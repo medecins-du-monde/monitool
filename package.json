@@ -1,0 +1,8 @@
+{
+	"main": "main.html",
+	"name": "Monitool",
+	"window": {
+		"toolbar": false
+	}
+}
+
