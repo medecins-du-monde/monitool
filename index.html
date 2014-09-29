@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<title>Monitool</title>
+		<meta charset="UTF-8">
+
+		<link rel="stylesheet" type="text/css" href="bower_components/fontawesome/css/font-awesome.min.css" />
+		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/app.css" />
+
+		<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-route/angular-route.min.js"></script>
+		<script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+		<script type="text/javascript" src="js/services.js"></script>
+		<script type="text/javascript" src="js/controllers.js"></script>
+		<script type="text/javascript" src="js/app.js"></script>
+	</head>
+	<body ng-app="MonitoolApp">
+
+		<ul class="side-nav" ng-controller="MenuController">
+			<li ng-repeat="route in routes" ng-show="isVisible(route)">
+				<a ng-show="isSelected(route)" href="{{route.path}}">{{route.name}}</a>
+				<span ng-hide="isSelected(route)">{{route.name}}</span>
+			</li>
+		</ul>
+		
+		<hr />
+
+		<div class="main-content">
+			<div ng-view></div>
+
+		</div>
+	
+
+	</body>
+</html>

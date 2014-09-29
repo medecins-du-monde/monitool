@@ -1,0 +1,24 @@
+
+
+<table class="table table-bordered table-stripped">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Country</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="project in projects">
+			<td>{{project.name}}</td>
+			<td>{{project.country}}</td>
+			<td></td>
+			<td><a href="#projects/{{project.id}}">Voir</a></td>
+		</tr>
+	</tbody>
+</table>
+
+<a href="#projects/new">Creer nouveau projet</a>
+
+{{projects | json}}
