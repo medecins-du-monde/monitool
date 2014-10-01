@@ -1,2 +1,22 @@
+<form class="simple-form">
 
+	Nom: <input type="text" ng-model="project.name" /><br/>
+	Pays: <input type="text" ng-model="project.country" /><br/>
 
+	Etat du projet:
+	<select ng-model="project.state">
+		<option value="running">En activite</option>
+		<option value="terminated">Interrompu</option>
+		<option value="finished">Termine</option>
+	</select>
+	<br/>
+
+	Date de lancement: <input type="date" ng-model="project.start_date" /><br/>
+	Date de fin: <input type="date" ng-model="project.end_date" /><br/>
+
+	<button ng-click="reset()">RESET</button>
+	<button ng-click="update(project)">SAVE</button>
+</form>
+
+<pre>form = {{project | json}}</pre>
+<pre>master = {{master | json}}</pre>

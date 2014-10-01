@@ -21,19 +21,42 @@ monitoolControllers.controller('MenuController', function($scope, $location) {
 });
 
 
-
 ///////////////////////////
 // Project
 ///////////////////////////
 
-monitoolControllers.controller('ProjectListController', function($scope, mtDatabase) {
-	mtDatabase.getProjects().then(function(projects) {
-		$scope.projects = projects;
+monitoolControllers.controller('ProjectListController', function($scope, $location, mtDatabase) {
+	mtDatabase.query('monitool/by_type', {include_docs: true, key: 'project'}).then(function(data) {
+		$scope.projects = data.rows.map(function(row) { return row.doc; });
 	});
+
+	$scope.create = function() {
+		$location.url('/projects/' + PouchDB.utils.uuid());
+	};
 });
 
-monitoolControllers.controller('ProjectDescriptionController', function($scope) {
+monitoolControllers.controller('ProjectDescriptionController', function($scope, $routeParams, $q, mtDatabase) {
+	mtDatabase.get($routeParams.projectId).then(function(master) {
+		$scope.master = master; // Edit
 
+	}).catch(function(error) {
+		$scope.master = {_id: $routeParams.projectId, type: 'project'}; // Create
+
+	}).finally(function() {
+
+		$scope.update = function(project) {
+			$scope.master = angular.copy(project);
+			mtDatabase.put($scope.master).then(function(data) {
+				$scope.master._rev = $scope.project._rev = data.rev;
+			});
+		};
+
+		$scope.reset = function() {
+			$scope.project = angular.copy($scope.master);
+		};
+
+		$scope.reset();
+	});
 });
 
 monitoolControllers.controller('ProjectCenterListController', function($scope) {

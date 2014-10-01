@@ -1,11 +1,11 @@
-
-
 <table class="table table-bordered table-stripped">
 	<thead>
 		<tr>
 			<th>Name</th>
 			<th>Country</th>
-			<th></th>
+			<th>Date debut</th>
+			<th>Date fin</th>
+			<th>Etat</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -13,12 +13,12 @@
 		<tr ng-repeat="project in projects">
 			<td>{{project.name}}</td>
 			<td>{{project.country}}</td>
-			<td></td>
-			<td><a href="#projects/{{project.id}}">Voir</a></td>
+			<td>{{project.start_date}}</td>
+			<td>{{project.end_date}}</td>
+			<td>{{project.state}}</td>
+			<td><a href="#projects/{{project._id}}">Voir</a></td>
 		</tr>
 	</tbody>
 </table>
 
-<a href="#projects/new">Creer nouveau projet</a>
-
-{{projects | json}}
+<button ng-click="create()">Creer nouveau projet</button>
