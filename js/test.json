@@ -1,0 +1,140 @@
+
+{
+	"project": [
+		{
+			"_id": "c50da7f0-30d3-4cce-ada5-ab6294cf65c6",
+			"type": "project",
+			"name": "Projet number 1",
+			"country": "RDC",
+		}
+	],
+
+	"center": [
+		{
+			"_id": "cc5943d0-8e22-488c-b998-bd942cbc1252",
+			"project": "c50da7f0-30d3-4cce-ada5-ab6294cf65c6",
+			"type": "center",
+			"latitude": 12,
+			"longitude": 10,
+			"name": "CASO Paris Saint Lazare"
+		},
+		{
+			"_id": "f0cb620a-8680-44ed-ab82-5c5816e40ab7",
+			"project": "c50da7f0-30d3-4cce-ada5-ab6294cf65c6",
+			"type": "center",
+			"latitude": 12,
+			"longitude": 10,
+			"name": "CASO Marseille Nord"
+		},
+		{
+			"_id": "19e8ca24-4b31-46f4-af7d-ffc322157909",
+			"project": "c50da7f0-30d3-4cce-ada5-ab6294cf65c6",
+			"type": "center",
+			"latitude": 12,
+			"longitude": 10,
+			"name": "CASO Quimper"
+		},
+	],
+
+	"indicators": [
+		{
+			"_id": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f",
+			"type": "indicator",
+			"name": "Nombre de partogrammes correctement renseignés",
+			"space_agg": true,
+			"time_agg": true,
+			"formulas": []
+		},
+		{
+			"_id": "4741ada6-709a-4a19-913e-ea174f053bbb",
+			"type": "indicator",
+			"name": "Nombre de partogrammes renseignés",
+			"space_agg": true,
+			"time_agg": true,
+			"formulas": []
+		},
+		{
+			"_id": "7003ff8b-4335-4682-9c48-82eb2320dfd2",
+			"type": "indicator",
+			"name": "Pourcentage des partogramme correctement renseignés",
+			"space_agg": false,
+			"time_agg": false,
+			"formulas": {
+				"59adb3e6-aab6-4d5e-b2c8-c8de4f95822c": {
+					"method": "percentage",
+					"name": "Pourcentage",
+					"numerator": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f",
+					"denominator": "4741ada6-709a-4a19-913e-ea174f053bbb"
+				},
+				"4d34b83b-586e-4316-802a-50bf7bcd0304": {
+					"method": "mathjs",
+					"name": "MathJS",
+					"expression": "100 * a / b",
+					"parameters": {
+						"a": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f",
+						"b": "4741ada6-709a-4a19-913e-ea174f053bbb"
+					}
+				}
+			}
+		}
+	],
+
+	"input": [
+		{
+			"_id": "77bc9228-56c8-4895-8627-4c93fa7f56ec",
+			"type": "input",
+			"project": "c50da7f0-30d3-4cce-ada5-ab6294cf65c6",
+			"begin": "2014-01-01T00:00:00Z",
+			"end": "2014-02-01T00:00:00Z",
+			"input": {
+			},
+			"center_input": {
+				"cc5943d0-8e22-488c-b998-bd942cbc1252": {
+					"8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f": 45,
+					"4741ada6-709a-4a19-913e-ea174f053bbb": 12,
+					"7003ff8b-4335-4682-9c48-82eb2320dfd2": 23
+				},
+				"f0cb620a-8680-44ed-ab82-5c5816e40ab7": {
+					"8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f": 45,
+					"4741ada6-709a-4a19-913e-ea174f053bbb": 12,
+					"7003ff8b-4335-4682-9c48-82eb2320dfd2": 23
+				},
+				"19e8ca24-4b31-46f4-af7d-ffc322157909": {
+					"8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f": 45,
+					"4741ada6-709a-4a19-913e-ea174f053bbb": 12,
+					"7003ff8b-4335-4682-9c48-82eb2320dfd2": 23
+				}
+			}
+		},
+		{
+			"_id": "4ab388ab-d293-406f-a51c-b7b8e624dbba",
+			"type": "input",
+			"project": "c50da7f0-30d3-4cce-ada5-ab6294cf65c6",
+			"begin": "2014-02-01T00:00:00Z",
+			"end": "2014-03-01T00:00:00Z",
+			"input": {
+				"7d74357e-121d-43db-b5c8-320a8b268aa6": 45,
+				"560d99c9-e157-4a60-8ed4-027f3a3b8b90": 12
+			},
+			"center_input": {
+				"cc5943d0-8e22-488c-b998-bd942cbc1252": {
+					"8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f": 45,
+					"4741ada6-709a-4a19-913e-ea174f053bbb": 12,
+					"7003ff8b-4335-4682-9c48-82eb2320dfd2": 23
+				},
+				"f0cb620a-8680-44ed-ab82-5c5816e40ab7": {
+					"8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f": 45,
+					"4741ada6-709a-4a19-913e-ea174f053bbb": 12,
+					"7003ff8b-4335-4682-9c48-82eb2320dfd2": 23
+				},
+				"19e8ca24-4b31-46f4-af7d-ffc322157909": {
+					"8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f": 45,
+					"4741ada6-709a-4a19-913e-ea174f053bbb": 12,
+					"7003ff8b-4335-4682-9c48-82eb2320dfd2": 23
+				}
+			}
+		}
+	]
+}
+
+

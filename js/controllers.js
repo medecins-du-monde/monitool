@@ -3,7 +3,6 @@
 var monitoolControllers = angular.module('MonitoolControllers', ['MonitoolServices']);
 
 monitoolControllers.controller('MenuController', function($scope, $location) {
-
 	$scope.routes = [
 		{path: '#projects', name: "Projects"},
 		{path: '#indicators', name: "Catalogue Indicateurs"},
@@ -26,12 +25,12 @@ monitoolControllers.controller('MenuController', function($scope, $location) {
 ///////////////////////////
 
 monitoolControllers.controller('ProjectListController', function($scope, $location, mtDatabase) {
-	mtDatabase.query('monitool/by_type', {include_docs: true, key: 'project'}).then(function(data) {
-		$scope.projects = data.rows.map(function(row) { return row.doc; });
+	mtDatabase.query('monitool/by_type', {include_docs: true, key: 'project'}).then(function(projects) {
+		$scope.projects = projects.rows.map(function(row) { return row.doc; });
 	});
 
 	$scope.create = function() {
-		$location.url('/projects/' + PouchDB.utils.uuid());
+		$location.url('/projects/' + PouchDB.utils.uuid().toLowerCase());
 	};
 });
 
@@ -43,11 +42,10 @@ monitoolControllers.controller('ProjectDescriptionController', function($scope, 
 		$scope.master = {_id: $routeParams.projectId, type: 'project'}; // Create
 
 	}).finally(function() {
-
 		$scope.update = function(project) {
 			$scope.master = angular.copy(project);
-			mtDatabase.put($scope.master).then(function(data) {
-				$scope.master._rev = $scope.project._rev = data.rev;
+			mtDatabase.put($scope.master).then(function(project) {
+				$scope.master._rev = $scope.project._rev = project.rev;
 			});
 		};
 
@@ -108,22 +106,42 @@ monitoolControllers.controller('ThemeEditController', function($scope) {
 // Input
 ///////////////////////////
 
+monitoolControllers.controller('InputListController', function($scope) {
+
+});
+
 monitoolControllers.controller('InputEditController', function($scope) {
 
 });
 
-monitoolControllers.controller('InputListController', function($scope) {
-
-});
 
 ///////////////////////////
 // Reporting
 ///////////////////////////
 
-monitoolControllers.controller('ReportingByEntitiesController', function($scope) {
+monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtDatabase) {
+	$scope.months = ['2013/01', '2013/02', '2013/03', '2013/04', '2013/05', '2013/06'];
 
+	mtDatabase.query('monitool/by_type', {include_docs: true, key: 'project'}).then(function(data) {
+		$scope.projects = data.rows.map(function(row) { return row.doc; });
+		$scope.selectedProject = $scope.projects.length ? $scope.projects[0] : null;
+		$scope.update();
+	});
+
+	$scope.update = function() {
+		var project  = $scope.selectedProject,
+			stats    = {};
+
+		mtDatabase.query('monitool/input_by_project', {include_docs: true, key: project._id}).then(function(inputs) {
+			inputs = inputs.rows.map(function(row) { return row.doc; });
+			// inputs.sort(function(input1, input2) { return input1.begin > input2.begin ? 1 : -1 });
+
+			console.log(inputs);
+		});
+	};
 });
 
 monitoolControllers.controller('ReportingByIndicatorsController', function($scope) {
+
 
 });

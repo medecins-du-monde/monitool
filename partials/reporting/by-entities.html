@@ -1,0 +1,21 @@
+
+
+<select ng-model="selectedProject"
+		ng-options="project.name for project in projects"
+		ng-change="update()">
+</select>
+
+<br/>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th ng-repeat="month in months">{{month}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="indicator in indicators">
+			<td ng-repeat="month in months">{{ stats[month][indicator.id] }}</td>
+		</tr>
+	</tbody>
+</table>
