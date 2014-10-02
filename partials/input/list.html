@@ -1,2 +1,22 @@
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th>Nom</th>
+			<th>Pays</th>
+			<th>Indicateurs manquants / total</th>
+			<th>Periode</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="input in inputs">
+			<td>{{input.centerName}}</td>
+			<td>{{input.country}}</td>
+			<td>{{input.missingIndicators}} / {{input.indicators}}</td>
+			<td>{{input.period}}</td>
+			<td>??</td>
+		</tr>
+	</tbody>
+</table>
 
-input list
+

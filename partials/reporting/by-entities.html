@@ -1,21 +1,24 @@
 
+<input ng-model="begin" />
+<input ng-model="end" />
 
-<select ng-model="selectedProject"
-		ng-options="project.name for project in projects"
-		ng-change="update()">
-</select>
+<select ng-model="selectedType" ng-options="t for t in types" ng-change="updateList()" />
+<select ng-model="selectedEntity" ng-options="e.name for e in entities" ng-change="updateData()" />
 
 <br/>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
-		<tr>
+	<!--
+ 		<tr>
 			<th ng-repeat="month in months">{{month}}</th>
 		</tr>
-	</thead>
+	-->
+ 	</thead>
 	<tbody>
-		<tr ng-repeat="indicator in indicators">
-			<td ng-repeat="month in months">{{ stats[month][indicator.id] }}</td>
+		<tr ng-repeat="(indicator, months) in statistics">
+			<th>{{indicator}}</th>
+			<td ng-repeat="(month, value) in months">{{value}}</td>
 		</tr>
 	</tbody>
 </table>

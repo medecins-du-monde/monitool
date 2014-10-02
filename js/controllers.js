@@ -36,12 +36,12 @@ monitoolControllers.controller('ProjectListController', function($scope, $locati
 
 monitoolControllers.controller('ProjectDescriptionController', function($scope, $routeParams, $q, mtDatabase) {
 	mtDatabase.get($routeParams.projectId).then(function(master) {
-		$scope.master = master; // Edit
-
-	}).catch(function(error) {
-		$scope.master = {_id: $routeParams.projectId, type: 'project'}; // Create
-
-	}).finally(function() {
+		$scope.master = master;
+	})
+	.catch(function(error) {
+		$scope.master = {_id: $routeParams.projectId, type: 'project'};
+	})
+	.finally(function() {
 		$scope.update = function(project) {
 			$scope.master = angular.copy(project);
 			mtDatabase.put($scope.master).then(function(project) {
@@ -106,9 +106,88 @@ monitoolControllers.controller('ThemeEditController', function($scope) {
 // Input
 ///////////////////////////
 
-monitoolControllers.controller('InputListController', function($scope) {
+monitoolControllers.controller('InputListController', function($scope, mtDatabase) {
+
+	// Etapes
+	//
+	// 1. On recupere tous les projets encore en vie.
+	//
+	// 2. On recupere tous les indicateurs qu'on doit saisir ce mois ci
+	//     2.1. On garde les indicateurs sans formule
+	//     2.2. On resoud les formules pour obtenir les dependences. 
+	//			Si on a des dependences profondes on fait quoi??? (ie, pleins de donnes de base, pas les intermediaires)
+	//
+	// 3. 
+
+	var currentMonth = '2014-01';
+
+	mtDatabase.query('monitool/by_type', {key: 'project', include_docs: true}).then(function(projects) {
+		projects = projects.rows.map(function(row) { return row.doc; });
+
+		// Retrieve all indicators that are needed for current month.
+		var indicators = {};
+		var indicatorsByProjects = {};
+
+		projects.forEach(function(project) {
+			var pIndicators = Object.keys(project.planning).filter(function(indicatorId) {
+				var p = project.planning[indicatorId];
+
+				if (p.periodicity === 'month')
+					return p.from <= currentMonth && p.to >= currentMonth;
+				else if (p.periodicity === 'planned')
+					return false; // @FIXME
+				else if (p.periodicity === 'quarter')
+					return false; // @FIXME
+				else
+					throw new Error('Unknown periodicity.');
+			});
+
+			indicatorsByProjects[project._id] = {requested: pIndicators};
+			pIndicators.forEach(function(indicator) { indicators[indicator] = true;	});
+		});
+		
+		// Resolve dependencies
+		mtDatabase.allDocs({keys: Object.keys(indicators), include_docs: true}).then(function(result) {
+			// Store all used indicators in the hash
+			result.rows.forEach(function(indicator) { indicators[indicator.id] = indicator.doc; });
+
+			// Add dependencies to all projects.
+			for (var projectId in indicatorsByProjects) {
+				indicatorsByProjects[projectId].requested.forEach(function(indicatorId) {
+					var dependencies = indicators[indicatorId]
+
+					if (indicatorsByProjects[projectId].requested.indexOf(indicatorId))
+				})
+			}
+		});
+
+		
+
+
+
+
+
+
+	});
+
+
+
+
+
+
+
+
+
 
 });
+
+
+
+
+
+
+
+
 
 monitoolControllers.controller('InputEditController', function($scope) {
 
@@ -119,29 +198,45 @@ monitoolControllers.controller('InputEditController', function($scope) {
 // Reporting
 ///////////////////////////
 
-monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtDatabase) {
-	$scope.months = ['2013/01', '2013/02', '2013/03', '2013/04', '2013/05', '2013/06'];
+monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtDatabase, mtStatistics) {
+	$scope.begin          = '2014-01';
+	$scope.end            = '2015-01';
+	$scope.types          = ['project', 'center', 'indicator'];
+	$scope.selectedType   = 'project';
+	$scope.entities       = [];
+	$scope.selectedEntity = null;
 
-	mtDatabase.query('monitool/by_type', {include_docs: true, key: 'project'}).then(function(data) {
-		$scope.projects = data.rows.map(function(row) { return row.doc; });
-		$scope.selectedProject = $scope.projects.length ? $scope.projects[0] : null;
-		$scope.update();
-	});
+	$scope.updateList = function() {
+		var view = 'monitool/by_type',
+			opt  = {include_docs: true, key: $scope.selectedType};
 
-	$scope.update = function() {
-		var project  = $scope.selectedProject,
-			stats    = {};
-
-		mtDatabase.query('monitool/input_by_project', {include_docs: true, key: project._id}).then(function(inputs) {
-			inputs = inputs.rows.map(function(row) { return row.doc; });
-			// inputs.sort(function(input1, input2) { return input1.begin > input2.begin ? 1 : -1 });
-
-			console.log(inputs);
+		mtDatabase.query(view, opt).then(function(data) {
+			$scope.entities = data.rows.map(function(row) { return row.doc; });
+			$scope.selectedEntity = $scope.entities.length ? $scope.entities[0] : null;
+			$scope.updateData();
 		});
 	};
+
+	$scope.updateData = function() {
+		var type  = $scope.selectedType,
+			id    = $scope.selectedEntity._id,
+			begin = $scope.begin,
+			end   = $scope.end;
+
+		if ($scope.selectedEntity.type === 'project')
+			columns = $scope.selectedEntity.
+
+		mtStatistics.getStatistics(type, id, begin, end).then(function(statistics) {
+			$scope.statistics = statistics;
+
+			// type vaut projet, centre ou indicateur.
+			// les colonnes sont toujours les mois entre les 2 bornes
+			// les lignes sont:
+			//		pour projet et centre, les indicateurs disponibles dans le projet.
+			//		pour indicateur, les projets qui renseignent cet indicateur.
+		});
+	};
+
+	$scope.updateList();
 });
 
-monitoolControllers.controller('ReportingByIndicatorsController', function($scope) {
-
-
-});
