@@ -81,14 +81,15 @@ app.config(function($routeProvider) {
 	// Input
 	///////////////////////////
 
-	$routeProvider.when('/inputs/:inputId', {
-		templateUrl: 'partials/input/edit.html',
-		controller: 'InputEditController'
-	});
 
 	$routeProvider.when('/inputs', {
 		templateUrl: 'partials/input/list.html',
 		controller: 'InputListController'
+	});
+
+	$routeProvider.when('/inputs/:month/:centerId', {
+		templateUrl: 'partials/input/edit.html',
+		controller: 'InputEditController'
 	});
 
 	///////////////////////////

@@ -119,78 +119,76 @@ monitoolControllers.controller('InputListController', function($scope, mtDatabas
 	//
 	// 3. 
 
-	var currentMonth = '2014-01';
+	// var currentMonth = '2014-01';
 
-	mtDatabase.query('monitool/by_type', {key: 'project', include_docs: true}).then(function(projects) {
-		projects = projects.rows.map(function(row) { return row.doc; });
+	// mtDatabase.query('monitool/by_type', {key: 'project', include_docs: true}).then(function(projects) {
+	// 	projects = projects.rows.map(function(row) { return row.doc; });
 
-		// Retrieve all indicators that are needed for current month.
-		var indicators = {};
-		var indicatorsByProjects = {};
+	// 	// Retrieve all indicators that are needed for current month.
+	// 	var indicatorsByProjects = {};
 
-		projects.forEach(function(project) {
-			var pIndicators = Object.keys(project.planning).filter(function(indicatorId) {
-				var p = project.planning[indicatorId];
+	// 	projects.forEach(function(project) {
+	// 		var projectIndicators = Object.keys(project.planning).filter(function(indicatorId) {
+	// 			var p = project.planning[indicatorId];
 
-				if (p.periodicity === 'month')
-					return p.from <= currentMonth && p.to >= currentMonth;
-				else if (p.periodicity === 'planned')
-					return false; // @FIXME
-				else if (p.periodicity === 'quarter')
-					return false; // @FIXME
-				else
-					throw new Error('Unknown periodicity.');
-			});
+	// 			switch (p.periodicity) {
+	// 				case 'month': return p.from <= currentMonth && p.to >= currentMonth;
+	// 				case 'planned': return false; // @FIXME
+	// 				case 'quarter': return false; // @FIXME
+	// 				default: throw new Error('Invalid project periodicity.');
+	// 			}
+	// 		});
 
-			indicatorsByProjects[project._id] = {requested: pIndicators};
-			pIndicators.forEach(function(indicator) { indicators[indicator] = true;	});
-		});
-		
-		// Resolve dependencies
-		mtDatabase.allDocs({keys: Object.keys(indicators), include_docs: true}).then(function(result) {
-			// Store all used indicators in the hash
-			result.rows.forEach(function(indicator) { indicators[indicator.id] = indicator.doc; });
+	// 		indicatorsByProjects[project._id] = projectIndicators;
+	// 		projectIndicators.forEach(function(indicator) {
+	// 			indicators[indicator] = true;
+	// 		});
 
-			// Add dependencies to all projects.
-			for (var projectId in indicatorsByProjects) {
-				indicatorsByProjects[projectId].requested.forEach(function(indicatorId) {
-					var dependencies = indicators[indicatorId]
+	// 	});
 
-					if (indicatorsByProjects[projectId].requested.indexOf(indicatorId))
-				})
-			}
-		});
+	// 	// Resolve dependencies
+	// 	mtDatabase.allDocs({keys: Object.keys(indicators), include_docs: true}).then(function(result) {
+	// 		// Store all used indicators in the hash
+	// 		result.rows.forEach(function(indicator) {
+	// 			indicators[indicator.id] = indicator.doc;
+	// 		});
 
-		
+	// 		// Add dependencies to all projects.
+	// 		for (var projectId in indicatorsByProjects)
+	// 			indicatorsByProjects[projectId].requested.forEach(function(indicatorId) {
+	// 				var dependencies = indicators[indicatorId];
 
 
 
+	// 				// if (indicatorsByProjects[projectId].requested.indexOf(indicatorId))
+	// 			});
+	// 	});
 
-
-
-	});
-
-
-
-
-
-
-
-
-
+	// });
 
 });
 
 
+monitoolControllers.controller('InputEditController', function($q, $scope, $routeParams, mtDatabase) {
+	// load project and indicators definition
+	mtDatabase.query('project_by_center', {key: $routeParams.centerId, include_docs: true}).then(function(project) {
+		return $q.all([
+			$q.when(result),
+			mtDatabase.allDocs({keys: Object.keys(result[1].planning)})
+		]);
+	})
+	.then(function(result) {
+		var project = result[0], indicators = result[1];
+
+		console.log(project, indicators);
 
 
 
 
-
-
-
-monitoolControllers.controller('InputEditController', function($scope) {
-
+	})
+	.catch(function(error) {
+		console.log(error)
+	})
 });
 
 
