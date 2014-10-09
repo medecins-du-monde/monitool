@@ -169,26 +169,44 @@ monitoolControllers.controller('InputListController', function($scope, mtDatabas
 });
 
 
-monitoolControllers.controller('InputEditController', function($q, $scope, $routeParams, mtDatabase) {
-	// load project and indicators definition
-	mtDatabase.query('project_by_center', {key: $routeParams.centerId, include_docs: true}).then(function(project) {
-		return $q.all([
-			$q.when(result),
-			mtDatabase.allDocs({keys: Object.keys(result[1].planning)})
-		]);
-	})
-	.then(function(result) {
-		var project = result[0], indicators = result[1];
+monitoolControllers.controller('InputEditController', function($scope, $routeParams, $q, mtInput) {
+	// Retrieve values and description for this form.
+	$q.all([
+		mtInput.getFormValues($routeParams.centerId, $routeParams.month),
+		mtInput.getFormDescription($routeParams.centerId, $routeParams.month)
+	]).then(function(result) {
+		$scope.values = result[0];
+		$scope.indicators = result[1];
+	});
 
-		console.log(project, indicators);
+	// Update all indicator on each change until there are no more changes.
+	$scope.evaluate = function() {
+		var values = null, newValues = JSON.stringify($scope.values);
 
+		while (values != newValues) {
+			$scope.indicators.forEach(function(indicator) {
+				indicator.compute && indicator.compute($scope.values);
+			});
 
+			values    = newValues;
+			newValues = JSON.stringify($scope.values);
+		}
+	};
 
+	// An indicator is disabled when there exists one instance of it that is calculated in the whole form.
+	// writing this here is stupid. it should be a property of the input.
+	$scope.isDisabled = function(indicatorId) {
+		return $scope.indicators.some(function(indicator) {
+			return (indicatorId === indicator.id && indicator.compute) ||
+				indicator.dependencies.some(function(indicator) {
+					return indicatorId === indicator.id && indicator.compute;
+				});
+		});
+	};
 
-	})
-	.catch(function(error) {
-		console.log(error)
-	})
+	$scope.save = function() {
+		mtInput.save($routeParams.centerId, $routeParams.month, $scope.values);
+	};
 });
 
 

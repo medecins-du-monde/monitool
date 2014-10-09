@@ -1,0 +1,25 @@
+
+<div ng-repeat="indicator in indicators">
+
+	<div ng-repeat="dependency in indicator.dependencies">
+		<label for="input-{{dependency.id}}">{{dependency.name}}</label>
+		
+		<input id="input-{{dependency.id}}"
+			   ng-model="values[dependency.id]"
+			   ng-change="evaluate()"
+			   ng-disabled="isDisabled(dependency.id)"
+			   smart-float />
+	</div>
+
+	<label for="input-{{indicator.id}}">{{indicator.name}}</label>
+
+	<input id="input-{{indicator.id}}"
+		   ng-model="values[indicator.id]"
+		   ng-change="evaluate()"
+		   ng-disabled="isDisabled(indicator.id)"
+		   smart-float />
+
+	<hr/>
+</div>
+
+<button ng-click="save()">Save</button>

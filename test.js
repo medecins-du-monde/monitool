@@ -1,5 +1,57 @@
 
 var data = {
+
+	"views": [
+		{
+			"_id": '_design/monitool',
+			"views": {
+				"by_type": {
+					"map": function(doc) { emit(doc.type); }.toString()
+				},
+
+				"inputs_by_project_period_indicator": {
+					"map": function(doc) {
+						if (doc.type === 'input')
+							for (var indicator in doc.indicators)
+								emit([doc.project, doc.period, indicator], doc.indicators[indicator]);
+					}.toString()
+				},
+
+				"inputs_by_center_period_indicator": {
+					"map": function(doc) {
+						if (doc.type === 'input')
+							for (var indicator in doc.indicators)
+								emit([doc.center, doc.period, indicator], doc.indicators[indicator]);
+					}.toString()
+				},
+
+				"inputs_by_indicator_period_project": {
+					"map": function(doc) {
+						if (doc.type === 'input')
+							for (var indicator in doc.indicators)
+								emit([indicator, doc.period, doc.project], doc.indicators[indicator]);
+					}.toString()
+				},
+
+				"project_by_center": {
+					"map": function(doc) {
+						if (doc.type === 'project')
+							for (var centerId in doc.center)
+								emit(centerId);
+					}.toString()
+				},
+
+				"formulas": {
+					"map": function(doc) {
+						if (doc.type === 'indicator')
+							for (var formulaId in doc.formulas)
+								emit(formulaId, doc.formulas[formulaId]);
+					}.toString()
+				}
+			}
+		}
+	],
+
 	"project": [
 		{
 			"_id": "c50da7f0-30d3-4cce-ada5-ab6294cf65c6",
@@ -8,11 +60,22 @@ var data = {
 			"country": "RDC",
 
 			"planning": {
+				"4741ada6-709a-4a19-913e-ea174f053bbb": {
+					"periodicity": "month",
+					"from": "2014-01",
+					"to": "2015-01"
+				},
 				"7003ff8b-4335-4682-9c48-82eb2320dfd2": {
 					"periodicity": "month",
 					"from": "2014-01",
 					"to": "2015-01",
-					"formula": "59adb3e6-aab6-4d5e-b2c8-c8de4f95822c"
+					"formula": "4d34b83b-586e-4316-802a-50bf7bcd0304"
+				},
+				"1c38fa28-1dc2-449e-aa34-08aa3b773e3b": {
+					"periodicity": "month",
+					"from": "2014-01",
+					"to": "2015-01",
+					"formula": "3ddfd5dd-48b1-44c4-8809-f163bb9e1150"	
 				}
 			},
 
@@ -60,16 +123,33 @@ var data = {
 			"space_agg": false,
 			"time_agg": false,
 			"formulas": {
-				"59adb3e6-aab6-4d5e-b2c8-c8de4f95822c": {
-					"method": "percentage",
-					"name": "Pourcentage",
-					"numerator": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f",
-					"denominator": "4741ada6-709a-4a19-913e-ea174f053bbb"
-				},
 				"4d34b83b-586e-4316-802a-50bf7bcd0304": {
-					"method": "mathjs",
-					"name": "MathJS",
+					"name": "Percentage",
 					"expression": "100 * a / b",
+					"parameters": {
+						"a": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f",
+						"b": "4741ada6-709a-4a19-913e-ea174f053bbb"
+					}
+				}
+			}
+		},
+		{
+			"_id": "1c38fa28-1dc2-449e-aa34-08aa3b773e3b",
+			"type": "indicator",
+			"name": "Double du % des partogramme correctement renseignés",
+			"space_agg": true,
+			"time_agg": true,
+			"formulas": {
+				"3ddfd5dd-48b1-44c4-8809-f163bb9e1150": {
+					"name": "Double du %",
+					"expression": "2 * a",
+					"parameters": {
+						"a": "7003ff8b-4335-4682-9c48-82eb2320dfd2"
+					}
+				},
+				"4a7be146-4aa7-4925-93d0-f819bec11bba": {
+					"name": "Calcul avec les donnees de base",
+					"expression": "200 * a / b",
 					"parameters": {
 						"a": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f",
 						"b": "4741ada6-709a-4a19-913e-ea174f053bbb"

@@ -3,6 +3,9 @@
 	"name": "Monitool",
 	"window": {
 		"toolbar": false
+	},
+	"dependencies": {
+		"request": "x"
 	}
 }
 

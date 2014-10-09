@@ -20,7 +20,8 @@
     "fontawesome": "~4.2.0",
     "angular-pouchdb": "angular-pouchdb/angular-pouchdb",
     "pouchdb": "~3.0.6",
-    "angular-route": "~1.2.25"
+    "angular-route": "~1.2.25",
+    "mathjs": "~1.0.1"
   },
   "resolutions": {
     "pouchdb": "~3.0.6"

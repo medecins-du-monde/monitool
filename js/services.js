@@ -3,46 +3,11 @@
 var mtServices = angular.module('MonitoolServices', ['pouchdb']);
 
 mtServices.factory('mtDatabase', function(PouchDB) {
-	var db = new PouchDB('monitool');
+	// var db = new PouchDB('monitool');
+	// db.sync('http://localhost:5984/monitool', {live: true});
 
-	db.put({
-		_id: '_design/monitool',
-		views: {
-			by_type: {
-				map: function(doc) {
-					emit(doc.type);
-				}.toString()
-			},
 
-			inputs_by_project_period_indicator: {
-				map: function(doc) {
-					if (doc.type === 'input')
-						for (var indicator in doc.indicators)
-							emit([doc.project, doc.period, indicator], doc.indicators[indicator]);
-				}.toString()
-			},
-
-			inputs_by_center_period_indicator: {
-				map: function(doc) {
-					if (doc.type === 'input')
-						for (var indicator in doc.indicators)
-							emit([doc.center, doc.period, indicator], doc.indicators[indicator]);
-				}.toString()
-			},
-
-			inputs_by_indicator_period_project: {
-				map: function(doc) {
-					if (doc.type === 'input')
-						for (var indicator in doc.indicators)
-							emit([indicator, doc.period, doc.project], doc.indicators[indicator]);
-				}.toString()
-			}
-		}
-	});
-
-	db.sync('http://localhost:5984/monitool', {live: true});
-
-	return db;
+	return new PouchDB('http://localhost:5984/monitool');
 });
 
 
@@ -129,4 +94,87 @@ mtServices.factory('mtStatistics', function($q, mtDatabase) {
 
 	}
 });
+
+
+
+mtServices.factory('mtInput', function(mtDatabase, $q) {
+	var getFormElementDescription = function(indicatorId, planning) {
+		return mtDatabase.get(indicatorId).then(function(indicatorDef) {
+			// succeed, we retrieved the definition, and we do not use a formula
+			if (!planning.formula)
+				return {id: indicatorDef._id, name: indicatorDef.name, dependencies: []};
+
+			// fail, the specified formula does not exists.
+			if (!indicatorDef.formulas[planning.formula])
+				return $q.reject('There is no such formula.');
+
+			// load dependencies
+			var formula       = indicatorDef.formulas[planning.formula],
+				dependencyIds = Object.values(formula.parameters);
+
+			return mtDatabase.allDocs({keys: dependencyIds, include_docs: true}).then(function(dependencies) {
+				// if we get less dependencies that asked, say something
+				if (dependencies.rows.length != dependencyIds.length)
+					return $q.reject('Could not find all dependencies.');
+
+				return {
+					id: indicatorDef._id,
+					name: indicatorDef.name,
+					dependencies: dependencies.rows.map(function(indicator) {
+						return {id: indicator.id, name: indicator.doc.name};
+					}),
+					compute: function(scope) {
+						var localScope = {};
+						for (var dependencyName in formula.parameters)
+							localScope[dependencyName] = parseFloat(scope[formula.parameters[dependencyName]]) || 0;
+
+						scope[indicatorDef._id] = math.eval(formula.expression, localScope);
+					}
+				};
+			});
+		});
+
+		return promise.promise;
+	};
+
+	var getFormDescription = function(centerId, month) {
+		return mtDatabase.query('monitool/project_by_center', {key: centerId, include_docs: true}).then(function(result) {
+			var project = result.rows[0].doc;
+
+			// filter indicators we do not want.
+			var indicatorIds = Object.keys(project.planning).filter(function(indicatorId) {
+				var p = project.planning[indicatorId];
+
+				switch (p.periodicity) {
+					case 'month': return p.from <= month && p.to >= month;
+					case 'planned': return false; // @FIXME
+					case 'quarter': return false; // @FIXME
+					default: throw new Error('Invalid project periodicity.');
+				}
+			});
+
+			var formElementsPromises = indicatorIds.map(function(indicatorId) {
+				return getFormElementDescription(indicatorId, project.planning[indicatorId]);
+			});
+
+			return $q.all(formElementsPromises);
+		});
+	};
+
+	var getFormValues = function(centerId, month) {
+		return $q.when({});
+	};
+
+	var save = function(centerId, month, values) {
+
+	};
+
+	return {
+		getFormDescription: getFormDescription,
+		getFormValues: getFormValues,
+		save: save
+	};
+});
+
+
 
