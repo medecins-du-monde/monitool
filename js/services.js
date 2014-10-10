@@ -5,37 +5,52 @@ var mtServices = angular.module('MonitoolServices', ['pouchdb']);
 mtServices.factory('mtDatabase', function(PouchDB) {
 	// var db = new PouchDB('monitool');
 	// db.sync('http://localhost:5984/monitool', {live: true});
-
-
+	// return db;
 	return new PouchDB('http://localhost:5984/monitool');
 });
 
 
-
-
-mtServices.factory('mtEntities', function($q, mtDatabase) {
-	return {
-		get: function(id) {
-			mtDatabase.get(id).then(function(doc) {
-				return new models[doc.type](doc);
-			});
-		}
-	}
-});
-
-
-
-
-
-// Desk, centre, projet
-// Periode
-// Indicateur
 mtServices.factory('mtStatistics', function($q, mtDatabase) {
-
 	var views = {
 		project:   'monitool/inputs_by_project_period_indicator',
 		center:    'monitool/inputs_by_center_period_indicator',
 		indicator: 'monitool/inputs_by_indicator_period_project'
+	};
+
+	var getPeriods = function(start, end) {
+		if (start >= end)
+			return [];
+
+		start = start.split('-').map(function(e) { return parseInt(e); });
+		end   = end.split('-').map(function(e) { return parseInt(e); });
+
+		var currentMonth = start[1], currentYear = start[0], endMonth = end[1], endYear = end[0], periods = [];
+
+		while (currentMonth !== endMonth || currentYear !== endYear) {
+			periods.push(currentYear + '-' + (currentMonth < 10 ? '0': '') + currentMonth);
+
+			if (currentMonth == 12) {
+				currentYear++;
+				currentMonth = 1;
+			}
+			else
+				currentMonth++;
+		}
+		periods.push(currentYear + '-' + (currentMonth < 10 ? '0': '') + currentMonth);
+
+		return periods
+	};
+
+	var getIndicatorsRows = function(type, ids) {
+		if (type === 'project') {
+			
+		}
+		else if (type === 'center') {
+			
+		}
+		else if (type === 'indicator') {
+			
+		}
 	};
 
 	/**
@@ -70,26 +85,50 @@ mtServices.factory('mtStatistics', function($q, mtDatabase) {
 		return result;
 	};
 
-	// var compute = function(indicatorId, formula, scope) {
-	// 	switch (definition.method) {
-	// 		case 'percentage':
-	// 			scope[indicatorId] = 100 * scope[formula.numerator] / scope[formula.denominator];
-	// 			break;
-	// 		default:
-	// 			throw new Error('Unknown formula method');
-	// 	}
-	// };
+	var getData = function(type, ids, begin, end) {
+		var id  = ids[0];
+		var opt = {startkey: [id, begin], endkey: [id, end, {}]};
+
+		return mtDatabase.query(views[type], opt).then(function(data) {
+			return regroup(data.rows, [2, 1]);
+		});
+	};
 
 	return {
+		getPeriods: getPeriods,
+
 		/**
 		 * Retrieve structured inputs for a given entity, by month.
 		 */
-		getStatistics: function(type, id, begin, end) {
-			var opt = {startkey: [id, begin], endkey: [id, end, {}]};
+		getStatistics: function(type, ids, begin, end) {
+			return {
+				"periods": getPeriods(begin, end),
+				"lines": [
+					{id: '234234', name: "line 1"},
+					{id: '234235', name: "line 2"},
+					{id: '234236', name: "line 3"},
+					{id: '234237', name: "line 4"},
+					{id: '234238', name: "line 5"},
+					{id: '234239', name: "line 6"},
+				],
+				"data": {
 
-			return mtDatabase.query(views[type], opt).then(function(data) {
-				return regroup(data.rows, [2, 1]);
-			});
+					"2013-05": {
+						234234: 35,
+						234235: 35,
+						234236: 35,
+						234237: 35,
+						234238: 35,
+						234239: 35,
+
+					},
+
+				}
+			};
+
+
+
+			
 		},
 
 	}
@@ -133,16 +172,14 @@ mtServices.factory('mtInput', function(mtDatabase, $q) {
 				};
 			});
 		});
-
-		return promise.promise;
 	};
 
-	var getFormDescription = function(centerId, month) {
-		return mtDatabase.query('monitool/project_by_center', {key: centerId, include_docs: true}).then(function(result) {
-			var project = result.rows[0].doc;
+	var getFormDescription = function(project, month) {
+		// filter indicators we do not want.
+		var indicatorIds = Object.keys(project.planning);
 
-			// filter indicators we do not want.
-			var indicatorIds = Object.keys(project.planning).filter(function(indicatorId) {
+		if (month)
+			indicatorIds = indicatorIds.filter(function(indicatorId) {
 				var p = project.planning[indicatorId];
 
 				switch (p.periodicity) {
@@ -153,26 +190,46 @@ mtServices.factory('mtInput', function(mtDatabase, $q) {
 				}
 			});
 
-			var formElementsPromises = indicatorIds.map(function(indicatorId) {
-				return getFormElementDescription(indicatorId, project.planning[indicatorId]);
-			});
-
-			return $q.all(formElementsPromises);
+		var formElementsPromises = indicatorIds.map(function(indicatorId) {
+			return getFormElementDescription(indicatorId, project.planning[indicatorId]);
 		});
+
+		return $q.all(formElementsPromises);
 	};
 
 	var getFormValues = function(centerId, month) {
-		return $q.when({});
+		return mtDatabase.get('input:' + centerId + ':' + month)
+			.then(function(record) { return record.indicators; })
+			.catch(function(error) { return {}; });
 	};
 
-	var save = function(centerId, month, values) {
+	var saveFormValues = function(centerId, month, values) {
+		mtDatabase.query('monitool/project_by_center', {key: centerId, include_docs: true}).then(function(project) {
+			project = project.rows[0].doc;
 
+			var record = {
+				_id: 'input:' + centerId + ':' + month,
+				type: "input",
+				project: project._id,
+				center: centerId,
+				period: month,
+				indicators: values
+			};
+
+			mtDatabase.get('input:' + centerId + ':' + month).then(function(oldRecord) {
+				record._rev = oldRecord._rev;
+				return mtDatabase.put(record);
+			}).catch(function(error) {
+				return mtDatabase.put(record);
+			});
+		});
 	};
 
 	return {
+		getFormElementDescription: getFormElementDescription,
 		getFormDescription: getFormDescription,
 		getFormValues: getFormValues,
-		save: save
+		saveFormValues: saveFormValues
 	};
 });
 

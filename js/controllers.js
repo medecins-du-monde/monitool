@@ -169,14 +169,19 @@ monitoolControllers.controller('InputListController', function($scope, mtDatabas
 });
 
 
-monitoolControllers.controller('InputEditController', function($scope, $routeParams, $q, mtInput) {
+monitoolControllers.controller('InputEditController', function($scope, $routeParams, $q, mtDatabase, mtInput) {
 	// Retrieve values and description for this form.
-	$q.all([
-		mtInput.getFormValues($routeParams.centerId, $routeParams.month),
-		mtInput.getFormDescription($routeParams.centerId, $routeParams.month)
-	]).then(function(result) {
-		$scope.values = result[0];
-		$scope.indicators = result[1];
+	mtDatabase.query('monitool/project_by_center', {key: $routeParams.centerId, include_docs: true}).then(function(result) {
+		$scope.project = result.rows[0].doc;
+		$scope.center  = $scope.project.center[$routeParams.centerId];
+
+		$q.all([
+			mtInput.getFormValues($routeParams.centerId, $routeParams.month),
+			mtInput.getFormDescription($scope.project, $routeParams.month)
+		]).then(function(result) {
+			$scope.values = result[0];
+			$scope.indicators = result[1];
+		});
 	});
 
 	// Update all indicator on each change until there are no more changes.
@@ -205,7 +210,7 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 	};
 
 	$scope.save = function() {
-		mtInput.save($routeParams.centerId, $routeParams.month, $scope.values);
+		mtInput.saveFormValues($routeParams.centerId, $routeParams.month, $scope.values);
 	};
 });
 
@@ -214,45 +219,57 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 // Reporting
 ///////////////////////////
 
-monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtDatabase, mtStatistics) {
-	$scope.begin          = '2014-01';
-	$scope.end            = '2015-01';
-	$scope.types          = ['project', 'center', 'indicator'];
-	$scope.selectedType   = 'project';
-	$scope.entities       = [];
-	$scope.selectedEntity = null;
+monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtStatistics) {
 
-	$scope.updateList = function() {
-		var view = 'monitool/by_type',
-			opt  = {include_docs: true, key: $scope.selectedType};
+	$scope.stats = mtStatistics.getStatistics('project', [123], '2013-01', '2013-12');
+	console.log($scope.stats);
 
-		mtDatabase.query(view, opt).then(function(data) {
-			$scope.entities = data.rows.map(function(row) { return row.doc; });
-			$scope.selectedEntity = $scope.entities.length ? $scope.entities[0] : null;
-			$scope.updateData();
-		});
-	};
+	// $scope.begin          = '2014-01';
+	// $scope.end            = '2015-01';
+	// $scope.types          = ['project', 'center', 'indicator'];
+	// $scope.selectedType   = 'project';
+	// $scope.entities       = [];
+	// $scope.selectedEntity = null;
 
-	$scope.updateData = function() {
-		var type  = $scope.selectedType,
-			id    = $scope.selectedEntity._id,
-			begin = $scope.begin,
-			end   = $scope.end;
+	// $scope.updateList = function() {
+	// 	var view = 'monitool/by_type',
+	// 		opt  = {include_docs: true, key: $scope.selectedType};
 
-		if ($scope.selectedEntity.type === 'project')
-			columns = $scope.selectedEntity.
+	// 	mtDatabase.query(view, opt).then(function(data) {
+	// 		$scope.entities = data.rows.map(function(row) { return row.doc; });
+	// 		$scope.selectedEntity = $scope.entities.length ? $scope.entities[0] : null;
+	// 		if ($scope.selectedEntity)
+	// 			$scope.updateData();
+	// 	});
+	// };
 
-		mtStatistics.getStatistics(type, id, begin, end).then(function(statistics) {
-			$scope.statistics = statistics;
+	// $scope.updateData = function() {
+	// 	var type  = $scope.selectedType,
+	// 		id    = $scope.selectedEntity._id,
+	// 		begin = $scope.begin,
+	// 		end   = $scope.end;
 
-			// type vaut projet, centre ou indicateur.
-			// les colonnes sont toujours les mois entre les 2 bornes
-			// les lignes sont:
-			//		pour projet et centre, les indicateurs disponibles dans le projet.
-			//		pour indicateur, les projets qui renseignent cet indicateur.
-		});
-	};
 
-	$scope.updateList();
+
+	// 	mtStatistics.getStatistics(type, id, begin, end).then(function(statistics) {
+	// 		$scope.statistics = statistics;
+
+	// 		// type vaut projet, centre ou indicateur.
+	// 		// les colonnes sont toujours les mois entre les 2 bornes
+	// 		// les lignes sont:
+	// 		//		pour projet et centre, les indicateurs disponibles dans le projet.
+	// 		//		pour indicateur, les projets qui renseignent cet indicateur.
+	// 	});
+	// };
+
+	// $scope.updateList();
 });
+
+
+query = {
+	type: "project",
+	ids: [238490234, 234234234, 234234234, 23423423233],
+	start: "2014-01",
+	end: "2015-01"
+}
 

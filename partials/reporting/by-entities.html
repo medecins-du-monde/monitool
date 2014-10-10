@@ -1,24 +1,24 @@
 
 <input ng-model="begin" />
 <input ng-model="end" />
-
 <select ng-model="selectedType" ng-options="t for t in types" ng-change="updateList()" />
 <select ng-model="selectedEntity" ng-options="e.name for e in entities" ng-change="updateData()" />
 
-<br/>
+<hr/>
+
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
-	<!--
- 		<tr>
-			<th ng-repeat="month in months">{{month}}</th>
+		<tr>
+			<th></th>
+			<th ng-repeat="period in stats.periods">{{period}}</th>
 		</tr>
-	-->
  	</thead>
 	<tbody>
-		<tr ng-repeat="(indicator, months) in statistics">
-			<th>{{indicator}}</th>
-			<td ng-repeat="(month, value) in months">{{value}}</td>
+		<tr ng-repeat="line in stats.lines">
+			<th>{{line.name}}</th>
+			<td ng-repeat="period in stats.periods">{{stats.data[period][line.id]}}</td>
 		</tr>
 	</tbody>
 </table>
+
