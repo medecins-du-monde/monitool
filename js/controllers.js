@@ -169,7 +169,7 @@ monitoolControllers.controller('InputListController', function($scope, mtDatabas
 });
 
 
-monitoolControllers.controller('InputEditController', function($scope, $routeParams, $q, mtDatabase, mtInput) {
+monitoolControllers.controller('InputEditController', function($scope, $routeParams, $q, mtDatabase, mtInput, mtIndicators) {
 	// Retrieve values and description for this form.
 	mtDatabase.query('monitool/project_by_center', {key: $routeParams.centerId, include_docs: true}).then(function(result) {
 		$scope.project = result.rows[0].doc;
@@ -177,7 +177,7 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 
 		$q.all([
 			mtInput.getFormValues($routeParams.centerId, $routeParams.month),
-			mtInput.getFormDescription($scope.project, $routeParams.month)
+			mtIndicators.getPlanningDescription($scope.project, $routeParams.month)
 		]).then(function(result) {
 			$scope.values = result[0];
 			$scope.indicators = result[1];
@@ -186,16 +186,7 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 
 	// Update all indicator on each change until there are no more changes.
 	$scope.evaluate = function() {
-		var values = null, newValues = JSON.stringify($scope.values);
-
-		while (values != newValues) {
-			$scope.indicators.forEach(function(indicator) {
-				indicator.compute && indicator.compute($scope.values);
-			});
-
-			values    = newValues;
-			newValues = JSON.stringify($scope.values);
-		}
+		mtIndicators.evaluate($scope.indicators, $scope.values);
 	};
 
 	// An indicator is disabled when there exists one instance of it that is calculated in the whole form.
@@ -221,8 +212,9 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 
 monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtStatistics) {
 
-	$scope.stats = mtStatistics.getStatistics('project', [123], '2013-01', '2013-12');
-	console.log($scope.stats);
+	mtStatistics.getStatistics('project', ['c50da7f0-30d3-4cce-ada5-ab6294cf65c6'], '2014-01', '2014-12').then(function(stats) {
+		$scope.stats = stats;
+	});
 
 	// $scope.begin          = '2014-01';
 	// $scope.end            = '2015-01';
@@ -266,10 +258,9 @@ monitoolControllers.controller('ReportingByEntitiesController', function($scope,
 });
 
 
-query = {
-	type: "project",
-	ids: [238490234, 234234234, 234234234, 23423423233],
-	start: "2014-01",
-	end: "2015-01"
-}
-
+// query = {
+// 	type: "project",
+// 	ids: [238490234, 234234234, 234234234, 23423423233],
+// 	start: "2014-01",
+// 	end: "2015-01"
+// }

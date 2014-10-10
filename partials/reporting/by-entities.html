@@ -6,6 +6,10 @@
 
 <hr/>
 
+<input type="checkbox" ng-model="showDependencies" id="show-dependencies" />
+<label for="show-dependencies">Montrer les dependences</label>
+
+<hr/>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
@@ -13,12 +17,19 @@
 			<th></th>
 			<th ng-repeat="period in stats.periods">{{period}}</th>
 		</tr>
- 	</thead>
-	<tbody>
-		<tr ng-repeat="line in stats.lines">
-			<th>{{line.name}}</th>
+	</thead>
+	<tbody ng-repeat="line in stats.lines">
+
+		<tr ng-repeat="dependency in line.dependencies" ng-show="showDependencies">
+			<th style="background-color: #ffffaa; ">{{dependency.name}}</th>
+			<td ng-repeat="period in stats.periods">{{stats.data[period][dependency.id]}}</td>
+		</tr>
+
+		<tr>
+			<th style="background-color: #aaffaa; ">{{line.name}}</th>
 			<td ng-repeat="period in stats.periods">{{stats.data[period][line.id]}}</td>
 		</tr>
+
 	</tbody>
 </table>
 

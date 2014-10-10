@@ -10,134 +10,8 @@ mtServices.factory('mtDatabase', function(PouchDB) {
 });
 
 
-mtServices.factory('mtStatistics', function($q, mtDatabase) {
-	var views = {
-		project:   'monitool/inputs_by_project_period_indicator',
-		center:    'monitool/inputs_by_center_period_indicator',
-		indicator: 'monitool/inputs_by_indicator_period_project'
-	};
-
-	var getPeriods = function(start, end) {
-		if (start >= end)
-			return [];
-
-		start = start.split('-').map(function(e) { return parseInt(e); });
-		end   = end.split('-').map(function(e) { return parseInt(e); });
-
-		var currentMonth = start[1], currentYear = start[0], endMonth = end[1], endYear = end[0], periods = [];
-
-		while (currentMonth !== endMonth || currentYear !== endYear) {
-			periods.push(currentYear + '-' + (currentMonth < 10 ? '0': '') + currentMonth);
-
-			if (currentMonth == 12) {
-				currentYear++;
-				currentMonth = 1;
-			}
-			else
-				currentMonth++;
-		}
-		periods.push(currentYear + '-' + (currentMonth < 10 ? '0': '') + currentMonth);
-
-		return periods
-	};
-
-	var getIndicatorsRows = function(type, ids) {
-		if (type === 'project') {
-			
-		}
-		else if (type === 'center') {
-			
-		}
-		else if (type === 'indicator') {
-			
-		}
-	};
-
-	/**
-	 * Nest flat data from touchdb.
-	 * Input: [{key: [1, 2, 3], value: 1}, {key: [1, 2, 4], value: 2}]
-	 * Output: {1: {2: {3: 1, 4: 2}}}
-	 */
-	var regroup = function(data, levelSequence, levelId) {
-		levelId = levelId || 0;
-
-		var result = {};
-
-		// Split data array into subarrays by data[xxx].keys[level]
-		data.forEach(function(datum) {
-			var key = datum.key[levelSequence[levelId]];
-
-			if (!result[key])
-				result[key] = [datum];
-			else
-				result[key].push(datum);
-		});
-		
-		for (var key in result) {
-			// result[key] is an array where all .keys[level] are the same.
-			if (levelId < levelSequence.length - 1)
-				result[key] = regroup(result[key], levelSequence, levelId + 1);
-			else
-				result[key] = result[key].map(function(e) { return e.value })
-										 .reduce(function(memo, el) { return memo + el; });
-		}
-		
-		return result;
-	};
-
-	var getData = function(type, ids, begin, end) {
-		var id  = ids[0];
-		var opt = {startkey: [id, begin], endkey: [id, end, {}]};
-
-		return mtDatabase.query(views[type], opt).then(function(data) {
-			return regroup(data.rows, [2, 1]);
-		});
-	};
-
-	return {
-		getPeriods: getPeriods,
-
-		/**
-		 * Retrieve structured inputs for a given entity, by month.
-		 */
-		getStatistics: function(type, ids, begin, end) {
-			return {
-				"periods": getPeriods(begin, end),
-				"lines": [
-					{id: '234234', name: "line 1"},
-					{id: '234235', name: "line 2"},
-					{id: '234236', name: "line 3"},
-					{id: '234237', name: "line 4"},
-					{id: '234238', name: "line 5"},
-					{id: '234239', name: "line 6"},
-				],
-				"data": {
-
-					"2013-05": {
-						234234: 35,
-						234235: 35,
-						234236: 35,
-						234237: 35,
-						234238: 35,
-						234239: 35,
-
-					},
-
-				}
-			};
-
-
-
-			
-		},
-
-	}
-});
-
-
-
-mtServices.factory('mtInput', function(mtDatabase, $q) {
-	var getFormElementDescription = function(indicatorId, planning) {
+mtServices.factory('mtIndicators', function($q, mtDatabase) {
+	var getIndicatorPlanningDetail = function(indicatorId, planning) {
 		return mtDatabase.get(indicatorId).then(function(indicatorDef) {
 			// succeed, we retrieved the definition, and we do not use a formula
 			if (!planning.formula)
@@ -174,7 +48,7 @@ mtServices.factory('mtInput', function(mtDatabase, $q) {
 		});
 	};
 
-	var getFormDescription = function(project, month) {
+	var getPlanningDescription = function(project, month) {
 		// filter indicators we do not want.
 		var indicatorIds = Object.keys(project.planning);
 
@@ -191,12 +65,156 @@ mtServices.factory('mtInput', function(mtDatabase, $q) {
 			});
 
 		var formElementsPromises = indicatorIds.map(function(indicatorId) {
-			return getFormElementDescription(indicatorId, project.planning[indicatorId]);
+			return getIndicatorPlanningDetail(indicatorId, project.planning[indicatorId]);
 		});
 
 		return $q.all(formElementsPromises);
 	};
 
+	var evaluate = function(planningDescription, scope) {
+		var values = null, newValues = JSON.stringify(scope);
+
+		while (values != newValues) {
+			planningDescription.forEach(function(indicator) {
+				indicator.compute && indicator.compute(scope);
+			});
+
+			values    = newValues;
+			newValues = JSON.stringify(scope);
+		}
+	};
+
+	return {
+		evaluate: evaluate,
+		getIndicatorPlanningDetail: getIndicatorPlanningDetail,
+		getPlanningDescription: getPlanningDescription,
+	};
+
+});
+
+
+
+
+mtServices.factory('mtStatistics', function($q, mtDatabase, mtIndicators) {
+	var getPeriods = function(start, end) {
+		if (start >= end)
+			return [];
+
+		start = start.split('-').map(function(e) { return parseInt(e); });
+		end   = end.split('-').map(function(e) { return parseInt(e); });
+
+		var currentMonth = start[1], currentYear = start[0], endMonth = end[1], endYear = end[0], periods = [];
+
+		while (currentMonth !== endMonth || currentYear !== endYear) {
+			periods.push(currentYear + '-' + (currentMonth < 10 ? '0': '') + currentMonth);
+
+			if (currentMonth == 12) {
+				currentYear++;
+				currentMonth = 1;
+			}
+			else
+				currentMonth++;
+		}
+		periods.push(currentYear + '-' + (currentMonth < 10 ? '0': '') + currentMonth);
+
+		return $q.when(periods);
+	};
+
+	var getIndicatorsRows = function(type, ids) {
+		if (type === 'project') {
+			return $q
+				.all(ids.map(function(id) {
+					return mtDatabase.get(id);
+				}))
+				.then(function(projects) {
+					return $q.all(projects.map(function(project) {
+						return mtIndicators.getPlanningDescription(project);
+					}));
+				})
+				.then(function(formDescriptions) {
+					return formDescriptions[0];
+				})
+		}
+		else if (type === 'center') {
+			
+
+		}
+		else if (type === 'indicator') {
+			
+
+		}
+	};
+
+	/**
+	 * Nest flat data from touchdb.
+	 * Input: [{key: [1, 2, 3], value: 1}, {key: [1, 2, 4], value: 2}]
+	 * Output: {1: {2: {3: 1, 4: 2}}}
+	 */
+	var regroup = function(data, levelSequence, levelId) {
+		levelId = levelId || 0;
+
+		var result = {};
+
+		// Split data array into subarrays by data[xxx].keys[level]
+		data.forEach(function(datum) {
+			var key = datum.key[levelSequence[levelId]];
+
+			if (!result[key])
+				result[key] = [datum];
+			else
+				result[key].push(datum);
+		});
+		
+		for (var key in result) {
+			// result[key] is an array where all .keys[level] are the same.
+			if (levelId < levelSequence.length - 1)
+				result[key] = regroup(result[key], levelSequence, levelId + 1);
+			else
+				result[key] = result[key].map(function(e) { return e.value * 1 })
+										 .reduce(function(memo, el) { return memo + el; });
+		}
+		
+		return result;
+	};
+
+	var getData = function(type, ids, begin, end) {
+		var views = {
+			project:   'monitool/inputs_by_project_period_indicator',
+			center:    'monitool/inputs_by_center_period_indicator',
+			indicator: 'monitool/inputs_by_indicator_period_project'
+		};
+
+		var id = ids[0],
+			options = {startkey: [id, begin], endkey: [id, end, {}]};
+
+		return mtDatabase.query(views[type], options).then(function(data) {
+			return regroup(data.rows, [1, 2]);
+		});
+	};
+
+	return {
+		/**
+		 * Retrieve structured inputs for a given entity, by month.
+		 */
+		getStatistics: function(type, ids, begin, end) {
+			return $q.all([
+				getPeriods(begin, end),
+				getIndicatorsRows(type, ids),
+				getData(type, ids, begin, end)
+			]).then(function(result) {
+				if (type === 'project' || type === 'center')
+					for (var period in result[2])
+						mtIndicators.evaluate(result[1], result[2][period]);
+
+				return {periods: result[0], lines: result[1], data: result[2]};
+			});
+		}
+	}
+});
+
+
+
+mtServices.factory('mtInput', function(mtDatabase) {
 	var getFormValues = function(centerId, month) {
 		return mtDatabase.get('input:' + centerId + ':' + month)
 			.then(function(record) { return record.indicators; })
@@ -226,8 +244,6 @@ mtServices.factory('mtInput', function(mtDatabase, $q) {
 	};
 
 	return {
-		getFormElementDescription: getFormElementDescription,
-		getFormDescription: getFormDescription,
 		getFormValues: getFormValues,
 		saveFormValues: saveFormValues
 	};
