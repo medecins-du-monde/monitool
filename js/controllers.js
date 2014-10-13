@@ -1,6 +1,6 @@
 "use strict";
 
-var monitoolControllers = angular.module('MonitoolControllers', ['MonitoolServices']);
+var monitoolControllers = angular.module('MonitoolControllers', ['MonitoolServices', 'ui.bootstrap', 'ui.select']);
 
 monitoolControllers.controller('MenuController', function($scope, $location) {
 	$scope.routes = [
@@ -210,51 +210,52 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 // Reporting
 ///////////////////////////
 
-monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtStatistics) {
+monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtDatabase, mtStatistics) {
+	// work around bug in datepicker.
+	$scope.beginMode = $scope.endMode = 'month';
 
-	mtStatistics.getStatistics('project', ['c50da7f0-30d3-4cce-ada5-ab6294cf65c6'], '2014-01', '2014-12').then(function(stats) {
-		$scope.stats = stats;
-	});
+	// Init models
+	$scope.begin              = '2014-01';
+	$scope.end                = '2015-01';
+	
+	$scope.entityTypes        = ['project', 'center', 'indicator'];
+	$scope.selectedEntityType = {selected: 'project'};
 
-	// $scope.begin          = '2014-01';
-	// $scope.end            = '2015-01';
-	// $scope.types          = ['project', 'center', 'indicator'];
-	// $scope.selectedType   = 'project';
-	// $scope.entities       = [];
-	// $scope.selectedEntity = null;
+	$scope.entities           = [];
+	$scope.selectedEntities   = {selected: []};
 
-	// $scope.updateList = function() {
-	// 	var view = 'monitool/by_type',
-	// 		opt  = {include_docs: true, key: $scope.selectedType};
+	// load indicators / centers / projects to fill select box.
+	$scope.updateList = function() {
+		var view = 'monitool/by_type',
+			opt  = {key: $scope.selectedEntityType.selected};
 
-	// 	mtDatabase.query(view, opt).then(function(data) {
-	// 		$scope.entities = data.rows.map(function(row) { return row.doc; });
-	// 		$scope.selectedEntity = $scope.entities.length ? $scope.entities[0] : null;
-	// 		if ($scope.selectedEntity)
-	// 			$scope.updateData();
-	// 	});
-	// };
-
-	// $scope.updateData = function() {
-	// 	var type  = $scope.selectedType,
-	// 		id    = $scope.selectedEntity._id,
-	// 		begin = $scope.begin,
-	// 		end   = $scope.end;
+		mtDatabase.query(view, opt).then(function(data) {
+			$scope.entities = data.rows.map(function(row) { return row.value; });
+			$scope.selectedEntities = [];
 
 
+			if ($scope.selectedEntities.length)
+				$scope.updateData();
+			else
+				$scope.statistics = [];
+		});
+	};
 
-	// 	mtStatistics.getStatistics(type, id, begin, end).then(function(statistics) {
-	// 		$scope.statistics = statistics;
+	$scope.updateData = function() {
+		
+		// console.log($scope.selectedEntities);
 
-	// 		// type vaut projet, centre ou indicateur.
-	// 		// les colonnes sont toujours les mois entre les 2 bornes
-	// 		// les lignes sont:
-	// 		//		pour projet et centre, les indicateurs disponibles dans le projet.
-	// 		//		pour indicateur, les projets qui renseignent cet indicateur.
-	// 	});
-	// };
+		var ids = $scope.selectedEntities.selected.map(function(entity) { return entity._id || entity.id; });
 
-	// $scope.updateList();
+		// console.log($scope.selectedEntityType.selected, ids, $scope.begin, $scope.end)
+		mtStatistics
+			.getStatistics($scope.selectedEntityType.selected, ids, $scope.begin, $scope.end)
+			.then(function(statistics) {
+				$scope.statistics = statistics;
+			});
+	};
+
+	$scope.updateList();
 });
 
 

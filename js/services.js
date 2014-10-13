@@ -33,6 +33,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 				return {
 					id: indicatorDef._id,
 					name: indicatorDef.name,
+					formula: planning.formula,
 					dependencies: dependencies.rows.map(function(indicator) {
 						return {id: indicator.id, name: indicator.doc.name};
 					}),
@@ -121,27 +122,58 @@ mtServices.factory('mtStatistics', function($q, mtDatabase, mtIndicators) {
 	};
 
 	var getIndicatorsRows = function(type, ids) {
-		if (type === 'project') {
-			return $q
-				.all(ids.map(function(id) {
-					return mtDatabase.get(id);
-				}))
-				.then(function(projects) {
-					return $q.all(projects.map(function(project) {
-						return mtIndicators.getPlanningDescription(project);
-					}));
-				})
-				.then(function(formDescriptions) {
-					return formDescriptions[0];
-				})
-		}
-		else if (type === 'center') {
-			
+		if (type === 'indicator') {
 
 		}
-		else if (type === 'indicator') {
+		else {
+			// retrieve project ids
+			var projectIdsPromise = $q.when(ids);
+			if (type === 'center')
+				projectIdsPromise = mtDatabase.query('monitool/project_by_center', {keys: ids}).then(function(result) {
+					var r = {};
+					result.rows.forEach(function(row) { r[row.id] = true; });
+					return Object.keys(r);
+				});
 			
+			// retrieve projects
+			return projectIdsPromise.then(function(projectIds) {
+				return $q.all(projectIds.map(function(id) { return mtDatabase.get(id); }));
+			})
+			// retrieve form descriptions
+			.then(function(projects) {
+				return $q.all(projects.map(function(project) { return mtIndicators.getPlanningDescription(project); }));
+			})
+			// then merge them
+			.then(function(planningDescriptions) {
 
+				/**
+				 * this is a bit more complicated that meets the eye
+				 * We have multiple projects, that have different indicators, but some are shared.
+				 * 
+				 * We want to make sure that the data we show is valid and assume that data typed by the user is always summable
+				 * (wich is wrong).
+				 *
+				 * => Rewrite this ASAP adding fields so that the users can declare which data is summable or not (over time or space).
+				 * For now, this code only keeps the intersection of indicators with the same formula (which we know will work with simple
+				 * percentages, but is wrong).
+				 */
+
+				var base = planningDescriptions[0],
+					numPlannings = planningDescriptions.length;
+
+				// This could be done in O(n) with sorted arrays, instead of nesting 3 loops. Fix it if it happens to be slow
+				// on the profiler.
+				for (var i = 1; i < planningDescriptions.length; ++i) {
+					var planning = planningDescriptions[i];
+					base = base.filter(function(basePlanningElt) {
+						return planning.some(function(planningElt) {
+							return planningElt.id === basePlanningElt.id && planningElt.formula === basePlanningElt.formula;
+						});
+					});
+				}
+
+				return base;
+			});
 		}
 	};
 
@@ -150,10 +182,10 @@ mtServices.factory('mtStatistics', function($q, mtDatabase, mtIndicators) {
 	 * Input: [{key: [1, 2, 3], value: 1}, {key: [1, 2, 4], value: 2}]
 	 * Output: {1: {2: {3: 1, 4: 2}}}
 	 */
-	var regroup = function(data, levelSequence, levelId) {
+	var regroup = function(result, data, levelSequence, levelId) {
 		levelId = levelId || 0;
 
-		var result = {};
+		result = result || {};
 
 		// Split data array into subarrays by data[xxx].keys[level]
 		data.forEach(function(datum) {
@@ -168,7 +200,7 @@ mtServices.factory('mtStatistics', function($q, mtDatabase, mtIndicators) {
 		for (var key in result) {
 			// result[key] is an array where all .keys[level] are the same.
 			if (levelId < levelSequence.length - 1)
-				result[key] = regroup(result[key], levelSequence, levelId + 1);
+				result[key] = regroup({}, result[key], levelSequence, levelId + 1);
 			else
 				result[key] = result[key].map(function(e) { return e.value * 1 })
 										 .reduce(function(memo, el) { return memo + el; });
@@ -184,11 +216,16 @@ mtServices.factory('mtStatistics', function($q, mtDatabase, mtIndicators) {
 			indicator: 'monitool/inputs_by_indicator_period_project'
 		};
 
-		var id = ids[0],
-			options = {startkey: [id, begin], endkey: [id, end, {}]};
+		return $q.all(ids.map(function(id) {
+			return mtDatabase.query(views[type], {startkey: [id, begin], endkey: [id, end, {}]});
+		})).then(function(sources) {
+			var result = {};
 
-		return mtDatabase.query(views[type], options).then(function(data) {
-			return regroup(data.rows, [1, 2]);
+			sources.forEach(function(source) {
+				regroup(result, source.rows, [1, 2])
+			});
+
+			return result;
 		});
 	};
 

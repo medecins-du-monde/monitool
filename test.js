@@ -6,7 +6,16 @@ var data = {
 			"_id": '_design/monitool',
 			"views": {
 				"by_type": {
-					"map": function(doc) { emit(doc.type); }.toString()
+					"map": function(doc) {
+						emit(doc.type, doc);
+
+						if (doc.type === 'project')
+							for (var centerId in doc.center) {
+								var center = JSON.parse(JSON.stringify(doc.center[centerId]));
+								center._id = centerId;
+								emit('center', center);
+							}
+					}.toString()
 				},
 
 				"inputs_by_project_period_indicator": {
