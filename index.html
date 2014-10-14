@@ -33,20 +33,38 @@
 	</head>
 	<body ng-app="MonitoolApp">
 
-		<ul class="side-nav" ng-controller="MenuController">
-			<li ng-repeat="route in routes" ng-show="isVisible(route)">
-				<a ng-show="isSelected(route)" href="{{route.path}}">{{route.name}}</a>
-				<span ng-hide="isSelected(route)">{{route.name}}</span>
-			</li>
-		</ul>
-		
-		<hr />
+		<div class="container">
 
-		<div class="main-content">
+			<div class="row">
+				<div class="col-md-12">
+
+					<nav class="navbar navbar-inverse" role="navigation">
+						<div class="container-fluid">
+							<div class="navbar-header">
+								<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+									<span class="sr-only">Toggle navigation</span>
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+								</button>
+								<a class="navbar-brand" href="#">Monitool</a>
+							</div>
+
+							<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+								<ul class="nav navbar-nav" ng-controller="MenuController">
+
+									<li ng-repeat="route in routes" ng-class="{active: !isSelected(route)}">
+										<a href="{{route.path}}">{{route.name}}</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</nav>
+					
+				</div>
+			</div>
+
 			<div ng-view></div>
-
 		</div>
-	
-
 	</body>
 </html>

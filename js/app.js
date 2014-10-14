@@ -96,22 +96,12 @@ app.config(function($routeProvider) {
 	// Reporting
 	///////////////////////////
 
-	$routeProvider.when('/reporting/by-entities', {
+	$routeProvider.when('/reporting', {
 		templateUrl: 'partials/reporting/by-entities.html',
 		controller: 'ReportingByEntitiesController'
-	});
-
-	$routeProvider.when('/reporting/by-indicators', {
-		templateUrl: 'partials/reporting/by-indicators.html',
-		controller: 'ReportingByIndicatorsController'
-	});
-
-	$routeProvider.when('/reporting', {
-		redirectTo: '/reporting/by-entities'
 	});
 
 	$routeProvider.otherwise({
 		redirectTo: '/projects'
 	});
 });
-

@@ -185,25 +185,25 @@ mtServices.factory('mtStatistics', function($q, mtDatabase, mtIndicators) {
 	var regroup = function(result, data, levelSequence, levelId) {
 		levelId = levelId || 0;
 
-		result = result || {};
+		var intermediate = {};
 
 		// Split data array into subarrays by data[xxx].keys[level]
 		data.forEach(function(datum) {
 			var key = datum.key[levelSequence[levelId]];
 
-			if (!result[key])
-				result[key] = [datum];
+			if (!intermediate[key])
+				intermediate[key] = [datum];
 			else
-				result[key].push(datum);
+				intermediate[key].push(datum);
 		});
 		
-		for (var key in result) {
+		for (var key in intermediate) {
 			// result[key] is an array where all .keys[level] are the same.
 			if (levelId < levelSequence.length - 1)
-				result[key] = regroup({}, result[key], levelSequence, levelId + 1);
+				result[key] = regroup(result[key] || {}, intermediate[key], levelSequence, levelId + 1);
 			else
-				result[key] = result[key].map(function(e) { return e.value * 1 })
-										 .reduce(function(memo, el) { return memo + el; });
+				result[key] = (result[key] || 0) + intermediate[key].map(function(e) { return e.value * 1 })
+									   .reduce(function(memo, el) { return memo + el; });
 		}
 		
 		return result;

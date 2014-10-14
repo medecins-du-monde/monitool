@@ -1,6 +1,6 @@
 {
-	"main": "main.html",
 	"name": "Monitool",
+	"main": "index.html",
 	"window": {
 		"toolbar": false
 	},

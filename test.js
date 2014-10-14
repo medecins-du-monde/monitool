@@ -18,6 +18,14 @@ var data = {
 					}.toString()
 				},
 
+				"input_by_month": {
+					"map": function(doc) {
+						if (doc.type === 'input')
+							emit(doc._id.split(':')[2])
+
+					}.toString()
+				},
+
 				"inputs_by_project_period_indicator": {
 					"map": function(doc) {
 						if (doc.type === 'input')

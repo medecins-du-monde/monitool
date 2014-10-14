@@ -2,6 +2,16 @@
 
 var monitoolControllers = angular.module('MonitoolControllers', ['MonitoolServices', 'ui.bootstrap', 'ui.select']);
 
+
+var period = function(date) {
+	var month = date.getMonth() + 1,
+		year  = date.getFullYear();
+
+	return year + '-' + (month < 10 ? '0' : '') + month;
+};
+
+
+
 monitoolControllers.controller('MenuController', function($scope, $location) {
 	$scope.routes = [
 		{path: '#projects', name: "Projects"},
@@ -106,68 +116,47 @@ monitoolControllers.controller('ThemeEditController', function($scope) {
 // Input
 ///////////////////////////
 
-monitoolControllers.controller('InputListController', function($scope, mtDatabase) {
+monitoolControllers.controller('InputListController', function($scope, $q, mtDatabase) {
+	$scope.datePickerMode = 'month';
+	$scope.inputMonth = new Date();
+	$scope.period = period;
 
-	// Etapes
-	//
-	// 1. On recupere tous les projets encore en vie.
-	//
-	// 2. On recupere tous les indicateurs qu'on doit saisir ce mois ci
-	//     2.1. On garde les indicateurs sans formule
-	//     2.2. On resoud les formules pour obtenir les dependences. 
-	//			Si on a des dependences profondes on fait quoi??? (ie, pleins de donnes de base, pas les intermediaires)
-	//
-	// 3. 
+	$scope.reload = function() {
+		$q.all([
+			mtDatabase.query('monitool/by_type', {key: 'project'}),
+			mtDatabase.query('monitool/input_by_month', {key: period($scope.inputMonth), include_docs: true})
+		]).then(function(result) {
+			var projects = result[0].rows.map(function(row) { return row.value; }),
+				inputs   = result[1].rows.map(function(row) { return row.doc; });
 
-	// var currentMonth = '2014-01';
+			$scope.inputs = [];
 
-	// mtDatabase.query('monitool/by_type', {key: 'project', include_docs: true}).then(function(projects) {
-	// 	projects = projects.rows.map(function(row) { return row.doc; });
+			projects.forEach(function(project) {
+				for (var centerId in project.center) {
+					var filledIndicators = 0,
+						totalIndicators  = Object.keys(project.planning).length,
+						center           = project.center[centerId],
+						input            = inputs.filter(function(input) { return input.center === centerId; });
 
-	// 	// Retrieve all indicators that are needed for current month.
-	// 	var indicatorsByProjects = {};
+					if (input.length)
+						for (var indicatorId in project.planning)
+							if (typeof input[0].indicators[indicatorId] !== 'undefined')
+								filledIndicators++;
 
-	// 	projects.forEach(function(project) {
-	// 		var projectIndicators = Object.keys(project.planning).filter(function(indicatorId) {
-	// 			var p = project.planning[indicatorId];
-
-	// 			switch (p.periodicity) {
-	// 				case 'month': return p.from <= currentMonth && p.to >= currentMonth;
-	// 				case 'planned': return false; // @FIXME
-	// 				case 'quarter': return false; // @FIXME
-	// 				default: throw new Error('Invalid project periodicity.');
-	// 			}
-	// 		});
-
-	// 		indicatorsByProjects[project._id] = projectIndicators;
-	// 		projectIndicators.forEach(function(indicator) {
-	// 			indicators[indicator] = true;
-	// 		});
-
-	// 	});
-
-	// 	// Resolve dependencies
-	// 	mtDatabase.allDocs({keys: Object.keys(indicators), include_docs: true}).then(function(result) {
-	// 		// Store all used indicators in the hash
-	// 		result.rows.forEach(function(indicator) {
-	// 			indicators[indicator.id] = indicator.doc;
-	// 		});
-
-	// 		// Add dependencies to all projects.
-	// 		for (var projectId in indicatorsByProjects)
-	// 			indicatorsByProjects[projectId].requested.forEach(function(indicatorId) {
-	// 				var dependencies = indicators[indicatorId];
-
-
-
-	// 				// if (indicatorsByProjects[projectId].requested.indexOf(indicatorId))
-	// 			});
-	// 	});
-
-	// });
-
+					$scope.inputs.push({
+						centerId: centerId,
+						centerName: center.name,
+						projectName: project.name,
+						projectCountry: project.country,
+						missingIndicators: totalIndicators - filledIndicators,
+						totalIndicators: totalIndicators
+					});
+				}
+			});
+		});
+	}
+	$scope.reload();
 });
-
 
 monitoolControllers.controller('InputEditController', function($scope, $routeParams, $q, mtDatabase, mtInput, mtIndicators) {
 	// Retrieve values and description for this form.
@@ -190,7 +179,7 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 	};
 
 	// An indicator is disabled when there exists one instance of it that is calculated in the whole form.
-	// writing this here is stupid. it should be a property of the input.
+	// !!!!!!!!!!!!!!!! Writing this here is stupid. it should be a property of the input.
 	$scope.isDisabled = function(indicatorId) {
 		return $scope.indicators.some(function(indicator) {
 			return (indicatorId === indicator.id && indicator.compute) ||
@@ -215,24 +204,21 @@ monitoolControllers.controller('ReportingByEntitiesController', function($scope,
 	$scope.beginMode = $scope.endMode = 'month';
 
 	// Init models
-	$scope.begin              = '2014-01';
-	$scope.end                = '2015-01';
+	$scope.begin = new Date();
+	$scope.begin.setFullYear($scope.begin.getFullYear() - 1);
+	$scope.end = new Date();
 	
-	$scope.entityTypes        = ['project', 'center', 'indicator'];
+	$scope.entityTypes = ['project', 'center'];
 	$scope.selectedEntityType = {selected: 'project'};
 
-	$scope.entities           = [];
-	$scope.selectedEntities   = {selected: []};
+	$scope.entities = [];
+	$scope.selectedEntities = {selected: []};
 
 	// load indicators / centers / projects to fill select box.
 	$scope.updateList = function() {
-		var view = 'monitool/by_type',
-			opt  = {key: $scope.selectedEntityType.selected};
-
-		mtDatabase.query(view, opt).then(function(data) {
+		mtDatabase.query('monitool/by_type', {key: $scope.selectedEntityType.selected}).then(function(data) {
 			$scope.entities = data.rows.map(function(row) { return row.value; });
 			$scope.selectedEntities = [];
-
 
 			if ($scope.selectedEntities.length)
 				$scope.updateData();
@@ -242,14 +228,10 @@ monitoolControllers.controller('ReportingByEntitiesController', function($scope,
 	};
 
 	$scope.updateData = function() {
-		
-		// console.log($scope.selectedEntities);
-
 		var ids = $scope.selectedEntities.selected.map(function(entity) { return entity._id || entity.id; });
 
-		// console.log($scope.selectedEntityType.selected, ids, $scope.begin, $scope.end)
 		mtStatistics
-			.getStatistics($scope.selectedEntityType.selected, ids, $scope.begin, $scope.end)
+			.getStatistics($scope.selectedEntityType.selected, ids, period($scope.begin), period($scope.end))
 			.then(function(statistics) {
 				$scope.statistics = statistics;
 			});
@@ -258,10 +240,3 @@ monitoolControllers.controller('ReportingByEntitiesController', function($scope,
 	$scope.updateList();
 });
 
-
-// query = {
-// 	type: "project",
-// 	ids: [238490234, 234234234, 234234234, 23423423233],
-// 	start: "2014-01",
-// 	end: "2015-01"
-// }
