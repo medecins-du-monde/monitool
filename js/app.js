@@ -66,14 +66,14 @@ app.config(function($routeProvider) {
 		controller: 'IndicatorEditController'
 	});
 
-	$routeProvider.when('/themes/:themeId', {
-		templateUrl: 'partials/indicators/theme.html',
-		controller: 'ThemeEditController'
+	$routeProvider.when('/themes', {
+		templateUrl: 'partials/indicators/theme-list.html',
+		controller: 'ThemeListController'
 	});
 
-	$routeProvider.when('/types/:typeId', {
-		templateUrl: 'partials/indicators/type.html',
-		controller: 'TypeEditController'
+	$routeProvider.when('/types', {
+		templateUrl: 'partials/indicators/type-list.html',
+		controller: 'TypeListController'
 	});
 
 

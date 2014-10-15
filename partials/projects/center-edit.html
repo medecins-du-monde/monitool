@@ -1,0 +1,44 @@
+
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/projects/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+
+		<div class="alert alert-warning" role="alert">Attention: page pas encore faite.</div>
+
+
+		<form class="form-horizontal" role="form">
+
+			<div class="form-group">
+				<label for="name" class="col-sm-2 control-label">Nom</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="name" ng-model="project.name">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="latitude" class="col-sm-2 control-label">Latitude</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="latitude" ng-model="project.latitude">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="longitude" class="col-sm-2 control-label">Longitude</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="longitude" ng-model="project.longitude">
+				</div>
+			</div>
+
+			<button ng-click="reset()" class="btn btn-default">RESET</button>
+			<button ng-click="update(project)" class="btn btn-default">SAVE</button>
+		</form>
+
+	</div>
+</div>
+
+
+
+

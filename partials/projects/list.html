@@ -1,11 +1,13 @@
-<table class="table table-bordered table-stripped">
+<input type="checkbox" ng-model="filterFinished" id="filter-finished" />
+<label for="filter-finished">Montrer les projets finis</label>
+
+<table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th>Name</th>
+			<th>Nom</th>
 			<th>Country</th>
 			<th>Date debut</th>
 			<th>Date fin</th>
-			<th>Etat</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -15,7 +17,6 @@
 			<td>{{project.country}}</td>
 			<td>{{project.start_date}}</td>
 			<td>{{project.end_date}}</td>
-			<td>{{project.state}}</td>
 			<td><a href="#projects/{{project._id}}">Voir</a></td>
 		</tr>
 	</tbody>

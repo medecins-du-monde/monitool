@@ -1,0 +1,37 @@
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/indicators/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+
+		<table class="table table-stripped table-bordered table-condensed" ng-show="types">
+			<thead>
+				<tr>
+					<th>Nom</th>
+					<th>Nombre d'indicateurs</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="type in types | orderBy: 'name'">
+					<td>{{type.name}}</td>
+					<td>{{usage[type._id] || 0}}</td>
+					<td><button class="btn btn-danger btn-xs" ng-disabled="usage[type._id]" ng-click="delete(type._id)">Supprimer</button></td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div class="input-group input-group-sm" style="width: 100%">
+							<input type="text" class="form-control" ng-model="newType" placeholder="Nom du nouveau type">
+						    <span class="input-group-btn">
+								<button class="btn btn-default" ng-click="add()">Ajouter</button>
+							</span>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+</div>
+

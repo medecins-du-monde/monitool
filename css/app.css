@@ -1,3 +1,43 @@
 
 
 /*https://www.gv.com/portfolio/*/
+
+
+.indicator-level-1, .indicator-level-2, .indicator-level-3 {
+	border: solid black;
+	border-width: 1px 0 0 1px;
+	padding: 5px 0 0 5px;
+}
+
+.indicator-header {
+	margin-bottom: 5px;
+}
+
+.indicator-level-1 {
+	margin-left: 0px;
+	border-width: 1px;
+}
+
+.indicator-level-2 {
+	margin-left: 40px;
+}
+
+.indicator-level-3 {
+	margin-left: 40px;
+}
+
+.indicator-level-3 .color {
+	display: inline-block;
+	width: 10px;
+	height: 16px;
+	margin-right: 10px;
+	background-color: #d68227;
+}
+.indicator-level-3 .color.green {
+	background-color: #72bb53;
+}
+
+.indicator-level-3 a {
+	float: right;
+	margin-right: 10px;
+}

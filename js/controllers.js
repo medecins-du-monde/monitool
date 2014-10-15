@@ -14,7 +14,7 @@ var period = function(date) {
 
 monitoolControllers.controller('MenuController', function($scope, $location) {
 	$scope.routes = [
-		{path: '#projects', name: "Projects"},
+		{path: '#projects', name: "Projets"},
 		{path: '#indicators', name: "Catalogue Indicateurs"},
 		{path: '#inputs', name: "Saisies en attente"},
 		{path: '#reporting', name: "Consultation"},
@@ -26,6 +26,16 @@ monitoolControllers.controller('MenuController', function($scope, $location) {
 
 	$scope.isVisible = function(route) {
 		return true;
+	};
+});
+
+monitoolControllers.controller('SubMenuController', function($scope, $routeParams, $location) {
+	$scope.projectId = $routeParams.projectId;
+
+	// this is wrong: it will get called a LOT for not much.
+	$scope.isSelected = function(suffix) {
+		var path = $location.path();
+		return path.substring(path.length - suffix.length) === suffix;
 	};
 });
 
@@ -45,6 +55,8 @@ monitoolControllers.controller('ProjectListController', function($scope, $locati
 });
 
 monitoolControllers.controller('ProjectDescriptionController', function($scope, $routeParams, $q, mtDatabase) {
+	$scope.beginMode = $scope.endMode = 'month';
+
 	mtDatabase.get($routeParams.projectId).then(function(master) {
 		$scope.master = master;
 	})
@@ -52,6 +64,7 @@ monitoolControllers.controller('ProjectDescriptionController', function($scope, 
 		$scope.master = {_id: $routeParams.projectId, type: 'project'};
 	})
 	.finally(function() {
+
 		$scope.update = function(project) {
 			$scope.master = angular.copy(project);
 			mtDatabase.put($scope.master).then(function(project) {
@@ -67,11 +80,40 @@ monitoolControllers.controller('ProjectDescriptionController', function($scope, 
 	});
 });
 
-monitoolControllers.controller('ProjectCenterListController', function($scope) {
+monitoolControllers.controller('ProjectCenterListController', function($scope, $routeParams, $location, mtDatabase) {
+	mtDatabase.get($routeParams.projectId).then(function(project) {
+		$scope.project = project;
+	});
 
+	$scope.create = function() {
+		$location.url('/projects/' + $scope.project._id + '/centers/' + PouchDB.utils.uuid().toLowerCase());
+	};
 });
 
 monitoolControllers.controller('ProjectCenterEditController', function($scope) {
+
+});
+
+monitoolControllers.controller('ProjectIndicatorListController', function($scope, $routeParams, mtDatabase, $location) {
+	mtDatabase.get($routeParams.projectId).then(function(project) {
+
+		mtDatabase.allDocs({keys: Object.keys(project.planning || {}), include_docs: true}).then(function(indicators) {
+
+			$scope.indicators = {};
+			indicators.rows.forEach(function(indicator) {
+				$scope.indicators[indicator.id] = indicator.doc;
+			});
+
+			$scope.project = project;
+		});
+	});
+
+	$scope.create = function() {
+		$location.url('/projects/' + $scope.project._id + '/indicators/' + PouchDB.utils.uuid().toLowerCase());
+	};
+});
+
+monitoolControllers.controller('ProjectIndicatorEditController', function($scope) {
 
 });
 
@@ -80,36 +122,99 @@ monitoolControllers.controller('ProjectUserListController', function($scope) {
 });
 
 monitoolControllers.controller('ProjectUserEditController', function($scope) {
+	mtDatabase.get($routeParams.projectId).then(function(master) {
+		$scope.project = project;
+	});
 
 });
 
-monitoolControllers.controller('ProjectIndicatorListController', function($scope) {
-
-});
-
-monitoolControllers.controller('ProjectIndicatorEditController', function($scope) {
-
-});
 
 
 ///////////////////////////
 // Indicators
 ///////////////////////////
 
-monitoolControllers.controller('IndicatorListController', function($scope) {
+monitoolControllers.controller('IndicatorListController', function($scope, $q, mtDatabase) {
+	$q.all([
+		mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}),
+		mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}),
+		mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}),
+		mtDatabase.query('monitool/indicator_usage', {group: true})
+	]).then(function(result) {
+		var usage = usage = {};
+		result[3].rows.forEach(function(row) { usage[row.key] = row.value; });
 
+		$scope.hierarchy = {};
+		result[0].rows.forEach(function(row) {
+			var indicator = row.doc;
+			indicator.usage = usage[indicator._id] || 0;
+
+			indicator.themes.forEach(function(theme) {
+				indicator.types.forEach(function(type) {
+					if (!$scope.hierarchy[theme])
+						$scope.hierarchy[theme] = {};
+
+					if (!$scope.hierarchy[theme][type])
+						$scope.hierarchy[theme][type] = [];
+
+					$scope.hierarchy[theme][type].push(indicator);
+				});
+			});
+
+			return row.doc;
+		});
+
+		$scope.types = {};
+		result[1].rows.forEach(function(row) { return $scope.types[row.id] = row.doc; });
+
+		$scope.themes = {};
+		result[2].rows.forEach(function(row) { return $scope.themes[row.id] = row.doc; });
+	});
 });
 
 monitoolControllers.controller('IndicatorEditController', function($scope) {
 
 });
 
-monitoolControllers.controller('TypeEditController', function($scope) {
+monitoolControllers.controller('TypeListController', function($q, $scope, mtDatabase) {
+	$q.all([
+		mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}),
+		mtDatabase.query('monitool/type_usage', {group: true})
+	]).then(function(result) {
+		$scope.types = result[0].rows.map(function(row) { return row.doc; });
+		$scope.usage = {};
+		result[1].rows.forEach(function(row) {
+			$scope.usage[row.key] = row.value;
+		});
+	});
 
+	$scope.add = function() {
+		var newType = {_id: PouchDB.utils.uuid().toLowerCase(), type: 'type', name: $scope.newType || ''};
+		newType.name = newType.name.trim();
+
+		$scope.newType = '';
+		if (newType.name.length && !$scope.types.filter(function(type) { return type.name == newType.name; }).length) {
+			$scope.types.push(newType)
+			mtDatabase.put(newType)
+		}
+	};
+
+	$scope.delete = function(typeId) {
+		$scope.types = $scope.types.filter(function(type) { return type._id !== typeId });
+	};
 });
 
-monitoolControllers.controller('ThemeEditController', function($scope) {
-
+monitoolControllers.controller('ThemeListController', function($q, $scope, mtDatabase) {
+	$q.all([
+		mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}),
+		mtDatabase.query('monitool/theme_usage', {group: true})
+	]).then(function(result) {
+		$scope.themes = result[0].rows.map(function(row) { return row.doc; });
+		$scope.usage = {};
+		result[1].rows.forEach(function(row) {
+			$scope.usage[row.key] = row.value;
+		});
+	});
 });
 
 ///////////////////////////

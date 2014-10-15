@@ -1,1 +1,33 @@
-indicator  list
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/indicators/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+		
+		<div class="alert alert-warning" role="alert">
+			<ul>
+				<li>Accordeon à implementer [+] [-]</li>
+				<li>rajouter les projets qui utilisent les indicateurs dans un tooltip</li>
+				<li>c'est moche, refaire</li>
+			</ul>
+		</div>
+
+		<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in hierarchy">
+			<div class="indicator-header">{{themes[themeId].name}}</div>
+
+			<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes">
+				<div class="indicator-header">{{types[typeId].name}}</div>
+
+				<div class="indicator-level-3" ng-repeat="indicator in indicators">
+					<span class="color" ng-class="{green: indicator.standard}"></span>
+					<span class="name">{{indicator.name}} ({{indicator.usage}} utilisations)</span>
+					
+					<a href="#indicators/{{indicator._id}}">Éditer</a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+

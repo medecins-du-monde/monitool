@@ -1,0 +1,27 @@
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/projects/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+		<table class="table table-bordered table-stripped table-condensed">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Périodicité</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="(indicatorId, planning) in project.planning">
+					<td>{{indicators[indicatorId].name}}</td>
+					<td>{{planning.periodicity}}</td>
+					<td><a href="#projects/{{project._id}}/indicators/{{indicatorId}}">Voir</a></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<button ng-click="create()">Collecter un autre indicateur</button>
+
+	</div>
+</div>

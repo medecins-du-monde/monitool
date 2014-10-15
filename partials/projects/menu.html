@@ -1,0 +1,16 @@
+
+<ul class="nav nav-pills nav-stacked" ng-controller="SubMenuController">
+	<li ng-class="{active: isSelected('description')}">
+		<a href="#projects/{{projectId}}/description">Description</a>
+	</li>
+	<li ng-class="{active: isSelected('centers')}">
+		<a href="#projects/{{projectId}}/centers">Centres</a>
+	</li>
+	<li ng-class="{active: isSelected('indicators')}">
+		<a href="#projects/{{projectId}}/indicators">Planning</a>
+	</li>
+<!-- 	<li ng-class="{active: isSelected('users')}">
+		<a href="#projects/{{projectId}}/users">Utilisateurs</a>
+	</li>
+ --></ul>
+

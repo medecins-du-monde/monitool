@@ -64,7 +64,37 @@ var data = {
 							for (var formulaId in doc.formulas)
 								emit(formulaId, doc.formulas[formulaId]);
 					}.toString()
-				}
+				},
+
+				"indicator_usage": {
+					"map": function(doc) {
+						if (doc.type === 'project')
+							for (var indicatorId in doc.planning)
+								emit(indicatorId, 1);
+					}.toString(),
+					"reduce": "_sum"
+				},
+
+				"type_usage": {
+					"map": function(doc) {
+						if (doc.type === 'indicator')
+							doc.types.forEach(function(typeId) {
+								emit(typeId, 1);
+							});
+					}.toString(),
+					"reduce": "_sum"
+				},
+
+				"theme_usage": {
+					"map": function(doc) {
+						if (doc.type === 'indicator')
+							doc.themes.forEach(function(themeId) {
+								emit(themeId, 1);
+							});
+						}.toString(),
+					"reduce": "_sum"
+				},
+
 			}
 		}
 	],
@@ -112,9 +142,28 @@ var data = {
 	],
 
 	"indicators": [
+		// types
+		{"_id": "154d03d8-ae56-431f-8858-2a469dfc138a", "type": "type","name": "Dénominateur"},
+		{"_id": "41be51fb-37a0-46af-b2a4-d49f6dc9a430", "type": "type","name": "Donnée de base"},
+		{"_id": "92998f60-b9e2-4e82-9380-13efe60524d1", "type": "type","name": "Prévalence"},
+		{"_id": "9642825d-8d02-4044-bd40-ec9171e40b5c", "type": "type","name": "Indicateur infrastructure"},
+		{"_id": "c140df25-f31b-40bb-9f2b-54afb8f55e10", "type": "type","name": "Indicateur formation"},
+		{"_id": "1c3a3941-76ba-4017-8a16-ec7d7e323e63", "type": "type","name": "Indicateur médical"},
+
+		// themes
+		{"_id": "588dec94-a3f3-4a0f-b986-192fb1c6ea33", "type": "theme", "name": "Réduction des risques"},
+		{"_id": "82490fd3-1413-4281-ae8c-c40e7f3b5d0d", "type": "theme", "name": "Soins de santé primaires"},
+		{"_id": "976801fe-4947-49e8-8547-e2920d85d42a", "type": "theme", "name": "Santé Sexuelle et reproductive"},
+		{"_id": "cb0835a5-7cbb-4a29-a2b1-eea18fe699d1", "type": "theme", "name": "Santé Mentale"},
+		{"_id": "1c881468-3b01-4c9f-af18-54df0f2a9733", "type": "theme", "name": "Transversal"},
+		{"_id": "78721072-16ae-49e0-86cd-a6e4c0aacd17", "type": "theme", "name": "Urgences, Crises"},
+
+		// Indicators
 		{
 			"_id": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f",
 			"type": "indicator",
+			"themes": ["976801fe-4947-49e8-8547-e2920d85d42a"],
+			"types": ["41be51fb-37a0-46af-b2a4-d49f6dc9a430"],
 			"name": "Nombre de partogrammes correctement renseignés",
 			"space_agg": true,
 			"time_agg": true,
@@ -123,6 +172,8 @@ var data = {
 		{
 			"_id": "4741ada6-709a-4a19-913e-ea174f053bbb",
 			"type": "indicator",
+			"themes": ["976801fe-4947-49e8-8547-e2920d85d42a"],
+			"types": ["41be51fb-37a0-46af-b2a4-d49f6dc9a430"],
 			"name": "Nombre de partogrammes renseignés",
 			"space_agg": true,
 			"time_agg": true,
@@ -131,6 +182,8 @@ var data = {
 		{
 			"_id": "7003ff8b-4335-4682-9c48-82eb2320dfd2",
 			"type": "indicator",
+			"themes": ["976801fe-4947-49e8-8547-e2920d85d42a"],
+			"types": ["c140df25-f31b-40bb-9f2b-54afb8f55e10"],
 			"name": "Pourcentage des partogramme correctement renseignés",
 			"space_agg": false,
 			"time_agg": false,
@@ -149,6 +202,8 @@ var data = {
 			"_id": "1c38fa28-1dc2-449e-aa34-08aa3b773e3b",
 			"type": "indicator",
 			"name": "Double du % des partogramme correctement renseignés",
+			"themes": ["976801fe-4947-49e8-8547-e2920d85d42a"],
+			"types": ["c140df25-f31b-40bb-9f2b-54afb8f55e10"],
 			"space_agg": true,
 			"time_agg": true,
 			"formulas": {

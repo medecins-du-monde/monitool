@@ -1,0 +1,29 @@
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/projects/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+		<table class="table table-bordered table-stripped table-condensed">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Latitude</th>
+					<th>Longitude</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="(centerId, center) in project.center">
+					<td>{{center.name}}</td>
+					<td>{{center.latitude}}</td>
+					<td>{{center.longitude}}</td>
+					<td><a href="#projects/{{project._id}}/centers/{{centerId}}">Voir</a></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<button ng-click="create()">Creer nouveau centre</button>
+
+	</div>
+</div>

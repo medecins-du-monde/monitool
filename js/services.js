@@ -3,8 +3,14 @@
 var mtServices = angular.module('MonitoolServices', ['pouchdb']);
 
 mtServices.factory('mtDatabase', function(PouchDB) {
-	// var db = new PouchDB('monitool');
-	// db.sync('http://localhost:5984/monitool', {live: true});
+	// var db = new PouchDB('monitool2');
+
+	// db.sync('http://localhost:5984/monitool', {live: true}).then(function(hello) {
+	// 	console.log(hello);
+	// }).catch(function(error) {
+	// 	console.log(error)
+	// });
+	
 	// return db;
 	return new PouchDB('http://localhost:5984/monitool');
 });
@@ -51,7 +57,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 
 	var getPlanningDescription = function(project, month) {
 		// filter indicators we do not want.
-		var indicatorIds = Object.keys(project.planning);
+		var indicatorIds = Object.keys(project.planning || {});
 
 		if (month)
 			indicatorIds = indicatorIds.filter(function(indicatorId) {
