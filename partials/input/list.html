@@ -1,34 +1,44 @@
 <div class="row">
 	<div class="col-md-12">
 
-		<datepicker ng-model="inputMonth" min-mode="month" datepicker-mode="datePickerMode" ng-change="reload()"></datepicker>
+		Quel mois de saisie voulez-vous consulter?
+		<input type="month" ng-model="inputMonth" max="{{maxMonth}}" class="form-control" ng-change="reload()" />
 
-		<hr/>
+		<div ng-show="ready">
+			<hr/>
 
-		<input type="checkbox" ng-model="showFinished" id="show-finished" />
-		<label for="show-finished">Montrer les saisies terminées</label>
+			<input type="checkbox" ng-model="showFinished" id="show-finished" />
+			<label for="show-finished">Montrer les saisies terminées</label>
 
-		<table class="table table-bordered table-stripped table-condensed">
-			<thead>
-				<tr>
-					<th>Centre</th>
-					<th>Projet</th>
-					<th>Pays</th>
-					<th>Indicateurs manquants / total</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="input in inputs" ng-show="input.missingIndicators || showFinished">
-					<td>{{input.centerName}}</td>
-					<td>{{input.projectName}}</td>
-					<td>{{input.projectCountry}}</td>
-					<td>{{input.missingIndicators}} / {{input.totalIndicators}}</td>
-					<td><a href="#inputs/{{period(inputMonth)}}/{{input.centerId}}">Éditer</a></td>
-				</tr>
-			</tbody>
-		</table>
+			<div ng-hide="allDone && !showFinished">
 
+				<table class="table table-bordered table-stripped table-condensed">
+					<thead>
+						<tr>
+							<th>Centre</th>
+							<th>Projet</th>
+							<th>Pays</th>
+							<th>Indicateurs manquants / total</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="input in inputs" ng-show="input.missingIndicators || showFinished">
+							<td>{{input.centerName}}</td>
+							<td>{{input.projectName}}</td>
+							<td>{{input.projectCountry}}</td>
+							<td>{{input.missingIndicators}} / {{input.totalIndicators}}</td>
+							<td><a href="#inputs/{{inputMonth}}/{{input.centerId}}">Éditer</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div ng-show="allDone && !showFinished" class="alert alert-success">
+				Aucune saisie en attente.
+			</div>
+
+		</div>
 	</div>
 </div>
 

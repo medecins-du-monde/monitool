@@ -6,8 +6,8 @@
 		<tr>
 			<th>Nom</th>
 			<th>Country</th>
-			<th>Date debut</th>
-			<th>Date fin</th>
+			<th>Début</th>
+			<th>Fin</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -15,9 +15,13 @@
 		<tr ng-repeat="project in projects">
 			<td>{{project.name}}</td>
 			<td>{{project.country}}</td>
-			<td>{{project.start_date}}</td>
-			<td>{{project.end_date}}</td>
-			<td><a href="#projects/{{project._id}}">Voir</a></td>
+			<td>{{project.begin}}</td>
+			<td>{{project.end}}</td>
+			<td>
+				<a href="#projects/{{project._id}}" class="btn btn-default btn-xs" ng-click="delete(centerId)">
+					Modifier
+				</a>
+			</td>
 		</tr>
 	</tbody>
 </table>

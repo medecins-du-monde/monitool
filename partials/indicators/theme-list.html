@@ -17,14 +17,14 @@
 				<tr ng-repeat="theme in themes | orderBy: 'name'">
 					<td>{{theme.name}}</td>
 					<td>{{usage[theme._id] || 0}}</td>
-					<td><button class="btn btn-danger btn-xs" ng-disabled="usage[theme._id]">Supprimer</button></td>
+					<td><button class="btn btn-danger btn-xs" ng-disabled="usage[theme._id]" ng-click="remove(theme)">Supprimer</button></td>
 				</tr>
 				<tr>
 					<td colspan="3">
 						<div class="input-group input-group-sm" style="width: 100%">
 							<input type="text" class="form-control" ng-model="newTheme" placeholder="Nom du nouveau thème">
-						    <span class="input-group-btn">
-								<button class="btn btn-default">Ajouter</button>
+							<span class="input-group-btn">
+								<button class="btn btn-default" ng-click="add()">Ajouter</button>
 							</span>
 						</div>
 					</td>

@@ -80,31 +80,73 @@ monitoolControllers.controller('ProjectDescriptionController', function($scope, 
 	});
 });
 
-monitoolControllers.controller('ProjectCenterListController', function($scope, $routeParams, $location, mtDatabase) {
-	mtDatabase.get($routeParams.projectId).then(function(project) {
-		$scope.project = project;
+monitoolControllers.controller('ProjectCenterListController', function($scope, $routeParams, $q, mtDatabase) {
+	$q.all([
+		mtDatabase.get($routeParams.projectId),
+		mtDatabase.query(
+			'monitool/num_inputs_by_project_center',
+			{
+				startkey: [$routeParams.projectId],
+				endkey: [$routeParams.projectId, {}],
+				group: true,
+				group_level: 2
+			}
+		)
+	]).then(function(result) {
+		$scope.project = result[0];
+		$scope.usage = {};
+
+		result[1].rows.forEach(function(row) {
+			$scope.usage[row.key[1]] = row.value;
+		});
 	});
 
+	$scope.delete = function(centerId) {
+		delete $scope.project.center[centerId];
+		mtDatabase.put($scope.project).then(function(result) {
+			$scope.project._rev = result.rev;
+		});
+	};
+
 	$scope.create = function() {
-		$location.url('/projects/' + $scope.project._id + '/centers/' + PouchDB.utils.uuid().toLowerCase());
+		var newCenterName = $scope.newCenter ? $scope.newCenter.trim() : '';
+		$scope.newCenter = '';
+
+		if (!newCenterName || !newCenterName.length)
+			return;
+
+		for (var key in $scope.project.center)
+			if ($scope.project.center[key].name === newCenterName)
+				return;
+
+		$scope.project.center[PouchDB.utils.uuid().toLowerCase()] = {name: newCenterName};
+		mtDatabase.put($scope.project).then(function(result) {
+			$scope.project._rev = result.rev;
+		})
 	};
 });
 
-monitoolControllers.controller('ProjectCenterEditController', function($scope) {
-
-});
-
-monitoolControllers.controller('ProjectIndicatorListController', function($scope, $routeParams, mtDatabase, $location) {
+monitoolControllers.controller('ProjectIndicatorListController', function($scope, $routeParams, $q, mtDatabase, $location) {
 	mtDatabase.get($routeParams.projectId).then(function(project) {
+		var usageQuery = mtDatabase.query(
+			'monitool/num_inputs_by_project_indicator',
+			{ startkey: [$routeParams.projectId], endkey: [$routeParams.projectId, {}], group: true, group_level: 2 }
+		);
 
-		mtDatabase.allDocs({keys: Object.keys(project.planning || {}), include_docs: true}).then(function(indicators) {
+		var indicatorsQuery = mtDatabase.allDocs({keys: Object.keys(project.planning || {}), include_docs: true});
 
+		$q.all([indicatorsQuery, usageQuery]).then(function(result) {
+			$scope.project = project;
 			$scope.indicators = {};
-			indicators.rows.forEach(function(indicator) {
+			$scope.usage = {};
+
+			result[0].rows.forEach(function(indicator) {
 				$scope.indicators[indicator.id] = indicator.doc;
 			});
 
-			$scope.project = project;
+			result[1].rows.forEach(function(row) {
+				$scope.usage[row.key[1]] = row.value;
+			});
 		});
 	});
 
@@ -176,6 +218,9 @@ monitoolControllers.controller('IndicatorEditController', function($scope) {
 
 });
 
+/**
+ * this controller and theme controller are the same, factorize it!
+ */
 monitoolControllers.controller('TypeListController', function($q, $scope, mtDatabase) {
 	$q.all([
 		mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}),
@@ -195,12 +240,13 @@ monitoolControllers.controller('TypeListController', function($q, $scope, mtData
 		$scope.newType = '';
 		if (newType.name.length && !$scope.types.filter(function(type) { return type.name == newType.name; }).length) {
 			$scope.types.push(newType)
-			mtDatabase.put(newType)
+			mtDatabase.put(newType);
 		}
 	};
 
-	$scope.delete = function(typeId) {
-		$scope.types = $scope.types.filter(function(type) { return type._id !== typeId });
+	$scope.remove = function(type) {
+		$scope.types = $scope.types.filter(function(lType) { return lType !== type });
+		mtDatabase.remove(type);
 	};
 });
 
@@ -215,6 +261,22 @@ monitoolControllers.controller('ThemeListController', function($q, $scope, mtDat
 			$scope.usage[row.key] = row.value;
 		});
 	});
+
+	$scope.add = function() {
+		var newTheme = {_id: PouchDB.utils.uuid().toLowerCase(), type: 'theme', name: $scope.newTheme || ''};
+		newTheme.name = newTheme.name.trim();
+
+		$scope.newTheme = '';
+		if (newTheme.name.length && !$scope.themes.filter(function(theme) { return theme.name == newTheme.name; }).length) {
+			$scope.themes.push(newTheme)
+			mtDatabase.put(newTheme);
+		}
+	};
+
+	$scope.remove = function(theme) {
+		$scope.themes = $scope.themes.filter(function(lTheme) { return lTheme !== theme });
+		mtDatabase.remove(theme);
+	};
 });
 
 ///////////////////////////
@@ -222,19 +284,28 @@ monitoolControllers.controller('ThemeListController', function($q, $scope, mtDat
 ///////////////////////////
 
 monitoolControllers.controller('InputListController', function($scope, $q, mtDatabase) {
-	$scope.datePickerMode = 'month';
-	$scope.inputMonth = new Date();
-	$scope.period = period;
+	$scope.inputMonth = period(new Date());
+	$scope.maxMonth = $scope.inputMonth;
 
 	$scope.reload = function() {
+		$scope.ready = false;
+
+		if (!$scope.inputMonth || !$scope.inputMonth.match(/[0-9]{4}\-[0-9]{2}/))
+			return;
+
+		// form control is buggy...
+		if ($scope.inputMonth > $scope.maxMonth)
+			$scope.inputMonth = $scope.maxMonth;
+
 		$q.all([
 			mtDatabase.query('monitool/by_type', {key: 'project'}),
-			mtDatabase.query('monitool/input_by_month', {key: period($scope.inputMonth), include_docs: true})
+			mtDatabase.query('monitool/input_by_month', {key: $scope.inputMonth, include_docs: true})
 		]).then(function(result) {
 			var projects = result[0].rows.map(function(row) { return row.value; }),
 				inputs   = result[1].rows.map(function(row) { return row.doc; });
 
 			$scope.inputs = [];
+			$scope.allDone = true;
 
 			projects.forEach(function(project) {
 				for (var centerId in project.center) {
@@ -256,7 +327,12 @@ monitoolControllers.controller('InputListController', function($scope, $q, mtDat
 						missingIndicators: totalIndicators - filledIndicators,
 						totalIndicators: totalIndicators
 					});
+
+					if (totalIndicators !== filledIndicators)
+						$scope.allDone = false;
 				}
+
+				$scope.ready = true;
 			});
 		});
 	}
@@ -305,13 +381,10 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 ///////////////////////////
 
 monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtDatabase, mtStatistics) {
-	// work around bug in datepicker.
-	$scope.beginMode = $scope.endMode = 'month';
-
-	// Init models
-	$scope.begin = new Date();
-	$scope.begin.setFullYear($scope.begin.getFullYear() - 1);
-	$scope.end = new Date();
+	var now = new Date();
+	$scope.end = period(now);
+	now.setFullYear(now.getFullYear() - 1);
+	$scope.begin = period(now);
 	
 	$scope.entityTypes = ['project', 'center'];
 	$scope.selectedEntityType = {selected: 'project'};
@@ -336,7 +409,7 @@ monitoolControllers.controller('ReportingByEntitiesController', function($scope,
 		var ids = $scope.selectedEntities.selected.map(function(entity) { return entity._id || entity.id; });
 
 		mtStatistics
-			.getStatistics($scope.selectedEntityType.selected, ids, period($scope.begin), period($scope.end))
+			.getStatistics($scope.selectedEntityType.selected, ids, $scope.begin, $scope.end)
 			.then(function(statistics) {
 				$scope.statistics = statistics;
 			});

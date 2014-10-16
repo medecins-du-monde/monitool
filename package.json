@@ -2,7 +2,9 @@
 	"name": "Monitool",
 	"main": "index.html",
 	"window": {
-		"toolbar": false
+		"title": "Monitool",
+		"toolbar": false,
+		"min_width": 1000
 	},
 	"dependencies": {
 		"request": "x"

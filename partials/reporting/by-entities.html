@@ -1,27 +1,18 @@
 <div class="row">
 
 	<div class="col-md-3">
-		Date de début
-		<datepicker ng-model="begin" min-mode="month" datepicker-mode="beginMode" ng-change="updateData()"></datepicker>
-	</div>
-
-	<div class="col-md-3">
-		Date de fin
-		<datepicker ng-model="end" min-mode="month" datepicker-mode="endMode" ng-change="updateData()"></datepicker>
-	</div>
-
-	<div class="col-md-6">
-		Quel type voulez vous consuter?
+		Que voulez-vous consulter?<br/>
 		<ui-select ng-model="selectedEntityType.selected" theme="bootstrap" ng-disabled="disabled" ng-change="updateList()">
 			<ui-select-match placeholder="Quel type voulez-vous consulter">{{$select.selected}}</ui-select-match>
 			<ui-select-choices repeat="entityType in entityTypes | filter: $select.search">
 				<span>{{entityType}}</span>
 			</ui-select-choices>
 		</ui-select>
+	</div>
 
-		<br/>
-		Quels entitées voulez vous voir?
-		<ui-select multiple ng-model="selectedEntities.selected" theme="bootstrap" ng-disabled="disabled" style="height: 72px;" ng-change="updateData()">
+	<div class="col-md-3">
+		Sur quoi?<br/>
+		<ui-select multiple ng-model="selectedEntities.selected" theme="bootstrap" ng-disabled="disabled"ng-change="updateData()">
 			<ui-select-match placeholder="">
 				{{$item.name}}
 			</ui-select-match>
@@ -29,37 +20,53 @@
 				{{entity.name}}
 			</ui-select-choices>
 		</ui-select>
-
 	</div>
-</div>
 
+	<div class="col-md-3">
+		À partir de quand?<br/>
+		<input type="month" ng-model="begin" ng-change="updateData()" class="form-control"/>
+	</div>
+
+	<div class="col-md-3">
+		Jusqu'à quand?<br/>
+		<input type="month" ng-model="end" ng-change="updateData()" class="form-control"/>
+	</div>
+
+</div>
 
 <hr/>
 
-<input type="checkbox" ng-model="showDependencies" id="show-dependencies" />
-<label for="show-dependencies">Voir les variables de calcul</label>
-<br/>
+<div ng-hide="statistics.lines" class="alert alert-warning">
+	Aucune donnée disponible
+</div>
 
-<input type="checkbox" ng-model="colorize" id="colorize" />
-<label for="colorize">Colorer</label>
-<br/>
+<div ng-show="statistics.lines">
 
-<table class="table table-bordered table-stripped table-condensed">
-	<thead>
-		<tr>
-			<th></th>
-			<th ng-repeat="period in statistics.periods" style="white-space: nowrap">{{period}}</th>
-		</tr>
-	</thead>
-	<tbody ng-repeat="line in statistics.lines">
-		<tr ng-repeat="dependency in line.dependencies" ng-show="showDependencies">
-			<td>{{dependency.name}}</th>
-			<td ng-repeat="period in statistics.periods">{{statistics.data[period][dependency.id] | number: 2}}</td>
-		</tr>
-		<tr>
-			<th>{{line.name}}</th>
-			<td ng-repeat="period in statistics.periods">{{statistics.data[period][line.id] | number: 2}}</td>
-		</tr>
-	</tbody>
-</table>
+	<input type="checkbox" ng-model="showDependencies" id="show-dependencies" />
+	<label for="show-dependencies">Voir les variables de calcul</label>
+	<br/>
 
+	<input type="checkbox" ng-model="colorize" id="colorize" />
+	<label for="colorize">Colorer</label>
+	<br/>
+
+	<table class="table table-bordered table-stripped table-condensed">
+		<thead>
+			<tr>
+				<th></th>
+				<th ng-repeat="period in statistics.periods" style="white-space: nowrap">{{period}}</th>
+			</tr>
+		</thead>
+		<tbody ng-repeat="line in statistics.lines">
+			<tr ng-repeat="dependency in line.dependencies" ng-show="showDependencies">
+				<td>{{dependency.name}}</th>
+				<td ng-repeat="period in statistics.periods">{{statistics.data[period][dependency.id] | number: 2}}</td>
+			</tr>
+			<tr>
+				<th>{{line.name}}</th>
+				<td ng-repeat="period in statistics.periods">{{statistics.data[period][line.id] | number: 2}}</td>
+			</tr>
+		</tbody>
+	</table>
+
+</div>

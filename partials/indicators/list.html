@@ -7,19 +7,28 @@
 		
 		<div class="alert alert-warning" role="alert">
 			<ul>
-				<li>Accordeon à implementer [+] [-]</li>
-				<li>rajouter les projets qui utilisent les indicateurs dans un tooltip</li>
-				<li>c'est moche, refaire</li>
+				<li>Hors charte! refaire proprement</li>
+				<li>Rajouter quel projet utilise quel indicateur (et combien de saisies) dans des tooltips sur chaque ligne</li>
 			</ul>
 		</div>
 
 		<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in hierarchy">
-			<div class="indicator-header">{{themes[themeId].name}}</div>
+			<div class="indicator-header">
+				<button ng-click="open1 = !open1" class="btn btn-default btn-xs">
+					<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
+				</button>
+				{{themes[themeId].name}}
+			</div>
 
-			<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes">
-				<div class="indicator-header">{{types[typeId].name}}</div>
+			<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes" ng-show="open1">
+				<div class="indicator-header">
+					<button ng-click="open2 = !open2" class="btn btn-default btn-xs">
+						<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open2, 'fa-minus-circle': open2}"></i>
+					</button>
+					{{types[typeId].name}}
+				</div>
 
-				<div class="indicator-level-3" ng-repeat="indicator in indicators">
+				<div class="indicator-level-3" ng-repeat="indicator in indicators" ng-show="open2">
 					<span class="color" ng-class="{green: indicator.standard}"></span>
 					<span class="name">{{indicator.name}} ({{indicator.usage}} utilisations)</span>
 					

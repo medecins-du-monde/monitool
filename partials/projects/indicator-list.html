@@ -9,6 +9,7 @@
 				<tr>
 					<th>Name</th>
 					<th>Périodicité</th>
+					<th>Nombre de saisies</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -16,6 +17,7 @@
 				<tr ng-repeat="(indicatorId, planning) in project.planning">
 					<td>{{indicators[indicatorId].name}}</td>
 					<td>{{planning.periodicity}}</td>
+					<td>{{usage[indicatorId]}}</td>
 					<td><a href="#projects/{{project._id}}/indicators/{{indicatorId}}">Voir</a></td>
 				</tr>
 			</tbody>

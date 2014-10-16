@@ -17,7 +17,7 @@
 				<tr ng-repeat="type in types | orderBy: 'name'">
 					<td>{{type.name}}</td>
 					<td>{{usage[type._id] || 0}}</td>
-					<td><button class="btn btn-danger btn-xs" ng-disabled="usage[type._id]" ng-click="delete(type._id)">Supprimer</button></td>
+					<td><button class="btn btn-danger btn-xs" ng-disabled="usage[type._id]" ng-click="remove(type)">Supprimer</button></td>
 				</tr>
 				<tr>
 					<td colspan="3">
