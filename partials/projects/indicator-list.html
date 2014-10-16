@@ -17,7 +17,7 @@
 				<tr ng-repeat="(indicatorId, planning) in project.planning">
 					<td>{{indicators[indicatorId].name}}</td>
 					<td>{{planning.periodicity}}</td>
-					<td>{{usage[indicatorId]}}</td>
+					<td>{{usage[indicatorId] || 0}}</td>
 					<td><a href="#projects/{{project._id}}/indicators/{{indicatorId}}">Voir</a></td>
 				</tr>
 			</tbody>

@@ -1,7 +1,9 @@
 
 
 /*https://www.gv.com/portfolio/*/
-
+textarea {
+	resize: vertical;
+}
 
 .indicator-level-1, .indicator-level-2, .indicator-level-3 {
 	border: solid black;

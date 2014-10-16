@@ -4,60 +4,149 @@
 	</div>
 
 	<div class="col-md-10">
-
-		<div class="alert alert-warning" role="alert">Attention: page pas encore faite.</div>
-
 		<form class="form-horizontal" role="form">
 
-			<div class="form-group">
-				<label for="indicator" class="col-sm-2 control-label">Indicateur</label>
-				<div class="col-sm-10">
-					
-				</div>
-			</div>
+			<fieldset>
+				<legend>Indicateur</legend>
 
-			<div class="form-group">
-				<label for="formula" class="col-sm-2 control-label">Méthode de calcul</label>
-				<div class="col-sm-10">
-					
+				<div class="form-group">
+					<label for="indicator" class="col-sm-2 control-label">Indicateur</label>
+					<div class="col-sm-10">
+						<select class="form-control" ng-model="indicator" ng-options="i.name for i in indicators"></select>
+					</div>
 				</div>
-			</div>
 
-			<div class="form-group">
-				<label for="source" class="col-sm-2 control-label">Source</label>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" id="source" ng-model="planning.source">
+				<div class="form-group">
+					<label for="formula" class="col-sm-2 control-label">Méthode de calcul</label>
+					<div class="col-sm-10">
+						<select class="form-control" ng-model="planning.formula" ng-options="formula.name for (formulaId, formula) in indicator.formulas" ng-disabled="!indicator">
+							<option value="">-- Saisie manuelle --</option>
+						</select>
+					</div>
 				</div>
-			</div>
 
-			<div class="form-group">
-				<label for="relevance" class="col-sm-2 control-label">Pertinence</label>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" id="relevance" ng-model="planning.relevance">
+			</fieldset>
+
+			<fieldset>
+				<legend>Raisonnement</legend>
+
+				<div class="form-group">
+					<label for="source" class="col-sm-2 control-label">Source</label>
+					<div class="col-sm-10">
+						<textarea class="form-control" id="source" ng-model="planning.source"></textarea>
+					</div>
 				</div>
-			</div>
 
-			<div class="form-group">
-				<label for="periodicity" class="col-sm-2 control-label">Périodicité</label>
-				<div class="col-sm-10">
-					
+				<div class="form-group">
+					<label for="relevance" class="col-sm-2 control-label">Pertinence</label>
+					<div class="col-sm-10">
+						<textarea class="form-control" id="relevance" ng-model="planning.relevance"></textarea>
+					</div>
 				</div>
-			</div>
+			</fieldset>
 
-			<div class="form-group">
-				<label for="coloration" class="col-sm-2 control-label">Coloration</label>
-				<div class="col-sm-10">
-					
+			<fieldset>
+				<legend>Collecte</legend>
+				<div class="form-group">
+					<label for="periodicity" class="col-sm-2 control-label">Périodicité</label>
+					<div class="col-sm-10">
+						<select class="form-control" ng-model="planning.periodicity">
+							<option value="month">Tous les mois</option>
+							<option value="free">Planifiée</option>
+						</select>
+					</div>
 				</div>
-			</div>
 
-			<div class="form-group">
-				<label for="targets" class="col-sm-2 control-label">Cibles</label>
-				<div class="col-sm-10">
-					
+				<div class="form-group">
+					<label for="periodicity" class="col-sm-2 control-label">Début</label>
+					<div class="col-sm-10">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<input type="checkbox" ng-model="planning.useProjectStart" /> Début du projet
+							</div>
+							<input type="month" class="form-control" ng-model="planning.start" ng-disabled="planning.useProjectStart" />
+						</div>
+					</div>
 				</div>
-			</div>
 
+				<div class="form-group">
+					<label for="periodicity" class="col-sm-2 control-label">Fin</label>
+					<div class="col-sm-10">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<input type="checkbox" ng-model="planning.useProjectEnd" /> Fin du projet
+							</div>
+							<input type="month" class="form-control" ng-model="planning.end" ng-disabled="planning.useProjectEnd" />
+						</div>
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Échelle</legend>
+
+				<div class="form-group">
+					<label for="targets" class="col-sm-2 control-label">Baseline</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" ng-model="planning.baseline" placeholder="valeur de référence" />
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label for="targets" class="col-sm-2 control-label">Cibles</label>
+					<div class="col-sm-10">
+						<div class="row">
+							<div class="col-sm-12">
+								<button class="btn btn-default" ng-click="addTarget()">Ajouter une cible</button>
+							</div>
+						</div>
+
+						<div ng-repeat="target in planning.targets" class="row" style="padding-top: 10px">
+							<div class="col-sm-4">
+								<input type="month" class="form-control" ng-model="target.month" />
+							</div>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" ng-model="target.value" placeholder="valeur"/>
+							</div>
+							<div class="col-sm-4">
+								<button class="btn btn-danger" ng-click="removeTarget(target)">Supprimer</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Limites</label>
+					<div class="col-sm-5">
+						<input class="form-control" type="text" ng-model="planning.minimum" placeholder="minimum" />
+					</div>
+					<div class="col-sm-5">
+						<input class="form-control" type="text" ng-model="planning.maximum" placeholder="maximum" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Zone Verte</label>
+					<div class="col-sm-5">
+						<input class="form-control" type="text" ng-model="planning.greenMinimum" placeholder="minimum" />
+					</div>
+					<div class="col-sm-5">
+						<input class="form-control" type="text" ng-model="planning.greenMaximum" placeholder="maximum" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Zone Orange</label>
+					<div class="col-sm-5">
+						<input class="form-control" type="text" ng-model="planning.orangeMinimum" placeholder="minimum" />
+					</div>
+					<div class="col-sm-5">
+						<input class="form-control" type="text" ng-model="planning.orangeMaximum" placeholder="maximum" />
+					</div>
+				</div>
+
+
+			</fieldset>
 
 			<button ng-click="reset()" class="btn btn-danger">DELETE</button>
 			<button ng-click="reset()" class="btn btn-default">RESET</button>

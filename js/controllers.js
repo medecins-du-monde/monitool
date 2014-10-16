@@ -155,7 +155,26 @@ monitoolControllers.controller('ProjectIndicatorListController', function($scope
 	};
 });
 
-monitoolControllers.controller('ProjectIndicatorEditController', function($scope) {
+monitoolControllers.controller('ProjectIndicatorEditController', function($scope, mtDatabase) {
+	mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}).then(function(indicators) {
+		$scope.indicators = indicators.rows.map(function(i) { return i.doc; })
+		
+		$scope.indicator = $scope.indicators.filter(function(indicator) { return indicator._id === $scope.indicatorId; });
+		$scope.indicator = $scope.indicator.length ? $scope.indicator[0] : null;
+
+		$scope.planning = {
+			targets: []
+		};
+		
+	});
+
+	$scope.addTarget = function() {
+		$scope.planning.targets.push({value: null, month: null})
+	};
+
+	$scope.removeTarget = function(target) {
+		$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
+	};
 
 });
 
