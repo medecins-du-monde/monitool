@@ -233,8 +233,61 @@ monitoolControllers.controller('IndicatorListController', function($scope, $q, m
 	});
 });
 
-monitoolControllers.controller('IndicatorEditController', function($scope) {
+monitoolControllers.controller('IndicatorEditController', function($scope, $routeParams, mtDatabase, $interval) {
+	var options = {keys: ['indicator', 'type', 'theme'], include_docs: true};
 
+	mtDatabase.query('monitool/by_type', options)
+		.then(function(result) {
+			$scope.indicators = [];
+			$scope.types      = [];
+			$scope.themes     = [];
+
+			result.rows.forEach(function(row) {
+				if (row.id === $routeParams.indicatorId)
+					$scope.indicator = row.doc;
+				else if (row.doc.type === 'indicator') $scope.indicators.push(row.doc);
+				else if (row.doc.type === 'type') $scope.types.push(row.doc);
+				else if (row.doc.type === 'theme') $scope.themes.push(row.doc);
+			});
+		})
+		.finally(function() {
+			$scope.addFormula = function() {
+				$scope.indicator.formulas[PouchDB.utils.uuid().toLowerCase()] = null;
+			};
+
+			$scope.deleteFormula = function(formulaId) {
+				delete $scope.indicator.formulas[formulaId];
+			};
+
+			$scope.getSymbols = function(expression) {
+				var getSymbolsRec = function(root, symbols) {
+					if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
+						root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
+					else if (root.type === 'SymbolNode')
+						symbols[root.name] = true;
+
+					return Object.keys(symbols);
+
+				};
+
+				try { return getSymbolsRec(math.parse(expression), {}); }
+				catch (e) { return []; }
+			};
+
+			$scope.save = function() {
+				console.log($scope.indicator);
+			};
+
+			$scope.reset = function() {
+				console.log($scope.indicator);
+			};
+
+			$scope.remove = function() {
+				console.log($scope.indicator);
+			};
+		});
+
+	$scope.indicator = {type: "indicator", types: [], themes: [], formulas: {}};
 });
 
 /**

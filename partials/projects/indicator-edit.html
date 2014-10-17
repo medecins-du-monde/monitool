@@ -19,7 +19,10 @@
 				<div class="form-group">
 					<label for="formula" class="col-sm-2 control-label">Méthode de calcul</label>
 					<div class="col-sm-10">
-						<select class="form-control" ng-model="planning.formula" ng-options="formula.name for (formulaId, formula) in indicator.formulas" ng-disabled="!indicator">
+						<select class="form-control"
+								ng-model="planning.formula"
+								ng-options="formula.name for (formulaId, formula) in indicator.formulas"
+								ng-disabled="!indicator">
 							<option value="">-- Saisie manuelle --</option>
 						</select>
 					</div>
@@ -33,14 +36,14 @@
 				<div class="form-group">
 					<label for="source" class="col-sm-2 control-label">Source</label>
 					<div class="col-sm-10">
-						<textarea class="form-control" id="source" ng-model="planning.source"></textarea>
+						<textarea class="form-control" id="source" ng-model="planning.source" placeholder="Collecté au niveau du ... par ... puis aggrégé et saisi par ..."></textarea>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label for="relevance" class="col-sm-2 control-label">Pertinence</label>
 					<div class="col-sm-10">
-						<textarea class="form-control" id="relevance" ng-model="planning.relevance"></textarea>
+						<textarea class="form-control" id="relevance" ng-model="planning.relevance" placeholder="Permet de quantifier nos progrès sur l'objectif spécifique ..."></textarea>
 					</div>
 				</div>
 			</fieldset>
@@ -95,13 +98,7 @@
 				<div class="form-group">
 					<label for="targets" class="col-sm-2 control-label">Cibles</label>
 					<div class="col-sm-10">
-						<div class="row">
-							<div class="col-sm-12">
-								<button class="btn btn-default" ng-click="addTarget()">Ajouter une cible</button>
-							</div>
-						</div>
-
-						<div ng-repeat="target in planning.targets" class="row" style="padding-top: 10px">
+						<div ng-repeat="target in planning.targets" class="row" style="padding-bottom: 10px">
 							<div class="col-sm-4">
 								<input type="month" class="form-control" ng-model="target.month" />
 							</div>
@@ -110,6 +107,12 @@
 							</div>
 							<div class="col-sm-4">
 								<button class="btn btn-danger" ng-click="removeTarget(target)">Supprimer</button>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-12">
+								<button class="btn btn-default" ng-click="addTarget()">Ajouter une cible</button>
 							</div>
 						</div>
 					</div>
