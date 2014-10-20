@@ -178,33 +178,6 @@ monitoolControllers.controller('ProjectPlanningEditController', function($scope,
 	};
 
 	$scope.removeTarget = function(target) {
-	return year + '-' + (month < 10 ? '0' : '') + month;
-};
-
-
-monitoolControllers.controller('MenuController', function($scope, $location) {
-	$scope.currentPage = $location.path().split('/')[1];
-
-	$scope.changePage = function(page) {
-		$location.url('/' + page);
-		$scope.currentPage = page;
-	};
-});
-
-monitoolControllers.controller('SubMenuController', function($scope, $routeParams, $location) {
-	$scope.currentPage = $location.path().split('/')[3];
-	$scope.projectId = $routeParams.projectId;
-
-	$scope.changePage = function(page) {
-		if ($routeParams.projectId !== 'new')
-			$location.url('/projects/' + $routeParams.projectId + '/' + page);
-	};
-});
-
-///////////////////////////
-// Project
-///////////////////////////
-
 		$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
 	};
 
