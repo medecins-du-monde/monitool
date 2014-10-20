@@ -4,9 +4,12 @@ CACHE:
 
 index.html
 
+bower_components/fontawesome/fonts/fontawesome-webfont.woff?v=4.2.0
+bower_components/fontawesome/fonts/fontawesome-webfont.ttf?v=4.2.0
+bower_components/fontawesome/fonts/fontawesome-webfont.svg?v=4.2.0
+
 bower_components/fontawesome/css/font-awesome.min.css
 bower_components/bootstrap/dist/css/bootstrap.min.css
-bower_components/bootstrap/dist/css/bootstrap-theme.min.css
 bower_components/angular-ui-select/dist/select.min.css
 bower_components/jquery/dist/jquery.min.js
 bower_components/angular/angular.min.js
@@ -18,11 +21,13 @@ bower_components/mathjs/dist/math.min.js
 bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js
 bower_components/angular-ui-select/dist/select.min.js
 bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.woff
+bower_components/angular-bootstrap-show-errors/src/showErrors.min.js
 
 css/app.css
 
 js/app.js
 js/controllers.js
+js/directives.js
 js/services.js
 
 partials/reporting/by-entities.html
@@ -31,7 +36,6 @@ partials/input/list.html
 partials/projects/description.html
 partials/projects/indicator-edit.html
 partials/projects/user-edit.html
-partials/projects/center-edit.html
 partials/projects/indicator-list.html
 partials/projects/menu.html
 partials/projects/list.html
@@ -45,3 +49,4 @@ partials/indicators/list.html
 
 NETWORK:
 *
+  

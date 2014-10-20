@@ -95,21 +95,22 @@ var data = {
 					"reduce": "_sum"
 				},
 
+
 				"num_inputs_by_project_center": {
 					"map": function(doc) {
 						if (doc.type === "input")
-							emit([doc.project, doc.center], 1);
+							emit([doc.project, doc.center]);
 					}.toString(),
-					"reduce": "_sum"
+					"reduce": "_count"
 				},
 
 				"num_inputs_by_project_indicator": {
 					"map": function(doc) {
 						if (doc.type === "input")
 							for (var indicatorId in doc.indicators)
-							emit([doc.project, indicatorId], 1);
+							emit([doc.project, indicatorId]);
 					}.toString(),
-					"reduce": "_sum"
+					"reduce": "_count"
 				}
 			}
 		}

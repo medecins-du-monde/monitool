@@ -4,6 +4,13 @@
 	</div>
 
 	<div class="col-md-10">
+		
+		<ol class="breadcrumb">
+			<li><a href="#projects">Projets</a></li>
+			<li ng-show="project._id"><a href="#projects/{{project._id}}">{{project.name}}</a></li>
+			<li class="active">Liste des centres</li>
+		</ol>
+
 		<table class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
@@ -18,12 +25,12 @@
 					<td>{{indicators[indicatorId].name}}</td>
 					<td>{{planning.periodicity}}</td>
 					<td>{{usage[indicatorId] || 0}}</td>
-					<td><a href="#projects/{{project._id}}/indicators/{{indicatorId}}">Voir</a></td>
+					<td><a href="#projects/{{project._id}}/plannings/{{indicatorId}}">Voir</a></td>
 				</tr>
 			</tbody>
 		</table>
 
-		<button ng-click="create()">Collecter un autre indicateur</button>
+		<button class="btn btn-default" ng-click="create()">Collecter un autre indicateur</button>
 
 	</div>
 </div>

@@ -1,6 +1,6 @@
 "use strict";
 
-var app = angular.module('MonitoolApp', ['ngRoute', 'MonitoolControllers']);
+var app = angular.module('MonitoolApp', ['ngRoute', 'MonitoolControllers', 'MonitoolDirectives']);
 
 app.config(function($routeProvider) {
 
@@ -38,14 +38,14 @@ app.config(function($routeProvider) {
 		controller: 'ProjectUserEditController'
 	});
 
-	$routeProvider.when('/projects/:projectId/indicators', {
-		templateUrl: 'partials/projects/indicator-list.html',
-		controller: 'ProjectIndicatorListController'
+	$routeProvider.when('/projects/:projectId/plannings', {
+		templateUrl: 'partials/projects/planning-list.html',
+		controller: 'ProjectPlanningListController'
 	});
 
-	$routeProvider.when('/projects/:projectId/indicators/:indicatorId', {
-		templateUrl: 'partials/projects/indicator-edit.html',
-		controller: 'ProjectIndicatorEditController'
+	$routeProvider.when('/projects/:projectId/plannings/:indicatorId', {
+		templateUrl: 'partials/projects/planning-edit.html',
+		controller: 'ProjectPlanningEditController'
 	});
 
 	$routeProvider.when('/projects/:projectId', {

@@ -23,7 +23,8 @@
     "angular-route": "~1.2.25",
     "mathjs": "~1.0.1",
     "angular-bootstrap": "~0.11.2",
-    "angular-ui-select": "~0.8.2"
+    "angular-ui-select": "~0.8.2",
+    "angular-bootstrap-show-errors": "https://github.com/paulyoder/angular-bootstrap-show-errors.git#~2.0.0"
   },
   "resolutions": {
     "pouchdb": "~3.0.6"

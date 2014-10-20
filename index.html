@@ -1,11 +1,11 @@
 <html>
-	<head>
+<!-- <html manifest="monitool.appcache"> -->
+ 	<head>
 		<title>Monitool</title>
 		<meta charset="UTF-8">
 
 		<link rel="stylesheet" type="text/css" href="bower_components/fontawesome/css/font-awesome.min.css" />
 		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
-		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" />
 		<link rel="stylesheet" type="text/css" href="bower_components/angular-ui-select/dist/select.min.css">
 		<link rel="stylesheet" type="text/css" href="css/app.css" />
 
@@ -26,10 +26,12 @@
 		<script type="text/javascript" src="bower_components/mathjs/dist/math.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-ui-select/dist/select.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-bootstrap-show-errors/src/showErrors.min.js"></script>
 
 		<script type="text/javascript" src="js/services.js"></script>
 		<script type="text/javascript" src="js/controllers.js"></script>
 		<script type="text/javascript" src="js/app.js"></script>
+		<script type="text/javascript" src="js/directives.js"></script>
 	</head>
 	<body ng-app="MonitoolApp">
 
@@ -46,9 +48,17 @@
 
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav" ng-controller="MenuController">
-
-						<li ng-repeat="route in routes" ng-class="{active: !isSelected(route)}">
-							<a href="{{route.path}}">{{route.name}}</a>
+						<li ng-class="{active: currentPage == 'projects'}">
+							<a ng-click="changePage('projects')">Projets</a>
+						</li>
+						<li ng-class="{active: currentPage == 'indicators'}">
+							<a ng-click="changePage('indicators')">Catalogue Indicateurs</a>
+						</li>
+						<li ng-class="{active: currentPage == 'inputs'}">
+							<a ng-click="changePage('inputs')">Saisies en attente</a>
+						</li>
+						<li ng-class="{active: currentPage == 'reporting'}">
+							<a ng-click="changePage('reporting')">Consultation</a>
 						</li>
 					</ul>
 				</div>

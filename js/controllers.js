@@ -1,6 +1,6 @@
 "use strict";
 
-var monitoolControllers = angular.module('MonitoolControllers', ['MonitoolServices', 'ui.bootstrap', 'ui.select']);
+var monitoolControllers = angular.module('MonitoolControllers', ['MonitoolServices', 'ui.bootstrap', 'ui.select', 'ui.bootstrap.showErrors']);
 
 
 var period = function(date) {
@@ -11,34 +11,24 @@ var period = function(date) {
 };
 
 
-
 monitoolControllers.controller('MenuController', function($scope, $location) {
-	$scope.routes = [
-		{path: '#projects', name: "Projets"},
-		{path: '#indicators', name: "Catalogue Indicateurs"},
-		{path: '#inputs', name: "Saisies en attente"},
-		{path: '#reporting', name: "Consultation"},
-	];
+	$scope.currentPage = $location.path().split('/')[1];
 
-	$scope.isSelected = function(route) {
-		return route.path.substring(1) !== $location.path().substring(1);
-	};
-
-	$scope.isVisible = function(route) {
-		return true;
+	$scope.changePage = function(page) {
+		$location.url('/' + page);
+		$scope.currentPage = page;
 	};
 });
 
 monitoolControllers.controller('SubMenuController', function($scope, $routeParams, $location) {
+	$scope.currentPage = $location.path().split('/')[3];
 	$scope.projectId = $routeParams.projectId;
 
-	// this is wrong: it will get called a LOT for not much.
-	$scope.isSelected = function(suffix) {
-		var path = $location.path();
-		return path.substring(path.length - suffix.length) === suffix;
+	$scope.changePage = function(page) {
+		if ($routeParams.projectId !== 'new')
+			$location.url('/projects/' + $routeParams.projectId + '/' + page);
 	};
 });
-
 
 ///////////////////////////
 // Project
@@ -50,30 +40,45 @@ monitoolControllers.controller('ProjectListController', function($scope, $locati
 	});
 
 	$scope.create = function() {
-		$location.url('/projects/' + PouchDB.utils.uuid().toLowerCase());
+		$location.url('/projects/new');
 	};
 });
 
-monitoolControllers.controller('ProjectDescriptionController', function($scope, $routeParams, $q, mtDatabase) {
-	$scope.beginMode = $scope.endMode = 'month';
+monitoolControllers.controller('ProjectDescriptionController', function($location, $scope, $routeParams, $q, mtDatabase) {
+	// load or create new project.
+	var projectPromise;
+	if ($routeParams.projectId === 'new')
+		projectPromise = $q.when({type: 'project', planning: {}, center: {}});
+	else
+		projectPromise = mtDatabase.get($routeParams.projectId);
 
-	mtDatabase.get($routeParams.projectId).then(function(master) {
+	// Manage form
+	projectPromise.then(function(master) {
 		$scope.master = master;
-	})
-	.catch(function(error) {
-		$scope.master = {_id: $routeParams.projectId, type: 'project'};
-	})
-	.finally(function() {
+		
+		// on save
+		$scope.update = function() {
+			if ($routeParams.projectId === 'new')
+				$scope.project._id = PouchDB.utils.uuid().toLowerCase();
 
-		$scope.update = function(project) {
-			$scope.master = angular.copy(project);
-			mtDatabase.put($scope.master).then(function(project) {
-				$scope.master._rev = $scope.project._rev = project.rev;
+			mtDatabase.put($scope.project).then(function(result) {
+				$scope.project._rev = result.rev;
+				$scope.master = angular.copy($scope.project);
+
+				if ($routeParams.projectId === 'new')
+					$location.url('/projects/' + result.id + '/description');
+
+			}).catch(function(error) {
+				$scope.error = error;
 			});
 		};
 
 		$scope.reset = function() {
 			$scope.project = angular.copy($scope.master);
+		};
+
+		$scope.isUnchanged = function() {
+			return angular.equals($scope.master, $scope.project);
 		};
 
 		$scope.reset();
@@ -126,7 +131,7 @@ monitoolControllers.controller('ProjectCenterListController', function($scope, $
 	};
 });
 
-monitoolControllers.controller('ProjectIndicatorListController', function($scope, $routeParams, $q, mtDatabase, $location) {
+monitoolControllers.controller('ProjectPlanningListController', function($scope, $routeParams, $q, mtDatabase, $location) {
 	mtDatabase.get($routeParams.projectId).then(function(project) {
 		var usageQuery = mtDatabase.query(
 			'monitool/num_inputs_by_project_indicator',
@@ -151,21 +156,21 @@ monitoolControllers.controller('ProjectIndicatorListController', function($scope
 	});
 
 	$scope.create = function() {
-		$location.url('/projects/' + $scope.project._id + '/indicators/' + PouchDB.utils.uuid().toLowerCase());
+		$location.url('/projects/' + $scope.project._id + '/plannings/' + PouchDB.utils.uuid().toLowerCase());
 	};
 });
 
-monitoolControllers.controller('ProjectIndicatorEditController', function($scope, mtDatabase) {
+monitoolControllers.controller('ProjectPlanningEditController', function($scope, mtDatabase) {
 	mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}).then(function(indicators) {
 		$scope.indicators = indicators.rows.map(function(i) { return i.doc; })
-		
-		$scope.indicator = $scope.indicators.filter(function(indicator) { return indicator._id === $scope.indicatorId; });
-		$scope.indicator = $scope.indicator.length ? $scope.indicator[0] : null;
-
+		$scope.indicatorId = $scope.indicatorId;
 		$scope.planning = {
 			targets: []
 		};
+		console.log($scope.indicators)
 		
+	}).catch(function(error) {
+		console.log(error)
 	});
 
 	$scope.addTarget = function() {
@@ -173,6 +178,33 @@ monitoolControllers.controller('ProjectIndicatorEditController', function($scope
 	};
 
 	$scope.removeTarget = function(target) {
+	return year + '-' + (month < 10 ? '0' : '') + month;
+};
+
+
+monitoolControllers.controller('MenuController', function($scope, $location) {
+	$scope.currentPage = $location.path().split('/')[1];
+
+	$scope.changePage = function(page) {
+		$location.url('/' + page);
+		$scope.currentPage = page;
+	};
+});
+
+monitoolControllers.controller('SubMenuController', function($scope, $routeParams, $location) {
+	$scope.currentPage = $location.path().split('/')[3];
+	$scope.projectId = $routeParams.projectId;
+
+	$scope.changePage = function(page) {
+		if ($routeParams.projectId !== 'new')
+			$location.url('/projects/' + $routeParams.projectId + '/' + page);
+	};
+});
+
+///////////////////////////
+// Project
+///////////////////////////
+
 		$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
 	};
 
@@ -195,7 +227,7 @@ monitoolControllers.controller('ProjectUserEditController', function($scope) {
 // Indicators
 ///////////////////////////
 
-monitoolControllers.controller('IndicatorListController', function($scope, $q, mtDatabase) {
+monitoolControllers.controller('IndicatorListController', function($scope, $q, $location, mtDatabase) {
 	$q.all([
 		mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}),
 		mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}),
@@ -231,6 +263,10 @@ monitoolControllers.controller('IndicatorListController', function($scope, $q, m
 		$scope.themes = {};
 		result[2].rows.forEach(function(row) { return $scope.themes[row.id] = row.doc; });
 	});
+
+	$scope.create = function() {
+		$location.url('/indicators/new');
+	};
 });
 
 monitoolControllers.controller('IndicatorEditController', function($scope, $routeParams, mtDatabase, $interval) {
@@ -251,6 +287,7 @@ monitoolControllers.controller('IndicatorEditController', function($scope, $rout
 			});
 		})
 		.finally(function() {
+
 			$scope.addFormula = function() {
 				$scope.indicator.formulas[PouchDB.utils.uuid().toLowerCase()] = null;
 			};
@@ -267,7 +304,6 @@ monitoolControllers.controller('IndicatorEditController', function($scope, $rout
 						symbols[root.name] = true;
 
 					return Object.keys(symbols);
-
 				};
 
 				try { return getSymbolsRec(math.parse(expression), {}); }
@@ -416,6 +452,7 @@ monitoolControllers.controller('InputEditController', function($scope, $routePar
 	mtDatabase.query('monitool/project_by_center', {key: $routeParams.centerId, include_docs: true}).then(function(result) {
 		$scope.project = result.rows[0].doc;
 		$scope.center  = $scope.project.center[$routeParams.centerId];
+		$scope.period  = $routeParams.month;
 
 		$q.all([
 			mtInput.getFormValues($routeParams.centerId, $routeParams.month),

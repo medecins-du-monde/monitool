@@ -58,3 +58,13 @@ textarea {
     line-height: 1.5;
     border-radius: 3px;
 }
+
+
+
+.form-group .help-block {
+  display: none;
+}
+
+.form-group.has-error .help-block {
+  display: block;
+}

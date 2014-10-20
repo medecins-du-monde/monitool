@@ -1,16 +1,11 @@
-
 <ul class="nav nav-pills nav-stacked" ng-controller="SubMenuController">
-	<li ng-class="{active: isSelected('description')}">
-		<a href="#projects/{{projectId}}/description">Description</a>
+	<li ng-class="{active: currentPage === 'description'}">
+		<a ng-click="changePage('description')">Description</a>
 	</li>
-	<li ng-class="{active: isSelected('centers')}">
-		<a href="#projects/{{projectId}}/centers">Centres</a>
+	<li ng-class="{active: currentPage === 'centers', disabled: projectId === 'new'}">
+		<a ng-click="changePage('centers')">Centres</a>
 	</li>
-	<li ng-class="{active: isSelected('indicators')}">
-		<a href="#projects/{{projectId}}/indicators">Planning</a>
+	<li ng-class="{active: currentPage === 'plannings', disabled: projectId === 'new'}">
+		<a ng-click="changePage('plannings')">Planning</a>
 	</li>
-<!-- 	<li ng-class="{active: isSelected('users')}">
-		<a href="#projects/{{projectId}}/users">Utilisateurs</a>
-	</li>
- --></ul>
-
+</ul>

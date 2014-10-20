@@ -4,7 +4,13 @@
 	</div>
 
 	<div class="col-md-10">
-		<form class="form-horizontal" role="form" ng-show="indicator">
+
+		<ol class="breadcrumb">
+			<li><a href="#indicators">Indicateurs</a></li>
+			<li class="active">{{indicator.name}}</li>
+		</ol>
+
+		<form class="form-horizontal" role="form">
 			<fieldset>
 				<legend>Définition</legend>
 

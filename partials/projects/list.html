@@ -4,15 +4,15 @@
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th>Nom</th>
-			<th>Country</th>
-			<th>Début</th>
-			<th>Fin</th>
+			<th><a ng-click="pred = 'name'; rev = !rev">Nom</a></th>
+			<th><a ng-click="pred = 'country'; rev = !rev">Pays</a></th>
+			<th><a ng-click="pred = 'begin'; rev = !rev">Début</a></th>
+			<th><a ng-click="pred = 'end'; rev = !rev">Fin</a></th>
 			<th></th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="project in projects">
+		<tr ng-repeat="project in projects | orderBy:pred:rev">
 			<td>{{project.name}}</td>
 			<td>{{project.country}}</td>
 			<td>{{project.begin}}</td>
@@ -26,4 +26,4 @@
 	</tbody>
 </table>
 
-<button ng-click="create()">Creer nouveau projet</button>
+<button class="btn btn-default" ng-click="create()">Creer nouveau projet</button>

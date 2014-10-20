@@ -5,38 +5,83 @@
 	</div>
 
 	<div class="col-md-10">
-		<form class="form-horizontal" role="form">
-			
-			<div class="form-group">
-				<label for="name" class="col-sm-2 control-label">Nom</label>
+
+		<ol class="breadcrumb">
+			<li><a href="#projects">Projets</a></li>
+			<li class="active">{{project.name}}</li>
+			<li class="active">Description</li>
+		</ol>
+
+
+		<form class="form-horizontal" role="form" name="projectForm" novalidate>
+
+			<div class="form-group" show-errors>
+				<label for="input-name" class="col-sm-2 control-label">Nom</label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" id="name" ng-model="project.name">
+					<input type="text" class="form-control" id="input-name" name="name" ng-model="project.name" required placeholder="Exemple: Réduction des Risques Laos">
+					<p class="help-block" ng-if="projectForm.name.$error.required">
+						Ce champ est obligatoire
+					</p>
 				</div>
 			</div>
 
-			<div class="form-group">
-				<label for="country" class="col-sm-2 control-label">Pays</label>
+			<div class="form-group" show-errors>
+				<label for="input-country" class="col-sm-2 control-label">Pays</label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" id="country" ng-model="project.country">
+					<input type="text" class="form-control" id="input-country" name="country" ng-model="project.country" required placeholder="Exemple: Laos">
+					<p class="help-block" ng-if="projectForm.country.$error.required">
+						Ce champ est obligatoire
+					</p>
 				</div>
 			</div>
 
-			<div class="form-group">
-				<label for="begin" class="col-sm-2 control-label">Date de lancement</label>
+			<div class="form-group" show-errors>
+				<label for="input-begin" class="col-sm-2 control-label">Date de lancement</label>
 				<div class="col-sm-10">
-					<input type="month" class="form-control" id="begin" ng-model="project.begin">
+					<input type="month"
+						   class="form-control"
+						   id="input-begin"
+						   name="begin"
+						   max="{{project.end}}"
+						   ng-model="project.begin"
+						   required
+						   lower-than="{{project.end}}">
+
+					<p class="help-block" ng-if="projectForm.begin.$error.required">
+						Ce champ est obligatoire
+					</p>
+
+					<p class="help-block" ng-if="projectForm.begin.$error.lowerThan">
+						La date début de doit être inférieure à la date de fin
+					</p>
 				</div>
 			</div>
 
-			<div class="form-group">
-				<label for="end" class="col-sm-2 control-label">Date de fin</label>
+			<div class="form-group" show-errors>
+
+				<label for="input-end" class="col-sm-2 control-label">Date de fin</label>
 				<div class="col-sm-10">
-					<input type="month" class="form-control" id="end" ng-model="project.end">
+					<input type="month"
+						   class="form-control"
+						   id="input-end"
+						   name="end"
+						   min="{{project.begin}}"
+						   ng-model="project.end"
+						   greater-than="{{project.begin}}"
+						   required>
+
+					<p class="help-block" ng-if="projectForm.end.$error.required">
+						Ce champ est obligatoire
+					</p>
+
+					<p class="help-block" ng-if="projectForm.end.$error.greaterThan">
+						La date de fin doit être supérieure à la date de début
+					</p>
 				</div>
 			</div>
 
-			<button ng-click="reset()" class="btn btn-default">RESET</button>
-			<button ng-click="update(project)" class="btn btn-default">SAVE</button>
+			<button ng-click="update()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
+			<button ng-click="reset()" class="btn btn-default">Réinitialiser</button>
 		</form>
 
 	</div>
