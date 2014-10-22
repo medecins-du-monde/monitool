@@ -10,35 +10,58 @@
 			<li class="active">{{indicator.name}}</li>
 		</ol>
 
-		<form class="form-horizontal" role="form">
+		<form class="form-horizontal" role="form" name="indicatorForm" novalidate>
 			<fieldset>
 				<legend>Définition</legend>
 
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="input-standard" class="col-sm-2 control-label">Standard</label>
 					<div class="col-sm-10">
 						<input id="input-standard" type="checkbox" ng-model="indicator.standard" />
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="input-name" class="col-sm-2 control-label">Nom</label>
 					<div class="col-sm-10">
-						<input id="input-name" type="text" class="form-control" ng-model="indicator.name" placeholder="Exemple: Part des dossiers patient bien remplis" />
+						<input id="input-name"
+							   class="form-control"
+							   type="text"
+							   ng-model="indicator.name"
+							   name="name"
+							   placeholder="Exemple: Part des dossiers patient bien remplis"
+							   required />
+					
+						<p class="help-block" ng-if="indicatorForm.name.$error.required">
+							Ce champ est obligatoire
+						</p>
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="input-description" class="col-sm-2 control-label">Description</label>
 					<div class="col-sm-10">
-						<textarea id="input-description" class="form-control" ng-model="indicator.description" placeholder="Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre."></textarea>
+						<textarea id="input-description"
+								  name="description"
+								  class="form-control"
+								  ng-model="indicator.description"
+								  required
+								  placeholder="Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre."></textarea>
+
+						<p class="help-block" ng-if="indicatorForm.description.$error.required">
+							Ce champ est obligatoire
+						</p>
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="input-history" class="col-sm-2 control-label">Historique</label>
 					<div class="col-sm-10">
-						<textarea id="input-history" ng-model="indicator.source" class="form-control" placeholder="Exemple: Défini en 2007 par l'OMS et utilisé sur les projets de UNICEF ... cet indicateur a permi de suivre les objectifs ..."></textarea>
+						<textarea id="input-history"
+								  name="history"
+								  ng-model="indicator.history"
+								  class="form-control"
+								  placeholder="Exemple: Défini en 2007 par l'OMS et utilisé sur les projets de UNICEF ... cet indicateur a permi de suivre les objectifs ..."></textarea>
 					</div>
 				</div>
 
@@ -47,11 +70,10 @@
 			<fieldset>
 				<legend>Classement</legend>
 
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="input-types" class="col-sm-2 control-label">Types</label>
 					<div class="col-sm-10">
-
-						<ui-select id="input-types" multiple ng-model="indicator.types" theme="bootstrap">
+						<ui-select id="input-types" multiple ng-model="indicator.types" theme="bootstrap" required>
 							<ui-select-match placeholder="Sélectionnez un ou plusieurs types">
 								{{$item.name}}
 							</ui-select-match>
@@ -62,10 +84,10 @@
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="input-themes" class="col-sm-2 control-label">Thématiques</label>
 					<div class="col-sm-10">
-						<ui-select id="input-themes" multiple ng-model="indicator.themes" theme="bootstrap">
+						<ui-select id="input-themes" multiple ng-model="indicator.themes" theme="bootstrap" required>
 							<ui-select-match placeholder="Sélectionnez une ou plusieures thématiques">
 								{{$item.name}}
 							</ui-select-match>
@@ -80,14 +102,14 @@
 			<fieldset>
 				<legend>Calcul</legend>
 
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="input-sum-allowed" class="col-sm-2 control-label">Sommable</label>
 					<div class="col-sm-10">
 						<input id="input-sum-allowed" type="checkbox" ng-model="indicator.sumAllowed">
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="name" class="col-sm-2 control-label">Formules</label>
 					<div class="col-sm-10">
 						<table class="table table-bordered table-condensed" ng-repeat="(formulaId, formula) in indicator.formulas">
@@ -98,7 +120,7 @@
 										<input type="text"
 											   class="form-control"
 											   placeholder="Exemple: Pourcentage entre dossiers patient bien remplis et total"
-											   ng-model="formula.name" />
+											   ng-model="indicator.formulas[formulaId].name" required/>
 
 										<span class="input-group-btn">
 											<button class="btn btn-danger" ng-click="deleteFormula(formulaId)">Retirer</button>
@@ -111,14 +133,14 @@
 								<td>
 									<input type="text"
 										   class="form-control"
-										   ng-model="formula.expression"
-										   placeholder="Exemple: 100 * a / b" />
+										   ng-model="indicator.formulas[formulaId].expression"
+										   placeholder="Exemple: 100 * a / b" required mathjs-valid />
 								</td>
 							</tr>
-							<tr ng-repeat="parameterName in getSymbols(formula.expression)">
+							<tr ng-repeat="parameterName in getSymbols(indicator.formulas[formulaId].expression)">
 								<td>Paramètre <strong>"{{parameterName}}"</strong></td>
 								<td>
-									<ui-select ng-model="formula.parameters[parameterName]" theme="bootstrap">
+									<ui-select ng-model="indicator.formulas[formulaId].parameters[parameterName]" theme="bootstrap" required>
 										<ui-select-match placeholder="Choisissez un indicateur">{{$select.selected.name}}</ui-select-match>
 										<ui-select-choices repeat="indicator._id as indicator in indicators | filter: $select.search">
 											<span>{{indicator.name}}</span>
@@ -133,10 +155,11 @@
 				</div>
 			</fieldset>
 
-			<div class="pull-right">
-				<button class="btn btn-primary" ng-click="save()">Sauvegarder</button>
-				<button class="btn btn-warning" ng-click="reset()">Réinitialiser</button>
-				<button class="btn btn-danger" ng-click="remove()">Supprimer</button>
+			<div>
+				<button class="btn btn-primary"  ng-disabled="indicatorForm.$invalid || isUnchanged()" ng-click="save()">Sauvegarder</button>
+				<button class="btn btn-warning" ng-disabled="isUnchanged()" ng-click="reset()">Réinitialiser</button>
+
+				<button class="btn btn-danger" ng-click="remove()" ng-if="indicator._id">Supprimer</button>
 			</div>
 
 		</form>

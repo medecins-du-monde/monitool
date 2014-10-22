@@ -34,77 +34,47 @@ monitoolControllers.controller('SubMenuController', function($scope, $routeParam
 // Project
 ///////////////////////////
 
-monitoolControllers.controller('ProjectListController', function($scope, $location, mtDatabase) {
-	mtDatabase.query('monitool/by_type', {include_docs: true, key: 'project'}).then(function(projects) {
-		$scope.projects = projects.rows.map(function(row) { return row.doc; });
-	});
+monitoolControllers.controller('ProjectListController', function($scope, $location, projects) {
+	$scope.projects = projects;
 
 	$scope.create = function() {
 		$location.url('/projects/new');
 	};
 });
 
-monitoolControllers.controller('ProjectDescriptionController', function($location, $scope, $routeParams, $q, mtDatabase) {
-	// load or create new project.
-	var projectPromise;
-	if ($routeParams.projectId === 'new')
-		projectPromise = $q.when({type: 'project', planning: {}, center: {}});
-	else
-		projectPromise = mtDatabase.get($routeParams.projectId);
+monitoolControllers.controller('ProjectDescriptionController', function($location, $scope, $routeParams, mtDatabase, project) {
+	$scope.project = project;
+	$scope.master = angular.copy(project);
+	
+	// on save
+	$scope.update = function() {
+		if ($routeParams.projectId === 'new')
+			$scope.project._id = PouchDB.utils.uuid().toLowerCase();
 
-	// Manage form
-	projectPromise.then(function(master) {
-		$scope.master = master;
-		
-		// on save
-		$scope.update = function() {
+		mtDatabase.put($scope.project).then(function(result) {
+			$scope.project._rev = result.rev;
+			$scope.master = angular.copy($scope.project);
+
 			if ($routeParams.projectId === 'new')
-				$scope.project._id = PouchDB.utils.uuid().toLowerCase();
+				$location.url('/projects/' + result.id + '/description');
 
-			mtDatabase.put($scope.project).then(function(result) {
-				$scope.project._rev = result.rev;
-				$scope.master = angular.copy($scope.project);
+		}).catch(function(error) {
+			$scope.error = error;
+		});
+	};
 
-				if ($routeParams.projectId === 'new')
-					$location.url('/projects/' + result.id + '/description');
+	$scope.reset = function() {
+		$scope.project = angular.copy($scope.master);
+	};
 
-			}).catch(function(error) {
-				$scope.error = error;
-			});
-		};
-
-		$scope.reset = function() {
-			$scope.project = angular.copy($scope.master);
-		};
-
-		$scope.isUnchanged = function() {
-			return angular.equals($scope.master, $scope.project);
-		};
-
-		$scope.reset();
-	});
+	$scope.isUnchanged = function() {
+		return angular.equals($scope.master, $scope.project);
+	};
 });
 
-monitoolControllers.controller('ProjectCenterListController', function($scope, $routeParams, $q, mtDatabase) {
-	$q.all([
-		mtDatabase.get($routeParams.projectId),
-		mtDatabase.query(
-			'monitool/num_inputs_by_project_center',
-			{
-				startkey: [$routeParams.projectId],
-				endkey: [$routeParams.projectId, {}],
-				group: true,
-				group_level: 2
-			}
-		)
-	]).then(function(result) {
-		$scope.project = result[0];
-		$scope.usage = {};
-
-		result[1].rows.forEach(function(row) {
-			$scope.usage[row.key[1]] = row.value;
-		});
-	});
+monitoolControllers.controller('ProjectCenterListController', function($scope, project, inputsByCenterId, mtDatabase) {
+	$scope.project = project;
+	$scope.usage = inputsByCenterId;
 
 	$scope.delete = function(centerId) {
 		delete $scope.project.center[centerId];
@@ -117,46 +87,26 @@ monitoolControllers.controller('ProjectCenterListController', function($scope, $
 		var newCenterName = $scope.newCenter ? $scope.newCenter.trim() : '';
 		$scope.newCenter = '';
 
-		if (!newCenterName || !newCenterName.length)
-			return;
+		if (newCenterName && newCenterName.length) {
+			for (var key in $scope.project.center)
+				if ($scope.project.center[key].name === newCenterName)
+					return;
 
-		for (var key in $scope.project.center)
-			if ($scope.project.center[key].name === newCenterName)
-				return;
-
-		$scope.project.center[PouchDB.utils.uuid().toLowerCase()] = {name: newCenterName};
-		mtDatabase.put($scope.project).then(function(result) {
-			$scope.project._rev = result.rev;
-		})
+			$scope.project.center[PouchDB.utils.uuid().toLowerCase()] = {name: newCenterName};
+			mtDatabase.put($scope.project).then(function(result) {
+				$scope.project._rev = result.rev;
+			});
+		}
 	};
 });
 
-monitoolControllers.controller('ProjectPlanningListController', function($scope, $routeParams, $q, mtDatabase, $location) {
-	mtDatabase.get($routeParams.projectId).then(function(project) {
-		var usageQuery = mtDatabase.query(
-			'monitool/num_inputs_by_project_indicator',
-			{ startkey: [$routeParams.projectId], endkey: [$routeParams.projectId, {}], group: true, group_level: 2 }
-		);
-
-		var indicatorsQuery = mtDatabase.allDocs({keys: Object.keys(project.planning || {}), include_docs: true});
-
-		$q.all([indicatorsQuery, usageQuery]).then(function(result) {
-			$scope.project = project;
-			$scope.indicators = {};
-			$scope.usage = {};
-
-			result[0].rows.forEach(function(indicator) {
-				$scope.indicators[indicator.id] = indicator.doc;
-			});
-
-			result[1].rows.forEach(function(row) {
-				$scope.usage[row.key[1]] = row.value;
-			});
-		});
-	});
+monitoolControllers.controller('ProjectPlanningListController', function($scope, $location, project, indicators, inputsByIndicatorId) {
+	$scope.project    = project;
+	$scope.usage      = inputsByIndicatorId;
+	$scope.indicators = indicators;
 
 	$scope.create = function() {
-		$location.url('/projects/' + $scope.project._id + '/plannings/' + PouchDB.utils.uuid().toLowerCase());
+		$location.url('/projects/' + project._id + '/plannings/new');
 	};
 });
 
@@ -180,18 +130,14 @@ monitoolControllers.controller('ProjectPlanningEditController', function($scope,
 	$scope.removeTarget = function(target) {
 		$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
 	};
-
 });
 
 monitoolControllers.controller('ProjectUserListController', function($scope) {
 
 });
 
-monitoolControllers.controller('ProjectUserEditController', function($scope) {
-	mtDatabase.get($routeParams.projectId).then(function(master) {
-		$scope.project = project;
-	});
-
+monitoolControllers.controller('ProjectUserEditController', function($scope, project) {
+	$scope.project = project;
 });
 
 
@@ -200,119 +146,79 @@ monitoolControllers.controller('ProjectUserEditController', function($scope) {
 // Indicators
 ///////////////////////////
 
-monitoolControllers.controller('IndicatorListController', function($scope, $q, $location, mtDatabase) {
-	$q.all([
-		mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}),
-		mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}),
-		mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}),
-		mtDatabase.query('monitool/indicator_usage', {group: true})
-	]).then(function(result) {
-		var usage = usage = {};
-		result[3].rows.forEach(function(row) { usage[row.key] = row.value; });
-
-		$scope.hierarchy = {};
-		result[0].rows.forEach(function(row) {
-			var indicator = row.doc;
-			indicator.usage = usage[indicator._id] || 0;
-
-			indicator.themes.forEach(function(theme) {
-				indicator.types.forEach(function(type) {
-					if (!$scope.hierarchy[theme])
-						$scope.hierarchy[theme] = {};
-
-					if (!$scope.hierarchy[theme][type])
-						$scope.hierarchy[theme][type] = [];
-
-					$scope.hierarchy[theme][type].push(indicator);
-				});
-			});
-
-			return row.doc;
-		});
-
-		$scope.types = {};
-		result[1].rows.forEach(function(row) { return $scope.types[row.id] = row.doc; });
-
-		$scope.themes = {};
-		result[2].rows.forEach(function(row) { return $scope.themes[row.id] = row.doc; });
-	});
+monitoolControllers.controller('IndicatorListController', function($scope, $q, $location, hierarchy) {
+	$scope.hierarchy = hierarchy.hierarchy;
+	$scope.types     = hierarchy.types;
+	$scope.themes    = hierarchy.themes;
 
 	$scope.create = function() {
 		$location.url('/indicators/new');
 	};
 });
 
-monitoolControllers.controller('IndicatorEditController', function($scope, $routeParams, mtDatabase, $interval) {
-	var options = {keys: ['indicator', 'type', 'theme'], include_docs: true};
+monitoolControllers.controller('IndicatorEditController', function($scope, $routeParams, $location, mtDatabase, indicator, indicators, types, themes) {
+	$scope.indicator  = indicator;
+	$scope.master     = angular.copy(indicator);
+	$scope.indicators = indicators.rows.map(function(row) { return row.doc; }).filter(function(i) { return i._id != indicator._id });
+	$scope.types      = types.rows.map(function(row) { return row.doc; });
+	$scope.themes     = themes.rows.map(function(row) { return row.doc; });
 
-	mtDatabase.query('monitool/by_type', options)
-		.then(function(result) {
-			$scope.indicators = [];
-			$scope.types      = [];
-			$scope.themes     = [];
+	// Formula handlers
+	$scope.addFormula = function() {
+		$scope.indicator.formulas[PouchDB.utils.uuid().toLowerCase()] = {};
+	};
 
-			result.rows.forEach(function(row) {
-				if (row.id === $routeParams.indicatorId)
-					$scope.indicator = row.doc;
-				else if (row.doc.type === 'indicator') $scope.indicators.push(row.doc);
-				else if (row.doc.type === 'type') $scope.types.push(row.doc);
-				else if (row.doc.type === 'theme') $scope.themes.push(row.doc);
-			});
-		})
-		.finally(function() {
+	$scope.deleteFormula = function(formulaId) {
+		delete $scope.indicator.formulas[formulaId];
+	};
 
-			$scope.addFormula = function() {
-				$scope.indicator.formulas[PouchDB.utils.uuid().toLowerCase()] = null;
-			};
+	$scope.getSymbols = function(expression) {
+		var getSymbolsRec = function(root, symbols) {
+			if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
+				root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
+			else if (root.type === 'SymbolNode')
+				symbols[root.name] = true;
 
-			$scope.deleteFormula = function(formulaId) {
-				delete $scope.indicator.formulas[formulaId];
-			};
+			return Object.keys(symbols);
+		};
 
-			$scope.getSymbols = function(expression) {
-				var getSymbolsRec = function(root, symbols) {
-					if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
-						root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
-					else if (root.type === 'SymbolNode')
-						symbols[root.name] = true;
+		try { return getSymbolsRec(math.parse(expression), {}); }
+		catch (e) { return []; }
+	};
 
-					return Object.keys(symbols);
-				};
+	// Form actions
+	$scope.reset = function() {
+		$scope.indicator = angular.copy($scope.master);
+	};
 
-				try { return getSymbolsRec(math.parse(expression), {}); }
-				catch (e) { return []; }
-			};
+	$scope.save = function() {
+		if ($routeParams.indicatorId === 'new')
+			$scope.indicator._id = PouchDB.utils.uuid().toLowerCase();
 
-			$scope.save = function() {
-				console.log($scope.indicator);
-			};
+		mtDatabase.put($scope.indicator).then(function(result) {
+			$scope.indicator._rev = result.rev;
+			$scope.master = angular.copy($scope.indicator);
 
-			$scope.reset = function() {
-				console.log($scope.indicator);
-			};
-
-			$scope.remove = function() {
-				console.log($scope.indicator);
-			};
+			if ($routeParams.indicatorId === 'new')
+				$location.url('/indicators/' + result.id);
 		});
+	};
 
-	$scope.indicator = {type: "indicator", types: [], themes: [], formulas: {}};
+	$scope.isUnchanged = function() {
+		return angular.equals($scope.master, $scope.indicator);
+	};
+
+	$scope.remove = function() {
+		console.log($scope.indicator);
+	};
 });
 
 /**
  * this controller and theme controller are the same, factorize it!
  */
-monitoolControllers.controller('TypeListController', function($q, $scope, mtDatabase) {
-	$q.all([
-		mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}),
-		mtDatabase.query('monitool/type_usage', {group: true})
-	]).then(function(result) {
-		$scope.types = result[0].rows.map(function(row) { return row.doc; });
-		$scope.usage = {};
-		result[1].rows.forEach(function(row) {
-			$scope.usage[row.key] = row.value;
-		});
-	});
+monitoolControllers.controller('TypeListController', function($q, $scope, types, typeUsages, mtDatabase) {
+	$scope.types = types;
+	$scope.usage = typeUsages;
 
 	$scope.add = function() {
 		var newType = {_id: PouchDB.utils.uuid().toLowerCase(), type: 'type', name: $scope.newType || ''};
@@ -331,17 +237,9 @@ monitoolControllers.controller('TypeListController', function($q, $scope, mtData
 	};
 });
 
-monitoolControllers.controller('ThemeListController', function($q, $scope, mtDatabase) {
-	$q.all([
-		mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}),
-		mtDatabase.query('monitool/theme_usage', {group: true})
-	]).then(function(result) {
-		$scope.themes = result[0].rows.map(function(row) { return row.doc; });
-		$scope.usage = {};
-		result[1].rows.forEach(function(row) {
-			$scope.usage[row.key] = row.value;
-		});
-	});
+monitoolControllers.controller('ThemeListController', function($q, $scope, themes, themeUsages, mtDatabase) {
+	$scope.themes = themes;
+	$scope.usage = themeUsages;
 
 	$scope.add = function() {
 		var newTheme = {_id: PouchDB.utils.uuid().toLowerCase(), type: 'theme', name: $scope.newTheme || ''};
