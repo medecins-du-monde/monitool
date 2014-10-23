@@ -157,22 +157,20 @@ monitoolControllers.controller('IndicatorListController', function($scope, $q, $
 });
 
 monitoolControllers.controller('IndicatorEditController', function($scope, $routeParams, $location, mtDatabase, indicator, indicators, types, themes) {
-	$scope.indicator  = indicator;
-	$scope.master     = angular.copy(indicator);
-	$scope.indicators = indicators.rows.map(function(row) { return row.doc; }).filter(function(i) { return i._id != indicator._id });
-	$scope.types      = types.rows.map(function(row) { return row.doc; });
-	$scope.themes     = themes.rows.map(function(row) { return row.doc; });
-
 	// Formula handlers
 	$scope.addFormula = function() {
-		$scope.indicator.formulas[PouchDB.utils.uuid().toLowerCase()] = {};
+		var uuid  = PouchDB.utils.uuid().toLowerCase(),
+			value = {name: '', expression: '', parameters: {}};
+
+		$scope.indicator.formulas[uuid] = value;
 	};
 
 	$scope.deleteFormula = function(formulaId) {
 		delete $scope.indicator.formulas[formulaId];
 	};
 
-	$scope.getSymbols = function(expression) {
+	$scope.updateFormula = function(formulaId) {
+		// Helper function to recursively retrieve symbols from abstract syntax tree.
 		var getSymbolsRec = function(root, symbols) {
 			if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
 				root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
@@ -181,9 +179,35 @@ monitoolControllers.controller('IndicatorEditController', function($scope, $rout
 
 			return Object.keys(symbols);
 		};
+		
+		var formula = $scope.indicator.formulas[formulaId];
+		formula.isValid = true;
+		try {
+			var expression = math.parse(formula.expression);
+			// do not allow empty formula
+			if (expression.type === 'ConstantNode' && expression.value === 'undefined')
+				throw new Error();
+			
+			formula.symbols = getSymbolsRec(expression, {});
+		}
+		catch (e) { 
+			formula.symbols = [];
+			formula.isValid = false;
+		}
 
-		try { return getSymbolsRec(math.parse(expression), {}); }
-		catch (e) { return []; }
+		var numSymbols = formula.symbols.length;
+		for (var i = 0; i < numSymbols; ++i)
+			if (!formula.parameters[formula.symbols[i]])
+				formula.isValid = false;
+
+		if (!formula.name)
+			formula.isValid = false;
+	};
+
+	$scope.formulaInvalid = function() {
+		return Object.keys($scope.indicator.formulas).some(function(formulaId) {
+			return !$scope.indicator.formulas[formulaId].isValid;
+		});
 	};
 
 	// Form actions
@@ -211,6 +235,16 @@ monitoolControllers.controller('IndicatorEditController', function($scope, $rout
 	$scope.remove = function() {
 		console.log($scope.indicator);
 	};
+
+	// init scope
+	$scope.indicator  = indicator;
+	for (var formulaId in indicator.formulas)
+		$scope.updateFormula(formulaId);
+
+	$scope.master     = angular.copy(indicator);
+	$scope.indicators = indicators.rows.map(function(row) { return row.doc; }).filter(function(i) { return i._id != indicator._id });
+	$scope.types      = types.rows.map(function(row) { return row.doc; });
+	$scope.themes     = themes.rows.map(function(row) { return row.doc; });
 });
 
 /**

@@ -8,13 +8,13 @@
 		<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in hierarchy">
 			<div class="indicator-header" ng-click="open1 = !open1">
 				<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
-				{{themes[themeId].name}}
+				{{themes[themeId].name || 'Sans thématique'}}
 			</div>
 
 			<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes" ng-show="open1">
 				<div class="indicator-header" ng-click="open2 = !open2">
 					<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open2, 'fa-minus-circle': open2}"></i>
-					{{types[typeId].name}}
+					{{types[typeId].name || 'Sans type'}}
 				</div>
 
 				<div class="indicator-level-3" ng-repeat="indicator in indicators" ng-show="open2">

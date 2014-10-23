@@ -132,7 +132,6 @@ app.config(function($routeProvider) {
 					mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}),
 					mtDatabase.query('monitool/indicator_usage', {group: true})
 				]).then(function(result) {
-
 					var scope = {};
 					var usage = {};
 					result[3].rows.forEach(function(row) { usage[row.key] = row.value; });
@@ -141,6 +140,12 @@ app.config(function($routeProvider) {
 					result[0].rows.forEach(function(row) {
 						var indicator = row.doc;
 						indicator.usage = usage[indicator._id] || 0;
+
+						if (!indicator.themes.length)
+							indicator.themes.push('');
+
+						if (!indicator.types.length)
+							indicator.types.push('');
 
 						indicator.themes.forEach(function(theme) {
 							indicator.types.forEach(function(type) {
@@ -157,10 +162,9 @@ app.config(function($routeProvider) {
 						return row.doc;
 					});
 
-					scope.types = {};
-					result[1].rows.forEach(function(row) { return scope.types[row.id] = row.doc; });
-
+					scope.types  = {};
 					scope.themes = {};
+					result[1].rows.forEach(function(row) { return scope.types[row.id] = row.doc; });
 					result[2].rows.forEach(function(row) { return scope.themes[row.id] = row.doc; });
 
 					return scope;
@@ -175,7 +179,7 @@ app.config(function($routeProvider) {
 		resolve: {
 			indicator: function($route, $q, mtDatabase) {
 				if ($route.current.params.indicatorId === 'new') {
-					var i = {type: 'indicator', name: '', description: '', history: '', standard: false, types: [], themes: [], formulas: {}};
+					var i = {type: 'indicator', name: '', description: '', history: '', standard: false, sumAllowed: false, types: [], themes: [], formulas: {}};
 					return $q.when(i);
 				}
 				else
@@ -221,7 +225,7 @@ app.config(function($routeProvider) {
 			types: function(mtDatabase) {
 				return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
 					return result.rows.map(function(row) { return row.doc; });
-				})
+				});
 			},
 			typeUsages: function(mtDatabase) {
 				return mtDatabase.query('monitool/type_usage', {group: true}).then(function(result) {

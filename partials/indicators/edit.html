@@ -14,10 +14,10 @@
 			<fieldset>
 				<legend>Définition</legend>
 
-				<div class="form-group" show-errors>
+				<div class="form-group">
 					<label for="input-standard" class="col-sm-2 control-label">Standard</label>
 					<div class="col-sm-10">
-						<input id="input-standard" type="checkbox" ng-model="indicator.standard" />
+						<input id="input-standard" type="checkbox" ng-model="indicator.standard" name="standard" />
 					</div>
 				</div>
 
@@ -70,10 +70,10 @@
 			<fieldset>
 				<legend>Classement</legend>
 
-				<div class="form-group" show-errors>
+				<div class="form-group">
 					<label for="input-types" class="col-sm-2 control-label">Types</label>
 					<div class="col-sm-10">
-						<ui-select id="input-types" multiple ng-model="indicator.types" theme="bootstrap" required>
+						<ui-select id="input-types" multiple ng-model="indicator.types" name="types" theme="bootstrap" required>
 							<ui-select-match placeholder="Sélectionnez un ou plusieurs types">
 								{{$item.name}}
 							</ui-select-match>
@@ -84,10 +84,10 @@
 					</div>
 				</div>
 
-				<div class="form-group" show-errors>
+				<div class="form-group">
 					<label for="input-themes" class="col-sm-2 control-label">Thématiques</label>
 					<div class="col-sm-10">
-						<ui-select id="input-themes" multiple ng-model="indicator.themes" theme="bootstrap" required>
+						<ui-select id="input-themes" multiple ng-model="indicator.themes" name="themes" theme="bootstrap" required>
 							<ui-select-match placeholder="Sélectionnez une ou plusieures thématiques">
 								{{$item.name}}
 							</ui-select-match>
@@ -102,17 +102,19 @@
 			<fieldset>
 				<legend>Calcul</legend>
 
-				<div class="form-group" show-errors>
+				<div class="form-group">
 					<label for="input-sum-allowed" class="col-sm-2 control-label">Sommable</label>
 					<div class="col-sm-10">
 						<input id="input-sum-allowed" type="checkbox" ng-model="indicator.sumAllowed">
 					</div>
 				</div>
 
-				<div class="form-group" show-errors>
+				<div class="form-group">
 					<label for="name" class="col-sm-2 control-label">Formules</label>
 					<div class="col-sm-10">
-						<table class="table table-bordered table-condensed" ng-repeat="(formulaId, formula) in indicator.formulas">
+						<table class="table table-bordered table-condensed"
+							   ng-repeat="(formulaId, formula) in indicator.formulas"
+							   style="border-width: 0 0 0 5px; border-color: {{indicator.formulas[formulaId].isValid ? '#ddd' : 'darkred'}}">
 							<tr>
 								<td style="width: 250px">Nom</td>
 								<td>
@@ -120,7 +122,7 @@
 										<input type="text"
 											   class="form-control"
 											   placeholder="Exemple: Pourcentage entre dossiers patient bien remplis et total"
-											   ng-model="indicator.formulas[formulaId].name" required/>
+											   ng-model="indicator.formulas[formulaId].name" ng-change="updateFormula(formulaId)" />
 
 										<span class="input-group-btn">
 											<button class="btn btn-danger" ng-click="deleteFormula(formulaId)">Retirer</button>
@@ -134,13 +136,17 @@
 									<input type="text"
 										   class="form-control"
 										   ng-model="indicator.formulas[formulaId].expression"
-										   placeholder="Exemple: 100 * a / b" required mathjs-valid />
+										   ng-change="updateFormula(formulaId)"
+										   placeholder="Exemple: 100 * a / b" />
 								</td>
 							</tr>
-							<tr ng-repeat="parameterName in getSymbols(indicator.formulas[formulaId].expression)">
-								<td>Paramètre <strong>"{{parameterName}}"</strong></td>
+							<tr ng-repeat="symbol in indicator.formulas[formulaId].symbols">
+								<td>Paramètre <strong>"{{symbol}}"</strong></td>
 								<td>
-									<ui-select ng-model="indicator.formulas[formulaId].parameters[parameterName]" theme="bootstrap" required>
+									<ui-select ng-model="indicator.formulas[formulaId].parameters[symbol]"
+											   ng-change="updateFormula(formulaId)"
+											   theme="bootstrap">
+
 										<ui-select-match placeholder="Choisissez un indicateur">{{$select.selected.name}}</ui-select-match>
 										<ui-select-choices repeat="indicator._id as indicator in indicators | filter: $select.search">
 											<span>{{indicator.name}}</span>
@@ -156,9 +162,8 @@
 			</fieldset>
 
 			<div>
-				<button class="btn btn-primary"  ng-disabled="indicatorForm.$invalid || isUnchanged()" ng-click="save()">Sauvegarder</button>
+				<button class="btn btn-primary" ng-disabled="indicatorForm.$invalid || isUnchanged() || formulaInvalid()" ng-click="save()">Sauvegarder</button>
 				<button class="btn btn-warning" ng-disabled="isUnchanged()" ng-click="reset()">Réinitialiser</button>
-
 				<button class="btn btn-danger" ng-click="remove()" ng-if="indicator._id">Supprimer</button>
 			</div>
 
