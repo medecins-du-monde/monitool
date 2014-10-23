@@ -4,88 +4,161 @@
 	</div>
 
 	<div class="col-md-10">
-		<form class="form-horizontal" role="form">
 
+		<ol class="breadcrumb">
+			<li><a href="#projects">Projets</a></li>
+			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
+			<li><a href="#projects/{{project._id}}/plannings">Liste des indicateurs</a></li>
+			<li class="active">{{container.indicator.name}}</li>
+		</ol>
+
+		<form class="form-horizontal" role="form" name="planningForm" novalidate>
 			<fieldset>
 				<legend>Indicateur</legend>
 
 				<div class="form-group">
 					<label for="indicator" class="col-sm-2 control-label">Indicateur</label>
 					<div class="col-sm-10">
-						<ui-select ng-model="indicatorId" theme="bootstrap" required>
-							<ui-select-match placeholder="Choisissez un indicateur">{{$select.selected.name}}</ui-select-match>
-							<ui-select-choices repeat="indicator._id as indicator in indicators | filter: $select.search">
-								<span>{{indicator.name}}</span>
-							</ui-select-choices>
-						</ui-select>
+						<div class="input-group invert">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+									{{themeFilter.name || "Filtre Thématique"}} <span class="caret"></span>
+								</button>
+
+								<ul class="dropdown-menu" role="menu">
+									<li ng-show="themeFilter"><a ng-click="themeFilter=0">Retirer thématique</a></li>
+									<li ng-repeat="theme in themes" ng-show="themeFilter != theme">
+										<a ng-click="$parent.themeFilter=theme">{{theme.name}}</a>
+									</li>
+								</ul>
+							</div>
+
+							<div class="input-group-btn square">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+									{{typeFilter.name || "Filtre Type"}} <span class="caret"></span>
+								</button>
+
+								<ul class="dropdown-menu" role="menu">
+									<li ng-show="typeFilter"><a ng-click="typeFilter=0">Retirer type</a></li>
+									<li ng-repeat="type in types" ng-show="typeFilter != type">
+										<a ng-click="$parent.typeFilter=type">{{type.name}}</a>
+									</li>
+								</ul>
+							</div>
+
+							<ui-select ng-model="container.indicator" theme="bootstrap">
+								<ui-select-match placeholder="Choisissez un indicateur">{{$select.selected.name}}</ui-select-match>
+								<ui-select-choices repeat="indicator in indicators | filter: {name: $select.search, themes: themeFilter._id, types: typeFilter._id}">
+									<span>{{indicator.name}}</span>
+								</ui-select-choices>
+							</ui-select>
+						</div>
 					</div>
 				</div>
 
-				<div class="form-group">
-					<label for="formula" class="col-sm-2 control-label">Méthode de calcul</label>
+				<div class="form-group" show-errors>
+					<label for="formula-input" class="col-sm-2 control-label">Méthode de calcul</label>
 					<div class="col-sm-10">
-						<select class="form-control"
+						<select id="formula-input"
+								class="form-control"
+								name="formula"
 								ng-model="planning.formula"
-								ng-options="formula.name for (formulaId, formula) in indicator.formulas"
-								ng-disabled="!indicator">
-
-							<option value="">-- Saisie manuelle --</option>
+								ng-disabled="!container.indicator"
+								required>
+							<option value="global">-- Saisie manuelle globale --</option>
+							<option value="{{formulaId}}" ng-repeat="(formulaId, formula) in container.indicator.formulas">{{formula.name}}</option>
 						</select>
+
+						<p class="help-block" ng-if="planningForm.formula.$error.required">
+							Ce champ est obligatoire
+						</p>
 					</div>
 				</div>
-
 			</fieldset>
 
 			<fieldset>
 				<legend>Raisonnement</legend>
 
-				<div class="form-group">
-					<label for="source" class="col-sm-2 control-label">Source</label>
+				<div class="form-group" show-errors>
+					<label for="source-input" class="col-sm-2 control-label">Source</label>
 					<div class="col-sm-10">
-						<textarea class="form-control" id="source" ng-model="planning.source" placeholder="Collecté au niveau du ... par ... puis aggrégé et saisi par ..."></textarea>
+						<textarea class="form-control"
+								  id="source-input"
+								  name="source"
+								  ng-model="planning.source"
+								  placeholder="Collecté au niveau du ... par ... puis aggrégé et saisi par ..."
+								  required></textarea>
+
+						<p class="help-block" ng-if="planningForm.source.$error.required">
+							Ce champ est obligatoire
+						</p>
 					</div>
 				</div>
 
-				<div class="form-group">
-					<label for="relevance" class="col-sm-2 control-label">Pertinence</label>
+				<div class="form-group" show-errors>
+					<label for="relevance-input" class="col-sm-2 control-label">Pertinence</label>
 					<div class="col-sm-10">
-						<textarea class="form-control" id="relevance" ng-model="planning.relevance" placeholder="Permet de quantifier nos progrès sur l'objectif spécifique ..."></textarea>
+						<textarea class="form-control"
+								  id="relevance-input"
+								  name="relevance"
+								  ng-model="planning.relevance"
+								  placeholder="Permet de quantifier nos progrès sur l'objectif spécifique ..."
+								  required></textarea>
+
+						<p class="help-block" ng-if="planningForm.source.$error.required">
+							Ce champ est obligatoire
+						</p>
 					</div>
 				</div>
 			</fieldset>
 
 			<fieldset>
 				<legend>Collecte</legend>
-				<div class="form-group">
-					<label for="periodicity" class="col-sm-2 control-label">Périodicité</label>
+				<div class="form-group" show-errors>
+					<label for="periodicity-input" class="col-sm-2 control-label">Périodicité</label>
 					<div class="col-sm-10">
-						<select class="form-control" ng-model="planning.periodicity">
-							<option value="month">Tous les mois</option>
+						<select class="form-control"
+								name="periodicity"
+								id="periodicity-input"
+								ng-model="planning.periodicity">
+							<option value="month" selected>Tous les mois</option>
 							<option value="free">Planifiée</option>
 						</select>
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" show-errors ng-if="planning.periodicity == 'month'">
 					<label for="periodicity" class="col-sm-2 control-label">Début</label>
 					<div class="col-sm-10">
 						<div class="input-group">
 							<div class="input-group-addon">
 								<input type="checkbox" ng-model="planning.useProjectStart" /> Début du projet
 							</div>
-							<input type="month" class="form-control" ng-model="planning.start" ng-disabled="planning.useProjectStart" />
+
+							<input type="month"
+								   class="form-control"
+								   ng-model="planning.start"
+								   ng-disabled="planning.useProjectStart"
+								   name="start"
+								   required />
 						</div>
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" show-errors ng-if="planning.periodicity == 'month'">
 					<label for="periodicity" class="col-sm-2 control-label">Fin</label>
 					<div class="col-sm-10">
 						<div class="input-group">
 							<div class="input-group-addon">
 								<input type="checkbox" ng-model="planning.useProjectEnd" /> Fin du projet
 							</div>
-							<input type="month" class="form-control" ng-model="planning.end" ng-disabled="planning.useProjectEnd" />
+
+							<input type="month"
+								   class="form-control"
+								   ng-model="planning.end"
+								   ng-disabled="planning.useProjectEnd"
+								   name="end"
+								   required />
 						</div>
 					</div>
 				</div>
@@ -94,10 +167,88 @@
 			<fieldset>
 				<legend>Échelle</legend>
 
-				<div class="form-group">
-					<label for="targets" class="col-sm-2 control-label">Baseline</label>
+				<div class="row" style="margin-bottom: 15px">
+					<label class="col-sm-2 control-label">Limites</label>
+					<div class="form-group col-sm-5" show-errors style="margin: 0">
+						<input class="form-control"
+							   type="number"
+							   name="minimum"
+							   ng-model="planning.minimum"
+							   placeholder="minimum"
+							   required
+							   ng-max="planning.orangeMinimum" />
+					</div>
+					<div class="form-group col-sm-5" show-errors style="margin: 0">
+						<input class="form-control"
+							   type="number"
+							   name="maximum"
+							   ng-model="planning.maximum"
+							   placeholder="maximum"
+							   required
+							   ng-min="planning.orangeMaximum" />
+					</div>
+				</div>
+
+				<div class="row" style="margin-bottom: 15px">
+					<label class="col-sm-2 control-label">Zone Orange</label>
+					<div class="form-group col-sm-5" show-errors style="margin: 0">
+						<input class="form-control"
+							   type="number"
+							   name="orangeMinimum"
+							   ng-model="planning.orangeMinimum"
+							   placeholder="minimum"
+							   ng-min="planning.minimum"
+							   ng-max="planning.greenMinimum"
+							   required />
+					</div>
+					<div class="form-group col-sm-5" show-errors style="margin: 0">
+						<input class="form-control"
+							   type="number"
+							   name="orangeMaximum"
+							   ng-model="planning.orangeMaximum"
+							   placeholder="maximum"
+							   ng-min="planning.greenMaximum"
+							   ng-max="planning.maximum"
+							   required />
+					</div>
+				</div>
+
+				<div class="row" style="margin-bottom: 15px">
+					<label class="col-sm-2 control-label">Zone Verte</label>
+					<div class="form-group col-sm-5" show-errors style="margin: 0">
+						<input class="form-control"
+							   type="number"
+							   name="greenMinimum"
+							   ng-model="planning.greenMinimum"
+							   placeholder="minimum"
+							   required
+							   ng-min="planning.orangeMinimum"
+							   ng-max="planning.greenMaximum" />
+					</div>
+					<div class="form-group col-sm-5" show-errors style="margin: 0">
+						<input class="form-control"
+							   type="number"
+							   name="greenMaximum"
+							   ng-model="planning.greenMaximum"
+							   placeholder="maximum"
+							   required
+							   ng-min="planning.greenMinimum"
+							   ng-max="planning.orangeMaximum" />
+					</div>
+				</div>
+
+				<div class="form-group" show-errors>
+					<label for="baseline-input" class="col-sm-2 control-label">Baseline</label>
 					<div class="col-sm-10">
-						<input class="form-control" type="text" ng-model="planning.baseline" placeholder="valeur de référence" />
+						<input class="form-control"
+							   id="baseline-input"
+							   name="baseline"
+							   type="number"
+							   ng-model="planning.baseline"
+							   placeholder="valeur de référence"
+							   ng-min="planning.minimum"
+							   ng-max="planning.maximum"
+							   required />
 					</div>
 				</div>
 				
@@ -124,42 +275,22 @@
 					</div>
 				</div>
 
-				<div class="form-group">
-					<label class="col-sm-2 control-label">Limites</label>
-					<div class="col-sm-5">
-						<input class="form-control" type="text" ng-model="planning.minimum" placeholder="minimum" />
-					</div>
-					<div class="col-sm-5">
-						<input class="form-control" type="text" ng-model="planning.maximum" placeholder="maximum" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-2 control-label">Zone Verte</label>
-					<div class="col-sm-5">
-						<input class="form-control" type="text" ng-model="planning.greenMinimum" placeholder="minimum" />
-					</div>
-					<div class="col-sm-5">
-						<input class="form-control" type="text" ng-model="planning.greenMaximum" placeholder="maximum" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-2 control-label">Zone Orange</label>
-					<div class="col-sm-5">
-						<input class="form-control" type="text" ng-model="planning.orangeMinimum" placeholder="minimum" />
-					</div>
-					<div class="col-sm-5">
-						<input class="form-control" type="text" ng-model="planning.orangeMaximum" placeholder="maximum" />
-					</div>
-				</div>
-
 			</fieldset>
 
-			<button ng-click="update()" class="btn btn-primary">Sauvegarder</button>
-			<button ng-click="reset()" class="btn btn-default">Reinitialiser</button>
-			<button ng-click="reset()" class="btn btn-danger">Supprimer</button>
-		</form>
+			<button ng-click="update()"
+					ng-disabled="planningForm.$invalid || isUnchanged()"
+					class="btn btn-primary">
+				Sauvegarder
+			</button>
 
+			<button ng-click="reset()"
+					ng-disabled="isUnchanged()"
+					class="btn btn-default">
+				Réinitialiser
+			</button>
+
+			<button ng-click="" class="btn btn-danger">Supprimer</button>
+
+		</form>
 	</div>
 </div>

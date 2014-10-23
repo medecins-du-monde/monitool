@@ -103,14 +103,33 @@ app.config(function($routeProvider) {
 					});
 					return usage;
 				});
-			},
-
+			}
 		}
 	});
 
 	$routeProvider.when('/projects/:projectId/plannings/:indicatorId', {
 		templateUrl: 'partials/projects/planning-edit.html',
-		controller: 'ProjectPlanningEditController'
+		controller: 'ProjectPlanningEditController',
+		resolve: {
+			project: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.projectId);
+			},
+			indicators: function(mtDatabase) {
+				return mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}).then(function(result) {
+					return result.rows.map(function(row) { return row.doc; })
+				});
+			},
+			types: function(mtDatabase) {
+				return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
+					return result.rows.map(function(row) { return row.doc; });
+				});
+			},
+			themes: function(mtDatabase) {
+				return mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}).then(function(result) {
+					return result.rows.map(function(row) { return row.doc; });
+				});
+			}
+		}
 	});
 
 	$routeProvider.when('/projects/:projectId', {

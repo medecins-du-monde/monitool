@@ -68,3 +68,14 @@ textarea {
 .form-group.has-error .help-block {
   display: block;
 }
+
+.invert.input-group .form-control {
+	border-radius: 4px;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+.input-group-btn.square button {
+	border-radius: 0;
+	border-right-width: 0;
+}

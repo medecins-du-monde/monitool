@@ -148,7 +148,7 @@
 											   theme="bootstrap">
 
 										<ui-select-match placeholder="Choisissez un indicateur">{{$select.selected.name}}</ui-select-match>
-										<ui-select-choices repeat="indicator._id as indicator in indicators | filter: $select.search">
+										<ui-select-choices repeat="indicator._id as indicator in indicators | filter: {name: $select.search}">
 											<span>{{indicator.name}}</span>
 										</ui-select-choices>
 									</ui-select>

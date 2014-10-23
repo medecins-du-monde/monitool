@@ -7,7 +7,7 @@
 
 		<ol class="breadcrumb">
 			<li><a href="#projects">Projets</a></li>
-			<li ng-show="project._id"><a href="#projects/{{project._id}}">{{project.name}}</a></li>
+			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
 			<li class="active">Liste des centres</li>
 		</ol>
 
@@ -32,7 +32,7 @@
 				<tr>
 					<td colspan="3">
 						<div class="input-group input-group-sm" style="width: 100%">
-							<input type="text" class="form-control" ng-model="newCenter" placeholder="Nom du nouveau centre">
+							<input type="text" class="form-control" ng-model="newCenter" placeholder="Nom du nouveau centre" ng-enter="create()">
 							<span class="input-group-btn">
 								<button class="btn btn-default" ng-click="create()">Ajouter</button>
 							</span>

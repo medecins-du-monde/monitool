@@ -110,18 +110,41 @@ monitoolControllers.controller('ProjectPlanningListController', function($scope,
 	};
 });
 
-monitoolControllers.controller('ProjectPlanningEditController', function($scope, mtDatabase) {
-	mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}).then(function(indicators) {
-		$scope.indicators = indicators.rows.map(function(i) { return i.doc; })
-		$scope.indicatorId = $scope.indicatorId;
-		$scope.planning = {
-			targets: []
+monitoolControllers.controller('ProjectPlanningEditController', function($scope, $location, $routeParams, mtDatabase, project, indicators, types, themes) {
+	$scope.project    = project;
+	$scope.indicators = indicators;
+	$scope.types      = types;
+	$scope.themes     = themes;
+
+	if ($routeParams.indicatorId == 'new') {
+		$scope.container = {indicator: null};
+		$scope.planning  = {
+			formula: null,
+			source: '',
+			relevance: '',
+			periodicity: 'month',
+			useProjectStart: true, start: project.begin,
+			useProjectEnd: true, end: project.end,
+			target: [],
+			baseline: null,
+			minimum: 0, orangeMinimum: 20, greenMinimum: 40, greenMaximum: 60, orangeMaximum: 80, maximum: 100
 		};
-		console.log($scope.indicators)
-		
-	}).catch(function(error) {
-		console.log(error)
-	});
+	}
+	else {
+		var tmp = indicators.filter(function(i) { return i._id == $routeParams.indicatorId });
+		$scope.planning  = project.planning[$routeParams.indicatorId];
+		$scope.container = {indicator: tmp[0]};
+	}
+	$scope.master = angular.copy($scope.planning);
+
+
+	$scope.isUnchanged = function() {
+		return angular.equals($scope.master, $scope.planning);
+	};
+
+	$scope.reset = function() {
+		$scope.planning = angular.copy($scope.master);
+	};
 
 	$scope.addTarget = function() {
 		$scope.planning.targets.push({value: null, month: null})
@@ -129,6 +152,20 @@ monitoolControllers.controller('ProjectPlanningEditController', function($scope,
 
 	$scope.removeTarget = function(target) {
 		$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
+	};
+
+	$scope.update = function() {
+		if ($routeParams.indicatorId !== 'new')
+			delete $scope.project.planning[$routeParams.indicatorId];
+
+		$scope.project.planning[$scope.container.indicator._id] = $scope.planning;
+		mtDatabase.put($scope.project).then(function(result) {
+			$scope.project._rev = result.rev;
+			$scope.master = angular.copy($scope.planning);
+
+			if ($routeParams.indicatorId === 'new')
+				$location.url('/projects/' + result.id + '/plannings/' + $scope.container.indicator._id);
+		});
 	};
 });
 
@@ -431,4 +468,33 @@ monitoolControllers.controller('ReportingByEntitiesController', function($scope,
 
 	$scope.updateList();
 });
+
+
+
+
+
+
+
+
+
+
+
+	// mainMethod: {
+	// 	type: "formula",
+	// 	formulaId: 2349238402938490
+	// },
+	// dependencyMethods: {
+	// 	32897892478932: {
+	// 		local/global/formula
+	// 	},
+	// 	23489023849023: {
+
+	// 	},
+	// 	24892738947289: {
+
+	// 	},
+	// 	23894028394083: {
+
+	// 	}
+	// }
 
