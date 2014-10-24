@@ -4,10 +4,43 @@ var data = {
 	"views": [
 		{
 			"_id": '_design/monitool',
+
+			"shows": {
+				"project": function(doc, req) {
+					return doc.name + ' is a capital project for our goal!';
+				}.toString()
+			},
+
+			"lists": {
+				"by_type": function(head, req) {
+					var row;
+					while (row = getRow())
+						if (row.value)
+							send(row.value.name + "\n");
+				}.toString()
+			},
+
+			"updates": {
+
+				"make_stupid": function(doc, req) {
+					doc.name = 'Stupid ' + doc.name;
+					return [doc, toJSON(doc)];
+				}.toString(),
+
+			},
+
+			"filters": {
+
+				"projects": function(doc, request) {
+					return doc.type === 'project';
+				}.toString()
+
+			},
+
 			"views": {
 				"by_type": {
 					"map": function(doc) {
-						emit(doc.type, doc);
+						emit(doc.type);
 
 						if (doc.type === 'project')
 							for (var centerId in doc.center) {

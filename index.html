@@ -35,7 +35,7 @@
 		<script type="text/javascript" src="js/app.js"></script>
 		<script type="text/javascript" src="js/directives.js"></script>
 	</head>
-	<body ng-app="MonitoolApp">
+	<body>
 
 		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<!-- <div class="container-fluid"> -->
@@ -61,6 +61,9 @@
 						</li>
 						<li ng-class="{active: currentPage == 'reporting'}">
 							<a ng-click="changePage('reporting')">Consultation</a>
+						</li>
+						<li ng-class="{active: currentPage == 'sync'}">
+							<a ng-click="changePage('sync')">Synchronisation</a>
 						</li>
 					</ul>
 				</div>

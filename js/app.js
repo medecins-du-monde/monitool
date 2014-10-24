@@ -287,3 +287,12 @@ app.config(function($routeProvider) {
 		redirectTo: '/projects'
 	});
 });
+
+
+
+angular.element(document).ready(function() {
+	angular.bootstrap(document, ['MonitoolApp']);
+
+
+
+});

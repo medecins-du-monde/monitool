@@ -3,16 +3,33 @@
 var mtServices = angular.module('MonitoolServices', ['pouchdb']);
 
 mtServices.factory('mtDatabase', function(PouchDB) {
-	// var db = new PouchDB('monitool3');
+	var r = {};
+	
+	r.local = new PouchDB('monitool3');
+	r.remote = new PouchDB('http://localhost:5984/monitool', {adapter: 'http'});
 
+
+
+
+
+
+	// remote: ,
+
+
+
+
+
+	// var db = new PouchDB('monitool');
 	// db.sync('http://localhost:5984/monitool', {live: true}).then(function(hello) {
 	// 	console.log(hello);
 	// }).catch(function(error) {
 	// 	console.log(error)
 	// });
-	
 	// return db;
-	return new PouchDB('http://localhost:5984/monitool');
+
+
+
+	return r.remote;
 });
 
 
