@@ -40,7 +40,7 @@ var data = {
 			"views": {
 				"by_type": {
 					"map": function(doc) {
-						emit(doc.type);
+						emit(doc.type, doc);
 
 						if (doc.type === 'project')
 							for (var centerId in doc.center) {
