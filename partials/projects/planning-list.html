@@ -8,29 +8,149 @@
 		<ol class="breadcrumb">
 			<li><a href="#projects">Projets</a></li>
 			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
-			<li class="active">Liste des indicateurs</li>
+			<li><a href="#projects/{{project._id}}/plannings">Liste de plannings de saisie</a></li>
+			<li class="active">{{planning.name}}</li>
 		</ol>
 
-		<table class="table table-bordered table-stripped table-condensed">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Périodicité</th>
-					<th>Nombre de saisies</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="(indicatorId, planning) in project.planning">
-					<td>{{indicators[indicatorId].name}}</td>
-					<td>{{planning.periodicity}}</td>
-					<td>{{usage[indicatorId] || 0}}</td>
-					<td><a href="#projects/{{project._id}}/plannings/{{indicatorId}}">Voir</a></td>
-				</tr>
-			</tbody>
-		</table>
+		<form class="form-horizontal" role="form" name="planningForm" novalidate>
 
-		<button class="btn btn-default" ng-click="create()">Collecter un autre indicateur</button>
+			<fieldset>
+				<legend>Collecte</legend>
 
+				<div class="form-group" show-errors>
+					<label for="input-name" class="col-sm-2 control-label">Nom</label>
+					<div class="col-sm-10">
+						<input type="text"
+							   class="form-control"
+							   id="input-name"
+							   name="name"
+							   ng-model="planning.name"
+							   placeholder="Exemple: Sondage trimestriel"
+							   required />
+						
+						<p class="help-block" ng-if="planningForm.name.$error.required">
+							Ce champ est obligatoire
+						</p>
+					</div>
+				</div>
+
+
+				<div class="form-group" show-errors>
+					<label for="periodicity-input" class="col-sm-2 control-label">Périodicité</label>
+					<div class="col-sm-10">
+						<select class="form-control"
+								name="periodicity"
+								id="periodicity-input"
+								ng-model="planning.periodicity">
+							<option value="monthly">Tous les mois</option>
+							<option value="planned">Planifiée</option>
+						</select>
+					</div>
+				</div>
+
+				<div ng-if="planning.periodicity == 'monthly'">
+					<div class="form-group" show-errors>
+						<label for="periodicity" class="col-sm-2 control-label">Début</label>
+						<div class="col-sm-10">
+							<div class="input-group">
+								<div class="input-group-addon">
+									<input type="checkbox" ng-model="planning.useProjectStart" /> Début du projet
+								</div>
+
+								<input type="month"
+									   class="form-control"
+									   ng-model="planning.start"
+									   ng-disabled="planning.useProjectStart"
+									   name="start"
+									   required />
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group" show-errors>
+						<label for="periodicity" class="col-sm-2 control-label">Fin</label>
+						<div class="col-sm-10">
+							<div class="input-group">
+								<div class="input-group-addon">
+									<input type="checkbox" ng-model="planning.useProjectEnd" /> Fin du projet
+								</div>
+
+								<input type="month"
+									   class="form-control"
+									   ng-model="planning.end"
+									   ng-disabled="planning.useProjectEnd"
+									   name="end"
+									   required />
+							</div>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Indicateurs</legend>
+
+				<table class="table table-bordered table-stripped table-condensed">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="(indicatorId, indicator) in planning.indicators">
+							<td>{{indicatorsById[indicatorId].name}}</td>
+							<td>
+								<a ng-if="planning.indicators[indicatorId]"
+								   href="#projects/{{project._id}}/plannings/{{planningId}}/{{indicatorId}}">
+								   Voir
+								</a>
+							</td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="5">
+								<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%">Ajouter un indicateur</button>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</fieldset>
+
+			<fieldset>
+				<legend>Données à saisir et méthode de calcul</legend>
+
+				<table class="table table-bordered table-stripped table-condensed">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Calcul</th>
+							<th>Sommable</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="(indicatorId, formulaId) in planning.compute">
+							<td>{{indicatorsById[indicatorId].name}}</td>
+							<td>
+								<select id="formula-input"
+										class="form-control"
+										name="formula"
+										ng-model="planning.compute[indicatorId]"
+										ng-change="updateDependencies()"
+										required>
+									<option value="">-- Saisie manuelle --</option>
+									<option value="{{formulaId}}" ng-repeat="(formulaId, formula) in indicatorsById[indicatorId].formulas">{{formula.name}}</option>
+								</select>
+							</td>
+							<td>
+								<i class="fa {{sumAllowed(indicatorId) ? 'fa-check' : 'fa-times'}}"></i>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</fieldset>
+
+		</form>
 	</div>
 </div>

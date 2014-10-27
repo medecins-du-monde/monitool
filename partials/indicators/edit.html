@@ -162,11 +162,24 @@
 			</fieldset>
 
 			<div>
-				<button class="btn btn-primary" ng-disabled="indicatorForm.$invalid || isUnchanged() || formulaInvalid()" ng-click="save()">Sauvegarder</button>
-				<button class="btn btn-warning" ng-disabled="isUnchanged()" ng-click="reset()">Réinitialiser</button>
-				<button class="btn btn-danger" ng-click="remove()" ng-if="indicator._id">Supprimer</button>
-			</div>
+				<button class="btn btn-primary"
+						ng-disabled="indicatorForm.$invalid || isUnchanged() || formulaInvalid()"
+						ng-click="save()">
+					Sauvegarder
+				</button>
 
+				<button class="btn btn-warning"
+						ng-disabled="isUnchanged()"
+						ng-click="reset()">
+					Réinitialiser
+				</button>
+				
+				<button class="btn btn-danger"
+						ng-click="remove()"
+						ng-if="indicator._id">
+					Supprimer
+				</button>
+			</div>
 		</form>
 	</div>
 </div>

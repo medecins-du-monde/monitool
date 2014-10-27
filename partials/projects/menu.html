@@ -1,11 +1,15 @@
+
 <ul class="nav nav-pills nav-stacked" ng-controller="SubMenuController">
 	<li ng-class="{active: currentPage === 'description'}">
 		<a ng-click="changePage('description')">Description</a>
 	</li>
-	<li ng-class="{active: currentPage === 'centers', disabled: projectId === 'new'}">
-		<a ng-click="changePage('centers')">Centres</a>
+	<li ng-class="{active: currentPage === 'logical-frame', disabled: projectId === 'new'}">
+		<a ng-click="changePage('logical-frame')">Cadre Logique</a>
 	</li>
 	<li ng-class="{active: currentPage === 'plannings', disabled: projectId === 'new'}">
-		<a ng-click="changePage('plannings')">Planning</a>
+		<a ng-click="changePage('plannings')">Planning et Indicateurs</a>
+	</li>
+	<li ng-class="{active: currentPage === 'centers', disabled: projectId === 'new'}">
+		<a ng-click="changePage('centers')">Entitée de saisie</a>
 	</li>
 </ul>

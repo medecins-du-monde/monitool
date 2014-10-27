@@ -100,29 +100,127 @@ monitoolControllers.controller('ProjectCenterListController', function($scope, p
 	};
 });
 
-monitoolControllers.controller('ProjectPlanningListController', function($scope, $location, project, indicators, inputsByIndicatorId) {
-	$scope.project    = project;
-	$scope.usage      = inputsByIndicatorId;
-	$scope.indicators = indicators;
+
+monitoolControllers.controller('ProjectLogicalFrameController', function($scope, $location, project) {
+	// pass data to view
+	$scope.project = project;
+
+	// $scope.create = function() {
+	// 	$location.url('/projects/' + project._id + '/plannings/new');
+	// };
+});
+
+
+monitoolControllers.controller('ProjectPlanningsController', function($scope, $location, project, mtDatabase) {
+	$scope.project = project;
 
 	$scope.create = function() {
-		$location.url('/projects/' + project._id + '/plannings/new');
+		var newPlanningName = $scope.newPlanning ? $scope.newPlanning.trim() : '';
+		$scope.newPlanning = '';
+
+		if (newPlanningName && newPlanningName.length) {
+			for (var key in $scope.project.plannings)
+				if ($scope.project.plannings[key].name === newPlanningName)
+					return;
+
+			$scope.project.plannings[PouchDB.utils.uuid().toLowerCase()] = {
+				name: newPlanningName,
+				periodicity: "monthly",
+				useProjectStart: true,
+				useProjectEnd: true,
+				indicators: {},
+				compute: {}
+			};
+
+			mtDatabase.put($scope.project).then(function(result) {
+				$scope.project._rev = result.rev;
+			});
+		}
 	};
 });
 
-monitoolControllers.controller('ProjectPlanningEditController', function($scope, $location, $routeParams, mtDatabase, project, indicators, types, themes) {
+monitoolControllers.controller('ProjectPlanningListController', function($scope, $location, $routeParams, project, indicators, themes, types) {
+	// pass models directly to view.
 	$scope.project    = project;
 	$scope.indicators = indicators;
-	$scope.types      = types;
 	$scope.themes     = themes;
+	$scope.types      = types;
+
+	// load indicators in a hash to be able to display names on the table.
+	$scope.indicatorsById = {};
+	$scope.indicators.forEach(function(indicator) {
+		$scope.indicatorsById[indicator._id] = indicator;
+	});
+
+	// a planning is always defined.
+	$scope.planningId = $routeParams.planningId;
+	$scope.planning   = project.plannings[$routeParams.planningId];
+
+	console.log($scope.planning)
+
+	$scope.updateDependencies = function() {
+		var updateDependencyRec = function(indicatorId, oldDependencyTree, newDependencyTree) {
+			var formulaId = oldDependencyTree[indicatorId];
+			if (!formulaId) // stop recursing
+				newDependencyTree[indicatorId] = null; // this one is entered by hand.
+			else {
+				var formula = $scope.indicatorsById[indicatorId].formulas[formulaId];
+				newDependencyTree[indicatorId] = formulaId;
+				for (var parameterName in formula.parameters)
+					updateDependencyRec(formula.parameters[parameterName], oldDependencyTree, newDependencyTree);
+			}
+		};
+
+		var newDependencyTree = {};
+		for (var indicatorId in $scope.planning.indicators)
+			updateDependencyRec(indicatorId, $scope.planning.compute, newDependencyTree);
+
+		$scope.planning.compute = newDependencyTree;
+	};
+
+	$scope.sumAllowed = function(indicatorId) {
+		// if it is allowed for the given indicator, then it's all ok.
+		if ($scope.indicatorsById[indicatorId].sumAllowed)
+			return true;
+
+		// we need to check the formula.
+		var formulaId = $scope.planning.compute[indicatorId];
+		if (!formulaId)
+			return false; // no formula => no.
+
+		var formula = $scope.indicatorsById[indicatorId].formulas[formulaId];
+		for (var parameterName in formula.parameters)
+			if (!$scope.sumAllowed(formula.parameters[parameterName]))
+				return false;
+
+		return true;
+	};
+
+	$scope.create = function() {
+		// $location.url('/projects/' + project._id + '/plannings/' + $routeParams.planningId + '/new');
+	};
+});
+
+monitoolControllers.controller('ProjectPlanningEditController', function($scope, $location, $routeParams, mtDatabase, project, indicator) {
+	$scope.project = project;
+	$scope.planningId = $routeParams.planningId;
+	$scope.planningG = project.plannings[$routeParams.planningId];
+	$scope.indicator = indicator;
+
+	console.log($scope.planning)
+	// $scope.planning = project.plannings[$routeParams.planningId].indicators[$routeParams.indicatorId];
+
+	// $scope.indicators = indicators;
+	// $scope.types      = types;
+	// $scope.themes     = themes;
 
 	if ($routeParams.indicatorId == 'new') {
-		$scope.container = {indicator: null};
+		// $scope.container = {indicator: null};
 		$scope.planning  = {
 			formula: null,
 			source: '',
 			relevance: '',
-			periodicity: 'month',
+			periodicity: 'monthly',
 			useProjectStart: true, start: project.begin,
 			useProjectEnd: true, end: project.end,
 			target: [],
@@ -131,9 +229,9 @@ monitoolControllers.controller('ProjectPlanningEditController', function($scope,
 		};
 	}
 	else {
-		var tmp = indicators.filter(function(i) { return i._id == $routeParams.indicatorId });
-		$scope.planning  = project.planning[$routeParams.indicatorId];
-		$scope.container = {indicator: tmp[0]};
+		// var tmp = indicators.filter(function(i) { return i._id == $routeParams.indicatorId });
+		$scope.planning  = project.plannings[$routeParams.planningId].indicators[$routeParams.indicatorId];
+		// $scope.container = {indicator: tmp[0]};
 	}
 	$scope.master = angular.copy($scope.planning);
 

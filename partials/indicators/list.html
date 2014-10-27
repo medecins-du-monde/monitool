@@ -20,7 +20,6 @@
 				<div class="indicator-level-3" ng-repeat="indicator in indicators" ng-if="open2">
 					<span class="color" ng-class="{green: indicator.standard}"></span>
 					<span class="name">{{indicator.name}} ({{indicator.usage}} utilisations)</span>
-					
 					<a href="#indicators/{{indicator._id}}">Éditer</a>
 				</div>
 			</div>
@@ -29,4 +28,3 @@
 		<button class="btn btn-default" ng-click="create()">Créer un nouvel indicateur</button>
 	</div>
 </div>
-
