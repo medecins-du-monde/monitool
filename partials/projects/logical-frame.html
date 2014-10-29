@@ -1,3 +1,4 @@
+
 <div class="row">
 	<div class="col-md-2">
 		<ng-include src="'partials/projects/menu.html'"></ng-include>
@@ -12,6 +13,81 @@
 		</ol>
 
 		<form class="form-horizontal" role="form">
+			<fieldset>
+				<legend>Description</legend>
+
+				<div class="form-group" show-errors>
+					<label for="input-name" class="col-sm-2 control-label">Nom</label>
+					<div class="col-sm-10">
+						<input type="text"
+							   class="form-control"
+							   id="input-name"
+							   name="name"
+							   ng-model="project.name"
+							   placeholder="Exemple: Réduction des Risques Laos"
+							   required />
+						
+						<p class="help-block" ng-if="projectForm.name.$error.required">
+							Ce champ est obligatoire
+						</p>
+					</div>
+				</div>
+
+				<div class="form-group" show-errors>
+					<label for="input-country" class="col-sm-2 control-label">Pays</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="input-country" name="country" ng-model="project.country" required placeholder="Exemple: Laos">
+						<p class="help-block" ng-if="projectForm.country.$error.required">
+							Ce champ est obligatoire
+						</p>
+					</div>
+				</div>
+
+				<div class="form-group" show-errors>
+					<label for="input-begin" class="col-sm-2 control-label">Date de lancement</label>
+					<div class="col-sm-10">
+						<input type="month"
+							   class="form-control"
+							   id="input-begin"
+							   name="begin"
+							   max="{{project.end}}"
+							   ng-model="project.begin"
+							   required
+							   lower-than="{{project.end}}">
+
+						<p class="help-block" ng-if="projectForm.begin.$error.required">
+							Ce champ est obligatoire
+						</p>
+
+						<p class="help-block" ng-if="projectForm.begin.$error.lowerThan">
+							La date début de doit être inférieure à la date de fin
+						</p>
+					</div>
+				</div>
+
+				<div class="form-group" show-errors>
+
+					<label for="input-end" class="col-sm-2 control-label">Date de fin</label>
+					<div class="col-sm-10">
+						<input type="month"
+							   class="form-control"
+							   id="input-end"
+							   name="end"
+							   min="{{project.begin}}"
+							   ng-model="project.end"
+							   greater-than="{{project.begin}}"
+							   required>
+
+						<p class="help-block" ng-if="projectForm.end.$error.required">
+							Ce champ est obligatoire
+						</p>
+
+						<p class="help-block" ng-if="projectForm.end.$error.greaterThan">
+							La date de fin doit être supérieure à la date de début
+						</p>
+					</div>
+				</div>
+			</fieldset>
 
 			<fieldset>
 				<legend>Objectif global</legend>
@@ -19,7 +95,7 @@
 				<div class="form-group">
 					<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
 					<div class="col-sm-10">
-						<textarea class="form-control" placeholder="Description de la contribution du projet aux objectifs (impact) d'une politique ou d'un programme"></textarea>
+						<textarea class="form-control" placeholder="Description de la contribution du projet aux objectifs (impact) d'une politique ou d'un programme">To contribute to the reduction of neonatal mortality and maternal mortality in Afar region of Ethiopia by the next Ethiopia Demographic and Health Survey (EDHS)</textarea>
 					</div>
 				</div>
 
@@ -27,8 +103,8 @@
 					<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
 					<div class="col-sm-10">
 						<ul>
-							<li>Neonatal mortality rate</li>
-							<li>Maternal mortality ratio</li>
+							<li>Neonatal mortality rate (<a href="#">Retirer</a>)</li>
+							<li>Maternal mortality ratio (<a href="#">Retirer</a>)</li>
 							<li><a href="#">Ajouter un indicateur</a></li>
 						</ul>
 					</div>
@@ -38,216 +114,264 @@
 
 			<fieldset>
 				<legend>Objectifs spécifiques</legend>
-
-				<div class="well">
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Code</label>
-						<div class="col-sm-10">
-							<p class="form-control-static">OS.1</p>
+				
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<div class="panel-title">
+							OS.1: To reduce the prevalence and the harmful consequences of female genital mutilation in Zone 5 of Afar region by 2015
 						</div>
 					</div>
 
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
-						<div class="col-sm-10">
-							<textarea class="form-control" placeholder="Description des avantages directs destinés au(x) groupe(s) cible(s)"></textarea>
-						</div>
-					</div>
+					<div class="panel-body">
 
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
-						<div class="col-sm-10">
-							<textarea class="form-control" placeholder="Si l'objectif spécifique est atteint, quelles hypothèses doivent être confirmées pour atteindre l'objectif général?"></textarea>
+						<div class="form-group">
+							<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" placeholder="Description des avantages directs destinés au(x) groupe(s) cible(s)" value="To reduce the prevalence and the harmful consequences of female genital mutilation in Zone 5 of Afar region by 2015"/>
+							</div>
 						</div>
-					</div>
 
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
-						<div class="col-sm-10">
-							<ul>
-								<li>Among women age 15-49 who have heard about circumcision, percentage who believe practice should be continued</li>
-								<li>Among women age 15-49 with at least one living daughter, percentage with at least one daughter circumcised</li>
-								<li>Among girls born in the last 12 months, percentage who have been circumcised</li>
-								<li>Among girls born in the last 12 months and who have been circumcised, percentage with vagina sewn closed</li>
-								<li><a href="#">Ajouter un indicateur</a></li>
-							</ul>
+						<div class="form-group">
+							<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
+							<div class="col-sm-10">
+								<textarea class="form-control" placeholder="Si l'objectif spécifique est atteint, quelles hypothèses doivent être confirmées pour atteindre l'objectif général?">There is low risk for lies or false declarations during surveys.
+There is low to medium risk for the practice of female genital mutilation to continue through less severe forms, in secret and/or in neighbouring areas.
+The Afar region is homogeneous so that baseline values calculated for the whole of the region (EDHS 2005) are applicable to the sole Zone 5.</textarea>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
+							<div class="col-sm-10">
+								<ul>
+									<li>Among women age 15-49 who have heard about circumcision, percentage who believe practice should be continued (<a href="#">Retirer</a>)</li>
+									<li>Among women age 15-49 with at least one living daughter, percentage with at least one daughter circumcised (<a href="#">Retirer</a>)</li>
+									<li>Among girls born in the last 12 months, percentage who have been circumcised (<a href="#">Retirer</a>)</li>
+									<li>Among girls born in the last 12 months and who have been circumcised, percentage with vagina sewn closed (<a href="#">Retirer</a>)</li>
+									<li><a href="#">Ajouter un indicateur</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="panel panel-info">
+							<div class="panel-heading">
+								<div class="panel-title">
+									Résultat 1.1: The population in Zone 5 of Afar region (around 205,000 individuals) are aware of the harmful consequences of female genital mutilation.
+								</div>
+							</div>
+
+							<div class="panel-body">
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Description</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">The population in Zone 5 of Afar region (around 205,000 individuals) are aware of the harmful consequences of female genital mutilation.</textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">The awareness of the population concerns all the types of female genital mutilation, including the least severe forms.</textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
+									<div class="col-sm-10">
+										<ul>
+											<li>
+												Percentage of population that knows at least three complications / consequences of female
+												genital mutilation
+												(<a href="#">Retirer</a>)
+											</li>
+											<li>
+												Among women age 15-49 having received antenatal care from a skilled provider during their
+												last pregnancy, percentage who received information on the risks and the consequences of
+												genital mutilation on a newborn girl
+												(<a href="#">Retirer</a>)
+											</li>
+											<li>
+												Among women age 15-49 who gave birth to a girl in a health facility, percentage who received
+												information on the risks and the consequences of genital mutilation on their newborn girl
+												(<a href="#">Retirer</a>)
+											</li>
+											<li><a href="#">Ajouter un indicateur</a></li>
+										</ul>
+									</div>
+								</div>
+
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<div class="panel-title">
+											Activité 1.1.1: To conduct KAP surveys
+										</div>
+									</div>
+
+									<div class="panel-body">
+										<div class="form-group">
+											<label for="input-name" class="col-sm-2 control-label">Description</label>
+											<div class="col-sm-10">
+												<input type="text" class="form-control" placeholder="Produit ou service tangibles apportés par le projet." value="To conduct KAP surveys"/>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<label for="input-name" class="col-sm-2 control-label">Prérequis</label>
+											<div class="col-sm-10">
+												<input type="text" class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?" />
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<div class="panel-title">
+											Activité 1.1.2: To develop information, education, communication for the population on female genital mutilation
+										</div>
+									</div>
+
+									<div class="panel-body">
+										<div class="form-group">
+											<label for="input-name" class="col-sm-2 control-label">Description</label>
+											<div class="col-sm-10">
+												<input type="text" class="form-control" placeholder="Produit ou service tangibles apportés par le projet." value="To develop information, education, communication for the population on female genital mutilation" />
+											</div>
+										</div>
+
+										<div class="form-group">
+											<label for="input-name" class="col-sm-2 control-label">Prérequis</label>
+											<div class="col-sm-10">
+												<input type="text" class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?" />
+											</div>
+										</div>
+									</div>
+								</div>								
+
+							</div>
+						</div>
+
+						<div class="panel panel-info">
+							<div class="panel-heading">
+								<div class="panel-title">
+									Résultat 1.2: Prevention and management of complications and consequences of female genital mutilation is integrated in the continuum of care provided in 57 health facilities in Zone 5 of Afar region.
+								</div>
+							</div>
+
+							<div class="panel-body">
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Description</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">Prevention and management of complications and consequences of female genital mutilation is integrated in the continuum of care provided in 57 health facilities in Zone 5 of Afar region.</textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">Health facilities are functional and there is no disruption in the continuum of care.</textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
+									<div class="col-sm-10">
+										<ul>
+											<li>
+												Among women age 15-49 with vagina sewn closed (type III FGM) having received antenatal care
+												from a skilled provider during their last pregnancy, percentage who got de-infibulated during
+												the 2nd quarter
+												(<a href="#">Retirer</a>)
+											</li>
+											<li>
+												Percentage of antenatal consultations conducted in accordance with WHO recommendations related
+												to female genital mutilation.
+												(<a href="#">Retirer</a>)
+											</li>
+											<li><a href="#">Ajouter un indicateur</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="panel panel-info">
+							<div class="panel-heading">
+								<div class="panel-title">
+									Résultat 1.3: Female genital mutilation is a focus of community dialogue in 57 kebele in Zone 5 of Afar region and communities choose to abandon the practice.
+								</div>
+							</div>
+
+							<div class="panel-body">
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Description</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">Female genital mutilation is a focus of community dialogue in 57 kebele in Zone 5 of Afar region and communities choose to abandon the practice.</textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">Community leaders (clan leaders, religious leaders...) and traditional authorities (sultan) are influential and instrumental enough to convince their communities to abandon the practice of female genital mutilation.</textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
+									<div class="col-sm-10">
+										<ul>
+											<li>Number of communities publicly declaring that they abandon female genital mutilation (<a href="#">Retirer</a>)</li>
+											<li><a href="#">Ajouter un indicateur</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="panel panel-info">
+							<div class="panel-heading">
+								<div class="panel-title">
+									Résultat 1.4: Knowledge, and prevention, of female genital mutilation is introduced and supported at regional level.
+								</div>
+							</div>
+
+							<div class="panel-body">
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Description</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">Knowledge, and prevention, of female genital mutilation is introduced and supported at regional level.</textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
+									<div class="col-sm-10">
+										<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">All the stakeholders involved in prevention of female genital mutilation in Afar region are known. All of them agree to share information and their experiences.</textarea>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
+									<div class="col-sm-10">
+										<ul>
+											<li>Number of coordination meetings between partners and other stakeholders (<a href="#">Retirer</a>)</li>
+											<li>Number of reports, publications, conferences and their main recommendations (<a href="#">Retirer</a>)</li>
+											<li><a href="#">Ajouter un indicateur</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 
 				<button class="btn btn-default">Ajouter un objectif spécifique</button>
 			</fieldset>
-
-			<br/><br/>
-	
-
-			<fieldset>
-				<legend>Résultats attendus</legend>
-
-				<div class="well">
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Code</label>
-						<div class="col-sm-10">
-							<p class="form-control-static">R.1</p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Description</label>
-						<div class="col-sm-10">
-							<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">The population in Zone 5 of Afar region (around 205,000 individuals) are aware of the harmful consequences of female genital mutilation.</textarea>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
-						<div class="col-sm-10">
-							<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">The awareness of the population concerns all the types of female genital mutilation, including the least severe forms.</textarea>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
-						<div class="col-sm-10">
-							<ul>
-								<li>
-									Percentage of population that knows at least three complications / consequences of female
-									genital mutilation
-								</li>
-								<li>
-									Among women age 15-49 having received antenatal care from a skilled provider during their
-									last pregnancy, percentage who received information on the risks and the consequences of
-									genital mutilation on a newborn girl
-								</li>
-								<li>
-									Among women age 15-49 who gave birth to a girl in a health facility, percentage who received
-									information on the risks and the consequences of genital mutilation on their newborn girl
-								</li>
-								<li><a href="#">Ajouter un indicateur</a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-
-
-				<div class="well">
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Code</label>
-						<div class="col-sm-10">
-							<p class="form-control-static">R.2</p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Description</label>
-						<div class="col-sm-10">
-							<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">Prevention and management of complications and consequences of female genital mutilation is integrated in the continuum of care provided in 57 health facilities in Zone 5 of Afar region.</textarea>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
-						<div class="col-sm-10">
-							<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">Health facilities are functional and there is no disruption in the continuum of care.</textarea>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
-						<div class="col-sm-10">
-							<ul>
-								<li>
-									Among women age 15-49 with vagina sewn closed (type III FGM) having received antenatal care
-									from a skilled provider during their last pregnancy, percentage who got de-infibulated during
-									the 2nd quarter
-								</li>
-								<li>
-									Percentage of antenatal consultations conducted in accordance with WHO recommendations related
-									to female genital mutilation.
-								</li>
-								<li><a href="#">Ajouter un indicateur</a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-
-			</fieldset>
 		</form>
-
-		
-
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><hr/>
-	
-
-
-
-
-		
-
-
-		<table class="table table-bordered">
-			<thead>
-				<tr>
-					<th></th>
-					<th>Intervention logic</th>
-					<th>Objectively verifiable indicators of achievement</th>
-					<th>Assumptions</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td rowspan="1">
-						Objectifs globaux
-					</td>
-					<td contenteditable>
-						To contribute to the reduction of neonatal mortality and maternal mortality in Afar region of Ethiopia by the next Ethiopia Demographic and Health Survey (EDHS)
-					</td>
-					<td>
-						<ul>
-							<li>Neonatal mortality rate</li>
-							<li>Maternal mortality ratio</li>
-							<li><a href="#">Ajouter un indicateur</a></li>
-						</ul>
-					</td>
-					<td contenteditable>
-						N/A
-					</td>
-				</tr>
-
-				<tr>
-					<td rowspan="1">
-						Objectifs Spécifiques
-					</td>
-					<td contenteditable>
-						
-					</td>
-					<td>
-						<ul>
-							<li>Among women age 15-49 who have heard about circumcision, percentage who believe practice should be continued</li>
-							<li>Among women age15-49 with at least one living daughter, percentage with at least one daughter circumcised</li>
-							<li>Among girls born in the last 12 months, percentage who have been circumcised</li>
-							<li>Among girls born in the last 12 months and who have been circumcised, percentage with vagina sewn closed</li>
-							<li><a href="#">Ajouter un indicateur</a></li>
-						</ul>
-					</td>
-					<td contenteditable>
-						There is low risk for lies or false declarations during surveys.
-						There is low to medium risk for the practice of female genital mutilation to continue through less severe forms, in secret and/or in neighbouring areas.
-						The Afar region is homogeneous so that baseline values calculated for the whole of the region (EDHS 2005) are applicable to the sole Zone 5.
-					</td>
-				</tr>
-				<tr>
-
-
-
-			</tbody>
-		</table>
-
-
-
-	
 
 	</div>
 </div>
+

@@ -8,119 +8,153 @@
 	"begin": "2011-05",
 	"end": "2015-12",
 
-	"plannings": {
+	"logicOfIntervention": "",
+	"indicators": [
+		{
+			"id": "9b6aaa5d-bdf1-4bc0-a4d6-9a5867e68d49",
+			"indicator": "cb297cd2-4b59-4e78-a52e-97e2a7c3e81b",
+			"relevance": "3434",
+			"minimum": 0,
+			"orangeMinimum": 20,
+			"greenMinimum": 40,
+			"greenMaximum": 60,
+			"orangeMaximum": 80,
+			"maximum": 100,
+			"baseline": 4,
+			"targets": [
+				{"period": "2014-07", "value": 34},
+				{"period": "2014-07", "value": 56},
+				{"period": "2014-07", "value": 73}
+			]
+		}
+	],
 
-		"4f60d84d-6b37-407e-8896-31e9c0d15e4f": {
-			"name": "Fil actif centres",
-			"periodicity": "monthly",
-			"useProjectStart": true, "useProjectEnd": true,
-
-			"indicators": {
-				"0111fab4-81a4-7d4b-8c30-c2ee5fee9002": {
-					"source": "3434",
-					"relevance": "3434",
-					"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-					"baseline": 4,
-					"targets": [
-						{"period": "2014-07", "value": 34},
-						{"period": "2014-07", "value": 56},
-						{"period": "2014-07", "value": 73}
+	"specificObjectives": [
+		{
+			"logicOfIntervention": "",
+			"hypothesis": "",
+			"indicators": [],
+			"expectedResults": [
+				{
+					"description": "",
+					"hypothesis": "",
+					"indicators": [],
+					"activities": [
+						{ "description": "", "prerequesites": "" },
+						{ "description": "", "prerequesites": "" }
 					]
 				}
-			},
-			"compute": {
-				"0111fab4-81a4-7d4b-8c30-c2ee5fee9002": "b95be0b6-33ff-421c-ac09-4b29677fd57f",
-				"indicatorId": "formulaid",
-				"dependencyid": "formulaid"
-			}
-		},
+			]
+		}
+	],
 
-		"bfca2a10-90c3-4aaa-aa02-cc622f81737d": {
-			"name": "Spécial hopitaux",
-			"periodicity": "scheduled",
-			"dates": [ "2014-01", "2014-06", "2014-12", "2015-03" ],
+	"inputEntities": [
+		{ "id": "e37adee7-2cd9-63a9-a82d-2d3cd588a970", "name": "Nongphavong" },
+		{ "id": "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e", "name": "Makmi" },
+		{ "id": "aae927b9-ad29-1ce6-9b53-ebc9075e738d", "name": "Nachan" },
+		{ "id": "4b6172a9-b813-31e4-bc28-1657757dcac3", "name": "Banhieng" },
+		{ "id": "22466c7d-28f4-03e5-bd89-06dd93c98a5e", "name": "DHB Sukuma" },
+		{ "id": "b66ec629-6d29-cdab-8333-043a484aabca", "name": "Nadee" },
+		{ "id": "bad093f3-4911-1f9c-94fb-a6eeec2571b9", "name": "Kadanh" },
+		{ "id": "b184f5db-b0c1-742c-8bf2-bf163233b2c8", "name": "Nong Nga" },
+		{ "id": "f0d4c93b-e16d-0283-926a-cbe49f83eebd", "name": "Nong Hoy" },
+		{ "id": "cc75617f-6320-cf9a-bf4c-3e704c55dd08", "name": "Veunyang" },
+		{ "id": "88ec23d0-8f1c-256a-9c68-8f40924af400", "name": "Thahae" },
+		{ "id": "fda506b7-c3c5-3c96-8971-a460f4135cfb", "name": "DHB Moonlapamok" }
+	],
+
+	"inputGroups": [
+		{
+			"id": "72238d12-f1e6-467c-8618-1225011f382c",
+			"name": "Centres de santé",
+			"members": [
+				"e37adee7-2cd9-63a9-a82d-2d3cd588a970", "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e", "aae927b9-ad29-1ce6-9b53-ebc9075e738d",
+				"4b6172a9-b813-31e4-bc28-1657757dcac3", "b66ec629-6d29-cdab-8333-043a484aabca", "bad093f3-4911-1f9c-94fb-a6eeec2571b9",
+				"b184f5db-b0c1-742c-8bf2-bf163233b2c8", "f0d4c93b-e16d-0283-926a-cbe49f83eebd", "cc75617f-6320-cf9a-bf4c-3e704c55dd08",
+				"88ec23d0-8f1c-256a-9c68-8f40924af400"
+			]
+		},
+		{
+			"id": "b0fefdcb-519b-49e0-99d5-e3a63f886c99",
+			"name": "Hopitaux publics",
+			"members": ["22466c7d-28f4-03e5-bd89-06dd93c98a5e", "fda506b7-c3c5-3c96-8971-a460f4135cfb"]
+		},
+		{
+			"id": "84b9051e-ea75-4b3b-b512-f84492e1cada",
+			"name": "Sukuma",
+			"members": [
+				"e37adee7-2cd9-63a9-a82d-2d3cd588a970", "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e", "aae927b9-ad29-1ce6-9b53-ebc9075e738d",
+				"4b6172a9-b813-31e4-bc28-1657757dcac3", "22466c7d-28f4-03e5-bd89-06dd93c98a5e"
+			]
+		},
+		{
+			"id": "90b578bb-c1ef-431d-87e7-3af75432550f",
+			"name": "Moonlapamok",
+			"members": [
+				"b66ec629-6d29-cdab-8333-043a484aabca", "bad093f3-4911-1f9c-94fb-a6eeec2571b9", "b184f5db-b0c1-742c-8bf2-bf163233b2c8",
+				"f0d4c93b-e16d-0283-926a-cbe49f83eebd", "cc75617f-6320-cf9a-bf4c-3e704c55dd08", "88ec23d0-8f1c-256a-9c68-8f40924af400",
+				"fda506b7-c3c5-3c96-8971-a460f4135cfb"
+			]
+		}
+	],
+
+	"dataCollection": [
+		{
+			"id": "545e3225-6b7d-4aef-b3bd-322f1e1917f4",
+			"name": "Quarterly Survey",
+			"periodicity": "monthly",
+			"useProjectStart": true,
+			"useProjectEnd": true,
 
 			"indicators": {
-				"0111fab4-81a4-7d4b-8c30-c2ee5fee9002": {
-					"source": "3434",
-					"relevance": "3434",
-					"baseline": 4,
-					"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-					"targets": []
-				}
+				// that's indicator ids from the logical frame
+				"ab0e5347-21df-453d-988c-56910556fb61": "fieldId1 / fieldId2",
+				"ea5cb263-bb75-4ae8-8385-dadb71bdb859": "fieldId3",
+				"e5262d95-388c-4383-8e42-ede2ab57f734": "fieldId4",
+				"7055367e-cd01-489c-9f9a-b0b3b1a76411": "200 * fieldId5 / fieldId6"
 			},
-			"compute": {
+
+			"fields": {
+				// that's ids from the formulas just above.
+				"field1": {
+					"source": "",
+					// that's indicator ids to display labels
+					"indicator": "00cdbc1b-c5ed-4129-af8c-be24272a235f",
+				},
+				"field2": {
+					"source": "",
+					"indicator": "b8039685-0799-41eb-994d-0312e3bcd556",
+				},
+				"field3": {
+					"source": "",
+					"indicator": "c164385d-3d06-44c9-9397-6d13b2943fde",
+				},
+				"field4": {
+					"source": "",
+					"indicator": "b801cbde-11fc-4471-96bc-19e4f6b448dd",
+				},
+				"field5": {
+					"source": "",
+					"indicator": "9e544edd-ee48-405d-bdc0-c0cbc91625bb",
+				},
+				"field6": {
+					"source": "",
+					"indicator": "9fd6287b-6dbc-489a-aceb-e44e2e6b80ee"
+				}
 			}
 		},
-
-		"a8f38958-9598-430b-b138-982d20fea984": {
-			"name": "Sondage trimestriel",
-			"periodicity": "scheduled",
-			"dates": [ "2014-01", "2014-06", "2014-12", "2015-03" ],
+		{
+			"id": "b4c570f5-ab32-4c49-b746-179250147ca0",
+			"name": "Monthly data collection from medical centers",
+			"periodicity": "monthly",
+			"useProjectStart": true,
+			"useProjectEnd": true,
 
 			"indicators": {
-				"0111fab4-81a4-7d4b-8c30-c2ee5fee9002": {
-					"source": "3434",
-					"relevance": "3434",
-					"baseline": 4,
-					"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-					"targets": []
-				}
 			},
-			"compute": {
+
+			"fields": {
 			}
 		}
-	},
-
-	"center": {
-		"e37adee7-2cd9-63a9-a82d-2d3cd588a970": {
-			"name": "Nongphavong",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"ca36b4fe-6308-fa4c-89cd-84158ee7eb9e": {
-			"name": "Makmi",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"aae927b9-ad29-1ce6-9b53-ebc9075e738d": {
-			"name": "Nachan",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"4b6172a9-b813-31e4-bc28-1657757dcac3": {
-			"name": "Banhieng",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"22466c7d-28f4-03e5-bd89-06dd93c98a5e": {
-			"name": "DHB Sukuma",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f", "bfca2a10-90c3-4aaa-aa02-cc622f81737d"]
-		},
-		"b66ec629-6d29-cdab-8333-043a484aabca": {
-			"name": "Nadee",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"bad093f3-4911-1f9c-94fb-a6eeec2571b9": {
-			"name": "Kadanh",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"b184f5db-b0c1-742c-8bf2-bf163233b2c8": {
-			"name": "Nong Nga",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"f0d4c93b-e16d-0283-926a-cbe49f83eebd": {
-			"name": "Nong Hoy",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"cc75617f-6320-cf9a-bf4c-3e704c55dd08": {
-			"name": "Veunyang",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"88ec23d0-8f1c-256a-9c68-8f40924af400": {
-			"name": "Thahae",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f"]
-		},
-		"fda506b7-c3c5-3c96-8971-a460f4135cfb": {
-			"name": "DHB Moonlapamok",
-			"plannings": ["4f60d84d-6b37-407e-8896-31e9c0d15e4f", "bfca2a10-90c3-4aaa-aa02-cc622f81737d"]
-		}
-	}
-
+	]
 }
