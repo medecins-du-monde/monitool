@@ -1,0 +1,39 @@
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/projects/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+
+		<ol class="breadcrumb">
+			<li><a href="#projects">Projets</a></li>
+			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
+			<li class="active">Formulaires de saisie</li>
+		</ol>
+
+		<table class="table table-bordered table-stripped table-condensed">
+			<thead>
+				<tr>
+					<th>Nom</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="form in project.dataCollection">
+					<td>{{form.name}}</td>
+					<td>
+						<button class="btn btn-default btn-xs" ng-click="edit(form.id)">Editer</button>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<button class="btn btn-default btn-xs" style="width: 100%" ng-click="edit('new')">Ajouter</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+
+
+	</div>
+</div>

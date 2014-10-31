@@ -1,9 +1,8 @@
 
 {
-	"_id": "26db44c7-d37c-4f8d-a100-e6c12d8c737a",
-	"_rev": "27-44f53f2457d3756d9a5dfdaf3e281fec",
+	"_id": "e1764020-cecf-4445-bd5f-2906c33c9c5e",
 	"type": "project",
-	"name": "Réduction des risques",
+	"name": "nouveau format de projet",
 	"country": "Laos",
 	"begin": "2011-05",
 	"end": "2015-12",
@@ -11,8 +10,7 @@
 	"logicOfIntervention": "",
 	"indicators": [
 		{
-			"id": "9b6aaa5d-bdf1-4bc0-a4d6-9a5867e68d49",
-			"indicator": "cb297cd2-4b59-4e78-a52e-97e2a7c3e81b",
+			"id": "1c38fa28-1dc2-449e-aa34-08aa3b773e3b",
 			"relevance": "3434",
 			"minimum": 0,
 			"orangeMinimum": 20,
@@ -107,39 +105,17 @@
 			"useProjectEnd": true,
 
 			"indicators": {
-				// that's indicator ids from the logical frame
-				"ab0e5347-21df-453d-988c-56910556fb61": "fieldId1 / fieldId2",
-				"ea5cb263-bb75-4ae8-8385-dadb71bdb859": "fieldId3",
-				"e5262d95-388c-4383-8e42-ede2ab57f734": "fieldId4",
-				"7055367e-cd01-489c-9f9a-b0b3b1a76411": "200 * fieldId5 / fieldId6"
+				"1c38fa28-1dc2-449e-aa34-08aa3b773e3b": "fieldId1/fieldId2"
 			},
 
 			"fields": {
-				// that's ids from the formulas just above.
 				"field1": {
 					"source": "",
-					// that's indicator ids to display labels
-					"indicator": "00cdbc1b-c5ed-4129-af8c-be24272a235f",
+					"indicator": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f"
 				},
 				"field2": {
 					"source": "",
-					"indicator": "b8039685-0799-41eb-994d-0312e3bcd556",
-				},
-				"field3": {
-					"source": "",
-					"indicator": "c164385d-3d06-44c9-9397-6d13b2943fde",
-				},
-				"field4": {
-					"source": "",
-					"indicator": "b801cbde-11fc-4471-96bc-19e4f6b448dd",
-				},
-				"field5": {
-					"source": "",
-					"indicator": "9e544edd-ee48-405d-bdc0-c0cbc91625bb",
-				},
-				"field6": {
-					"source": "",
-					"indicator": "9fd6287b-6dbc-489a-aceb-e44e2e6b80ee"
+					"indicator": "4741ada6-709a-4a19-913e-ea174f053bbb"
 				}
 			}
 		},
