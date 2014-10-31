@@ -91,12 +91,8 @@
 				
 				<table class="table table-bordered table-stripped">
 					<tr ng-repeat="indicator in projectIndicators">
-						<td>
-							<input type="checkbox" ng-disabled="indicator.disabled" ng-model="indicator.selected" />
-						</td>
-						<td>
-							{{indicator.name}}
-						</td>
+						<td><input type="checkbox" ng-disabled="indicator.disabled" ng-model="indicator.selected" /></td>
+						<td>{{indicator.name}}</td>
 					</tr>
 				</table>
 			</fieldset>

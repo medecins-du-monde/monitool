@@ -1,4 +1,3 @@
-
 <div class="row">
 	<div class="col-md-2">
 		<ng-include src="'partials/projects/menu.html'"></ng-include>
@@ -8,24 +7,18 @@
 
 		<ol class="breadcrumb">
 			<li><a href="#projects">Projets</a></li>
-			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
+			<li class="active">{{project.name}}</li>
 			<li class="active">Cadre logique</li>
 		</ol>
 
-		<form class="form-horizontal" role="form">
+		<form class="form-horizontal" role="form" name="projectForm" novalidate>
 			<fieldset>
-				<legend>Description</legend>
+				<legend>Données générales</legend>
 
 				<div class="form-group" show-errors>
 					<label for="input-name" class="col-sm-2 control-label">Nom</label>
 					<div class="col-sm-10">
-						<input type="text"
-							   class="form-control"
-							   id="input-name"
-							   name="name"
-							   ng-model="project.name"
-							   placeholder="Exemple: Réduction des Risques Laos"
-							   required />
+						<input type="text" class="form-control" id="input-name" name="name" ng-model="project.name" placeholder="Exemple: Réduction des Risques Laos" required />
 						
 						<p class="help-block" ng-if="projectForm.name.$error.required">
 							Ce champ est obligatoire
@@ -46,14 +39,7 @@
 				<div class="form-group" show-errors>
 					<label for="input-begin" class="col-sm-2 control-label">Date de lancement</label>
 					<div class="col-sm-10">
-						<input type="month"
-							   class="form-control"
-							   id="input-begin"
-							   name="begin"
-							   max="{{project.end}}"
-							   ng-model="project.begin"
-							   required
-							   lower-than="{{project.end}}">
+						<input type="month" class="form-control" id="input-begin" name="begin" max="{{project.end}}" ng-model="project.begin" required lower-than="{{project.end}}">
 
 						<p class="help-block" ng-if="projectForm.begin.$error.required">
 							Ce champ est obligatoire
@@ -66,17 +52,9 @@
 				</div>
 
 				<div class="form-group" show-errors>
-
 					<label for="input-end" class="col-sm-2 control-label">Date de fin</label>
 					<div class="col-sm-10">
-						<input type="month"
-							   class="form-control"
-							   id="input-end"
-							   name="end"
-							   min="{{project.begin}}"
-							   ng-model="project.end"
-							   greater-than="{{project.begin}}"
-							   required>
+						<input type="month" class="form-control" id="input-end" name="end" min="{{project.begin}}" ng-model="project.end" greater-than="{{project.begin}}" required>
 
 						<p class="help-block" ng-if="projectForm.end.$error.required">
 							Ce champ est obligatoire
@@ -91,285 +69,159 @@
 
 			<fieldset>
 				<legend>Objectif global</legend>
-				
 				<div class="form-group">
 					<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
 					<div class="col-sm-10">
-						<textarea class="form-control" placeholder="Description de la contribution du projet aux objectifs (impact) d'une politique ou d'un programme">To contribute to the reduction of neonatal mortality and maternal mortality in Afar region of Ethiopia by the next Ethiopia Demographic and Health Survey (EDHS)</textarea>
+						<textarea class="form-control" placeholder="Description de la contribution du projet aux objectifs (impact) d'une politique ou d'un programme" ng-model="project.logicalFrame.goal"></textarea>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
 					<div class="col-sm-10">
-						<ul>
-							<li>Neonatal mortality rate (<a href="#">Retirer</a>)</li>
-							<li>Maternal mortality ratio (<a href="#">Retirer</a>)</li>
-							<li><a href="#">Ajouter un indicateur</a></li>
+						<ul class="form-control-static">
+							<li ng-repeat="indicatorId in project.logicalFrame.indicators">
+								{{indicatorsById[indicatorId].name}}
+								(<a ng-click="removeIndicator(indicatorId)">Retirer</a>)
+							</li>
+							<li><a href="#" ng-click="addIndicator(project.logicalFrame.indicators)">Ajouter un indicateur</a></li>
 						</ul>
 					</div>
 				</div>
-			
 			</fieldset>
 
 			<fieldset>
 				<legend>Objectifs spécifiques</legend>
 				
-				<div class="panel panel-primary">
+				<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes">
+
 					<div class="panel-heading">
 						<div class="panel-title">
-							OS.1: To reduce the prevalence and the harmful consequences of female genital mutilation in Zone 5 of Afar region by 2015
+							<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
+							<i class="fa fa-minus-circle"></i>
+							Objectif Spécifique {{purposeId + 1}}: {{purpose.description}}
 						</div>
 					</div>
 
 					<div class="panel-body">
-
-						<div class="form-group">
-							<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
-							<div class="col-sm-10">
-								<input type="text" class="form-control" placeholder="Description des avantages directs destinés au(x) groupe(s) cible(s)" value="To reduce the prevalence and the harmful consequences of female genital mutilation in Zone 5 of Afar region by 2015"/>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
-							<div class="col-sm-10">
-								<textarea class="form-control" placeholder="Si l'objectif spécifique est atteint, quelles hypothèses doivent être confirmées pour atteindre l'objectif général?">There is low risk for lies or false declarations during surveys.
-There is low to medium risk for the practice of female genital mutilation to continue through less severe forms, in secret and/or in neighbouring areas.
-The Afar region is homogeneous so that baseline values calculated for the whole of the region (EDHS 2005) are applicable to the sole Zone 5.</textarea>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
-							<div class="col-sm-10">
-								<ul>
-									<li>Among women age 15-49 who have heard about circumcision, percentage who believe practice should be continued (<a href="#">Retirer</a>)</li>
-									<li>Among women age 15-49 with at least one living daughter, percentage with at least one daughter circumcised (<a href="#">Retirer</a>)</li>
-									<li>Among girls born in the last 12 months, percentage who have been circumcised (<a href="#">Retirer</a>)</li>
-									<li>Among girls born in the last 12 months and who have been circumcised, percentage with vagina sewn closed (<a href="#">Retirer</a>)</li>
-									<li><a href="#">Ajouter un indicateur</a></li>
-								</ul>
-							</div>
-						</div>
-
-						<div class="panel panel-info">
-							<div class="panel-heading">
-								<div class="panel-title">
-									Résultat 1.1: The population in Zone 5 of Afar region (around 205,000 individuals) are aware of the harmful consequences of female genital mutilation.
+						<ng-form name="purposeForm">
+							<div class="form-group">
+								<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
+								<div class="col-sm-10">
+									<input type="text"
+										   class="form-control"
+										   placeholder="Description des avantages directs destinés au(x) groupe(s) cible(s)"
+										   ng-model="purpose.description"/>
 								</div>
 							</div>
 
-							<div class="panel-body">
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Description</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">The population in Zone 5 of Afar region (around 205,000 individuals) are aware of the harmful consequences of female genital mutilation.</textarea>
+							<div class="form-group">
+								<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
+								<div class="col-sm-10">
+									<textarea class="form-control"
+											  placeholder="Si l'objectif spécifique est atteint, quelles hypothèses doivent être confirmées pour atteindre l'objectif général?"
+											  ng-model="purpose.assumptions"></textarea>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
+								<div class="col-sm-10">
+									<ul class="form-control-static">
+										<li ng-repeat="indicatorId in purpose.indicators">
+											{{indicatorsById[indicatorId].name}}
+											(<a ng-click="removeIndicator(indicatorId)">Retirer</a>)
+										</li>
+										<li><a href="#" ng-click="addIndicator(purpose.indicators)">Ajouter un indicateur</a></li>
+									</ul>
+								</div>
+							</div>
+
+							<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs">
+								<div class="panel-heading">
+									<div class="panel-title">
+										<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
+										<i class="fa fa-minus-circle"></i>
+										Résultat {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
 									</div>
 								</div>
 
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">The awareness of the population concerns all the types of female genital mutilation, including the least severe forms.</textarea>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
-									<div class="col-sm-10">
-										<ul>
-											<li>
-												Percentage of population that knows at least three complications / consequences of female
-												genital mutilation
-												(<a href="#">Retirer</a>)
-											</li>
-											<li>
-												Among women age 15-49 having received antenatal care from a skilled provider during their
-												last pregnancy, percentage who received information on the risks and the consequences of
-												genital mutilation on a newborn girl
-												(<a href="#">Retirer</a>)
-											</li>
-											<li>
-												Among women age 15-49 who gave birth to a girl in a health facility, percentage who received
-												information on the risks and the consequences of genital mutilation on their newborn girl
-												(<a href="#">Retirer</a>)
-											</li>
-											<li><a href="#">Ajouter un indicateur</a></li>
-										</ul>
-									</div>
-								</div>
-
-								<div class="panel panel-default">
-									<div class="panel-heading">
-										<div class="panel-title">
-											Activité 1.1.1: To conduct KAP surveys
-										</div>
-									</div>
-
-									<div class="panel-body">
+								<div class="panel-body">
+									<ng-form name="outputForm">
 										<div class="form-group">
 											<label for="input-name" class="col-sm-2 control-label">Description</label>
 											<div class="col-sm-10">
-												<input type="text" class="form-control" placeholder="Produit ou service tangibles apportés par le projet." value="To conduct KAP surveys"/>
+												<textarea class="form-control"
+														  placeholder="Produit ou service tangibles apportés par le projet."
+														  ng-model="output.description"></textarea>
 											</div>
 										</div>
 
 										<div class="form-group">
-											<label for="input-name" class="col-sm-2 control-label">Prérequis</label>
+											<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
 											<div class="col-sm-10">
-												<input type="text" class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?" />
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div class="panel panel-default">
-									<div class="panel-heading">
-										<div class="panel-title">
-											Activité 1.1.2: To develop information, education, communication for the population on female genital mutilation
-										</div>
-									</div>
-
-									<div class="panel-body">
-										<div class="form-group">
-											<label for="input-name" class="col-sm-2 control-label">Description</label>
-											<div class="col-sm-10">
-												<input type="text" class="form-control" placeholder="Produit ou service tangibles apportés par le projet." value="To develop information, education, communication for the population on female genital mutilation" />
+												<textarea class="form-control"
+														  placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?"
+														  ng-model="output.assumptions"></textarea>
 											</div>
 										</div>
 
 										<div class="form-group">
-											<label for="input-name" class="col-sm-2 control-label">Prérequis</label>
+											<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
 											<div class="col-sm-10">
-												<input type="text" class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?" />
+												<ul class="form-control-static">
+													<li ng-repeat="indicatorId in output.indicators">
+														{{indicatorsById[indicatorId].name}}
+														(<a ng-click="removeIndicator(indicatorId)">Retirer</a>)
+													</li>
+													<li><a href="#" ng-click="addIndicator(output.indicators)">Ajouter un indicateur</a></li>
+												</ul>
 											</div>
 										</div>
-									</div>
-								</div>								
 
-							</div>
-						</div>
+										<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities">
+											<div class="panel-heading">
+												<div class="panel-title">
+													<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
+													<i class="fa fa-minus-circle"></i>
+													Activité {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}
+												</div>
+											</div>
 
-						<div class="panel panel-info">
-							<div class="panel-heading">
-								<div class="panel-title">
-									Résultat 1.2: Prevention and management of complications and consequences of female genital mutilation is integrated in the continuum of care provided in 57 health facilities in Zone 5 of Afar region.
+											<div class="panel-body">
+												<ng-form name="activityForm">
+													<div class="form-group">
+														<label for="input-name" class="col-sm-2 control-label">Description</label>
+														<div class="col-sm-10">
+															<input type="text" class="form-control" placeholder="Produit ou service tangibles apportés par le projet." ng-model="activity.description"/>
+														</div>
+													</div>
+
+													<div class="form-group">
+														<label for="input-name" class="col-sm-2 control-label">Prérequis</label>
+														<div class="col-sm-10">
+															<input type="text" class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?" ng-model="activity.prerequesites" />
+														</div>
+													</div>
+												</ng-form>
+											</div>
+										</div>
+
+										<button class="btn btn-default" ng-click="addActivity(output)">Ajouter une activité</button>
+									</ng-form>
 								</div>
 							</div>
-
-							<div class="panel-body">
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Description</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">Prevention and management of complications and consequences of female genital mutilation is integrated in the continuum of care provided in 57 health facilities in Zone 5 of Afar region.</textarea>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">Health facilities are functional and there is no disruption in the continuum of care.</textarea>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
-									<div class="col-sm-10">
-										<ul>
-											<li>
-												Among women age 15-49 with vagina sewn closed (type III FGM) having received antenatal care
-												from a skilled provider during their last pregnancy, percentage who got de-infibulated during
-												the 2nd quarter
-												(<a href="#">Retirer</a>)
-											</li>
-											<li>
-												Percentage of antenatal consultations conducted in accordance with WHO recommendations related
-												to female genital mutilation.
-												(<a href="#">Retirer</a>)
-											</li>
-											<li><a href="#">Ajouter un indicateur</a></li>
-										</ul>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="panel panel-info">
-							<div class="panel-heading">
-								<div class="panel-title">
-									Résultat 1.3: Female genital mutilation is a focus of community dialogue in 57 kebele in Zone 5 of Afar region and communities choose to abandon the practice.
-								</div>
-							</div>
-
-							<div class="panel-body">
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Description</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">Female genital mutilation is a focus of community dialogue in 57 kebele in Zone 5 of Afar region and communities choose to abandon the practice.</textarea>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">Community leaders (clan leaders, religious leaders...) and traditional authorities (sultan) are influential and instrumental enough to convince their communities to abandon the practice of female genital mutilation.</textarea>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
-									<div class="col-sm-10">
-										<ul>
-											<li>Number of communities publicly declaring that they abandon female genital mutilation (<a href="#">Retirer</a>)</li>
-											<li><a href="#">Ajouter un indicateur</a></li>
-										</ul>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="panel panel-info">
-							<div class="panel-heading">
-								<div class="panel-title">
-									Résultat 1.4: Knowledge, and prevention, of female genital mutilation is introduced and supported at regional level.
-								</div>
-							</div>
-
-							<div class="panel-body">
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Description</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" placeholder="Produit ou service tangibles apportés par le projet.">Knowledge, and prevention, of female genital mutilation is introduced and supported at regional level.</textarea>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?">All the stakeholders involved in prevention of female genital mutilation in Afar region are known. All of them agree to share information and their experiences.</textarea>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<label for="input-name" class="col-sm-2 control-label">Indicateurs</label>
-									<div class="col-sm-10">
-										<ul>
-											<li>Number of coordination meetings between partners and other stakeholders (<a href="#">Retirer</a>)</li>
-											<li>Number of reports, publications, conferences and their main recommendations (<a href="#">Retirer</a>)</li>
-											<li><a href="#">Ajouter un indicateur</a></li>
-										</ul>
-									</div>
-								</div>
-							</div>
-						</div>
+							
+							<button class="btn btn-default" ng-click="addOutput(purpose)">Ajouter un résultat attendu</button>
+						</ng-form>
 					</div>
 				</div>
 
-				<button class="btn btn-default">Ajouter un objectif spécifique</button>
+				<button class="btn btn-default" ng-click="addPurpose()">Ajouter un objectif spécifique</button>
 			</fieldset>
+
+			<button ng-click="update()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
+			<button ng-click="reset()" class="btn btn-default">Réinitialiser</button>
 		</form>
 
 	</div>

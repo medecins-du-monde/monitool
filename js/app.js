@@ -42,8 +42,19 @@ app.config(function($routeProvider) {
 		controller: 'ProjectLogicalFrameController',
 		resolve: {
 			project: function($route, $q, mtDatabase) {
-				if ($route.current.params.projectId === 'new')
-					return $q.when({type: 'project', plannings: {}, center: {}});
+				if ($route.current.params.projectId === 'new') {
+					return $q.when({
+						type: "project",
+						name: "",
+						country: "",
+						begin: "",
+						end: "",
+						logicalFrame: {goal: "", purposes: []},
+						inputEntities: [],
+						inputGroups: [],
+						dataCollection: []
+					});
+				}
 				else
 					return mtDatabase.get($route.current.params.projectId);
 			}
@@ -356,10 +367,7 @@ app.config(function($routeProvider) {
 });
 
 
-
 angular.element(document).ready(function() {
 	angular.bootstrap(document, ['MonitoolApp']);
-
-
-
 });
+

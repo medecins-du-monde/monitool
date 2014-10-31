@@ -46,8 +46,52 @@ monitoolControllers.controller('ProjectListController', function($scope, $locati
 monitoolControllers.controller('ProjectLogicalFrameController', function($location, $scope, $routeParams, mtDatabase, project) {
 	$scope.project = project;
 	$scope.master = angular.copy(project);
+
+	mtDatabase.allDocs({include_docs: true, keys: Object.keys(project.indicators)}).then(function(result) {
+		$scope.indicatorsById = {};
+		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
+	});
 	
-	$scope.update = function() {
+	// handle indicator add and remove
+	$scope.addIndicator = function(target) {
+	};
+
+	$scope.removeIndicator = function(indicatorId, target) {
+	};
+
+	// handle purpose add and remove
+	$scope.addPurpose = function() {
+		$scope.project.logicalFrame.purposes.push({
+			description: "", assumptions: "", indicators: [], outputs: []});
+	};
+
+	$scope.removePurpose = function(purpose) {
+		$scope.project.logicalFrame.purposes.splice(
+			$scope.project.logicalFrame.purposes.indexOf(purpose), 1
+		);
+	};
+
+	// handle output add and remove
+	$scope.addOutput = function(purpose) {
+		purpose.outputs.push({
+			description: "", assumptions: "", indicators: [], activities: []});
+	};
+
+	$scope.removeOutput = function(output, purpose) {
+		purpose.outputs.splice(purpose.outputs.indexOf(output), 1);
+	};
+
+	// handle output add and remove
+	$scope.addActivity = function(output) {
+		output.activities.push({description: "", prerequisites: ""});
+	};
+
+	$scope.removeOutput = function(activity, output) {
+		output.activities.splice(output.activities.indexOf(activity), 1);
+	};	
+
+	// handle global form actions
+	$scope.save = function() {
 		if ($routeParams.projectId === 'new')
 			$scope.project._id = PouchDB.utils.uuid().toLowerCase();
 
@@ -121,14 +165,6 @@ monitoolControllers.controller('ProjectFormEditionController', function($scope, 
 	$scope.form    = project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
 
 	// put all indicators in the same array.
-	var indicatorsInstances = [];
-	Array.prototype.push.apply(indicatorsInstances, project.indicators);
-	project.specificObjectives.forEach(function(obj) {
-		Array.prototype.push.apply(indicatorsInstances, obj.indicators);
-		obj.expectedResults.forEach(function(result) {
-			Array.prototype.push.apply(indicatorsInstances, result.indicators);
-		});
-	});
 
 	// retrieve their and put them in a hash
 	mtDatabase.allDocs({include_docs: true, keys: indicatorsInstances.map(function(ind) { return ind.id; })}).then(function(result) {
