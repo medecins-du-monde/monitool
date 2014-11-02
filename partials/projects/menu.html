@@ -3,14 +3,19 @@
 	<li ng-class="{active: currentPage === 'logical-frame', disabled: projectId === 'new'}">
 		<a ng-click="changePage('logical-frame')">Cadre Logique</a>
 	</li>
-	<li ng-class="{active: currentPage === 'input-entity', disabled: projectId === 'new'}">
-		<a ng-click="changePage('input-entities')">Entitées de saisie</a>
+	<li ng-class="{active: currentPage === 'input-entities', disabled: projectId === 'new'}">
+		<a ng-click="changePage('input-entities')">Lieux d'activité</a>
 	</li>
-	<li ng-class="{active: currentPage === 'groups', disabled: projectId === 'new'}">
-		<a ng-click="changePage('input-groups')">Groupes</a>
+	<li ng-class="{active: currentPage === 'input-groups', disabled: projectId === 'new'}">
+		<a ng-click="changePage('input-groups')">Groupes d'activité</a>
 	</li>
-
 	<li ng-class="{active: currentPage === 'forms', disabled: projectId === 'new'}">
 		<a ng-click="changePage('forms')">Formulaires de saisie</a>
+	</li>
+	<li ng-class="{active: currentPage === 'inputs', disabled: projectId === 'new'}">
+		<a ng-click="changePage('inputs')">Saisies en attentes</a>
+	</li>
+	<li ng-class="{active: currentPage === 'reporting', disabled: projectId === 'new'}">
+		<a ng-click="changePage('reporting')">Statistiques</a>
 	</li>
 </ul>

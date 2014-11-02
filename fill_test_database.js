@@ -1,6 +1,8 @@
 
 var data = {
 
+
+
 	"views": [
 		{
 			"_id": '_design/monitool',
@@ -59,11 +61,23 @@ var data = {
 					}.toString()
 				},
 
-				"inputs_by_project_period_indicator": {
+				"inputs_by_project_period": {
 					"map": function(doc) {
 						if (doc.type === 'input')
-							for (var indicator in doc.indicators)
-								emit([doc.project, doc.period, indicator], doc.indicators[indicator]);
+							emit([doc.project, doc.period], doc.indicators);
+					}.toString(),
+
+					"reduce": function(key, values, rereduce) {
+						var memo = {}, numValues = values.length;
+						for (var i = 0; i < numValues; ++i) {
+							var value = values[i];
+							for (var key in value)
+								if (memo[key])
+									memo[key] += value[key];
+								else
+									memo[key] = value[key];
+						}
+						return memo;
 					}.toString()
 				},
 
@@ -292,3 +306,11 @@ for (var type in data) {
 	})
 }
 
+{
+	"type": "input",
+	"project": "22a68ae1-cb32-541e-ad57-14479b6c10a3",
+	"center": "22466c7d-28f4-03e5-bd89-06dd93c98a5e",
+	"indicators": {
+		
+	}
+}

@@ -1,0 +1,139 @@
+<style>
+	table {
+		font-size: 12px;
+	}
+	.small {
+		font-size: 11px;
+		font-weight: bold;
+		line-height: 11px;
+	}
+</style>
+
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/projects/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+
+		<ol class="breadcrumb">
+			<li><a href="#projects">Projets</a></li>
+			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
+			<li class="active">Statistiques</li>
+		</ol>
+
+		<form class="form-horizontal well well-sm" novalidate>
+
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label">Date de début</label>
+				<div class="col-sm-10">
+					<input type="month" class="form-control" />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label">Date de fin</label>
+				<div class="col-sm-10">
+					<input type="month" class="form-control" />
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="group-by-input" class="col-sm-2 control-label">Colonnes</label>
+				<div class="col-sm-10">
+					<select class="form-control" id="group-by-input">
+						<option>Mois</option>
+						<option>An</option>
+						<option>Lieux d'activité</option>
+						<option>Groupe d'activité</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="show-dependencies-input" class="col-sm-2 control-label">Voir les variables de calcul</label>
+				<div class="col-sm-10">
+					<input type="checkbox" ng-model="showDependencies" id="show-dependencies-input" />
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="colorize-input" class="col-sm-2 control-label">Colorer</label>
+				<div class="col-sm-10">
+					<input type="checkbox" ng-model="colorize" id="colorize-input" />
+				</div>
+			</div>
+		</form>
+
+		<div class="well well-sm">
+			<nvd3-multi-bar-chart
+				data="reportingData"
+				id="showControlsExample"
+		        showXAxis="true"
+    		    showYAxis="true"
+				width="800"
+				height="300"
+				showLegend="true">
+
+				<svg style="width: 100%; height:300px;"></svg>
+				
+			</nvd3-multi-bar-chart>
+		</div>
+
+		<table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
+			<tbody>
+				<tr class="small">
+					<td colspan="6">
+						OG: {{project.logicalFrame.goal}}
+					</td>
+				</tr>
+				<tr ng-repeat="indicatorId in project.logicalFrame.indicators">
+					<td>
+						<input type="checkbox" ng-model="graphIndicators[indicatorId]" value="{{indicatorId}}" style="margin-top: 1px">
+						{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
+					</td>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+			</tbody>
+			<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
+				<tr class="small">
+					<td colspan="6">
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<a ng-click="purposeOpen=!purposeOpen">
+							<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
+							OS.{{purposeId+1}}: {{purpose.description}}
+						</a>
+					</td>
+				</tr>
+				<tr ng-repeat="indicatorId in purpose.indicators" ng-if="purposeOpen">
+					<td>
+						<input type="checkbox" ng-model="graphIndicators[indicatorId]" value="{{indicatorId}}" style="margin-top: 1px">
+						{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
+					</td>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+			</tbody>
+			<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
+				<tr class="small">
+					<td colspan="6">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a ng-click="outputOpen=!outputOpen">
+							<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
+							R.{{purposeId+1}}.{{$index+1}}: {{output.description}}
+						</a>
+					</td>
+				</tr>
+				<tr ng-repeat="indicatorId in output.indicators" ng-if="outputOpen">
+					<td>
+						<input type="checkbox" ng-model="graphIndicators[indicatorId]" value="{{indicatorId}}" style="margin-top: 1px">
+						{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
+					</td>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+			</tbody>
+			<tbody ng-repeat-end><!-- This may look a bit hackish... but is always better than nesting tables --></tbody>
+		</table>
+
+	</div>
+</div>
+

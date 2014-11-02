@@ -93,17 +93,17 @@
 			<fieldset>
 				<legend>Objectifs spécifiques</legend>
 				
-				<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes">
+				<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes" ng-init="tabOpen=false">
 
 					<div class="panel-heading">
 						<div class="panel-title">
 							<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
-							<i class="fa fa-minus-circle"></i>
-							Objectif Spécifique {{purposeId + 1}}: {{purpose.description}}
+							<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
+							<a ng-click="tabOpen = !tabOpen">Objectif Spécifique {{purposeId + 1}}: {{purpose.description}}</a>
 						</div>
 					</div>
 
-					<div class="panel-body">
+					<div class="panel-body" ng-show="tabOpen">
 						<ng-form name="purposeForm">
 							<div class="form-group">
 								<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
@@ -137,16 +137,16 @@
 								</div>
 							</div>
 
-							<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs">
+							<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs" ng-init="tabOpen=false">
 								<div class="panel-heading">
 									<div class="panel-title">
 										<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
-										<i class="fa fa-minus-circle"></i>
-										Résultat {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
+										<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
+										<a ng-click="tabOpen = !tabOpen">Résultat {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}</a>
 									</div>
 								</div>
 
-								<div class="panel-body">
+								<div class="panel-body" ng-show="tabOpen">
 									<ng-form name="outputForm">
 										<div class="form-group">
 											<label for="input-name" class="col-sm-2 control-label">Description</label>
@@ -179,16 +179,16 @@
 											</div>
 										</div>
 
-										<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities">
+										<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities" ng-init="tabOpen=false">
 											<div class="panel-heading">
 												<div class="panel-title">
 													<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
-													<i class="fa fa-minus-circle"></i>
-													Activité {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}
+													<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
+													<a ng-click="tabOpen = !tabOpen">Activité {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}</a>
 												</div>
 											</div>
 
-											<div class="panel-body">
+											<div class="panel-body" ng-show="tabOpen">
 												<ng-form name="activityForm">
 													<div class="form-group">
 														<label for="input-name" class="col-sm-2 control-label">Description</label>

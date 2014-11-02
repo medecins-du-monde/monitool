@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <!-- <html manifest="monitool.appcache"> -->
  	<head>
@@ -10,6 +11,7 @@
 		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="bower_components/angular-ui-select/dist/select.min.css">
 		<link rel="stylesheet" type="text/css" href="css/app.css" />
+		<link rel="stylesheet" type="text/css" href="bower_components/nvd3/nv.d3.min.css"/>
 
 		<script type="text/javascript">
 			// Object.values shim
@@ -29,6 +31,13 @@
 		<script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-ui-select/dist/select.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-bootstrap-show-errors/src/showErrors.min.js"></script>
+		<script type="text/javascript" src="bower_components/moment/min/moment.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-moment/angular-moment.min.js"></script>
+
+		<script type="text/javascript" src="bower_components/d3/d3.min.js"></script>
+		<script type="text/javascript" src="bower_components/nvd3/nv.d3.min.js"></script>
+		<script type="text/javascript" src="bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js"></script>
+
 
 		<script type="text/javascript" src="js/services.js"></script>
 		<script type="text/javascript" src="js/controllers.js"></script>
@@ -55,12 +64,6 @@
 						</li>
 						<li ng-class="{active: currentPage == 'indicators'}">
 							<a ng-click="changePage('indicators')">Catalogue Indicateurs</a>
-						</li>
-						<li ng-class="{active: currentPage == 'inputs'}">
-							<a ng-click="changePage('inputs')">Saisies en attente</a>
-						</li>
-						<li ng-class="{active: currentPage == 'reporting'}">
-							<a ng-click="changePage('reporting')">Consultation</a>
 						</li>
 						<li ng-class="{active: currentPage == 'sync'}">
 							<a ng-click="changePage('sync')">Synchronisation</a>

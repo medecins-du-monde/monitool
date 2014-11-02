@@ -126,15 +126,13 @@
 		{
 			"id": "545e3225-6b7d-4aef-b3bd-322f1e1917f4",
 			"name": "Quarterly Survey",
-			"periodicity": "monthly",
+			"periodicity": "quaterly",
 			"useProjectStart": true,
 			"useProjectEnd": true,
-			"indicators": ["1c38fa28-1dc2-449e-aa34-08aa3b773e3b"],
 
 			"fields": {
 				"1c38fa28-1dc2-449e-aa34-08aa3b773e3b": {
-					"type": "computed",
-					"formula": "37592e8b-fa7c-47cb-b88b-19a5a82d78aa"
+
 				}
 			}
 		},

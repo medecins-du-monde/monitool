@@ -117,12 +117,48 @@ app.config(function($routeProvider) {
 		}
 	});
 
-
 	$routeProvider.when('/projects/:projectId/users', {
 		templateUrl: 'partials/projects/user-list.html',
 		controller: 'ProjectUserListController',
 		resolve: {
 			project: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.projectId);
+			}
+		}
+	});
+
+	$routeProvider.when('/projects/:projectId/inputs', {
+		templateUrl: 'partials/projects/input-list.html',
+		controller: 'ProjectInputListController',
+		resolve: {
+			project: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.projectId);
+			},
+			inputs: function($route, mtDatabase) {
+				return [];
+			}
+		}
+	});
+
+	$routeProvider.when('/projects/:projectId/input/:period/:formId/:entityId', {
+		templateUrl: 'partials/projects/input.html',
+		controller: 'ProjectInputController',
+		resolve: {
+			project: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.projectId);
+			},
+			input: function($route, mtDatabase) {
+				
+			}
+		}
+	});
+
+	$routeProvider.when('/projects/:projectId/reporting', {
+		templateUrl: 'partials/projects/reporting.html',
+		controller: 'ReportingController',
+		resolve: {
+			type: function() { return 'project'; },
+			entity: function($route, mtDatabase) {
 				return mtDatabase.get($route.current.params.projectId);
 			}
 		}
@@ -138,77 +174,6 @@ app.config(function($routeProvider) {
 			}
 		}
 	});
-
-	// $routeProvider.when('/projects/:projectId/plannings', {
-	// 	templateUrl: 'partials/projects/plannings.html',
-	// 	controller: 'ProjectPlanningsController',
-	// 	resolve: {
-	// 		project: function($route, mtDatabase) {
-	// 			return mtDatabase.get($route.current.params.projectId);
-	// 		}
-	// 	}
-	// });
-
-	// $routeProvider.when('/projects/:projectId/plannings/:planningId', {
-	// 	templateUrl: 'partials/projects/planning-list.html',
-	// 	controller: 'ProjectPlanningListController',
-	// 	resolve: {
-	// 		project: function($route, mtDatabase) {
-	// 			return mtDatabase.get($route.current.params.projectId);
-	// 		},
-	// 		indicators: function(mtDatabase) {
-	// 			return mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}).then(function(result) {
-	// 				return result.rows.map(function(row) { return row.doc; });
-	// 			});
-	// 		},
-	// 		types: function(mtDatabase) {
-	// 			return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
-	// 				return result.rows.map(function(row) { return row.doc; });
-	// 			});
-	// 		},
-	// 		themes: function(mtDatabase) {
-	// 			return mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}).then(function(result) {
-	// 				return result.rows.map(function(row) { return row.doc; });
-	// 			});
-	// 		}
-	// 		// ,
-	// 		// inputsByIndicatorId: function($route, mtDatabase) {
-	// 		// 	var view = 'monitool/num_inputs_by_project_indicator',
-	// 		// 		options = {
-	// 		// 			startkey: [$route.current.params.projectId],
-	// 		// 			endkey: [$route.current.params.projectId, {}],
-	// 		// 			group: true, group_level: 2
-	// 		// 		};
-
-	// 		// 	return mtDatabase.query(view, options).then(function(result) {
-	// 		// 		var usage = {};
-	// 		// 		result.rows.forEach(function(row) {
-	// 		// 			usage[row.key[1]] = row.value;
-	// 		// 		});
-	// 		// 		return usage;
-	// 		// 	});
-	// 		// }
-	// 	}
-	// });
-
-	// $routeProvider.when('/projects/:projectId/plannings/:planningId/:indicatorId', {
-	// 	templateUrl: 'partials/projects/planning-edit.html',
-	// 	controller: 'ProjectPlanningEditController',
-	// 	resolve: {
-	// 		project: function($route, mtDatabase) {
-	// 			return mtDatabase.get($route.current.params.projectId);
-	// 		},
-	// 		indicator: function($route, mtDatabase) {
-	// 			return mtDatabase.get($route.current.params.indicatorId);
-	// 		},
-
-	// 		// indicators: function(mtDatabase) {
-	// 		// 	return mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}).then(function(result) {
-	// 		// 		return result.rows.map(function(row) { return row.doc; })
-	// 		// 	});
-	// 		// },
-	// 	}
-	// });
 
 	$routeProvider.when('/projects/:projectId', {
 		redirectTo: '/projects/:projectId/logical-frame'
@@ -342,10 +307,17 @@ app.config(function($routeProvider) {
 	///////////////////////////
 
 
-	$routeProvider.when('/inputs', {
-		templateUrl: 'partials/input/list.html',
-		controller: 'InputListController'
-	});
+	// $routeProvider.when('/inputs', {
+	// 	templateUrl: 'partials/input/list.html',
+	// 	controller: 'InputListController',
+	// 	resolve: {
+	// 		projects: function(mtDatabase) {
+	// 			return mtDatabase.query('monitool/by_type', {key: 'project'}).then(function(result) {
+	// 				return result.rows.map(function(row) { return row.value; });
+	// 			});
+	// 		}
+	// 	}
+	// });
 
 	$routeProvider.when('/inputs/:month/:centerId', {
 		templateUrl: 'partials/input/edit.html',
@@ -361,9 +333,9 @@ app.config(function($routeProvider) {
 		controller: 'ReportingByEntitiesController'
 	});
 
-	$routeProvider.otherwise({
-		redirectTo: '/projects'
-	});
+	// $routeProvider.otherwise({
+	// 	redirectTo: '/projects'
+	// });
 });
 
 

@@ -8,39 +8,42 @@
 		<ol class="breadcrumb">
 			<li><a href="#projects">Projets</a></li>
 			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
-			<li class="active">Liste des centres</li>
+			<li class="active">Lieux d'activité</li>
 		</ol>
 
 		<table class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
 					<th>Nom</th>
-					<th>Nombre de saisies</th>
 					<th></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="(centerId, center) in project.center">
-					<td>{{center.name}}</td>
-					<td>{{usage[centerId] || 0}}</td>
+				<tr ng-repeat="inputEntity in project.inputEntities">
+					<td>{{inputEntity.name}}</td>
 					<td>
-						<button class="btn btn-danger btn-xs" ng-click="delete(centerId)" ng-disabled="usage[centerId]">
+						<button class="btn btn-default btn-xs">
+							Voir les statistiques
+						</button>
+
+						<button class="btn btn-danger btn-xs" ng-click="delete(inputEntity)">
 							Supprimer
 						</button>
 					</td>
 				</tr>
+			</tbody>
+			<tfoot>
 				<tr>
 					<td colspan="3">
 						<div class="input-group input-group-sm" style="width: 100%">
-							<input type="text" class="form-control" ng-model="newCenter" placeholder="Nom du nouveau centre" ng-enter="create()">
+							<input type="text" class="form-control" ng-model="newCenter" placeholder="Nom de la nouvelle entitée" ng-enter="create()">
 							<span class="input-group-btn">
 								<button class="btn btn-default" ng-click="create()">Ajouter</button>
 							</span>
 						</div>
 					</td>
 				</tr>
-			</tbody>
+			</tfoot>
 		</table>
-
 	</div>
 </div>
