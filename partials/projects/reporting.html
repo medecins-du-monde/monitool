@@ -3,9 +3,9 @@
 		font-size: 12px;
 	}
 	.small {
-		font-size: 11px;
+		font-size: 12px;
 		font-weight: bold;
-		line-height: 11px;
+		line-height: 12px;
 	}
 </style>
 
@@ -27,77 +27,80 @@
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label">Date de début</label>
 				<div class="col-sm-10">
-					<input type="month" class="form-control" />
+					<input type="month" class="form-control" ng-model="begin" />
 				</div>
 			</div>
 			
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label">Date de fin</label>
 				<div class="col-sm-10">
-					<input type="month" class="form-control" />
+					<input type="month" class="form-control" ng-model="end" />
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label for="group-by-input" class="col-sm-2 control-label">Colonnes</label>
 				<div class="col-sm-10">
-					<select class="form-control" id="group-by-input">
-						<option>Mois</option>
-						<option>An</option>
-						<option>Lieux d'activité</option>
-						<option>Groupe d'activité</option>
+					<select class="form-control" id="group-by-input" ng-model="groupBy">
+						<option value="month">Mois</option>
+						<option value="year">Année</option>
+						<option value="entity">Lieux d'activité</option>
+						<option value="group">Groupe d'activité</option>
 					</select>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label for="show-dependencies-input" class="col-sm-2 control-label">Voir les variables de calcul</label>
-				<div class="col-sm-10">
-					<input type="checkbox" ng-model="showDependencies" id="show-dependencies-input" />
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label for="colorize-input" class="col-sm-2 control-label">Colorer</label>
 				<div class="col-sm-10">
-					<input type="checkbox" ng-model="colorize" id="colorize-input" />
+					<p class="form-control-static">
+						<input type="checkbox" id="colorize-input" ng-model="colorize" />
+					</p>
 				</div>
 			</div>
+
+			<button ng-click="updateData()">refresh</button>
 		</form>
 
-		<div class="well well-sm">
+<!-- 		<div class="well well-sm">
 			<nvd3-multi-bar-chart
 				data="reportingData"
 				id="showControlsExample"
-		        showXAxis="true"
-    		    showYAxis="true"
+				showXAxis="true"
+				showYAxis="true"
 				width="800"
-				height="300"
-				showLegend="true">
+				height="300">
 
 				<svg style="width: 100%; height:300px;"></svg>
 				
 			</nvd3-multi-bar-chart>
-		</div>
+		</div> -->
 
 		<table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
+			<thead>
+				<tr>
+					<th></th>
+					<th ng-repeat="col in cols">{{col.name || col}}</th>
+					<th>Total</th>
+				</tr>
+			</thead>
 			<tbody>
 				<tr class="small">
-					<td colspan="6">
+					<td colspan="{{cols.length + 2}}">
 						OG: {{project.logicalFrame.goal}}
 					</td>
 				</tr>
 				<tr ng-repeat="indicatorId in project.logicalFrame.indicators">
 					<td>
-						<input type="checkbox" ng-model="graphIndicators[indicatorId]" value="{{indicatorId}}" style="margin-top: 1px">
 						{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td></td><td></td><td></td><td></td><td></td>
+					<td ng-repeat="col in cols">{{round(data[col.id || col][indicatorId])}}</td>
+					<td>{{round(data.total[indicatorId])}}</td>
 				</tr>
 			</tbody>
 			<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
 				<tr class="small">
-					<td colspan="6">
+					<td colspan="{{cols.length + 2}}">
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						<a ng-click="purposeOpen=!purposeOpen">
 							<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
@@ -107,15 +110,15 @@
 				</tr>
 				<tr ng-repeat="indicatorId in purpose.indicators" ng-if="purposeOpen">
 					<td>
-						<input type="checkbox" ng-model="graphIndicators[indicatorId]" value="{{indicatorId}}" style="margin-top: 1px">
-						{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
+						&nbsp;&nbsp;&nbsp;&nbsp;{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td></td><td></td><td></td><td></td><td></td>
+					<td ng-repeat="col in cols">{{round(data[col.id || col][indicatorId])}}</td>
+					<td>{{round(data.total[indicatorId])}}</td>
 				</tr>
 			</tbody>
 			<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
 				<tr class="small">
-					<td colspan="6">
+					<td colspan="{{cols.length + 2}}">
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 						<a ng-click="outputOpen=!outputOpen">
 							<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
@@ -125,10 +128,10 @@
 				</tr>
 				<tr ng-repeat="indicatorId in output.indicators" ng-if="outputOpen">
 					<td>
-						<input type="checkbox" ng-model="graphIndicators[indicatorId]" value="{{indicatorId}}" style="margin-top: 1px">
-						{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td></td><td></td><td></td><td></td><td></td>
+					<td ng-repeat="col in cols">{{round(data[col.id || col][indicatorId])}}</td>
+					<td>{{round(data.total[indicatorId])}}</td>
 				</tr>
 			</tbody>
 			<tbody ng-repeat-end><!-- This may look a bit hackish... but is always better than nesting tables --></tbody>

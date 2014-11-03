@@ -111,7 +111,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/form-edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
-			project: function($route, mtDatabase) {
+			master: function($route, mtDatabase) {
 				return mtDatabase.get($route.current.params.projectId);
 			}
 		}
@@ -135,7 +135,14 @@ app.config(function($routeProvider) {
 				return mtDatabase.get($route.current.params.projectId);
 			},
 			inputs: function($route, mtDatabase) {
-				return [];
+				return mtDatabase.allDocs({
+					startkey: $route.current.params.projectId + ':',
+					endkey: $route.current.params.projectId + ':~'
+				}).then(function(result) {
+					var i = {};
+					result.rows.forEach(function(row) { i[row.id] = true; });
+					return i;
+				});
 			}
 		}
 	});
@@ -148,7 +155,16 @@ app.config(function($routeProvider) {
 				return mtDatabase.get($route.current.params.projectId);
 			},
 			input: function($route, mtDatabase) {
-				
+				var p  = $route.current.params,
+					id = [p.projectId, p.entityId, p.period, p.formId].join(':');
+
+				return mtDatabase.get(id).catch(function(error) {
+					return {
+						_id: id, type: 'input',
+						project: p.projectId, entity: p.entityId, form: p.formId, period: p.period,
+						indicators: { }
+					};
+				});
 			}
 		}
 	});

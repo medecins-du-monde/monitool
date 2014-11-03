@@ -63,11 +63,13 @@ var data = {
 
 				"inputs_by_project_period": {
 					"map": function(doc) {
-						if (doc.type === 'input')
-							emit([doc.project, doc.period], doc.indicators);
+						if (doc.type === 'input') {
+							var p = doc.period.split('-');
+							emit([doc.project, p[0], p[1]], doc.indicators);
+						}
 					}.toString(),
 
-					"reduce": function(key, values, rereduce) {
+					"reduce": function(keys, values, rereduce) {
 						var memo = {}, numValues = values.length;
 						for (var i = 0; i < numValues; ++i) {
 							var value = values[i];
@@ -81,37 +83,59 @@ var data = {
 					}.toString()
 				},
 
-				"inputs_by_center_period_indicator": {
+				"inputs_by_project_entity_period": {
 					"map": function(doc) {
-						if (doc.type === 'input')
-							for (var indicator in doc.indicators)
-								emit([doc.center, doc.period, indicator], doc.indicators[indicator]);
+						if (doc.type === 'input') {
+							var p = doc.period.split('-');
+							emit([doc.project, doc.entity, p[0], p[1]], doc.indicators);
+						}
+					}.toString(),
+
+					"reduce": function(keys, values, rereduce) {
+						var memo = {}, numValues = values.length;
+						for (var i = 0; i < numValues; ++i) {
+							var value = values[i];
+							for (var key in value)
+								if (memo[key])
+									memo[key] += value[key];
+								else
+									memo[key] = value[key];
+						}
+						return memo;
 					}.toString()
 				},
 
-				"inputs_by_indicator_period_project": {
-					"map": function(doc) {
-						if (doc.type === 'input')
-							for (var indicator in doc.indicators)
-								emit([indicator, doc.period, doc.project], doc.indicators[indicator]);
-					}.toString()
-				},
+				// "inputs_by_center_period_indicator": {
+				// 	"map": function(doc) {
+				// 		if (doc.type === 'input')
+				// 			for (var indicator in doc.indicators)
+				// 				emit([doc.center, doc.period, indicator], doc.indicators[indicator]);
+				// 	}.toString()
+				// },
 
-				"project_by_center": {
-					"map": function(doc) {
-						if (doc.type === 'project')
-							for (var centerId in doc.center)
-								emit(centerId);
-					}.toString()
-				},
+				// "inputs_by_indicator_period_project": {
+				// 	"map": function(doc) {
+				// 		if (doc.type === 'input')
+				// 			for (var indicator in doc.indicators)
+				// 				emit([indicator, doc.period, doc.project], doc.indicators[indicator]);
+				// 	}.toString()
+				// },
 
-				"formulas": {
-					"map": function(doc) {
-						if (doc.type === 'indicator')
-							for (var formulaId in doc.formulas)
-								emit(formulaId, doc.formulas[formulaId]);
-					}.toString()
-				},
+				// "project_by_center": {
+				// 	"map": function(doc) {
+				// 		if (doc.type === 'project')
+				// 			for (var centerId in doc.center)
+				// 				emit(centerId);
+				// 	}.toString()
+				// },
+
+				// "formulas": {
+				// 	"map": function(doc) {
+				// 		if (doc.type === 'indicator')
+				// 			for (var formulaId in doc.formulas)
+				// 				emit(formulaId, doc.formulas[formulaId]);
+				// 	}.toString()
+				// },
 
 				"indicator_usage": {
 					"map": function(doc) {
@@ -304,13 +328,4 @@ for (var type in data) {
 			console.log(body)
 		});
 	})
-}
-
-{
-	"type": "input",
-	"project": "22a68ae1-cb32-541e-ad57-14479b6c10a3",
-	"center": "22466c7d-28f4-03e5-bd89-06dd93c98a5e",
-	"indicators": {
-		
-	}
 }

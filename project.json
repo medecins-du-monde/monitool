@@ -8,17 +8,17 @@
 
 	"logicalFrame": {
 		"goal": "To contribute to the reduction of neonatal mortality and maternal mortality in Afar region of Ethiopia by the next Ethiopia Demographic and Health Survey (EDHS)",
-		"indicators": [],
+		"indicators": ["d07a3b78-ff14-24a0-942e-e282176fa241"],
 		"purposes": [
 			{
 				"description": "To reduce the prevalence and the harmful consequences of female genital mutilation in Zone 5 of Afar region by 2015",
 				"assumptions": "There is low risk for lies or false declarations during surveys. There is low to medium risk for the practice of female genital mutilation to continue through less severe forms, in secret and/or in neighbouring areas. The Afar region is homogeneous so that baseline values calculated for the whole of the region (EDHS 2005) are applicable to the sole Zone 5",
-				"indicators": ["1c38fa28-1dc2-449e-aa34-08aa3b773e3b"],
+				"indicators": ["650c1666-7557-9261-99a6-c841962a7220", "566b5af2-6bd2-c7c1-b0b8-b4df5e78f597"],
 				"outputs": [
 					{
 						"description": "The population in Zone 5 of Afar region (around 205,000 individuals) are aware of the harmful consequences of female genital mutilation.",
 						"assumptions": "The awareness of the population concerns all the types of female genital mutilation, including the least severe forms.",
-						"indicators": [],
+						"indicators": ["d4f4e2a1-141c-59d4-9027-3cfbf9ca17ed"],
 						"activities": [
 							{ "description": "to conduct KAP surveys", "prerequesites": "" },
 							{ "description": "to develop information, education, communication for the population on female genital mutilation", "prerequesites": "" },
@@ -28,7 +28,7 @@
 					{
 						"description": "Prevention and management of complications and consequences of female genital mutilation is integrated in the continuum of care provided in 57 health facilities in Zone 5 of Afar region.",
 						"assumptions": "Health facilities are functional and there is no disruption in the continuum of care.",
-						"indicators": [],
+						"indicators": ["7003ff8b-4335-4682-9c48-82eb2320dfd2"],
 						"activities": [
 							{ "description": "to train and support 92 skilled health workers on female genital mutilation in the continuum of care", "prerequesites": "" },
 							{ "description": "to introduce materials and protocols in 57 health facilities for the integration of WHO recommendations related to female genital mutilation", "prerequesites": "" },
@@ -110,15 +110,30 @@
 	],
 
 	"indicators": {
-		"1c38fa28-1dc2-449e-aa34-08aa3b773e3b": {
-			"relevance": "3434",
-			"baseline": 4,
+		"d07a3b78-ff14-24a0-942e-e282176fa241": {
+			"relevance": "3434", "baseline": 4,
 			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-			"targets": [
-				{"period": "2014-07", "value": 34},
-				{"period": "2014-07", "value": 56},
-				{"period": "2014-07", "value": 73}
-			]
+			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
+		},
+		"650c1666-7557-9261-99a6-c841962a7220": {
+			"relevance": "3434", "baseline": 4,
+			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
+			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
+		},
+		"566b5af2-6bd2-c7c1-b0b8-b4df5e78f597": {
+			"relevance": "3434", "baseline": 4,
+			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
+			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
+		},
+		"d4f4e2a1-141c-59d4-9027-3cfbf9ca17ed": {
+			"relevance": "3434", "baseline": 4,
+			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
+			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
+		},
+		"7003ff8b-4335-4682-9c48-82eb2320dfd2": {
+			"relevance": "3434", "baseline": 4,
+			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
+			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
 		}
 	},
 
@@ -126,14 +141,11 @@
 		{
 			"id": "545e3225-6b7d-4aef-b3bd-322f1e1917f4",
 			"name": "Quarterly Survey",
-			"periodicity": "quaterly",
+			"periodicity": "quarterly",
 			"useProjectStart": true,
 			"useProjectEnd": true,
 
 			"fields": {
-				"1c38fa28-1dc2-449e-aa34-08aa3b773e3b": {
-
-				}
 			}
 		},
 		{
@@ -145,7 +157,6 @@
 			"indicators": [],
 
 			"fields": {
-
 			}
 		}
 	]

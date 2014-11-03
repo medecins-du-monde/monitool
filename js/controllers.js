@@ -102,7 +102,7 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 			$scope.master = angular.copy($scope.project);
 
 			if ($routeParams.projectId === 'new')
-				$location.url('/projects/' + result.id + '/description');
+				$location.url('/projects/' + result.id + '/logical-frame');
 
 		}).catch(function(error) {
 			$scope.error = error;
@@ -162,9 +162,9 @@ monitoolControllers.controller('ProjectFormsController', function($scope, $locat
 });
 
 
-monitoolControllers.controller('ProjectFormEditionController', function($scope, $routeParams, project, mtDatabase) {
-	$scope.project = project;
-	$scope.form    = project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
+monitoolControllers.controller('ProjectFormEditionController', function($scope, $routeParams, master, mtDatabase) {
+	$scope.project = angular.copy(master);
+	$scope.form    = $scope.project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
 
 	// Retrieve indicators definition
 	$scope.indicatorsById = {};
@@ -175,19 +175,21 @@ monitoolControllers.controller('ProjectFormEditionController', function($scope, 
 	});
 
 	// Build indicator selection
-	$scope.chosenIndicators = [];
-	Object.keys($scope.project.indicators).forEach(function(indicatorId) {
-		if ($scope.form.fields[indicatorId])
-			$scope.chosenIndicators.push({id: indicatorId, selected: true, disabled: false});
-		else {
-			var disabled = false;
-			project.dataCollection.forEach(function(form) {
-				if (form.id !== $scope.form.id && form.fields[indicatorId])
-					disabled = true;
-			});
-			$scope.chosenIndicators.push({id: indicatorId, selected: false, disabled: disabled});
-		}
-	});
+	var rebuildChosenIndicators = function() {
+		$scope.chosenIndicators = [];
+		Object.keys($scope.project.indicators).forEach(function(indicatorId) {
+			if ($scope.form.fields[indicatorId])
+				$scope.chosenIndicators.push({id: indicatorId, selected: true, disabled: false});
+			else {
+				var disabled = false;
+				$scope.project.dataCollection.forEach(function(form) {
+					if (form.id !== $scope.form.id && form.fields[indicatorId])
+						disabled = true;
+				});
+				$scope.chosenIndicators.push({id: indicatorId, selected: false, disabled: disabled});
+			}
+		});
+	};
 
 	$scope.updateFields = function() {
 		// Retrieve all dependencies of a given indicator, with duplicates (which we do not care about).
@@ -240,13 +242,31 @@ monitoolControllers.controller('ProjectFormEditionController', function($scope, 
 		});
 	};
 
+	$scope.save = function() {
+		mtDatabase.put($scope.project).then(function(result) {
+			$scope.project._rev = result.rev;
+			master = angular.copy($scope.project);
+		}).catch(function(error) {
+			$scope.error = error;
+		});
+	};
+
+	$scope.reset = function() {
+		$scope.project = angular.copy(master);
+		$scope.form    = $scope.project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
+		rebuildChosenIndicators();
+	};
+
+	$scope.isUnchanged = function() {
+		return angular.equals(master, $scope.project);
+	};
+
+	rebuildChosenIndicators();
 });
 
-monitoolControllers.controller('ProjectInputListController', function($scope, $location, project, inputs) {
+monitoolControllers.controller('ProjectInputListController', function($scope, $location, project, inputs, mtDatabase) {
 	$scope.project = project;
 	$scope.inputs = [];
-
-	
 
 	project.inputEntities.forEach(function(inputEntity) {
 		project.dataCollection.forEach(function(form) {
@@ -268,11 +288,11 @@ monitoolControllers.controller('ProjectInputListController', function($scope, $l
 				periods = form.periods;
 			}
 			else
-				throw new Error();
+				throw new Error(form.periodicity + ' is not a valid periodicity');
 
 			periods.forEach(function(period) {
 				$scope.inputs.push({
-					filled: false,
+					filled: inputs[[$scope.project._id, inputEntity.id, period.format('YYYY-MM'), form.id].join(':')],
 					period: period,
 					formId: form.id, formName: form.name,
 					inputEntityId: inputEntity.id, inputEntityName: inputEntity.name
@@ -296,23 +316,66 @@ monitoolControllers.controller('ProjectInputListController', function($scope, $l
 
 });
 
-monitoolControllers.controller('ProjectInputController', function($scope, project, input) {
+monitoolControllers.controller('ProjectInputController', function($scope, $routeParams, $location, project, input, mtDatabase) {
 	$scope.project = project;
 	$scope.input   = input;
+	$scope.form    = $scope.project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
+	$scope.fields  = Object.keys($scope.form.fields).map(function(fieldId) {
+		var field = $scope.form.fields[fieldId];
+		field.id = fieldId;
+		field.source = 'coucou<br/>coucou coucou coucou coucou coucou coucou'
+		return field;
+	});
 
+	$scope.indicatorsById = {};
+	mtDatabase.allDocs({include_docs: true, keys: Object.keys($scope.form.fields)}).then(function(result) {
+		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
+	});
 
+	$scope.evaluate = function() {
+		var values = null, newValues = angular.copy($scope.input.indicators);
+
+		while (!angular.equals(values, newValues)) {
+			for (var indicatorId in $scope.form.fields) {
+				var field = $scope.form.fields[indicatorId];
+				if (field.type === 'computed') {
+					var localScope = {};
+					for (var paramName in field.parameters)
+						localScope[paramName] = $scope.input.indicators[field.parameters[paramName]] || 0;
+					$scope.input.indicators[indicatorId] = math.eval(field.expression, localScope);
+				}
+			}
+
+			values    = newValues;
+			newValues = $scope.input.indicators;
+		}
+	};
+
+	$scope.save = function() {
+		mtDatabase.put($scope.input).then(function() {
+			$location.url('projects/' + project._id + '/inputs');
+		});
+	};
 });
 
 monitoolControllers.controller('ProjectUserListController', function($scope) {
 
 });
 
-monitoolControllers.controller('ReportingController', function($scope, type, entity, mtDatabase) {
+// $scope.reportingData = [
+// 	{key:"some value 1", values:[["2014-01", 34], ["2014-02", 24], ["2014-03", 14], ["2014-04", 19], ["2014-05", 34], ["2014-06", 45]]},
+// 	{key:"some value 2", values:[["2014-01", 24], ["2014-02", 14], ["2014-03", 19], ["2014-04", 45], ["2014-05", 34], ["2014-06", 34]]},
+// ];
+
+monitoolControllers.controller('ReportingController', function($scope, type, entity, mtDatabase, mtIndicators) {
 	$scope.project = entity;
-	$scope.reportingData = [
-		{key:"Here is a long indicator descriptor with many mnay letters", values:[["2014-01", 34], ["2014-02", 24], ["2014-03", 14], ["2014-04", 19], ["2014-05", 34], ["2014-06", 45]]},
-		{key:"Here is a long indicator descriptor with many mnay lettersHere is a long indicator descriptor with many mnay letters", values:[["2014-01", 24], ["2014-02", 14], ["2014-03", 19], ["2014-04", 45], ["2014-05", 34], ["2014-06", 34]]},
-	];
+
+	// for now...
+	var formFields = {};
+	$scope.project.dataCollection.forEach(function(form) {
+		for (var key in form.fields)
+			formFields[key] = form.fields[key];
+	});
 
 	// Retrieve indicators
 	$scope.indicatorsById = {};
@@ -320,11 +383,21 @@ monitoolControllers.controller('ReportingController', function($scope, type, ent
 		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
 	});
 
+	$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM');
+	$scope.end     = moment().format('YYYY-MM');
+	$scope.groupBy = 'month';
+
+	$scope.round = function(val) { return Math.round(val); };
+
 	// Retrieve inputs
-	var options = {startkey: [$scope.project._id], endkey: [$scope.project._id, {}], reduce: true};
-	mtDatabase.query('monitool/inputs_by_project_period', options).then(function(result) {
-		console.log(result);
-	});
+	$scope.updateData = function() {
+		mtIndicators.getProjectStats($scope.project, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
+			$scope.cols = mtIndicators.getProjectStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy);
+			$scope.data = data;
+		});
+	};
+
+	$scope.updateData();
 });
 
 
@@ -591,3 +664,9 @@ monitoolControllers.controller('ReportingByEntitiesController', function($scope,
 	// 	}
 	// }
 
+
+
+// {"error":"reduce_overflow_error","reason":"Reduce output must shrink more rapidly: Current output: '
+// [
+// {\"49c10052-053d-c995-9120-88799f6b000e\":12,
+// \"d4f4e2a1-141c-59d4-9027-3cfbf9ca17ed\":106.6666666666666'... (first 100 of 629 bytes)"}

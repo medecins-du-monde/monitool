@@ -219,8 +219,10 @@
 
 				<button class="btn btn-default" ng-click="addPurpose()">Ajouter un objectif spécifique</button>
 			</fieldset>
+			
+			<br/><br/>
 
-			<button ng-click="update()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
+			<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
 			<button ng-click="reset()" class="btn btn-default">Réinitialiser</button>
 		</form>
 

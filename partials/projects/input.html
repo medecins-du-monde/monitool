@@ -1,0 +1,48 @@
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/projects/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+
+		<ol class="breadcrumb">
+			<li><a href="#projects">Projets</a></li>
+			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
+			<li><a href="#projects/{{project._id}}/inputs">Saisies en attente</a></li>
+			<li class="active">{{form.name}}</li>
+		</ol>
+
+		<table class="table table-bordered table-stripped table-condensed">
+			<thead>
+				<tr>
+					<th style="width: 300px;">Nom</th>
+					<th>Nouvelle valeur</th>
+					<th>Mois précédant</th>
+				</tr>
+			</thead>
+			<tbody ng-repeat="field in fields | orderBy:'type'">
+				<tr>
+					<td>
+						<label for="input-{{field.id}}">
+							{{indicatorsById[field.id].name}}
+						</label>
+					</td>
+					<td>
+						<input id="input-{{field.id}}"
+							   type="number"
+							   ng-model="input.indicators[field.id]"
+							   ng-change="evaluate()"
+							   ng-disabled="field.type == 'computed'"
+							   tooltip-html-unsafe="Source: {{field.source}}"
+							   tooltip-trigger="focus" 
+							   class="form-control input-sm" />
+					</td>
+					<td>{{lastValues[indicator.id]}}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<button class="btn btn-default" ng-click="save()">Sauvegarder</button>
+		<button class="btn btn-danger" ng-click="delete()">Supprimer</button>
+	</div>
+</div>
