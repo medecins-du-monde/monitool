@@ -82,9 +82,9 @@
 						<ul class="form-control-static">
 							<li ng-repeat="indicatorId in project.logicalFrame.indicators">
 								{{indicatorsById[indicatorId].name}}
-								(<a ng-click="removeIndicator(indicatorId)">Retirer</a>)
+								(<a ng-click="editIndicator(indicatorId)">Modifier</a>)
 							</li>
-							<li><a href="#" ng-click="addIndicator(project.logicalFrame.indicators)">Ajouter un indicateur</a></li>
+							<li><a ng-click="addIndicator(project.logicalFrame.indicators)">Ajouter un indicateur</a></li>
 						</ul>
 					</div>
 				</div>
@@ -130,9 +130,9 @@
 									<ul class="form-control-static">
 										<li ng-repeat="indicatorId in purpose.indicators">
 											{{indicatorsById[indicatorId].name}}
-											(<a ng-click="removeIndicator(indicatorId)">Retirer</a>)
+											(<a ng-click="editIndicator(indicatorId)">Modifier</a>)
 										</li>
-										<li><a href="#" ng-click="addIndicator(purpose.indicators)">Ajouter un indicateur</a></li>
+										<li><a ng-click="addIndicator(purpose.indicators)">Ajouter un indicateur</a></li>
 									</ul>
 								</div>
 							</div>
@@ -172,9 +172,9 @@
 												<ul class="form-control-static">
 													<li ng-repeat="indicatorId in output.indicators">
 														{{indicatorsById[indicatorId].name}}
-														(<a ng-click="removeIndicator(indicatorId)">Retirer</a>)
+														(<a ng-click="editIndicator(indicatorId)">Modifier</a>)
 													</li>
-													<li><a href="#" ng-click="addIndicator(output.indicators)">Ajouter un indicateur</a></li>
+													<li><a ng-click="addIndicator(output.indicators)">Ajouter un indicateur</a></li>
 												</ul>
 											</div>
 										</div>

@@ -45,7 +45,7 @@ monitoolControllers.controller('ProjectListController', function($scope, $locati
 });
 
 
-monitoolControllers.controller('ProjectLogicalFrameController', function($location, $scope, $routeParams, mtDatabase, project) {
+monitoolControllers.controller('ProjectLogicalFrameController', function($location, $scope, $routeParams, $modal, mtDatabase, project) {
 	$scope.project = project;
 	$scope.master = angular.copy(project);
 
@@ -56,6 +56,18 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 	
 	// handle indicator add and remove
 	$scope.addIndicator = function(target) {
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/projects/logical-frame-indicator.html',
+			controller: 'ProjectLogicalFrameIndicatorController',
+			size: 'lg',
+			resolve: {}
+		});
+
+		modalInstance.result.then(function(selectedItem) {
+			$scope.selected = selectedItem;
+		}).catch(function () {
+			// $log.info('Modal dismissed at: ' + new Date());
+		});
 	};
 
 	$scope.removeIndicator = function(indicatorId, target) {
@@ -118,6 +130,24 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 	};
 });
 
+monitoolControllers.controller('ProjectLogicalFrameIndicatorController', function($scope, mtDatabase) {
+	$scope.indicator = {};
+	mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}).then(function(result) {
+		$scope.indicators = result.rows.map(function(row) { return row.doc; });
+	});
+
+	$scope.add = function () {
+		$modalInstance.close($scope.selected.item);
+	};
+
+	$scope.delete = function() {
+
+	};
+
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+});
 
 monitoolControllers.controller('ProjectInputEntitiesController', function($scope, project, inputsByCenterId, mtDatabase) {
 	$scope.project = project;
@@ -555,85 +585,85 @@ monitoolControllers.controller('ThemeListController', function($q, $scope, theme
 // Input
 ///////////////////////////
 
-monitoolControllers.controller('InputEditController', function($scope, $routeParams, $q, mtDatabase, mtInput, mtIndicators) {
-	// Retrieve values and description for this form.
-	mtDatabase.query('monitool/project_by_center', {key: $routeParams.centerId, include_docs: true}).then(function(result) {
-		$scope.project = result.rows[0].doc;
-		$scope.center  = $scope.project.center[$routeParams.centerId];
-		$scope.period  = $routeParams.month;
+// monitoolControllers.controller('InputEditController', function($scope, $routeParams, $q, mtDatabase, mtInput, mtIndicators) {
+// 	// Retrieve values and description for this form.
+// 	mtDatabase.query('monitool/project_by_center', {key: $routeParams.centerId, include_docs: true}).then(function(result) {
+// 		$scope.project = result.rows[0].doc;
+// 		$scope.center  = $scope.project.center[$routeParams.centerId];
+// 		$scope.period  = $routeParams.month;
 
-		$q.all([
-			mtInput.getFormValues($routeParams.centerId, $routeParams.month),
-			mtIndicators.getPlanningDescription($scope.project, $routeParams.month)
-		]).then(function(result) {
-			$scope.values = result[0];
-			$scope.indicators = result[1];
-		});
-	});
+// 		$q.all([
+// 			mtInput.getFormValues($routeParams.centerId, $routeParams.month),
+// 			mtIndicators.getPlanningDescription($scope.project, $routeParams.month)
+// 		]).then(function(result) {
+// 			$scope.values = result[0];
+// 			$scope.indicators = result[1];
+// 		});
+// 	});
 
-	// Update all indicator on each change until there are no more changes.
-	$scope.evaluate = function() {
-		mtIndicators.evaluate($scope.indicators, $scope.values);
-	};
+// 	// Update all indicator on each change until there are no more changes.
+// 	$scope.evaluate = function() {
+// 		mtIndicators.evaluate($scope.indicators, $scope.values);
+// 	};
 
-	// An indicator is disabled when there exists one instance of it that is calculated in the whole form.
-	// !!!!!!!!!!!!!!!! Writing this here is stupid. it should be a property of the input.
-	$scope.isDisabled = function(indicatorId) {
-		return $scope.indicators.some(function(indicator) {
-			return (indicatorId === indicator.id && indicator.compute) ||
-				indicator.dependencies.some(function(indicator) {
-					return indicatorId === indicator.id && indicator.compute;
-				});
-		});
-	};
+// 	// An indicator is disabled when there exists one instance of it that is calculated in the whole form.
+// 	// !!!!!!!!!!!!!!!! Writing this here is stupid. it should be a property of the input.
+// 	$scope.isDisabled = function(indicatorId) {
+// 		return $scope.indicators.some(function(indicator) {
+// 			return (indicatorId === indicator.id && indicator.compute) ||
+// 				indicator.dependencies.some(function(indicator) {
+// 					return indicatorId === indicator.id && indicator.compute;
+// 				});
+// 		});
+// 	};
 
-	$scope.save = function() {
-		mtInput.saveFormValues($routeParams.centerId, $routeParams.month, $scope.values);
-	};
-});
+// 	$scope.save = function() {
+// 		mtInput.saveFormValues($routeParams.centerId, $routeParams.month, $scope.values);
+// 	};
+// });
 
 
 ///////////////////////////
 // Reporting
 ///////////////////////////
 
-monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtDatabase, mtStatistics) {
-	var now = new Date();
-	$scope.end = period(now);
-	now.setFullYear(now.getFullYear() - 1);
-	$scope.begin = period(now);
+// monitoolControllers.controller('ReportingByEntitiesController', function($scope, mtDatabase, mtStatistics) {
+// 	var now = new Date();
+// 	$scope.end = period(now);
+// 	now.setFullYear(now.getFullYear() - 1);
+// 	$scope.begin = period(now);
 	
-	$scope.entityTypes = ['project', 'center'];
-	$scope.selectedEntityType = {selected: 'project'};
+// 	$scope.entityTypes = ['project', 'center'];
+// 	$scope.selectedEntityType = {selected: 'project'};
 
-	$scope.entities = [];
-	$scope.selectedEntities = {selected: []};
+// 	$scope.entities = [];
+// 	$scope.selectedEntities = {selected: []};
 
-	// load indicators / centers / projects to fill select box.
-	$scope.updateList = function() {
-		mtDatabase.query('monitool/by_type', {key: $scope.selectedEntityType.selected}).then(function(data) {
-			$scope.entities = data.rows.map(function(row) { return row.value; });
-			$scope.selectedEntities = [];
+// 	// load indicators / centers / projects to fill select box.
+// 	$scope.updateList = function() {
+// 		mtDatabase.query('monitool/by_type', {key: $scope.selectedEntityType.selected}).then(function(data) {
+// 			$scope.entities = data.rows.map(function(row) { return row.value; });
+// 			$scope.selectedEntities = [];
 
-			if ($scope.selectedEntities.length)
-				$scope.updateData();
-			else
-				$scope.statistics = [];
-		});
-	};
+// 			if ($scope.selectedEntities.length)
+// 				$scope.updateData();
+// 			else
+// 				$scope.statistics = [];
+// 		});
+// 	};
 
-	$scope.updateData = function() {
-		var ids = $scope.selectedEntities.selected.map(function(entity) { return entity._id || entity.id; });
+// 	$scope.updateData = function() {
+// 		var ids = $scope.selectedEntities.selected.map(function(entity) { return entity._id || entity.id; });
 
-		mtStatistics
-			.getStatistics($scope.selectedEntityType.selected, ids, $scope.begin, $scope.end)
-			.then(function(statistics) {
-				$scope.statistics = statistics;
-			});
-	};
+// 		mtStatistics
+// 			.getStatistics($scope.selectedEntityType.selected, ids, $scope.begin, $scope.end)
+// 			.then(function(statistics) {
+// 				$scope.statistics = statistics;
+// 			});
+// 	};
 
-	$scope.updateList();
-});
+// 	$scope.updateList();
+// });
 
 
 

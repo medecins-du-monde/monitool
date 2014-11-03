@@ -1,16 +1,30 @@
 
 <ul class="nav nav-pills nav-stacked" ng-controller="SubMenuController">
+
 	<li ng-class="{active: currentPage === 'logical-frame', disabled: projectId === 'new'}">
-		<a ng-click="changePage('logical-frame')">Cadre Logique</a>
+		<a ng-click="changePage('logical-frame')"
+		   tooltip="Décrit les objectifs, resultats attendus et activitées mises en oeuvre par le projet."
+		   tooltip-popup-delay="1000">
+			Cadre Logique
+		</a>
 	</li>
+	
 	<li ng-class="{active: currentPage === 'input-entities', disabled: projectId === 'new'}">
-		<a ng-click="changePage('input-entities')">Lieux d'activité</a>
+		<a ng-click="changePage('input-entities')"
+		   tooltip="Permet de grouper les lieux d'activité par catégories logiques."
+		   tooltip-popup-delay="1000">Lieux d'activité</a>
 	</li>
+
 	<li ng-class="{active: currentPage === 'input-groups', disabled: projectId === 'new'}">
-		<a ng-click="changePage('input-groups')">Groupes d'activité</a>
+		<a ng-click="changePage('input-groups')"
+		   tooltip="Liste les lieux d'activité du projet où sont collectés les indicateurs. Par exemple des hopitaux, centre de santé, villages..."
+		   tooltip-popup-delay="1000">Groupes d'activité</a>
 	</li>
+
 	<li ng-class="{active: currentPage === 'forms', disabled: projectId === 'new'}">
-		<a ng-click="changePage('forms')">Formulaires de saisie</a>
+		<a ng-click="changePage('forms')"
+		   tooltip="Déclaration des formulaires et du planning de saisie des indicateurs de suivi du projet."
+		   tooltip-popup-delay="1000">Formulaires de saisie</a>
 	</li>
 	<li ng-class="{active: currentPage === 'inputs', disabled: projectId === 'new'}">
 		<a ng-click="changePage('inputs')">Saisies en attentes</a>
