@@ -30,8 +30,11 @@ app.config(function($routeProvider) {
 		controller: 'ProjectListController',
 		resolve: {
 			projects: function(mtDatabase) {
-				return mtDatabase.query('monitool/by_type', {include_docs: true, key: 'project'}).then(function(projects) {
-					return projects.rows.map(function(row) { return row.doc; });
+				return mtDatabase.query('monitool/projects_short').then(function(result) {
+					return result.rows.map(function(row) {
+						row.value._id = row.id;
+						return row.value;
+					});
 				});
 			}
 		}
@@ -67,23 +70,7 @@ app.config(function($routeProvider) {
 		resolve: {
 			project: function($route, mtDatabase) {
 				return mtDatabase.get($route.current.params.projectId);
-			},
-			inputsByCenterId: function($route, mtDatabase) {
-				var view = 'monitool/num_inputs_by_project_center',
-					options = {
-						startkey: [$route.current.params.projectId],
-						endkey: [$route.current.params.projectId, {}],
-						group: true, group_level: 2
-					};
-
-				return mtDatabase.query(view, options).then(function(result) {
-					var usage = {};
-					result.rows.forEach(function(row) {
-						usage[row.key[1]] = row.value;
-					});
-					return usage;
-				});
-			},
+			}
 		}
 	});
 
@@ -203,49 +190,42 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
 		resolve: {
-			hierarchy: function($q, mtDatabase) {
-				return $q.all([
-					mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true}),
-					mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}),
-					mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}),
-					mtDatabase.query('monitool/indicator_usage', {group: true})
-				]).then(function(result) {
-					var scope = {};
-					var usage = {};
-					result[3].rows.forEach(function(row) { usage[row.key] = row.value; });
+			indicatorHierarchy: function(mtDatabase) {
+				return mtDatabase.query('monitool/indicators_short', {group: true}).then(function(result) {
+					var hierarchy = {};
 
-					scope.hierarchy = {};
-					result[0].rows.forEach(function(row) {
-						var indicator = row.doc;
-						indicator.usage = usage[indicator._id] || 0;
+					result.rows.forEach(function(row) {
+						// add dummy types and themes
+						!row.value.themes.length && row.value.themes.push('');
+						!row.value.types.length  && row.value.types.push('');
 
-						if (!indicator.themes.length)
-							indicator.themes.push('');
+						row.value.themes.forEach(function(theme) {
+							row.value.types.forEach(function(type) {
+								// add empty tree branches if those are undefined
+								!hierarchy[theme] && (hierarchy[theme] = {});
+								!hierarchy[theme][type] && (hierarchy[theme][type] = []);
 
-						if (!indicator.types.length)
-							indicator.types.push('');
-
-						indicator.themes.forEach(function(theme) {
-							indicator.types.forEach(function(type) {
-								if (!scope.hierarchy[theme])
-									scope.hierarchy[theme] = {};
-
-								if (!scope.hierarchy[theme][type])
-									scope.hierarchy[theme][type] = [];
-
-								scope.hierarchy[theme][type].push(indicator);
+								row.value._id = row.key;
+								hierarchy[theme][type].push(row.value);
 							});
 						});
-
-						return row.doc;
 					});
 
-					scope.types  = {};
-					scope.themes = {};
-					result[1].rows.forEach(function(row) { return scope.types[row.id] = row.doc; });
-					result[2].rows.forEach(function(row) { return scope.themes[row.id] = row.doc; });
-
-					return scope;
+					return hierarchy;
+				});
+			},
+			typesById: function(mtDatabase) {
+				return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
+					var types = {};
+					result.rows.forEach(function(row) { return types[row.id] = row.doc; });
+					return types;
+				});
+			},
+			themesById: function(mtDatabase) {
+				return mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}).then(function(result) {
+					var themes = {};
+					result.rows.forEach(function(row) { return themes[row.id] = row.doc; });
+					return themes;
 				});
 			}
 		}
@@ -335,19 +315,19 @@ app.config(function($routeProvider) {
 	// 	}
 	// });
 
-	$routeProvider.when('/inputs/:month/:centerId', {
-		templateUrl: 'partials/input/edit.html',
-		controller: 'InputEditController'
-	});
+	// $routeProvider.when('/inputs/:month/:centerId', {
+	// 	templateUrl: 'partials/input/edit.html',
+	// 	controller: 'InputEditController'
+	// });
 
 	///////////////////////////
 	// Reporting
 	///////////////////////////
 
-	$routeProvider.when('/reporting', {
-		templateUrl: 'partials/reporting/by-entities.html',
-		controller: 'ReportingByEntitiesController'
-	});
+	// $routeProvider.when('/reporting', {
+	// 	templateUrl: 'partials/reporting/by-entities.html',
+	// 	controller: 'ReportingByEntitiesController'
+	// });
 
 	// $routeProvider.otherwise({
 	// 	redirectTo: '/projects'

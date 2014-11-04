@@ -104,38 +104,28 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		begin = moment(begin);
 		end   = moment(end);
 
-		var view, options;
-		if (groupBy === 'month' || groupBy == 'year') {
-			view    = 'monitool/inputs_by_project_period';
-			options = {
-				startkey: [project._id, begin.format('YYYY'), begin.format('MM')],
-				endkey: [project._id, end.format('YYYY'), end.format('MM')],
-				group_level: 3
-			};
-		}
-		else if (groupBy === 'entity' || groupBy === 'group') {
-			view = 'monitool/inputs_by_project_entity_period';
-			options = {
-				startkey: [project._id, '', begin.format('YYYY'), begin.format('MM')],
-				endkey: [project._id, {}, end.format('YYYY'), end.format('MM')],
-				group_level: 4
-			};
-		}
+		var view    = 'monitool/inputs_by_project_year_month_entity',
+			options = {startkey: [project._id, begin.format('YYYY'), begin.format('MM')], endkey: [project._id, end.format('YYYY'), end.format('MM'), {}]};
+
+		if (groupBy === 'year')
+			options.group_level = 2;
+		else if (groupBy === 'month')
+			options.group_level = 3;
+		else if (groupBy === 'entity' || groupBy === 'group')
+			options.group_level = 4;
 		else
 			throw new Error('Invalid groupBy: ' + groupBy);
 
-		return mtDatabase.query(view, options);
-	};
-
-	var getProjectStats = function(project, begin, end, groupBy) {
-		return getProjectRawStats(project, begin, end, groupBy).then(function(result) {
+		return mtDatabase.query(view, options).then(function(result) {
 			var regrouped = {};
 
 			// regroup db results if needed
-			if (groupBy === 'year' || groupBy === 'entity' || groupBy === 'group')
+			if (groupBy === 'entity' || groupBy === 'group') {
+				result.rows.forEach(function(row) { row.key[1] = row.key[3]; });
 				result.rows = group(result.rows, 2);
+			}
 			else if (groupBy === 'month')
-				result.rows.forEach(function(row) { row.key[1] += '-' + row.key[2]; row.key.pop(); });
+				result.rows.forEach(function(row) { row.key[1] += '-' + row.key[2]; });
 
 			result.rows.forEach(function(row) { regrouped[row.key[1]] = row.value; });
 
@@ -143,18 +133,77 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			if (groupBy === 'group') {
 				var regrouped2 = {};
 				project.inputGroups.forEach(function(inputGroup) {
-					// dark magic
-					regrouped2[inputGroup.id] = reduce(inputGroup.members.map(function(entityId) { return regrouped[entityId] || {}; }));
+					regrouped2[inputGroup.id] = reduce(inputGroup.members.map(function(entityId) {
+						return regrouped[entityId] || {};
+					}));
 				});
 				regrouped = regrouped2;
 			}
 
-			// compute indicators
-			// for (var key in regrouped) {
+			// compute total
+			var total = {};
+			for (var key in regrouped)
+				for (var indicatorId in regrouped[key])
+					if (total[indicatorId])
+						total[indicatorId] += regrouped[key][indicatorId];
+					else
+						total[indicatorId] = regrouped[key][indicatorId];
+			regrouped.total = total;
 
-			// }
+			// compute indicators
+			var fakeForm = {fields:{}}; // wrong!
+			project.dataCollection.forEach(function(form) {
+				for (var key in form.fields)
+					fakeForm.fields[key] = form.fields[key];
+			});
+			for (var key in regrouped)
+				evaluate(fakeForm, regrouped[key]);
 
 			return regrouped;
+		});
+	};
+
+	var getTargetValue = function(period, targets) {
+		return NaN;
+	};
+
+	var retrieveMetadata = function(project, begin, end, groupBy, regrouped) {
+		// add metadata
+		var regroupedWithMetadata = {};
+		for (var key in regrouped) {
+			regroupedWithMetadata[key] = {};
+
+			for (var indicatorId in regrouped[key]) {
+				var params   = project.indicators[indicatorId],
+					metadata = {value: regrouped[key][indicatorId]};
+
+				// compute display value
+				metadata.display = Math.round(metadata.value);
+				metadata.totalPart = Math.round(100 * metadata.value / regrouped.total[indicatorId]) + '%';
+
+				if (params) {
+					metadata.baselinePart = Math.round(100 * metadata.value / params.baseline) + '%';
+					metadata.targetPart = Math.round(100 * metadata.value / getTargetValue());
+
+					// compute color
+					if (params.greenMinimum <= metadata.value && metadata.value <= params.greenMaximum)
+						metadata.color = '#AFA';
+					else if (params.orangeMinimum <= metadata.value && metadata.value <= params.orangeMaximum)
+						metadata.color = '#FC6';
+					else
+						metadata.color = '#F88';
+				}
+
+				regroupedWithMetadata[key][indicatorId] = metadata;
+			}
+		}
+
+		return regroupedWithMetadata;
+	};
+
+	var getProjectStats = function(project, begin, end, groupBy) {
+		return getProjectRawStats(project, begin, end, groupBy).then(function(regrouped) {
+			return retrieveMetadata(project, begin, end, groupBy, regrouped);
 		});
 	};
 
@@ -167,9 +216,6 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		getProjectStats: getProjectStats
 	};
 });
-
-
-
 
 // mtServices.factory('mtStatistics', function($q, mtDatabase, mtIndicators) {
 // 	var getPeriods = function(start, end) {

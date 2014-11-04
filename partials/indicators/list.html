@@ -19,7 +19,7 @@
 
 				<div class="indicator-level-3" ng-repeat="indicator in indicators" ng-if="open2">
 					<span class="color" ng-class="{green: indicator.standard}"></span>
-					<span class="name">{{indicator.name}} ({{indicator.usage}} utilisations)</span>
+					<span class="name">{{indicator.name}} ({{indicator.main}} suivis, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
 					<a href="#indicators/{{indicator._id}}">Éditer</a>
 				</div>
 			</div>

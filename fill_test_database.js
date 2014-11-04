@@ -53,97 +53,86 @@ var data = {
 					}.toString()
 				},
 
-				"input_by_month": {
-					"map": function(doc) {
-						if (doc.type === 'input')
-							emit(doc._id.split(':')[2])
-
-					}.toString()
-				},
-
-				"inputs_by_project_period": {
-					"map": function(doc) {
-						if (doc.type === 'input') {
-							var p = doc.period.split('-');
-							emit([doc.project, p[0], p[1]], doc.indicators);
-						}
-					}.toString(),
-
-					"reduce": function(keys, values, rereduce) {
-						var memo = {}, numValues = values.length;
-						for (var i = 0; i < numValues; ++i) {
-							var value = values[i];
-							for (var key in value)
-								if (memo[key])
-									memo[key] += value[key];
-								else
-									memo[key] = value[key];
-						}
-						return memo;
-					}.toString()
-				},
-
-				"inputs_by_project_entity_period": {
-					"map": function(doc) {
-						if (doc.type === 'input') {
-							var p = doc.period.split('-');
-							emit([doc.project, doc.entity, p[0], p[1]], doc.indicators);
-						}
-					}.toString(),
-
-					"reduce": function(keys, values, rereduce) {
-						var memo = {}, numValues = values.length;
-						for (var i = 0; i < numValues; ++i) {
-							var value = values[i];
-							for (var key in value)
-								if (memo[key])
-									memo[key] += value[key];
-								else
-									memo[key] = value[key];
-						}
-						return memo;
-					}.toString()
-				},
-
-				// "inputs_by_center_period_indicator": {
-				// 	"map": function(doc) {
-				// 		if (doc.type === 'input')
-				// 			for (var indicator in doc.indicators)
-				// 				emit([doc.center, doc.period, indicator], doc.indicators[indicator]);
-				// 	}.toString()
-				// },
-
-				// "inputs_by_indicator_period_project": {
-				// 	"map": function(doc) {
-				// 		if (doc.type === 'input')
-				// 			for (var indicator in doc.indicators)
-				// 				emit([indicator, doc.period, doc.project], doc.indicators[indicator]);
-				// 	}.toString()
-				// },
-
-				// "project_by_center": {
-				// 	"map": function(doc) {
-				// 		if (doc.type === 'project')
-				// 			for (var centerId in doc.center)
-				// 				emit(centerId);
-				// 	}.toString()
-				// },
-
-				// "formulas": {
-				// 	"map": function(doc) {
-				// 		if (doc.type === 'indicator')
-				// 			for (var formulaId in doc.formulas)
-				// 				emit(formulaId, doc.formulas[formulaId]);
-				// 	}.toString()
-				// },
-
-				"indicator_usage": {
+				"projects_short": {
 					"map": function(doc) {
 						if (doc.type === 'project')
-							for (var indicatorId in doc.planning)
-								emit(indicatorId, 1);
+							emit(doc._id, {name: doc.name, begin: doc.begin, end: doc.end});
+					}.toString()
+				},
+
+				"indicators_short": {
+					"map": function(doc) {
+						if (doc.type === 'project') {
+							var main = {}, dependency = {}, indicatorId = null;
+
+							for (indicatorId in doc.indicators)
+								main[indicatorId] = true;
+
+							var numForms = doc.dataCollection.length;
+							for (var i = 0; i < numForms; ++i)
+								for (indicatorId in doc.dataCollection.fields)
+									if (!main[indicatorId])
+										dependency[indicatorId] = true;
+
+							for (indicatorId in main)
+								emit(indicatorId, {main: 1});
+
+							for (indicatorId in dependency)
+								emit(indicatorId, {dependency: 1});
+						}
+						else if (doc.type === 'indicator')
+							emit(doc._id, {name: doc.name, standart: doc.standart, types: doc.types, themes: doc.themes});
+
+						// this may be a bit overkill
+						else if (doc.type === 'input')
+							for (var indicatorId in doc.indicators)
+								emit(indicatorId, {input: 1});
 					}.toString(),
-					"reduce": "_sum"
+
+					"reduce": function(keys, values, rereduce) {
+						var memo      = {main: 0, dependency: 0, input: 0},
+							numValues = values.length;
+
+						for (var i = 0; i < numValues; ++i) {
+							var value = values[i];
+
+							if (value.name) {
+								memo.name     = value.name
+								memo.standart = value.standart
+								memo.types    = value.types
+								memo.themes   = value.themes
+							}
+
+							value.main       && (memo.main       += value.main);
+							value.dependency && (memo.dependency += value.dependency);
+							value.input      && (memo.input      += value.input);
+						}
+
+						return memo;
+					}.toString()
+				},
+
+				// For statistics consultation
+				"inputs_by_project_year_month_entity": {
+					"map": function(doc) {
+						if (doc.type === 'input') {
+							var p = doc.period.split('-');
+							emit([doc.project, p[0], p[1], doc.entity], doc.indicators);
+						}
+					}.toString(),
+
+					"reduce": function(keys, values, rereduce) {
+						var memo = {}, numValues = values.length;
+						for (var i = 0; i < numValues; ++i) {
+							var value = values[i];
+							for (var key in value)
+								if (memo[key])
+									memo[key] += value[key];
+								else
+									memo[key] = value[key];
+						}
+						return memo;
+					}.toString()
 				},
 
 				"type_usage": {
@@ -164,24 +153,6 @@ var data = {
 							});
 						}.toString(),
 					"reduce": "_sum"
-				},
-
-
-				"num_inputs_by_project_center": {
-					"map": function(doc) {
-						if (doc.type === "input")
-							emit([doc.project, doc.center]);
-					}.toString(),
-					"reduce": "_count"
-				},
-
-				"num_inputs_by_project_indicator": {
-					"map": function(doc) {
-						if (doc.type === "input")
-							for (var indicatorId in doc.indicators)
-							emit([doc.project, indicatorId]);
-					}.toString(),
-					"reduce": "_count"
 				}
 			}
 		}

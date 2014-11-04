@@ -5,7 +5,6 @@
 	<thead>
 		<tr>
 			<th><a ng-click="pred = 'name'; rev = !rev">Nom</a></th>
-			<th><a ng-click="pred = 'country'; rev = !rev">Pays</a></th>
 			<th><a ng-click="pred = 'begin'; rev = !rev">Début</a></th>
 			<th><a ng-click="pred = 'end'; rev = !rev">Fin</a></th>
 			<th></th>
@@ -14,7 +13,6 @@
 	<tbody>
 		<tr ng-repeat="project in projects | orderBy:pred:rev">
 			<td>{{project.name}}</td>
-			<td>{{project.country}}</td>
 			<td>{{project.begin}}</td>
 			<td>{{project.end}}</td>
 			<td>

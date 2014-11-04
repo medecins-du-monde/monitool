@@ -149,9 +149,8 @@ monitoolControllers.controller('ProjectLogicalFrameIndicatorController', functio
 	};
 });
 
-monitoolControllers.controller('ProjectInputEntitiesController', function($scope, project, inputsByCenterId, mtDatabase) {
+monitoolControllers.controller('ProjectInputEntitiesController', function($scope, project, mtDatabase) {
 	$scope.project = project;
-	$scope.usage = inputsByCenterId;
 
 	$scope.delete = function(centerId) {
 		delete $scope.project.center[centerId];
@@ -400,13 +399,6 @@ monitoolControllers.controller('ProjectUserListController', function($scope) {
 monitoolControllers.controller('ReportingController', function($scope, type, entity, mtDatabase, mtIndicators) {
 	$scope.project = entity;
 
-	// for now...
-	var formFields = {};
-	$scope.project.dataCollection.forEach(function(form) {
-		for (var key in form.fields)
-			formFields[key] = form.fields[key];
-	});
-
 	// Retrieve indicators
 	$scope.indicatorsById = {};
 	mtDatabase.allDocs({keys: Object.keys($scope.project.indicators), include_docs: true}).then(function(result) {
@@ -416,8 +408,7 @@ monitoolControllers.controller('ReportingController', function($scope, type, ent
 	$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM');
 	$scope.end     = moment().format('YYYY-MM');
 	$scope.groupBy = 'month';
-
-	$scope.round = function(val) { return Math.round(val); };
+	$scope.display = 'display'
 
 	// Retrieve inputs
 	$scope.updateData = function() {
@@ -435,10 +426,10 @@ monitoolControllers.controller('ReportingController', function($scope, type, ent
 // Indicators
 ///////////////////////////
 
-monitoolControllers.controller('IndicatorListController', function($scope, $q, $location, hierarchy) {
-	$scope.hierarchy = hierarchy.hierarchy;
-	$scope.types     = hierarchy.types;
-	$scope.themes    = hierarchy.themes;
+monitoolControllers.controller('IndicatorListController', function($scope, $q, $location, indicatorHierarchy, typesById, themesById) {
+	$scope.hierarchy = indicatorHierarchy;
+	$scope.types     = typesById;
+	$scope.themes    = themesById;
 
 	$scope.create = function() {
 		$location.url('/indicators/new');

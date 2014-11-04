@@ -27,25 +27,37 @@
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label">Date de début</label>
 				<div class="col-sm-10">
-					<input type="month" class="form-control" ng-model="begin" />
+					<input type="month" class="form-control" ng-model="begin" ng-change="updateData()" />
 				</div>
 			</div>
 			
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label">Date de fin</label>
 				<div class="col-sm-10">
-					<input type="month" class="form-control" ng-model="end" />
+					<input type="month" class="form-control" ng-model="end" ng-change="updateData()" />
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label for="group-by-input" class="col-sm-2 control-label">Colonnes</label>
 				<div class="col-sm-10">
-					<select class="form-control" id="group-by-input" ng-model="groupBy">
+					<select class="form-control" id="group-by-input" ng-model="groupBy" ng-change="updateData()">
 						<option value="month">Mois</option>
 						<option value="year">Année</option>
 						<option value="entity">Lieux d'activité</option>
 						<option value="group">Groupe d'activité</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="display-input" class="col-sm-2 control-label">Afficher</label>
+				<div class="col-sm-10">
+					<select class="form-control" id="display-input" ng-model="display">
+						<option value="display">Valeures</option>
+						<option value="totalPart">Pourcentage du total</option>
+						<option value="targetPart">Pourcentage de l'objectif</option>
+						<option value="baselinePart">Pourcentage de la baseline</option>
 					</select>
 				</div>
 			</div>
@@ -58,8 +70,6 @@
 					</p>
 				</div>
 			</div>
-
-			<button ng-click="updateData()">refresh</button>
 		</form>
 
 <!-- 		<div class="well well-sm">
@@ -94,8 +104,12 @@
 					<td>
 						{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td ng-repeat="col in cols">{{round(data[col.id || col][indicatorId])}}</td>
-					<td>{{round(data.total[indicatorId])}}</td>
+					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
+						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+					</td>
+					<td ng-style="colorize && {'background-color': data.total[indicatorId].color}">
+						{{data.total[indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+					</td>
 				</tr>
 			</tbody>
 			<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
@@ -112,8 +126,12 @@
 					<td>
 						&nbsp;&nbsp;&nbsp;&nbsp;{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td ng-repeat="col in cols">{{round(data[col.id || col][indicatorId])}}</td>
-					<td>{{round(data.total[indicatorId])}}</td>
+					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
+						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+					</td>
+					<td ng-style="colorize && {'background-color': data.total[indicatorId].color}">
+						{{data.total[indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+					</td>
 				</tr>
 			</tbody>
 			<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
@@ -130,8 +148,12 @@
 					<td>
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td ng-repeat="col in cols">{{round(data[col.id || col][indicatorId])}}</td>
-					<td>{{round(data.total[indicatorId])}}</td>
+					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
+						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+					</td>
+					<td ng-style="colorize && {'background-color': data.total[indicatorId].color}">
+						{{data.total[indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+					</td>
 				</tr>
 			</tbody>
 			<tbody ng-repeat-end><!-- This may look a bit hackish... but is always better than nesting tables --></tbody>

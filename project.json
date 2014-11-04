@@ -1,163 +1,413 @@
 {
-	"_id": "e1764020-cecf-4445-bd5f-2906c33c9c5e",
-	"type": "project",
-	"name": "nouveau format de projet",
-	"country": "Laos",
-	"begin": "2011-05",
-	"end": "2015-12",
-
-	"logicalFrame": {
-		"goal": "To contribute to the reduction of neonatal mortality and maternal mortality in Afar region of Ethiopia by the next Ethiopia Demographic and Health Survey (EDHS)",
-		"indicators": ["d07a3b78-ff14-24a0-942e-e282176fa241"],
-		"purposes": [
-			{
-				"description": "To reduce the prevalence and the harmful consequences of female genital mutilation in Zone 5 of Afar region by 2015",
-				"assumptions": "There is low risk for lies or false declarations during surveys. There is low to medium risk for the practice of female genital mutilation to continue through less severe forms, in secret and/or in neighbouring areas. The Afar region is homogeneous so that baseline values calculated for the whole of the region (EDHS 2005) are applicable to the sole Zone 5",
-				"indicators": ["650c1666-7557-9261-99a6-c841962a7220", "566b5af2-6bd2-c7c1-b0b8-b4df5e78f597"],
-				"outputs": [
-					{
-						"description": "The population in Zone 5 of Afar region (around 205,000 individuals) are aware of the harmful consequences of female genital mutilation.",
-						"assumptions": "The awareness of the population concerns all the types of female genital mutilation, including the least severe forms.",
-						"indicators": ["d4f4e2a1-141c-59d4-9027-3cfbf9ca17ed"],
-						"activities": [
-							{ "description": "to conduct KAP surveys", "prerequesites": "" },
-							{ "description": "to develop information, education, communication for the population on female genital mutilation", "prerequesites": "" },
-							{ "description": "to train and support114 Health Extension Workers (HEW), 92 skilled health workers, 548 teachers on IEC on female genital mutilation", "prerequesites": "" }
-						]
-					},
-					{
-						"description": "Prevention and management of complications and consequences of female genital mutilation is integrated in the continuum of care provided in 57 health facilities in Zone 5 of Afar region.",
-						"assumptions": "Health facilities are functional and there is no disruption in the continuum of care.",
-						"indicators": ["7003ff8b-4335-4682-9c48-82eb2320dfd2"],
-						"activities": [
-							{ "description": "to train and support 92 skilled health workers on female genital mutilation in the continuum of care", "prerequesites": "" },
-							{ "description": "to introduce materials and protocols in 57 health facilities for the integration of WHO recommendations related to female genital mutilation", "prerequesites": "" },
-							{ "description": "to set up protocols (including transfers to Dalifage hospital) for the opening of type III FGM during the second quarter of pregnancy", "prerequesites": "" }
-						]
-					},
-					{
-						"description": "Female genital mutilation is a focus of community dialogue in 57 kebele in Zone 5 of Afar region and communities choose to abandon the practice.",
-						"assumptions": "Community leaders (clan leaders, religious leaders...) and traditional authorities (sultan) are influential and instrumental enough to convince their communities to abandon the practice of female genital mutilation.",
-						"indicators": [],
-						"activities": [
-							{ "description": "to train the local partner ACISDA on community dialogue facilitation methodology", "prerequesites": "" },
-							{ "description": "to set up, train and support 57 local anti-FGM committees", "prerequesites": "" },
-							{ "description": "to facilitate community dialogue sessions on prevention of female genital mutilation in 57 kebele", "prerequesites": "" }
-						]
-					},
-					{
-						"description": "Knowledge, and prevention, of female genital mutilation is introduced and supported at regional level.",
-						"assumptions": "All the stakeholders involved in prevention of female genital mutilation in Afar region are known. All of them agree to share information and their experiences.",
-						"indicators": [],
-						"activities": [
-							{ "description": "to prepare and write memoranda of understanding between partners and other stakeholders", "prerequesites": "" },
-							{ "description": "to facilitate regional networking between partners and stakeholders involved in prevention of female genital mutilation", "prerequesites": "" }
-						]
-					}
-				]
-			}
-		]
-	},
-
-	"inputEntities": [
-		{ "id": "e37adee7-2cd9-63a9-a82d-2d3cd588a970", "name": "Nongphavong" },
-		{ "id": "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e", "name": "Makmi" },
-		{ "id": "aae927b9-ad29-1ce6-9b53-ebc9075e738d", "name": "Nachan" },
-		{ "id": "4b6172a9-b813-31e4-bc28-1657757dcac3", "name": "Banhieng" },
-		{ "id": "22466c7d-28f4-03e5-bd89-06dd93c98a5e", "name": "DHB Sukuma" },
-		{ "id": "b66ec629-6d29-cdab-8333-043a484aabca", "name": "Nadee" },
-		{ "id": "bad093f3-4911-1f9c-94fb-a6eeec2571b9", "name": "Kadanh" },
-		{ "id": "b184f5db-b0c1-742c-8bf2-bf163233b2c8", "name": "Nong Nga" },
-		{ "id": "f0d4c93b-e16d-0283-926a-cbe49f83eebd", "name": "Nong Hoy" },
-		{ "id": "cc75617f-6320-cf9a-bf4c-3e704c55dd08", "name": "Veunyang" },
-		{ "id": "88ec23d0-8f1c-256a-9c68-8f40924af400", "name": "Thahae" },
-		{ "id": "fda506b7-c3c5-3c96-8971-a460f4135cfb", "name": "DHB Moonlapamok" }
-	],
-
-	"inputGroups": [
-		{
-			"id": "72238d12-f1e6-467c-8618-1225011f382c",
-			"name": "Centres de santé",
-			"members": [
-				"e37adee7-2cd9-63a9-a82d-2d3cd588a970", "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e", "aae927b9-ad29-1ce6-9b53-ebc9075e738d",
-				"4b6172a9-b813-31e4-bc28-1657757dcac3", "b66ec629-6d29-cdab-8333-043a484aabca", "bad093f3-4911-1f9c-94fb-a6eeec2571b9",
-				"b184f5db-b0c1-742c-8bf2-bf163233b2c8", "f0d4c93b-e16d-0283-926a-cbe49f83eebd", "cc75617f-6320-cf9a-bf4c-3e704c55dd08",
-				"88ec23d0-8f1c-256a-9c68-8f40924af400"
-			]
-		},
-		{
-			"id": "b0fefdcb-519b-49e0-99d5-e3a63f886c99",
-			"name": "Hopitaux publics",
-			"members": ["22466c7d-28f4-03e5-bd89-06dd93c98a5e", "fda506b7-c3c5-3c96-8971-a460f4135cfb"]
-		},
-		{
-			"id": "84b9051e-ea75-4b3b-b512-f84492e1cada",
-			"name": "Sukuma",
-			"members": [
-				"e37adee7-2cd9-63a9-a82d-2d3cd588a970", "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e", "aae927b9-ad29-1ce6-9b53-ebc9075e738d",
-				"4b6172a9-b813-31e4-bc28-1657757dcac3", "22466c7d-28f4-03e5-bd89-06dd93c98a5e"
-			]
-		},
-		{
-			"id": "90b578bb-c1ef-431d-87e7-3af75432550f",
-			"name": "Moonlapamok",
-			"members": [
-				"b66ec629-6d29-cdab-8333-043a484aabca", "bad093f3-4911-1f9c-94fb-a6eeec2571b9", "b184f5db-b0c1-742c-8bf2-bf163233b2c8",
-				"f0d4c93b-e16d-0283-926a-cbe49f83eebd", "cc75617f-6320-cf9a-bf4c-3e704c55dd08", "88ec23d0-8f1c-256a-9c68-8f40924af400",
-				"fda506b7-c3c5-3c96-8971-a460f4135cfb"
-			]
-		}
-	],
-
-	"indicators": {
-		"d07a3b78-ff14-24a0-942e-e282176fa241": {
-			"relevance": "3434", "baseline": 4,
-			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
-		},
-		"650c1666-7557-9261-99a6-c841962a7220": {
-			"relevance": "3434", "baseline": 4,
-			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
-		},
-		"566b5af2-6bd2-c7c1-b0b8-b4df5e78f597": {
-			"relevance": "3434", "baseline": 4,
-			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
-		},
-		"d4f4e2a1-141c-59d4-9027-3cfbf9ca17ed": {
-			"relevance": "3434", "baseline": 4,
-			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
-		},
-		"7003ff8b-4335-4682-9c48-82eb2320dfd2": {
-			"relevance": "3434", "baseline": 4,
-			"minimum": 0, "orangeMinimum": 20, "greenMinimum": 40, "greenMaximum": 60, "orangeMaximum": 80, "maximum": 100,
-			"targets": [{"period": "2014-07", "value": 34}, {"period": "2014-07", "value": 56}, {"period": "2014-07", "value": 73}]
-		}
-	},
-
-	"dataCollection": [
-		{
-			"id": "545e3225-6b7d-4aef-b3bd-322f1e1917f4",
-			"name": "Quarterly Survey",
-			"periodicity": "quarterly",
-			"useProjectStart": true,
-			"useProjectEnd": true,
-
-			"fields": {
-			}
-		},
-		{
-			"id": "b4c570f5-ab32-4c49-b746-179250147ca0",
-			"name": "Monthly data collection from medical centers",
-			"periodicity": "monthly",
-			"useProjectStart": true,
-			"useProjectEnd": true,
-			"indicators": [],
-
-			"fields": {
-			}
-		}
-	]
+   "_id": "17aa6a59-04a6-2d3c-88bc-729d2d834580",
+   "_rev": "37-fc9d7a234e759df474ae7f3986e45891",
+   "type": "project",
+   "name": "reduction des risques laos",
+   "country": "Laos",
+   "begin": "2011-05",
+   "end": "2015-12",
+   "dataCollection": [
+       {
+           "id": "545e3225-6b7d-4aef-b3bd-322f1e1917f4",
+           "name": "Quarterly Survey",
+           "periodicity": "quarterly",
+           "useProjectStart": true,
+           "useProjectEnd": true,
+           "fields": {
+               "7003ff8b-4335-4682-9c48-82eb2320dfd2": {
+                   "type": "computed",
+                   "expression": "100 * a / b",
+                   "parameters": {
+                       "a": "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f",
+                       "b": "4741ada6-709a-4a19-913e-ea174f053bbb"
+                   }
+               },
+               "8bafe57e-1c1d-4a7e-bf9f-fbd2a27c4b0f": {
+                   "type": "manual"
+               },
+               "4741ada6-709a-4a19-913e-ea174f053bbb": {
+                   "type": "manual"
+               }
+           }
+       },
+       {
+           "id": "b4c570f5-ab32-4c49-b746-179250147ca0",
+           "name": "Monthly data collection from medical centers",
+           "periodicity": "monthly",
+           "useProjectStart": true,
+           "useProjectEnd": true,
+           "fields": {
+               "832eab36-72da-8956-b6c6-3b8a0030a535": {
+                   "type": "manual"
+               },
+               "d07a3b78-ff14-24a0-942e-e282176fa241": {
+                   "type": "computed",
+                   "expression": "deaths / births * 100000",
+                   "parameters": {
+                       "deaths": "832eab36-72da-8956-b6c6-3b8a0030a535",
+                       "births": "7f7e50c6-2c7d-767e-838d-753b7d865248"
+                   }
+               },
+               "749e897d-6aaa-f8d2-bec3-d961cf5e38e0": {
+                   "type": "manual"
+               },
+               "5144697b-17f8-bd1e-ac3b-efc4d6406c68": {
+                   "type": "manual"
+               },
+               "f1c9f908-a5e2-391e-bb00-cb827807f7c0": {
+                   "type": "manual"
+               },
+               "7f7e50c6-2c7d-767e-838d-753b7d865248": {
+                   "type": "manual"
+               },
+               "49c10052-053d-c995-9120-88799f6b000e": {
+                   "type": "manual"
+               },
+               "650c1666-7557-9261-99a6-c841962a7220": {
+                   "type": "computed",
+                   "expression": "100 * women_wo_contraception / total_women",
+                   "parameters": {
+                       "women_wo_contraception": "f1c9f908-a5e2-391e-bb00-cb827807f7c0",
+                       "total_women": "5144697b-17f8-bd1e-ac3b-efc4d6406c68"
+                   }
+               },
+               "566b5af2-6bd2-c7c1-b0b8-b4df5e78f597": {
+                   "type": "computed",
+                   "expression": "100 * a / b",
+                   "parameters": {
+                       "a": "49c10052-053d-c995-9120-88799f6b000e",
+                       "b": "7f7e50c6-2c7d-767e-838d-753b7d865248"
+                   }
+               },
+               "d4f4e2a1-141c-59d4-9027-3cfbf9ca17ed": {
+                   "type": "computed",
+                   "expression": "100 * a  / b",
+                   "parameters": {
+                       "a": "749e897d-6aaa-f8d2-bec3-d961cf5e38e0",
+                       "b": "5144697b-17f8-bd1e-ac3b-efc4d6406c68"
+                   }
+               }
+           },
+           "indicators": [
+           ]
+       }
+   ],
+   "indicators": {
+       "7003ff8b-4335-4682-9c48-82eb2320dfd2": {
+           "relevance": "3434",
+           "baseline": 4,
+           "minimum": 0,
+           "orangeMinimum": 20,
+           "greenMinimum": 40,
+           "greenMaximum": 60,
+           "orangeMaximum": 80,
+           "maximum": 100,
+           "targets": [
+               {
+                   "period": "2014-07",
+                   "value": 34
+               },
+               {
+                   "period": "2014-07",
+                   "value": 56
+               },
+               {
+                   "period": "2014-07",
+                   "value": 73
+               }
+           ]
+       },
+       "d4f4e2a1-141c-59d4-9027-3cfbf9ca17ed": {
+           "relevance": "3434",
+           "baseline": 4,
+           "minimum": 0,
+           "orangeMinimum": 20,
+           "greenMinimum": 40,
+           "greenMaximum": 60,
+           "orangeMaximum": 80,
+           "maximum": 100,
+           "targets": [
+               {
+                   "period": "2014-07",
+                   "value": 34
+               },
+               {
+                   "period": "2014-07",
+                   "value": 56
+               },
+               {
+                   "period": "2014-07",
+                   "value": 73
+               }
+           ]
+       },
+       "566b5af2-6bd2-c7c1-b0b8-b4df5e78f597": {
+           "relevance": "3434",
+           "baseline": 4,
+           "minimum": 0,
+           "orangeMinimum": 20,
+           "greenMinimum": 40,
+           "greenMaximum": 60,
+           "orangeMaximum": 80,
+           "maximum": 100,
+           "targets": [
+               {
+                   "period": "2014-07",
+                   "value": 34
+               },
+               {
+                   "period": "2014-07",
+                   "value": 56
+               },
+               {
+                   "period": "2014-07",
+                   "value": 73
+               }
+           ]
+       },
+       "650c1666-7557-9261-99a6-c841962a7220": {
+           "relevance": "3434",
+           "baseline": 4,
+           "minimum": 0,
+           "orangeMinimum": 20,
+           "greenMinimum": 40,
+           "greenMaximum": 60,
+           "orangeMaximum": 80,
+           "maximum": 100,
+           "targets": [
+               {
+                   "period": "2014-07",
+                   "value": 34
+               },
+               {
+                   "period": "2014-07",
+                   "value": 56
+               },
+               {
+                   "period": "2014-07",
+                   "value": 73
+               }
+           ]
+       },
+       "d07a3b78-ff14-24a0-942e-e282176fa241": {
+           "relevance": "3434",
+           "baseline": 4,
+           "minimum": 0,
+           "orangeMinimum": 20,
+           "greenMinimum": 40,
+           "greenMaximum": 60,
+           "orangeMaximum": 80,
+           "maximum": 100,
+           "targets": [
+               {
+                   "period": "2014-07",
+                   "value": 34
+               },
+               {
+                   "period": "2014-07",
+                   "value": 56
+               },
+               {
+                   "period": "2014-07",
+                   "value": 73
+               }
+           ]
+       }
+   },
+   "inputGroups": [
+       {
+           "id": "72238d12-f1e6-467c-8618-1225011f382c",
+           "name": "Centres de santé",
+           "members": [
+               "e37adee7-2cd9-63a9-a82d-2d3cd588a970",
+               "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e",
+               "aae927b9-ad29-1ce6-9b53-ebc9075e738d",
+               "4b6172a9-b813-31e4-bc28-1657757dcac3",
+               "b66ec629-6d29-cdab-8333-043a484aabca",
+               "bad093f3-4911-1f9c-94fb-a6eeec2571b9",
+               "b184f5db-b0c1-742c-8bf2-bf163233b2c8",
+               "f0d4c93b-e16d-0283-926a-cbe49f83eebd",
+               "cc75617f-6320-cf9a-bf4c-3e704c55dd08",
+               "88ec23d0-8f1c-256a-9c68-8f40924af400"
+           ]
+       },
+       {
+           "id": "b0fefdcb-519b-49e0-99d5-e3a63f886c99",
+           "name": "Hopitaux publics",
+           "members": [
+               "22466c7d-28f4-03e5-bd89-06dd93c98a5e",
+               "fda506b7-c3c5-3c96-8971-a460f4135cfb"
+           ]
+       },
+       {
+           "id": "84b9051e-ea75-4b3b-b512-f84492e1cada",
+           "name": "Sukuma",
+           "members": [
+               "e37adee7-2cd9-63a9-a82d-2d3cd588a970",
+               "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e",
+               "aae927b9-ad29-1ce6-9b53-ebc9075e738d",
+               "4b6172a9-b813-31e4-bc28-1657757dcac3",
+               "22466c7d-28f4-03e5-bd89-06dd93c98a5e"
+           ]
+       },
+       {
+           "id": "90b578bb-c1ef-431d-87e7-3af75432550f",
+           "name": "Moonlapamok",
+           "members": [
+               "b66ec629-6d29-cdab-8333-043a484aabca",
+               "bad093f3-4911-1f9c-94fb-a6eeec2571b9",
+               "b184f5db-b0c1-742c-8bf2-bf163233b2c8",
+               "f0d4c93b-e16d-0283-926a-cbe49f83eebd",
+               "cc75617f-6320-cf9a-bf4c-3e704c55dd08",
+               "88ec23d0-8f1c-256a-9c68-8f40924af400",
+               "fda506b7-c3c5-3c96-8971-a460f4135cfb"
+           ]
+       }
+   ],
+   "inputEntities": [
+       {
+           "id": "e37adee7-2cd9-63a9-a82d-2d3cd588a970",
+           "name": "Nongphavong"
+       },
+       {
+           "id": "ca36b4fe-6308-fa4c-89cd-84158ee7eb9e",
+           "name": "Makmi"
+       },
+       {
+           "id": "aae927b9-ad29-1ce6-9b53-ebc9075e738d",
+           "name": "Nachan"
+       },
+       {
+           "id": "4b6172a9-b813-31e4-bc28-1657757dcac3",
+           "name": "Banhieng"
+       },
+       {
+           "id": "22466c7d-28f4-03e5-bd89-06dd93c98a5e",
+           "name": "DHB Sukuma"
+       },
+       {
+           "id": "b66ec629-6d29-cdab-8333-043a484aabca",
+           "name": "Nadee"
+       },
+       {
+           "id": "bad093f3-4911-1f9c-94fb-a6eeec2571b9",
+           "name": "Kadanh"
+       },
+       {
+           "id": "b184f5db-b0c1-742c-8bf2-bf163233b2c8",
+           "name": "Nong Nga"
+       },
+       {
+           "id": "f0d4c93b-e16d-0283-926a-cbe49f83eebd",
+           "name": "Nong Hoy"
+       },
+       {
+           "id": "cc75617f-6320-cf9a-bf4c-3e704c55dd08",
+           "name": "Veunyang"
+       },
+       {
+           "id": "88ec23d0-8f1c-256a-9c68-8f40924af400",
+           "name": "Thahae"
+       },
+       {
+           "id": "fda506b7-c3c5-3c96-8971-a460f4135cfb",
+           "name": "DHB Moonlapamok"
+       }
+   ],
+   "logicalFrame": {
+       "goal": "To contribute to the reduction of neonatal mortality and maternal mortality in Afar region of Ethiopia by the next Ethiopia Demographic and Health Survey (EDHS)",
+       "purposes": [
+           {
+               "description": "To reduce the prevalence and the harmful consequences of female genital mutilation in Zone 5 of Afar region by 2015",
+               "assumptions": "There is low risk for lies or false declarations during surveys. There is low to medium risk for the practice of female genital mutilation to continue through less severe forms, in secret and/or in neighbouring areas. The Afar region is homogeneous so that baseline values calculated for the whole of the region (EDHS 2005) are applicable to the sole Zone 5",
+               "outputs": [
+                   {
+                       "description": "The population in Zone 5 of Afar region (around 205,000 individuals) are aware of the harmful consequences of female genital mutilation.",
+                       "assumptions": "The awareness of the population concerns all the types of female genital mutilation, including the least severe forms.",
+                       "activities": [
+                           {
+                               "description": "to conduct KAP surveys",
+                               "prerequesites": ""
+                           },
+                           {
+                               "description": "to develop information, education, communication for the population on female genital mutilation",
+                               "prerequesites": ""
+                           },
+                           {
+                               "description": "to train and support114 Health Extension Workers (HEW), 92 skilled health workers, 548 teachers on IEC on female genital mutilation",
+                               "prerequesites": ""
+                           }
+                       ],
+                       "indicators": [
+                           "d4f4e2a1-141c-59d4-9027-3cfbf9ca17ed"
+                       ]
+                   },
+                   {
+                       "description": "Prevention and management of complications and consequences of female genital mutilation is integrated in the continuum of care provided in 57 health facilities in Zone 5 of Afar region.",
+                       "assumptions": "Health facilities are functional and there is no disruption in the continuum of care.",
+                       "activities": [
+                           {
+                               "description": "to train and support 92 skilled health workers on female genital mutilation in the continuum of care",
+                               "prerequesites": ""
+                           },
+                           {
+                               "description": "to introduce materials and protocols in 57 health facilities for the integration of WHO recommendations related to female genital mutilation",
+                               "prerequesites": ""
+                           },
+                           {
+                               "description": "to set up protocols (including transfers to Dalifage hospital) for the opening of type III FGM during the second quarter of pregnancy",
+                               "prerequesites": ""
+                           }
+                       ],
+                       "indicators": [
+                           "7003ff8b-4335-4682-9c48-82eb2320dfd2"
+                       ]
+                   },
+                   {
+                       "description": "Female genital mutilation is a focus of community dialogue in 57 kebele in Zone 5 of Afar region and communities choose to abandon the practice.",
+                       "assumptions": "Community leaders (clan leaders, religious leaders...) and traditional authorities (sultan) are influential and instrumental enough to convince their communities to abandon the practice of female genital mutilation.",
+                       "activities": [
+                           {
+                               "description": "to train the local partner ACISDA on community dialogue facilitation methodology",
+                               "prerequesites": ""
+                           },
+                           {
+                               "description": "to set up, train and support 57 local anti-FGM committees",
+                               "prerequesites": ""
+                           },
+                           {
+                               "description": "to facilitate community dialogue sessions on prevention of female genital mutilation in 57 kebele",
+                               "prerequesites": ""
+                           }
+                       ],
+                       "indicators": [
+                       ]
+                   },
+                   {
+                       "description": "Knowledge, and prevention, of female genital mutilation is introduced and supported at regional level.",
+                       "assumptions": "All the stakeholders involved in prevention of female genital mutilation in Afar region are known. All of them agree to share information and their experiences.",
+                       "activities": [
+                           {
+                               "description": "to prepare and write memoranda of understanding between partners and other stakeholders",
+                               "prerequesites": ""
+                           },
+                           {
+                               "description": "to facilitate regional networking between partners and stakeholders involved in prevention of female genital mutilation",
+                               "prerequesites": ""
+                           }
+                       ],
+                       "indicators": [
+                       ]
+                   }
+               ],
+               "indicators": [
+                   "650c1666-7557-9261-99a6-c841962a7220",
+                   "566b5af2-6bd2-c7c1-b0b8-b4df5e78f597"
+               ]
+           }
+       ],
+       "indicators": [
+           "d07a3b78-ff14-24a0-942e-e282176fa241"
+       ]
+   }
 }
