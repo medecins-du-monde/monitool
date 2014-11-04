@@ -190,30 +190,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
 		resolve: {
-			indicatorHierarchy: function(mtDatabase) {
-				return mtDatabase.query('monitool/indicators_short', {group: true}).then(function(result) {
-					var hierarchy = {};
-
-					result.rows.forEach(function(row) {
-						// add dummy types and themes
-						!row.value.themes.length && row.value.themes.push('');
-						!row.value.types.length  && row.value.types.push('');
-
-						row.value.themes.forEach(function(theme) {
-							row.value.types.forEach(function(type) {
-								// add empty tree branches if those are undefined
-								!hierarchy[theme] && (hierarchy[theme] = {});
-								!hierarchy[theme][type] && (hierarchy[theme][type] = []);
-
-								row.value._id = row.key;
-								hierarchy[theme][type].push(row.value);
-							});
-						});
-					});
-
-					return hierarchy;
-				});
-			},
+			indicatorHierarchy: 'indicatorHierarchy',
 			typesById: function(mtDatabase) {
 				return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
 					var types = {};
@@ -296,38 +273,6 @@ app.config(function($routeProvider) {
 			}
 		}
 	});
-
-
-	///////////////////////////
-	// Input
-	///////////////////////////
-
-
-	// $routeProvider.when('/inputs', {
-	// 	templateUrl: 'partials/input/list.html',
-	// 	controller: 'InputListController',
-	// 	resolve: {
-	// 		projects: function(mtDatabase) {
-	// 			return mtDatabase.query('monitool/by_type', {key: 'project'}).then(function(result) {
-	// 				return result.rows.map(function(row) { return row.value; });
-	// 			});
-	// 		}
-	// 	}
-	// });
-
-	// $routeProvider.when('/inputs/:month/:centerId', {
-	// 	templateUrl: 'partials/input/edit.html',
-	// 	controller: 'InputEditController'
-	// });
-
-	///////////////////////////
-	// Reporting
-	///////////////////////////
-
-	// $routeProvider.when('/reporting', {
-	// 	templateUrl: 'partials/reporting/by-entities.html',
-	// 	controller: 'ReportingByEntitiesController'
-	// });
 
 	// $routeProvider.otherwise({
 	// 	redirectTo: '/projects'
