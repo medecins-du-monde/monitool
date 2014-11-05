@@ -14,14 +14,14 @@
 				<tr>
 					<th>Nom</th>
 					<th>Nombre d'indicateurs</th>
-					<th></th>
+					<th style="width:85px"></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="type in types | orderBy: 'name'">
 					<td>{{type.name}}</td>
-					<td>{{usage[type._id] || 0}}</td>
-					<td><button class="btn btn-danger btn-xs" ng-disabled="usage[type._id]" ng-click="remove(type)">Supprimer</button></td>
+					<td>{{type.usage || 0}}</td>
+					<td><button class="btn btn-danger btn-xs" ng-disabled="type.usage" ng-click="remove(type)">Supprimer</button></td>
 				</tr>
 				<tr>
 					<td colspan="3">

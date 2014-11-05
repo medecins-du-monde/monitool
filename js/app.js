@@ -34,14 +34,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/list.html',
 		controller: 'ProjectListController',
 		resolve: {
-			projects: function(mtDatabase) {
-				return mtDatabase.query('monitool/projects_short').then(function(result) {
-					return result.rows.map(function(row) {
-						row.value._id = row.id;
-						return row.value;
-					});
-				});
-			}
+			projects: function(mtFetch) { return mtFetch.projects(); }
 		}
 	});
 
@@ -206,65 +199,37 @@ app.config(function($routeProvider) {
 		controller: 'IndicatorEditController',
 		resolve: {
 			indicator: function($route, $q, mtDatabase) {
-				if ($route.current.params.indicatorId === 'new') {
-					var i = {type: 'indicator', name: '', description: '', history: '', standard: false, sumAllowed: false, types: [], themes: [], formulas: {}};
-					return $q.when(i);
-				}
+				if ($route.current.params.indicatorId === 'new')
+					return $q.when({
+						type: 'indicator',
+						name: '',
+						description: '',
+						history: '',
+						standard: false,
+						sumAllowed: false,
+						types: [],
+						themes: [],
+						formulas: {}
+					});
 				else
 					return mtDatabase.get($route.current.params.indicatorId);
 			},
-			indicators: function(mtDatabase) {
-				return mtDatabase.query('monitool/by_type', {key: 'indicator', include_docs: true});
-			},
-			types: function(mtDatabase) {
-				return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true});
-			},
-			themes: function(mtDatabase) {
-				return mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true})
-			}
+			indicators: function(mtFetch) { return mtFetch.indicators(); },
+			types: function(mtFetch) { return mtFetch.types(); },
+			themes: function(mtFetch) { return mtFetch.themes(); }
 		}
 	});
 
 	$routeProvider.when('/themes', {
 		templateUrl: 'partials/indicators/theme-list.html',
 		controller: 'ThemeListController',
-		resolve: {
-			themes: function(mtDatabase) {
-				return mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}).then(function(result) {
-					return result.rows.map(function(row) { return row.doc; });
-				})
-			},
-			themeUsages: function(mtDatabase) {
-				return mtDatabase.query('monitool/theme_usage', {group: true}).then(function(result) {
-					var usage = {};
-					result.rows.forEach(function(row) {
-						usage[row.key] = row.value;
-					});
-					return usage;
-				});
-			}
-		}
+		resolve: {themes: function(mtFetch) { return mtFetch.themes(); }}
 	});
 
 	$routeProvider.when('/types', {
 		templateUrl: 'partials/indicators/type-list.html',
 		controller: 'TypeListController',
-		resolve: {
-			types: function(mtDatabase) {
-				return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
-					return result.rows.map(function(row) { return row.doc; });
-				});
-			},
-			typeUsages: function(mtDatabase) {
-				return mtDatabase.query('monitool/type_usage', {group: true}).then(function(result) {
-					var usage = {};
-					result.rows.forEach(function(row) {
-						usage[row.key] = row.value;
-					});
-					return usage;
-				});
-			}
-		}
+		resolve: {types: function(mtFetch) { return mtFetch.types(); }}
 	});
 
 	// $routeProvider.otherwise({

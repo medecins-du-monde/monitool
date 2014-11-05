@@ -7,51 +7,54 @@ var data = {
 		{
 			"_id": '_design/monitool',
 
-			"shows": {
-				"project": function(doc, req) {
-					return doc.name + ' is a capital project for our goal!';
-				}.toString()
-			},
+			// "shows": {
+			// 	"project": function(doc, req) {
+			// 		return doc.name + ' is a capital project for our goal!';
+			// 	}.toString()
+			// },
 
-			"lists": {
-				"by_type": function(head, req) {
-					var row;
-					while (row = getRow())
-						if (row.value)
-							send(row.value.name + "\n");
-				}.toString()
-			},
+			// "lists": {
+			// 	"by_type": function(head, req) {
+			// 		var row;
+			// 		while (row = getRow())
+			// 			if (row.value)
+			// 				send(row.value.name + "\n");
+			// 	}.toString()
+			// },
 
-			"updates": {
+			// "updates": {
 
-				"make_stupid": function(doc, req) {
-					doc.name = 'Stupid ' + doc.name;
-					return [doc, toJSON(doc)];
-				}.toString(),
+			// 	"make_stupid": function(doc, req) {
+			// 		doc.name = 'Stupid ' + doc.name;
+			// 		return [doc, toJSON(doc)];
+			// 	}.toString(),
 
-			},
+			// },
 
 			"filters": {
-
-				"projects": function(doc, request) {
-					return doc.type === 'project';
+				"offline": function(doc, request) {
+					if (doc.type === 'type' || doc.type === 'theme' || doc.type === 'indicator')
+						return true;
+					else if (request.query.projects) {
+						try {
+							var ids = JSON.parse(request.query.projects);
+							if (doc.type === 'project')
+								return request.query.projects.indexOf(doc._id);
+							else if (doc.type === 'input')
+								return request.query.projects.indexOf(doc.project);
+							else
+								return false;
+						}
+						catch (e) {
+							return false;
+						}
+					}
+					else
+						return false;
 				}.toString()
-
 			},
 
 			"views": {
-				"by_type": {
-					"map": function(doc) {
-						emit(doc.type, doc);
-
-						if (doc.type === 'project')
-							for (var centerId in doc.center) {
-								var center = JSON.parse(JSON.stringify(doc.center[centerId]));
-								center._id = centerId;
-								emit('center', center);
-							}
-					}.toString()
-				},
 
 				"projects_short": {
 					"map": function(doc) {
@@ -135,24 +138,62 @@ var data = {
 					}.toString()
 				},
 
-				"type_usage": {
+				"types_short": {
 					"map": function(doc) {
 						if (doc.type === 'indicator')
 							doc.types.forEach(function(typeId) {
-								emit(typeId, 1);
+								emit(typeId, {usage: 1});
 							});
+						
+						else if (doc.type === 'type')
+							emit(doc._id, {name: doc.name});
+
 					}.toString(),
-					"reduce": "_sum"
+
+					"reduce": function(keys, values, rereduce) {
+						var memo      = {usage: 0},
+							numValues = values.length;
+
+						for (var i = 0; i < numValues; ++i) {
+							var value = values[i];
+
+							if (value.usage)
+								memo.usage += value.usage;
+
+							if (value.name)
+								memo.name = value.name
+						}
+
+						return memo;
+					}.toString()
 				},
 
-				"theme_usage": {
+				"themes_short": {
 					"map": function(doc) {
 						if (doc.type === 'indicator')
 							doc.themes.forEach(function(themeId) {
-								emit(themeId, 1);
+								emit(themeId, {usage: 1});
 							});
-						}.toString(),
-					"reduce": "_sum"
+						else if (doc.type === 'theme')
+							emit(doc._id, {name: doc.name});
+					}.toString(),
+
+					"reduce": function(keys, values, rereduce) {
+						var memo      = {usage: 0},
+							numValues = values.length;
+
+						for (var i = 0; i < numValues; ++i) {
+							var value = values[i];
+
+							if (value.usage)
+								memo.usage += value.usage;
+
+							if (value.name)
+								memo.name = value.name;
+						}
+
+						return memo;
+					}.toString()
 				}
 			}
 		}

@@ -5,9 +5,24 @@ var mtServices = angular.module('MonitoolServices', ['pouchdb']);
 
 mtServices.factory('mtDatabase', function(PouchDB) {
 	var r = {};
-	
-	r.local = new PouchDB('monitool3');
-	r.remote = new PouchDB('http://localhost:5984/monitool', {adapter: 'http'});
+	r.remote  = new PouchDB('http://localhost:5984/monitool', {adapter: 'http'});
+	r.local   = new PouchDB('monitool');
+	r.current = r.remote;
+
+	r.getOfflineProjects = function() {
+		return r.local.get('_local/offline');
+	};
+
+	r.setOfflineProjects = function(newProjects) {
+		return r.local.get('_local/offline').then(function(currentProjects) {
+			var toAdd = [], toRemove = [];
+
+			currentProjects.sort();
+			newProjects.sort();
+
+			return r.local.set(newProjects);
+		});
+	};
 
 	// var db = new PouchDB('monitool');
 	// db.sync('http://localhost:5984/monitool', {live: true}).then(function(hello) {
@@ -21,7 +36,21 @@ mtServices.factory('mtDatabase', function(PouchDB) {
 });
 
 
+
 mtServices.factory('mtFetch', function(mtDatabase) {
+	var reformatArray = function(result) {
+		return result.rows.map(function(row) {
+			row.value._id = row.key;
+			return row.value;
+		});
+	};
+
+	var reformatHashById = function(result) {
+		var types = {};
+		result.rows.forEach(function(row) { return types[row.key] = row.value; });
+		return types;
+	};
+
 	return {
 		indicatorHierarchy: function(forbiddenIds) {
 			return mtDatabase.query('monitool/indicators_short', {group: true}).then(function(result) {
@@ -51,20 +80,25 @@ mtServices.factory('mtFetch', function(mtDatabase) {
 				return hierarchy;
 			});
 		},
+		
+		projects: function() {
+			return mtDatabase.query('monitool/projects_short').then(reformatArray);
+		},
+		indicators: function() {
+			return mtDatabase.query('monitool/indicators_short', {group: true}).then(reformatArray);
+		},
+		themes: function() {
+			return mtDatabase.query('monitool/themes_short', {group: true}).then(reformatArray);
+		},
+		types: function() {
+			return mtDatabase.query('monitool/types_short', {group: true}).then(reformatArray);
+		},
 		typesById: function() {
-			return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
-				var types = {};
-				result.rows.forEach(function(row) { return types[row.id] = row.doc; });
-				return types;
-			});
+			return mtDatabase.query('monitool/types_short', {group: true}).then(reformatHashById);
 		},
 		themesById: function() {
-			return mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}).then(function(result) {
-				var themes = {};
-				result.rows.forEach(function(row) { return themes[row.id] = row.doc; });
-				return themes;
-			});
-		}
+			return mtDatabase.query('monitool/themes_short', {group: true}).then(reformatHashById);
+		},
 	};
 });
 

@@ -615,18 +615,17 @@ monitoolControllers.controller('IndicatorEditController', function($scope, $rout
 		$scope.updateFormula(formulaId);
 
 	$scope.master     = angular.copy(indicator);
-	$scope.indicators = indicators.rows.map(function(row) { return row.doc; }).filter(function(i) { return i._id != indicator._id });
-	$scope.types      = types.rows.map(function(row) { return row.doc; });
-	$scope.themes     = themes.rows.map(function(row) { return row.doc; });
+	$scope.indicators = indicators.filter(function(i) { return i._id != indicator._id });
+	$scope.types      = types;
+	$scope.themes     = themes;
 });
 
 
 /**
  * this controller and theme controller are the same, factorize it!
  */
-monitoolControllers.controller('TypeListController', function($q, $scope, types, typeUsages, mtDatabase) {
+monitoolControllers.controller('TypeListController', function($scope, types, mtDatabase) {
 	$scope.types = types;
-	$scope.usage = typeUsages;
 
 	$scope.add = function() {
 		var newType = {_id: PouchDB.utils.uuid().toLowerCase(), type: 'type', name: $scope.newType || ''};
@@ -641,14 +640,15 @@ monitoolControllers.controller('TypeListController', function($q, $scope, types,
 
 	$scope.remove = function(type) {
 		$scope.types = $scope.types.filter(function(lType) { return lType !== type });
-		mtDatabase.remove(type);
+		mtDatabase.get(type._id).then(function(type) {
+			mtDatabase.remove(type);
+		});
 	};
 });
 
 
-monitoolControllers.controller('ThemeListController', function($q, $scope, themes, themeUsages, mtDatabase) {
+monitoolControllers.controller('ThemeListController', function($scope, themes, mtDatabase) {
 	$scope.themes = themes;
-	$scope.usage = themeUsages;
 
 	$scope.add = function() {
 		var newTheme = {_id: PouchDB.utils.uuid().toLowerCase(), type: 'theme', name: $scope.newTheme || ''};
@@ -663,6 +663,8 @@ monitoolControllers.controller('ThemeListController', function($q, $scope, theme
 
 	$scope.remove = function(theme) {
 		$scope.themes = $scope.themes.filter(function(lTheme) { return lTheme !== theme });
-		mtDatabase.remove(theme);
+		mtDatabase.get(theme._id).then(function(theme) {
+			mtDatabase.remove(theme);
+		})
 	};
 });
