@@ -62,7 +62,7 @@
 									   ng-model="form.start"
 									   ng-disabled="form.useProjectStart"
 									   name="start"
-									   required />
+									   ng-required="!form.useProjectStart" />
 							</div>
 						</div>
 					</div>
@@ -80,7 +80,7 @@
 									   ng-model="form.end"
 									   ng-disabled="form.useProjectEnd"
 									   name="end"
-									   required />
+									   ng-required="!form.useProjectEnd" />
 							</div>
 						</div>
 					</div>
@@ -93,9 +93,9 @@
 				<table class="table table-bordered table-stripped">
 					<tr ng-repeat="indicator in chosenIndicators">
 						<td>
-							<input type="checkbox" ng-disabled="indicator.disabled" ng-model="indicator.selected" ng-change="updateFields()" />
+							<input id="ind-{{indicator.id}}" type="checkbox" ng-disabled="indicator.disabled" ng-model="indicator.selected" ng-change="updateFields()" />
 						</td>
-						<td>{{indicatorsById[indicator.id].name}}</td>
+						<td><label style="font-weight: normal" for="ind-{{indicator.id}}">{{indicatorsById[indicator.id].name}}</label></td>
 					</tr>
 				</table>
 			</fieldset>
@@ -138,8 +138,8 @@
 				</table>
 			</fieldset>
 
-			<br /><br />
-			<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
+			<br/>
+			<button ng-click="save()" ng-disabled="formForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
 			<button ng-click="reset()" class="btn btn-default">Réinitialiser</button>
 		</form>
 	</div>

@@ -22,7 +22,8 @@
 				<tr ng-repeat="form in project.dataCollection">
 					<td>{{form.name}}</td>
 					<td>
-						<button class="btn btn-default btn-xs" ng-click="edit(form.id)">Editer</button>
+						<button class="btn btn-default btn-sm" ng-click="edit(form.id)">Editer</button>
+						<button class="btn btn-danger btn-sm" ng-click="delete(form.id)">Supprimer</button>
 					</td>
 				</tr>
 				<tr>
@@ -32,8 +33,5 @@
 				</tr>
 			</tbody>
 		</table>
-
-
-
 	</div>
 </div>

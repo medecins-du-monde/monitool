@@ -27,16 +27,6 @@
 				</div>
 
 				<div class="form-group" show-errors>
-					<label for="input-country" class="col-sm-2 control-label">Pays</label>
-					<div class="col-sm-10">
-						<input type="text" class="form-control" id="input-country" name="country" ng-model="project.country" required placeholder="Exemple: Laos">
-						<p class="help-block" ng-if="projectForm.country.$error.required">
-							Ce champ est obligatoire
-						</p>
-					</div>
-				</div>
-
-				<div class="form-group" show-errors>
 					<label for="input-begin" class="col-sm-2 control-label">Date de lancement</label>
 					<div class="col-sm-10">
 						<input type="month" class="form-control" id="input-begin" name="begin" max="{{project.end}}" ng-model="project.begin" required lower-than="{{project.end}}">
@@ -69,11 +59,20 @@
 
 			<fieldset>
 				<legend>Objectif global</legend>
-				<div class="form-group">
+				<div class="form-group" show-errors>
 					<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
 					<div class="col-sm-10">
-						<textarea class="form-control" placeholder="Description de la contribution du projet aux objectifs (impact) d'une politique ou d'un programme" ng-model="project.logicalFrame.goal"></textarea>
+						<textarea class="form-control"
+								  name="goalDesc"
+								  required
+								  placeholder="Description de la contribution du projet aux objectifs (impact) d'une politique ou d'un programme"
+								  ng-model="project.logicalFrame.goal"></textarea>
+
+						<p class="help-block" ng-if="projectForm.goalDesc.$error.required">
+							Ce champ est obligatoire
+						</p>
 					</div>
+
 				</div>
 
 				<div class="form-group">
@@ -82,9 +81,9 @@
 						<ul class="form-control-static">
 							<li ng-repeat="indicatorId in project.logicalFrame.indicators">
 								{{indicatorsById[indicatorId].name}}
-								(<a ng-click="editIndicator(indicatorId)">Modifier</a>)
+								(<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)">Modifier</a>)
 							</li>
-							<li><a ng-click="addIndicator(project.logicalFrame.indicators)">Ajouter un indicateur</a></li>
+							<li><a ng-click="editIndicator(null, project.logicalFrame.indicators)">Ajouter un indicateur</a></li>
 						</ul>
 					</div>
 				</div>
@@ -97,7 +96,7 @@
 
 					<div class="panel-heading">
 						<div class="panel-title">
-							<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
+							<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)">Supprimer</button>
 							<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
 							<a ng-click="tabOpen = !tabOpen">Objectif Spécifique {{purposeId + 1}}: {{purpose.description}}</a>
 						</div>
@@ -105,22 +104,34 @@
 
 					<div class="panel-body" ng-show="tabOpen">
 						<ng-form name="purposeForm">
-							<div class="form-group">
+							<div class="form-group" show-errors>
 								<label for="input-name" class="col-sm-2 control-label">Logique d'intervention</label>
 								<div class="col-sm-10">
 									<input type="text"
 										   class="form-control"
+										   name="description"
 										   placeholder="Description des avantages directs destinés au(x) groupe(s) cible(s)"
-										   ng-model="purpose.description"/>
+										   ng-model="purpose.description"
+										   required />
+
+									<p class="help-block" ng-if="purposeForm.description.$error.required">
+										Ce champ est obligatoire
+									</p>
 								</div>
 							</div>
 
-							<div class="form-group">
+							<div class="form-group" show-errors>
 								<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
 								<div class="col-sm-10">
 									<textarea class="form-control"
+											  name="assumptions"
 											  placeholder="Si l'objectif spécifique est atteint, quelles hypothèses doivent être confirmées pour atteindre l'objectif général?"
-											  ng-model="purpose.assumptions"></textarea>
+											  ng-model="purpose.assumptions"
+											  required></textarea>
+
+									<p class="help-block" ng-if="purposeForm.assumptions.$error.required">
+										Ce champ est obligatoire
+									</p>
 								</div>
 							</div>
 
@@ -130,9 +141,9 @@
 									<ul class="form-control-static">
 										<li ng-repeat="indicatorId in purpose.indicators">
 											{{indicatorsById[indicatorId].name}}
-											(<a ng-click="editIndicator(indicatorId)">Modifier</a>)
+											(<a ng-click="editIndicator(indicatorId, purpose.indicators)">Modifier</a>)
 										</li>
-										<li><a ng-click="addIndicator(purpose.indicators)">Ajouter un indicateur</a></li>
+										<li><a ng-click="editIndicator(null, purpose.indicators)">Ajouter un indicateur</a></li>
 									</ul>
 								</div>
 							</div>
@@ -140,7 +151,7 @@
 							<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs" ng-init="tabOpen=false">
 								<div class="panel-heading">
 									<div class="panel-title">
-										<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
+										<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)">Supprimer</button>
 										<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
 										<a ng-click="tabOpen = !tabOpen">Résultat {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}</a>
 									</div>
@@ -148,21 +159,33 @@
 
 								<div class="panel-body" ng-show="tabOpen">
 									<ng-form name="outputForm">
-										<div class="form-group">
+										<div class="form-group" show-errors>
 											<label for="input-name" class="col-sm-2 control-label">Description</label>
 											<div class="col-sm-10">
 												<textarea class="form-control"
+														  required
+														  name="description"
 														  placeholder="Produit ou service tangibles apportés par le projet."
 														  ng-model="output.description"></textarea>
+
+												<p class="help-block" ng-if="outputForm.description.$error.required">
+													Ce champ est obligatoire
+												</p>
 											</div>
 										</div>
 
-										<div class="form-group">
+										<div class="form-group" show-errors>
 											<label for="input-name" class="col-sm-2 control-label">Hypothèses</label>
 											<div class="col-sm-10">
 												<textarea class="form-control"
+														  required
+														  name="assumptions"
 														  placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?"
 														  ng-model="output.assumptions"></textarea>
+
+												<p class="help-block" ng-if="outputForm.assumptions.$error.required">
+													Ce champ est obligatoire
+												</p>
 											</div>
 										</div>
 
@@ -172,9 +195,9 @@
 												<ul class="form-control-static">
 													<li ng-repeat="indicatorId in output.indicators">
 														{{indicatorsById[indicatorId].name}}
-														(<a ng-click="editIndicator(indicatorId)">Modifier</a>)
+														(<a ng-click="editIndicator(indicatorId, output.indicators)">Modifier</a>)
 													</li>
-													<li><a ng-click="addIndicator(output.indicators)">Ajouter un indicateur</a></li>
+													<li><a ng-click="editIndicator(null, output.indicators)">Ajouter un indicateur</a></li>
 												</ul>
 											</div>
 										</div>
@@ -182,7 +205,7 @@
 										<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities" ng-init="tabOpen=false">
 											<div class="panel-heading">
 												<div class="panel-title">
-													<button class="btn btn-danger btn-xs pull-right">Supprimer</button>
+													<button class="btn btn-danger btn-xs pull-right" ng-click="removeActivity(activity, output)">Supprimer</button>
 													<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
 													<a ng-click="tabOpen = !tabOpen">Activité {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}</a>
 												</div>
@@ -190,17 +213,26 @@
 
 											<div class="panel-body" ng-show="tabOpen">
 												<ng-form name="activityForm">
-													<div class="form-group">
+													<div class="form-group" show-errors>
 														<label for="input-name" class="col-sm-2 control-label">Description</label>
 														<div class="col-sm-10">
-															<input type="text" class="form-control" placeholder="Produit ou service tangibles apportés par le projet." ng-model="activity.description"/>
+															<input type="text" class="form-control" name="description" placeholder="Produit ou service tangibles apportés par le projet." ng-model="activity.description" required/>
+
+															<p class="help-block" ng-if="activityForm.description.$error.required">
+																Ce champ est obligatoire
+															</p>
 														</div>
 													</div>
 
-													<div class="form-group">
+													<div class="form-group" show-errors>
 														<label for="input-name" class="col-sm-2 control-label">Prérequis</label>
 														<div class="col-sm-10">
-															<input type="text" class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?" ng-model="activity.prerequesites" />
+															<input type="text" class="form-control" placeholder="Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l'objectif spécifique?" ng-model="activity.prerequesites" name="prerequesites" required/>
+
+															<p class="help-block" ng-if="activityForm.prerequesites.$error.required">
+																Ce champ est obligatoire
+															</p>
+
 														</div>
 													</div>
 												</ng-form>

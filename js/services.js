@@ -21,31 +21,52 @@ mtServices.factory('mtDatabase', function(PouchDB) {
 });
 
 
-mtServices.factory('indicatorHierarchy', function(mtDatabase) {
-	return mtDatabase.query('monitool/indicators_short', {group: true}).then(function(result) {
-		var hierarchy = {};
+mtServices.factory('mtFetch', function(mtDatabase) {
+	return {
+		indicatorHierarchy: function(forbiddenIds) {
+			return mtDatabase.query('monitool/indicators_short', {group: true}).then(function(result) {
+				var hierarchy = {};
 
-		result.rows.forEach(function(row) {
-			// add dummy types and themes
-			!row.value.themes.length && row.value.themes.push('');
-			!row.value.types.length  && row.value.types.push('');
+				result.rows.forEach(function(row) {
+					// skip forbidden indicators if parameter was provided (for logical frame edition, and avoiding double indicators)
+					if (forbiddenIds && forbiddenIds.indexOf(row.key) !== -1)
+						return;
 
-			row.value.themes.forEach(function(theme) {
-				row.value.types.forEach(function(type) {
-					// add empty tree branches if those are undefined
-					!hierarchy[theme] && (hierarchy[theme] = {});
-					!hierarchy[theme][type] && (hierarchy[theme][type] = []);
+					// add dummy types and themes
+					!row.value.themes.length && row.value.themes.push('');
+					!row.value.types.length  && row.value.types.push('');
 
-					row.value._id = row.key;
-					hierarchy[theme][type].push(row.value);
+					row.value.themes.forEach(function(theme) {
+						row.value.types.forEach(function(type) {
+							// add empty tree branches if those are undefined
+							!hierarchy[theme] && (hierarchy[theme] = {});
+							!hierarchy[theme][type] && (hierarchy[theme][type] = []);
+
+							row.value._id = row.key;
+							hierarchy[theme][type].push(row.value);
+						});
+					});
 				});
+
+				return hierarchy;
 			});
-		});
-
-		return hierarchy;
-	});
+		},
+		typesById: function() {
+			return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
+				var types = {};
+				result.rows.forEach(function(row) { return types[row.id] = row.doc; });
+				return types;
+			});
+		},
+		themesById: function() {
+			return mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}).then(function(result) {
+				var themes = {};
+				result.rows.forEach(function(row) { return themes[row.id] = row.doc; });
+				return themes;
+			});
+		}
+	};
 });
-
 
 mtServices.factory('mtIndicators', function($q, mtDatabase) {
 
@@ -105,8 +126,8 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 	};
 
 	var getProjectStatsColumns = function(project, begin, end, groupBy) {
-		begin = moment(begin);
-		end   = moment(end);
+		begin = moment(begin, 'YYYY-MM');
+		end   = moment(end, 'YYYY-MM');
 
 		if (groupBy === 'month' || groupBy === 'year') {
 			var format  = groupBy === 'month' ? 'YYYY-MM' : 'YYYY',
@@ -128,8 +149,8 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 	};
 
 	var getProjectRawStats = function(project, begin, end, groupBy) {
-		begin = moment(begin);
-		end   = moment(end);
+		begin = moment(begin, 'YYYY-MM');
+		end   = moment(end, 'YYYY-MM');
 
 		var view    = 'monitool/inputs_by_project_year_month_entity',
 			options = {startkey: [project._id, begin.format('YYYY'), begin.format('MM')], endkey: [project._id, end.format('YYYY'), end.format('MM'), {}]};

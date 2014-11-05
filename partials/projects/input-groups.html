@@ -11,50 +11,56 @@
 			<li class="active">Groupes d'activité</li>
 		</ol>
 
-		<table class="table table-bordered table-stripped table-condensed">
-			<thead>
-				<tr>
-					<th>Nom</th>
-					<th>Membres</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="inputGroup in project.inputGroups">
-					<td>{{inputGroup.name}}</td>
-					<td>
-						<ui-select multiple ng-model="inputGroup.members" theme="bootstrap">
-							<ui-select-match placeholder="">
-								{{$item.name}}
-							</ui-select-match>
-							<ui-select-choices repeat="inputEntity.id as inputEntity in project.inputEntities">
-								{{inputEntity.name}}
-							</ui-select-choices>
-						</ui-select>
-					</td>
-					<td>
-						<button class="btn btn-default btn-xs">
-							Voir les statistiques
-						</button>
+		<form name="projectForm" novalidate>
 
-						<button class="btn btn-danger btn-xs" ng-click="delete(inputGroup)">
-							Supprimer
-						</button>
-					</td>
-				</tr>
-			</tbody>
-			<tfoot>
-				<tr>
-					<td colspan="3">
-						<div class="input-group input-group-sm" style="width: 100%">
-							<input type="text" class="form-control" ng-model="newCenter" placeholder="Nom du nouveau groupe" ng-enter="create()">
-							<span class="input-group-btn">
-								<button class="btn btn-default" ng-click="create()">Ajouter</button>
-							</span>
-						</div>
-					</td>
-				</tr>
-			</tfoot>
-		</table>
+			<table class="table table-bordered table-stripped table-condensed">
+				<thead>
+					<tr>
+						<th>Nom</th>
+						<th>Membres</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="!project.inputGroups.length">
+						<td colspan="2" style="text-align: center">Aucun groupe d'activité n'a encore été créé!</td>
+					</tr>
+					<tr ng-repeat="inputGroup in project.inputGroups">
+						<td>
+							<ng-form name="center">
+								<div class="form-group" show-errors style="margin: 0">
+									<input type="text" name="name" ng-model="inputGroup.name" class="form-control error input-sm" required />
+								</div>
+							</ng-form>
+						</td>
+						<td>
+							<ui-select multiple ng-model="inputGroup.members" theme="bootstrap">
+								<ui-select-match placeholder="">
+									{{$item.name}}
+								</ui-select-match>
+								<ui-select-choices repeat="inputEntity.id as inputEntity in project.inputEntities">
+									{{inputEntity.name}}
+								</ui-select-choices>
+							</ui-select>
+						</td>
+						<td>
+							<button class="btn btn-default btn-sm">Voir les statistiques</button>
+							<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)">Supprimer</button>
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="3">
+							<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%">Ajouter</button>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+
+			<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
+			<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">Réinitialiser</button>
+
+		</form>
 	</div>
 </div>

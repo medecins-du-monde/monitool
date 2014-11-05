@@ -70,7 +70,7 @@ var data = {
 
 							var numForms = doc.dataCollection.length;
 							for (var i = 0; i < numForms; ++i)
-								for (indicatorId in doc.dataCollection.fields)
+								for (indicatorId in doc.dataCollection[i].fields)
 									if (!main[indicatorId])
 										dependency[indicatorId] = true;
 

@@ -11,39 +11,44 @@
 			<li class="active">Lieux d'activité</li>
 		</ol>
 
-		<table class="table table-bordered table-stripped table-condensed">
-			<thead>
-				<tr>
-					<th>Nom</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="inputEntity in project.inputEntities">
-					<td>{{inputEntity.name}}</td>
-					<td>
-						<button class="btn btn-default btn-xs">
-							Voir les statistiques
-						</button>
+		<form name="projectForm" novalidate>
+			<table class="table table-bordered table-stripped table-condensed">
+				<thead>
+					<tr>
+						<th>Nom</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="!project.inputEntities.length">
+						<td colspan="2" style="text-align: center">Aucun lieu d'activité n'a encore été créé!</td>
+					</tr>
+					<tr ng-repeat="inputEntity in project.inputEntities">
+						<td>
+							<ng-form name="center">
+								<div class="form-group" show-errors style="margin: 0">
+									<input type="text" name="name" ng-model="inputEntity.name" class="form-control input-sm" required />
+								</div>
+							</ng-form>
+						</td>
+						<td>
+							<button class="btn btn-default btn-sm">Voir les statistiques</button>
+							<button class="btn btn-danger btn-sm" ng-click="delete(inputEntity.id)">Supprimer</button>
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="3">
+							<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%">Ajouter</button>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
 
-						<button class="btn btn-danger btn-xs" ng-click="delete(inputEntity)">
-							Supprimer
-						</button>
-					</td>
-				</tr>
-			</tbody>
-			<tfoot>
-				<tr>
-					<td colspan="3">
-						<div class="input-group input-group-sm" style="width: 100%">
-							<input type="text" class="form-control" ng-model="newCenter" placeholder="Nom de la nouvelle entitée" ng-enter="create()">
-							<span class="input-group-btn">
-								<button class="btn btn-default" ng-click="create()">Ajouter</button>
-							</span>
-						</div>
-					</td>
-				</tr>
-			</tfoot>
-		</table>
+			<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
+			<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">Réinitialiser</button>
+
+		</form>
 	</div>
 </div>

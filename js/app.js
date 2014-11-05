@@ -1,6 +1,11 @@
 "use strict";
 
-var app = angular.module('MonitoolApp', ['ngRoute', 'MonitoolControllers', 'MonitoolDirectives']);
+var app = angular.module('MonitoolApp', [
+	'ngRoute',
+	'MonitoolControllers',
+	'MonitoolDirectives',
+	'MonitoolServices'
+]);
 
 app.config(function($routeProvider) {
 
@@ -49,13 +54,13 @@ app.config(function($routeProvider) {
 					return $q.when({
 						type: "project",
 						name: "",
-						country: "",
 						begin: "",
 						end: "",
-						logicalFrame: {goal: "", purposes: []},
+						logicalFrame: {goal: "", indicators: [], purposes: []},
 						inputEntities: [],
 						inputGroups: [],
-						dataCollection: []
+						dataCollection: [],
+						indicators: {}
 					});
 				}
 				else
@@ -98,7 +103,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/form-edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
-			master: function($route, mtDatabase) {
+			project: function($route, mtDatabase) {
 				return mtDatabase.get($route.current.params.projectId);
 			}
 		}
@@ -190,21 +195,9 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
 		resolve: {
-			indicatorHierarchy: 'indicatorHierarchy',
-			typesById: function(mtDatabase) {
-				return mtDatabase.query('monitool/by_type', {key: 'type', include_docs: true}).then(function(result) {
-					var types = {};
-					result.rows.forEach(function(row) { return types[row.id] = row.doc; });
-					return types;
-				});
-			},
-			themesById: function(mtDatabase) {
-				return mtDatabase.query('monitool/by_type', {key: 'theme', include_docs: true}).then(function(result) {
-					var themes = {};
-					result.rows.forEach(function(row) { return themes[row.id] = row.doc; });
-					return themes;
-				});
-			}
+			indicatorHierarchy: function(mtFetch) { return mtFetch.indicatorHierarchy(); },
+			typesById: function(mtFetch) { return mtFetch.typesById(); },
+			themesById: function(mtFetch) { return mtFetch.themesById(); }
 		}
 	});
 
