@@ -5,6 +5,15 @@
 
 	<div class="col-md-10">
 		
+		Trier par:
+		<select id="sort-input" ng-model="orderField">
+			<option value="name">Ordre alphabétique</option>
+			<option value="-input">Nombre de saisies</option>
+			<option value="-main">Nombre de projets</option>
+		</select>
+
+		<br/><br/>
+
 		<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in hierarchy">
 			<div class="indicator-header" ng-click="open1 = !open1">
 				<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
@@ -17,9 +26,9 @@
 					{{types[typeId].name || 'Sans type'}}
 				</div>
 
-				<div class="indicator-level-3" ng-repeat="indicator in indicators" ng-if="open2">
+				<div class="indicator-level-3" ng-repeat="indicator in indicators | orderBy:orderField" ng-if="open2">
 					<span class="color" ng-class="{green: indicator.standard}"></span>
-					<span class="name">{{indicator.name}} ({{indicator.main}} suivis, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
+					<span class="name">{{indicator.name}} ({{indicator.main}} projets, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
 					<a href="#indicators/{{indicator._id}}">Éditer</a>
 				</div>
 			</div>

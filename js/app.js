@@ -159,7 +159,29 @@ app.config(function($routeProvider) {
 		controller: 'ReportingController',
 		resolve: {
 			type: function() { return 'project'; },
-			entity: function($route, mtDatabase) {
+			project: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.projectId);
+			}
+		}
+	});
+
+	$routeProvider.when('/projects/:projectId/reporting/entity/:entityId', {
+		templateUrl: 'partials/projects/reporting.html',
+		controller: 'ReportingController',
+		resolve: {
+			type: function() { return 'entity'; },
+			project: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.projectId);
+			}
+		}
+	});
+
+	$routeProvider.when('/projects/:projectId/reporting/group/:groupId', {
+		templateUrl: 'partials/projects/reporting.html',
+		controller: 'ReportingController',
+		resolve: {
+			type: function() { return 'group'; },
+			project: function($route, mtDatabase) {
 				return mtDatabase.get($route.current.params.projectId);
 			}
 		}

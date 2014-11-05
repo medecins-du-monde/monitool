@@ -33,11 +33,10 @@
 		<script type="text/javascript" src="bower_components/angular-bootstrap-show-errors/src/showErrors.min.js"></script>
 		<script type="text/javascript" src="bower_components/moment/min/moment.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-moment/angular-moment.min.js"></script>
-
+		<script type="text/javascript" src="bower_components/javascript-state-machine/state-machine.min.js"></script>
 		<script type="text/javascript" src="bower_components/d3/d3.min.js"></script>
 		<script type="text/javascript" src="bower_components/nvd3/nv.d3.min.js"></script>
 		<script type="text/javascript" src="bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js"></script>
-
 
 		<script type="text/javascript" src="js/services.js"></script>
 		<script type="text/javascript" src="js/controllers.js"></script>
@@ -46,8 +45,8 @@
 	</head>
 	<body>
 
-		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-			<!-- <div class="container-fluid"> -->
+		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" ng-controller="MenuController">
+			<div class="container-fluid">
 				<div class="navbar-header">
 					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 						<span class="sr-only">Toggle navigation</span>
@@ -58,22 +57,38 @@
 				</div>
 
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav" ng-controller="MenuController">
+					<ul class="nav navbar-nav">
 						<li ng-class="{active: currentPage == 'projects'}">
 							<a ng-click="changePage('projects')">Projets</a>
 						</li>
 						<li ng-class="{active: currentPage == 'indicators'}">
 							<a ng-click="changePage('indicators')">Catalogue Indicateurs</a>
 						</li>
-						<li ng-class="{active: currentPage == 'sync'}">
-							<a ng-click="changePage('sync')">Synchronisation</a>
-						</li>
 						<li ng-class="{active: currentPage == 'help'}">
 							<a ng-click="changePage('help')">Aide</a>
 						</li>
 					</ul>
+					<ul class="nav navbar-nav navbar-right">
+
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								<i class="fa fa-circle" style="color: green"></i>
+								Mode connecté
+								<span class="caret"></span>
+							</a>
+
+							<ul class="dropdown-menu" role="menu">
+								<li>
+									<a href="#">
+										<i class="fa fa-circle" style="color: red"></i>
+										Passer en mode déconnecté
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
 				</div>
-			<!-- </div> -->
+			</div>
 		</nav>
 
 		<div class="container-fluid" ng-view style="padding-top: 70px;"></div>

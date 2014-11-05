@@ -36,6 +36,18 @@ mtServices.factory('mtDatabase', function(PouchDB) {
 });
 
 
+mtServices.factory('mtStatus', function() {
+	var fsm = StateMachine.create({
+		initial: 'green',
+		events: [
+			{ name: 'clear', from: 'yellow', to: 'green'  }
+		]
+	});
+
+
+
+})
+
 
 mtServices.factory('mtFetch', function(mtDatabase) {
 	var reformatArray = function(result) {

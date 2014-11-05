@@ -38,7 +38,14 @@ monitoolControllers.controller('SubMenuController', function($scope, $routeParam
 
 
 monitoolControllers.controller('ProjectListController', function($scope, $location, projects) {
-	$scope.projects = projects;
+	$scope.projects       = projects;
+	$scope.filterFinished = true;
+	$scope.now            = moment().format('YYYY-MM');
+	$scope.pred           = 'name'; // default sorting predicate
+
+	$scope.isFinished = function(project) {
+		return !$scope.filterFinished || project.end > $scope.now;
+	};
 
 	$scope.create = function() {
 		$location.url('/projects/new');
@@ -180,9 +187,13 @@ monitoolControllers.controller('ProjectLogicalFrameIndicatorController', functio
 });
 
 
-monitoolControllers.controller('ProjectInputEntitiesController', function($scope, project, mtDatabase) {
+monitoolControllers.controller('ProjectInputEntitiesController', function($scope, $location, project, mtDatabase) {
 	$scope.project = project;
 	$scope.master  = angular.copy(project);
+
+	$scope.stats = function(inputEntityId) {
+		$location.url('/projects/' + project._id + '/reporting/entity/' + inputEntityId);
+	};
 
 	$scope.delete = function(inputEntityId) {
 		var message = 'Si vous supprimez un lieu d\'activité vous perdrez toutes les saisies associées. Tapez "supprimer" pour confirmer';
@@ -216,9 +227,13 @@ monitoolControllers.controller('ProjectInputEntitiesController', function($scope
 });
 
 
-monitoolControllers.controller('ProjectInputGroupsController', function($scope, project, mtDatabase) {
+monitoolControllers.controller('ProjectInputGroupsController', function($scope, $location, project, mtDatabase) {
 	$scope.project = project;
 	$scope.master  = angular.copy(project);
+
+	$scope.stats = function(inputGroupId) {
+		$location.url('/projects/' + project._id + '/reporting/group/' + inputGroupId);
+	};
 
 	$scope.delete = function(inputEntityId) {
 		$scope.project.inputGroups = 
@@ -435,7 +450,7 @@ monitoolControllers.controller('ProjectInputController', function($scope, $route
 	$scope.fields  = Object.keys($scope.form.fields).map(function(fieldId) {
 		var field = $scope.form.fields[fieldId];
 		field.id = fieldId;
-		field.source = 'coucou<br/>coucou coucou coucou coucou coucou coucou'
+		field.source = 'Source: '
 		return field;
 	});
 
@@ -481,8 +496,8 @@ monitoolControllers.controller('ProjectUserListController', function($scope) {
 // 	{key:"some value 2", values:[["2014-01", 24], ["2014-02", 14], ["2014-03", 19], ["2014-04", 45], ["2014-05", 34], ["2014-06", 34]]},
 // ];
 
-monitoolControllers.controller('ReportingController', function($scope, type, entity, mtDatabase, mtIndicators) {
-	$scope.project = entity;
+monitoolControllers.controller('ReportingController', function($scope, $routeParams, type, project, mtDatabase, mtIndicators) {
+	$scope.project = project;
 
 	// Retrieve indicators
 	$scope.indicatorsById = {};
@@ -503,10 +518,16 @@ monitoolControllers.controller('ReportingController', function($scope, type, ent
 
 	// Retrieve inputs
 	$scope.updateData = function() {
-		mtIndicators.getProjectStats($scope.project, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
-			$scope.cols = mtIndicators.getProjectStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy);
-			$scope.data = data;
-		});
+		var data;
+		if (type === 'project')
+			data = mtIndicators.getProjectStats($scope.project, $scope.begin, $scope.end, $scope.groupBy);
+		else if (type === 'entity')
+			data = mtIndicators.getEntityStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $routeParams.entityId);
+		else if (type === 'group')
+			data = mtIndicators.getGroupStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $routeParams.groupId);
+
+		$scope.cols = mtIndicators.getProjectStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy);
+		data.then(function(data) { $scope.data = data; });
 	};
 
 	$scope.updateData();
@@ -519,9 +540,10 @@ monitoolControllers.controller('ReportingController', function($scope, type, ent
 
 
 monitoolControllers.controller('IndicatorListController', function($scope, $q, $location, indicatorHierarchy, typesById, themesById) {
-	$scope.hierarchy = indicatorHierarchy;
-	$scope.types     = typesById;
-	$scope.themes    = themesById;
+	$scope.hierarchy  = indicatorHierarchy;
+	$scope.types      = typesById;
+	$scope.themes     = themesById;
+	$scope.orderField = 'name';
 
 	$scope.create = function() {
 		$location.url('/indicators/new');

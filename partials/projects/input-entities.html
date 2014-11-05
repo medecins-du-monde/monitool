@@ -32,7 +32,7 @@
 							</ng-form>
 						</td>
 						<td>
-							<button class="btn btn-default btn-sm">Voir les statistiques</button>
+							<button class="btn btn-default btn-sm" ng-click="stats(inputEntity.id)">Voir les statistiques</button>
 							<button class="btn btn-danger btn-sm" ng-click="delete(inputEntity.id)">Supprimer</button>
 						</td>
 					</tr>
@@ -47,7 +47,7 @@
 			</table>
 
 			<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">Sauvegarder</button>
-			<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">Réinitialiser</button>
+			<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">Annuler les modifications</button>
 
 		</form>
 	</div>
