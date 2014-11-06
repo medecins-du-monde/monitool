@@ -192,7 +192,7 @@ monitoolControllers.controller('ProjectInputEntitiesController', function($scope
 	$scope.master  = angular.copy(project);
 
 	$scope.stats = function(inputEntityId) {
-		$location.url('/projects/' + project._id + '/reporting/entity/' + inputEntityId);
+		$location.url('/projects/' + project._id + '/input-entities/' + inputEntityId);
 	};
 
 	$scope.delete = function(inputEntityId) {
@@ -232,7 +232,7 @@ monitoolControllers.controller('ProjectInputGroupsController', function($scope, 
 	$scope.master  = angular.copy(project);
 
 	$scope.stats = function(inputGroupId) {
-		$location.url('/projects/' + project._id + '/reporting/group/' + inputGroupId);
+		$location.url('/projects/' + project._id + '/input-groups/' + inputGroupId);
 	};
 
 	$scope.delete = function(inputEntityId) {
@@ -399,8 +399,8 @@ monitoolControllers.controller('ProjectInputListController', function($scope, $l
 		project.dataCollection.forEach(function(form) {
 			var periods;
 			if (form.periodicity == 'monthly' || form.periodicity == 'quarterly') {
-				var current = moment(form.useProjectStart ? project.begin : form.begin),
-					end     = moment(form.useProjectEnd ? project.end : project.end);
+				var current = moment(form.useProjectStart ? project.begin : form.begin, 'YYYY-MM'),
+					end     = moment(form.useProjectEnd ? project.end : project.end, 'YYYY-MM');
 
 				if (end.isAfter()) // do not allow to go in the future
 					end = moment();
@@ -518,15 +518,21 @@ monitoolControllers.controller('ReportingController', function($scope, $routePar
 
 	// Retrieve inputs
 	$scope.updateData = function() {
+		$scope.entity = $scope.group = null;
+
 		var data;
 		if (type === 'project')
 			data = mtIndicators.getProjectStats($scope.project, $scope.begin, $scope.end, $scope.groupBy);
-		else if (type === 'entity')
+		else if (type === 'entity') {
 			data = mtIndicators.getEntityStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $routeParams.entityId);
-		else if (type === 'group')
+			$scope.entity = $scope.project.inputEntities.filter(function(e) { return e.id == $routeParams.entityId; })[0];
+		}
+		else if (type === 'group') {
 			data = mtIndicators.getGroupStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $routeParams.groupId);
+			$scope.group = $scope.project.inputGroups.filter(function(g) { return g.id == $routeParams.groupId; })[0];
+		}
 
-		$scope.cols = mtIndicators.getProjectStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy);
+		$scope.cols = mtIndicators.getStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy, type, $routeParams[type=='group'?'groupId':'entityId']);
 		data.then(function(data) { $scope.data = data; });
 	};
 

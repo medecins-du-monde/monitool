@@ -72,10 +72,32 @@ app.config(function($routeProvider) {
 		}
 	});
 
+	$routeProvider.when('/projects/:projectId/input-entities/:entityId', {
+		templateUrl: 'partials/projects/reporting.html',
+		controller: 'ReportingController',
+		resolve: {
+			type: function() { return 'entity'; },
+			project: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.projectId);
+			}
+		}
+	});
+
 	$routeProvider.when('/projects/:projectId/input-groups', {
 		templateUrl: 'partials/projects/input-groups.html',
 		controller: 'ProjectInputGroupsController',
 		resolve: {
+			project: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.projectId);
+			}
+		}
+	});
+
+	$routeProvider.when('/projects/:projectId/input-groups/:groupId', {
+		templateUrl: 'partials/projects/reporting.html',
+		controller: 'ReportingController',
+		resolve: {
+			type: function() { return 'group'; },
 			project: function($route, mtDatabase) {
 				return mtDatabase.get($route.current.params.projectId);
 			}
@@ -164,29 +186,6 @@ app.config(function($routeProvider) {
 			}
 		}
 	});
-
-	$routeProvider.when('/projects/:projectId/reporting/entity/:entityId', {
-		templateUrl: 'partials/projects/reporting.html',
-		controller: 'ReportingController',
-		resolve: {
-			type: function() { return 'entity'; },
-			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
-			}
-		}
-	});
-
-	$routeProvider.when('/projects/:projectId/reporting/group/:groupId', {
-		templateUrl: 'partials/projects/reporting.html',
-		controller: 'ReportingController',
-		resolve: {
-			type: function() { return 'group'; },
-			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
-			}
-		}
-	});
-
 
 	$routeProvider.when('/projects/:projectId/users', {
 		templateUrl: 'partials/projects/user-list.html',

@@ -20,6 +20,8 @@
 			<li><a href="#projects">Projets</a></li>
 			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
 			<li class="active">Statistiques</li>
+			<li class="active" ng-if="group">Groupe d'activité: {{group.name}}</li>
+			<li class="active" ng-if="entity">Lieu d'activité: {{entity.name}}</li>
 		</ol>
 
 		<form class="form-horizontal well well-sm" novalidate>
@@ -55,8 +57,7 @@
 				<div class="col-sm-10">
 					<select class="form-control" id="display-input" ng-model="display">
 						<option value="display">Valeurs</option>
-						<option value="totalPart">Pourcentage du total</option>
-						<option value="targetPart">Pourcentage de l'objectif</option>
+						<option value="targetPart">Pourcentage de la cible</option>
 						<option value="baselinePart">Pourcentage de la baseline</option>
 					</select>
 				</div>
@@ -91,12 +92,11 @@
 				<tr>
 					<th></th>
 					<th ng-repeat="col in cols">{{col.name || col}}</th>
-					<th>Total</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr class="small">
-					<td colspan="{{cols.length + 2}}">
+					<td colspan="{{cols.length + 1}}">
 						OG: {{project.logicalFrame.goal}}
 					</td>
 				</tr>
@@ -107,14 +107,11 @@
 					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
 						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
 					</td>
-					<td ng-style="colorize && {'background-color': data.total[indicatorId].color}">
-						{{data.total[indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
-					</td>
 				</tr>
 			</tbody>
 			<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
 				<tr class="small">
-					<td colspan="{{cols.length + 2}}">
+					<td colspan="{{cols.length + 1}}">
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						<a ng-click="purposeOpen=!purposeOpen">
 							<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
@@ -129,14 +126,11 @@
 					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
 						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
 					</td>
-					<td ng-style="colorize && {'background-color': data.total[indicatorId].color}">
-						{{data.total[indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
-					</td>
 				</tr>
 			</tbody>
 			<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
 				<tr class="small">
-					<td colspan="{{cols.length + 2}}">
+					<td colspan="{{cols.length + 1}}">
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 						<a ng-click="outputOpen=!outputOpen">
 							<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
@@ -150,9 +144,6 @@
 					</td>
 					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
 						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
-					</td>
-					<td ng-style="colorize && {'background-color': data.total[indicatorId].color}">
-						{{data.total[indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
 					</td>
 				</tr>
 			</tbody>

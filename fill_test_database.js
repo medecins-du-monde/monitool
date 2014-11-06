@@ -138,6 +138,28 @@ var data = {
 					}.toString()
 				},
 
+				'inputs_by_entity_year_month': {
+					"map": function(doc) {
+						if (doc.type === 'input') {
+							var p = doc.period.split('-');
+							emit([doc.entity, p[0], p[1]], doc.indicators);
+						}
+					}.toString(),
+
+					"reduce": function(keys, values, rereduce) {
+						var memo = {}, numValues = values.length;
+						for (var i = 0; i < numValues; ++i) {
+							var value = values[i];
+							for (var key in value)
+								if (memo[key])
+									memo[key] += value[key];
+								else
+									memo[key] = value[key];
+						}
+						return memo;
+					}.toString()
+				},
+
 				"types_short": {
 					"map": function(doc) {
 						if (doc.type === 'indicator')
