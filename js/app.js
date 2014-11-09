@@ -241,6 +241,19 @@ app.config(function($routeProvider) {
 		}
 	});
 
+	$routeProvider.when('/indicators/:indicatorId/reporting', {
+		templateUrl: 'partials/indicators/reporting.html',
+		controller: 'IndicatorReportingController',
+		resolve: {
+			indicator: function($route, mtDatabase) {
+				return mtDatabase.get($route.current.params.indicatorId);
+			},
+			projects: function($route, mtFetch) {
+				return mtFetch.projectsByIndicator($route.current.params.indicatorId);
+			}
+		}
+	});
+
 	$routeProvider.when('/themes', {
 		templateUrl: 'partials/indicators/theme-list.html',
 		controller: 'ThemeListController',

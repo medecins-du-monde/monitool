@@ -30,6 +30,7 @@
 					<span class="color" ng-class="{green: indicator.standard}"></span>
 					<span class="name">{{indicator.name}} ({{indicator.main}} projets, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
 					<a href="#indicators/{{indicator._id}}">Éditer</a>
+					<a href="#indicators/{{indicator._id}}/reporting" ng-if="indicator.main">Statistiques</a>
 				</div>
 			</div>
 		</div>

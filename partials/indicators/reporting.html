@@ -1,0 +1,137 @@
+<style>
+	table {
+		font-size: 12px;
+	}
+	.small {
+		font-size: 12px;
+		font-weight: bold;
+		line-height: 12px;
+	}
+</style>
+
+<div class="row">
+	<div class="col-md-2">
+		<ng-include src="'partials/indicators/menu.html'"></ng-include>
+	</div>
+
+	<div class="col-md-10">
+
+		<ol class="breadcrumb">
+			<li><a href="#indicators">Catalogue Indicateurs</a></li>
+			<li><a href="#indicators/{{indicator._id}}">{{indicator.name}}</a></li>
+			<li class="active">Statistiques</li>
+		</ol>
+
+		<form class="form-horizontal well well-sm" novalidate>
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label">Date de début</label>
+				<div class="col-sm-10">
+					<input type="month" class="form-control" ng-model="begin" ng-change="updateData()" required />
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label">Date de fin</label>
+				<div class="col-sm-10">
+					<input type="month" class="form-control" ng-model="end" ng-change="updateData()" required />
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="group-by-input" class="col-sm-2 control-label">Colonnes</label>
+				<div class="col-sm-10">
+					<select class="form-control" id="group-by-input" ng-model="groupBy" ng-change="updateData()">
+						<option value="month">Mois</option>
+						<option value="year">Année</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="display-input" class="col-sm-2 control-label">Afficher</label>
+				<div class="col-sm-10">
+					<select class="form-control" id="display-input" ng-model="display">
+						<option value="display">Valeurs</option>
+						<option value="targetPart">Pourcentage de la cible</option>
+						<option value="baselinePart">Pourcentage de la baseline</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="colorize-input" class="col-sm-2 control-label">Colorer</label>
+				<div class="col-sm-10">
+					<p class="form-control-static">
+						<input type="checkbox" id="colorize-input" ng-model="colorize" />
+					</p>
+				</div>
+			</div>
+		</form>
+
+<!--
+	<div class="well well-sm">
+		<nvd3-multi-bar-chart
+			data="reportingData"
+			id="showControlsExample"
+			showXAxis="true"
+			showYAxis="true"
+			width="800"
+			height="300">
+
+			<svg style="width: 100%; height:300px;"></svg>
+			
+		</nvd3-multi-bar-chart>
+	</div>
+-->
+
+		<table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
+			<thead>
+				<tr>
+					<th></th>
+					<th ng-repeat="col in cols">{{col.name}}</th>
+				</tr>
+			</thead>
+			<tbody ng-repeat="project in projects" ng-init="projectOpen=true;">
+				<tr class="small">
+					<td>
+						<a ng-click="projectOpen=!projectOpen">
+							<i class="fa" ng-class="{'fa-minus-circle': projectOpen, 'fa-plus-circle': !projectOpen}"></i>
+							{{project.name}}
+						</a>
+					</td>
+					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][project._id].color}">
+						<span ng-switch="display">
+							<span ng-switch-when="display" ng-if="data[col.id][project._id].value !== undefined">
+								{{data[col.id][project._id].value}}{{indicator.unit}}
+							</span>
+							<span ng-switch-when="targetPart" ng-if="data[col.id][project._id].targetPart !== undefined">
+								{{data[col.id][project._id].targetPart}}%
+							</span>
+							<span ng-switch-when="baselinePart" ng-if="data[col.id][project._id].baselinePart !== undefined">
+								{{data[col.id][project._id].baselinePart}}%
+							</span>
+						</span>
+					</td>
+				</tr>
+				<tr ng-repeat="inputEntity in project.inputEntities" ng-if="projectOpen">
+					<td>
+						&nbsp;&nbsp;&nbsp;&nbsp;{{inputEntity.name}}
+					</td>
+					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][inputEntity._id].color}">
+						<span ng-switch="display">
+							<span ng-switch-when="display" ng-if="data[col.id][inputEntity._id].value !== undefined">
+								{{data[col.id][inputEntity._id].value}}{{indicator.unit}}
+							</span>
+							<span ng-switch-when="targetPart" ng-if="data[col.id][inputEntity._id].targetPart !== undefined">
+								{{data[col.id][inputEntity._id].targetPart}}%
+							</span>
+							<span ng-switch-when="baselinePart" ng-if="data[col.id][inputEntity._id].baselinePart !== undefined">
+								{{data[col.id][inputEntity._id].baselinePart}}%
+							</span>
+						</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

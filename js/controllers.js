@@ -649,6 +649,30 @@ monitoolControllers.controller('IndicatorEditController', function($scope, $rout
 });
 
 
+monitoolControllers.controller('IndicatorReportingController', function($scope, indicator, projects, mtIndicators) {
+	$scope.indicator = indicator;
+	$scope.projects = projects;
+
+	$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM');
+	$scope.end     = moment().format('YYYY-MM');
+	$scope.groupBy = 'month';
+	$scope.display = 'display'
+
+	if ($scope.end > moment().format('YYYY-MM'))
+		$scope.end = moment().format('YYYY-MM');
+
+	// Retrieve inputs
+	$scope.updateData = function() {
+		$scope.cols = mtIndicators.getStatsColumns(null, $scope.begin, $scope.end, $scope.groupBy, null, null);
+
+		mtIndicators.getIndicatorStats($scope.indicator, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
+			$scope.data = data;
+		});
+	};
+
+	$scope.updateData();
+});
+
 /**
  * this controller and theme controller are the same, factorize it!
  */

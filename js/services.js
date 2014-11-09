@@ -96,6 +96,11 @@ mtServices.factory('mtFetch', function(mtDatabase) {
 		projects: function() {
 			return mtDatabase.query('monitool/projects_short').then(reformatArray);
 		},
+		projectsByIndicator: function(indicatorId) {
+			return mtDatabase.query('monitool/projects_by_indicator', {key: indicatorId, include_docs: true}).then(function(result) {
+				return result.rows.map(function(row) { return row.doc; });
+			});
+		},
 		indicators: function() {
 			return mtDatabase.query('monitool/indicators_short', {group: true}).then(reformatArray);
 		},
@@ -413,12 +418,19 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		});
 	};
 
+	var getIndicatorStats = function(indicator, begin, end, groupBy) {
+		begin = moment(begin, 'YYYY-MM');
+		end   = moment(end, 'YYYY-MM');
+
+		return $q.when({});
+	};
 
 	return {
 		getStatsColumns: getStatsColumns,
 		getProjectStats: getProjectStats,
 		getGroupStats: getGroupStats,
-		getEntityStats: getEntityStats
+		getEntityStats: getEntityStats,
+		getIndicatorStats: getIndicatorStats
 	};
 });
 
