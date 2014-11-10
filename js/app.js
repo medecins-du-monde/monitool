@@ -9,8 +9,17 @@ var app = angular.module('MonitoolApp', [
 
 app.config(function($routeProvider) {
 
+	$routeProvider.when('/offline-fail', {
+		templateUrl: 'partials/workflow/offline-fail.html'
+	});
+
+	$routeProvider.when('/login', {
+		controller: 'LoginController',
+		templateUrl: 'partials/workflow/login.html'
+	});
+
 	$routeProvider.when('/help', {
-		redirectTo: '/help/monitoring'
+		redirectTo: 'partials/help/monitoring.html'
 	});
 
 	$routeProvider.when('/help/monitoring', {
@@ -19,11 +28,6 @@ app.config(function($routeProvider) {
 
 	$routeProvider.when('/help/documentation', {
 		templateUrl: 'partials/help/documentation.html'
-	});
-
-
-	$routeProvider.when('/sync', {
-		templateUrl: 'partials/sync.html'
 	});
 
 	///////////////////////////
@@ -57,7 +61,7 @@ app.config(function($routeProvider) {
 					});
 				}
 				else
-					return mtDatabase.get($route.current.params.projectId);
+					return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -67,7 +71,7 @@ app.config(function($routeProvider) {
 		controller: 'ProjectInputEntitiesController',
 		resolve: {
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -78,7 +82,7 @@ app.config(function($routeProvider) {
 		resolve: {
 			type: function() { return 'entity'; },
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -88,7 +92,7 @@ app.config(function($routeProvider) {
 		controller: 'ProjectInputGroupsController',
 		resolve: {
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -99,7 +103,7 @@ app.config(function($routeProvider) {
 		resolve: {
 			type: function() { return 'group'; },
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -109,7 +113,7 @@ app.config(function($routeProvider) {
 		controller: 'ProjectFormsController',
 		resolve: {
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -119,7 +123,7 @@ app.config(function($routeProvider) {
 		controller: 'ProjectFormEditionController',
 		resolve: {
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -129,7 +133,7 @@ app.config(function($routeProvider) {
 		controller: 'ProjectUserListController',
 		resolve: {
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -139,7 +143,7 @@ app.config(function($routeProvider) {
 		controller: 'ProjectInputListController',
 		resolve: {
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			},
 			inputs: function($route, mtDatabase) {
 				return mtDatabase.allDocs({
@@ -159,13 +163,13 @@ app.config(function($routeProvider) {
 		controller: 'ProjectInputController',
 		resolve: {
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			},
 			input: function($route, mtDatabase) {
 				var p  = $route.current.params,
 					id = [p.projectId, p.entityId, p.period, p.formId].join(':');
 
-				return mtDatabase.get(id).catch(function(error) {
+				return mtDatabase.current.get(id).catch(function(error) {
 					return {
 						_id: id, type: 'input',
 						project: p.projectId, entity: p.entityId, form: p.formId, period: p.period,
@@ -182,7 +186,7 @@ app.config(function($routeProvider) {
 		resolve: {
 			type: function() { return 'project'; },
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -192,7 +196,7 @@ app.config(function($routeProvider) {
 		controller: 'ProjectUserListController',
 		resolve: {
 			project: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.projectId);
+				return mtDatabase.current.get($route.current.params.projectId);
 			}
 		}
 	});
@@ -233,7 +237,7 @@ app.config(function($routeProvider) {
 						formulas: {}
 					});
 				else
-					return mtDatabase.get($route.current.params.indicatorId);
+					return mtDatabase.current.get($route.current.params.indicatorId);
 			},
 			indicators: function(mtFetch) { return mtFetch.indicators(); },
 			types: function(mtFetch) { return mtFetch.types(); },
@@ -246,7 +250,7 @@ app.config(function($routeProvider) {
 		controller: 'IndicatorReportingController',
 		resolve: {
 			indicator: function($route, mtDatabase) {
-				return mtDatabase.get($route.current.params.indicatorId);
+				return mtDatabase.current.get($route.current.params.indicatorId);
 			},
 			projects: function($route, mtFetch) {
 				return mtFetch.projectsByIndicator($route.current.params.indicatorId);

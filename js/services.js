@@ -1,52 +1,130 @@
 "use strict";
 
-var mtServices = angular.module('MonitoolServices', ['pouchdb']);
-
+var mtServices = angular.module('MonitoolServices', ['pouchdb']),
+	LOCAL_DB   = 'monitool2',
+	REMOTE_DB  = 'http://localhost:5984/monitool';
 
 mtServices.factory('mtDatabase', function(PouchDB) {
-	var r = {};
-	r.remote  = new PouchDB('http://localhost:5984/monitool', {adapter: 'http'});
-	r.local   = new PouchDB('monitool');
-	r.current = r.remote;
-
-	r.getOfflineProjects = function() {
-		return r.local.get('_local/offline');
+	return {
+		local: new PouchDB(LOCAL_DB),
+		remote: new PouchDB(REMOTE_DB, {adapter: 'http', ajax: {cache: true}})
 	};
-
-	r.setOfflineProjects = function(newProjects) {
-		return r.local.get('_local/offline').then(function(currentProjects) {
-			var toAdd = [], toRemove = [];
-
-			currentProjects.sort();
-			newProjects.sort();
-
-			return r.local.set(newProjects);
-		});
-	};
-
-	// var db = new PouchDB('monitool');
-	// db.sync('http://localhost:5984/monitool', {live: true}).then(function(hello) {
-	// 	console.log(hello);
-	// }).catch(function(error) {
-	// 	console.log(error)
-	// });
-	// return db;
-
-	return r.remote;
 });
 
+mtServices.factory('mtStatus', function($q, mtDatabase) {
 
-mtServices.factory('mtStatus', function() {
 	var fsm = StateMachine.create({
-		initial: 'green',
+		initial: "Init",
+		states: [
+			"Init",
+
+			"OfflineFail",
+			"OnlineOnly",
+			"InitialSync",
+			"Synced",
+
+			"ProjectDownload",
+			"Offline",
+			"Resync",
+			"Conflicted"
+		],
 		events: [
-			{ name: 'clear', from: 'yellow', to: 'green'  }
-		]
+			{ name: "initFail", from: "Init", to: "OfflineFail"},
+			{ name: "initOffline", from: "Init", to: "Offline"},
+			{ name: "initOnline", from: "Init", to: "OnlineOnly"},
+			{ name: "initResync", from: "Init", to: "Resync"},
+
+			{ name: "dirtyConnect", from: "OfflineFail", to: "OnlineOnly" },
+			{ name: "enableOffline", from: "OnlineOnly", to: "InitialSync" },
+			{ name: "dirtyDisconnect", from: ["InitialSync", "OnlineOnly"], to: "OfflineFail" },
+
+			{ name: "initialSyncDone", from: "InitialSync", to: "Synced" },
+			{ name: "addProject", from: "Synced", to: "ProjectDownload" },
+			{ name: "addProjectDone", from: "ProjectDownload", to: "Synced" },
+			{ name: "cleanDisconnect", from: ["Synced", "ProjectDownload"], to: "Offline"},
+
+			{ name: "cleanConnect", from: "Offline", to: "Resync"},
+			{ name: "resyncDone", from: "Resync", to: "Synced"},
+			{ name: "resyncConflict", from: "Resync", to: "Conflicted"},
+			{ name: "conflictResolve", from: "Conflicted", to: "Synced"},
+		],
+		callbacks: {
+			onenterOfflineFail: function() {
+				// // check every second if we can connect
+				// var checkConnectivity = function() {
+				// 	return mtDatabase.remote.info()
+				// 		.then(function(info) {
+				// 			fsm.dirtyConnect();
+				// 		})
+				// 		.catch(function(error) {
+				// 			setTimeout(checkConnectivity, 1000);
+				// 			return false;
+				// 		});
+				// };
+
+				// checkConnectivity();
+			},
+
+			onenterOnlineOnly: function() {
+				mtDatabase.current = mtDatabase.remote;
+				// start up application!!
+			},
+
+			onenterInitialSync: function() {
+				mtDatabase.local.put({_id: '_local/projects', projects: []}).then(function() {
+					var replication = PouchDB.replicate(REMOTE_DB, LOCAL_DB, {filter: "monitool/offline"})
+						// destroy local database and disconnect if the replication fails.
+						// we could try to resume as it should work but well...
+						.on('error', function() {
+							PouchDB.destroy(LOCAL_DB);
+							mtDatabase.local = new PouchDB(LOCAL_DB);
+							fsm.dirtyDisconnect();
+							console.log('fail')
+						})
+
+						// if the replication worked, we are done
+						.on('complete', function() {
+							mtDatabase.local.put({_id: '_local/status'}).then(function() {
+								fsm.initialSyncDone();
+							});
+						});
+				})
+			},
+
+			onenterSynced: function() {
+				mtDatabase.local.get('_local/projects').then(function(projectIds) {
+					var repOptions = {live: true, filter: "monitool/offline", queryParams: {projects: projectIds}};
+
+					PouchDB.replicate(REMOTE_DB, LOCAL_DB, repOptions)
+						// when there is a replication error, assume that we have disconnected
+						.on('error', function(error) {
+							fsm.cleanDisconnect();
+							mtDatabase.current = mtDatabase.local;
+						});
+				});
+			},
+
+			onenterProjectDownload: function() {
+
+			},
+
+			onenterOffline: function() {
+				mtDatabase.current = mtDatabase.local;
+			},
+
+			onenterResync: function() {
+
+			},
+
+			onenterConflicted: function() {
+
+			},
+
+		}
 	});
 
-
-
-})
+	return fsm;
+});
 
 
 mtServices.factory('mtFetch', function(mtDatabase) {
@@ -63,9 +141,13 @@ mtServices.factory('mtFetch', function(mtDatabase) {
 		return types;
 	};
 
+	var handleError = function(error) {
+		console.log(error)
+	}
+
 	return {
 		indicatorHierarchy: function(forbiddenIds) {
-			return mtDatabase.query('monitool/indicators_short', {group: true}).then(function(result) {
+			return mtDatabase.current.query('monitool/indicators_short', {group: true}).then(function(result) {
 				var hierarchy = {};
 
 				result.rows.forEach(function(row) {
@@ -94,27 +176,27 @@ mtServices.factory('mtFetch', function(mtDatabase) {
 		},
 		
 		projects: function() {
-			return mtDatabase.query('monitool/projects_short').then(reformatArray);
+			return mtDatabase.current.query('monitool/projects_short').then(reformatArray).catch(handleError);
 		},
 		projectsByIndicator: function(indicatorId) {
-			return mtDatabase.query('monitool/projects_by_indicator', {key: indicatorId, include_docs: true}).then(function(result) {
+			return mtDatabase.current.query('monitool/projects_by_indicator', {key: indicatorId, include_docs: true}).then(function(result) {
 				return result.rows.map(function(row) { return row.doc; });
 			});
 		},
 		indicators: function() {
-			return mtDatabase.query('monitool/indicators_short', {group: true}).then(reformatArray);
+			return mtDatabase.current.query('monitool/indicators_short', {group: true}).then(reformatArray);
 		},
 		themes: function() {
-			return mtDatabase.query('monitool/themes_short', {group: true}).then(reformatArray);
+			return mtDatabase.current.query('monitool/themes_short', {group: true}).then(reformatArray);
 		},
 		types: function() {
-			return mtDatabase.query('monitool/types_short', {group: true}).then(reformatArray);
+			return mtDatabase.current.query('monitool/types_short', {group: true}).then(reformatArray);
 		},
 		typesById: function() {
-			return mtDatabase.query('monitool/types_short', {group: true}).then(reformatHashById);
+			return mtDatabase.current.query('monitool/types_short', {group: true}).then(reformatHashById);
 		},
 		themesById: function() {
-			return mtDatabase.query('monitool/themes_short', {group: true}).then(reformatHashById);
+			return mtDatabase.current.query('monitool/themes_short', {group: true}).then(reformatHashById);
 		},
 	};
 });
@@ -305,7 +387,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		else if (groupBy === 'entity' || groupBy === 'group')
 			options.group_level = 4;
 
-		return mtDatabase.query(view, options).then(function(result) {
+		return mtDatabase.current.query(view, options).then(function(result) {
 			// regroup db results if needed
 			var regrouped = {};
 			if (groupBy === 'entity' || groupBy === 'group') {
@@ -345,7 +427,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		else if (groupBy === 'entity' || groupBy === 'group')
 			options.group_level = 0;
 
-		return mtDatabase.query(view, options).then(function(result) {
+		return mtDatabase.current.query(view, options).then(function(result) {
 			var regrouped = {};
 			if (groupBy === 'year')
 				result.rows.forEach(function(row) { regrouped[row.key[1]] = row.value; });
@@ -379,7 +461,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 				group_level: 4
 			};
 
-		return mtDatabase.query(view, options).then(function(result) {
+		return mtDatabase.current.query(view, options).then(function(result) {
 			var regrouped = {};
 			var curGroup = project.inputGroups.filter(function(g) { return g.id === entityGroupId; })[0];
 

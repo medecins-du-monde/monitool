@@ -12,7 +12,35 @@ var monitoolControllers = angular.module(
 );
 
 
-monitoolControllers.controller('MenuController', function($scope, $location) {
+monitoolControllers.controller('LoginController', function($scope, $location, mtDatabase, mtStatus) {
+	$scope.tryLogin = function() {
+		console.log(mtDatabase.remote)
+
+		mtDatabase.remote.login($scope.login, $scope.password).then(function(user) {
+			$scope.userInfo.name = user.lastname;
+
+		}).catch(function(error) {
+			console.log('login failed')
+		});
+	};
+});
+
+
+monitoolControllers.controller('MenuController', function($scope, $location, mtDatabase, mtStatus) {
+	// Application startup
+	$location.url('/');
+
+	// Try to log user in from local credentials
+	$scope.userInfo = {};
+	mtDatabase.local.get('_local/credentials').then(function(cred) {
+		return mtDatabase.remote.login(cred.login, cred.password);
+	}).then(function(user) {
+		$scope.userInfo.name = user.lastname;
+	}).catch(function(error) {
+		$location.url('login');
+	});
+
+
 	$scope.currentPage = $location.path().split('/')[1];
 
 	$scope.changePage = function(page) {
@@ -32,10 +60,10 @@ monitoolControllers.controller('SubMenuController', function($scope, $routeParam
 	};
 });
 
+
 ///////////////////////////
 // Project
 ///////////////////////////
-
 
 monitoolControllers.controller('ProjectListController', function($scope, $location, projects) {
 	$scope.projects       = projects;
@@ -57,7 +85,7 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 	$scope.project = project;
 	$scope.master = angular.copy(project);
 
-	mtDatabase.allDocs({include_docs: true, keys: Object.keys(project.indicators)}).then(function(result) {
+	mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(project.indicators)}).then(function(result) {
 		$scope.indicatorsById = {};
 		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
 	});
@@ -86,7 +114,7 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 			if (result.action === 'add')
 				target.push(result.indicatorId);
 
-			mtDatabase.get(result.indicatorId).then(function(indicator) {
+			mtDatabase.current.get(result.indicatorId).then(function(indicator) {
 				$scope.indicatorsById[indicator._id] = indicator;
 			});
 		});
@@ -128,7 +156,7 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 		if ($routeParams.projectId === 'new')
 			$scope.project._id = PouchDB.utils.uuid().toLowerCase();
 
-		mtDatabase.put($scope.project).then(function(result) {
+		mtDatabase.current.put($scope.project).then(function(result) {
 			$scope.project._rev = result.rev;
 			$scope.master = angular.copy($scope.project);
 
@@ -160,7 +188,7 @@ monitoolControllers.controller('ProjectLogicalFrameIndicatorController', functio
 			$scope.themes = result[2];
 		});
 	else
-		mtDatabase.get(indicatorId).then(function(indicator) {
+		mtDatabase.current.get(indicatorId).then(function(indicator) {
 			$scope.container.indicator = indicator;
 		});
 
@@ -209,7 +237,7 @@ monitoolControllers.controller('ProjectInputEntitiesController', function($scope
 	};
 
 	$scope.save = function() {
-		mtDatabase.put($scope.project).then(function(result) {
+		mtDatabase.current.put($scope.project).then(function(result) {
 			$scope.project._rev = result.rev;
 			$scope.master = angular.copy($scope.project);
 		}).catch(function(error) {
@@ -245,7 +273,7 @@ monitoolControllers.controller('ProjectInputGroupsController', function($scope, 
 	};
 
 	$scope.save = function() {
-		mtDatabase.put($scope.project).then(function(result) {
+		mtDatabase.current.put($scope.project).then(function(result) {
 			$scope.project._rev = result.rev;
 			$scope.master = angular.copy($scope.project);
 		}).catch(function(error) {
@@ -335,13 +363,13 @@ monitoolControllers.controller('ProjectFormEditionController', function($scope, 
 				toLoad.push(indicatorId);
 			}
 		}
-		mtDatabase.allDocs({include_docs: true, keys: toLoad}).then(function(result) {
+		mtDatabase.current.allDocs({include_docs: true, keys: toLoad}).then(function(result) {
 			result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
 		});
 	};
 
 	$scope.save = function() {
-		mtDatabase.put($scope.project).then(function(result) {
+		mtDatabase.current.put($scope.project).then(function(result) {
 			$scope.project._rev = result.rev;
 			$scope.master = angular.copy($scope.project);
 
@@ -385,7 +413,7 @@ monitoolControllers.controller('ProjectFormEditionController', function($scope, 
 	$scope.indicatorsById = {};
 	Object.keys($scope.project.indicators).forEach(function(id) { $scope.indicatorsById[id] = true; });
 	Object.keys($scope.form.fields).forEach(function(id) { $scope.indicatorsById[id] = true; });
-	mtDatabase.allDocs({include_docs: true, keys: Object.keys($scope.indicatorsById)}).then(function(result) {
+	mtDatabase.current.allDocs({include_docs: true, keys: Object.keys($scope.indicatorsById)}).then(function(result) {
 		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
 	});
 });
@@ -455,7 +483,7 @@ monitoolControllers.controller('ProjectInputController', function($scope, $route
 	});
 
 	$scope.indicatorsById = {};
-	mtDatabase.allDocs({include_docs: true, keys: Object.keys($scope.form.fields)}).then(function(result) {
+	mtDatabase.current.allDocs({include_docs: true, keys: Object.keys($scope.form.fields)}).then(function(result) {
 		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
 	});
 
@@ -479,7 +507,7 @@ monitoolControllers.controller('ProjectInputController', function($scope, $route
 	};
 
 	$scope.save = function() {
-		mtDatabase.put($scope.input).then(function() {
+		mtDatabase.current.put($scope.input).then(function() {
 			$location.url('projects/' + project._id + '/inputs');
 		});
 	};
@@ -501,7 +529,7 @@ monitoolControllers.controller('ReportingController', function($scope, $routePar
 
 	// Retrieve indicators
 	$scope.indicatorsById = {};
-	mtDatabase.allDocs({keys: Object.keys($scope.project.indicators), include_docs: true}).then(function(result) {
+	mtDatabase.current.allDocs({keys: Object.keys($scope.project.indicators), include_docs: true}).then(function(result) {
 		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
 	});
 
@@ -620,7 +648,7 @@ monitoolControllers.controller('IndicatorEditController', function($scope, $rout
 		if ($routeParams.indicatorId === 'new')
 			$scope.indicator._id = PouchDB.utils.uuid().toLowerCase();
 
-		mtDatabase.put($scope.indicator).then(function(result) {
+		mtDatabase.current.put($scope.indicator).then(function(result) {
 			$scope.indicator._rev = result.rev;
 			$scope.master = angular.copy($scope.indicator);
 
@@ -686,14 +714,14 @@ monitoolControllers.controller('TypeListController', function($scope, types, mtD
 		$scope.newType = '';
 		if (newType.name.length && !$scope.types.filter(function(type) { return type.name == newType.name; }).length) {
 			$scope.types.push(newType)
-			mtDatabase.put(newType);
+			mtDatabase.current.put(newType);
 		}
 	};
 
 	$scope.remove = function(type) {
 		$scope.types = $scope.types.filter(function(lType) { return lType !== type });
-		mtDatabase.get(type._id).then(function(type) {
-			mtDatabase.remove(type);
+		mtDatabase.current.get(type._id).then(function(type) {
+			mtDatabase.current.remove(type);
 		});
 	};
 });
@@ -709,14 +737,14 @@ monitoolControllers.controller('ThemeListController', function($scope, themes, m
 		$scope.newTheme = '';
 		if (newTheme.name.length && !$scope.themes.filter(function(theme) { return theme.name == newTheme.name; }).length) {
 			$scope.themes.push(newTheme)
-			mtDatabase.put(newTheme);
+			mtDatabase.current.put(newTheme);
 		}
 	};
 
 	$scope.remove = function(theme) {
 		$scope.themes = $scope.themes.filter(function(lTheme) { return lTheme !== theme });
-		mtDatabase.get(theme._id).then(function(theme) {
-			mtDatabase.remove(theme);
+		mtDatabase.current.get(theme._id).then(function(theme) {
+			mtDatabase.current.remove(theme);
 		})
 	};
 });

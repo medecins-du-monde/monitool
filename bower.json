@@ -27,6 +27,7 @@
     "angular-bootstrap-show-errors": "https://github.com/paulyoder/angular-bootstrap-show-errors.git#~2.0.0",
     "angular-moment": "~0.8.2",
     "angularjs-nvd3-directives": "~0.0.7",
-    "javascript-state-machine": "https://github.com/jakesgordon/javascript-state-machine.git#~2.3.3"
+    "javascript-state-machine": "https://github.com/jakesgordon/javascript-state-machine.git#~2.3.3",
+    "pouchdb-authentication": "~0.3.6"
   }
 }
