@@ -180,7 +180,7 @@ var data = [
 				}.toString()
 			},
 
-			// For statistics consultation
+			// For project by X stats and inputGroup by X stats
 			"inputs_by_project_year_month_entity": {
 				"map": function(doc) {
 					if (doc.type === 'input') {
@@ -203,6 +203,7 @@ var data = [
 				}.toString()
 			},
 
+			// For input entity by X stats
 			'inputs_by_entity_year_month': {
 				"map": function(doc) {
 					if (doc.type === 'input') {
@@ -223,8 +224,7 @@ var data = [
 					}
 					return memo;
 				}.toString()
-			},
-
+			}
 		}
 	},
 

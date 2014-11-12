@@ -14,8 +14,6 @@ var monitoolControllers = angular.module(
 
 monitoolControllers.controller('LoginController', function($scope, $location, mtDatabase, mtStatus) {
 	$scope.tryLogin = function() {
-		console.log(mtDatabase.remote)
-
 		mtDatabase.remote.login($scope.login, $scope.password).then(function(user) {
 			$scope.userInfo.name = user.lastname;
 
@@ -28,17 +26,17 @@ monitoolControllers.controller('LoginController', function($scope, $location, mt
 
 monitoolControllers.controller('MenuController', function($scope, $location, mtDatabase, mtStatus) {
 	// Application startup
-	$location.url('/');
+	// $location.url('/');
 
-	// Try to log user in from local credentials
-	$scope.userInfo = {};
-	mtDatabase.local.get('_local/credentials').then(function(cred) {
-		return mtDatabase.remote.login(cred.login, cred.password);
-	}).then(function(user) {
-		$scope.userInfo.name = user.lastname;
-	}).catch(function(error) {
-		$location.url('login');
-	});
+	// // Try to log user in from local credentials
+	// $scope.userInfo = {};
+	// mtDatabase.local.get('_local/credentials').then(function(cred) {
+	// 	return mtDatabase.remote.login(cred.login, cred.password);
+	// }).then(function(user) {
+	// 	$scope.userInfo.name = user.lastname;
+	// }).catch(function(error) {
+	// 	$location.url('login');
+	// });
 
 
 	$scope.currentPage = $location.path().split('/')[1];
@@ -536,7 +534,7 @@ monitoolControllers.controller('ReportingController', function($scope, $routePar
 	$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM');
 	$scope.end     = moment().format('YYYY-MM');
 	$scope.groupBy = 'month';
-	$scope.display = 'display'
+	$scope.display = 'value';
 
 	if ($scope.begin < $scope.project.begin)
 		$scope.begin = $scope.project.begin;
@@ -684,7 +682,7 @@ monitoolControllers.controller('IndicatorReportingController', function($scope, 
 	$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM');
 	$scope.end     = moment().format('YYYY-MM');
 	$scope.groupBy = 'month';
-	$scope.display = 'display'
+	$scope.display = 'value';
 
 	if ($scope.end > moment().format('YYYY-MM'))
 		$scope.end = moment().format('YYYY-MM');
@@ -693,13 +691,14 @@ monitoolControllers.controller('IndicatorReportingController', function($scope, 
 	$scope.updateData = function() {
 		$scope.cols = mtIndicators.getStatsColumns(null, $scope.begin, $scope.end, $scope.groupBy, null, null);
 
-		mtIndicators.getIndicatorStats($scope.indicator, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
+		mtIndicators.getIndicatorStats($scope.indicator, $scope.projects, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
 			$scope.data = data;
 		});
 	};
 
 	$scope.updateData();
 });
+
 
 /**
  * this controller and theme controller are the same, factorize it!

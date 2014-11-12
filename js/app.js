@@ -146,7 +146,7 @@ app.config(function($routeProvider) {
 				return mtDatabase.current.get($route.current.params.projectId);
 			},
 			inputs: function($route, mtDatabase) {
-				return mtDatabase.allDocs({
+				return mtDatabase.current.allDocs({
 					startkey: $route.current.params.projectId + ':',
 					endkey: $route.current.params.projectId + ':~'
 				}).then(function(result) {

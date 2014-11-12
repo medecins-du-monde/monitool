@@ -56,7 +56,7 @@
 				<label for="display-input" class="col-sm-2 control-label">Afficher</label>
 				<div class="col-sm-10">
 					<select class="form-control" id="display-input" ng-model="display">
-						<option value="display">Valeurs</option>
+						<option value="value">Valeurs</option>
 						<option value="targetPart">Pourcentage de la cible</option>
 						<option value="baselinePart">Pourcentage de la baseline</option>
 					</select>
@@ -104,8 +104,12 @@
 					<td>
 						{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
-						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
+						<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+							<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+							<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
+							<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
+						</span>
 					</td>
 				</tr>
 			</tbody>
@@ -123,8 +127,13 @@
 					<td>
 						&nbsp;&nbsp;&nbsp;&nbsp;{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
-						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+
+					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
+						<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+							<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+							<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
+							<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
+						</span>
 					</td>
 				</tr>
 			</tbody>
@@ -142,8 +151,12 @@
 					<td>
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{indicatorsById[indicatorId].name || 'Indicateur inconnu'}}
 					</td>
-					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][indicatorId].color}">
-						{{data[col.id][indicatorId][display]}}<span ng-if="display=='display'">{{indicatorsById[indicatorId].unit}}</span>
+					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
+						<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+							<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+							<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
+							<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
+						</span>
 					</td>
 				</tr>
 			</tbody>

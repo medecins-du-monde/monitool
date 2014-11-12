@@ -2,12 +2,16 @@
 
 var mtServices = angular.module('MonitoolServices', ['pouchdb']),
 	LOCAL_DB   = 'monitool2',
-	REMOTE_DB  = 'http://localhost:5984/monitool';
+	REMOTE_DB  = 'http://***REMOVED***:***REMOVED***@localhost:5984/monitool';
 
 mtServices.factory('mtDatabase', function(PouchDB) {
 	return {
+		current: new PouchDB(REMOTE_DB, {adapter: 'http', ajax: {cache: true}}),
+	};
+
+	return {
 		local: new PouchDB(LOCAL_DB),
-		remote: new PouchDB(REMOTE_DB, {adapter: 'http', ajax: {cache: true}})
+		remote: new PouchDB(REMOTE_DB, {adapter: 'http', ajax: {cache: true}}),
 	};
 });
 
@@ -203,59 +207,54 @@ mtServices.factory('mtFetch', function(mtDatabase) {
 
 mtServices.factory('mtIndicators', function($q, mtDatabase) {
 
-	var evaluateScope = function(form, scope) {
-		var values = null, newValues = angular.copy(scope);
+	var evaluateAll = function(project, regrouped) {
+		var evaluateScope = function(form, scope) {
+			var values = null, newValues = angular.copy(scope);
 
-		while (!angular.equals(values, newValues)) {
-			for (var indicatorId in form.fields) {
-				var field = form.fields[indicatorId];
+			while (!angular.equals(values, newValues)) {
+				for (var indicatorId in form.fields) {
+					var field = form.fields[indicatorId];
 
-				if (field && field.type === 'computed') {
-					var localScope = {};
-					for (var paramName in field.parameters)
-						localScope[paramName] = scope[field.parameters[paramName]] || 0;
-					scope[indicatorId] = math.eval(field.expression, localScope);
+					if (field && field.type === 'computed') {
+						var localScope = {};
+						for (var paramName in field.parameters)
+							localScope[paramName] = scope[field.parameters[paramName]] || 0;
+						scope[indicatorId] = math.eval(field.expression, localScope);
+					}
 				}
+				values    = newValues;
+				newValues = scope;
 			}
-			values    = newValues;
-			newValues = scope;
-		}
+		};
+
+		// compute indicators
+		var fakeForm = {fields:{}}; // wrong!
+		project.dataCollection.forEach(function(form) {
+			for (var key in form.fields)
+				fakeForm.fields[key] = form.fields[key];
+		});
+		for (var key in regrouped)
+			evaluateScope(fakeForm, regrouped[key]);
 	};
 
-	var reduce = function(values) {
-		var memo = {}, numValues = values.length;
-		for (var i = 0; i < numValues; ++i) {
-			var value = values[i];
-			for (var key in value)
-				if (memo[key])
-					memo[key] += value[key];
-				else
-					memo[key] = value[key];
-		}
-		return memo;
-	};
+	var regroup = function(rows, makeKeys) {
+		var result = {};
 
-	var group = function(rows, level) {
-		var newResult = {};
-
-		// group them
 		rows.forEach(function(row) {
-			var newKey = row.key.slice(0, level),
-				tmpKey = newKey.join('@');
-
-			if (!newResult[tmpKey])
-				newResult[tmpKey] = {key: newKey, values: []};
-
-			newResult[tmpKey].values.push(row.value);
+			makeKeys(row.key).forEach(function(key) {
+				if (!result[key])
+					result[key] = row.value;
+				else
+					for (var indicatorId in row.value) {
+						if (result[key][indicatorId])
+							result[key][indicatorId] += row.value[indicatorId];
+						else
+							result[key][indicatorId] = row.value[indicatorId];
+					}
+			});
 		});
 
-		// reduce them
-		return Object.keys(newResult).map(function(tmpKey) {
-			return {
-				key: newResult[tmpKey].key,
-				value: reduce(newResult[tmpKey].values)
-			};
-		});
+		return result;
 	};
 
 	var getStatsColumns = function(project, begin, end, groupBy, type, id) {
@@ -298,42 +297,6 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			throw new Error('Invalid groupBy: ' + groupBy)
 	};
 
-	var computeTotal = function(regrouped) {
-		// compute total
-		var total = {};
-		for (var key in regrouped)
-			for (var indicatorId in regrouped[key])
-				if (total[indicatorId])
-					total[indicatorId] += regrouped[key][indicatorId];
-				else
-					total[indicatorId] = regrouped[key][indicatorId];
-
-		return total;
-	};
-
-	var processGroups = function(project, regrouped) {
-		var regrouped2 = {};
-
-		project.inputGroups.forEach(function(inputGroup) {
-			regrouped2[inputGroup.id] = reduce(inputGroup.members.map(function(entityId) {
-				return regrouped[entityId] || {};
-			}));
-		});
-
-		return regrouped2;
-	};
-
-	var evaluateAll = function(project, regrouped) {
-		// compute indicators
-		var fakeForm = {fields:{}}; // wrong!
-		project.dataCollection.forEach(function(form) {
-			for (var key in form.fields)
-				fakeForm.fields[key] = form.fields[key];
-		});
-		for (var key in regrouped)
-			evaluateScope(fakeForm, regrouped[key]);
-	};
-
 	var getTargetValue = function(period, targets) {
 		return NaN;
 	};
@@ -346,11 +309,9 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 
 			for (var indicatorId in regrouped[key]) {
 				var params   = project.indicators[indicatorId],
-					metadata = {value: regrouped[key][indicatorId]};
+					metadata = {value: Math.round(regrouped[key][indicatorId])};
 
 				// compute display value
-				metadata.display = Math.round(metadata.value);
-
 				if (params) {
 					metadata.baselinePart = Math.round(100 * metadata.value / params.baseline) + '%';
 					metadata.targetPart = Math.round(100 * metadata.value / getTargetValue());
@@ -375,37 +336,27 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		begin = moment(begin, 'YYYY-MM');
 		end   = moment(end, 'YYYY-MM');
 
-		var view    = 'monitool/inputs_by_project_year_month_entity',
-			options = {
-				startkey: [project._id, begin.format('YYYY'), begin.format('MM')],
-				endkey: [project._id, end.format('YYYY'), end.format('MM'), {}]};
+		var options = {
+			startkey: [project._id, begin.format('YYYY'), begin.format('MM')],
+			endkey: [project._id, end.format('YYYY'), end.format('MM'), {}],
+			group_level: {year: 2, month: 3, entity: 4, group: 4}[groupBy]
+		};
 
-		if (groupBy === 'year')
-			options.group_level = 2;
-		else if (groupBy === 'month')
-			options.group_level = 3;
-		else if (groupBy === 'entity' || groupBy === 'group')
-			options.group_level = 4;
+		return mtDatabase.current.query('monitool/inputs_by_project_year_month_entity', options).then(function(result) {
+			var keyTransformFunctions = {
+				month:  function(key) { return ['total', key[1] + '-' + key[2]]; }, // 2014-05
+				year:   function(key) { return ['total', key[1]]; }, // 2014
+				entity: function(key) { return ['total', key[3]]; }, // key index 3: "entity"
+				group:  function(key) {
+					return project.inputGroups.filter(function(group) {
+						return group.members.indexOf(key[3]) !== -1;
+					}).map(function(group) { return group.id; });
+				}
+			};
 
-		return mtDatabase.current.query(view, options).then(function(result) {
-			// regroup db results if needed
-			var regrouped = {};
-			if (groupBy === 'entity' || groupBy === 'group') {
-				result.rows.forEach(function(row) { row.key[1] = row.key[3]; });
-				result.rows = group(result.rows, 2);
-			}
-			else if (groupBy === 'month')
-				result.rows.forEach(function(row) { row.key[1] += '-' + row.key[2]; });
-
-			result.rows.forEach(function(row) { regrouped[row.key[1]] = row.value; });
-
-			// process groups
-			if (groupBy === 'group')
-				regrouped = processGroups(project, regrouped);
-			else
-				regrouped.total = computeTotal(regrouped);
+			// Regroup and evaluate
+			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-
 			return retrieveMetadata(project, begin, end, groupBy, regrouped);
 		});
 	};
@@ -414,38 +365,29 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		begin = moment(begin, 'YYYY-MM');
 		end   = moment(end, 'YYYY-MM');
 
-		var view    = 'monitool/inputs_by_entity_year_month',
-			options = {
-				startkey: [entityId, begin.format('YYYY'), begin.format('MM')],
-				endkey: [entityId, end.format('YYYY'), end.format('MM')]
+		var options = {
+			startkey:    [entityId, begin.format('YYYY'), begin.format('MM')],
+			endkey:      [entityId, end.format('YYYY'), end.format('MM')],
+			group_level: {year: 2, month: 3, entity: 0, group: 0}[groupBy],
+		};
+
+		return mtDatabase.current.query('monitool/inputs_by_entity_year_month', options).then(function(result) {
+			var keyTransformFunctions = {
+				month:  function(key) { return ['total', key[1] + '-' + key[2]]; },
+				year:   function(key) { return ['total', key[1]]; },
+				entity: function(key) { return ['total', entityId]; },
+
+				// Keep groups that contains entityId
+				group:  function(key) {
+					return project.inputGroups.filter(function(group) {
+						return group.members.indexOf(entityId) !== -1;
+					}).map(function(group) { return group.id; });
+				},
 			};
 
-		if (groupBy === 'year')
-			options.group_level = 2;
-		else if (groupBy === 'month')
-			options.group_level = 3;
-		else if (groupBy === 'entity' || groupBy === 'group')
-			options.group_level = 0;
-
-		return mtDatabase.current.query(view, options).then(function(result) {
-			var regrouped = {};
-			if (groupBy === 'year')
-				result.rows.forEach(function(row) { regrouped[row.key[1]] = row.value; });
-			else if (groupBy === 'month')
-				result.rows.forEach(function(row) { regrouped[row.key[1] + '-' + row.key[2]] = row.value; });
-			else if (groupBy === 'entity')
-				regrouped[entityId] = result.rows[0].value;
-			else if (groupBy === 'group')
-				project.inputGroups.forEach(function(g) {
-					if (g.members.indexOf(entityId) !== -1)
-						regrouped[g.id] = result.rows[0].value;
-				});
-
-			if (groupBy !== 'group')
-				regrouped.total = computeTotal(regrouped);
-
+			// Regroup and evaluate
+			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-
 			return retrieveMetadata(project, begin, end, groupBy, regrouped);
 		});
 	};
@@ -454,65 +396,127 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		begin = moment(begin, 'YYYY-MM');
 		end   = moment(end, 'YYYY-MM');
 
-		var view    = 'monitool/inputs_by_project_year_month_entity',
-			options = {
-				startkey: [project._id, begin.format('YYYY'), begin.format('MM')],
-				endkey: [project._id, end.format('YYYY'), end.format('MM'), {}],
-				group_level: 4
+		// We need all four levels on the project_year_month_entity view :(
+		// we can't filter by group at query level because those are not in the input documents (as they change after input).
+		var options = {
+			startkey: [project._id, begin.format('YYYY'), begin.format('MM')],
+			endkey: [project._id, end.format('YYYY'), end.format('MM'), {}],
+			group_level: 4
+		};
+
+		return mtDatabase.current.query('monitool/inputs_by_project_year_month_entity', options).then(function(result) {
+			// Declare couchdb key transformation functions.
+			var keyTransformFunctions = {
+				month:  function(key) { return ['total', key[1] + '-' + key[2]]; }, // 2014-05
+				year:   function(key) { return ['total', key[1]]; }, // 2014
+				entity: function(key) { return ['total', key[3]]; }, // key index 3: "entity"
+				group:  function(key) { return ['total', entityGroupId]; },
 			};
 
-		return mtDatabase.current.query(view, options).then(function(result) {
-			var regrouped = {};
-			var curGroup = project.inputGroups.filter(function(g) { return g.id === entityGroupId; })[0];
+			// Retrieve the inputGroup members and filter our result.
+			var members = project.inputGroups.filter(function(g) { return g.id === entityGroupId; })[0].members;
+			result.rows = result.rows.filter(function(row) { return members.indexOf(row.key[3]) !== -1; });
 
-			// filter rows
-			result.rows = result.rows.filter(function(row) {
-				return curGroup.members.indexOf(row.key[3]) !== -1;
-			});
-
-			if (groupBy === 'group')
-				regrouped[entityGroupId] = group(result.rows, 0)[0].value;
-
-			else if (groupBy === 'entity') {
-				result.rows.forEach(function(row) { row.key[1] = row.key[3]; });
-				result.rows = group(result.rows, 2); // keep project and entity
-				result.rows.forEach(function(row) {
-					regrouped[row.key[1]] = row.value;
-				});
-			}
-			else if (groupBy === 'month') {
-				result.rows = group(result.rows, 3); // keep project, year, month
-				result.rows.forEach(function(row) {
-					regrouped[row.key[1]+'-'+row.key[2]] = row.value;
-				});
-			}
-			else if (groupBy === 'year') {
-				result.rows = group(result.rows, 2); // keep project, year
-				result.rows.forEach(function(row) {
-					regrouped[row.key[1]] = row.value;
-				});	
-			}
-
-			regrouped.total = computeTotal(regrouped);
+			// Regroup and evaluate
+			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-
 			return retrieveMetadata(project, begin, end, groupBy, regrouped);
 		});
 	};
 
-	var getIndicatorStats = function(indicator, begin, end, groupBy) {
+	var getIndicatorStats = function(indicator, projects, begin, end, groupBy) {
 		begin = moment(begin, 'YYYY-MM');
 		end   = moment(end, 'YYYY-MM');
 
-		return $q.when({});
+		var queries = projects.map(function(project) {
+			return mtDatabase.current.query('monitool/inputs_by_project_year_month_entity', {
+				startkey: [project._id, begin.format('YYYY'), begin.format('MM')],
+				endkey: [project._id, end.format('YYYY'), end.format('MM'), {}],
+				group: true // we need centers...
+			});
+		});
+
+		var regroupFunction = function(key) {
+			if (groupBy === 'month')
+				return [
+					JSON.stringify([key[1] + '-' + key[2], key[3]]), 	// year-month, center
+					JSON.stringify([key[1] + '-' + key[2], key[0]]), 	// year-month, project
+					JSON.stringify(['total', key[3]]), 	// total, center
+					JSON.stringify(['total', key[0]]) 	// total, project
+				];
+			else
+				return [
+					JSON.stringify([key[1], key[3]]), 	// year, center
+					JSON.stringify([key[1], key[0]]), 	// year, project
+					JSON.stringify(['total', key[3]]), 	// total, center
+					JSON.stringify(['total', key[0]]) 	// total, project
+				];
+		};
+
+		return $q.all(queries).then(function(results) {
+			var regrouped = {};
+
+			results.map(function(result, index) {
+				// regroup, and add metadata for each project stats (they all use different settings)
+				var pRegrouped = regroup(result.rows, regroupFunction); // this use JSON compound keys to keep time and project/entity
+				evaluateAll(projects[index], pRegrouped);
+				return retrieveMetadata(projects[index], begin, end, groupBy, pRegrouped);
+
+			}).forEach(function(pRegrouped) {
+				// replace the JSON keys by a 2 level hash.
+				// no collisons should occur
+				for (var compoundKey in pRegrouped) {
+					var key = JSON.parse(compoundKey);
+					if (!regrouped[key[0]])
+						regrouped[key[0]] = {};
+
+					regrouped[key[0]][key[1]] = pRegrouped[compoundKey];
+				}
+			});
+
+			return regrouped;
+		});
 	};
 
 	return {
-		getStatsColumns: getStatsColumns,
-		getProjectStats: getProjectStats,
-		getGroupStats: getGroupStats,
-		getEntityStats: getEntityStats,
+		getStatsColumns:   getStatsColumns,
+		getProjectStats:   getProjectStats,
+		getGroupStats:     getGroupStats,
+		getEntityStats:    getEntityStats,
 		getIndicatorStats: getIndicatorStats
 	};
 });
+
+
+
+		// common format
+		// {
+		// 	month1: {
+		// 		indicator1: {},
+		// 		indicator2: {},
+		// 	},
+		// 	month2: {
+
+		// 	}
+		// }
+
+		// our format
+		// {
+		// 	month1: {
+		// 		project: {
+		// 			indicator1: {},
+		// 			indicator2: {},
+		// 		},
+		// 		total: {
+		// 			indicator1: {},
+		// 			indicator2: {},
+		// 		}
+		// 	},
+		// 	month2: {
+
+		// 	},
+		// 	total: {
+
+		// 	}
+		// }
 

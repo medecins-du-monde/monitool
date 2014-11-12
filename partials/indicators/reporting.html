@@ -51,7 +51,7 @@
 				<label for="display-input" class="col-sm-2 control-label">Afficher</label>
 				<div class="col-sm-10">
 					<select class="form-control" id="display-input" ng-model="display">
-						<option value="display">Valeurs</option>
+						<option value="value">Valeurs</option>
 						<option value="targetPart">Pourcentage de la cible</option>
 						<option value="baselinePart">Pourcentage de la baseline</option>
 					</select>
@@ -91,44 +91,32 @@
 					<th ng-repeat="col in cols">{{col.name}}</th>
 				</tr>
 			</thead>
-			<tbody ng-repeat="project in projects" ng-init="projectOpen=true;">
+			<tbody ng-repeat="project in projects" ng-init="open=false;">
 				<tr class="small">
 					<td>
-						<a ng-click="projectOpen=!projectOpen">
-							<i class="fa" ng-class="{'fa-minus-circle': projectOpen, 'fa-plus-circle': !projectOpen}"></i>
+						<a ng-click="open=!open">
+							<i class="fa" ng-class="{'fa-minus-circle': open, 'fa-plus-circle': !open}"></i>
 							{{project.name}}
 						</a>
 					</td>
-					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][project._id].color}">
-						<span ng-switch="display">
-							<span ng-switch-when="display" ng-if="data[col.id][project._id].value !== undefined">
-								{{data[col.id][project._id].value}}{{indicator.unit}}
-							</span>
-							<span ng-switch-when="targetPart" ng-if="data[col.id][project._id].targetPart !== undefined">
-								{{data[col.id][project._id].targetPart}}%
-							</span>
-							<span ng-switch-when="baselinePart" ng-if="data[col.id][project._id].baselinePart !== undefined">
-								{{data[col.id][project._id].baselinePart}}%
-							</span>
-						</span>
+					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][project._id][indicator._id] ? (colorize ? data[col.id][project._id][indicator._id].color : white) : '#eeeeee'}">
+						<div ng-switch="display" ng-if="data[col.id][project._id][indicator._id]">
+							<span ng-switch-when="value">{{data[col.id][project._id][indicator._id].value}}{{indicator.unit}}</span>
+							<span ng-switch-when="targetPart">{{data[col.id][project._id][indicator._id].targetPart}}%</span>
+							<span ng-switch-when="baselinePart">{{data[col.id][project._id][indicator._id].baselinePart}}%</span>
+						</div>
 					</td>
 				</tr>
-				<tr ng-repeat="inputEntity in project.inputEntities" ng-if="projectOpen">
+				<tr ng-repeat="inputEntity in project.inputEntities" ng-if="open">
 					<td>
 						&nbsp;&nbsp;&nbsp;&nbsp;{{inputEntity.name}}
 					</td>
-					<td ng-repeat="col in cols" ng-style="colorize && {'background-color': data[col.id][inputEntity._id].color}">
-						<span ng-switch="display">
-							<span ng-switch-when="display" ng-if="data[col.id][inputEntity._id].value !== undefined">
-								{{data[col.id][inputEntity._id].value}}{{indicator.unit}}
-							</span>
-							<span ng-switch-when="targetPart" ng-if="data[col.id][inputEntity._id].targetPart !== undefined">
-								{{data[col.id][inputEntity._id].targetPart}}%
-							</span>
-							<span ng-switch-when="baselinePart" ng-if="data[col.id][inputEntity._id].baselinePart !== undefined">
-								{{data[col.id][inputEntity._id].baselinePart}}%
-							</span>
-						</span>
+					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][inputEntity.id][indicator._id] ? (colorize ? data[col.id][inputEntity.id][indicator._id].color : white) : '#eee'}">
+						<div ng-switch="display" ng-if="data[col.id][inputEntity.id][indicator._id] !== undefined">
+							<span ng-switch-when="value">{{data[col.id][inputEntity.id][indicator._id].value}}{{indicator.unit}}</span>
+							<span ng-switch-when="targetPart">{{data[col.id][inputEntity.id][indicator._id].targetPart}}%</span>
+							<span ng-switch-when="baselinePart">{{data[col.id][inputEntity.id][indicator._id].baselinePart}}%</span>
+						</div>
 					</td>
 				</tr>
 			</tbody>
