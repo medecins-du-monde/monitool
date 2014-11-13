@@ -46,23 +46,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/logical-frame.html',
 		controller: 'ProjectLogicalFrameController',
 		resolve: {
-			project: function($route, $q, mtDatabase) {
-				if ($route.current.params.projectId === 'new') {
-					return $q.when({
-						type: "project",
-						name: "",
-						begin: "",
-						end: "",
-						logicalFrame: {goal: "", indicators: [], purposes: []},
-						inputEntities: [],
-						inputGroups: [],
-						dataCollection: [],
-						indicators: {}
-					});
-				}
-				else
-					return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -70,9 +54,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/input-entities.html',
 		controller: 'ProjectInputEntitiesController',
 		resolve: {
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -81,9 +63,7 @@ app.config(function($routeProvider) {
 		controller: 'ReportingController',
 		resolve: {
 			type: function() { return 'entity'; },
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -91,9 +71,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/input-groups.html',
 		controller: 'ProjectInputGroupsController',
 		resolve: {
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -102,9 +80,7 @@ app.config(function($routeProvider) {
 		controller: 'ReportingController',
 		resolve: {
 			type: function() { return 'group'; },
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -112,9 +88,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/form-list.html',
 		controller: 'ProjectFormsController',
 		resolve: {
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -122,9 +96,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/form-edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -132,9 +104,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/user-list.html',
 		controller: 'ProjectUserListController',
 		resolve: {
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -142,9 +112,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/input-list.html',
 		controller: 'ProjectInputListController',
 		resolve: {
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			},
+			project: function(mtFetch) { return mtFetch.currentProject(); },
 			inputs: function($route, mtDatabase) {
 				return mtDatabase.current.allDocs({
 					startkey: $route.current.params.projectId + ':',
@@ -162,9 +130,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/input.html',
 		controller: 'ProjectInputController',
 		resolve: {
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			},
+			project: function(mtFetch) { return mtFetch.currentProject(); },
 			input: function($route, mtDatabase) {
 				var p  = $route.current.params,
 					id = [p.projectId, p.entityId, p.period, p.formId].join(':');
@@ -185,9 +151,7 @@ app.config(function($routeProvider) {
 		controller: 'ReportingController',
 		resolve: {
 			type: function() { return 'project'; },
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -195,9 +159,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/user-list.html',
 		controller: 'ProjectUserListController',
 		resolve: {
-			project: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.projectId);
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
@@ -223,22 +185,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/indicators/edit.html',
 		controller: 'IndicatorEditController',
 		resolve: {
-			indicator: function($route, $q, mtDatabase) {
-				if ($route.current.params.indicatorId === 'new')
-					return $q.when({
-						type: 'indicator',
-						name: '',
-						description: '',
-						history: '',
-						standard: false,
-						sumAllowed: false,
-						types: [],
-						themes: [],
-						formulas: {}
-					});
-				else
-					return mtDatabase.current.get($route.current.params.indicatorId);
-			},
+			indicator: function(mtFetch) { return mtFetch.currentIndicator(); },
 			indicators: function(mtFetch) { return mtFetch.indicators(); },
 			types: function(mtFetch) { return mtFetch.types(); },
 			themes: function(mtFetch) { return mtFetch.themes(); }
@@ -249,9 +196,7 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/indicators/reporting.html',
 		controller: 'IndicatorReportingController',
 		resolve: {
-			indicator: function($route, mtDatabase) {
-				return mtDatabase.current.get($route.current.params.indicatorId);
-			},
+			indicator: function(mtFetch) { return mtFetch.currentIndicator(); },
 			projects: function($route, mtFetch) {
 				return mtFetch.projectsByIndicator($route.current.params.indicatorId);
 			}
@@ -261,13 +206,17 @@ app.config(function($routeProvider) {
 	$routeProvider.when('/themes', {
 		templateUrl: 'partials/indicators/theme-list.html',
 		controller: 'ThemeListController',
-		resolve: {themes: function(mtFetch) { return mtFetch.themes(); }}
+		resolve: {
+			themes: function(mtFetch) { return mtFetch.themes(); }
+		}
 	});
 
 	$routeProvider.when('/types', {
 		templateUrl: 'partials/indicators/type-list.html',
 		controller: 'TypeListController',
-		resolve: {types: function(mtFetch) { return mtFetch.types(); }}
+		resolve: {
+			types: function(mtFetch) { return mtFetch.types(); }
+		}
 	});
 
 	// $routeProvider.otherwise({

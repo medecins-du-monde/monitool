@@ -131,7 +131,7 @@ mtServices.factory('mtStatus', function($q, mtDatabase) {
 });
 
 
-mtServices.factory('mtFetch', function(mtDatabase) {
+mtServices.factory('mtFetch', function($route, $q, mtDatabase) {
 	var reformatArray = function(result) {
 		return result.rows.map(function(row) {
 			row.value._id = row.key;
@@ -150,6 +150,51 @@ mtServices.factory('mtFetch', function(mtDatabase) {
 	}
 
 	return {
+		currentProject: function() {
+			if ($route.current.params.projectId === 'new') {
+				return $q.when({
+					type: "project",
+					name: "",
+					begin: "",
+					end: "",
+					logicalFrame: {goal: "", indicators: [], purposes: []},
+					inputEntities: [],
+					inputGroups: [],
+					dataCollection: [],
+					indicators: {}
+				});
+			}
+			else
+				return mtDatabase.current.get($route.current.params.projectId);
+		},
+		projects: function() {
+			return mtDatabase.current.query('monitool/projects_short').then(reformatArray).catch(handleError);
+		},
+		projectsByIndicator: function(indicatorId) {
+			return mtDatabase.current.query('monitool/projects_by_indicator', {key: indicatorId, include_docs: true}).then(function(result) {
+				return result.rows.map(function(row) { return row.doc; });
+			});
+		},
+
+		currentIndicator: function() {
+			if ($route.current.params.indicatorId === 'new')
+				return $q.when({
+					type: 'indicator',
+					name: '',
+					description: '',
+					history: '',
+					standard: false,
+					sumAllowed: false,
+					types: [],
+					themes: [],
+					formulas: {}
+				});
+			else
+				return mtDatabase.current.get($route.current.params.indicatorId);
+		},
+		indicators: function() {
+			return mtDatabase.current.query('monitool/indicators_short', {group: true}).then(reformatArray);
+		},		
 		indicatorHierarchy: function(forbiddenIds) {
 			return mtDatabase.current.query('monitool/indicators_short', {group: true}).then(function(result) {
 				var hierarchy = {};
@@ -178,29 +223,17 @@ mtServices.factory('mtFetch', function(mtDatabase) {
 				return hierarchy;
 			});
 		},
-		
-		projects: function() {
-			return mtDatabase.current.query('monitool/projects_short').then(reformatArray).catch(handleError);
-		},
-		projectsByIndicator: function(indicatorId) {
-			return mtDatabase.current.query('monitool/projects_by_indicator', {key: indicatorId, include_docs: true}).then(function(result) {
-				return result.rows.map(function(row) { return row.doc; });
-			});
-		},
-		indicators: function() {
-			return mtDatabase.current.query('monitool/indicators_short', {group: true}).then(reformatArray);
-		},
 		themes: function() {
 			return mtDatabase.current.query('monitool/themes_short', {group: true}).then(reformatArray);
+		},
+		themesById: function() {
+			return mtDatabase.current.query('monitool/themes_short', {group: true}).then(reformatHashById);
 		},
 		types: function() {
 			return mtDatabase.current.query('monitool/types_short', {group: true}).then(reformatArray);
 		},
 		typesById: function() {
 			return mtDatabase.current.query('monitool/types_short', {group: true}).then(reformatHashById);
-		},
-		themesById: function() {
-			return mtDatabase.current.query('monitool/themes_short', {group: true}).then(reformatHashById);
 		},
 	};
 });
@@ -301,7 +334,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		return NaN;
 	};
 
-	var retrieveMetadata = function(project, begin, end, groupBy, regrouped) {
+	var retrieveMetadata = function(project, regrouped) {
 		// add metadata
 		var regroupedWithMetadata = {};
 		for (var key in regrouped) {
@@ -357,7 +390,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			// Regroup and evaluate
 			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-			return retrieveMetadata(project, begin, end, groupBy, regrouped);
+			return retrieveMetadata(project, regrouped);
 		});
 	};
 
@@ -388,7 +421,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			// Regroup and evaluate
 			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-			return retrieveMetadata(project, begin, end, groupBy, regrouped);
+			return retrieveMetadata(project, regrouped);
 		});
 	};
 
@@ -420,7 +453,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			// Regroup and evaluate
 			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-			return retrieveMetadata(project, begin, end, groupBy, regrouped);
+			return retrieveMetadata(project, regrouped);
 		});
 	};
 
@@ -436,44 +469,32 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			});
 		});
 
-		var regroupFunction = function(key) {
-			if (groupBy === 'month')
-				return [
-					JSON.stringify([key[1] + '-' + key[2], key[3]]), 	// year-month, center
-					JSON.stringify([key[1] + '-' + key[2], key[0]]), 	// year-month, project
-					JSON.stringify(['total', key[3]]), 	// total, center
-					JSON.stringify(['total', key[0]]) 	// total, project
-				];
-			else
-				return [
-					JSON.stringify([key[1], key[3]]), 	// year, center
-					JSON.stringify([key[1], key[0]]), 	// year, project
-					JSON.stringify(['total', key[3]]), 	// total, center
-					JSON.stringify(['total', key[0]]) 	// total, project
-				];
-		};
-
 		return $q.all(queries).then(function(results) {
 			var regrouped = {};
 
 			results.map(function(result, index) {
 				// regroup, and add metadata for each project stats (they all use different settings)
-				var pRegrouped = regroup(result.rows, regroupFunction); // this use JSON compound keys to keep time and project/entity
-				evaluateAll(projects[index], pRegrouped);
-				return retrieveMetadata(projects[index], begin, end, groupBy, pRegrouped);
+				// this use JSON compound keys to keep time and project/entity
+				var pRegrouped = regroup(result.rows, function(key) {
+					var period  = groupBy === 'month' ? key[1] + '-' + key[2] : key[1],
+						project = key[0],
+						center  = key[3],
+						keys    = [[period, center], [period, project], ['total', center], ['total', project]];
 
+					return keys.map(JSON.stringify);
+				});
+
+				evaluateAll(projects[index], pRegrouped);
+				return retrieveMetadata(projects[index], pRegrouped);
 			}).forEach(function(pRegrouped) {
-				// replace the JSON keys by a 2 level hash.
-				// no collisons should occur
+				// Nest the JSON.keys into a 2 level hash.
 				for (var compoundKey in pRegrouped) {
 					var key = JSON.parse(compoundKey);
 					if (!regrouped[key[0]])
 						regrouped[key[0]] = {};
-
 					regrouped[key[0]][key[1]] = pRegrouped[compoundKey];
 				}
 			});
-
 			return regrouped;
 		});
 	};
@@ -486,37 +507,3 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		getIndicatorStats: getIndicatorStats
 	};
 });
-
-
-
-		// common format
-		// {
-		// 	month1: {
-		// 		indicator1: {},
-		// 		indicator2: {},
-		// 	},
-		// 	month2: {
-
-		// 	}
-		// }
-
-		// our format
-		// {
-		// 	month1: {
-		// 		project: {
-		// 			indicator1: {},
-		// 			indicator2: {},
-		// 		},
-		// 		total: {
-		// 			indicator1: {},
-		// 			indicator2: {},
-		// 		}
-		// 	},
-		// 	month2: {
-
-		// 	},
-		// 	total: {
-
-		// 	}
-		// }
-
