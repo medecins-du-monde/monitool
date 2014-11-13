@@ -476,7 +476,6 @@ monitoolControllers.controller('ProjectInputController', function($scope, $route
 	$scope.fields  = Object.keys($scope.form.fields).map(function(fieldId) {
 		var field = $scope.form.fields[fieldId];
 		field.id = fieldId;
-		field.source = 'Source: '
 		return field;
 	});
 
