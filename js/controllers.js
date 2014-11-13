@@ -445,7 +445,7 @@ monitoolControllers.controller('ProjectInputListController', function($scope, $l
 
 			periods.forEach(function(period) {
 				$scope.inputs.push({
-					filled: inputs[[$scope.project._id, inputEntity.id, period.format('YYYY-MM'), form.id].join(':')],
+					filled: inputs[[$scope.project._id, inputEntity.id, form.id, period.format('YYYY-MM')].join(':')],
 					period: period,
 					formId: form.id, formName: form.name,
 					inputEntityId: inputEntity.id, inputEntityName: inputEntity.name
@@ -469,15 +469,97 @@ monitoolControllers.controller('ProjectInputListController', function($scope, $l
 });
 
 
-monitoolControllers.controller('ProjectInputController', function($scope, $routeParams, $location, project, input, mtDatabase) {
-	$scope.project = project;
-	$scope.input   = input;
-	$scope.form    = $scope.project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
-	$scope.fields  = Object.keys($scope.form.fields).map(function(fieldId) {
-		var field = $scope.form.fields[fieldId];
-		field.id = fieldId;
-		return field;
+monitoolControllers.controller('ProjectInputController', function($scope, $routeParams, $location, project, inputs, mtDatabase) {
+	$scope.project       = project;
+	$scope.input         = inputs.current;
+	$scope.previousInput = inputs.previous;
+
+	$scope.form          = $scope.project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
+	$scope.inputEntity   = project.inputEntities.filter(function(entity) { return entity.id == $scope.input.entity; })[0];
+
+	// var colors = ["#F2B701", "#E57D04", "#DC0030", "#B10058", "#7C378A", "#3465AA", "#09A275", "#7CB854"];
+	var colors = ['#FBB735', '#E98931', '#EB403B', '#B32E37', '#6C2A6A', '#5C4399', '#274389', '#1F5EA8', '#227FB0', '#2AB0C5', '#39C0B3'],
+		curColorIndex = 0;
+
+	$scope.colors = colors;
+
+	var fields = [];
+	for (var indicatorId in $scope.form.fields) {
+		var field = $scope.form.fields[indicatorId];
+		field.id = indicatorId;
+		field.colors = [];
+		if (project.indicators[indicatorId])
+			field.colors.push(colors[(curColorIndex++) % colors.length]);
+		fields.push(field);
+	}
+
+	for (var i = 0; i < 3; ++i)
+		fields.forEach(function(field) {
+			if (field.type !== 'computed')
+				return;
+			// retrieve all dependencies and add them all colors from the computed field.
+			fields
+				.filter(function(f) {
+					for (var k in field.parameters)
+						if (field.parameters[k] === f.id)
+							return true;
+					return false;
+				})
+				.forEach(function(f) {
+					field.colors.forEach(function(color) {
+						if (f.colors.indexOf(color) === -1)
+							f.colors.push(color);
+					});
+				});
+		});
+
+	// sort colors in fields
+	fields.forEach(function(field) {
+		field.colors.sort(function(color1, color2) {
+			return colors.indexOf(color1) - colors.indexOf(color2);
+		});
 	});
+
+	// sort fields by colors
+	fields.sort(function(field1, field2) {
+		if (field1.type !== field2.type)
+			return field1.type === 'computed' ? -1 : 1;
+		 
+		var length = Math.min(field1.colors.length, field2.colors.length);
+		for (var i = 0; i < length; ++i) {
+			var indexA = colors.indexOf(field1.colors[i]),
+				indexB = colors.indexOf(field2.colors[i]);
+			if (indexA != indexB)
+				return indexA - indexB;
+		}
+		
+		return field2.length - field1.length; // longer table goes last.
+	});
+
+
+
+
+
+	// fields.forEach(function(field) {
+	// 	var indicators = Object.keys(field.parameters).map(function(e) { return field.parameters[e]; });
+	// 	fields.forEach(function(refField) {
+
+	// 		var refIndicators = Object.keys(refField.parameters).map(function(e) { return refField.parameters[e]; });
+	// 		if (refIndicators.indexOf(field.id) !== -1)
+	// 			refField.colors.forEach(function(color) {
+	// 				if (field.colors.indexOf(color) === -1)
+	// 					field.colors.push(color);
+	// 			});
+	// 	});
+	// });
+
+	$scope.fields = fields;//computedFields.concat(inputFields);
+
+	// 	Object.keys($scope.form.fields).map(function(fieldId, index) {
+	// 	var field = $scope.form.fields[fieldId];
+	// 	field.id = fieldId;
+	// 	return field;
+	// });
 
 	$scope.indicatorsById = {};
 	mtDatabase.current.allDocs({include_docs: true, keys: Object.keys($scope.form.fields)}).then(function(result) {
@@ -501,6 +583,11 @@ monitoolControllers.controller('ProjectInputController', function($scope, $route
 			values    = newValues;
 			newValues = $scope.input.indicators;
 		}
+	};
+
+	$scope.copy = function(fieldId) {
+		$scope.input.indicators[fieldId] = $scope.previousInput.indicators[fieldId];
+		$scope.evaluate();
 	};
 
 	$scope.save = function() {

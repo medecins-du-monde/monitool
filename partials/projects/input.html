@@ -9,20 +9,27 @@
 			<li><a href="#projects">Projets</a></li>
 			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
 			<li><a href="#projects/{{project._id}}/inputs">Saisies en attente</a></li>
+			<li class="active">{{inputEntity.name}}</li>
 			<li class="active">{{form.name}}</li>
 		</ol>
 
 		<table class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
-					<th style="width: 300px;">Nom</th>
-					<th>Nouvelle valeur</th>
-					<th>Mois précédant</th>
+					<th ng-style="{width:previousInput?'33%':'50%'}">Nom</th>
+					<th ng-style="{width:previousInput?'33%':'50%'}">{{input.period}}</th>
+					<th ng-style="{width:previousInput?'33%':'50%'}" ng-if="previousInput">{{previousInput.period}}</th>
 				</tr>
 			</thead>
-			<tbody ng-repeat="field in fields | orderBy:'type'">
+			<tbody ng-repeat="field in fields">
 				<tr>
 					<td>
+						<div>
+							<div style="heigth: 100%; width: 5px"
+								 ng-repeat="color in field.colors"
+								 ng-style="{'background-color': color}">
+							</div>
+						<div>
 						<label for="input-{{field.id}}">
 							{{indicatorsById[field.id].name}}
 						</label>
@@ -34,10 +41,21 @@
 							   ng-change="evaluate()"
 							   ng-disabled="field.type == 'computed'"
 							   tooltip-html-unsafe="Source: {{field.source}}"
-							   tooltip-trigger="focus" 
-							   class="form-control input-sm" />
+							   tooltip-trigger="focus"
+							   class="form-control" />
 					</td>
-					<td>{{lastValues[indicator.id]}}</td>
+					<td ng-if="previousInput">
+						<div class="input-group" style="width: 100%">
+							<input type="number"
+								   value="{{previousInput.indicators[field.id]}}"
+								   class="form-control"
+								   disabled />
+
+							<span class="input-group-btn" ng-if="field.type !== 'computed'">
+								<button class="btn btn-primary" type="button" ng-click="copy(field.id)">Copier</button>
+							</span>
+						</div>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -46,3 +64,8 @@
 		<button class="btn btn-danger" ng-click="delete()">Supprimer</button>
 	</div>
 </div>
+
+
+
+
+<span ng-style="{'background-color': color}" ng-repeat="color in colors">&nbsp;&nbsp;</span>
