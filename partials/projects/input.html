@@ -21,16 +21,14 @@
 					<th ng-style="{width:previousInput?'33%':'50%'}" ng-if="previousInput">{{previousInput.period}}</th>
 				</tr>
 			</thead>
-			<tbody ng-repeat="field in fields">
+			<tbody ng-repeat="(fieldId, field) in fields">
 				<tr>
 					<td>
 						<div>
-							<div style="heigth: 100%; width: 5px"
-								 ng-repeat="color in field.colors"
-								 ng-style="{'background-color': color}">
-							</div>
 						<div>
 						<label for="input-{{field.id}}">
+							<span ng-repeat="color in field.colors"
+								  ng-style="{'background-color': color}">&nbsp;&nbsp;</span> 
 							{{indicatorsById[field.id].name}}
 						</label>
 					</td>
@@ -64,8 +62,3 @@
 		<button class="btn btn-danger" ng-click="delete()">Supprimer</button>
 	</div>
 </div>
-
-
-
-
-<span ng-style="{'background-color': color}" ng-repeat="color in colors">&nbsp;&nbsp;</span>

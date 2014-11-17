@@ -346,7 +346,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 
 				// compute display value
 				if (params) {
-					metadata.baselinePart = Math.round(100 * metadata.value / params.baseline) + '%';
+					metadata.baselinePart = Math.round(100 * metadata.value / params.baseline);
 					metadata.targetPart = Math.round(100 * metadata.value / getTargetValue());
 
 					// compute color

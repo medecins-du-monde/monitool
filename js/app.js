@@ -19,7 +19,7 @@ app.config(function($routeProvider) {
 	});
 
 	$routeProvider.when('/help', {
-		redirectTo: 'partials/help/monitoring.html'
+		redirectTo: '/help/monitoring'
 	});
 
 	$routeProvider.when('/help/monitoring', {
@@ -253,9 +253,9 @@ app.config(function($routeProvider) {
 		}
 	});
 
-	// $routeProvider.otherwise({
-	// 	redirectTo: '/projects'
-	// });
+	$routeProvider.otherwise({
+		redirectTo: '/projects'
+	});
 });
 
 

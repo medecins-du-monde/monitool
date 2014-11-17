@@ -7,7 +7,7 @@ var monitoolControllers = angular.module(
 		'ui.select',
 		'ui.bootstrap.showErrors',
 		'angularMoment',
-		'nvd3ChartDirectives'
+
 	]
 );
 
@@ -520,6 +520,7 @@ monitoolControllers.controller('ProjectInputController', function($scope, $route
 		});
 	});
 
+
 	// sort fields by colors
 	fields.sort(function(field1, field2) {
 		if (field1.type !== field2.type)
@@ -536,31 +537,7 @@ monitoolControllers.controller('ProjectInputController', function($scope, $route
 		return field2.length - field1.length; // longer table goes last.
 	});
 
-
-
-
-
-	// fields.forEach(function(field) {
-	// 	var indicators = Object.keys(field.parameters).map(function(e) { return field.parameters[e]; });
-	// 	fields.forEach(function(refField) {
-
-	// 		var refIndicators = Object.keys(refField.parameters).map(function(e) { return refField.parameters[e]; });
-	// 		if (refIndicators.indexOf(field.id) !== -1)
-	// 			refField.colors.forEach(function(color) {
-	// 				if (field.colors.indexOf(color) === -1)
-	// 					field.colors.push(color);
-	// 			});
-	// 	});
-	// });
-
-	$scope.fields = fields;//computedFields.concat(inputFields);
-
-	// 	Object.keys($scope.form.fields).map(function(fieldId, index) {
-	// 	var field = $scope.form.fields[fieldId];
-	// 	field.id = fieldId;
-	// 	return field;
-	// });
-
+	$scope.fields = fields;
 	$scope.indicatorsById = {};
 	mtDatabase.current.allDocs({include_docs: true, keys: Object.keys($scope.form.fields)}).then(function(result) {
 		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
@@ -602,13 +579,9 @@ monitoolControllers.controller('ProjectUserListController', function($scope) {
 
 });
 
-
-// $scope.reportingData = [
-// 	{key:"some value 1", values:[["2014-01", 34], ["2014-02", 24], ["2014-03", 14], ["2014-04", 19], ["2014-05", 34], ["2014-06", 45]]},
-// 	{key:"some value 2", values:[["2014-01", 24], ["2014-02", 14], ["2014-03", 19], ["2014-04", 45], ["2014-05", 34], ["2014-06", 34]]},
-// ];
-
 monitoolControllers.controller('ReportingController', function($scope, $routeParams, type, project, mtDatabase, mtIndicators) {
+	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
+
 	$scope.project = project;
 
 	// Retrieve indicators
@@ -621,6 +594,7 @@ monitoolControllers.controller('ReportingController', function($scope, $routePar
 	$scope.end     = moment().format('YYYY-MM');
 	$scope.groupBy = 'month';
 	$scope.display = 'value';
+	$scope.plots   = {};
 
 	if ($scope.begin < $scope.project.begin)
 		$scope.begin = $scope.project.begin;
@@ -645,7 +619,95 @@ monitoolControllers.controller('ReportingController', function($scope, $routePar
 		}
 
 		$scope.cols = mtIndicators.getStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy, type, $routeParams[type=='group'?'groupId':'entityId']);
-		data.then(function(data) { $scope.data = data; });
+		data.then(function(data) {
+			$scope.data = data;
+
+			if ($scope.plot)
+				$scope.updateGraph();
+		});
+	};
+
+	$scope.updateGraph = function(changedIndicatorId) {
+		var cols      = $scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; }),
+			chartData = {
+				type: $scope.groupBy === 'month' || $scope.groupBy === 'year' ? 'line' : 'bar',
+				columns: [['x'].concat(cols)] // x-axis
+			};
+
+		if (changedIndicatorId && !$scope.plots[changedIndicatorId])
+			chartData.unload = [$scope.indicatorsById[changedIndicatorId].name];
+
+		for (var indicatorId in $scope.plots) {
+			if ($scope.plots[indicatorId]) {
+				// Retrieve name
+				var column = [$scope.indicatorsById[indicatorId].name];
+
+				// iterate on months, centers, etc
+				$scope.cols.forEach(function(col) {
+					if (col.id !== 'total') {
+						if ($scope.data[col.id] && $scope.data[col.id][indicatorId])
+							column.push($scope.data[col.id][indicatorId][$scope.display] || 0);
+						else
+							column.push(0);
+					}
+				});
+
+				chartData.columns.push(column);
+			}
+		}
+
+		chart.load(chartData);
+	};
+
+	$scope.downloadGraph = function() {
+		var filename  = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.png',
+			sourceSVG = document.querySelector("svg");
+
+		saveSvgAsPng(sourceSVG, filename, 1);
+	};
+
+	$scope.downloadCSV = function() {
+		var csvDump = 'os;res;indicator';
+		$scope.cols.forEach(function(col) { csvDump += ';' + col.name; })
+		csvDump += "\n";
+
+		$scope.project.logicalFrame.indicators.forEach(function(indicatorId) {
+			csvDump += 'None;None;' + $scope.indicatorsById[indicatorId].name;
+			$scope.cols.forEach(function(col) {
+				csvDump += ';';
+				try { csvDump += $scope.data[col.id][indicatorId].value }
+				catch (e) {}
+			});
+			csvDump += "\n";
+
+			$scope.project.logicalFrame.purposes.forEach(function(purpose) {
+				purpose.indicators.forEach(function(indicatorId) {
+					csvDump += purpose.description + ';None;' + $scope.indicatorsById[indicatorId].name;
+					$scope.cols.forEach(function(col) {
+						csvDump += ';';
+						try { csvDump += $scope.data[col.id][indicatorId].value }
+						catch (e) {}
+					});
+					csvDump += "\n";
+				});
+
+				purpose.outputs.forEach(function(output) {
+					output.indicators.forEach(function(indicatorId) {
+						csvDump += purpose.description + ';' + output.description + ';' + $scope.indicatorsById[indicatorId].name;
+						$scope.cols.forEach(function(col) {
+							csvDump += ';';
+							try { csvDump += $scope.data[col.id][indicatorId].value }
+							catch (e) {}
+						});
+						csvDump += "\n";
+					});
+				});
+			});
+		});
+
+		var blob = new Blob([csvDump], {type: "text/csv;charset=utf-8"});
+		var name = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.csv';
+		saveAs(blob, name);
 	};
 
 	$scope.updateData();
@@ -762,6 +824,8 @@ monitoolControllers.controller('IndicatorEditController', function($scope, $rout
 
 
 monitoolControllers.controller('IndicatorReportingController', function($scope, indicator, projects, mtIndicators) {
+	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
+
 	$scope.indicator = indicator;
 	$scope.projects = projects;
 
@@ -769,9 +833,23 @@ monitoolControllers.controller('IndicatorReportingController', function($scope, 
 	$scope.end     = moment().format('YYYY-MM');
 	$scope.groupBy = 'month';
 	$scope.display = 'value';
+	$scope.plots   = {};
 
 	if ($scope.end > moment().format('YYYY-MM'))
 		$scope.end = moment().format('YYYY-MM');
+
+	var getName = function(entityId) {
+		var numProjects = $scope.projects.length;
+		for (var i = 0; i < numProjects; ++i) {
+			if ($scope.projects[i]._id == entityId)
+				return $scope.projects[i].name;
+
+			var numEntities = $scope.projects[i].inputEntities.length;
+			for (var j = 0; j < numEntities; ++j)
+				if ($scope.projects[i].inputEntities[j].id === entityId)
+					return $scope.projects[i].inputEntities[j].name;
+		}
+	};
 
 	// Retrieve inputs
 	$scope.updateData = function() {
@@ -779,7 +857,77 @@ monitoolControllers.controller('IndicatorReportingController', function($scope, 
 
 		mtIndicators.getIndicatorStats($scope.indicator, $scope.projects, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
 			$scope.data = data;
+			if ($scope.plot)
+				$scope.updateGraph();
 		});
+	};
+
+	$scope.updateGraph = function(changedEntityId) {
+		var cols      = $scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; }),
+			chartData = {type: 'line', columns: [['x'].concat(cols)]};
+
+		if (changedEntityId && !$scope.plots[changedEntityId])
+			chartData.unload = [getName(changedEntityId)];
+
+		for (var entityId in $scope.plots) {
+			if ($scope.plots[entityId]) {
+				// Retrieve name
+				var column = [getName(entityId)];
+
+				// iterate on months, centers, etc
+				$scope.cols.forEach(function(col) {
+					if (col.id !== 'total') {
+						if ($scope.data[col.id] && $scope.data[col.id][entityId] && $scope.data[col.id][entityId][indicator._id])
+							column.push($scope.data[col.id][entityId][indicator._id][$scope.display] || 0);
+						else
+							column.push(0);
+					}
+				});
+
+				chartData.columns.push(column);
+			}
+		}
+
+		chart.load(chartData);
+	};
+
+	$scope.downloadCSV = function() {
+		var csvDump = 'type;nom';
+
+		// header
+		$scope.cols.forEach(function(col) { csvDump += ';' + col.name; })
+		csvDump += "\n";
+
+		$scope.projects.forEach(function(project) {
+			csvDump += 'project;' + project.name;
+			$scope.cols.forEach(function(col) {
+				csvDump += ';';
+				try { csvDump += $scope.data[col.id][project._id][indicator._id].value }
+				catch (e) {}
+			});
+			csvDump += "\n";
+
+			project.inputEntities.forEach(function(entity) {
+				csvDump += 'entity;' + entity.name;
+				$scope.cols.forEach(function(col) {
+					csvDump += ';';
+					try { csvDump += $scope.data[col.id][project._id][indicator._id].value; }
+					catch (e) {}
+				});
+				csvDump += "\n";
+			});
+		});
+
+		var blob = new Blob([csvDump], {type: "text/csv;charset=utf-8"});
+		var name = [indicator.name, $scope.begin, $scope.end].join('_') + '.csv';
+		saveAs(blob, name);
+	};
+
+	$scope.downloadGraph = function() {
+		var filename  = [indicator.name, $scope.begin, $scope.end].join('_') + '.png',
+			sourceSVG = document.querySelector("svg");
+			
+		saveSvgAsPng(sourceSVG, filename, 1);
 	};
 
 	$scope.updateData();
