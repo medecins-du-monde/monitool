@@ -1,0 +1,9 @@
+CACHE MANIFEST
+
+CACHE:
+index.html
+js/monitool.js
+css/monitool.css
+
+NETWORK:
+*

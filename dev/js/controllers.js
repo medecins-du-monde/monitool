@@ -6,8 +6,7 @@ var monitoolControllers = angular.module(
 		'ui.bootstrap',
 		'ui.select',
 		'ui.bootstrap.showErrors',
-		'angularMoment',
-
+		'angularMoment'
 	]
 );
 
