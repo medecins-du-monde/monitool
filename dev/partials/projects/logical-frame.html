@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-md-2">
-		<ng-include src="'partials/projects/menu.html'"></ng-include>
+		<ng-include src="'/partials/projects/menu.html'"></ng-include>
 	</div>
 
 	<div class="col-md-10">
@@ -98,7 +98,7 @@
 						<div class="panel-title">
 							<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)">Supprimer</button>
 							<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-							<a ng-click="tabOpen = !tabOpen">Objectif Spécifique {{purposeId + 1}}: {{purpose.description}}</a>
+							<a ng-click="tabOpen = !tabOpen"> Objectif Spécifique {{purposeId + 1}}: {{purpose.description}}</a>
 						</div>
 					</div>
 
@@ -153,7 +153,7 @@
 									<div class="panel-title">
 										<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)">Supprimer</button>
 										<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-										<a ng-click="tabOpen = !tabOpen">Résultat {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}</a>
+										<a ng-click="tabOpen = !tabOpen"> Résultat {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}</a>
 									</div>
 								</div>
 
@@ -207,7 +207,7 @@
 												<div class="panel-title">
 													<button class="btn btn-danger btn-xs pull-right" ng-click="removeActivity(activity, output)">Supprimer</button>
 													<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-													<a ng-click="tabOpen = !tabOpen">Activité {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}</a>
+													<a ng-click="tabOpen = !tabOpen"> Activité {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}</a>
 												</div>
 											</div>
 

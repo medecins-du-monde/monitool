@@ -55,6 +55,10 @@ monitoolControllers.controller('SubMenuController', function($scope, $routeParam
 		if ($routeParams.projectId !== 'new')
 			$location.url('/projects/' + $routeParams.projectId + '/' + page);
 	};
+
+	$scope.goto = function(url) {
+		$location.url(url);
+	};
 });
 
 
@@ -71,6 +75,10 @@ monitoolControllers.controller('ProjectListController', function($scope, $locati
 	$scope.isFinished = function(project) {
 		return !$scope.filterFinished || project.end > $scope.now;
 	};
+
+	$scope.openProject = function(projectId) {
+		$location.url('/projects/' + projectId);
+	}
 
 	$scope.create = function() {
 		$location.url('/projects/new');

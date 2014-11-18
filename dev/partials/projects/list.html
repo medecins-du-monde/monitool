@@ -14,7 +14,7 @@
 		<tr ng-repeat="project in projects | filter:isFinished | orderBy:pred:rev">
 			<td><i class="fa" ng-class="{'fa-star': offline[project._id], 'fa-star-o': !offline[project._id]}"></i></td>
 			<td>
-				<a href="#projects/{{project._id}}">
+				<a ng-click="openProject(project._id)">
 					{{project.name}}
 				</a>
 			</td>
