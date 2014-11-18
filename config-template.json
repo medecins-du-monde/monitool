@@ -1,0 +1,15 @@
+{
+	"aws": {
+		"key": "",
+		"secret": "",
+		"bucket": "someprefix-monitool",
+		"region": "eu-west-1"
+	},
+	"localdb": "monitool",
+	"couchdb": {
+		"url": "http://couchdb-url-without-trailing-slash.com:5984",
+		"bucket": "someprefix-monitool",
+		"username": "",
+		"password": ""
+	}
+}

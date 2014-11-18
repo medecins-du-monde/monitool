@@ -1,8 +1,6 @@
 "use strict";
 
-var mtServices = angular.module('MonitoolServices', ['pouchdb']),
-	LOCAL_DB   = 'monitool2',
-	REMOTE_DB  = 'http://***REMOVED***:***REMOVED***@localhost:5984/monitool';
+var mtServices = angular.module('MonitoolServices', ['pouchdb']);
 
 mtServices.factory('mtDatabase', function(PouchDB) {
 	return {

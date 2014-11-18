@@ -1,14 +1,20 @@
 "use strict";
 
-var gulp          = require('gulp'),
+var addCors       = require('add-cors-to-couchdb'),
+	gulp          = require('gulp'),
 	templateCache = require('gulp-angular-templatecache'),
+	awspublish    = require('gulp-awspublish'),
 	concat        = require('gulp-concat'),
+	insert        = require('gulp-insert'),
 	minifyCSS     = require('gulp-minify-css'),
 	ngAnnotate    = require('gulp-ng-annotate'),
 	rename        = require('gulp-rename'),
 	replace       = require('gulp-replace'),
 	uglify        = require('gulp-uglify'),
-	Queue         = require('streamqueue');
+	request       = require('request'),
+	rimraf        = require('rimraf'),
+	Queue         = require('streamqueue'),
+	config        = require('./config.json');
 
 var files = {
 	css: {
@@ -54,18 +60,64 @@ var files = {
 	}
 };
 
-gulp.task('deploy', ['build'], function() {
 
+//////////////////////////////////////////////////////////
+// Deploy
+//////////////////////////////////////////////////////////
+
+gulp.task('deploy', ['prepare-couchdb', 'copy-files-to-s3']);
+
+gulp.task('prepare-couchdb', function(callback) {
+	var auth         = {user: config.couchdb.username, pass: config.couchdb.password},
+		txtAuth      = config.couchdb.username + ':' + config.couchdb.password,
+		createBucket = {url: config.couchdb.url + '/' + config.couchdb.bucket, auth: auth},
+		getDdoc      = {url: config.couchdb.url + '/' + config.couchdb.bucket + '/_design/monitool', auth: auth},
+		createDdoc   = {url: config.couchdb.url + '/' + config.couchdb.bucket + '/_design/monitool', auth: auth, json: require('./couchdb/_design/monitool.js')};
+
+	// allow cors
+	addCors(config.couchdb.url, txtAuth, function(error) {
+		if (error)
+			console.log('Failed to add cors', error);
+
+		// create bucket
+		request.put(createBucket, function(error, response) {
+			if (error)
+				console.log('failed to create bucket', error);
+
+			// create design doc
+			request.get(getDdoc, function(error, response, doc) {
+				if (doc)
+					createDdoc.json._rev = JSON.parse(doc)._rev;
+
+				request.put(createDdoc, function(error, response, doc) {
+					if (error)
+						console.log('failed to create design doc');
+
+					callback();
+				});
+			});
+		});
+	});
 });
 
 
+gulp.task('copy-files-to-s3', ['build'], function() {
+	var publisher = awspublish.create(config.aws),
+		headers   = {'Cache-Control': 'max-age=315360000, no-transform, public'};
 
+	return gulp.src('build/**/*')
+			   .pipe(awspublish.gzip())
+			   .pipe(publisher.publish(headers))
+			   // .pipe(publisher.cache())
+			   .pipe(awspublish.reporter())
+			   .on('error', function(err) { console.error('failed to publish err code: ', err.statusCode); } );
+});
+
+//////////////////////////////////////////////////////////
+// Build
+//////////////////////////////////////////////////////////
 
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
-
-gulp.task('clean', function(callback) {
-	rimraf('build', callback);
-});
 
 gulp.task('copy-static', function() {
 	gulp.src('dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('build'));
@@ -74,7 +126,12 @@ gulp.task('copy-static', function() {
 });
 
 gulp.task('build-js', function() {
+	var clientConf = "";
+	clientConf += "var LOCAL_DB = '" + config.localdb + "';";
+	clientConf += "var REMOTE_DB = '" + config.couchdb.url + '/' + config.couchdb.bucket + "';";
+
 	var queue = new Queue({ objectMode: true });
+	queue.queue()
 	queue.queue(gulp.src(files.js.min));										// min.js are unchanged
 	queue.queue(gulp.src(files.js.common).pipe(ngAnnotate()).pipe(uglify()));	// js are annotated, uglified
 
@@ -90,6 +147,7 @@ gulp.task('build-js', function() {
 	// concat it all.
 	return queue.done()
 				.pipe(concat('monitool.js'))
+				.pipe(insert.prepend(clientConf))
 				.pipe(gulp.dest('build/js'));
 });
 
@@ -101,4 +159,12 @@ gulp.task('build-css', function() {
 	return queue.done()
 				.pipe(concat('monitool.css'))
 				.pipe(gulp.dest('build/css'));
+});
+
+//////////////////////////////////////////////////////////
+// Clean
+//////////////////////////////////////////////////////////
+
+gulp.task('clean', function(callback) {
+	rimraf('build', callback);
 });
