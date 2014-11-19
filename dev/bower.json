@@ -32,6 +32,6 @@
     "mathjs": "~1.0.1",
     "pouchdb": "~3.0.6",
     "pouchdb-authentication": "~0.3.6",
-    "saveSvgAsPng": "https://github.com/exupero/saveSvgAsPng.git#gh-pages",
+    "saveSvgAsPng": "https://github.com/exupero/saveSvgAsPng.git#gh-pages"
   }
 }

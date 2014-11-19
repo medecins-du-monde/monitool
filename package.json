@@ -21,6 +21,7 @@
     "gulp-rimraf": "^0.1.1",
     "gulp-uglify": "^1.0.1",
     "request": "x",
-    "rimraf": "^2.2.8"
+    "rimraf": "^2.2.8",
+    "streamqueue": "^0.1.1"
   }
 }
