@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-md-2">
-		<ng-include src="'/partials/indicators/menu.html'"></ng-include>
+		<ng-include src="'partials/indicators/menu.html'"></ng-include>
 	</div>
 
 	<div class="col-md-10">
@@ -26,7 +26,7 @@
 				<tr>
 					<td colspan="3">
 						<div class="input-group input-group-sm" style="width: 100%">
-							<input type="text" class="form-control" ng-model="newType" placeholder="Nom du nouveau type" ng-enter="add()">
+							<input type="text" class="form-control" ng-model="newType" placeholder="{{'indicator.new_type_name'|translate}}" ng-enter="add()">
 						    <span class="input-group-btn">
 								<button class="btn btn-default" ng-click="add()" translate>shared.add</button>
 							</span>
