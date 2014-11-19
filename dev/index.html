@@ -41,11 +41,14 @@
 		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-route/angular-route.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-pouchdb/angular-pouchdb.js"></script>
-		<script type="text/javascript" src="bower_components/angular-translate/angular-translate.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-moment/angular-moment.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-ui-select/dist/select.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-bootstrap-show-errors/src/showErrors.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-cookies/angular-cookies.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-translate/angular-translate.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js"></script>
 		
 		<!-- Pouch -->
 		<script type="text/javascript" src="bower_components/pouchdb/dist/pouchdb.min.js"></script>
@@ -63,7 +66,7 @@
 		<script type="text/javascript" src="js/image-exporter.js"></script>
 	</head>
 	<body>
-		<div ng-include="'/partials/home.html'"></div>
+		<div ng-include="'partials/home.html'"></div>
 		<div class="container-fluid" ng-view style="padding-top: 70px;"></div>
 	</body>
 </html>
