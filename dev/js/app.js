@@ -249,18 +249,20 @@ app.config(function($routeProvider) {
 	});
 
 	$routeProvider.when('/themes', {
-		templateUrl: 'partials/indicators/theme-list.html',
-		controller: 'ThemeListController',
+		templateUrl: 'partials/indicators/theme-type-list.html',
+		controller: 'ThemeTypeListController',
 		resolve: {
-			themes: function(mtFetch) { return mtFetch.themes(); }
+			entities: function(mtFetch) { return mtFetch.themes(); },
+			entityType: function() { return 'theme'; }
 		}
 	});
 
 	$routeProvider.when('/types', {
-		templateUrl: 'partials/indicators/type-list.html',
-		controller: 'TypeListController',
+		templateUrl: 'partials/indicators/theme-type-list.html',
+		controller: 'ThemeTypeListController',
 		resolve: {
-			types: function(mtFetch) { return mtFetch.types(); }
+			entities: function(mtFetch) { return mtFetch.types(); },
+			entityType: function() { return 'type'; }
 		}
 	});
 

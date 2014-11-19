@@ -946,51 +946,45 @@ monitoolControllers.controller('IndicatorReportingController', function($scope, 
 	$scope.updateData();
 });
 
+monitoolControllers.controller('ThemeTypeListController', function($scope, entities, entityType, mtDatabase) {
+	entities.sort(function(entity1, entity2) {
+		return entity1.name.localeCompare(entity2.name);
+	});
 
-/**
- * this controller and theme controller are the same, factorize it!
- */
-monitoolControllers.controller('TypeListController', function($scope, types, mtDatabase) {
-	$scope.types = types;
+	$scope.entities = entities;
+	$scope.master = angular.copy(entities);
+	$scope.entityType = entityType;
 
-	$scope.add = function() {
-		var newType = {_id: PouchDB.utils.uuid().toLowerCase(), type: 'type', name: $scope.newType || ''};
-		newType.name = newType.name.trim();
-
-		$scope.newType = '';
-		if (newType.name.length && !$scope.types.filter(function(type) { return type.name == newType.name; }).length) {
-			$scope.types.push(newType)
-			mtDatabase.current.put(newType);
-		}
+	$scope.hasChanged = function(entityIndex) {
+		return !angular.equals($scope.entities[entityIndex], $scope.master[entityIndex]);
 	};
 
-	$scope.remove = function(type) {
-		$scope.types = $scope.types.filter(function(lType) { return lType !== type });
-		mtDatabase.current.get(type._id).then(function(type) {
-			mtDatabase.current.remove(type);
+	$scope.create = function() {
+		var newEntity = {_id: PouchDB.utils.uuid().toLowerCase(), type: entityType, name: ''};
+		$scope.entities.push(newEntity);
+		$scope.master.push(angular.copy(newEntity));
+	};
+
+	$scope.save = function(entityIndex) {
+		var entity = $scope.entities[entityIndex];
+		$scope.master[entityIndex] = angular.copy(entity);
+
+		if (entity.usage === undefined)
+			mtDatabase.current.put(entity);
+		else
+			mtDatabase.current.get(entity._id).then(function(dbEntity) {
+				dbEntity.name = entity.name;
+				mtDatabase.current.put(dbEntity);
+			});
+	};
+
+	$scope.remove = function(entityIndex) {
+		var entity = $scope.entities.splice(entityIndex, 1)[0];
+		$scope.master.splice(entityIndex, 1);
+
+		// get and delete, because we need to know the revision, which is missing from the entity_short view.
+		mtDatabase.current.get(entity._id).then(function(entity) {
+			mtDatabase.current.remove(entity);
 		});
-	};
-});
-
-
-monitoolControllers.controller('ThemeListController', function($scope, themes, mtDatabase) {
-	$scope.themes = themes;
-
-	$scope.add = function() {
-		var newTheme = {_id: PouchDB.utils.uuid().toLowerCase(), type: 'theme', name: $scope.newTheme || ''};
-		newTheme.name = newTheme.name.trim();
-
-		$scope.newTheme = '';
-		if (newTheme.name.length && !$scope.themes.filter(function(theme) { return theme.name == newTheme.name; }).length) {
-			$scope.themes.push(newTheme)
-			mtDatabase.current.put(newTheme);
-		}
-	};
-
-	$scope.remove = function(theme) {
-		$scope.themes = $scope.themes.filter(function(lTheme) { return lTheme !== theme });
-		mtDatabase.current.get(theme._id).then(function(theme) {
-			mtDatabase.current.remove(theme);
-		})
 	};
 });

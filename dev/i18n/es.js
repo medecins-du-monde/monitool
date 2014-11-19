@@ -41,8 +41,8 @@ var SPANISH_TRANSLATION = {
 		target_percentage: 'Porcentaje del objetivo',
 		baseline_percentage: 'Porcentaje de la valor base',
 		plot: 'Mostrar grafico',
-		download_plot: 'Descarcar el grafico',
-		download_table: 'Descarcar la tabla',
+		download_plot: 'Descargar el grafico',
+		download_table: 'Descargar la tabla',
 		unknown_indicator: "Indicador no conocido",
 
 		choose_indicator: 'Elige un indicador',
