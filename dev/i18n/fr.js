@@ -172,7 +172,8 @@ var FRENCH_TRANSLATION = {
 		types_list: "Liste des types",
 		num_indicators: 'Nombre d\'indicateurs',
 		
-
+		new_type_name: "Nom du nouveau type",
+		new_theme_name: "Nom de la nouvelle thématique",
 	},
 	form: {
 		mandatory: "Ce champ est obligatoire",
