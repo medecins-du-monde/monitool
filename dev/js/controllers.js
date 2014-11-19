@@ -983,8 +983,9 @@ monitoolControllers.controller('ThemeTypeListController', function($scope, entit
 		$scope.master.splice(entityIndex, 1);
 
 		// get and delete, because we need to know the revision, which is missing from the entity_short view.
-		mtDatabase.current.get(entity._id).then(function(entity) {
-			mtDatabase.current.remove(entity);
-		});
+		if (entity.usage !== undefined) // @FIXME, this is wrong! use another hash to know which entities are persisted
+			mtDatabase.current.get(entity._id).then(function(entity) {
+				mtDatabase.current.remove(entity);
+			});
 	};
 });
