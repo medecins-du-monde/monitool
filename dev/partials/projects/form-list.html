@@ -6,15 +6,15 @@
 	<div class="col-md-10">
 
 		<ol class="breadcrumb">
-			<li><a href="#projects">Projets</a></li>
+			<li><a href="#projects" translate>shared.projects</a></li>
 			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
-			<li class="active">Formulaires de saisie</li>
+			<li class="active" translate>project.input_forms</li>
 		</ol>
 
 		<table class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
-					<th>Nom</th>
+					<th translate>shared.name</th>
 					<th style="width:150px"></th>
 				</tr>
 			</thead>
@@ -22,13 +22,13 @@
 				<tr ng-repeat="form in project.dataCollection">
 					<td>{{form.name}}</td>
 					<td>
-						<button class="btn btn-default btn-sm" ng-click="edit(form.id)">Editer</button>
-						<button class="btn btn-danger btn-sm" ng-click="delete(form.id)">Supprimer</button>
+						<button class="btn btn-default btn-sm" ng-click="edit(form.id)" translate>shared.edit</button>
+						<button class="btn btn-danger btn-sm" ng-click="delete(form.id)" translate>shared.delete</button>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="3">
-						<button class="btn btn-default btn-xs" style="width: 100%" ng-click="edit('new')">Ajouter</button>
+						<button class="btn btn-default btn-xs" style="width: 100%" ng-click="edit('new')" translate>shared.add</button>
 					</td>
 				</tr>
 			</tbody>

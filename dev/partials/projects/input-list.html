@@ -6,21 +6,21 @@
 	<div class="col-md-10">
 
 		<ol class="breadcrumb">
-			<li><a href="#projects">Projets</a></li>
+			<li><a href="#projects" translate>shared.projects</a></li>
 			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
-			<li class="active">Saisies en attente</li>
+			<li class="active" translate>project.waiting_inputs</li>
 		</ol>
 
 		<input type="checkbox" id="see-all-input" ng-model="showFinished" />
-		<label for="see-all-input">Voir toutes les saisies</label>
+		<label for="see-all-input" translate>project.see_all_inputs</label>
 
 		<table class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
-					<th>Fait</th>
-					<th>Mois</th>
-					<th>Lieux d'activité</th>
-					<th>Formulaire</th>
+					<th translate>shared.done</th>
+					<th translate>shared.month</th>
+					<th translate>shared.input_entities</th>
+					<th translate>project.input_forms</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -34,15 +34,14 @@
 					<td>{{input.period | amDateFormat: 'MMMM YYYY'}}</td>
 					<td>{{input.inputEntityName}}</td>
 					<td>{{input.formName}}</td>
-					<td><a ng-click="makeInput(input)">Saisir</a></td>
+					<td><a ng-click="makeInput(input)" translate>project.input</a></td>
 				</tr>
 			</tbody>
 			<tbody ng-if="allDone && !showFinished">
 				<tr>
-					<td colspan="5">Aucune saisie en attente.</td>
+					<td colspan="5" translate>project.no_waiting_inputs</td>
 				</tr>
 			</tbody>
 		</table>
-
 	</div>
 </div>

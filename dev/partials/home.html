@@ -2,27 +2,41 @@
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-				<span class="sr-only">Toggle navigation</span>
+				<span class="sr-only" translate>menu.toggle_nav</span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
 		</div>
-
+		
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<li ng-class="{active: currentPage == 'projects'}">
-					<a ng-click="changePage('projects')">Projets</a>
+					<a ng-click="changePage('projects')" translate>shared.projects</a>
 				</li>
 				<li ng-class="{active: currentPage == 'indicators'}">
-					<a ng-click="changePage('indicators')">Catalogue Indicateurs</a>
+					<a ng-click="changePage('indicators')" translate>shared.indicators_catalog</a>
 				</li>
 				<li ng-class="{active: currentPage == 'help'}">
-					<a ng-click="changePage('help')">Aide</a>
+					<a ng-click="changePage('help')" translate>shared.help</a>
 				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
+
 				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						{{'menu.language' | translate}}
+						<span class="caret"></span>
+					</a>
+
+					<ul class="dropdown-menu" role="menu">
+						<li><a ng-click="changeLanguage('fr')" ng-if="language != 'fr'" translate>menu.french</a></li>
+						<li><a ng-click="changeLanguage('en')" ng-if="language != 'en'" translate>menu.english</a></li>
+						<li><a ng-click="changeLanguage('es')" ng-if="language != 'es'" translate>menu.spanish</a></li>
+					</ul>
+				</li>
+
+				<!-- <li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						{{status}}
 						<span class="caret"></span>
@@ -40,8 +54,9 @@
 							</a>
 						</li>
 					</ul>
-				</li>
+				</li> -->
 			</ul>
 		</div>
 	</div>
 </nav>
+

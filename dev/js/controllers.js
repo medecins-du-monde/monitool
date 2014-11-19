@@ -23,7 +23,7 @@ monitoolControllers.controller('LoginController', function($scope, $location, mt
 });
 
 
-monitoolControllers.controller('MenuController', function($scope, $location, mtDatabase, mtStatus) {
+monitoolControllers.controller('MenuController', function($scope, $location, $translate) {
 	// Application startup
 	// $location.url('/');
 
@@ -39,6 +39,12 @@ monitoolControllers.controller('MenuController', function($scope, $location, mtD
 
 
 	$scope.currentPage = $location.path().split('/')[1];
+	$scope.language    = $translate.use();
+
+	$scope.changeLanguage = function(langKey) {
+		$translate.use(langKey);
+		$scope.language = langKey;
+	};
 
 	$scope.changePage = function(page) {
 		$location.url('/' + page);

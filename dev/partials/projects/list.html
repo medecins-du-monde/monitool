@@ -1,27 +1,23 @@
 <input type="checkbox" ng-model="filterFinished" id="filter-finished" />
-<label for="filter-finished">Montrer les projets finis</label>
+<label for="filter-finished" translate>project.show_finished</label>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
 			<th style="width: 30px"></th>
-			<th><a ng-click="pred = 'name'; rev = !rev">Nom</a></th>
-			<th><a ng-click="pred = 'begin'; rev = !rev">Début</a></th>
-			<th><a ng-click="pred = 'end'; rev = !rev">Fin</a></th>
+			<th><a ng-click="pred = 'name'; rev = !rev" translate>shared.name</a></th>
+			<th><a ng-click="pred = 'begin'; rev = !rev" translate>shared.begin</a></th>
+			<th><a ng-click="pred = 'end'; rev = !rev" translate>shared.end</a></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="project in projects | filter:isFinished | orderBy:pred:rev">
 			<td><i class="fa" ng-class="{'fa-star': offline[project._id], 'fa-star-o': !offline[project._id]}"></i></td>
-			<td>
-				<a ng-click="openProject(project._id)">
-					{{project.name}}
-				</a>
-			</td>
+			<td><a ng-click="openProject(project._id)">{{project.name}}</a></td>
 			<td>{{project.begin}}</td>
 			<td>{{project.end}}</td>
 		</tr>
 	</tbody>
 </table>
 
-<button class="btn btn-default" ng-click="create()">Creer nouveau projet</button>
+<button class="btn btn-default" ng-click="create()" translate>project.create</button>

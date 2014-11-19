@@ -1,0 +1,1 @@
+var SPANISH_TRANSLATION = {};

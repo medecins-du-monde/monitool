@@ -5,15 +5,15 @@
 
 	<div class="col-md-10">
 		<ol class="breadcrumb">
-			<li><a href="#indicators">Indicateurs</a></li>
-			<li class="active">Liste des types</li>
+			<li><a href="#indicators" translate>shared.indicators</a></li>
+			<li class="active" translate>indicator.types_list</li>
 		</ol>
 
 		<table class="table table-stripped table-bordered table-condensed">
 			<thead>
 				<tr>
-					<th>Nom</th>
-					<th>Nombre d'indicateurs</th>
+					<th translate>shared.name</th>
+					<th translate>indicator.num_indicators</th>
 					<th style="width:85px"></th>
 				</tr>
 			</thead>
@@ -21,21 +21,20 @@
 				<tr ng-repeat="type in types | orderBy: 'name'">
 					<td>{{type.name}}</td>
 					<td>{{type.usage || 0}}</td>
-					<td><button class="btn btn-danger btn-xs" ng-disabled="type.usage" ng-click="remove(type)">Supprimer</button></td>
+					<td><button class="btn btn-danger btn-xs" ng-disabled="type.usage" ng-click="remove(type)" translate>shared.delete</button></td>
 				</tr>
 				<tr>
 					<td colspan="3">
 						<div class="input-group input-group-sm" style="width: 100%">
 							<input type="text" class="form-control" ng-model="newType" placeholder="Nom du nouveau type" ng-enter="add()">
 						    <span class="input-group-btn">
-								<button class="btn btn-default" ng-click="add()">Ajouter</button>
+								<button class="btn btn-default" ng-click="add()" translate>shared.add</button>
 							</span>
 						</div>
 					</td>
 				</tr>
 			</tbody>
 		</table>
-
 	</div>
 </div>
 

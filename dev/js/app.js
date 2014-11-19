@@ -4,12 +4,19 @@ var app = angular.module('MonitoolApp', [
 	'ngRoute',
 	'MonitoolControllers',
 	'MonitoolDirectives',
-	'MonitoolServices'
+	'MonitoolServices',
+	'pascalprecht.translate'
 ]);
 
-app.config(function($routeProvider, $locationProvider) {
+app.config(function($translateProvider) {
+	$translateProvider.translations('fr', FRENCH_TRANSLATION);
+	$translateProvider.translations('en', ENGLISH_TRANSLATION);
+	$translateProvider.translations('es', SPANISH_TRANSLATION);
 
-	$locationProvider.html5Mode(true);
+	$translateProvider.preferredLanguage('fr');
+});
+
+app.config(function($routeProvider) {
 
 	$routeProvider.when('/offline-fail', {
 		templateUrl: '/partials/workflow/offline-fail.html'

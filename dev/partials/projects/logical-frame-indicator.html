@@ -2,63 +2,61 @@
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
 
 		<div ng-if="!container.indicator">
-			<legend>Choisissez un indicateur</legend>
+			<legend translate>shared.choose_indicator</legend>
 
 			<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in indicatorHierarchy" ng-if="!container.indicator">
 				<div class="indicator-header" ng-click="open1 = !open1">
 					<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
-					{{themes[themeId].name || 'Sans thématique'}}
+					{{(themes[themeId].name || 'indicator.no_theme') | translate}}
 				</div>
 
 				<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes" ng-if="open1">
 					<div class="indicator-header" ng-click="open2 = !open2">
 						<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open2, 'fa-minus-circle': open2}"></i>
-						{{types[typeId].name || 'Sans type'}}
+						{{(types[typeId].name || 'indicator.no_type') | translate}}
 					</div>
 
 					<div class="indicator-level-3" ng-repeat="indicator in indicators" ng-if="open2">
 						<span class="color" ng-class="{green: indicator.standard}"></span>
 						<span class="name">{{indicator.name}} ({{indicator.main}} suivis, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
-						<a ng-click="container.indicator=indicator">Choisir</a>
+						<a ng-click="container.indicator=indicator" translate>shared.choose</a>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<div ng-if="container.indicator">
-			<legend>Édition</legend>
-	
+			<legend translate>shared.edition</legend>
+
 			<div class="form-group">
-				<label for="relevance-input" class="col-sm-2 control-label">Indicateur</label>
+				<label for="relevance-input" class="col-sm-2 control-label" translate>shared.indicator</label>
 				<div class="col-sm-10">
 					<input type="text" ng-model="container.indicator.name" class="form-control" disabled />
 				</div>
 			</div>
 
 			<div class="form-group" show-errors>
-				<label for="relevance-input" class="col-sm-2 control-label">Pertinence</label>
+				<label for="relevance-input" class="col-sm-2 control-label" translate>project.relevance</label>
 				<div class="col-sm-10">
 					<textarea class="form-control"
 							  id="relevance-input"
 							  name="relevance"
 							  ng-model="planning.relevance"
-							  placeholder="Pourquoi collectez-vous cet indicateur?"
+							  placeholder="{{'project.relevance_ph'|translate}}"
 							  required></textarea>
 
-					<p class="help-block" ng-if="planningForm.source.$error.required">
-						Ce champ est obligatoire
-					</p>
+					<p class="help-block" ng-if="planningForm.source.$error.required" translate>form.mandatory</p>
 				</div>
 			</div>
 
 			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label">Limites</label>
+				<label class="col-sm-2 control-label" translate>project.limits</label>
 				<div class="form-group col-sm-5" show-errors style="margin: 0">
 					<input class="form-control"
 						   type="number"
 						   name="minimum"
 						   ng-model="planning.minimum"
-						   placeholder="minimum"
+						   placeholder="{{'project.minimum_ph'|translate}}"
 						   required
 						   ng-max="planning.orangeMinimum" />
 				</div>
@@ -67,20 +65,20 @@
 						   type="number"
 						   name="maximum"
 						   ng-model="planning.maximum"
-						   placeholder="maximum"
+						   placeholder="{{'project.maximum_ph'|translate}}"
 						   required
 						   ng-min="planning.orangeMaximum" />
 				</div>
 			</div>
 
 			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label">Zone Orange</label>
+				<label class="col-sm-2 control-label" translate>project.orange_zone</label>
 				<div class="form-group col-sm-5" show-errors style="margin: 0">
 					<input class="form-control"
 						   type="number"
 						   name="orangeMinimum"
 						   ng-model="planning.orangeMinimum"
-						   placeholder="minimum"
+						   placeholder="{{'project.minimum_ph'|translate}}"
 						   ng-min="planning.minimum"
 						   ng-max="planning.greenMinimum"
 						   required />
@@ -90,7 +88,7 @@
 						   type="number"
 						   name="orangeMaximum"
 						   ng-model="planning.orangeMaximum"
-						   placeholder="maximum"
+						   placeholder="{{'project.maximum_ph'|translate}}"
 						   ng-min="planning.greenMaximum"
 						   ng-max="planning.maximum"
 						   required />
@@ -98,13 +96,13 @@
 			</div>
 
 			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label">Zone Verte</label>
+				<label class="col-sm-2 control-label" translate>project.green_zone</label>
 				<div class="form-group col-sm-5" show-errors style="margin: 0">
 					<input class="form-control"
 						   type="number"
 						   name="greenMinimum"
 						   ng-model="planning.greenMinimum"
-						   placeholder="minimum"
+						   placeholder="{{'project.minimum_ph'|translate}}"
 						   required
 						   ng-min="planning.orangeMinimum"
 						   ng-max="planning.greenMaximum" />
@@ -114,7 +112,7 @@
 						   type="number"
 						   name="greenMaximum"
 						   ng-model="planning.greenMaximum"
-						   placeholder="maximum"
+						   placeholder="{{'project.maximum_ph'|translate}}"
 						   required
 						   ng-min="planning.greenMinimum"
 						   ng-max="planning.orangeMaximum" />
@@ -122,14 +120,14 @@
 			</div>
 
 			<div class="form-group" show-errors>
-				<label for="baseline-input" class="col-sm-2 control-label">Baseline</label>
+				<label for="baseline-input" class="col-sm-2 control-label" translate>project.baseline</label>
 				<div class="col-sm-10">
 					<input class="form-control"
 						   id="baseline-input"
 						   name="baseline"
 						   type="number"
 						   ng-model="planning.baseline"
-						   placeholder="valeur de référence"
+						   placeholder="{{'baseline_ph'|translate}}"
 						   ng-min="planning.minimum"
 						   ng-max="planning.maximum"
 						   required />
@@ -137,23 +135,23 @@
 			</div>
 			
 			<div class="form-group">
-				<label for="targets" class="col-sm-2 control-label">Cibles</label>
+				<label for="targets" class="col-sm-2 control-label" translate>project.targets</label>
 				<div class="col-sm-10">
 					<div ng-repeat="target in planning.targets" class="row" style="padding-bottom: 10px">
 						<div class="col-sm-4">
 							<input type="month" class="form-control" ng-model="target.month" />
 						</div>
 						<div class="col-sm-4">
-							<input type="text" class="form-control" ng-model="target.value" placeholder="valeur"/>
+							<input type="text" class="form-control" ng-model="target.value" placeholder="{{'project.target_value_ph'|translate}}"/>
 						</div>
 						<div class="col-sm-4">
-							<button class="btn btn-danger" ng-click="removeTarget(target)">Supprimer</button>
+							<button class="btn btn-danger" ng-click="removeTarget(target)" translate>shared.delete</button>
 						</div>
 					</div>
 
 					<div class="row">
 						<div class="col-sm-12">
-							<button class="btn btn-default" ng-click="addTarget()">Ajouter une cible</button>
+							<button class="btn btn-default" ng-click="addTarget()" translate>project.add_target</button>
 						</div>
 					</div>
 				</div>
@@ -163,13 +161,12 @@
 </div>
 
 <div class="modal-footer">
-
 	<div ng-if="container.indicator">
-		<button ng-click="add()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="container.isNew">Ajouter</button>
-		<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="!container.isNew">Sauvegarder</button>
-		<button ng-click="delete()" class="btn btn-danger" ng-if="!container.isNew">Retirer</button>
+		<button ng-click="add()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="container.isNew" translate>shared.add</button>
+		<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="!container.isNew" translate>shared.save</button>
+		<button ng-click="delete()" class="btn btn-danger" ng-if="!container.isNew" translate>shared.remove</button>
 	</div>
 	<div ng-if="!container.indicator">
-		<button ng-click="cancel()" class="btn btn-default">Annuler</button>
+		<button ng-click="cancel()" class="btn btn-default" translate>shared.cancel</button>
 	</div>
 </div>

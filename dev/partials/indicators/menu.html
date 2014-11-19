@@ -1,13 +1,14 @@
 
 <ul class="nav nav-pills nav-stacked" ng-controller="SubMenuController">
 	<li ng-class="{active: isSelected('indicators')}">
-		<a ng-click="goto('indicators')">Indicateurs</a>
+		<a ng-click="goto('indicators')" translate>shared.indicators</a>
 	</li>
 	<li ng-class="{active: isSelected('themes')}">
-		<a ng-click="goto('themes')">Thématiques</a>
+		<a ng-click="goto('themes')" translate>indicator.themes</a>
 	</li>
 	<li ng-class="{active: isSelected('types')}">
-		<a ng-click="goto('types')">Types</a>
+		<a ng-click="goto('types')" translate>indicator.types</a>
 	</li>
 </ul>
+
 

@@ -6,9 +6,9 @@
 	<div class="col-md-10">
 
 		<ol class="breadcrumb">
-			<li><a href="#projects">Projets</a></li>
+			<li><a href="#projects" translate>shared.projects</a></li>
 			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
-			<li><a href="#projects/{{project._id}}/inputs">Saisies en attente</a></li>
+			<li><a href="#projects/{{project._id}}/inputs" translate>project.waiting_inputs</a></li>
 			<li class="active">{{inputEntity.name}}</li>
 			<li class="active">{{form.name}}</li>
 		</ol>
@@ -16,7 +16,7 @@
 		<table class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
-					<th ng-style="{width:previousInput?'33%':'50%'}">Nom</th>
+					<th ng-style="{width:previousInput?'33%':'50%'}" translate>shared.name</th>
 					<th ng-style="{width:previousInput?'33%':'50%'}">{{input.period}}</th>
 					<th ng-style="{width:previousInput?'33%':'50%'}" ng-if="previousInput">{{previousInput.period}}</th>
 				</tr>
@@ -50,7 +50,7 @@
 								   disabled />
 
 							<span class="input-group-btn" ng-if="field.type !== 'computed'">
-								<button class="btn btn-primary" type="button" ng-click="copy(field.id)">Copier</button>
+								<button class="btn btn-primary" type="button" ng-click="copy(field.id)" translate>shared.copy</button>
 							</span>
 						</div>
 					</td>
@@ -58,7 +58,7 @@
 			</tbody>
 		</table>
 
-		<button class="btn btn-default" ng-click="save()">Sauvegarder</button>
-		<button class="btn btn-danger" ng-click="delete()">Supprimer</button>
+		<button class="btn btn-default" ng-click="save()" translate>shared.save</button>
+		<button class="btn btn-danger" ng-click="delete()" translate>shared.delete</button>
 	</div>
 </div>
