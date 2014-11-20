@@ -167,7 +167,7 @@ gulp.task('prepare-couchdb', function(callback) {
 			if (error)
 				console.log('failed to create bucket', error);
 
-			// create design doc
+			// create/update design doc
 			request.get(getDdoc, function(error, response, doc) {
 				if (doc)
 					createDdoc.json._rev = JSON.parse(doc)._rev;

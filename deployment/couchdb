@@ -1,3 +1,6 @@
+; CouchDB configuration file
+; On a debian install, goes at /etc/couchdb/local.ini
+
 [httpd]
 port = 5984
 bind_address = 0.0.0.0
