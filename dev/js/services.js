@@ -274,7 +274,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 		rows.forEach(function(row) {
 			makeKeys(row.key).forEach(function(key) {
 				if (!result[key])
-					result[key] = row.value;
+					result[key] = angular.copy(row.value);
 				else
 					for (var indicatorId in row.value) {
 						if (result[key][indicatorId])
