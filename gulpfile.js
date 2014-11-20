@@ -73,41 +73,7 @@ var files = {
 // Deploy
 //////////////////////////////////////////////////////////
 
-gulp.task('deploy', ['prepare-couchdb', 'copy-files-to-s3']);
-
-gulp.task('prepare-couchdb', function(callback) {
-	var auth         = {user: config.couchdb.username, pass: config.couchdb.password},
-		txtAuth      = config.couchdb.username + ':' + config.couchdb.password,
-		createBucket = {url: config.couchdb.url + '/' + config.couchdb.bucket, auth: auth},
-		getDdoc      = {url: config.couchdb.url + '/' + config.couchdb.bucket + '/_design/monitool', auth: auth},
-		createDdoc   = {url: config.couchdb.url + '/' + config.couchdb.bucket + '/_design/monitool', auth: auth, json: require('./couchdb/_design/monitool.js')};
-
-	// allow cors
-	addCors(config.couchdb.url, txtAuth, function(error) {
-		if (error)
-			console.log('Failed to add cors', error);
-
-		// create bucket
-		request.put(createBucket, function(error, response) {
-			if (error)
-				console.log('failed to create bucket', error);
-
-			// create design doc
-			request.get(getDdoc, function(error, response, doc) {
-				if (doc)
-					createDdoc.json._rev = JSON.parse(doc)._rev;
-
-				request.put(createDdoc, function(error, response, doc) {
-					if (error)
-						console.log('failed to create design doc');
-
-					callback();
-				});
-			});
-		});
-	});
-});
-
+gulp.task('deploy', ['copy-files-to-s3']);
 
 gulp.task('copy-files-to-s3', ['build'], function() {
 	var publisher = awspublish.create(config.aws),
@@ -176,3 +142,46 @@ gulp.task('build-css', function() {
 gulp.task('clean', function(callback) {
 	rimraf('build', callback);
 });
+
+
+
+//////////////////////////////////////////////////////////
+// CouchDB
+//////////////////////////////////////////////////////////
+
+
+gulp.task('prepare-couchdb', function(callback) {
+	var auth         = {user: config.couchdb.username, pass: config.couchdb.password},
+		txtAuth      = config.couchdb.username + ':' + config.couchdb.password,
+		createBucket = {url: config.couchdb.url + '/' + config.couchdb.bucket, auth: auth},
+		getDdoc      = {url: config.couchdb.url + '/' + config.couchdb.bucket + '/_design/monitool', auth: auth},
+		createDdoc   = {url: config.couchdb.url + '/' + config.couchdb.bucket + '/_design/monitool', auth: auth, json: require('./couchdb/_design/monitool.js')};
+
+	// allow cors
+	addCors(config.couchdb.url, txtAuth, function(error) {
+		if (error)
+			console.log('Failed to add cors', error);
+
+		// create bucket
+		request.put(createBucket, function(error, response) {
+			if (error)
+				console.log('failed to create bucket', error);
+
+			// create design doc
+			request.get(getDdoc, function(error, response, doc) {
+				if (doc)
+					createDdoc.json._rev = JSON.parse(doc)._rev;
+
+				request.put(createDdoc, function(error, response, doc) {
+					if (error)
+						console.log('failed to create design doc');
+
+					callback();
+				});
+			});
+		});
+	});
+});
+
+
+
