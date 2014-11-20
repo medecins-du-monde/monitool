@@ -1,10 +1,10 @@
 "use strict";
 
-var uuid    = require('node-uuid'),
-	lipsum  = require('lorem-ipsum'),
-	request = require('request'),
-	moment  = require('moment');
-
+var lipsum   = require('lorem-ipsum'),
+	moment   = require('moment'),
+	uuid     = require('node-uuid'),
+	readline = require('readline-sync'),
+	request  = require('request');
 
 function randomDate(min) {
 	if (min === '2015-12')
@@ -33,7 +33,6 @@ function getDates(begin, end) {
 		cols.push(current.format('YYYY-MM'));
 		current.add(1, 'month');
 	}
-	console.log(cols)
 
 	return cols;
 };
@@ -255,21 +254,34 @@ for (i = 0; i < 100; ++i) {
 	projects.push(project);
 }
 
+console.log('This script writes a lot of lipsum garbage into a couchdb monitool database. Run it at your own risks!');
+var host = readline.question('host [localhost]: ') || 'localhost',
+	port = readline.question('port [5984]: ') || 5984,
+	bucket = readline.question('bucket [monitool]: ') || 'monitool',
+	username = readline.question('login []: '),
+	password = readline.question('password []: ');
+
 request({
 	method: 'POST',
-	auth: {user: '', pass: ''},
-	url: 'http://localhost:5984/monitool_generated/_bulk_docs',
+	auth: {user: username, pass: password},
+	url: 'http://' + host + ':' + port + '/' + bucket + '/_bulk_docs',
 	json: { docs: types.concat(themes).concat(indicators).concat(projects).concat(inputs) }
 }, function(error, response, doc) {
-	console.log(error, doc);
+	if (!error)
+		console.log('Written', doc.length, 'documents');
+	else
+		console.log('Failed to write docs');
 });
 
 request({
 	method: 'PUT',
-	auth: {user: '', pass: ''},
-	url: 'http://localhost:5984/monitool_generated/_design/monitool',
+	auth: {user: username, pass: password},
+	url: 'http://' + host + ':' + port + '/' + bucket + '/_design/monitool',
 	json: require('./_design/monitool')
 }, function(error, response, doc) {
-	console.log(error, doc);
+	if (!error)
+		console.log('Written design doc');
+	else
+		console.log('Failed to write design doc');
 });
 

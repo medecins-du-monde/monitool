@@ -2,6 +2,7 @@
 ; On a debian install, goes at /etc/couchdb/local.ini
 
 [httpd]
+enable_cors = true
 port = 5984
 bind_address = 0.0.0.0
 WWW-Authenticate = Basic realm="***REMOVED***"

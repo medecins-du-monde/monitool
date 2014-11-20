@@ -140,7 +140,7 @@ var SPANISH_TRANSLATION = {
 
 		name_ph: 'Por ejemplo: Porcentaje de fichas de paciente completas',
 		description_ph: 'Por ejemplo: Medir el nivel de formación del personal medical que completa las fichas de pacientes. Medir este indicador es facil en proyectos pequeños, evitar usarlo en otras circunstancias.',
-		history_ph: 'Por ejemplo: Creador en 2007 en el cuadro de un proyecto de UNICEF ... este indicador permitio seguir los objetivos de ...',
+		history_ph: 'Por ejemplo: Creado en 2007 en el cuadro de un proyecto de UNICEF ... este indicador permitio seguir los objetivos de ...',
 		definition: 'Definición',
 		standard: 'Estandar',
 		history: 'Historico',
@@ -152,8 +152,8 @@ var SPANISH_TRANSLATION = {
 		themes: 'Temáticas',
 		select_types: 'Selectione uno o varios tipos',
 		select_themes: 'Selectione una o varias tématicas',
-		categorization: 'Catégorización',
-		computation: 'Calculo',
+		categorization: 'Categorización',
+		computation: 'Cálculo',
 		sum_allowed: 'Somable',
 		formula: 'Formula',
 		formulas: 'Formulas',
@@ -163,7 +163,7 @@ var SPANISH_TRANSLATION = {
 		parameter: 'Parametro',
 
 		order_by: 'Ordenar por',
-		alphabetical_order: 'Orden alfabetico',
+		alphabetical_order: 'Orden alfabético',
 		num_inputs: 'Número de entradas',
 		num_projects: 'Número de proyectos',
 		create_new: 'Crear un nuevo indicador',
