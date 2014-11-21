@@ -138,15 +138,17 @@
 				<label for="targets" class="col-sm-2 control-label" translate>project.targets</label>
 				<div class="col-sm-10">
 					<div ng-repeat="target in planning.targets" class="row" style="padding-bottom: 10px">
-						<div class="col-sm-4">
-							<input type="month" class="form-control" ng-model="target.month" />
-						</div>
-						<div class="col-sm-4">
-							<input type="text" class="form-control" ng-model="target.value" placeholder="{{'project.target_value_ph'|translate}}"/>
-						</div>
-						<div class="col-sm-4">
-							<button class="btn btn-danger" ng-click="removeTarget(target)" translate>shared.delete</button>
-						</div>
+						<ng-form name="targetForm">
+							<div class="col-sm-5 form-group" show-errors style="margin: 0">
+								<input type="month" class="form-control" ng-model="target.month" name="month" required />
+							</div>
+							<div class="col-sm-5 form-group" show-errors style="margin: 0">
+								<input type="text" class="form-control" ng-model="target.value" name="value" placeholder="{{'project.target_value_ph'|translate}}" required />
+							</div>
+							<div class="col-sm-2">
+								<button class="btn btn-danger" ng-click="removeTarget(target)" translate>shared.delete</button>
+							</div>
+						</ng-form>
 					</div>
 
 					<div class="row">
@@ -164,7 +166,8 @@
 	<div ng-if="container.indicator">
 		<button ng-click="add()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="container.isNew" translate>shared.add</button>
 		<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="!container.isNew" translate>shared.save</button>
-		<button ng-click="delete()" class="btn btn-danger" ng-if="!container.isNew" translate>shared.remove</button>
+		<button ng-click="delete()" class="btn btn-danger" ng-if="!container.isNew" translate>shared.delete</button>
+		<button ng-click="cancel()" class="btn btn-default" translate>shared.cancel</button>
 	</div>
 	<div ng-if="!container.indicator">
 		<button ng-click="cancel()" class="btn btn-default" translate>shared.cancel</button>

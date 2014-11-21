@@ -96,11 +96,11 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 	$scope.project = project;
 	$scope.master = angular.copy(project);
 
-	mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(project.indicators)}).then(function(result) {
+	mtDatabase.current.query('monitool/indicators_short', {group: true, keys: Object.keys(project.indicators)}).then(function(result) {
 		$scope.indicatorsById = {};
-		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
+		result.rows.forEach(function(row) { $scope.indicatorsById[row.key] = row.value; });
 	});
-	
+
 	// handle indicator add, edit and remove in a modal window.
 	$scope.editIndicator = function(indicatorId, target) {
 		var modalInstance = $modal.open({
@@ -108,10 +108,9 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 			controller: 'ProjectLogicalFrameIndicatorController',
 			size: 'lg',
 			resolve: {
-				// why functions?
-				indicatorId:  function() { return indicatorId },
-				planning:     function() { return $scope.project.indicators[indicatorId] },
-				forbiddenIds: function() { return Object.keys($scope.project.indicators) }
+				indicatorId:  function() { return indicatorId; },
+				planning:     function() { return $scope.project.indicators[indicatorId]; },
+				forbiddenIds: function() { return Object.keys($scope.project.indicators); }
 			}
 		});
 
@@ -160,7 +159,7 @@ monitoolControllers.controller('ProjectLogicalFrameController', function($locati
 
 	$scope.removeActivity = function(activity, output) {
 		output.activities.splice(output.activities.indexOf(activity), 1);
-	};	
+	};
 
 	// handle global form actions
 	$scope.save = function() {
@@ -208,6 +207,14 @@ monitoolControllers.controller('ProjectLogicalFrameIndicatorController', functio
 		baseline: 0,
 		minimum: 0, orangeMinimum: 20, greenMinimum: 40, greenMaximum: 60, orangeMaximum: 80, maximum: 100,
 		targets: []
+	};
+
+	$scope.addTarget = function() {
+		$scope.planning.targets.push({month: null, value: 0});
+	};
+
+	$scope.removeTarget = function(target) {
+		$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
 	};
 
 	$scope.add = function() {
@@ -490,7 +497,6 @@ monitoolControllers.controller('ProjectInputController', function($scope, $route
 	$scope.form          = $scope.project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
 	$scope.inputEntity   = project.inputEntities.filter(function(entity) { return entity.id == $scope.input.entity; })[0];
 
-	// var colors = ["#F2B701", "#E57D04", "#DC0030", "#B10058", "#7C378A", "#3465AA", "#09A275", "#7CB854"];
 	var colors = ['#FBB735', '#E98931', '#EB403B', '#B32E37', '#6C2A6A', '#5C4399', '#274389', '#1F5EA8', '#227FB0', '#2AB0C5', '#39C0B3'],
 		curColorIndex = 0;
 
