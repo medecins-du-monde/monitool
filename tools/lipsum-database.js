@@ -275,16 +275,3 @@ while (docs.length !== 0) {
 			console.log('Failed to write docs');
 	});
 }
-
-request({
-	method: 'PUT',
-	auth: {user: username, pass: password},
-	url: 'http://' + host + ':' + port + '/' + bucket + '/_design/monitool',
-	json: require('./_design/monitool')
-}, function(error, response, doc) {
-	if (!error)
-		console.log('Written design doc');
-	else
-		console.log('Failed to write design doc');
-});
-
