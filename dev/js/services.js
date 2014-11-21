@@ -328,11 +328,25 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			throw new Error('Invalid groupBy: ' + groupBy)
 	};
 
-	var getTargetValue = function(period, targets) {
-		return NaN;
+	// @FIXME Should be a dichotomy, and targets should be sorted all the time (before saving).
+	var getTargetValue = function(period, planning) {
+		console.log(planning)
+		var targets = planning.targets, numTargets = targets.length;
+		if (numTargets == 0)
+			return 0;
+		
+		targets.sort(function(a, b) { return a.period.localeCompare(b.period); });
+		var index = 0;
+		while (index < numTargets) {
+			if (targets[index].period > period)
+				return targets[index].value;
+			++index;
+		}
+
+		return targets[numTargets - 1].value;
 	};
 
-	var retrieveMetadata = function(project, regrouped) {
+	var retrieveMetadata = function(project, regrouped, begin, groupBy) {
 		// add metadata
 		var regroupedWithMetadata = {};
 		for (var key in regrouped) {
@@ -344,8 +358,10 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 
 				// compute display value
 				if (params) {
+					var targetValue = getTargetValue(groupBy === 'month' ? key : begin.format('YYYY-MM'), params);
+
 					metadata.baselinePart = Math.round(100 * metadata.value / params.baseline);
-					metadata.targetPart = Math.round(100 * metadata.value / getTargetValue());
+					metadata.targetPart = Math.round(100 * metadata.value / targetValue);
 
 					// compute color
 					if (params.greenMinimum <= metadata.value && metadata.value <= params.greenMaximum)
@@ -388,7 +404,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			// Regroup and evaluate
 			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-			return retrieveMetadata(project, regrouped);
+			return retrieveMetadata(project, regrouped, begin, groupBy);
 		});
 	};
 
@@ -419,7 +435,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			// Regroup and evaluate
 			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-			return retrieveMetadata(project, regrouped);
+			return retrieveMetadata(project, regrouped, begin, groupBy);
 		});
 	};
 
@@ -451,7 +467,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 			// Regroup and evaluate
 			var regrouped = regroup(result.rows, keyTransformFunctions[groupBy]);
 			evaluateAll(project, regrouped);
-			return retrieveMetadata(project, regrouped);
+			return retrieveMetadata(project, regrouped, begin, groupBy);
 		});
 	};
 
@@ -483,7 +499,7 @@ mtServices.factory('mtIndicators', function($q, mtDatabase) {
 				});
 
 				evaluateAll(projects[index], pRegrouped);
-				return retrieveMetadata(projects[index], pRegrouped);
+				return retrieveMetadata(projects[index], pRegrouped, begin, groupBy);
 			}).forEach(function(pRegrouped) {
 				// Nest the JSON.keys into a 2 level hash.
 				for (var compoundKey in pRegrouped) {

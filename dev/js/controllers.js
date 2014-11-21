@@ -210,7 +210,7 @@ monitoolControllers.controller('ProjectLogicalFrameIndicatorController', functio
 	};
 
 	$scope.addTarget = function() {
-		$scope.planning.targets.push({month: null, value: 0});
+		$scope.planning.targets.push({period: null, value: 0});
 	};
 
 	$scope.removeTarget = function(target) {

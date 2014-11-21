@@ -140,7 +140,7 @@
 					<div ng-repeat="target in planning.targets" class="row" style="padding-bottom: 10px">
 						<ng-form name="targetForm">
 							<div class="col-sm-5 form-group" show-errors style="margin: 0">
-								<input type="month" class="form-control" ng-model="target.month" name="month" required />
+								<input type="month" class="form-control" ng-model="target.period" name="period" required />
 							</div>
 							<div class="col-sm-5 form-group" show-errors style="margin: 0">
 								<input type="text" class="form-control" ng-model="target.value" name="value" placeholder="{{'project.target_value_ph'|translate}}" required />
