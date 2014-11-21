@@ -261,17 +261,20 @@ var host = readline.question('host [localhost]: ') || 'localhost',
 	username = readline.question('login []: '),
 	password = readline.question('password []: ');
 
-request({
-	method: 'POST',
-	auth: {user: username, pass: password},
-	url: 'http://' + host + ':' + port + '/' + bucket + '/_bulk_docs',
-	json: { docs: types.concat(themes).concat(indicators).concat(projects).concat(inputs) }
-}, function(error, response, doc) {
-	if (!error)
-		console.log('Written', doc.length, 'documents');
-	else
-		console.log('Failed to write docs');
-});
+var docs = types.concat(themes).concat(indicators).concat(projects).concat(inputs);
+while (docs.length !== 0) {
+	request({
+		method: 'POST',
+		auth: {user: username, pass: password},
+		url: 'http://' + host + ':' + port + '/' + bucket + '/_bulk_docs',
+		json: { docs: docs.splice(0, 100) }
+	}, function(error, response, doc) {
+		if (!error)
+			console.log('Written', doc.length, 'documents');
+		else
+			console.log('Failed to write docs');
+	});
+}
 
 request({
 	method: 'PUT',
