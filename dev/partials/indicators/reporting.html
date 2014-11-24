@@ -6,133 +6,124 @@
 
 </style>
 
-<div class="row">
-	<div class="col-md-2">
-		<ng-include src="'partials/indicators/menu.html'"></ng-include>
-	</div>
+<ol class="breadcrumb">
+	<li><a ui-sref="main.indicators.list" translate>shared.indicators</a></li>
+	<li><a ui-sref="main.indicator.edit({indicatorId: indicator._id}">{{indicator.name}}</a></li>
+	<li class="active" translate>shared.reporting</li>
+</ol>
 
-	<div class="col-md-10">
-
-		<ol class="breadcrumb">
-			<li><a href="#indicators" translate>shared.indicators_catalog</a></li>
-			<li><a href="#indicators/{{indicator._id}}">{{indicator.name}}</a></li>
-			<li class="active" translate>shared.reporting</li>
-		</ol>
-
-		<form class="form-horizontal" novalidate>
-			<div class="row">
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="indicator" class="col-sm-2 control-label" translate>shared.begin</label>
-						<div class="col-sm-10">
-							<input type="month" class="form-control" ng-model="begin" ng-change="updateData()" required />
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="group-by-input" class="col-sm-2 control-label" translate>shared.columns</label>
-						<div class="col-sm-10">
-							<select class="form-control" id="group-by-input" ng-model="groupBy" ng-change="updateData()">
-								<option value="month" translate>shared.month</option>
-								<option value="year" translate>shared.year</option>
-							</select>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="colorize-input" class="col-sm-2 control-label" translate>shared.colorize</label>
-						<div class="col-sm-10">
-							<p class="form-control-static">
-								<input type="checkbox" id="colorize-input" ng-model="colorize" />
-							</p>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="indicator" class="col-sm-2 control-label" translate>shared.end</label>
-						<div class="col-sm-10">
-							<input type="month" class="form-control" ng-model="end" ng-change="updateData()" required />
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="display-input" class="col-sm-2 control-label" translate>shared.display</label>
-						<div class="col-sm-10">
-							<select class="form-control" id="display-input" ng-model="display">
-								<option value="value" translate>shared.values</option>
-								<option value="targetPart" translate>shared.target_percentage</option>
-								<option value="baselinePart" translate>shared.baseline_percentage</option>
-							</select>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="plot-input" class="col-sm-2 control-label" translate>shared.plot</label>
-						<div class="col-sm-10">
-							<p class="form-control-static">
-								<input type="checkbox" id="plot-input" ng-model="plot" />
-
-							</p>
-						</div>
-					</div>
-
+<form class="form-horizontal" novalidate>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate>shared.begin</label>
+				<div class="col-sm-10">
+					<input type="month" class="form-control" ng-model="begin" ng-change="updateData()" required />
 				</div>
 			</div>
-		</form>
+			<div class="form-group">
+				<label for="group-by-input" class="col-sm-2 control-label" translate>shared.columns</label>
+				<div class="col-sm-10">
+					<select class="form-control" id="group-by-input" ng-model="groupBy" ng-change="updateData()">
+						<option value="month" translate>shared.month</option>
+						<option value="year" translate>shared.year</option>
+					</select>
+				</div>
+			</div>
 
-		<div class="clearfix">
-			<button
-				class="btn btn-primary btn-xs pull-right"
-				ng-show="plot"
-				ng-click="downloadGraph()" translate>shared.download_plot</button>
+			<div class="form-group">
+				<label for="colorize-input" class="col-sm-2 control-label" translate>shared.colorize</label>
+				<div class="col-sm-10">
+					<p class="form-control-static">
+						<input type="checkbox" id="colorize-input" ng-model="colorize" />
+					</p>
+				</div>
+			</div>
 		</div>
 
-		<div id="chart" ng-show="plot"></div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate>shared.end</label>
+				<div class="col-sm-10">
+					<input type="month" class="form-control" ng-model="end" ng-change="updateData()" required />
+				</div>
+			</div>
 
-		<button class="btn btn-primary btn-xs pull-right"
-				ng-click="downloadCSV()"
-				style="margin-bottom: 10px;" translate>shared.download_table</button>
+			<div class="form-group">
+				<label for="display-input" class="col-sm-2 control-label" translate>shared.display</label>
+				<div class="col-sm-10">
+					<select class="form-control" id="display-input" ng-model="display">
+						<option value="value" translate>shared.values</option>
+						<option value="targetPart" translate>shared.target_percentage</option>
+						<option value="baselinePart" translate>shared.baseline_percentage</option>
+					</select>
+				</div>
+			</div>
 
-		<table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
-			<thead>
-				<tr>
-					<th ng-show="plot"></th>
-					<th></th>
-					<th ng-repeat="col in cols">{{col.name}}</th>
-				</tr>
-			</thead>
-			<tbody ng-repeat="project in projects" ng-init="open=false;">
-				<tr>
-					<td ng-show="plot"><input id="plot-{{project._id}}" type="checkbox" ng-model="plots[project._id]" ng-change="updateGraph(project._id)" /></td>
-					<td>
-						<a ng-click="open=!open">
-							<i class="fa" ng-class="{'fa-minus-circle': open, 'fa-plus-circle': !open}"></i>
-							{{project.name}}
-						</a>
-					</td>
-					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][project._id][indicator._id] ? (colorize ? data[col.id][project._id][indicator._id].color : white) : '#eeeeee'}">
-						<div ng-switch="display" ng-if="data[col.id][project._id][indicator._id]">
-							<span ng-switch-when="value">{{data[col.id][project._id][indicator._id].value}}{{indicator.unit}}</span>
-							<span ng-switch-when="targetPart">{{data[col.id][project._id][indicator._id].targetPart}}%</span>
-							<span ng-switch-when="baselinePart">{{data[col.id][project._id][indicator._id].baselinePart}}%</span>
-						</div>
-					</td>
-				</tr>
-				<tr ng-repeat="inputEntity in project.inputEntities" ng-if="open">
-					<td ng-show="plot"><input id="plot-{{inputEntity.id}}" type="checkbox" ng-model="plots[inputEntity.id]" ng-change="updateGraph(inputEntity.id)" /></td>
-					<td>
-						<label for="plot-{{inputEntity.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{inputEntity.name}}</label>
-					</td>
-					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][inputEntity.id][indicator._id] ? (colorize ? data[col.id][inputEntity.id][indicator._id].color : white) : '#eee'}">
-						<div ng-switch="display" ng-if="data[col.id][inputEntity.id][indicator._id] !== undefined">
-							<span ng-switch-when="value">{{data[col.id][inputEntity.id][indicator._id].value}}{{indicator.unit}}</span>
-							<span ng-switch-when="targetPart">{{data[col.id][inputEntity.id][indicator._id].targetPart}}%</span>
-							<span ng-switch-when="baselinePart">{{data[col.id][inputEntity.id][indicator._id].baselinePart}}%</span>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+			<div class="form-group">
+				<label for="plot-input" class="col-sm-2 control-label" translate>shared.plot</label>
+				<div class="col-sm-10">
+					<p class="form-control-static">
+						<input type="checkbox" id="plot-input" ng-model="plot" />
+
+					</p>
+				</div>
+			</div>
+
+		</div>
 	</div>
+</form>
+
+<div class="clearfix">
+	<button
+		class="btn btn-primary btn-xs pull-right"
+		ng-show="plot"
+		ng-click="downloadGraph()" translate>shared.download_plot</button>
 </div>
+
+<div id="chart" ng-show="plot"></div>
+
+<button class="btn btn-primary btn-xs pull-right"
+		ng-click="downloadCSV()"
+		style="margin-bottom: 10px;" translate>shared.download_table</button>
+
+<table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
+	<thead>
+		<tr>
+			<th ng-show="plot"></th>
+			<th></th>
+			<th ng-repeat="col in cols">{{col.name}}</th>
+		</tr>
+	</thead>
+	<tbody ng-repeat="project in projects" ng-init="open=false;">
+		<tr>
+			<td ng-show="plot"><input id="plot-{{project._id}}" type="checkbox" ng-model="plots[project._id]" ng-change="updateGraph(project._id)" /></td>
+			<td>
+				<a ng-click="open=!open">
+					<i class="fa" ng-class="{'fa-minus-circle': open, 'fa-plus-circle': !open}"></i>
+					{{project.name}}
+				</a>
+			</td>
+			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][project._id][indicator._id] ? (colorize ? data[col.id][project._id][indicator._id].color : white) : '#eeeeee'}">
+				<div ng-switch="display" ng-if="data[col.id][project._id][indicator._id]">
+					<span ng-switch-when="value">{{data[col.id][project._id][indicator._id].value}}{{indicator.unit}}</span>
+					<span ng-switch-when="targetPart">{{data[col.id][project._id][indicator._id].targetPart}}%</span>
+					<span ng-switch-when="baselinePart">{{data[col.id][project._id][indicator._id].baselinePart}}%</span>
+				</div>
+			</td>
+		</tr>
+		<tr ng-repeat="inputEntity in project.inputEntities" ng-if="open">
+			<td ng-show="plot"><input id="plot-{{inputEntity.id}}" type="checkbox" ng-model="plots[inputEntity.id]" ng-change="updateGraph(inputEntity.id)" /></td>
+			<td>
+				<label for="plot-{{inputEntity.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{inputEntity.name}}</label>
+			</td>
+			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][inputEntity.id][indicator._id] ? (colorize ? data[col.id][inputEntity.id][indicator._id].color : white) : '#eee'}">
+				<div ng-switch="display" ng-if="data[col.id][inputEntity.id][indicator._id] !== undefined">
+					<span ng-switch-when="value">{{data[col.id][inputEntity.id][indicator._id].value}}{{indicator.unit}}</span>
+					<span ng-switch-when="targetPart">{{data[col.id][inputEntity.id][indicator._id].targetPart}}%</span>
+					<span ng-switch-when="baselinePart">{{data[col.id][inputEntity.id][indicator._id].baselinePart}}%</span>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>

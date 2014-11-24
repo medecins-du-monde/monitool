@@ -10,19 +10,15 @@ var indicatorControllers = angular.module(
 	]
 );
 
-indicatorControllers.controller('IndicatorListController', function($scope, $q, $location, indicatorHierarchy, typesById, themesById) {
+indicatorControllers.controller('IndicatorListController', function($scope, indicatorHierarchy, typesById, themesById) {
 	$scope.hierarchy  = indicatorHierarchy;
 	$scope.types      = typesById;
 	$scope.themes     = themesById;
 	$scope.orderField = 'name';
-
-	$scope.create = function() {
-		$location.url('/indicators/new');
-	};
 });
 
 
-indicatorControllers.controller('IndicatorEditController', function($scope, $routeParams, $location, mtDatabase, indicator, indicators, types, themes) {
+indicatorControllers.controller('IndicatorEditController', function($state, $scope, $stateParams, mtDatabase, indicator, indicators, types, themes) {
 	// Formula handlers
 	$scope.addFormula = function() {
 		var uuid  = PouchDB.utils.uuid().toLowerCase(),
@@ -82,15 +78,15 @@ indicatorControllers.controller('IndicatorEditController', function($scope, $rou
 	};
 
 	$scope.save = function() {
-		if ($routeParams.indicatorId === 'new')
+		if ($stateParams.indicatorId === 'new')
 			$scope.indicator._id = PouchDB.utils.uuid().toLowerCase();
 
 		mtDatabase.current.put($scope.indicator).then(function(result) {
 			$scope.indicator._rev = result.rev;
 			$scope.master = angular.copy($scope.indicator);
 
-			if ($routeParams.indicatorId === 'new')
-				$location.url('/indicators/' + result.id);
+			if ($stateParams.indicatorId === 'new')
+				$state.go('main.indicator.edit', {indicatorId: result.id});
 		});
 	};
 

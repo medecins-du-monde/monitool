@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "homepage": "https://github.com/romain-gilliotte/monitool",
   "authors": [
-    "Romain Gilliotte <rgilliotte@zebestof.com>"
+    "Romain Gilliotte <romain.gilliotte@medecinsdumonde.net>"
   ],
   "main": "main.html",
   "license": "MIT",
@@ -21,9 +21,9 @@
     "angular-cookies": "v1.2.25",
     "angular-moment": "~0.8.2",
     "angular-pouchdb": "angular-pouchdb/angular-pouchdb",
-    "angular-route": "~1.2.25",
     "angular-translate-storage-local": "~2.4.2",
     "angular-ui-select": "~0.8.2",
+    "angular-ui-router": "~0.2.13",
     "Blob.js": "https://github.com/eligrey/Blob.js.git",
     "bootstrap": "~3.2.0",
     "canvas-toBlob.js": "~0.1.3",

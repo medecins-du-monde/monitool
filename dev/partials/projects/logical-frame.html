@@ -1,257 +1,247 @@
-<div class="row">
-	<div class="col-md-2">
-		<ng-include src="'partials/projects/menu.html'"></ng-include>
-	</div>
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
+	<li class="active">{{project.name}}</li>
+	<li class="active" translate>shared.logical_frame</li>
+</ol>
 
-	<div class="col-md-10">
+<form class="form-horizontal" role="form" name="projectForm" novalidate>
+	<fieldset>
+		<legend translate>project.general_data</legend>
 
-		<ol class="breadcrumb">
-			<li><a href="#projects" translate>shared.projects</a></li>
-			<li class="active">{{project.name}}</li>
-			<li class="active" translate>shared.logical_frame</li>
-		</ol>
-
-		<form class="form-horizontal" role="form" name="projectForm" novalidate>
-			<fieldset>
-				<legend translate>project.general_data</legend>
-
-				<div class="form-group" show-errors>
-					<label for="input-name" class="col-sm-2 control-label" translate>shared.name</label>
-					<div class="col-sm-10">
-						<input type="text"
-							   class="form-control"
-							   id="input-name"
-							   name="name"
-							   ng-model="project.name"
-							   placeholder="{{'project.name_ph'|translate}}"
-							   required />
-						
-						<p class="help-block" ng-if="projectForm.name.$error.required" translate>form.mandatory</p>
-					</div>
-				</div>
-
-				<div class="form-group" show-errors>
-					<label for="input-begin" class="col-sm-2 control-label" translate>project.begin_date</label>
-					<div class="col-sm-10">
-						<input type="month"
-							   class="form-control"
-							   id="input-begin"
-							   name="begin"
-							   max="{{project.end}}"
-							   ng-model="project.begin"
-							   required
-							   lower-than="{{project.end}}">
-
-						<p class="help-block" ng-if="projectForm.begin.$error.required" translate>form.mandatory</p>
-						<p class="help-block" ng-if="projectForm.begin.$error.lowerThan" translate>form.begin_lower_than_end</p>
-					</div>
-				</div>
-
-
-				<div class="form-group" show-errors>
-					<label for="input-end" class="col-sm-2 control-label" translate>project.end_date</label>
-					<div class="col-sm-10">
-						<input type="month"
-							   class="form-control"
-							   id="input-end"
-							   name="end"
-							   min="{{project.begin}}"
-							   ng-model="project.end"
-							   greater-than="{{project.begin}}"
-							   required>
-
-						<p class="help-block" ng-if="projectForm.end.$error.required" translate>form.mandatory</p>
-						<p class="help-block" ng-if="projectForm.end.$error.greaterThan" translate>form.end_greater_than_begin</p>
-					</div>
-				</div>
-			</fieldset>
-
-			<fieldset>
-				<legend translate>project.goal</legend>
-				<div class="form-group" show-errors>
-					<label for="input-name" class="col-sm-2 control-label" translate>project.intervention_logic</label>
-
-					<div class="col-sm-10">
-						<textarea class="form-control"
-								  name="goalDesc"
-								  required
-								  placeholder="{{'project.intervention_logic_goal_ph'|translate}}"
-								  ng-model="project.logicalFrame.goal"></textarea>
-
-						<p class="help-block" ng-if="projectForm.goalDesc.$error.required" translate>form.mandatory</p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label for="input-name" class="col-sm-2 control-label" translate>shared.indicators</label>
-					<div class="col-sm-10">
-						<ul class="form-control-static">
-							<li ng-repeat="indicatorId in project.logicalFrame.indicators">
-								{{indicatorsById[indicatorId].name}}
-								(<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)" translate>shared.edit</a>)
-							</li>
-							<li><a ng-click="editIndicator(null, project.logicalFrame.indicators)" translate>project.add_indicator</a></li>
-						</ul>
-					</div>
-				</div>
-			</fieldset>
-
-			<fieldset>
-				<legend translate>project.purposes</legend>
+		<div class="form-group" show-errors>
+			<label for="input-name" class="col-sm-2 control-label" translate>shared.name</label>
+			<div class="col-sm-10">
+				<input type="text"
+					   class="form-control"
+					   id="input-name"
+					   name="name"
+					   ng-model="project.name"
+					   placeholder="{{'project.name_ph'|translate}}"
+					   required />
 				
-				<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes" ng-init="tabOpen=false">
+				<p class="help-block" ng-if="projectForm.name.$error.required" translate>form.mandatory</p>
+			</div>
+		</div>
 
-					<div class="panel-heading">
-						<div class="panel-title">
-							<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)" translate>shared.delete</button>
-							<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-							<a ng-click="tabOpen = !tabOpen"> {{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}</a>
+		<div class="form-group" show-errors>
+			<label for="input-begin" class="col-sm-2 control-label" translate>project.begin_date</label>
+			<div class="col-sm-10">
+				<input type="month"
+					   class="form-control"
+					   id="input-begin"
+					   name="begin"
+					   max="{{project.end}}"
+					   ng-model="project.begin"
+					   required
+					   lower-than="{{project.end}}">
+
+				<p class="help-block" ng-if="projectForm.begin.$error.required" translate>form.mandatory</p>
+				<p class="help-block" ng-if="projectForm.begin.$error.lowerThan" translate>form.begin_lower_than_end</p>
+			</div>
+		</div>
+
+
+		<div class="form-group" show-errors>
+			<label for="input-end" class="col-sm-2 control-label" translate>project.end_date</label>
+			<div class="col-sm-10">
+				<input type="month"
+					   class="form-control"
+					   id="input-end"
+					   name="end"
+					   min="{{project.begin}}"
+					   ng-model="project.end"
+					   greater-than="{{project.begin}}"
+					   required>
+
+				<p class="help-block" ng-if="projectForm.end.$error.required" translate>form.mandatory</p>
+				<p class="help-block" ng-if="projectForm.end.$error.greaterThan" translate>form.end_greater_than_begin</p>
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend translate>project.goal</legend>
+		<div class="form-group" show-errors>
+			<label for="input-name" class="col-sm-2 control-label" translate>project.intervention_logic</label>
+
+			<div class="col-sm-10">
+				<textarea class="form-control"
+						  name="goalDesc"
+						  required
+						  placeholder="{{'project.intervention_logic_goal_ph'|translate}}"
+						  ng-model="project.logicalFrame.goal"></textarea>
+
+				<p class="help-block" ng-if="projectForm.goalDesc.$error.required" translate>form.mandatory</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="input-name" class="col-sm-2 control-label" translate>shared.indicators</label>
+			<div class="col-sm-10">
+				<ul class="form-control-static">
+					<li ng-repeat="indicatorId in project.logicalFrame.indicators">
+						{{indicatorsById[indicatorId].name}}
+						(<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)" translate>shared.edit</a>)
+					</li>
+					<li><a ng-click="editIndicator(null, project.logicalFrame.indicators)" translate>project.add_indicator</a></li>
+				</ul>
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend translate>project.purposes</legend>
+		
+		<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes" ng-init="tabOpen=false">
+
+			<div class="panel-heading">
+				<div class="panel-title">
+					<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)" translate>shared.delete</button>
+					<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
+					<a ng-click="tabOpen = !tabOpen"> {{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}</a>
+				</div>
+			</div>
+
+			<div class="panel-body" ng-show="tabOpen">
+				<ng-form name="purposeForm">
+					<div class="form-group" show-errors>
+						<label for="input-name" class="col-sm-2 control-label" translate>project.intervention_logic</label>
+						<div class="col-sm-10">
+							<input type="text"
+								   class="form-control"
+								   name="description"
+								   placeholder="{{'project.intervention_logic_purpose_ph'|translate}}"
+								   ng-model="purpose.description"
+								   required />
+
+							<p class="help-block" ng-if="purposeForm.description.$error.required" translate>form.mandatory</p>
 						</div>
 					</div>
 
-					<div class="panel-body" ng-show="tabOpen">
-						<ng-form name="purposeForm">
-							<div class="form-group" show-errors>
-								<label for="input-name" class="col-sm-2 control-label" translate>project.intervention_logic</label>
-								<div class="col-sm-10">
-									<input type="text"
-										   class="form-control"
-										   name="description"
-										   placeholder="{{'project.intervention_logic_purpose_ph'|translate}}"
-										   ng-model="purpose.description"
-										   required />
+					<div class="form-group" show-errors>
+						<label for="input-name" class="col-sm-2 control-label" translate>project.assumptions</label>
+						<div class="col-sm-10">
+							<textarea class="form-control"
+									  name="assumptions"
+									  placeholder="{{'project.assumptions_purpose_ph'|translate}}"
+									  ng-model="purpose.assumptions"
+									  required></textarea>
 
-									<p class="help-block" ng-if="purposeForm.description.$error.required" translate>form.mandatory</p>
-								</div>
+							<p class="help-block" ng-if="purposeForm.assumptions.$error.required" translate>form.mandatory</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="input-name" class="col-sm-2 control-label" translate>shared.indicators</label>
+						<div class="col-sm-10">
+							<ul class="form-control-static">
+								<li ng-repeat="indicatorId in purpose.indicators">
+									{{indicatorsById[indicatorId].name}}
+									(<a ng-click="editIndicator(indicatorId, purpose.indicators)" translate>shared.edit</a>)
+								</li>
+								<li><a ng-click="editIndicator(null, purpose.indicators)" translate>project.add_indicator</a></li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs" ng-init="tabOpen=false">
+						<div class="panel-heading">
+							<div class="panel-title">
+								<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)" translate>shared.delete</button>
+								<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
+								<a ng-click="tabOpen = !tabOpen"> {{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}</a>
 							</div>
+						</div>
 
-							<div class="form-group" show-errors>
-								<label for="input-name" class="col-sm-2 control-label" translate>project.assumptions</label>
-								<div class="col-sm-10">
-									<textarea class="form-control"
-											  name="assumptions"
-											  placeholder="{{'project.assumptions_purpose_ph'|translate}}"
-											  ng-model="purpose.assumptions"
-											  required></textarea>
+						<div class="panel-body" ng-show="tabOpen">
+							<ng-form name="outputForm">
+								<div class="form-group" show-errors>
+									<label for="input-name" class="col-sm-2 control-label" translate>shared.description</label>
+									<div class="col-sm-10">
+										<textarea class="form-control"
+												  required
+												  name="description"
+												  placeholder="{{'project.output_desc_ph'|translate}}"
+												  ng-model="output.description"></textarea>
 
-									<p class="help-block" ng-if="purposeForm.assumptions.$error.required" translate>form.mandatory</p>
-								</div>
-							</div>
-
-							<div class="form-group">
-								<label for="input-name" class="col-sm-2 control-label" translate>shared.indicators</label>
-								<div class="col-sm-10">
-									<ul class="form-control-static">
-										<li ng-repeat="indicatorId in purpose.indicators">
-											{{indicatorsById[indicatorId].name}}
-											(<a ng-click="editIndicator(indicatorId, purpose.indicators)" translate>shared.edit</a>)
-										</li>
-										<li><a ng-click="editIndicator(null, purpose.indicators)" translate>project.add_indicator</a></li>
-									</ul>
-								</div>
-							</div>
-
-							<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs" ng-init="tabOpen=false">
-								<div class="panel-heading">
-									<div class="panel-title">
-										<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)" translate>shared.delete</button>
-										<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-										<a ng-click="tabOpen = !tabOpen"> {{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}</a>
+										<p class="help-block" ng-if="outputForm.description.$error.required" translate>form.mandatory</p>
 									</div>
 								</div>
 
-								<div class="panel-body" ng-show="tabOpen">
-									<ng-form name="outputForm">
-										<div class="form-group" show-errors>
-											<label for="input-name" class="col-sm-2 control-label" translate>shared.description</label>
-											<div class="col-sm-10">
-												<textarea class="form-control"
-														  required
-														  name="description"
-														  placeholder="{{'project.output_desc_ph'|translate}}"
-														  ng-model="output.description"></textarea>
+								<div class="form-group" show-errors>
+									<label for="input-name" class="col-sm-2 control-label" translate>project.assumptions</label>
+									<div class="col-sm-10">
+										<textarea class="form-control"
+												  required
+												  name="assumptions"
+												  placeholder="{{'project.output_assumptions_ph'|translate}}"
+												  ng-model="output.assumptions"></textarea>
 
-												<p class="help-block" ng-if="outputForm.description.$error.required" translate>form.mandatory</p>
-											</div>
+										<p class="help-block" ng-if="outputForm.assumptions.$error.required" translate>form.mandatory</p>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="input-name" class="col-sm-2 control-label" translate>shared.indicators</label>
+									<div class="col-sm-10">
+										<ul class="form-control-static">
+											<li ng-repeat="indicatorId in output.indicators">
+												{{indicatorsById[indicatorId].name}}
+												(<a ng-click="editIndicator(indicatorId, output.indicators)" translate>shared.edit</a>)
+											</li>
+											<li><a ng-click="editIndicator(null, output.indicators)" translate>project.add_indicator</a></li>
+										</ul>
+									</div>
+								</div>
+
+								<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities" ng-init="tabOpen=false">
+									<div class="panel-heading">
+										<div class="panel-title">
+											<button class="btn btn-danger btn-xs pull-right" ng-click="removeActivity(activity, output)" translate>shared.delete</button>
+											<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
+											<a ng-click="tabOpen = !tabOpen"> {{'project.activity'|translate}} {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}</a>
 										</div>
+									</div>
 
-										<div class="form-group" show-errors>
-											<label for="input-name" class="col-sm-2 control-label" translate>project.assumptions</label>
-											<div class="col-sm-10">
-												<textarea class="form-control"
-														  required
-														  name="assumptions"
-														  placeholder="{{'project.output_assumptions_ph'|translate}}"
-														  ng-model="output.assumptions"></textarea>
+									<div class="panel-body" ng-show="tabOpen">
+										<ng-form name="activityForm">
+											<div class="form-group" show-errors>
+												<label for="input-name" class="col-sm-2 control-label" translate>shared.description</label>
+												<div class="col-sm-10">
+													<input type="text" class="form-control" name="description" placeholder="{{'project.activity_desc_ph'|translate}}" ng-model="activity.description" required/>
 
-												<p class="help-block" ng-if="outputForm.assumptions.$error.required" translate>form.mandatory</p>
-											</div>
-										</div>
-
-										<div class="form-group">
-											<label for="input-name" class="col-sm-2 control-label" translate>shared.indicators</label>
-											<div class="col-sm-10">
-												<ul class="form-control-static">
-													<li ng-repeat="indicatorId in output.indicators">
-														{{indicatorsById[indicatorId].name}}
-														(<a ng-click="editIndicator(indicatorId, output.indicators)" translate>shared.edit</a>)
-													</li>
-													<li><a ng-click="editIndicator(null, output.indicators)" translate>project.add_indicator</a></li>
-												</ul>
-											</div>
-										</div>
-
-										<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities" ng-init="tabOpen=false">
-											<div class="panel-heading">
-												<div class="panel-title">
-													<button class="btn btn-danger btn-xs pull-right" ng-click="removeActivity(activity, output)" translate>shared.delete</button>
-													<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-													<a ng-click="tabOpen = !tabOpen"> {{'project.activity'|translate}} {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}</a>
+													<p class="help-block" ng-if="activityForm.description.$error.required" translate>form.mandatory</p>
 												</div>
 											</div>
 
-											<div class="panel-body" ng-show="tabOpen">
-												<ng-form name="activityForm">
-													<div class="form-group" show-errors>
-														<label for="input-name" class="col-sm-2 control-label" translate>shared.description</label>
-														<div class="col-sm-10">
-															<input type="text" class="form-control" name="description" placeholder="{{'project.activity_desc_ph'|translate}}" ng-model="activity.description" required/>
+											<div class="form-group" show-errors>
+												<label for="input-name" class="col-sm-2 control-label" translate>project.prerequisite</label>
+												<div class="col-sm-10">
+													<input type="text" class="form-control" placeholder="{{'project.activity_prereq_ph'|translate}}" ng-model="activity.prerequesites" name="prerequesites" required/>
 
-															<p class="help-block" ng-if="activityForm.description.$error.required" translate>form.mandatory</p>
-														</div>
-													</div>
+													<p class="help-block" ng-if="activityForm.prerequesites.$error.required" translate>form.mandatory</p>
 
-													<div class="form-group" show-errors>
-														<label for="input-name" class="col-sm-2 control-label" translate>project.prerequisite</label>
-														<div class="col-sm-10">
-															<input type="text" class="form-control" placeholder="{{'project.activity_prereq_ph'|translate}}" ng-model="activity.prerequesites" name="prerequesites" required/>
-
-															<p class="help-block" ng-if="activityForm.prerequesites.$error.required" translate>form.mandatory</p>
-
-														</div>
-													</div>
-												</ng-form>
+												</div>
 											</div>
-										</div>
-
-										<button class="btn btn-default" ng-click="addActivity(output)" translate>project.add_activity</button>
-									</ng-form>
+										</ng-form>
+									</div>
 								</div>
-							</div>
-							
-							<button class="btn btn-default" ng-click="addOutput(purpose)" translate>project.add_output</button>
-						</ng-form>
+
+								<button class="btn btn-default" ng-click="addActivity(output)" translate>project.add_activity</button>
+							</ng-form>
+						</div>
 					</div>
-				</div>
+					
+					<button class="btn btn-default" ng-click="addOutput(purpose)" translate>project.add_output</button>
+				</ng-form>
+			</div>
+		</div>
 
-				<button class="btn btn-default" ng-click="addPurpose()" translate>project.add_purpose</button>
-			</fieldset>
-			
-			<br/><br/>
+		<button class="btn btn-default" ng-click="addPurpose()" translate>project.add_purpose</button>
+	</fieldset>
+	
+	<br/><br/>
 
-			<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" translate>shared.save</button>
-			<button ng-click="reset()" class="btn btn-default" translate>shared.remove_changes</button>
-		</form>
-
-	</div>
-</div>
+	<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" translate>shared.save</button>
+	<button ng-click="reset()" class="btn btn-default" translate>shared.remove_changes</button>
+</form>

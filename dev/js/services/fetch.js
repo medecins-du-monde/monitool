@@ -2,7 +2,7 @@
 
 var fetchServices = angular.module('monitool.services.fetch', ['monitool.services.database']);
 
-fetchServices.factory('mtFetch', function($route, $q, mtDatabase) {
+fetchServices.factory('mtFetch', function($q, mtDatabase) {
 	var reformatArray = function(result) {
 		return result.rows.map(function(row) {
 			row.value._id = row.key;
@@ -21,8 +21,8 @@ fetchServices.factory('mtFetch', function($route, $q, mtDatabase) {
 	}
 
 	return {
-		currentProject: function() {
-			if ($route.current.params.projectId === 'new') {
+		project: function(projectId) {
+			if (projectId === 'new') {
 				return $q.when({
 					type: "project",
 					name: "",
@@ -36,7 +36,7 @@ fetchServices.factory('mtFetch', function($route, $q, mtDatabase) {
 				});
 			}
 			else
-				return mtDatabase.current.get($route.current.params.projectId);
+				return mtDatabase.current.get(projectId);
 		},
 		projects: function() {
 			return mtDatabase.current.query('monitool/projects_short').then(reformatArray).catch(handleError);
@@ -47,8 +47,8 @@ fetchServices.factory('mtFetch', function($route, $q, mtDatabase) {
 			});
 		},
 
-		currentIndicator: function() {
-			if ($route.current.params.indicatorId === 'new')
+		indicator: function(indicatorId) {
+			if (indicatorId === 'new')
 				return $q.when({
 					type: 'indicator',
 					name: '',
@@ -61,7 +61,7 @@ fetchServices.factory('mtFetch', function($route, $q, mtDatabase) {
 					formulas: {}
 				});
 			else
-				return mtDatabase.current.get($route.current.params.indicatorId);
+				return mtDatabase.current.get(indicatorId);
 		},
 		indicators: function() {
 			return mtDatabase.current.query('monitool/indicators_short', {group: true}).then(reformatArray);
@@ -107,9 +107,8 @@ fetchServices.factory('mtFetch', function($route, $q, mtDatabase) {
 			return mtDatabase.current.query('monitool/types_short', {group: true}).then(reformatHashById);
 		},
 
-		currentPreviousInput: function() {
-			var p        = $route.current.params,
-				id       = [p.projectId, p.entityId, p.formId, p.period].join(':'),
+		currentPreviousInput: function(p) {
+			var id       = [p.projectId, p.entityId, p.formId, p.period].join(':'),
 				startKey = id,
 				endKey   = [p.projectId, p.entityId, p.formId].join(':'),
 				options  = {startkey: startKey, endkey: endKey, descending: true, limit: 2, include_docs: true};

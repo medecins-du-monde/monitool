@@ -12,12 +12,18 @@
 	</thead>
 	<tbody>
 		<tr ng-repeat="project in projects | filter:isFinished | orderBy:pred:rev">
-			<td><i class="fa" ng-class="{'fa-star': offline[project._id], 'fa-star-o': !offline[project._id]}"></i></td>
-			<td><a ng-click="openProject(project._id)">{{project.name}}</a></td>
+			<td>
+				<i class="fa" ng-class="{'fa-star': offline[project._id], 'fa-star-o': !offline[project._id]}"></i>
+			</td>
+			<td>
+				<a ui-sref="main.project.logical_frame({projectId: project._id})">
+					{{project.name}}
+				</a>
+			</td>
 			<td>{{project.begin}}</td>
 			<td>{{project.end}}</td>
 		</tr>
 	</tbody>
 </table>
 
-<button class="btn btn-default" ng-click="create()" translate>project.create</button>
+<a class="btn btn-default" ui-sref="main.project.logical_frame({projectId: 'new'})" translate>project.create</a>

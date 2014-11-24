@@ -1,44 +1,50 @@
+<div class="row">
+	<div class="col-md-2">
+		<ul class="nav nav-pills nav-stacked">
 
-<ul class="nav nav-pills nav-stacked" ng-controller="SubMenuController">
+			<li ui-sref-active="active">
+				<a ui-sref="main.project.logical_frame({projectId: project._id})"
+				   tooltip="{{'project.logical_frame_tooltip'|translate}}"
+				   tooltip-popup-delay="1000"
+				   translate>shared.logical_frame</a>
+			</li>
+			
+			<li ng-class="{disabled: !project._id, active: $state.is('main.project.input_entities') || $state.is('main.project.input_entities_reporting')}">
+				<a ui-sref="main.project.input_entities({projectId: project._id})"
+				   tooltip="{{'project.input_entities_tooltip'|translate}}"
+				   tooltip-popup-delay="1000"
+				   translate>shared.input_entities</a>
+			</li>
 
-	<li ng-class="{active: currentPage === 'logical-frame', disabled: projectId === 'new'}">
-		<a ng-click="changePage('logical-frame')"
-		   tooltip="{{'project.logical_frame_tooltip'|translate}}"
-		   tooltip-popup-delay="200"
-		   translate>shared.logical_frame</a>
-	</li>
-	
-	<li ng-class="{active: currentPage === 'input-entities', disabled: projectId === 'new'}">
-		<a ng-click="changePage('input-entities')"
-		   tooltip="{{'project.input_entities_tooltip'|translate}}"
-		   tooltip-popup-delay="200"
-		   translate>shared.input_entities</a>
-	</li>
+			<li ng-class="{disabled: !project._id, active: $state.is('main.project.input_groups') || $state.is('main.project.input_groups_reporting')}">
+				<a ui-sref="main.project.input_groups({projectId: project._id})"
+				   tooltip="{{'project.input_groups_tooltip'|translate}}"
+				   tooltip-popup-delay="1000"
+				   translate>shared.input_groups</a>
+			</li>
 
-	<li ng-class="{active: currentPage === 'input-groups', disabled: projectId === 'new'}">
-		<a ng-click="changePage('input-groups')"
-		   tooltip="{{'project.input_groups_tooltip'|translate}}"
-		   tooltip-popup-delay="200"
-		   translate>shared.input_groups</a>
-	</li>
+			<li ui-sref-active="active" ng-class="{disabled: !project._id}">
+				<a ui-sref="main.project.forms({projectId: project._id})"
+				   tooltip="{{'project.input_forms_tooltip'|translate}}"
+				   tooltip-popup-delay="1000"
+				   translate>project.input_forms</a>
+			</li>
+			
+			<li ui-sref-active="active" ng-class="{disabled: !project._id}">
+				<a ui-sref="main.project.input_list({projectId: project._id})"
+				   tooltip="{{'project.waiting_inputs_tooltip'|translate}}"
+				   tooltip-popup-delay="1000"
+				   translate>project.waiting_inputs</a>
+			</li>
 
-	<li ng-class="{active: currentPage === 'forms', disabled: projectId === 'new'}">
-		<a ng-click="changePage('forms')"
-		   tooltip="{{'project.input_forms_tooltip'|translate}}"
-		   tooltip-popup-delay="200"
-		   translate>project.input_forms</a>
-	</li>
-	<li ng-class="{active: currentPage === 'inputs', disabled: projectId === 'new'}">
-		<a ng-click="changePage('inputs')"
-		   tooltip="{{'project.waiting_inputs_tooltip'|translate}}"
-		   tooltip-popup-delay="200"
-		   translate>project.waiting_inputs</a>
-	</li>
+			<li ui-sref-active="active" ng-class="{disabled: !project._id}">
+				<a ui-sref="main.project.reporting({projectId: project._id})"
+				   tooltip="{{'project.reporting_tooltip'|translate}}"
+				   tooltip-popup-delay="1000"
+				   translate>shared.reporting</a>
+			</li>
+		</ul>
+	</div>
 
-	<li ng-class="{active: currentPage === 'reporting', disabled: projectId === 'new'}">
-		<a ng-click="changePage('reporting')"
-		   tooltip="{{'project.reporting_tooltip'|translate}}"
-		   tooltip-popup-delay="200"
-		   translate>shared.reporting</a>
-	</li>
-</ul>
+	<div class="col-md-10" ui-view></div>
+</div>

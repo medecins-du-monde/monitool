@@ -1,44 +1,37 @@
-<div class="row">
-	<div class="col-md-2">
-		<ng-include src="'partials/indicators/menu.html'"></ng-include>
+<ol class="breadcrumb">
+	<li class="active" translate>shared.indicators</li>
+	<li class="active" translate>shared.list</li>
+</ol>
+
+{{'indicator.order_by'|translate}}:
+<select id="sort-input" ng-model="orderField">
+	<option value="name">{{'indicator.alphabetical_order'|translate}}</option>
+	<option value="-input">{{'indicator.num_inputs'|translate}}</option>
+	<option value="-main">{{'indicator.num_projects'|translate}}</option>
+</select>
+
+<br/><br/>
+
+<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in hierarchy">
+	<div class="indicator-header" ng-click="open1 = !open1">
+		<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
+		{{(themes[themeId].name || 'indicator.no_theme')|translate}}
 	</div>
 
-	<div class="col-md-10">
-		<ol class="breadcrumb">
-			<li class="active" translate>shared.indicators</li>
-			<li class="active" translate>shared.list</li>
-		</ol>
-
-		{{'indicator.order_by'|translate}}:
-		<select id="sort-input" ng-model="orderField">
-			<option value="name">{{'indicator.alphabetical_order'|translate}}</option>
-			<option value="-input">{{'indicator.num_inputs'|translate}}</option>
-			<option value="-main">{{'indicator.num_projects'|translate}}</option>
-		</select>
-
-		<br/><br/>
-
-		<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in hierarchy">
-			<div class="indicator-header" ng-click="open1 = !open1">
-				<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
-				{{(themes[themeId].name || 'indicator.no_theme')|translate}}
-			</div>
-
-			<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes" ng-if="open1">
-				<div class="indicator-header" ng-click="open2 = !open2">
-					<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open2, 'fa-minus-circle': open2}"></i>
-					{{(types[typeId].name || 'indicator.no_type')|translate}}
-				</div>
-
-				<div class="indicator-level-3" ng-repeat="indicator in indicators | orderBy:orderField" ng-if="open2">
-					<span class="color" ng-class="{green: indicator.standard}"></span>
-					<span class="name">{{indicator.name}} ({{indicator.main}} projets, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
-					<a href="#indicators/{{indicator._id}}" translate>shared.edit</a>
-					<a href="#indicators/{{indicator._id}}/reporting" ng-if="indicator.main" translate>shared.reporting</a>
-				</div>
-			</div>
+	<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes" ng-if="open1">
+		<div class="indicator-header" ng-click="open2 = !open2">
+			<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open2, 'fa-minus-circle': open2}"></i>
+			{{(types[typeId].name || 'indicator.no_type')|translate}}
 		</div>
 
-		<button class="btn btn-default" ng-click="create()" translate>indicator.create_new</button>
+		<div class="indicator-level-3" ng-repeat="indicator in indicators | orderBy:orderField" ng-if="open2">
+			<span class="color" ng-class="{green: indicator.standard}"></span>
+			<span class="name">{{indicator.name}} ({{indicator.main}} projets, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
+
+			<a ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate>shared.edit</a>
+			<a ui-sref="main.indicator.reporting({indicatorId: indicator._id})" ng-if="indicator.main" translate>shared.reporting</a>
+		</div>
 	</div>
 </div>
+
+<a class="btn btn-default" ui-sref="main.indicator.edit({indicatorId: 'new'})" translate>indicator.create_new</a>

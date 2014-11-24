@@ -10,7 +10,7 @@ var projectControllers = angular.module(
 	]
 );
 
-projectControllers.controller('ProjectListController', function($scope, $location, projects) {
+projectControllers.controller('ProjectListController', function($scope, projects) {
 	$scope.projects       = projects;
 	$scope.filterFinished = true;
 	$scope.now            = moment().format('YYYY-MM');
@@ -19,25 +19,17 @@ projectControllers.controller('ProjectListController', function($scope, $locatio
 	$scope.isFinished = function(project) {
 		return !$scope.filterFinished || project.end > $scope.now;
 	};
+});
 
-	$scope.openProject = function(projectId) {
-		$location.url('/projects/' + projectId);
-	}
-
-	$scope.create = function() {
-		$location.url('/projects/new');
-	};
+projectControllers.controller('ProjectMenuController', function($scope, $state, project) {
+	$scope.project = project;
 });
 
 
-projectControllers.controller('ProjectLogicalFrameController', function($location, $scope, $routeParams, $modal, mtDatabase, project) {
+projectControllers.controller('ProjectLogicalFrameController', function($scope, $modal, $state, $stateParams, mtDatabase, project, indicatorsById) {
 	$scope.project = project;
 	$scope.master = angular.copy(project);
-
-	mtDatabase.current.query('monitool/indicators_short', {group: true, keys: Object.keys(project.indicators)}).then(function(result) {
-		$scope.indicatorsById = {};
-		result.rows.forEach(function(row) { $scope.indicatorsById[row.key] = row.value; });
-	});
+	$scope.indicatorsById = indicatorsById;
 
 	// handle indicator add, edit and remove in a modal window.
 	$scope.editIndicator = function(indicatorId, target) {
@@ -101,15 +93,15 @@ projectControllers.controller('ProjectLogicalFrameController', function($locatio
 
 	// handle global form actions
 	$scope.save = function() {
-		if ($routeParams.projectId === 'new')
+		if ($stateParams.projectId === 'new')
 			$scope.project._id = PouchDB.utils.uuid().toLowerCase();
 
 		mtDatabase.current.put($scope.project).then(function(result) {
 			$scope.project._rev = result.rev;
 			$scope.master = angular.copy($scope.project);
 
-			if ($routeParams.projectId === 'new')
-				$location.url('/projects/' + result.id + '/logical-frame');
+			if ($stateParams.projectId === 'new')
+				$state.go('main.project.logical_frame', {projectId: result.id});
 		}).catch(function(error) {
 			$scope.error = error;
 		});
@@ -171,13 +163,9 @@ projectControllers.controller('ProjectLogicalFrameIndicatorController', function
 });
 
 
-projectControllers.controller('ProjectInputEntitiesController', function($scope, $location, project, mtDatabase) {
+projectControllers.controller('ProjectInputEntitiesController', function($scope, project, mtDatabase) {
 	$scope.project = project;
 	$scope.master  = angular.copy(project);
-
-	$scope.stats = function(inputEntityId) {
-		$location.url('/projects/' + project._id + '/input-entities/' + inputEntityId);
-	};
 
 	$scope.delete = function(inputEntityId) {
 		var message = 'Si vous supprimez un lieu d\'activité vous perdrez toutes les saisies associées. Tapez "supprimer" pour confirmer';
@@ -211,13 +199,9 @@ projectControllers.controller('ProjectInputEntitiesController', function($scope,
 });
 
 
-projectControllers.controller('ProjectInputGroupsController', function($scope, $location, project, mtDatabase) {
+projectControllers.controller('ProjectInputGroupsController', function($scope, project, mtDatabase) {
 	$scope.project = project;
 	$scope.master  = angular.copy(project);
-
-	$scope.stats = function(inputGroupId) {
-		$location.url('/projects/' + project._id + '/input-groups/' + inputGroupId);
-	};
 
 	$scope.delete = function(inputEntityId) {
 		$scope.project.inputGroups = 
@@ -246,16 +230,11 @@ projectControllers.controller('ProjectInputGroupsController', function($scope, $
 	};});
 
 
-projectControllers.controller('ProjectFormsController', function($scope, $location, $routeParams, project, mtDatabase) {
+projectControllers.controller('ProjectFormsController', function($scope, project) {
 	$scope.project = project;
-
-	$scope.edit = function(formId) {
-		$location.url('/projects/' + $routeParams.projectId + '/forms/' + formId);
-	};
 });
 
-
-projectControllers.controller('ProjectFormEditionController', function($scope, $routeParams, $location, project, mtDatabase) {
+projectControllers.controller('ProjectFormEditionController', function($scope, $stateParams, $state, project, mtDatabase) {
 	// Build indicator selection
 	var rebuildChosenIndicators = function() {
 		$scope.chosenIndicators = [];
@@ -329,8 +308,8 @@ projectControllers.controller('ProjectFormEditionController', function($scope, $
 			$scope.project._rev = result.rev;
 			$scope.master = angular.copy($scope.project);
 
-			if ($routeParams.formId === 'new')
-				$location.url('/projects/' + $scope.project._id + '/forms/' + $scope.form.id);
+			if ($stateParams.formId === 'new')
+				$state.go('main.project.form', {formId: $scope.form.id});
 		}).catch(function(error) {
 			$scope.error = error;
 		});
@@ -339,7 +318,7 @@ projectControllers.controller('ProjectFormEditionController', function($scope, $
 	$scope.reset = function() {
 		$scope.project = angular.copy($scope.master);
 		
-		if ($routeParams.formId === 'new') {
+		if ($stateParams.formId === 'new') {
 			$scope.form = {
 				id: PouchDB.utils.uuid().toLowerCase(),
 				name: "",
@@ -352,7 +331,7 @@ projectControllers.controller('ProjectFormEditionController', function($scope, $
 		}
 		else
 			$scope.form = $scope.project.dataCollection.filter(function(form) {
-				return form.id == $routeParams.formId;
+				return form.id == $stateParams.formId;
 			})[0];
 
 		rebuildChosenIndicators();
@@ -375,7 +354,7 @@ projectControllers.controller('ProjectFormEditionController', function($scope, $
 });
 
 
-projectControllers.controller('ProjectInputListController', function($scope, $location, project, inputs, mtDatabase) {
+projectControllers.controller('ProjectInputListController', function($scope, project, inputs, mtDatabase) {
 	$scope.project = project;
 	$scope.inputs = [];
 
@@ -420,19 +399,15 @@ projectControllers.controller('ProjectInputListController', function($scope, $lo
 		else
 			return a.period.isBefore(b.period) ? -1 : 1;
 	});
-
-	$scope.makeInput = function(i) {
-		$location.url('projects/' + project._id + '/input/' + i.period.format('YYYY-MM') + '/' + i.formId + '/' + i.inputEntityId);
-	};
 });
 
 
-projectControllers.controller('ProjectInputController', function($scope, $routeParams, $location, project, inputs, mtDatabase) {
+projectControllers.controller('ProjectInputController', function($state, $stateParams, $scope, project, inputs, mtDatabase) {
 	$scope.project       = project;
 	$scope.input         = inputs.current;
 	$scope.previousInput = inputs.previous;
 
-	$scope.form          = $scope.project.dataCollection.filter(function(form) { return form.id == $routeParams.formId; })[0];
+	$scope.form          = $scope.project.dataCollection.filter(function(form) { return form.id == $stateParams.formId; })[0];
 	$scope.inputEntity   = project.inputEntities.filter(function(entity) { return entity.id == $scope.input.entity; })[0];
 
 	var colors = ['#FBB735', '#E98931', '#EB403B', '#B32E37', '#6C2A6A', '#5C4399', '#274389', '#1F5EA8', '#227FB0', '#2AB0C5', '#39C0B3'],
@@ -526,7 +501,7 @@ projectControllers.controller('ProjectInputController', function($scope, $routeP
 
 	$scope.save = function() {
 		mtDatabase.current.put($scope.input).then(function() {
-			$location.url('projects/' + project._id + '/inputs');
+			$state.go('main.project.input_list');
 		});
 	};
 });
@@ -538,7 +513,7 @@ projectControllers.controller('ProjectUserListController', function($scope) {
 
 
 
-projectControllers.controller('ReportingController', function($scope, $routeParams, type, project, mtDatabase, mtIndicators) {
+projectControllers.controller('ReportingController', function($scope, $stateParams, type, project, mtDatabase, mtIndicators) {
 	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
 
 	$scope.project = project;
@@ -569,15 +544,15 @@ projectControllers.controller('ReportingController', function($scope, $routePara
 		if (type === 'project')
 			data = mtIndicators.getProjectStats($scope.project, $scope.begin, $scope.end, $scope.groupBy);
 		else if (type === 'entity') {
-			data = mtIndicators.getEntityStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $routeParams.entityId);
-			$scope.entity = $scope.project.inputEntities.filter(function(e) { return e.id == $routeParams.entityId; })[0];
+			data = mtIndicators.getEntityStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $stateParams.entityId);
+			$scope.entity = $scope.project.inputEntities.filter(function(e) { return e.id == $stateParams.entityId; })[0];
 		}
 		else if (type === 'group') {
-			data = mtIndicators.getGroupStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $routeParams.groupId);
-			$scope.group = $scope.project.inputGroups.filter(function(g) { return g.id == $routeParams.groupId; })[0];
+			data = mtIndicators.getGroupStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $stateParams.groupId);
+			$scope.group = $scope.project.inputGroups.filter(function(g) { return g.id == $stateParams.groupId; })[0];
 		}
 
-		$scope.cols = mtIndicators.getStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy, type, $routeParams[type=='group'?'groupId':'entityId']);
+		$scope.cols = mtIndicators.getStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy, type, $stateParams[type=='group'?'groupId':'entityId']);
 		data.then(function(data) {
 			$scope.data = data;
 

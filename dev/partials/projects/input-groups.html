@@ -1,63 +1,53 @@
-<div class="row">
-	<div class="col-md-2">
-		<ng-include src="'partials/projects/menu.html'"></ng-include>
-	</div>
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li class="active" translate>shared.input_groups</li>
+</ol>
 
-	<div class="col-md-10">
+<form name="projectForm" novalidate>
+	<table class="table table-bordered table-stripped table-condensed">
+		<thead>
+			<tr>
+				<th style="width:250px" translate>shared.name</th>
+				<th translate>shared.members</th>
+				<th style="width:225px"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-if="!project.inputGroups.length">
+				<td colspan="3" style="text-align: center" translate>project.no_input_groups</td>
+			</tr>
+			<tr ng-repeat="inputGroup in project.inputGroups">
+				<td>
+					<ng-form name="center">
+						<div class="form-group" show-errors style="margin: 0">
+							<input type="text" name="name" ng-model="inputGroup.name" class="form-control error input-sm" required />
+						</div>
+					</ng-form>
+				</td>
+				<td>
+					<ui-select multiple ng-model="inputGroup.members" theme="bootstrap">
+						<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
+						<ui-select-choices repeat="inputEntity.id as inputEntity in project.inputEntities">
+							{{inputEntity.name}}
+						</ui-select-choices>
+					</ui-select>
+				</td>
+				<td>
+					<a class="btn btn-default btn-sm" ui-sref="main.project.input_groups_reporting({groupId: inputGroup.id})" translate>shared.view_stats</a>
+					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)" translate>shared.delete</button>
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="3">
+					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
 
-		<ol class="breadcrumb">
-			<li><a href="#projects" translate>shared.projects</a></li>
-			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
-			<li class="active" translate>shared.input_groups</li>
-		</ol>
-
-		<form name="projectForm" novalidate>
-			<table class="table table-bordered table-stripped table-condensed">
-				<thead>
-					<tr>
-						<th style="width:250px" translate>shared.name</th>
-						<th translate>shared.members</th>
-						<th style="width:225px"></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-if="!project.inputGroups.length">
-						<td colspan="3" style="text-align: center" translate>project.no_input_groups</td>
-					</tr>
-					<tr ng-repeat="inputGroup in project.inputGroups">
-						<td>
-							<ng-form name="center">
-								<div class="form-group" show-errors style="margin: 0">
-									<input type="text" name="name" ng-model="inputGroup.name" class="form-control error input-sm" required />
-								</div>
-							</ng-form>
-						</td>
-						<td>
-							<ui-select multiple ng-model="inputGroup.members" theme="bootstrap">
-								<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
-								<ui-select-choices repeat="inputEntity.id as inputEntity in project.inputEntities">
-									{{inputEntity.name}}
-								</ui-select-choices>
-							</ui-select>
-						</td>
-						<td>
-							<button class="btn btn-default btn-sm" ng-click="stats(inputGroup.id)" translate>shared.view_stats</button>
-							<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)" translate>shared.delete</button>
-						</td>
-					</tr>
-				</tbody>
-				<tfoot>
-					<tr>
-						<td colspan="3">
-							<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
-						</td>
-					</tr>
-				</tfoot>
-			</table>
-
-			<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" translate>shared.save</button>
-			<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default" translate>shared.remove_changes</button>
-
-		</form>
-	</div>
-</div>
+	<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" translate>shared.save</button>
+	<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default" translate>shared.remove_changes</button>
+</form>

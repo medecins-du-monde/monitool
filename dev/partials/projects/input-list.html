@@ -1,47 +1,42 @@
-<div class="row">
-	<div class="col-md-2">
-		<ng-include src="'partials/projects/menu.html'"></ng-include>
-	</div>
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li class="active" translate>project.waiting_inputs</li>
+</ol>
 
-	<div class="col-md-10">
+<input type="checkbox" id="see-all-input" ng-model="showFinished" />
+<label for="see-all-input" translate>project.see_all_inputs</label>
 
-		<ol class="breadcrumb">
-			<li><a href="#projects" translate>shared.projects</a></li>
-			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
-			<li class="active" translate>project.waiting_inputs</li>
-		</ol>
-
-		<input type="checkbox" id="see-all-input" ng-model="showFinished" />
-		<label for="see-all-input" translate>project.see_all_inputs</label>
-
-		<table class="table table-bordered table-stripped table-condensed">
-			<thead>
-				<tr>
-					<th translate>shared.done</th>
-					<th translate>shared.month</th>
-					<th translate>shared.input_entities</th>
-					<th translate>project.input_forms</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="input in inputs" ng-if="!input.filled || showFinished">
-					<td>
-						<i ng-init="ok=input.filled"
-						   ng-class="{fa: true, 'fa-check': ok, 'fa-times': !ok}"
-						   ng-style="{color:ok?'green':'red'}"></i>
-					</td>
-					<td>{{input.period | amDateFormat: 'MMMM YYYY'}}</td>
-					<td>{{input.inputEntityName}}</td>
-					<td>{{input.formName}}</td>
-					<td><a ng-click="makeInput(input)" translate>project.input</a></td>
-				</tr>
-			</tbody>
-			<tbody ng-if="allDone && !showFinished">
-				<tr>
-					<td colspan="5" translate>project.no_waiting_inputs</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-</div>
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th translate>shared.done</th>
+			<th translate>shared.month</th>
+			<th translate>shared.input_entities</th>
+			<th translate>project.input_forms</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="input in inputs" ng-if="!input.filled || showFinished">
+			<td>
+				<i ng-init="ok=input.filled"
+				   ng-class="{fa: true, 'fa-check': ok, 'fa-times': !ok}"
+				   ng-style="{color:ok?'green':'red'}"></i>
+			</td>
+			<td>{{input.period | amDateFormat: 'MMMM YYYY'}}</td>
+			<td>{{input.inputEntityName}}</td>
+			<td>{{input.formName}}</td>
+			<td>
+				<a ui-sref="main.project.input({period: input.period.format('YYYY-MM'), formId: input.formId, entityId: input.inputEntityId})" translate>
+					project.input
+				</a>
+			</td>
+		</tr>
+	</tbody>
+	<tbody ng-if="allDone && !showFinished">
+		<tr>
+			<td colspan="5" translate>project.no_waiting_inputs</td>
+		</tr>
+	</tbody>
+</table>

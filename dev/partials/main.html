@@ -1,4 +1,4 @@
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" ng-controller="MenuController">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -11,14 +11,14 @@
 		
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li ng-class="{active: currentPage == 'projects'}">
-					<a ng-click="changePage('projects')" translate>shared.projects</a>
+				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}">
+					<a ui-sref="main.projects" translate>shared.projects</a>
 				</li>
-				<li ng-class="{active: currentPage == 'indicators'}">
-					<a ng-click="changePage('indicators')" translate>shared.indicators_catalog</a>
+				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator')}">
+					<a ui-sref="main.indicators.list" translate>shared.indicators_catalog</a>
 				</li>
-				<li ng-class="{active: currentPage == 'help'}">
-					<a ng-click="changePage('help')" translate>shared.help</a>
+				<li ng-class="{active: $state.includes('main.help')}">
+					<a ui-sref="main.help.monitoring" translate>shared.help</a>
 				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
@@ -36,27 +36,9 @@
 					</ul>
 				</li>
 
-				<!-- <li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						{{status}}
-						<span class="caret"></span>
-					</a>
-
-					<ul class="dropdown-menu" role="menu">
-						<li>
-							<a href="#" ng-click="firstSync()">
-								Lancer la première synchro
-							</a>
-						</li>
-						<li>
-							<a href="#" ng-click="goOffline()">
-								Passer en mode déconnecté
-							</a>
-						</li>
-					</ul>
-				</li> -->
 			</ul>
 		</div>
 	</div>
 </nav>
 
+<div class="container-fluid" ui-view style="padding-top: 70px;"></div>

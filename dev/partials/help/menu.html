@@ -1,9 +1,15 @@
 
-<ul class="nav nav-pills nav-stacked" ng-controller="SubMenuController">
-	<li ng-class="{active: currentPage === 'monitoring'}">
-		<a ng-click="goto('help/monitoring')">Monitoring</a>
-	</li>
-	<li ng-class="{active: currentPage === 'documentation'}">
-		<a ng-click="goto('help/documentation')">Documentation</a>
-	</li>
-</ul>
+<div class="row">
+	<div class="col-md-2">
+		<ul class="nav nav-pills nav-stacked">
+			<li ui-sref-active="active">
+				<a ui-sref="main.help.monitoring">Monitoring</a>
+			</li>
+			<li ui-sref-active="active">
+				<a ui-sref="main.help.documentation">Documentation</a>
+			</li>
+		</ul>
+	</div>
+
+	<div class="col-md-10" ui-view></div>
+</div>

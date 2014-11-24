@@ -23,185 +23,176 @@
 
 </style>
 
-<div class="row">
-	<div class="col-md-2">
-		<ng-include src="'partials/projects/menu.html'"></ng-include>
-	</div>
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li class="active" ng-if="group">{{group.name}}</li>
+	<li class="active" ng-if="entity">{{entity.name}}</li>
+	<li class="active" translate>shared.reporting</li>
+</ol>
 
-	<div class="col-md-10">
-		<ol class="breadcrumb">
-			<li><a href="#projects" translate>shared.projects</a></li>
-			<li><a href="#projects/{{project._id}}">{{project.name}}</a></li>
-			<li class="active" translate>shared.reporting</li>
-			<li class="active" ng-if="group">{{'shared.input_group'|translate}}: {{group.name}}</li>
-			<li class="active" ng-if="entity">{{'shared.input_entity'|translate}}: {{entity.name}}</li>
-		</ol>
-
-		<form class="form-horizontal" novalidate>
-			<div class="row">
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="indicator" class="col-sm-2 control-label" translate>shared.begin</label>
-						<div class="col-sm-10">
-							<input type="month" class="form-control" ng-model="begin" ng-change="updateData()" required />
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="group-by-input" class="col-sm-2 control-label" translate>shared.columns</label>
-						<div class="col-sm-10">
-							<select class="form-control" id="group-by-input" ng-model="groupBy" ng-change="updateData()">
-								<option value="month" translate>shared.month</option>
-								<option value="year" translate>shared.year</option>
-								<option value="entity" translate>shared.input_entity</option>
-								<option value="group" translate>shared.input_group</option>
-							</select>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="colorize-input" class="col-sm-2 control-label" translate>shared.colorize</label>
-						<div class="col-sm-10">
-							<p class="form-control-static">
-								<input type="checkbox" id="colorize-input" ng-model="colorize" />
-							</p>
-						</div>
-					</div>
-				</div>
-				
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="indicator" class="col-sm-2 control-label" translate>shared.end</label>
-						<div class="col-sm-10">
-							<input type="month" class="form-control" ng-model="end" ng-change="updateData()" required />
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="display-input" class="col-sm-2 control-label" translate>shared.display</label>
-						<div class="col-sm-10">
-							<select class="form-control" id="display-input" ng-model="display">
-								<option value="value" translate>shared.values</option>
-								<option value="targetPart" translate>shared.target_percentage</option>
-								<option value="baselinePart" translate>shared.baseline_percentage</option>
-							</select>
-						</div>
-					</div>
-					
-					<div class="form-group">
-						<label for="plot-input" class="col-sm-2 control-label" translate>shared.plot</label>
-						<div class="col-sm-10">
-							<p class="form-control-static">
-								<input type="checkbox" id="plot-input" ng-model="plot" />
-							</p>
-						</div>
-					</div>
+<form class="form-horizontal" novalidate>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate>shared.begin</label>
+				<div class="col-sm-10">
+					<input type="month" class="form-control" ng-model="begin" ng-change="updateData()" required />
 				</div>
 			</div>
-		</form>
 
-		<div class="clearfix">
-			<button
-				class="btn btn-primary btn-xs pull-right"
-				ng-show="plot"
-				ng-click="downloadGraph()" translate>shared.download_plot</button><br/>
+			<div class="form-group">
+				<label for="group-by-input" class="col-sm-2 control-label" translate>shared.columns</label>
+				<div class="col-sm-10">
+					<select class="form-control" id="group-by-input" ng-model="groupBy" ng-change="updateData()">
+						<option value="month" translate>shared.month</option>
+						<option value="year" translate>shared.year</option>
+						<option value="entity" translate>shared.input_entity</option>
+						<option value="group" translate>shared.input_group</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="colorize-input" class="col-sm-2 control-label" translate>shared.colorize</label>
+				<div class="col-sm-10">
+					<p class="form-control-static">
+						<input type="checkbox" id="colorize-input" ng-model="colorize" />
+					</p>
+				</div>
+			</div>
 		</div>
+		
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate>shared.end</label>
+				<div class="col-sm-10">
+					<input type="month" class="form-control" ng-model="end" ng-change="updateData()" required />
+				</div>
+			</div>
 
-		<div id="chart" ng-show="plot" style="overflow: hidden;"></div>
-
-		<button class="btn btn-primary btn-xs pull-right"
-				ng-click="downloadCSV()"
-				style="margin-bottom: 10px;" translate>shared.download_table</button>
-
-		<table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
-			<thead>
-				<tr>
-					<th ng-show="plot"></th>
-					<th></th>
-					<th ng-repeat="col in cols">{{col.name || col}}</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td ng-show="plot"></td>
-					<td class="section" colspan="{{cols.length + 1}}">
-						{{'project.goal_short'|translate}}: {{project.logicalFrame.goal}}
-					</td>
-				</tr>
-				<tr ng-repeat="indicatorId in project.logicalFrame.indicators">
-					<td ng-show="plot"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" /></td>
-					<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
-					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-						<span ng-switch="display" ng-if="data[col.id][indicatorId]">
-							<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
-							<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
-							<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
-						</span>
-					</td>
-				</tr>
-			</tbody>
-			<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
-				<tr>
-					<td ng-show="plot"></td>
-					<td class="section indent1" colspan="{{cols.length + 1}}">
-						<a ng-click="purposeOpen=!purposeOpen">
-							<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
-							{{'project.purpose_short'|translate}}.{{purposeId+1}}: {{purpose.description}}
-						</a>
-					</td>
-				</tr>
-				<tr ng-repeat="indicatorId in purpose.indicators" ng-if="purposeOpen">
-					<td ng-show="plot">
-						<input id="plot-{{indicatorId}}"
-							   type="checkbox"
-							   ng-model="plots[indicatorId]"
-							   ng-change="updateGraph(indicatorId)" />
-					</td>
-					<td class="indent1">
-						<label for="plot-{{indicatorId}}">
-							{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}
-						</label>
-					</td>
-					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-						<span ng-switch="display" ng-if="data[col.id][indicatorId]">
-							<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
-							<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
-							<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
-						</span>
-					</td>
-				</tr>
-			</tbody>
-			<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
-				<tr>
-					<td ng-show="plot"></td>
-					<td class="section indent2" colspan="{{cols.length + 1}}">
-						<a ng-click="outputOpen=!outputOpen">
-							<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
-							{{'project.output_short'|translate}}.{{purposeId+1}}.{{$index+1}}: {{output.description}}
-						</a>
-					</td>
-				</tr>
-				<tr ng-repeat="indicatorId in output.indicators" ng-if="outputOpen">
-					<td ng-show="plot">
-						<input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" />
-					</td>
-					<td class="indent2">
-						<label for="plot-{{indicatorId}}">
-							{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}
-						</label>
-					</td>
-					<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-						<span ng-switch="display" ng-if="data[col.id][indicatorId]">
-							<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
-							<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
-							<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
-						</span>
-					</td>
-				</tr>
-			</tbody>
-			<tbody ng-repeat-end><!-- This may look a bit hackish... but is always better than nesting tables --></tbody>
-		</table>
-
+			<div class="form-group">
+				<label for="display-input" class="col-sm-2 control-label" translate>shared.display</label>
+				<div class="col-sm-10">
+					<select class="form-control" id="display-input" ng-model="display">
+						<option value="value" translate>shared.values</option>
+						<option value="targetPart" translate>shared.target_percentage</option>
+						<option value="baselinePart" translate>shared.baseline_percentage</option>
+					</select>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label for="plot-input" class="col-sm-2 control-label" translate>shared.plot</label>
+				<div class="col-sm-10">
+					<p class="form-control-static">
+						<input type="checkbox" id="plot-input" ng-model="plot" />
+					</p>
+				</div>
+			</div>
+		</div>
 	</div>
+</form>
+
+<div class="clearfix">
+	<button
+		class="btn btn-primary btn-xs pull-right"
+		ng-show="plot"
+		ng-click="downloadGraph()" translate>shared.download_plot</button><br/>
 </div>
+
+<div id="chart" ng-show="plot" style="overflow: hidden;"></div>
+
+<button class="btn btn-primary btn-xs pull-right"
+		ng-click="downloadCSV()"
+		style="margin-bottom: 10px;" translate>shared.download_table</button>
+
+<table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
+	<thead>
+		<tr>
+			<th ng-show="plot"></th>
+			<th></th>
+			<th ng-repeat="col in cols">{{col.name || col}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td ng-show="plot"></td>
+			<td class="section" colspan="{{cols.length + 1}}">
+				{{'project.goal_short'|translate}}: {{project.logicalFrame.goal}}
+			</td>
+		</tr>
+		<tr ng-repeat="indicatorId in project.logicalFrame.indicators">
+			<td ng-show="plot"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" /></td>
+			<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
+			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
+				<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
+					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
+				</span>
+			</td>
+		</tr>
+	</tbody>
+	<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
+		<tr>
+			<td ng-show="plot"></td>
+			<td class="section indent1" colspan="{{cols.length + 1}}">
+				<a ng-click="purposeOpen=!purposeOpen">
+					<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
+					{{'project.purpose_short'|translate}}.{{purposeId+1}}: {{purpose.description}}
+				</a>
+			</td>
+		</tr>
+		<tr ng-repeat="indicatorId in purpose.indicators" ng-if="purposeOpen">
+			<td ng-show="plot">
+				<input id="plot-{{indicatorId}}"
+					   type="checkbox"
+					   ng-model="plots[indicatorId]"
+					   ng-change="updateGraph(indicatorId)" />
+			</td>
+			<td class="indent1">
+				<label for="plot-{{indicatorId}}">
+					{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}
+				</label>
+			</td>
+			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
+				<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
+					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
+				</span>
+			</td>
+		</tr>
+	</tbody>
+	<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
+		<tr>
+			<td ng-show="plot"></td>
+			<td class="section indent2" colspan="{{cols.length + 1}}">
+				<a ng-click="outputOpen=!outputOpen">
+					<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
+					{{'project.output_short'|translate}}.{{purposeId+1}}.{{$index+1}}: {{output.description}}
+				</a>
+			</td>
+		</tr>
+		<tr ng-repeat="indicatorId in output.indicators" ng-if="outputOpen">
+			<td ng-show="plot">
+				<input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" />
+			</td>
+			<td class="indent2">
+				<label for="plot-{{indicatorId}}">
+					{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}
+				</label>
+			</td>
+			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
+				<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
+					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
+				</span>
+			</td>
+		</tr>
+	</tbody>
+	<tbody ng-repeat-end><!-- This may look a bit hackish... but is always better than nesting tables --></tbody>
+</table>
 

@@ -1,7 +1,7 @@
 "use strict";
 
 var app = angular.module('monitool.app', [
-	'ngRoute',
+	'ui.router',
 	'ngCookies',
 	'monitool.controllers.helper',
 	'monitool.controllers.indicator',
@@ -22,26 +22,46 @@ app.config(function($translateProvider) {
 	$translateProvider.preferredLanguage('fr');
 });
 
-app.config(function($routeProvider) {
+app.config(function($stateProvider, $urlRouterProvider) {
+	///////////////////////////
+	// redirects
+	///////////////////////////
 
-	$routeProvider.when('/offline-fail', {
-		templateUrl: 'partials/workflow/offline-fail.html'
+	// $urlRouterProvider.otherwise('/projects');
+
+	///////////////////////////
+	// states
+	///////////////////////////
+
+	// $stateProvider.state('login', {
+	// 	url: '/login',
+	// 	controller: 'LoginController',
+	// 	templateUrl: 'partials/workflow/login.html'
+	// });
+
+	$stateProvider.state('main', {
+		abstract: true,
+		controller: 'MainController',
+		templateUrl: 'partials/main.html'
 	});
 
-	$routeProvider.when('/login', {
-		controller: 'LoginController',
-		templateUrl: 'partials/workflow/login.html'
+
+	///////////////////////////
+	// Help
+	///////////////////////////
+
+	$stateProvider.state('main.help', {
+		abstract: true,
+		templateUrl: 'partials/help/menu.html'
 	});
 
-	$routeProvider.when('/help', {
-		redirectTo: '/help/monitoring'
-	});
-
-	$routeProvider.when('/help/monitoring', {
+	$stateProvider.state('main.help.monitoring', {
+		url: '/help/monitoring',
 		templateUrl: 'partials/help/monitoring.html'
 	});
 
-	$routeProvider.when('/help/documentation', {
+	$stateProvider.state('main.help.documentation', {
+		url: '/help/documentation',
 		templateUrl: 'partials/help/documentation.html'
 	});
 
@@ -49,7 +69,8 @@ app.config(function($routeProvider) {
 	// Project
 	///////////////////////////
 
-	$routeProvider.when('/projects', {
+	$stateProvider.state('main.projects', {
+		url: '/projects',
 		templateUrl: 'partials/projects/list.html',
 		controller: 'ProjectListController',
 		resolve: {
@@ -57,81 +78,88 @@ app.config(function($routeProvider) {
 		}
 	});
 
-	$routeProvider.when('/projects/:projectId/logical-frame', {
+	$stateProvider.state('main.project', {
+		abstract: true,
+		url: '/projects/:projectId',
+		controller: 'ProjectMenuController',
+		templateUrl: 'partials/projects/menu.html',
+		resolve: {
+			project: function(mtFetch, $stateParams) {
+				return mtFetch.project($stateParams.projectId);
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.logical_frame', {
+		url: '/logical-frame',
 		templateUrl: 'partials/projects/logical-frame.html',
 		controller: 'ProjectLogicalFrameController',
 		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); }
+			indicatorsById: function(project, mtDatabase) {
+				var ids = Object.keys(project.indicators);
+				if (ids.length)
+					return mtDatabase.current.query('monitool/indicators_short', {group: true, keys: ids}).then(function(result) {
+						var indicatorsById = {};
+						result.rows.forEach(function(row) { indicatorsById[row.key] = row.value; });
+						return indicatorsById;
+					});
+				else
+					return {};
+			}
 		}
 	});
 
-	$routeProvider.when('/projects/:projectId/input-entities', {
+	$stateProvider.state('main.project.input_entities', {
+		url: '/input-entities',
 		templateUrl: 'partials/projects/input-entities.html',
-		controller: 'ProjectInputEntitiesController',
-		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); }
-		}
+		controller: 'ProjectInputEntitiesController'
 	});
 
-	$routeProvider.when('/projects/:projectId/input-entities/:entityId', {
+	$stateProvider.state('main.project.input_entities_reporting', {
+		url: '/input-entities/:entityId',
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ReportingController',
 		resolve: {
 			type: function() { return 'entity'; },
-			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
-	$routeProvider.when('/projects/:projectId/input-groups', {
+	$stateProvider.state('main.project.input_groups', {
+		url: '/input-groups',
 		templateUrl: 'partials/projects/input-groups.html',
-		controller: 'ProjectInputGroupsController',
-		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); }
-		}
+		controller: 'ProjectInputGroupsController'
 	});
 
-	$routeProvider.when('/projects/:projectId/input-groups/:groupId', {
+	$stateProvider.state('main.project.input_groups_reporting', {
+		url: '/input-groups/:groupId',
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ReportingController',
 		resolve: {
 			type: function() { return 'group'; },
-			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
-	$routeProvider.when('/projects/:projectId/forms', {
+	$stateProvider.state('main.project.forms', {
+		url: '/forms',
 		templateUrl: 'partials/projects/form-list.html',
-		controller: 'ProjectFormsController',
-		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); }
-		}
+		controller: 'ProjectFormsController'
 	});
 
-	$routeProvider.when('/projects/:projectId/forms/:formId', {
+	$stateProvider.state('main.project.form', {
+		url: '/forms/:formId',
 		templateUrl: 'partials/projects/form-edit.html',
-		controller: 'ProjectFormEditionController',
-		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); }
-		}
+		controller: 'ProjectFormEditionController'
 	});
 
-	$routeProvider.when('/projects/:projectId/users', {
-		templateUrl: 'partials/projects/user-list.html',
-		controller: 'ProjectUserListController',
-		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); }
-		}
-	});
-
-	$routeProvider.when('/projects/:projectId/inputs', {
+	$stateProvider.state('main.project.input_list', {
+		url: '/inputs',
 		templateUrl: 'partials/projects/input-list.html',
 		controller: 'ProjectInputListController',
 		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); },
-			inputs: function($route, mtDatabase) {
+			inputs: function($stateParams, mtDatabase) {
 				return mtDatabase.current.allDocs({
-					startkey: $route.current.params.projectId + ':',
-					endkey: $route.current.params.projectId + ':~'
+					startkey: $stateParams.projectId + ':',
+					endkey: $stateParams.projectId + ':~'
 				}).then(function(result) {
 					var i = {};
 					result.rows.forEach(function(row) { i[row.id] = true; });
@@ -141,41 +169,41 @@ app.config(function($routeProvider) {
 		}
 	});
 
-	$routeProvider.when('/projects/:projectId/input/:period/:formId/:entityId', {
+	$stateProvider.state('main.project.input', {
+		url: '/input/:period/:formId/:entityId',
 		templateUrl: 'partials/projects/input.html',
 		controller: 'ProjectInputController',
 		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); },
-			inputs: function(mtFetch) { return mtFetch.currentPreviousInput(); }
+			inputs: function(mtFetch, $stateParams) { return mtFetch.currentPreviousInput($stateParams); }
 		}
 	});
 
-	$routeProvider.when('/projects/:projectId/reporting', {
+	$stateProvider.state('main.project.reporting', {
+		url: '/reporting',
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ReportingController',
 		resolve: {
 			type: function() { return 'project'; },
-			project: function(mtFetch) { return mtFetch.currentProject(); }
 		}
 	});
 
-	$routeProvider.when('/projects/:projectId/users', {
+	$stateProvider.state('main.project.user_list', {
+		url: '/users',
 		templateUrl: 'partials/projects/user-list.html',
 		controller: 'ProjectUserListController',
-		resolve: {
-			project: function(mtFetch) { return mtFetch.currentProject(); }
-		}
-	});
-
-	$routeProvider.when('/projects/:projectId', {
-		redirectTo: '/projects/:projectId/logical-frame'
 	});
 
 	///////////////////////////
 	// Indicators
 	///////////////////////////
 
-	$routeProvider.when('/indicators', {
+	$stateProvider.state('main.indicators', {
+		abstract: true,
+		templateUrl: 'partials/indicators/menu.html'
+	});
+
+	$stateProvider.state('main.indicators.list', {
+		url: '/indicators',
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
 		resolve: {
@@ -185,29 +213,8 @@ app.config(function($routeProvider) {
 		}
 	});
 
-	$routeProvider.when('/indicators/:indicatorId', {
-		templateUrl: 'partials/indicators/edit.html',
-		controller: 'IndicatorEditController',
-		resolve: {
-			indicator: function(mtFetch) { return mtFetch.currentIndicator(); },
-			indicators: function(mtFetch) { return mtFetch.indicators(); },
-			types: function(mtFetch) { return mtFetch.types(); },
-			themes: function(mtFetch) { return mtFetch.themes(); }
-		}
-	});
-
-	$routeProvider.when('/indicators/:indicatorId/reporting', {
-		templateUrl: 'partials/indicators/reporting.html',
-		controller: 'IndicatorReportingController',
-		resolve: {
-			indicator: function(mtFetch) { return mtFetch.currentIndicator(); },
-			projects: function($route, mtFetch) {
-				return mtFetch.projectsByIndicator($route.current.params.indicatorId);
-			}
-		}
-	});
-
-	$routeProvider.when('/themes', {
+	$stateProvider.state('main.indicators.theme_list', {
+		url: '/themes',
 		templateUrl: 'partials/indicators/theme-type-list.html',
 		controller: 'ThemeTypeListController',
 		resolve: {
@@ -216,7 +223,8 @@ app.config(function($routeProvider) {
 		}
 	});
 
-	$routeProvider.when('/types', {
+	$stateProvider.state('main.indicators.type_list', {
+		url: '/types',
 		templateUrl: 'partials/indicators/theme-type-list.html',
 		controller: 'ThemeTypeListController',
 		resolve: {
@@ -225,9 +233,42 @@ app.config(function($routeProvider) {
 		}
 	});
 
-	$routeProvider.otherwise({
-		redirectTo: '/projects'
+	///////////////////////////
+	// Indicator
+	///////////////////////////
+
+	$stateProvider.state('main.indicator', {
+		abstract: true,
+		url: '/indicator/:indicatorId',
+		template: '<div ui-view></div>',
+		resolve: {
+			indicator: function(mtFetch, $stateParams) { return mtFetch.indicator($stateParams.indicatorId); }
+		}
 	});
+
+	$stateProvider.state('main.indicator.edit', {
+		url: '/edit',
+		templateUrl: 'partials/indicators/edit.html',
+		controller: 'IndicatorEditController',
+		resolve: {
+			indicators: function(mtFetch) { return mtFetch.indicators(); },
+			types: function(mtFetch) { return mtFetch.types(); },
+			themes: function(mtFetch) { return mtFetch.themes(); }
+		}
+	});
+
+	$stateProvider.state('main.indicator.reporting', {
+		url: '/reporting',
+		templateUrl: 'partials/indicators/reporting.html',
+		controller: 'IndicatorReportingController',
+		resolve: {
+			projects: function($stateParams, mtFetch) {
+				return mtFetch.projectsByIndicator($stateParams.indicatorId);
+			}
+		}
+	});
+
+
 });
 
 

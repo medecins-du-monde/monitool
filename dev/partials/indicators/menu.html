@@ -1,14 +1,17 @@
+<div class="row">
+	<div class="col-md-2">
+		<ul class="nav nav-pills nav-stacked">
+			<li ui-sref-active="active">
+				<a ui-sref="main.indicators.list" translate>shared.indicators</a>
+			</li>
+			<li ui-sref-active="active">
+				<a ui-sref="main.indicators.theme_list" translate>indicator.themes</a>
+			</li>
+			<li ui-sref-active="active">
+				<a ui-sref="main.indicators.type_list" translate>indicator.types</a>
+			</li>
+		</ul>
+	</div>
 
-<ul class="nav nav-pills nav-stacked" ng-controller="SubMenuController">
-	<li ng-class="{active: isSelected('indicators')}">
-		<a ng-click="goto('indicators')" translate>shared.indicators</a>
-	</li>
-	<li ng-class="{active: isSelected('themes')}">
-		<a ng-click="goto('themes')" translate>indicator.themes</a>
-	</li>
-	<li ng-class="{active: isSelected('types')}">
-		<a ng-click="goto('types')" translate>indicator.types</a>
-	</li>
-</ul>
-
-
+	<div class="col-md-10" ui-view></div>
+</div>
