@@ -150,22 +150,34 @@
 					</tr>
 				</table>
 
-				<button class="btn btn-default" ng-click="addFormula()" translate>indicator.add_formula</button>
+				<button class="btn btn-default" ng-click="addFormula()">
+					<i class="fa fa-plus"></i>
+					<span translate="indicator.add_formula"></span>
+				</button>
 			</div>
 		</div>
 	</fieldset>
 
-	<div>
+	<div class="pull-right">
 		<button class="btn btn-primary"
 				ng-disabled="indicatorForm.$invalid || isUnchanged() || formulaInvalid()"
-				ng-click="save()" translate>shared.save</button>
+				ng-click="save()">
+			<i class="fa fa-floppy-o"></i>
+			<span translate>shared.save</span>
+		</button>
 
 		<button class="btn btn-warning"
 				ng-disabled="isUnchanged()"
-				ng-click="reset()" translate>shared.remove_changes</button>
+				ng-click="reset()">
+			<i class="fa fa-undo"></i>
+			<span translate>shared.remove_changes</span>
+		</button>
 		
 		<button class="btn btn-danger"
 				ng-click="remove()"
-				ng-if="indicator._id" translate>shared.delete</button>
+				ng-if="indicator._id">
+			<i class="fa fa-remove"></i>
+			<span translate>shared.delete</span>
+		</button>
 	</div>
 </form>
