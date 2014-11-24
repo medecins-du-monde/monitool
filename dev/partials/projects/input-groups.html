@@ -10,7 +10,7 @@
 			<tr>
 				<th style="width:250px" translate>shared.name</th>
 				<th translate>shared.members</th>
-				<th style="width:225px"></th>
+				<th style="width: 255px;"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -34,8 +34,14 @@
 					</ui-select>
 				</td>
 				<td>
-					<a class="btn btn-default btn-sm" ui-sref="main.project.input_groups_reporting({groupId: inputGroup.id})" translate>shared.view_stats</a>
-					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)" translate>shared.delete</button>
+					<a class="btn btn-default btn-sm" ui-sref="main.project.input_groups_reporting({groupId: inputGroup.id})">
+						<i class="fa fa-line-chart"></i>
+						<span translate="shared.view_stats"></span>
+					</a>
+					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)">
+						<i class="fa fa-remove"></i>
+						<span translate>shared.delete</span>
+					</button>
 				</td>
 			</tr>
 		</tbody>
@@ -48,6 +54,13 @@
 		</tfoot>
 	</table>
 
-	<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" translate>shared.save</button>
-	<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default" translate>shared.remove_changes</button>
+	<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</button>
+
+	<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</button>
 </form>

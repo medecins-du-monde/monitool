@@ -46,7 +46,7 @@ var ENGLISH_TRANSLATION = {
 
 		choose_indicator: 'Choose an indicator',
 		list: 'List',
-
+		logout: 'Log Out',
 	},
 	menu: {
 		toggle_nav: "Toggle navigation",

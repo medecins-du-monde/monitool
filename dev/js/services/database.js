@@ -3,15 +3,14 @@
 var dbServices = angular.module('monitool.services.database', ['pouchdb']);
 
 dbServices.factory('mtDatabase', function(PouchDB) {
+	var local  = new PouchDB(LOCAL_DB),
+		remote = new PouchDB(REMOTE_DB, {skipSetup: true, adapter: 'http', ajax: {cache: true}});
 
 	return {
-		current: new PouchDB(REMOTE_DB, {adapter: 'http', skipSetup: true, ajax: {cache: true}}),
+		current: remote,
+		local: local,
+		remote: remote
 	};
-
-	// return {
-	// 	local: new PouchDB(LOCAL_DB),
-	// 	remote: new PouchDB(REMOTE_DB, {adapter: 'http', ajax: {cache: true}}),
-	// };
 });
 
 

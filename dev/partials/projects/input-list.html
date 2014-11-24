@@ -28,8 +28,10 @@
 			<td>{{input.inputEntityName}}</td>
 			<td>{{input.formName}}</td>
 			<td>
-				<a ui-sref="main.project.input({period: input.period.format('YYYY-MM'), formId: input.formId, entityId: input.inputEntityId})" translate>
-					project.input
+				<a class="btn btn-default btn-xs"
+					ui-sref="main.project.input({period: input.period.format('YYYY-MM'), formId: input.formId, entityId: input.inputEntityId})">
+					<i class="fa fa-pencil"></i>
+					<span translate="project.input"></span>
 				</a>
 			</td>
 		</tr>

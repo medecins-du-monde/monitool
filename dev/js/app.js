@@ -27,7 +27,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// redirects
 	///////////////////////////
 
-	// $urlRouterProvider.otherwise('/projects');
+	$urlRouterProvider.otherwise('/projects');
 
 	///////////////////////////
 	// states
@@ -39,12 +39,23 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// 	templateUrl: 'partials/workflow/login.html'
 	// });
 
-	$stateProvider.state('main', {
-		abstract: true,
-		controller: 'MainController',
-		templateUrl: 'partials/main.html'
+	// $stateProvider.state('index', {
+	// 	controller: 'MainController',
+	// 	url: '/',
+	// 	templateUrl: 'partials/main.html'
+	// });
+
+	$stateProvider.state('main.login', {
+		controller: 'LoginController',
+		url: '/login',
+		templateUrl: 'partials/login.html'
 	});
 
+	$stateProvider.state('main', {
+		abstract: true,
+		controller: 'MainMenuController',
+		templateUrl: 'partials/menu.html'
+	});
 
 	///////////////////////////
 	// Help

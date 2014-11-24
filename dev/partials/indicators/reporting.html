@@ -8,7 +8,7 @@
 
 <ol class="breadcrumb">
 	<li><a ui-sref="main.indicators.list" translate>shared.indicators</a></li>
-	<li><a ui-sref="main.indicator.edit({indicatorId: indicator._id}">{{indicator.name}}</a></li>
+	<li><a ui-sref="main.indicator.edit({indicatorId: indicator._id})">{{indicator.name}}</a></li>
 	<li class="active" translate>shared.reporting</li>
 </ol>
 
@@ -65,7 +65,6 @@
 				<div class="col-sm-10">
 					<p class="form-control-static">
 						<input type="checkbox" id="plot-input" ng-model="plot" />
-
 					</p>
 				</div>
 			</div>
@@ -74,18 +73,20 @@
 	</div>
 </form>
 
+
 <div class="clearfix">
-	<button
-		class="btn btn-primary btn-xs pull-right"
-		ng-show="plot"
-		ng-click="downloadGraph()" translate>shared.download_plot</button>
+	<button class="btn btn-primary btn-xs pull-right" ng-show="plot" ng-click="downloadGraph()">
+		<i class="fa fa-download"></i>
+		<span translate>shared.download_plot</span>
+	</button>
 </div>
 
-<div id="chart" ng-show="plot"></div>
+<div id="chart" ng-show="plot" style="overflow: hidden;"></div>
 
-<button class="btn btn-primary btn-xs pull-right"
-		ng-click="downloadCSV()"
-		style="margin-bottom: 10px;" translate>shared.download_table</button>
+<button class="btn btn-primary btn-xs pull-right" ng-click="downloadCSV()" style="margin-bottom: 10px;">
+	<i class="fa fa-download"></i>
+	<span translate>shared.download_table</span>
+</button>
 
 <table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
 	<thead>

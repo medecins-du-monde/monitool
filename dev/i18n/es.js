@@ -47,7 +47,7 @@ var SPANISH_TRANSLATION = {
 
 		choose_indicator: 'Elige un indicador',
 		list: 'Lista',
-
+		logout: 'Desconectar',
 	},
 	menu: {
 		toggle_nav: "Ver el menu",

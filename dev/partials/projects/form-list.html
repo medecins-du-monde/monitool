@@ -8,15 +8,21 @@
 	<thead>
 		<tr>
 			<th translate>shared.name</th>
-			<th style="width:150px"></th>
+			<th style="width:250px"></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="form in project.dataCollection">
 			<td>{{form.name}}</td>
 			<td>
-				<button class="btn btn-default btn-sm" ui-sref="main.project.form({formId: form.id})" translate>shared.edit</button>
-				<button class="btn btn-danger btn-sm" ng-click="delete(form.id)" translate>shared.delete</button>
+				<button class="btn btn-default btn-xs" ui-sref="main.project.form({formId: form.id})">
+					<i class="fa fa-pencil"></i>
+					<span translate="shared.edit"></span>
+				</button>
+				<button class="btn btn-danger btn-xs" ng-click="delete(form.id)">
+					<i class="fa fa-remove"></i>
+					<span translate="shared.delete"></span>
+				</button>
 			</td>
 		</tr>
 		<tr>

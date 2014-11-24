@@ -47,6 +47,7 @@ var FRENCH_TRANSLATION = {
 
 		choose_indicator: 'Choisissez un indicateur',
 		list: 'Liste',
+		logout: 'Déconnecter',
 
 	},
 	menu: {

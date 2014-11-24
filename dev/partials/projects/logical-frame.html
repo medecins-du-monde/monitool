@@ -96,7 +96,10 @@
 
 			<div class="panel-heading">
 				<div class="panel-title">
-					<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)" translate>shared.delete</button>
+					<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)">
+						<i class="fa fa-remove"></i>
+						<span translate>shared.delete</span>
+					</button>
 					<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
 					<a ng-click="tabOpen = !tabOpen"> {{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}</a>
 				</div>
@@ -147,7 +150,10 @@
 					<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs" ng-init="tabOpen=false">
 						<div class="panel-heading">
 							<div class="panel-title">
-								<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)" translate>shared.delete</button>
+								<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)">
+									<i class="fa fa-remove"></i>
+									<span translate>shared.delete</span>
+								</button>
 								<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
 								<a ng-click="tabOpen = !tabOpen"> {{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}</a>
 							</div>
@@ -197,7 +203,10 @@
 								<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities" ng-init="tabOpen=false">
 									<div class="panel-heading">
 										<div class="panel-title">
-											<button class="btn btn-danger btn-xs pull-right" ng-click="removeActivity(activity, output)" translate>shared.delete</button>
+											<button class="btn btn-danger btn-xs pull-right" ng-click="removeActivity(activity, output)">
+												<i class="fa fa-remove"></i>
+												<span translate>shared.delete</span>
+											</button>
 											<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
 											<a ng-click="tabOpen = !tabOpen"> {{'project.activity'|translate}} {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}</a>
 										</div>
@@ -227,21 +236,37 @@
 									</div>
 								</div>
 
-								<button class="btn btn-default" ng-click="addActivity(output)" translate>project.add_activity</button>
+								<button class="btn btn-default" ng-click="addActivity(output)">
+									<i class="fa fa-plus"></i>
+									<span translate="project.add_activity"></span>
+								</button>
 							</ng-form>
 						</div>
 					</div>
 					
-					<button class="btn btn-default" ng-click="addOutput(purpose)" translate>project.add_output</button>
+					<button class="btn btn-default" ng-click="addOutput(purpose)">
+						<i class="fa fa-plus"></i>
+						<span translate="project.add_output"></span>
+					</button>
 				</ng-form>
 			</div>
 		</div>
 
-		<button class="btn btn-default" ng-click="addPurpose()" translate>project.add_purpose</button>
+		<button class="btn btn-default" ng-click="addPurpose()">
+			<i class="fa fa-plus"></i>
+			<span translate="project.add_purpose"></span>
+		</button>
 	</fieldset>
 	
 	<br/><br/>
 
-	<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" translate>shared.save</button>
-	<button ng-click="reset()" class="btn btn-default" translate>shared.remove_changes</button>
+	<button ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</button>
+
+	<button ng-click="reset()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</button>
 </form>

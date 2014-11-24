@@ -164,12 +164,30 @@
 
 <div class="modal-footer">
 	<div ng-if="container.indicator">
-		<button ng-click="add()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="container.isNew" translate>shared.add</button>
-		<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="!container.isNew" translate>shared.save</button>
-		<button ng-click="delete()" class="btn btn-danger" ng-if="!container.isNew" translate>shared.delete</button>
-		<button ng-click="cancel()" class="btn btn-default" translate>shared.cancel</button>
+		<button ng-click="add()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="container.isNew">
+			<i class="fa fa-plus"></i>
+			<span translate="shared.add"></span>
+		</button>
+
+		<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="!container.isNew">
+			<i class="fa fa-floppy-o"></i>
+			<span translate="shared.save"></span>
+		</button>
+
+		<button ng-click="delete()" class="btn btn-danger" ng-if="!container.isNew">
+			<i class="fa fa-remove"></i>
+			<span translate="shared.delete">
+		</button>
+
+		<button ng-click="cancel()" class="btn btn-default">
+			<i class="fa fa-undo"></i>
+			<span translate="shared.cancel"></span>
+		</button>
 	</div>
 	<div ng-if="!container.indicator">
-		<button ng-click="cancel()" class="btn btn-default" translate>shared.cancel</button>
+		<button ng-click="cancel()" class="btn btn-default">
+			<i class="fa fa-undo"></i>
+			<span translate="shared.cancel">
+		</button>
 	</div>
 </div>

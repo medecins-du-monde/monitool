@@ -1,0 +1,63 @@
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+				<span class="sr-only" translate>menu.toggle_nav</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+		</div>
+		
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav" ng-if="user">
+				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}">
+					<a ui-sref="main.projects">
+						<i class="fa fa-building"></i>
+						<span translate>shared.projects</span>
+					</a>
+				</li>
+				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator')}">
+					<a ui-sref="main.indicators.list">
+						<i class="fa fa-book"></i>
+						<span translate>shared.indicators_catalog</span>
+					</a>
+				</li>
+				<li ng-class="{active: $state.includes('main.help')}">
+					<a ui-sref="main.help.monitoring">
+						<i class="fa fa-question"></i>
+						<span translate>shared.help</span>
+					</a>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<i class="fa fa-language"></i>
+						{{'menu.language' | translate}}
+						<span class="caret"></span>
+					</a>
+
+					<ul class="dropdown-menu" role="menu">
+						<li><a ng-click="changeLanguage('fr')" ng-if="language != 'fr'" translate>menu.french</a></li>
+						<li><a ng-click="changeLanguage('en')" ng-if="language != 'en'" translate>menu.english</a></li>
+						<li><a ng-click="changeLanguage('es')" ng-if="language != 'es'" translate>menu.spanish</a></li>
+					</ul>
+				</li>
+
+				<li class="dropdown" ng-if="user">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<i class="fa fa-user"></i>
+						{{user.name}}
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a ng-click="logout()" translate="shared.logout"></a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<div class="container-fluid" ui-view style="padding-top: 70px;"></div>

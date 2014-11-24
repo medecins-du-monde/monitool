@@ -135,13 +135,14 @@
 	</fieldset>
 
 	<br/>
-	<button ng-click="save()"
-			ng-disabled="formForm.$invalid || isUnchanged()"
-			class="btn btn-primary"
-			translate>shared.save</button>
+	<button ng-click="save()" ng-disabled="formForm.$invalid || isUnchanged()" class="btn btn-primary">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</button>
 
-	<button ng-click="reset()"
-			class="btn btn-default"
-			translate>shared.remove_changes</button>
+	<button ng-click="reset()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</button>
 
 </form>

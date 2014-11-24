@@ -9,7 +9,7 @@
 		<tr>
 			<th translate>shared.name</th>
 			<th translate>indicator.num_indicators</th>
-			<th style="width:185px"></th>
+			<th style="width:225px"></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -23,8 +23,14 @@
 			</td>
 			<td>{{entity.usage || 0}}</td>
 			<td>
-				<button class="btn btn-primary btn-xs" ng-click="save(entityIndex)" ng-disabled="!entity.name || !hasChanged(entityIndex)" translate>shared.save</button>
-				<button class="btn btn-danger btn-xs" ng-disabled="entity.usage" ng-click="remove(entityIndex)" translate>shared.delete</button>
+				<button class="btn btn-primary btn-sm" ng-click="save(entityIndex)" ng-disabled="!entity.name || !hasChanged(entityIndex)">
+					<i class="fa fa-floppy-o"></i>
+					<span translate>shared.save</span>
+				</button>
+				<button class="btn btn-danger btn-sm" ng-disabled="entity.usage" ng-click="remove(entityIndex)">
+					<i class="fa fa-remove"></i>
+					<span translate>shared.delete</span>
+				</button>
 			</td>
 		</tr>
 		<tr>
