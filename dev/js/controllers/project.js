@@ -506,13 +506,6 @@ projectControllers.controller('ProjectInputController', function($state, $stateP
 	};
 });
 
-
-projectControllers.controller('ProjectUserListController', function($scope) {
-
-});
-
-
-
 projectControllers.controller('ReportingController', function($scope, $stateParams, type, project, mtDatabase, mtIndicators) {
 	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
 
@@ -646,3 +639,12 @@ projectControllers.controller('ReportingController', function($scope, $statePara
 
 	$scope.updateData();
 });
+
+
+projectControllers.controller('ProjectUserListController', function($scope) {
+
+
+
+});
+
+

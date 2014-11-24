@@ -7,6 +7,7 @@ var app = angular.module('monitool.app', [
 	'monitool.controllers.indicator',
 	'monitool.controllers.project',
 	'monitool.directives',
+	'monitool.filters',
 	'monitool.services.database',
 	'monitool.services.fetch',
 	'monitool.services.reporting',
@@ -49,6 +50,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'LoginController',
 		url: '/login',
 		templateUrl: 'partials/login.html'
+	});
+
+	$stateProvider.state('main.change_password', {
+		controller: 'ChangePasswordController',
+		url: '/change-password',
+		templateUrl: 'partials/change-password.html',
+		resolve: {
+			userSession: function(mtDatabase) {
+				return mtDatabase.remote.getSession();
+			}
+		}
 	});
 
 	$stateProvider.state('main', {

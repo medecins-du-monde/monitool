@@ -66,6 +66,7 @@ var files = {
 			'dev/js/controllers/indicator.js',
 			'dev/js/app.js',
 			'dev/js/directives.js',
+			'dev/js/filters.js',
 		]
 	}
 };

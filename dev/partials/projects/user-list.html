@@ -1,1 +1,31 @@
-user list
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li class="active" translate>shared.users</li>
+</ol>
+
+<form class="form-horizontal" role="form" name="usersForm" novalidate>
+
+	<div class="form-group" show-errors>
+		<label for="input-owner" class="col-sm-2 control-label" translate="project.owner"></label>
+		<div class="col-sm-10">
+			<select class="form-control"
+					id="input-owner"
+					name="owner"
+					ng-model="project.owner"
+					required
+					ng-options=""></select>
+		</div>
+	</div>
+
+	<button ng-click="save()" ng-disabled="usersForm.$invalid || isUnchanged()" class="btn btn-primary">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</button>
+
+	<button ng-click="reset()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</button>
+
+</form>

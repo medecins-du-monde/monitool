@@ -29,7 +29,13 @@ helperControllers.controller('LoginController', function($state, $scope, mtDatab
 });
 
 
+helperControllers.controller('ChangePasswordController', function($scope, userSession, mtDatabase) {
+	$scope.login = userSession.userCtx.name;
+	
+});
+
 helperControllers.controller('MainController', function($state, $scope, $translate, mtDatabase) {
+
 });
 
 

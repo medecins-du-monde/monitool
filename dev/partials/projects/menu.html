@@ -57,6 +57,15 @@
 				   <span translate>shared.reporting</span>
 				</a>
 			</li>
+
+			<li ui-sref-active="active" ng-class="{disabled: !project._id}">
+				<a ui-sref="main.project.user_list"
+				   tooltip="{{'project.user_list_tooltip'|translate}}"
+				   tooltip-popup-delay="1000">
+				   <i class="fa fa-users fa-fw"></i>
+				   <span translate>project.users</span>
+				</a>
+			</li>
 		</ul>
 	</div>
 

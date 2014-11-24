@@ -115,3 +115,16 @@ textarea {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+.form-signin input#inputPasswordChange {
+  border-radius: 0;
+  margin: 0;
+}
+
+.form-signin input#inputPasswordChange2 {
+  margin: -1px 0 10px 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+
