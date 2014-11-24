@@ -175,6 +175,13 @@ var SPANISH_TRANSLATION = {
 		new_type_name: "Nombre del nuevo tipo",
 		new_theme_name: "Nombre de la nueva temática",
 	},
+	login: {
+		error: "Usuario o contraseña inválido",
+		please_connect: "Conectese",
+		login: 'Usuario',
+		password: "Contraseña",
+		connect: "Conectar"
+	},
 	form: {
 		mandatory: "Este campo es obligatorio",
 		begin_lower_than_end: 'La fecha de inicio tiene que ser inferior a la de fin',

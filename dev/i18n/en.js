@@ -175,9 +175,16 @@ var ENGLISH_TRANSLATION = {
 		new_theme_name: "New theme name",
 
 	},
+	login: {
+		error: "Invalid username or password",
+		please_connect: "Please log in",
+		login: 'Username',
+		password: "Password",
+		connect: "Log in"
+	},
 	form: {
 		mandatory: "This field is mandatory",
 		begin_lower_than_end: 'Begin date must be lower than end date',
-		end_greater_than_begin: 'End date must be greater than begin date',
+		end_greater_than_begin: 'End date must be greater than begin date'
 	}
 };

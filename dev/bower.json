@@ -20,7 +20,7 @@
     "angular-bootstrap-show-errors": "https://github.com/paulyoder/angular-bootstrap-show-errors.git#~2.0.0",
     "angular-cookies": "v1.2.25",
     "angular-moment": "~0.8.2",
-    "angular-pouchdb": "angular-pouchdb/angular-pouchdb",
+    "angular-pouchdb": "romain-gilliotte/angular-pouchdb",
     "angular-translate-storage-local": "~2.4.2",
     "angular-ui-select": "~0.8.2",
     "angular-ui-router": "~0.2.13",

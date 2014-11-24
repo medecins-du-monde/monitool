@@ -1,19 +1,35 @@
 <div class="container">
 
 	<form class="form-signin" role="form" novalidate>
-		<h2 class="form-signin-heading">Connectez-vous</h2>
+		<h2 class="form-signin-heading" translate="login.please_connect"></h2>
 
-		<div class="alert alert-danger" role="alert" ng-if="showError">
-			Identifiant ou mot de passe invalide
-		</div>
+		<div class="alert alert-danger"
+			 role="alert"
+			 ng-if="showError"
+			 translate="login.error"></div>
 
-		<label for="inputEmail" class="sr-only">Identifiant</label>
-		<input type="text" id="inputEmail" class="form-control" placeholder="Identifiant" required autofocus ng-model="login">
+		<label for="inputEmail" class="sr-only" translate="login.login"></label>
+		<input type="text"
+			   id="inputEmail"
+			   class="form-control"
+			   placeholder="{{'login.login'|translate}}"
+			   required
+			   autofocus
+			   ng-model="login">
 		
-		<label for="inputPassword" class="sr-only">Mot de passe</label>
-		<input type="password" id="inputPassword" class="form-control" placeholder="Mot de passe" required ng-model="password">
+		<label for="inputPassword" class="sr-only" translate="login.password"></label>
+
+		<input type="password"
+			   id="inputPassword"
+			   class="form-control"
+			   placeholder="{{'login.password'|translate}}"
+			   required
+			   ng-model="password">
 		
-		<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="tryLogin()">Me connecter</button>
+		<button class="btn btn-lg btn-primary btn-block"
+				type="submit"
+				ng-click="tryLogin()"
+				translate="login.connect"
+				ng-disabled="!login || !password"></button>
 	</form>
-
 </div>

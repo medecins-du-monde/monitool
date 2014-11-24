@@ -176,6 +176,13 @@ var FRENCH_TRANSLATION = {
 		new_type_name: "Nom du nouveau type",
 		new_theme_name: "Nom de la nouvelle thématique",
 	},
+	login: {
+		error: "Identifiant ou mot de passe invalide",
+		please_connect: "Connectez-vous",
+		login: 'Identifiant',
+		password: "Mot de passe",
+		connect: "Me connecter"
+	},
 	form: {
 		mandatory: "Ce champ est obligatoire",
 		begin_lower_than_end: 'La date début de doit être inférieure à la date de fin',
