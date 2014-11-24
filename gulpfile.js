@@ -60,8 +60,12 @@ var files = {
 			'dev/i18n/es.js',
 			'dev/i18n/en.js',
 			'dev/js/image-exporter.js',
-			'dev/js/services.js',
-			'dev/js/controllers.js',
+			'dev/js/services/database.js',
+			'dev/js/services/fetch.js',
+			'dev/js/services/reporting.js',
+			'dev/js/controllers/helper.js',
+			'dev/js/controllers/project.js',
+			'dev/js/controllers/indicator.js',
 			'dev/js/app.js',
 			'dev/js/directives.js',
 		]
@@ -115,7 +119,7 @@ gulp.task('build-js', function() {
 			.pipe(replace(/<!--[\s\S]*?-->/g, ''))	// Remove HTML comments
 			.pipe(replace(/[  \t\n\r]+/g, ' '))		// Merge spaces
 			.pipe(replace(/> </g, '><'))			// Remove spaces between tags (but keep others)
-			.pipe(templateCache({module: 'MonitoolApp', root: 'partials'}))
+			.pipe(templateCache({module: 'monitool.app', root: 'partials'}))
 	);
 
 	// concat it all.

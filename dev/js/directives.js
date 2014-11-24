@@ -1,9 +1,8 @@
 "use strict";
 
-var monitoolDirectives = angular.module('MonitoolDirectives', []);
+var monitoolDirectives = angular.module('monitool.directives', []);
 
-
-app.directive('lowerThan', function() {
+monitoolDirectives.directive('lowerThan', function() {
 	return {
 		require: 'ngModel',
 
@@ -33,7 +32,7 @@ app.directive('lowerThan', function() {
 	};
 });
 
-app.directive('greaterThan', function() {
+monitoolDirectives.directive('greaterThan', function() {
 	return {
 		require: 'ngModel',
 
@@ -70,7 +69,7 @@ function isEmpty(value) {
   return angular.isUndefined(value) || value === '' || value === null || value !== value;
 }
 
-app.directive('ngMin', function() {
+monitoolDirectives.directive('ngMin', function() {
     return {
         restrict: 'A',
         require: 'ngModel',
@@ -95,7 +94,7 @@ app.directive('ngMin', function() {
     };
 });
 
-app.directive('ngMax', function() {
+monitoolDirectives.directive('ngMax', function() {
     return {
         restrict: 'A',
         require: 'ngModel',
@@ -121,7 +120,7 @@ app.directive('ngMax', function() {
 });
 
 
-app.directive('ngEnter', function () {
+monitoolDirectives.directive('ngEnter', function () {
     return function (scope, element, attrs) {
         element.bind("keydown keypress", function (event) {
             if(event.which === 13) {

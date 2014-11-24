@@ -5,7 +5,7 @@
 enable_cors = true
 port = 5984
 bind_address = 0.0.0.0
-WWW-Authenticate = Basic realm="***REMOVED***"
+WWW-Authenticate = Basic realm="administrator"
 
 [couch_httpd_auth]
 require_valid_user = true
@@ -21,4 +21,4 @@ credentials = true
 methods = GET, PUT, POST, HEAD, DELETE
 headers = accept, authorization, content-type, origin, referer
 
-; Also add ***REMOVED*** user.
+; Also add admin user.

@@ -1,11 +1,15 @@
 "use strict";
 
-var app = angular.module('MonitoolApp', [
+var app = angular.module('monitool.app', [
 	'ngRoute',
 	'ngCookies',
-	'MonitoolControllers',
-	'MonitoolDirectives',
-	'MonitoolServices',
+	'monitool.controllers.helper',
+	'monitool.controllers.indicator',
+	'monitool.controllers.project',
+	'monitool.directives',
+	'monitool.services.database',
+	'monitool.services.fetch',
+	'monitool.services.reporting',
 	'pascalprecht.translate'
 ]);
 
@@ -141,53 +145,8 @@ app.config(function($routeProvider) {
 		templateUrl: 'partials/projects/input.html',
 		controller: 'ProjectInputController',
 		resolve: {
-			project: function(mtFetch) {
-				return mtFetch.currentProject();
-			},
-			inputs: function($route, mtDatabase) {
-				var p        = $route.current.params,
-					id       = [p.projectId, p.entityId, p.formId, p.period].join(':'),
-					startKey = id,
-					endKey   = [p.projectId, p.entityId, p.formId].join(':'),
-					options  = {startkey: startKey, endkey: endKey, descending: true, limit: 2, include_docs: true};
-
-				return mtDatabase.current.allDocs(options).then(function(result) {
-					// retrieve current and previous from view result.
-					var current, previous;
-
-					if (result.rows.length == 0) // we got no result at all.
-						current = previous = null;
-					else if (result.rows.length === 1) {
-						if (result.rows[0].id !== id) { // we only got an old input
-							current = null;
-							previous = result.rows[0].doc;
-						}
-						else { // we only got the current input
-							current = result.rows[0].doc;
-							previous = null;
-						}
-					}
-					else if (result.rows.length === 2) {
-						if (result.rows[0].id !== id) { // we got two old inputs
-							current = null;
-							previous = result.rows[0].doc;
-						}
-						else { // we got the current and previous inputs
-							current = result.rows[0].doc;
-							previous = result.rows[1].doc;
-						}
-					}
-
-					if (!current)
-						current = {
-							_id: id, type: 'input',
-							project: p.projectId, entity: p.entityId, form: p.formId, period: p.period,
-							indicators: { }
-						};
-
-					return {current: current, previous: previous};
-				});
-			}
+			project: function(mtFetch) { return mtFetch.currentProject(); },
+			inputs: function(mtFetch) { return mtFetch.currentPreviousInput(); }
 		}
 	});
 
@@ -273,6 +232,6 @@ app.config(function($routeProvider) {
 
 
 angular.element(document).ready(function() {
-	angular.bootstrap(document, ['MonitoolApp']);
+	angular.bootstrap(document, ['monitool.app']);
 });
 

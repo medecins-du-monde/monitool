@@ -59,14 +59,19 @@
 		<script type="text/javascript" src="bower_components/c3/c3.min.js"></script>
 		
 
-		<script type="text/javascript" src="js/services.js"></script>
-		<script type="text/javascript" src="js/controllers.js"></script>
-		<script type="text/javascript" src="js/app.js"></script>
-		<script type="text/javascript" src="js/directives.js"></script>
 		<script type="text/javascript" src="js/image-exporter.js"></script>
+		<script type="text/javascript" src="js/services/database.js"></script>
+		<script type="text/javascript" src="js/services/fetch.js"></script>
+		<script type="text/javascript" src="js/services/reporting.js"></script>
+		<script type="text/javascript" src="js/directives.js"></script>
+		<script type="text/javascript" src="js/controllers/project.js"></script>
+		<script type="text/javascript" src="js/controllers/indicator.js"></script>
+		<script type="text/javascript" src="js/controllers/helper.js"></script>
+		<script type="text/javascript" src="js/app.js"></script>
 	</head>
 	<body>
 		<div ng-include="'partials/home.html'"></div>
 		<div class="container-fluid" ng-view style="padding-top: 70px;"></div>
 	</body>
 </html>
+
