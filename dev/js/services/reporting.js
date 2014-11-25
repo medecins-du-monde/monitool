@@ -286,3 +286,82 @@ reportingServices.factory('mtIndicators', function($q, mtDatabase) {
 		getIndicatorStats: getIndicatorStats
 	};
 });
+
+
+reportingServices.factory('csvExport', function() {
+	
+	var exportProjectStats = function(cols, project, indicatorsById, data) {
+		var csvDump = 'os;res;indicator';
+		cols.forEach(function(col) { csvDump += ';' + col.name; })
+		csvDump += "\n";
+
+		project.logicalFrame.indicators.forEach(function(indicatorId) {
+			csvDump += 'None;None;' + indicatorsById[indicatorId].name;
+			cols.forEach(function(col) {
+				csvDump += ';';
+				try { csvDump += data[col.id][indicatorId].value }
+				catch (e) {}
+			});
+			csvDump += "\n";
+		});
+
+		project.logicalFrame.purposes.forEach(function(purpose) {
+			purpose.indicators.forEach(function(indicatorId) {
+				csvDump += purpose.description + ';None;' + indicatorsById[indicatorId].name;
+				cols.forEach(function(col) {
+					csvDump += ';';
+					try { csvDump += data[col.id][indicatorId].value }
+					catch (e) {}
+				});
+				csvDump += "\n";
+			});
+
+			purpose.outputs.forEach(function(output) {
+				output.indicators.forEach(function(indicatorId) {
+					csvDump += purpose.description + ';' + output.description + ';' + indicatorsById[indicatorId].name;
+					cols.forEach(function(col) {
+						csvDump += ';';
+						try { csvDump += data[col.id][indicatorId].value }
+						catch (e) {}
+					});
+					csvDump += "\n";
+				});
+			});
+		});
+
+		return csvDump;
+	};
+
+	var exportIndicatorStats = function(cols, projects, indicator, data) {
+		var csvDump = 'type;nom';
+
+		// header
+		cols.forEach(function(col) { csvDump += ';' + col.name; })
+		csvDump += "\n";
+
+		projects.forEach(function(project) {
+			csvDump += 'project;' + project.name;
+			cols.forEach(function(col) {
+				csvDump += ';';
+				try { csvDump += data[col.id][project._id][indicator._id].value }
+				catch (e) {}
+			});
+			csvDump += "\n";
+
+			project.inputEntities.forEach(function(entity) {
+				csvDump += 'entity;' + entity.name;
+				cols.forEach(function(col) {
+					csvDump += ';';
+					try { csvDump += data[col.id][project._id][indicator._id].value; }
+					catch (e) {}
+				});
+				csvDump += "\n";
+			});
+		});
+
+		return csvDump;
+	};
+
+	return {exportProjectStats: exportProjectStats, exportIndicatorStats: exportIndicatorStats};
+});
+

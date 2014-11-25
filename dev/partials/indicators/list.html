@@ -25,7 +25,7 @@
 		</div>
 
 		<div class="indicator-level-3" ng-repeat="indicator in indicators | orderBy:orderField" ng-if="open2">
-			<span class="color" ng-class="{green: indicator.standard}"></span>
+			<i class="fa fa-circle-o" ng-style="{color: indicator.standard ? '#72bb53' : '#d68227'}"></i>
 			<span class="name">{{indicator.name}} ({{indicator.main}} projets, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
 
 			<a ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate>shared.edit</a>

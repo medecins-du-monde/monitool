@@ -119,7 +119,7 @@ module.exports = {
 						emit(indicatorId, {dependency: 1});
 				}
 				else if (doc.type === 'indicator')
-					emit(doc._id, {name: doc.name, standart: doc.standart, types: doc.types, themes: doc.themes});
+					emit(doc._id, {name: doc.name, standard: doc.standard, types: doc.types, themes: doc.themes});
 
 				// this may be a bit overkill
 				else if (doc.type === 'input')
@@ -136,7 +136,7 @@ module.exports = {
 
 					if (value.name) {
 						memo.name     = value.name;
-						memo.standart = value.standart;
+						memo.standard = value.standard;
 						memo.types    = value.types;
 						memo.themes   = value.themes;
 					}

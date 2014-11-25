@@ -47,6 +47,7 @@ var ENGLISH_TRANSLATION = {
 		choose_indicator: 'Choose an indicator',
 		list: 'List',
 		logout: 'Log Out',
+		change_password: "Change password",
 	},
 	menu: {
 		toggle_nav: "Toggle navigation",
@@ -131,7 +132,8 @@ var ENGLISH_TRANSLATION = {
 		add_activity: 'Add activity',
 		add_output: 'Add output',
 		add_purpose: 'Add purpose',
-
+		users: "Users",
+		owner: "Owner",
 	},
 	indicator: {
 		no_theme: 'No theme',
@@ -180,7 +182,11 @@ var ENGLISH_TRANSLATION = {
 		please_connect: "Please log in",
 		login: 'Username',
 		password: "Password",
-		connect: "Log in"
+		connect: "Log in",
+		change_password_please: "Type your new password",
+		new_password: "Password",
+		new_password_again: "Password again",
+		change_password: "Change"
 	},
 	form: {
 		mandatory: "This field is mandatory",

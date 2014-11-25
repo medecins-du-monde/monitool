@@ -35,16 +35,6 @@ textarea {
 
 }
 
-.indicator-level-3 .color {
-	display: inline-block;
-	width: 10px;
-	height: 16px;
-	margin-right: 10px;
-	background-color: #d68227;
-}
-.indicator-level-3 .color.green {
-	background-color: #72bb53;
-}
 
 .indicator-level-3 a {
 	float: right;

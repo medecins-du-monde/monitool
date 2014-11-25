@@ -506,7 +506,7 @@ projectControllers.controller('ProjectInputController', function($state, $stateP
 	};
 });
 
-projectControllers.controller('ReportingController', function($scope, $stateParams, type, project, mtDatabase, mtIndicators) {
+projectControllers.controller('ReportingController', function($scope, $stateParams, type, project, mtDatabase, mtIndicators, csvExport) {
 	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
 
 	$scope.project = project;
@@ -594,46 +594,10 @@ projectControllers.controller('ReportingController', function($scope, $statePara
 	};
 
 	$scope.downloadCSV = function() {
-		var csvDump = 'os;res;indicator';
-		$scope.cols.forEach(function(col) { csvDump += ';' + col.name; })
-		csvDump += "\n";
+		var csvDump = csvExport.exportProjectStats($scope.cols, $scope.project, $scope.indicatorsById, $scope.data),
+			blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
+			name    = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.csv';
 
-		$scope.project.logicalFrame.indicators.forEach(function(indicatorId) {
-			csvDump += 'None;None;' + $scope.indicatorsById[indicatorId].name;
-			$scope.cols.forEach(function(col) {
-				csvDump += ';';
-				try { csvDump += $scope.data[col.id][indicatorId].value }
-				catch (e) {}
-			});
-			csvDump += "\n";
-
-			$scope.project.logicalFrame.purposes.forEach(function(purpose) {
-				purpose.indicators.forEach(function(indicatorId) {
-					csvDump += purpose.description + ';None;' + $scope.indicatorsById[indicatorId].name;
-					$scope.cols.forEach(function(col) {
-						csvDump += ';';
-						try { csvDump += $scope.data[col.id][indicatorId].value }
-						catch (e) {}
-					});
-					csvDump += "\n";
-				});
-
-				purpose.outputs.forEach(function(output) {
-					output.indicators.forEach(function(indicatorId) {
-						csvDump += purpose.description + ';' + output.description + ';' + $scope.indicatorsById[indicatorId].name;
-						$scope.cols.forEach(function(col) {
-							csvDump += ';';
-							try { csvDump += $scope.data[col.id][indicatorId].value }
-							catch (e) {}
-						});
-						csvDump += "\n";
-					});
-				});
-			});
-		});
-
-		var blob = new Blob([csvDump], {type: "text/csv;charset=utf-8"});
-		var name = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.csv';
 		saveAs(blob, name);
 	};
 

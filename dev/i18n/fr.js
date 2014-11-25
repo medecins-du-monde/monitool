@@ -48,6 +48,7 @@ var FRENCH_TRANSLATION = {
 		choose_indicator: 'Choisissez un indicateur',
 		list: 'Liste',
 		logout: 'Déconnecter',
+		change_password: "Changer le mot de passe",
 
 	},
 	menu: {
@@ -134,6 +135,8 @@ var FRENCH_TRANSLATION = {
 		add_output: 'Ajouter un résultat attendu',
 		add_purpose: 'Ajouter un objectif spécifique',
 
+		users: "Utilisateurs",
+		owner: "Propriétaire",
 	},
 	indicator: {
 		no_theme: 'Sans thématique',
@@ -181,7 +184,11 @@ var FRENCH_TRANSLATION = {
 		please_connect: "Connectez-vous",
 		login: 'Identifiant',
 		password: "Mot de passe",
-		connect: "Me connecter"
+		connect: "Me connecter",
+		change_password_please: "Entrez votre nouveau mot de passe",
+		new_password: "Mot de passe",
+		new_password_again: "Répétez le mot de passe",
+		change_password: "Changer mon mot de passe"
 	},
 	form: {
 		mandatory: "Ce champ est obligatoire",

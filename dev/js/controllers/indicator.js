@@ -110,7 +110,7 @@ indicatorControllers.controller('IndicatorEditController', function($state, $sco
 });
 
 
-indicatorControllers.controller('IndicatorReportingController', function($scope, indicator, projects, mtIndicators) {
+indicatorControllers.controller('IndicatorReportingController', function($scope, indicator, projects, mtIndicators, csvExport) {
 	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
 
 	$scope.indicator = indicator;
@@ -179,34 +179,10 @@ indicatorControllers.controller('IndicatorReportingController', function($scope,
 	};
 
 	$scope.downloadCSV = function() {
-		var csvDump = 'type;nom';
+		var csvDump = csvExport.exportIndicatorStats($scope.cols, $scope.projects, indicator, $scope.data),
+			blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
+			name    = [indicator.name, $scope.begin, $scope.end].join('_') + '.csv';
 
-		// header
-		$scope.cols.forEach(function(col) { csvDump += ';' + col.name; })
-		csvDump += "\n";
-
-		$scope.projects.forEach(function(project) {
-			csvDump += 'project;' + project.name;
-			$scope.cols.forEach(function(col) {
-				csvDump += ';';
-				try { csvDump += $scope.data[col.id][project._id][indicator._id].value }
-				catch (e) {}
-			});
-			csvDump += "\n";
-
-			project.inputEntities.forEach(function(entity) {
-				csvDump += 'entity;' + entity.name;
-				$scope.cols.forEach(function(col) {
-					csvDump += ';';
-					try { csvDump += $scope.data[col.id][project._id][indicator._id].value; }
-					catch (e) {}
-				});
-				csvDump += "\n";
-			});
-		});
-
-		var blob = new Blob([csvDump], {type: "text/csv;charset=utf-8"});
-		var name = [indicator.name, $scope.begin, $scope.end].join('_') + '.csv';
 		saveAs(blob, name);
 	};
 

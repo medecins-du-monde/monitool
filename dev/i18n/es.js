@@ -40,14 +40,16 @@ var SPANISH_TRANSLATION = {
 		values: 'Valores',
 		target_percentage: 'Porcentaje del objetivo',
 		baseline_percentage: 'Porcentaje de la valor base',
-		plot: 'Mostrar grafico',
-		download_plot: 'Descargar el grafico',
+		plot: 'Mostrar gráfico',
+		download_plot: 'Descargar el gráfico',
 		download_table: 'Descargar la tabla',
 		unknown_indicator: "Indicador no conocido",
 
 		choose_indicator: 'Elige un indicador',
 		list: 'Lista',
 		logout: 'Desconectar',
+		change_password: "Cambiar contraseña",
+
 	},
 	menu: {
 		toggle_nav: "Ver el menu",
@@ -132,7 +134,8 @@ var SPANISH_TRANSLATION = {
 		add_activity: 'Añadir una actividad',
 		add_output: 'Añadir un resultado esperado',
 		add_purpose: 'Añadir un objetivo específico',
-
+		users: "Usuarios",
+		owner: "Proprietario",
 	},
 	indicator: {
 		no_theme: 'Sin temática',
@@ -180,7 +183,11 @@ var SPANISH_TRANSLATION = {
 		please_connect: "Conectese",
 		login: 'Usuario',
 		password: "Contraseña",
-		connect: "Conectar"
+		connect: "Conectar",
+		change_password_please: "Entre su nueva contraseña",
+		new_password: "Contraseña",
+		new_password_again: "Repita su contraseña",
+		change_password: "Cambiar"
 	},
 	form: {
 		mandatory: "Este campo es obligatorio",
