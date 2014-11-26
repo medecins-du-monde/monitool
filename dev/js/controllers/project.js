@@ -1,14 +1,6 @@
 "use strict";
 
-var projectControllers = angular.module(
-	'monitool.controllers.project',
-	[
-		'ui.bootstrap',
-		'ui.select',
-		'ui.bootstrap.showErrors',
-		'angularMoment'
-	]
-);
+var projectControllers = angular.module('monitool.controllers.project', []);
 
 projectControllers.controller('ProjectListController', function($scope, projects) {
 	$scope.projects       = projects;
@@ -24,7 +16,6 @@ projectControllers.controller('ProjectListController', function($scope, projects
 projectControllers.controller('ProjectMenuController', function($scope, $state, project) {
 	$scope.project = project;
 });
-
 
 projectControllers.controller('ProjectLogicalFrameController', function($scope, $modal, $state, $stateParams, mtDatabase, project, indicatorsById) {
 	$scope.project = project;
@@ -234,7 +225,7 @@ projectControllers.controller('ProjectFormsController', function($scope, project
 	$scope.project = project;
 });
 
-projectControllers.controller('ProjectFormEditionController', function($scope, $stateParams, $state, project, mtDatabase) {
+projectControllers.controller('ProjectFormEditionController', function($scope, $state, $stateParams, mtDatabase, project, indicatorsById) {
 	// Build indicator selection
 	var rebuildChosenIndicators = function() {
 		$scope.chosenIndicators = [];
@@ -343,66 +334,17 @@ projectControllers.controller('ProjectFormEditionController', function($scope, $
 
 	$scope.master = angular.copy(project);
 	$scope.reset();
-
-	// Retrieve indicators definition
-	$scope.indicatorsById = {};
-	Object.keys($scope.project.indicators).forEach(function(id) { $scope.indicatorsById[id] = true; });
-	Object.keys($scope.form.fields).forEach(function(id) { $scope.indicatorsById[id] = true; });
-	mtDatabase.current.allDocs({include_docs: true, keys: Object.keys($scope.indicatorsById)}).then(function(result) {
-		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
-	});
+	$scope.indicatorsById = indicatorsById;
 });
 
 
-projectControllers.controller('ProjectInputListController', function($scope, project, inputs, mtDatabase) {
+projectControllers.controller('ProjectInputListController', function($scope, project, inputs) {
 	$scope.project = project;
-	$scope.inputs = [];
-
-	project.inputEntities.forEach(function(inputEntity) {
-		project.dataCollection.forEach(function(form) {
-			var periods;
-			if (form.periodicity == 'monthly' || form.periodicity == 'quarterly') {
-				var current = moment(form.useProjectStart ? project.begin : form.begin, 'YYYY-MM'),
-					end     = moment(form.useProjectEnd ? project.end : project.end, 'YYYY-MM');
-
-				if (end.isAfter()) // do not allow to go in the future
-					end = moment();
-
-				periods = [];
-				while (current.isBefore(end)) {
-					periods.push(current.clone());
-					current.add(form.periodicity === 'monthly' ? 1 : 3, 'month');
-				}
-			}
-			else if (form.periodicity === 'planned') {
-				periods = form.periods;
-			}
-			else
-				throw new Error(form.periodicity + ' is not a valid periodicity');
-
-			periods.forEach(function(period) {
-				$scope.inputs.push({
-					filled: inputs[[$scope.project._id, inputEntity.id, form.id, period.format('YYYY-MM')].join(':')],
-					period: period,
-					formId: form.id, formName: form.name,
-					inputEntityId: inputEntity.id, inputEntityName: inputEntity.name
-				});
-			});
-		});
-	});
-
-	$scope.inputs.sort(function(a, b) {
-		if (a.period.isSame(b.period)) {
-			var nameCmp = a.inputEntityName.localeCompare(b.inputEntityName);
-			return nameCmp !== 0 ? nameCmp : a.formName.localeCompare(b.formName);
-		}
-		else
-			return a.period.isBefore(b.period) ? -1 : 1;
-	});
+	$scope.inputs  = inputs;
 });
 
 
-projectControllers.controller('ProjectInputController', function($state, $stateParams, $scope, project, inputs, mtDatabase) {
+projectControllers.controller('ProjectInputController', function($state, $stateParams, $scope, mtDatabase, mtReporting, project, inputs) {
 	$scope.project       = project;
 	$scope.input         = inputs.current;
 	$scope.previousInput = inputs.previous;
@@ -476,22 +418,7 @@ projectControllers.controller('ProjectInputController', function($state, $stateP
 	});
 
 	$scope.evaluate = function() {
-		var values = null, newValues = angular.copy($scope.input.indicators);
-
-		while (!angular.equals(values, newValues)) {
-			for (var indicatorId in $scope.form.fields) {
-				var field = $scope.form.fields[indicatorId];
-				if (field.type === 'computed') {
-					var localScope = {};
-					for (var paramName in field.parameters)
-						localScope[paramName] = $scope.input.indicators[field.parameters[paramName]] || 0;
-					$scope.input.indicators[indicatorId] = math.eval(field.expression, localScope);
-				}
-			}
-
-			values    = newValues;
-			newValues = $scope.input.indicators;
-		}
+		mtReporting.evaluateScope($scope.form, $scope.input.indicators);
 	};
 
 	$scope.copy = function(fieldId) {
@@ -506,22 +433,16 @@ projectControllers.controller('ProjectInputController', function($state, $stateP
 	};
 });
 
-projectControllers.controller('ReportingController', function($scope, $stateParams, type, project, mtDatabase, mtIndicators, csvExport) {
+projectControllers.controller('ProjectReportingController', function($scope, $stateParams, mtReporting, type, project, indicatorsById) {
 	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
 
-	$scope.project = project;
-
-	// Retrieve indicators
-	$scope.indicatorsById = {};
-	mtDatabase.current.allDocs({keys: Object.keys($scope.project.indicators), include_docs: true}).then(function(result) {
-		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
-	});
-
-	$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM');
-	$scope.end     = moment().format('YYYY-MM');
-	$scope.groupBy = 'month';
-	$scope.display = 'value';
-	$scope.plots   = {};
+	$scope.project        = project;
+	$scope.indicatorsById = indicatorsById;
+	$scope.begin          = moment().subtract(1, 'year').format('YYYY-MM');
+	$scope.end            = moment().format('YYYY-MM');
+	$scope.groupBy        = 'month';
+	$scope.display        = 'value';
+	$scope.plots          = {};
 
 	if ($scope.begin < $scope.project.begin)
 		$scope.begin = $scope.project.begin;
@@ -535,17 +456,17 @@ projectControllers.controller('ReportingController', function($scope, $statePara
 
 		var data;
 		if (type === 'project')
-			data = mtIndicators.getProjectStats($scope.project, $scope.begin, $scope.end, $scope.groupBy);
+			data = mtReporting.getProjectStats($scope.project, $scope.begin, $scope.end, $scope.groupBy);
 		else if (type === 'entity') {
-			data = mtIndicators.getEntityStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $stateParams.entityId);
+			data = mtReporting.getEntityStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $stateParams.entityId);
 			$scope.entity = $scope.project.inputEntities.filter(function(e) { return e.id == $stateParams.entityId; })[0];
 		}
 		else if (type === 'group') {
-			data = mtIndicators.getGroupStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $stateParams.groupId);
+			data = mtReporting.getGroupStats($scope.project, $scope.begin, $scope.end, $scope.groupBy, $stateParams.groupId);
 			$scope.group = $scope.project.inputGroups.filter(function(g) { return g.id == $stateParams.groupId; })[0];
 		}
 
-		$scope.cols = mtIndicators.getStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy, type, $stateParams[type=='group'?'groupId':'entityId']);
+		$scope.cols = mtReporting.getStatsColumns($scope.project, $scope.begin, $scope.end, $scope.groupBy, type, $stateParams[type=='group'?'groupId':'entityId']);
 		data.then(function(data) {
 			$scope.data = data;
 
@@ -594,7 +515,7 @@ projectControllers.controller('ReportingController', function($scope, $statePara
 	};
 
 	$scope.downloadCSV = function() {
-		var csvDump = csvExport.exportProjectStats($scope.cols, $scope.project, $scope.indicatorsById, $scope.data),
+		var csvDump = mtReporting.exportProjectStats($scope.cols, $scope.project, $scope.indicatorsById, $scope.data),
 			blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
 			name    = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.csv';
 

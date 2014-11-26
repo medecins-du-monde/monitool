@@ -2,28 +2,80 @@
 
 var reportingServices = angular.module('monitool.services.reporting', ['monitool.services.database']);
 
-reportingServices.factory('mtIndicators', function($q, mtDatabase) {
+reportingServices.factory('mtFormula', function($q, mtDatabase) {
+	return {
+		/**
+		 * In: {expression: "a + b", parameters: {a: 42}}
+		 * Out {expression: "a + b", parameters: {a: 42}, symbols: ['a', 'b'], isValid: false}
+		 */
+		annotate: function(formula) {
+			// Helper function to recursively retrieve symbols from abstract syntax tree.
+			var getSymbolsRec = function(root, symbols) {
+				if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
+					root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
+				else if (root.type === 'SymbolNode')
+					symbols[root.name] = true;
+
+				return Object.keys(symbols);
+			};
+			
+			formula.isValid = true;
+			try {
+				var expression = math.parse(formula.expression);
+				// do not allow empty formula
+				if (expression.type === 'ConstantNode' && expression.value === 'undefined')
+					throw new Error();
+				
+				formula.symbols = getSymbolsRec(expression, {});
+			}
+			catch (e) { 
+				formula.symbols = [];
+				formula.isValid = false;
+			}
+
+			var numSymbols = formula.symbols.length;
+			for (var i = 0; i < numSymbols; ++i)
+				if (!formula.parameters[formula.symbols[i]])
+					formula.isValid = false;
+
+			if (!formula.name)
+				formula.isValid = false;
+		},
+
+		/**
+		 * Clean up
+		 */
+		clean: function(formula) {
+			delete formula.isValid;
+			delete formula.symbols;
+		},
+		
+	}
+});
+
+
+reportingServices.factory('mtReporting', function($q, mtDatabase) {
+
+	var evaluateScope = function(form, scope) {
+		var values = null, newValues = angular.copy(scope);
+
+		while (!angular.equals(values, newValues)) {
+			for (var indicatorId in form.fields) {
+				var field = form.fields[indicatorId];
+
+				if (field && field.type === 'computed') {
+					var localScope = {};
+					for (var paramName in field.parameters)
+						localScope[paramName] = scope[field.parameters[paramName]] || 0;
+					scope[indicatorId] = math.eval(field.expression, localScope);
+				}
+			}
+			values    = newValues;
+			newValues = scope;
+		}
+	};
 
 	var evaluateAll = function(project, regrouped) {
-		var evaluateScope = function(form, scope) {
-			var values = null, newValues = angular.copy(scope);
-
-			while (!angular.equals(values, newValues)) {
-				for (var indicatorId in form.fields) {
-					var field = form.fields[indicatorId];
-
-					if (field && field.type === 'computed') {
-						var localScope = {};
-						for (var paramName in field.parameters)
-							localScope[paramName] = scope[field.parameters[paramName]] || 0;
-						scope[indicatorId] = math.eval(field.expression, localScope);
-					}
-				}
-				values    = newValues;
-				newValues = scope;
-			}
-		};
-
 		// compute indicators
 		var fakeForm = {fields:{}}; // wrong!
 		project.dataCollection.forEach(function(form) {
@@ -278,18 +330,6 @@ reportingServices.factory('mtIndicators', function($q, mtDatabase) {
 		});
 	};
 
-	return {
-		getStatsColumns:   getStatsColumns,
-		getProjectStats:   getProjectStats,
-		getGroupStats:     getGroupStats,
-		getEntityStats:    getEntityStats,
-		getIndicatorStats: getIndicatorStats
-	};
-});
-
-
-reportingServices.factory('csvExport', function() {
-	
 	var exportProjectStats = function(cols, project, indicatorsById, data) {
 		var csvDump = 'os;res;indicator';
 		cols.forEach(function(col) { csvDump += ';' + col.name; })
@@ -362,6 +402,16 @@ reportingServices.factory('csvExport', function() {
 		return csvDump;
 	};
 
-	return {exportProjectStats: exportProjectStats, exportIndicatorStats: exportIndicatorStats};
+
+	return {
+		exportProjectStats:   exportProjectStats,
+		exportIndicatorStats: exportIndicatorStats,
+		evaluateScope:        evaluateScope,
+		getStatsColumns:      getStatsColumns,
+		getProjectStats:      getProjectStats,
+		getGroupStats:        getGroupStats,
+		getEntityStats:       getEntityStats,
+		getIndicatorStats:    getIndicatorStats
+	};
 });
 

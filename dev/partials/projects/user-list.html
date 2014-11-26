@@ -9,12 +9,13 @@
 	<div class="form-group" show-errors>
 		<label for="input-owner" class="col-sm-2 control-label" translate="project.owner"></label>
 		<div class="col-sm-10">
-			<select class="form-control"
-					id="input-owner"
-					name="owner"
-					ng-model="project.owner"
-					required
-					ng-options=""></select>
+
+			<ui-select ng-model="project.owner" theme="bootstrap" required id="input-owner">
+				<ui-select-match placeholder="{{'project.choose_user'|translate}}">{{$select.selected.name}}</ui-select-match>
+				<ui-select-choices repeat="user._id as user in users | filter: {name: $select.search}">
+					<span>{{user.name}}</span>
+				</ui-select-choices>
+			</ui-select>
 		</div>
 	</div>
 

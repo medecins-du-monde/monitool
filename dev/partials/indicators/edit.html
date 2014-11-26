@@ -116,7 +116,7 @@
 								<input type="text"
 									   class="form-control"
 									   placeholder="{{'indicator.formula_name_ph'|translate}}"
-									   ng-model="indicator.formulas[formulaId].name" ng-change="updateFormula(formulaId)" />
+									   ng-model="indicator.formulas[formulaId].name" ng-change="annotateFormula(formulaId)" />
 
 								<span class="input-group-btn">
 									<button class="btn btn-danger" ng-click="deleteFormula(formulaId)" translate>shared.remove</button>
@@ -130,7 +130,7 @@
 							<input type="text"
 								   class="form-control"
 								   ng-model="indicator.formulas[formulaId].expression"
-								   ng-change="updateFormula(formulaId)"
+								   ng-change="annotateFormula(formulaId)"
 								   placeholder="{{'indicator.formula_expression_ph'|translate}}" />
 						</td>
 					</tr>
@@ -138,7 +138,7 @@
 						<td>{{'indicator.parameter'|translate}} <strong>"{{symbol}}"</strong></td>
 						<td>
 							<ui-select ng-model="indicator.formulas[formulaId].parameters[symbol]"
-									   ng-change="updateFormula(formulaId)"
+									   ng-change="annotateFormula(formulaId)"
 									   theme="bootstrap">
 
 								<ui-select-match placeholder="{{'shared.choose_indicator'|translate}}">{{$select.selected.name}}</ui-select-match>

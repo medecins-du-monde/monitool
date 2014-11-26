@@ -1,14 +1,6 @@
 "use strict";
 
-var indicatorControllers = angular.module(
-	'monitool.controllers.indicator',
-	[
-		'ui.bootstrap',
-		'ui.select',
-		'ui.bootstrap.showErrors',
-		'angularMoment'
-	]
-);
+var indicatorControllers = angular.module('monitool.controllers.indicator', []);
 
 indicatorControllers.controller('IndicatorListController', function($scope, indicatorHierarchy, typesById, themesById) {
 	$scope.hierarchy  = indicatorHierarchy;
@@ -18,7 +10,7 @@ indicatorControllers.controller('IndicatorListController', function($scope, indi
 });
 
 
-indicatorControllers.controller('IndicatorEditController', function($state, $scope, $stateParams, mtDatabase, indicator, indicators, types, themes) {
+indicatorControllers.controller('IndicatorEditController', function($state, $scope, $stateParams, mtDatabase, mtFormula, indicator, indicators, types, themes) {
 	// Formula handlers
 	$scope.addFormula = function() {
 		var uuid  = PouchDB.utils.uuid().toLowerCase(),
@@ -31,45 +23,8 @@ indicatorControllers.controller('IndicatorEditController', function($state, $sco
 		delete $scope.indicator.formulas[formulaId];
 	};
 
-	$scope.updateFormula = function(formulaId) {
-		// Helper function to recursively retrieve symbols from abstract syntax tree.
-		var getSymbolsRec = function(root, symbols) {
-			if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
-				root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
-			else if (root.type === 'SymbolNode')
-				symbols[root.name] = true;
-
-			return Object.keys(symbols);
-		};
-		
-		var formula = $scope.indicator.formulas[formulaId];
-		formula.isValid = true;
-		try {
-			var expression = math.parse(formula.expression);
-			// do not allow empty formula
-			if (expression.type === 'ConstantNode' && expression.value === 'undefined')
-				throw new Error();
-			
-			formula.symbols = getSymbolsRec(expression, {});
-		}
-		catch (e) { 
-			formula.symbols = [];
-			formula.isValid = false;
-		}
-
-		var numSymbols = formula.symbols.length;
-		for (var i = 0; i < numSymbols; ++i)
-			if (!formula.parameters[formula.symbols[i]])
-				formula.isValid = false;
-
-		if (!formula.name)
-			formula.isValid = false;
-	};
-
-	$scope.formulaInvalid = function() {
-		return Object.keys($scope.indicator.formulas).some(function(formulaId) {
-			return !$scope.indicator.formulas[formulaId].isValid;
-		});
+	$scope.annotateFormula = function(formulaId) {
+		mtFormula.annotate($scope.indicator.formulas[formulaId]);
 	};
 
 	// Form actions
@@ -90,6 +45,12 @@ indicatorControllers.controller('IndicatorEditController', function($state, $sco
 		});
 	};
 
+	$scope.formulaInvalid = function() {
+		return Object.keys($scope.indicator.formulas).some(function(formulaId) {
+			return !$scope.indicator.formulas[formulaId].isValid;
+		});
+	};
+
 	$scope.isUnchanged = function() {
 		return angular.equals($scope.master, $scope.indicator);
 	};
@@ -101,7 +62,7 @@ indicatorControllers.controller('IndicatorEditController', function($state, $sco
 	// init scope
 	$scope.indicator  = indicator;
 	for (var formulaId in indicator.formulas)
-		$scope.updateFormula(formulaId);
+		$scope.annotateFormula(formulaId);
 
 	$scope.master     = angular.copy(indicator);
 	$scope.indicators = indicators.filter(function(i) { return i._id != indicator._id });
@@ -110,7 +71,7 @@ indicatorControllers.controller('IndicatorEditController', function($state, $sco
 });
 
 
-indicatorControllers.controller('IndicatorReportingController', function($scope, indicator, projects, mtIndicators, csvExport) {
+indicatorControllers.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects) {
 	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
 
 	$scope.indicator = indicator;
@@ -140,9 +101,9 @@ indicatorControllers.controller('IndicatorReportingController', function($scope,
 
 	// Retrieve inputs
 	$scope.updateData = function() {
-		$scope.cols = mtIndicators.getStatsColumns(null, $scope.begin, $scope.end, $scope.groupBy, null, null);
+		$scope.cols = mtReporting.getStatsColumns(null, $scope.begin, $scope.end, $scope.groupBy, null, null);
 
-		mtIndicators.getIndicatorStats($scope.indicator, $scope.projects, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
+		mtReporting.getIndicatorStats($scope.indicator, $scope.projects, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
 			$scope.data = data;
 			if ($scope.plot)
 				$scope.updateGraph();
@@ -179,7 +140,7 @@ indicatorControllers.controller('IndicatorReportingController', function($scope,
 	};
 
 	$scope.downloadCSV = function() {
-		var csvDump = csvExport.exportIndicatorStats($scope.cols, $scope.projects, indicator, $scope.data),
+		var csvDump = mtReporting.exportIndicatorStats($scope.cols, $scope.projects, indicator, $scope.data),
 			blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
 			name    = [indicator.name, $scope.begin, $scope.end].join('_') + '.csv';
 
@@ -189,28 +150,28 @@ indicatorControllers.controller('IndicatorReportingController', function($scope,
 	$scope.downloadGraph = function() {
 		var filename  = [indicator.name, $scope.begin, $scope.end].join('_') + '.png',
 			sourceSVG = document.querySelector("svg");
-			
+		
 		saveSvgAsPng(sourceSVG, filename, 1);
 	};
 
 	$scope.updateData();
 });
 
-indicatorControllers.controller('ThemeTypeListController', function($scope, entities, entityType, mtDatabase) {
+indicatorControllers.controller('ThemeTypeListController', function($scope, $state, entities, mtDatabase) {
 	entities.sort(function(entity1, entity2) {
 		return entity1.name.localeCompare(entity2.name);
 	});
 
 	$scope.entities = entities;
 	$scope.master = angular.copy(entities);
-	$scope.entityType = entityType;
+	$scope.entityType = $state.current.data.entityType;
 
 	$scope.hasChanged = function(entityIndex) {
 		return !angular.equals($scope.entities[entityIndex], $scope.master[entityIndex]);
 	};
 
 	$scope.create = function() {
-		var newEntity = {_id: PouchDB.utils.uuid().toLowerCase(), type: entityType, name: ''};
+		var newEntity = {_id: PouchDB.utils.uuid().toLowerCase(), type: $state.current.data.entityType, name: ''};
 		$scope.entities.push(newEntity);
 		$scope.master.push(angular.copy(newEntity));
 	};

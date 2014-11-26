@@ -1,8 +1,7 @@
 "use strict";
 
 var app = angular.module('monitool.app', [
-	'ui.router',
-	'ngCookies',
+	'angularMoment',
 	'monitool.controllers.helper',
 	'monitool.controllers.indicator',
 	'monitool.controllers.project',
@@ -11,7 +10,12 @@ var app = angular.module('monitool.app', [
 	'monitool.services.database',
 	'monitool.services.fetch',
 	'monitool.services.reporting',
-	'pascalprecht.translate'
+	'ngCookies',
+	'pascalprecht.translate',
+	'ui.bootstrap',
+	'ui.bootstrap.showErrors',
+	'ui.router',
+	'ui.select',
 ]);
 
 app.config(function($translateProvider) {
@@ -34,17 +38,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// states
 	///////////////////////////
 
-	// $stateProvider.state('login', {
-	// 	url: '/login',
-	// 	controller: 'LoginController',
-	// 	templateUrl: 'partials/workflow/login.html'
-	// });
-
-	// $stateProvider.state('index', {
-	// 	controller: 'MainController',
-	// 	url: '/',
-	// 	templateUrl: 'partials/main.html'
-	// });
 
 	$stateProvider.state('main.login', {
 		controller: 'LoginController',
@@ -171,7 +164,24 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.project.form', {
 		url: '/forms/:formId',
 		templateUrl: 'partials/projects/form-edit.html',
-		controller: 'ProjectFormEditionController'
+		controller: 'ProjectFormEditionController',
+		resolve: {
+			indicatorsById: function($stateParams, mtDatabase, project) {
+				var indicatorsById = {};
+				Object.keys(project.indicators).forEach(function(id) { indicatorsById[id] = true; });
+
+				if ($stateParams.formId !== 'new') {
+					var form = 	project.dataCollection.filter(function(form) { return form.id == $stateParams.formId; })[0];
+					Object.keys(form.fields).forEach(function(id) { indicatorsById[id] = true; });
+				}
+
+				mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(indicatorsById)}).then(function(result) {
+					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
+				});
+
+				return indicatorsById;
+			}
+		}
 	});
 
 	$stateProvider.state('main.project.input_list', {
@@ -179,15 +189,57 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/input-list.html',
 		controller: 'ProjectInputListController',
 		resolve: {
-			inputs: function($stateParams, mtDatabase) {
-				return mtDatabase.current.allDocs({
-					startkey: $stateParams.projectId + ':',
-					endkey: $stateParams.projectId + ':~'
-				}).then(function(result) {
-					var i = {};
-					result.rows.forEach(function(row) { i[row.id] = true; });
-					return i;
-				});
+			inputs: function($stateParams, mtDatabase, project) {
+				return mtDatabase.current
+					.allDocs({startkey: $stateParams.projectId + ':', endkey: $stateParams.projectId + ':~'})
+					.then(function(result) {
+						var inputExists = {}, inputs = [];
+						result.rows.forEach(function(row) { inputExists[row.id] = true; });
+						
+						project.inputEntities.forEach(function(inputEntity) {
+							project.dataCollection.forEach(function(form) {
+								var periods;
+								if (form.periodicity == 'monthly' || form.periodicity == 'quarterly') {
+									var current = moment(form.useProjectStart ? project.begin : form.begin, 'YYYY-MM'),
+										end     = moment(form.useProjectEnd ? project.end : project.end, 'YYYY-MM');
+
+									if (end.isAfter()) // do not allow to go in the future
+										end = moment();
+
+									periods = [];
+									while (current.isBefore(end)) {
+										periods.push(current.clone());
+										current.add(form.periodicity === 'monthly' ? 1 : 3, 'month');
+									}
+								}
+								else if (form.periodicity === 'planned') {
+									periods = form.periods;
+								}
+								else
+									throw new Error(form.periodicity + ' is not a valid periodicity');
+
+								periods.forEach(function(period) {
+									inputs.push({
+										filled: inputExists[[project._id, inputEntity.id, form.id, period.format('YYYY-MM')].join(':')],
+										period: period,
+										formId: form.id, formName: form.name,
+										inputEntityId: inputEntity.id, inputEntityName: inputEntity.name
+									});
+								});
+							});
+						});
+
+						inputs.sort(function(a, b) {
+							if (a.period.isSame(b.period)) {
+								var nameCmp = a.inputEntityName.localeCompare(b.inputEntityName);
+								return nameCmp !== 0 ? nameCmp : a.formName.localeCompare(b.formName);
+							}
+							else
+								return a.period.isBefore(b.period) ? -1 : 1;
+						});
+
+						return inputs;
+					});
 			}
 		}
 	});
@@ -204,10 +256,18 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.project.reporting', {
 		url: '/reporting',
 		templateUrl: 'partials/projects/reporting.html',
-		controller: 'ReportingController',
+		controller: 'ProjectReportingController',
 		resolve: {
 			type: function() { return 'project'; },
-		}
+			indicatorsById: function(mtDatabase, project) {
+				var indicatorsById = {};
+				mtDatabase.current.allDocs({keys: Object.keys(project.indicators), include_docs: true}).then(function(result) {
+					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
+				});
+				return indicatorsById;
+			}
+		},
+
 	});
 
 	$stateProvider.state('main.project.user_list', {
@@ -241,8 +301,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/theme-type-list.html',
 		controller: 'ThemeTypeListController',
 		resolve: {
-			entities: function(mtFetch) { return mtFetch.themes(); },
-			entityType: function() { return 'theme'; }
+			entities: function(mtFetch) { return mtFetch.themes(); }
+		},
+		data: {
+			entityType: 'theme'
 		}
 	});
 
@@ -251,8 +313,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/theme-type-list.html',
 		controller: 'ThemeTypeListController',
 		resolve: {
-			entities: function(mtFetch) { return mtFetch.types(); },
-			entityType: function() { return 'type'; }
+			entities: function(mtFetch) { return mtFetch.types(); }
+		},
+		data: {
+			entityType: 'type'
 		}
 	});
 

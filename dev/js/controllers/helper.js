@@ -1,14 +1,6 @@
 "use strict";
 
-var helperControllers = angular.module(
-	'monitool.controllers.helper',
-	[
-		'ui.bootstrap',
-		'ui.select',
-		'ui.bootstrap.showErrors',
-		'angularMoment'
-	]
-);
+var helperControllers = angular.module('monitool.controllers.helper', []);
 
 helperControllers.controller('LoginController', function($state, $scope, mtDatabase) {
 	$scope.showError = false;

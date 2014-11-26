@@ -19,6 +19,7 @@
 	</div>
 
 	<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes" ng-if="open1">
+		
 		<div class="indicator-header" ng-click="open2 = !open2">
 			<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open2, 'fa-minus-circle': open2}"></i>
 			{{(types[typeId].name || 'indicator.no_type')|translate}}
@@ -26,10 +27,18 @@
 
 		<div class="indicator-level-3" ng-repeat="indicator in indicators | orderBy:orderField" ng-if="open2">
 			<i class="fa fa-circle-o" ng-style="{color: indicator.standard ? '#72bb53' : '#d68227'}"></i>
-			<span class="name">{{indicator.name}} ({{indicator.main}} projets, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
 
-			<a ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate>shared.edit</a>
-			<a ui-sref="main.indicator.reporting({indicatorId: indicator._id})" ng-if="indicator.main" translate>shared.reporting</a>
+			<span>{{indicator.name}}</span>
+
+			<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
+				<a class="btn btn-xs btn-default" ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate>shared.edit</a>
+				<a class="btn btn-xs btn-default" ui-sref="main.indicator.reporting({indicatorId: indicator._id})" ng-if="indicator.main" translate>shared.reporting</a>
+			</span>
+
+			<span class="pull-right">
+				<span style="display: inline-block; width: 40px; text-align: right">{{indicator.main}} <i class="fa fa-building-o"></i></span>
+				<span style="display: inline-block; width: 50px; text-align: right">{{indicator.input}} <i class="fa fa-pencil-square-o"></i></span>
+			</span>
 		</div>
 	</div>
 </div>
