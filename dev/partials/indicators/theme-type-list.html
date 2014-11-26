@@ -9,12 +9,12 @@
 		<tr>
 			<th translate>shared.name</th>
 			<th translate>indicator.num_indicators</th>
-			<th style="width:225px"></th>
+			<th style="width:225px" acl-require-role="indicator"></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="(entityIndex, entity) in entities">
-			<td>
+			<td acl-require-role="indicator" acl-fallback="entity.name">
 				<ng-form name="entityForm">
 					<div class="form-group" show-errors style="margin: 0">
 						<input type="text" name="name" ng-model="entity.name" class="form-control input-sm" required />
@@ -22,7 +22,7 @@
 				</ng-form>
 			</td>
 			<td>{{entity.usage || 0}}</td>
-			<td>
+			<td acl-require-role="indicator">
 				<button class="btn btn-primary btn-sm" ng-click="save(entityIndex)" ng-disabled="!entity.name || !hasChanged(entityIndex)">
 					<i class="fa fa-floppy-o"></i>
 					<span translate>shared.save</span>
@@ -33,7 +33,7 @@
 				</button>
 			</td>
 		</tr>
-		<tr>
+		<tr acl-require-role="indicator">
 			<td colspan="3">
 				<div class="input-group input-group-sm" style="width: 100%">
 					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>

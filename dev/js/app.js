@@ -5,7 +5,9 @@ var app = angular.module('monitool.app', [
 	'monitool.controllers.helper',
 	'monitool.controllers.indicator',
 	'monitool.controllers.project',
-	'monitool.directives',
+	'monitool.directives.acl',
+	'monitool.directives.form',
+	'monitool.directives.fileexport',
 	'monitool.filters',
 	'monitool.services.database',
 	'monitool.services.fetch',
@@ -134,9 +136,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.project.input_entities_reporting', {
 		url: '/input-entities/:entityId',
 		templateUrl: 'partials/projects/reporting.html',
-		controller: 'ReportingController',
+		controller: 'ProjectReportingController',
 		resolve: {
 			type: function() { return 'entity'; },
+			indicatorsById: function(mtDatabase, project) {
+				var indicatorsById = {};
+				mtDatabase.current.allDocs({keys: Object.keys(project.indicators), include_docs: true}).then(function(result) {
+					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
+				});
+				return indicatorsById;
+			}
 		}
 	});
 
@@ -149,9 +158,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.project.input_groups_reporting', {
 		url: '/input-groups/:groupId',
 		templateUrl: 'partials/projects/reporting.html',
-		controller: 'ReportingController',
+		controller: 'ProjectReportingController',
 		resolve: {
 			type: function() { return 'group'; },
+			indicatorsById: function(mtDatabase, project) {
+				var indicatorsById = {};
+				mtDatabase.current.allDocs({keys: Object.keys(project.indicators), include_docs: true}).then(function(result) {
+					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
+				});
+				return indicatorsById;
+			}
 		}
 	});
 

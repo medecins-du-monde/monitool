@@ -26,11 +26,6 @@ helperControllers.controller('ChangePasswordController', function($scope, userSe
 	
 });
 
-helperControllers.controller('MainController', function($state, $scope, $translate, mtDatabase) {
-
-});
-
-
 helperControllers.controller('MainMenuController', function($q, $state, $scope, $translate, mtDatabase) {
 	$scope.$state = $state;
 	$scope.language = $translate.use();
@@ -40,7 +35,7 @@ helperControllers.controller('MainMenuController', function($q, $state, $scope, 
 		if (!response.userCtx || !response.userCtx.name)
 			return $q.reject('No username');
 
-		$scope.user = response.userCtx;
+		$scope.userCtx = response.userCtx;
 	}).catch(function(error) {
 		$state.go('main.login');
 	});

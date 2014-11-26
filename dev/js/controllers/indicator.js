@@ -147,17 +147,19 @@ indicatorControllers.controller('IndicatorReportingController', function($scope,
 		saveAs(blob, name);
 	};
 
-	$scope.downloadGraph = function() {
-		var filename  = [indicator.name, $scope.begin, $scope.end].join('_') + '.png',
-			sourceSVG = document.querySelector("svg");
+	// $scope.downloadGraph = function() {
+	// 	var filename  = [indicator.name, $scope.begin, $scope.end].join('_') + '.png',
+	// 		sourceSVG = document.querySelector("svg");
 		
-		saveSvgAsPng(sourceSVG, filename, 1);
-	};
+	// 	saveSvgAsPng(sourceSVG, filename, 1);
+	// };
 
 	$scope.updateData();
 });
 
 indicatorControllers.controller('ThemeTypeListController', function($scope, $state, entities, mtDatabase) {
+	$scope.canEdit = true;
+
 	entities.sort(function(entity1, entity2) {
 		return entity1.name.localeCompare(entity2.name);
 	});

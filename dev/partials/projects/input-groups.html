@@ -18,7 +18,7 @@
 				<td colspan="3" style="text-align: center" translate>project.no_input_groups</td>
 			</tr>
 			<tr ng-repeat="inputGroup in project.inputGroups">
-				<td>
+				<td acl-require-project-role="owner" acl-fallback="inputGroup.name">
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
 							<input type="text" name="name" ng-model="inputGroup.name" class="form-control error input-sm" required />
@@ -38,14 +38,14 @@
 						<i class="fa fa-line-chart"></i>
 						<span translate="shared.view_stats"></span>
 					</a>
-					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)">
+					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)" acl-require-project-role="owner">
 						<i class="fa fa-remove"></i>
 						<span translate>shared.delete</span>
 					</button>
 				</td>
 			</tr>
 		</tbody>
-		<tfoot>
+		<tfoot acl-require-project-role="owner">
 			<tr>
 				<td colspan="3">
 					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
@@ -54,13 +54,15 @@
 		</tfoot>
 	</table>
 
-	<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">
-		<i class="fa fa-floppy-o"></i>
-		<span translate="shared.save"></span>
-	</button>
+	<div acl-require-project-role="owner">
+		<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">
+			<i class="fa fa-floppy-o"></i>
+			<span translate="shared.save"></span>
+		</button>
 
-	<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">
-		<i class="fa fa-undo"></i>
-		<span translate="shared.remove_changes"></span>
-	</button>
+		<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">
+			<i class="fa fa-undo"></i>
+			<span translate="shared.remove_changes"></span>
+		</button>
+	</div>
 </form>

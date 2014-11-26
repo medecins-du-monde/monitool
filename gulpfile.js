@@ -65,7 +65,8 @@ var files = {
 			'dev/js/controllers/project.js',
 			'dev/js/controllers/indicator.js',
 			'dev/js/app.js',
-			'dev/js/directives.js',
+			'dev/js/directives/forms.js',
+			'dev/js/directives/acls.js',
 			'dev/js/filters.js',
 		]
 	}

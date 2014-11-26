@@ -19,16 +19,18 @@
 					<i class="fa fa-pencil"></i>
 					<span translate="shared.edit"></span>
 				</a>
-				<button class="btn btn-danger btn-xs" ng-click="delete(form.id)">
+				<button class="btn btn-danger btn-xs" ng-click="delete(form.id)" acl-require-project-role="owner">
 					<i class="fa fa-remove"></i>
 					<span translate="shared.delete"></span>
 				</button>
 			</td>
 		</tr>
+	</tbody>
+	<tfoot acl-require-project-role="owner">
 		<tr>
 			<td colspan="3">
 				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.form({formId: 'new'})" translate>shared.add</button>
 			</td>
 		</tr>
-	</tbody>
+	</tfoot>	
 </table>

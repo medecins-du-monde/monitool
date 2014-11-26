@@ -8,15 +8,15 @@
 		<legend translate>indicator.definition</legend>
 
 		<div class="form-group">
-			<label for="input-standard" class="col-sm-2 control-label" translate>indicator.standard</label>
-			<div class="col-sm-10">
+			<label for="input-standard" class="col-sm-2 control-label" translate="indicator.standard"></label>
+			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.standard">
 				<input id="input-standard" type="checkbox" ng-model="indicator.standard" name="standard" />
 			</div>
 		</div>
 
 		<div class="form-group" show-errors>
-			<label for="input-name" class="col-sm-2 control-label" translate>shared.name</label>
-			<div class="col-sm-10">
+			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
+			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.name">
 				<input id="input-name"
 					   class="form-control"
 					   type="text"
@@ -25,13 +25,13 @@
 					   placeholder="{{'indicator.name_ph'|translate}}"
 					   required />
 			
-				<p class="help-block" ng-if="indicatorForm.name.$error.required" translate>form.mandatory</p>
+				<p class="help-block" ng-if="indicatorForm.name.$error.required" translate="form.mandatory"></p>
 			</div>
 		</div>
 
 		<div class="form-group" show-errors>
-			<label for="input-description" class="col-sm-2 control-label" translate>shared.description</label>
-			<div class="col-sm-10">
+			<label for="input-description" class="col-sm-2 control-label" translate="shared.description"></label>
+			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.description">
 				<textarea id="input-description"
 						  name="description"
 						  class="form-control"
@@ -39,13 +39,13 @@
 						  required
 						  placeholder="{{'indicator.description_ph'|translate}}"></textarea>
 
-				<p class="help-block" ng-if="indicatorForm.description.$error.required" translate>form.mandatory</p>
+				<p class="help-block" ng-if="indicatorForm.description.$error.required" translate="form.mandatory"></p>
 			</div>
 		</div>
 
 		<div class="form-group" show-errors>
-			<label for="input-history" class="col-sm-2 control-label" translate>indicator.history</label>
-			<div class="col-sm-10">
+			<label for="input-history" class="col-sm-2 control-label" translate="indicator.history"></label>
+			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.history">
 				<textarea id="input-history"
 						  name="history"
 						  ng-model="indicator.history"
@@ -56,7 +56,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-unit" class="col-sm-2 control-label" translate>indicator.unit</label>
-			<div class="col-sm-10">
+			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.unit">
 				<select id="input-unit"
 						name="unit"
 						ng-model="indicator.unit"
@@ -69,7 +69,7 @@
 		</div>
 	</fieldset>
 
-	<fieldset>
+	<fieldset acl-require-role="indicator">
 		<legend translate>indicator.categorization</legend>
 
 		<div class="form-group">
@@ -98,7 +98,7 @@
 
 		<div class="form-group">
 			<label for="input-sum-allowed" class="col-sm-2 control-label" translate>indicator.sum_allowed</label>
-			<div class="col-sm-10">
+			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.sumAllowed">
 				<input id="input-sum-allowed" type="checkbox" ng-model="indicator.sumAllowed">
 			</div>
 		</div>
@@ -111,7 +111,7 @@
 					   style="border-width: 0 0 0 5px; border-color: {{indicator.formulas[formulaId].isValid ? '#ddd' : 'darkred'}}">
 					<tr>
 						<td style="width: 250px" translate>shared.name</td>
-						<td>
+						<td acl-require-role="indicator" acl-fallback="indicator.formulas[formulaId].name">
 							<div class="input-group">
 								<input type="text"
 									   class="form-control"
@@ -126,7 +126,7 @@
 					</tr>
 					<tr>
 						<td translate>indicator.formula</td>
-						<td>
+						<td acl-require-role="indicator" acl-fallback="indicator.formulas[formulaId].expression">
 							<input type="text"
 								   class="form-control"
 								   ng-model="indicator.formulas[formulaId].expression"
@@ -150,7 +150,7 @@
 					</tr>
 				</table>
 
-				<button class="btn btn-default" ng-click="addFormula()">
+				<button class="btn btn-default" ng-click="addFormula()" acl-require-role="indicator">
 					<i class="fa fa-plus"></i>
 					<span translate="indicator.add_formula"></span>
 				</button>
@@ -158,7 +158,7 @@
 		</div>
 	</fieldset>
 
-	<div class="pull-right">
+	<div class="pull-right" acl-require-role="indicator">
 		<button class="btn btn-primary"
 				ng-disabled="indicatorForm.$invalid || isUnchanged() || formulaInvalid()"
 				ng-click="save()">
