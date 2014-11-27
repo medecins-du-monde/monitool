@@ -15,70 +15,8 @@ var reduceTypeTheme = function(keys, values, rereduce) {
 	return memo;
 }.toString();
 
-var reduceInputs = function(keys, values, rereduce) {
-	var memo = {},
-		numValues = values.length;
-
-	for (var i = 0; i < numValues; ++i) {
-		var value = values[i];
-		for (var key in value)
-			if (memo[key])
-				memo[key] += value[key];
-			else
-				memo[key] = value[key];
-	}
-
-	return memo;
-}.toString();
-
-
 module.exports = {
-	_id: '_design/monitool',
-
-	// "shows": {
-	// 	"project": function(doc, req) {0
-	// 		return doc.name + ' is a capital project for our goal!';
-	// 	}.toString()
-	// },
-
-	// "lists": {
-	// 	"by_type": function(head, req) {
-	// 		var row;
-	// 		while (row = getRow())
-	// 			if (row.value)
-	// 				send(row.value.name + "\n");
-	// 	}.toString()
-	// },
-
-	// "updates": {
-	// 	"make_stupid": function(doc, req) {
-	// 		doc.name = 'Stupid ' + doc.name;
-	// 		return [doc, toJSON(doc)];
-	// 	}.toString(),
-	// },
-
-	filters: {
-		offline: function(doc, request) {
-			if (doc.type === 'type' || doc.type === 'theme' || doc.type === 'indicator' || doc._id === '_design/monitool')
-				return true;
-			else if (request.query.projects) {
-				try {
-					var ids = JSON.parse(request.query.projects);
-					if (doc.type === 'project')
-						return request.query.projects.indexOf(doc._id);
-					else if (doc.type === 'input')
-						return request.query.projects.indexOf(doc.project);
-					else
-						return false;
-				}
-				catch (e) {
-					return false;
-				}
-			}
-			else
-				return false;
-		}.toString()
-	},
+	_id: '_design/shortlists',
 
 	views: {
 		// secondary key
@@ -175,26 +113,5 @@ module.exports = {
 			reduce: reduceTypeTheme
 		},
 
-		// For project by X stats and inputGroup by X stats
-		inputs_by_project_year_month_entity: {
-			map: function(doc) {
-				if (doc.type === 'input') {
-					var p = doc.period.split('-');
-					emit([doc.project, p[0], p[1], doc.entity], doc.indicators);
-				}
-			}.toString(),
-			reduce: reduceInputs
-		},
-
-		// For input entity by X stats
-		inputs_by_entity_year_month: {
-			map: function(doc) {
-				if (doc.type === 'input') {
-					var p = doc.period.split('-');
-					emit([doc.entity, p[0], p[1]], doc.indicators);
-				}
-			}.toString(),
-			reduce: reduceInputs
-		}
 	}
 };

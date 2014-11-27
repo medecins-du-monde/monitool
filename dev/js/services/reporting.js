@@ -206,7 +206,7 @@ reportingServices.factory('mtReporting', function($q, mtDatabase) {
 			group_level: {year: 2, month: 3, entity: 4, group: 4}[groupBy]
 		};
 
-		return mtDatabase.current.query('monitool/inputs_by_project_year_month_entity', options).then(function(result) {
+		return mtDatabase.current.query('reporting/inputs_by_project_year_month_entity', options).then(function(result) {
 			var keyTransformFunctions = {
 				month:  function(key) { return ['total', key[1] + '-' + key[2]]; }, // 2014-05
 				year:   function(key) { return ['total', key[1]]; }, // 2014
@@ -235,7 +235,7 @@ reportingServices.factory('mtReporting', function($q, mtDatabase) {
 			group_level: {year: 2, month: 3, entity: 0, group: 0}[groupBy],
 		};
 
-		return mtDatabase.current.query('monitool/inputs_by_entity_year_month', options).then(function(result) {
+		return mtDatabase.current.query('reporting/inputs_by_entity_year_month', options).then(function(result) {
 			var keyTransformFunctions = {
 				month:  function(key) { return ['total', key[1] + '-' + key[2]]; },
 				year:   function(key) { return ['total', key[1]]; },
@@ -268,7 +268,7 @@ reportingServices.factory('mtReporting', function($q, mtDatabase) {
 			group_level: 4
 		};
 
-		return mtDatabase.current.query('monitool/inputs_by_project_year_month_entity', options).then(function(result) {
+		return mtDatabase.current.query('reporting/inputs_by_project_year_month_entity', options).then(function(result) {
 			// Declare couchdb key transformation functions.
 			var keyTransformFunctions = {
 				month:  function(key) { return ['total', key[1] + '-' + key[2]]; }, // 2014-05
@@ -293,7 +293,7 @@ reportingServices.factory('mtReporting', function($q, mtDatabase) {
 		end   = moment(end, 'YYYY-MM');
 
 		var queries = projects.map(function(project) {
-			return mtDatabase.current.query('monitool/inputs_by_project_year_month_entity', {
+			return mtDatabase.current.query('reporting/inputs_by_project_year_month_entity', {
 				startkey: [project._id, begin.format('YYYY'), begin.format('MM')],
 				endkey: [project._id, end.format('YYYY'), end.format('MM'), {}],
 				group: true // we need centers...

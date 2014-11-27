@@ -2,7 +2,12 @@
 
 var projectControllers = angular.module('monitool.controllers.project', []);
 
-projectControllers.controller('ProjectListController', function($scope, projects) {
+projectControllers.controller('ProjectMenuController', function($scope, $state, project) {
+	$scope.project = project;
+});
+
+
+projectControllers.controller('ProjectListController', function($scope, projects, mtDatabase) {
 	$scope.projects       = projects;
 	$scope.filterFinished = true;
 	$scope.now            = moment().format('YYYY-MM');
@@ -11,11 +16,13 @@ projectControllers.controller('ProjectListController', function($scope, projects
 	$scope.isFinished = function(project) {
 		return !$scope.filterFinished || project.end > $scope.now;
 	};
+
+
+	// mtDatabase.user.allDocs().then(function(userlist) {
+	// 	console.log(userlist)
+	// })
 });
 
-projectControllers.controller('ProjectMenuController', function($scope, $state, project) {
-	$scope.project = project;
-});
 
 projectControllers.controller('ProjectLogicalFrameController', function($scope, $modal, $state, $stateParams, mtDatabase, project, indicatorsById) {
 	$scope.project = project;

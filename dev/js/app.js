@@ -30,6 +30,7 @@ app.config(function($translateProvider) {
 });
 
 app.config(function($stateProvider, $urlRouterProvider) {
+
 	///////////////////////////
 	// redirects
 	///////////////////////////
@@ -40,6 +41,26 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// states
 	///////////////////////////
 
+	$stateProvider.state('main', {
+		abstract: true,
+		controller: 'MainMenuController',
+		templateUrl: 'partials/menu.html',
+		resolve: {
+			session: function($state, mtDatabase) {
+				console.log('hello')
+
+				// check that user is logged in
+				return mtDatabase.remote.getSession().then(function(response) {
+					if (!response.userCtx || !response.userCtx.name)
+						return null;
+
+					return response;
+				}).catch(function(error) {
+					return null;
+				});
+			}
+		}
+	});
 
 	$stateProvider.state('main.login', {
 		controller: 'LoginController',
@@ -50,18 +71,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.change_password', {
 		controller: 'ChangePasswordController',
 		url: '/change-password',
-		templateUrl: 'partials/change-password.html',
-		resolve: {
-			userSession: function(mtDatabase) {
-				return mtDatabase.remote.getSession();
-			}
-		}
-	});
-
-	$stateProvider.state('main', {
-		abstract: true,
-		controller: 'MainMenuController',
-		templateUrl: 'partials/menu.html'
+		templateUrl: 'partials/change-password.html'
 	});
 
 	///////////////////////////
@@ -92,7 +102,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/list.html',
 		controller: 'ProjectListController',
 		resolve: {
-			projects: function(mtFetch) { return mtFetch.projects(); }
+			projects: function(mtFetch) {				console.log('hello2')
+ return mtFetch.projects(); }
 		}
 	});
 
@@ -116,7 +127,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			indicatorsById: function(project, mtDatabase) {
 				var ids = Object.keys(project.indicators);
 				if (ids.length)
-					return mtDatabase.current.query('monitool/indicators_short', {group: true, keys: ids}).then(function(result) {
+					return mtDatabase.current.query('shortlists/indicators_short', {group: true, keys: ids}).then(function(result) {
 						var indicatorsById = {};
 						result.rows.forEach(function(row) { indicatorsById[row.key] = row.value; });
 						return indicatorsById;

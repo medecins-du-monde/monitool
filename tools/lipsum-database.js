@@ -258,8 +258,10 @@ console.log('This script writes a lot of lipsum garbage into a couchdb monitool 
 var host = readline.question('host [localhost]: ') || 'localhost',
 	port = readline.question('port [5984]: ') || 5984,
 	bucket = readline.question('bucket [monitool]: ') || 'monitool',
-	username = readline.question('login []: '),
-	password = readline.question('password []: ');
+	auth = {
+		user: readline.question('login []: '),
+		pass: readline.question('password []: ', {noEchoBack: true})
+	};
 
 var docs = types.concat(themes).concat(indicators).concat(projects).concat(inputs);
 while (docs.length !== 0) {

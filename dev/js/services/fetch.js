@@ -39,10 +39,10 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 				return mtDatabase.current.get(projectId);
 		},
 		projects: function() {
-			return mtDatabase.current.query('monitool/projects_short').then(reformatArray).catch(handleError);
+			return mtDatabase.current.query('shortlists/projects_short').then(reformatArray).catch(handleError);
 		},
 		projectsByIndicator: function(indicatorId) {
-			return mtDatabase.current.query('monitool/projects_by_indicator', {key: indicatorId, include_docs: true}).then(function(result) {
+			return mtDatabase.current.query('shortlists/projects_by_indicator', {key: indicatorId, include_docs: true}).then(function(result) {
 				return result.rows.map(function(row) { return row.doc; });
 			});
 		},
@@ -64,10 +64,10 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 				return mtDatabase.current.get(indicatorId);
 		},
 		indicators: function() {
-			return mtDatabase.current.query('monitool/indicators_short', {group: true}).then(reformatArray);
+			return mtDatabase.current.query('shortlists/indicators_short', {group: true}).then(reformatArray);
 		},		
 		indicatorHierarchy: function(forbiddenIds) {
-			return mtDatabase.current.query('monitool/indicators_short', {group: true}).then(function(result) {
+			return mtDatabase.current.query('shortlists/indicators_short', {group: true}).then(function(result) {
 				var hierarchy = {};
 
 				result.rows.forEach(function(row) {
@@ -95,16 +95,16 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 			});
 		},
 		themes: function() {
-			return mtDatabase.current.query('monitool/themes_short', {group: true}).then(reformatArray);
+			return mtDatabase.current.query('shortlists/themes_short', {group: true}).then(reformatArray);
 		},
 		themesById: function() {
-			return mtDatabase.current.query('monitool/themes_short', {group: true}).then(reformatHashById);
+			return mtDatabase.current.query('shortlists/themes_short', {group: true}).then(reformatHashById);
 		},
 		types: function() {
-			return mtDatabase.current.query('monitool/types_short', {group: true}).then(reformatArray);
+			return mtDatabase.current.query('shortlists/types_short', {group: true}).then(reformatArray);
 		},
 		typesById: function() {
-			return mtDatabase.current.query('monitool/types_short', {group: true}).then(reformatHashById);
+			return mtDatabase.current.query('shortlists/types_short', {group: true}).then(reformatHashById);
 		},
 
 		currentPreviousInput: function(p) {
