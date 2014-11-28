@@ -16,7 +16,7 @@ var SPANISH_TRANSLATION = {
 		end: 'Fin',
 
 		add: 'Añadir',
-		save: 'Salvar',
+		save: 'Guardar',
 		remove: 'Quitar',
 		remove_changes: 'Cancelar los cambios',
 		edit: 'Modificar',

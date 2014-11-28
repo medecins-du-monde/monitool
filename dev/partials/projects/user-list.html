@@ -7,14 +7,21 @@
 <form class="form-horizontal" role="form" name="usersForm" novalidate>
 
 	<div class="form-group">
-		<label for="input-owner" class="col-sm-2 control-label" translate="project.owner"></label>
+		<label for="input-owner" class="col-sm-2 control-label" translate="project.owners"></label>
 		<div class="col-sm-10">
+			<ui-select multiple ng-model="project.owners" theme="bootstrap" required>
+				<ui-select-match placeholder="">{{$item}}</ui-select-match>
+				<ui-select-choices repeat="user in users">{{user}}</ui-select-choices>
+			</ui-select>
+		</div>
+	</div>
 
-			<ui-select ng-model="project.owner" theme="bootstrap" required id="input-owner">
-				<ui-select-match placeholder="{{'project.choose_user'|translate}}">{{$select.selected.name}}</ui-select-match>
-				<ui-select-choices repeat="user._id as user in users | filter: {name: $select.search}">
-					<span>{{user.name}}</span>
-				</ui-select-choices>
+	<div class="form-group">
+		<label for="input-input" class="col-sm-2 control-label" translate="project.dataEntyOperators"></label>
+		<div class="col-sm-10">
+			<ui-select multiple ng-model="project.dataEntyOperators" theme="bootstrap" required>
+				<ui-select-match placeholder="">{{$item}}</ui-select-match>
+				<ui-select-choices repeat="user in users">{{user}}</ui-select-choices>
 			</ui-select>
 		</div>
 	</div>

@@ -47,8 +47,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/menu.html',
 		resolve: {
 			session: function($state, mtDatabase) {
-				console.log('hello')
-
 				// check that user is logged in
 				return mtDatabase.remote.getSession().then(function(response) {
 					if (!response.userCtx || !response.userCtx.name)
@@ -102,8 +100,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/list.html',
 		controller: 'ProjectListController',
 		resolve: {
-			projects: function(mtFetch) {				console.log('hello2')
- return mtFetch.projects(); }
+			projects: function(mtFetch) { return mtFetch.projects(); }
 		}
 	});
 
@@ -135,6 +132,29 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				else
 					return {};
 			}
+		}
+	});
+
+	$stateProvider.state('main.project.logical_frame.indicator_edit', {
+		url: '/indicator/:indicatorId/:target',
+		onEnter: function($state, $stateParams, $modal, project, session) {
+			$modal.open({
+				templateUrl: 'partials/projects/logical-frame-indicator.html',
+				controller: 'ProjectLogicalFrameIndicatorController',
+				size: 'lg',
+				resolve: {
+					project: function() { return project; },
+					userCtx: function() { return session.userCtxl; }
+					// indicatorId: function() { return $stateParams; },
+					// target: function() { return target; }
+
+
+					// indicatorId:  function() {},//return indicatorId; },
+					// planning:     function() {},//return $scope.project.indicators[indicatorId]; },
+					// forbiddenIds: function() {},//return Object.keys($scope.project.indicators); }
+				}
+
+			}).result.then(function() { $state.go('main.project.logical_frame'); })
 		}
 	});
 
@@ -301,6 +321,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/users',
 		templateUrl: 'partials/projects/user-list.html',
 		controller: 'ProjectUserListController',
+		resolve: {
+			users: function(mtDatabase) {
+				return mtDatabase.user.allDocs().then(function(data) {
+					data.rows.shift();
+					return data.rows.map(function(row) {
+						return row.id.substring("org.couchdb.user:".length);
+					});
+				});
+			}
+		}
 	});
 
 	///////////////////////////
@@ -356,7 +386,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/indicator/:indicatorId',
 		template: '<div ui-view></div>',
 		resolve: {
-			indicator: function(mtFetch, $stateParams) { return mtFetch.indicator($stateParams.indicatorId); }
+			indicator: function(mtFetch, $stateParams) {
+				return mtFetch.indicator($stateParams.indicatorId);
+			}
 		}
 	});
 
@@ -389,4 +421,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 angular.element(document).ready(function() {
 	angular.bootstrap(document, ['monitool.app']);
 });
+
+
+
+
 

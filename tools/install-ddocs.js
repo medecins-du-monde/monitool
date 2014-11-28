@@ -12,8 +12,6 @@ var host      = readline.question('host [localhost]: ') || 'localhost',
 
 var ddocs = {
 	_users: { 
-		_auth: require('./_design/users_native'),
-		permissions: require('./_design/users_permissions'),
 	},
 	_bucket: {
 		permissions: require('./_design/app_permissions'),

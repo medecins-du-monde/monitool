@@ -32,7 +32,9 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 					inputEntities: [],
 					inputGroups: [],
 					dataCollection: [],
-					indicators: {}
+					indicators: {},
+					owners: [],
+					dataEntryOperators: []
 				});
 			}
 			else

@@ -81,10 +81,10 @@
 				<ul class="form-control-static">
 					<li ng-repeat="indicatorId in project.logicalFrame.indicators">
 						{{indicatorsById[indicatorId].name}}
-						(<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)" translate="shared.edit"></a>)
+						(<a ng-click="editIndicator(indicatorId, 'root')" translate="shared.edit"></a>)
 					</li>
 					<li acl-require-project-role="owner">
-						<a ng-click="editIndicator(null, project.logicalFrame.indicators)" translate="project.add_indicator"></a>
+						<a ng-click="editIndicator('new', 'root')" translate="project.add_indicator"></a>
 					</li>
 				</ul>
 			</div>
@@ -143,10 +143,10 @@
 							<ul class="form-control-static">
 								<li ng-repeat="indicatorId in purpose.indicators">
 									{{indicatorsById[indicatorId].name}}
-									(<a ng-click="editIndicator(indicatorId, purpose.indicators)" translate="shared.edit"></a>)
+									(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId)" translate="shared.edit"></a>)
 								</li>
 								<li acl-require-project-role="owner">
-									<a ng-click="editIndicator(null, purpose.indicators)" translate="project.add_indicator"></a>
+									<a ng-click="editIndicator('new', 'root.' + purposeId)" translate="project.add_indicator"></a>
 								</li>
 							</ul>
 						</div>
@@ -199,10 +199,10 @@
 										<ul class="form-control-static">
 											<li ng-repeat="indicatorId in output.indicators">
 												{{indicatorsById[indicatorId].name}}
-												(<a ng-click="editIndicator(indicatorId, output.indicators)" translate="shared.edit"></a>)
+												(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId + '.' + outputId)" translate="shared.edit"></a>)
 											</li>
 											<li acl-require-project-role="owner">
-												<a ng-click="editIndicator(null, output.indicators)" translate="project.add_indicator"></a>
+												<a ng-click="editIndicator('new', 'root.' + purposeId + '.' + outputId)" translate="project.add_indicator"></a>
 											</li>
 										</ul>
 									</div>
@@ -237,7 +237,6 @@
 													<input type="text" class="form-control" placeholder="{{'project.activity_prereq_ph'|translate}}" ng-model="activity.prerequesites" name="prerequesites" required/>
 
 													<p class="help-block" ng-if="activityForm.prerequesites.$error.required" translate="form.mandatory"></p>
-
 												</div>
 											</div>
 										</ng-form>

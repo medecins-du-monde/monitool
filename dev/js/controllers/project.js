@@ -2,12 +2,8 @@
 
 var projectControllers = angular.module('monitool.controllers.project', []);
 
-projectControllers.controller('ProjectMenuController', function($scope, $state, project) {
-	$scope.project = project;
-});
 
-
-projectControllers.controller('ProjectListController', function($scope, projects, mtDatabase) {
+projectControllers.controller('ProjectListController', function($scope, projects) {
 	$scope.projects       = projects;
 	$scope.filterFinished = true;
 	$scope.now            = moment().format('YYYY-MM');
@@ -16,46 +12,45 @@ projectControllers.controller('ProjectListController', function($scope, projects
 	$scope.isFinished = function(project) {
 		return !$scope.filterFinished || project.end > $scope.now;
 	};
-
-
-	// mtDatabase.user.allDocs().then(function(userlist) {
-	// 	console.log(userlist)
-	// })
 });
 
 
-projectControllers.controller('ProjectLogicalFrameController', function($scope, $modal, $state, $stateParams, mtDatabase, project, indicatorsById) {
+projectControllers.controller('ProjectMenuController', function($scope, $state, project) {
+	$scope.project = project;
+
+	// save, reset and isUnchanged are all defined here, because those are shared between all project views.
+	$scope.save = function() {
+		if ($stateParams.projectId === 'new')
+			$scope.project._id = PouchDB.utils.uuid().toLowerCase();
+
+		mtDatabase.current.put($scope.project).then(function(result) {
+			$scope.project._rev = result.rev;
+			$scope.master = angular.copy($scope.project);
+
+			if ($stateParams.projectId === 'new')
+				$state.go('main.project.logical_frame', {projectId: result.id});
+		}).catch(function(error) {
+			$scope.error = error;
+		});
+	};
+
+	$scope.reset = function() {
+		$scope.project = angular.copy($scope.master);
+	};
+
+	$scope.isUnchanged = function() {
+		return angular.equals($scope.master, $scope.project);
+	};
+});
+
+projectControllers.controller('ProjectLogicalFrameController', function($scope, $modal, $state, $stateParams, project, indicatorsById) {
 	$scope.project = project;
 	$scope.master = angular.copy(project);
 	$scope.indicatorsById = indicatorsById;
 
 	// handle indicator add, edit and remove in a modal window.
 	$scope.editIndicator = function(indicatorId, target) {
-		var modalInstance = $modal.open({
-			templateUrl: 'partials/projects/logical-frame-indicator.html',
-			controller: 'ProjectLogicalFrameIndicatorController',
-			size: 'lg',
-			resolve: {
-				indicatorId:  function() { return indicatorId; },
-				planning:     function() { return $scope.project.indicators[indicatorId]; },
-				forbiddenIds: function() { return Object.keys($scope.project.indicators); }
-			}
-		});
-
-		modalInstance.result.then(function(result) {
-			if (result.action === 'add' || result.action === 'edit')
-				$scope.project.indicators[result.indicatorId] = result.indicator;
-			else if (result.action === 'delete') {
-				target.splice(target.indexOf(result.indicatorId));
-				delete $scope.project.indicators[result.indicatorId];
-			}
-			if (result.action === 'add')
-				target.push(result.indicatorId);
-
-			mtDatabase.current.get(result.indicatorId).then(function(indicator) {
-				$scope.indicatorsById[indicator._id] = indicator;
-			});
-		});
+		$state.go('main.project.logical_frame.indicator_edit', {indicatorId: indicatorId, target: target});
 	};
 
 	// handle purpose add and remove
@@ -88,76 +83,89 @@ projectControllers.controller('ProjectLogicalFrameController', function($scope, 
 	$scope.removeActivity = function(activity, output) {
 		output.activities.splice(output.activities.indexOf(activity), 1);
 	};
-
-	// handle global form actions
-	$scope.save = function() {
-		if ($stateParams.projectId === 'new')
-			$scope.project._id = PouchDB.utils.uuid().toLowerCase();
-
-		mtDatabase.current.put($scope.project).then(function(result) {
-			$scope.project._rev = result.rev;
-			$scope.master = angular.copy($scope.project);
-
-			if ($stateParams.projectId === 'new')
-				$state.go('main.project.logical_frame', {projectId: result.id});
-		}).catch(function(error) {
-			$scope.error = error;
-		});
-	};
-
-	$scope.reset = function() {
-		$scope.project = angular.copy($scope.master);
-	};
-
-	$scope.isUnchanged = function() {
-		return angular.equals($scope.master, $scope.project);
-	};
 });
 
 
-projectControllers.controller('ProjectLogicalFrameIndicatorController', function($scope, $q, $modalInstance, mtFetch, mtDatabase, indicatorId, planning, forbiddenIds) {
-	$scope.container = {};
-	$scope.container.isNew = !indicatorId;
+projectControllers.controller('ProjectLogicalFrameIndicatorController', function($scope, $stateParams, $modalInstance, project, userCtx) {
+	$scope.project = project;
+	$scope.userCtx = userCtx;
 
-	if ($scope.container.isNew)
-		$q.all([mtFetch.indicatorHierarchy(forbiddenIds), mtFetch.typesById(), mtFetch.themesById()]).then(function(result) {
-			$scope.indicatorHierarchy = result[0];
-			$scope.types  = result[1];
-			$scope.themes = result[2];
-		});
-	else
-		mtDatabase.current.get(indicatorId).then(function(indicator) {
-			$scope.container.indicator = indicator;
-		});
 
-	$scope.planning = planning || {
-		relevance: '',
-		baseline: 0,
-		minimum: 0, orangeMinimum: 20, greenMinimum: 40, greenMaximum: 60, orangeMaximum: 80, maximum: 100,
-		targets: []
+	// $scope.editIndicator = function(indicatorId, target) {
+	// 	var modalInstance = $modal.open({
+	// 		templateUrl: 'partials/projects/logical-frame-indicator.html',
+	// 		controller: 'ProjectLogicalFrameIndicatorController',
+	// 		size: 'lg',
+	// 		resolve: {
+	// 			indicatorId:  function() { return indicatorId; },
+	// 			planning:     function() { return $scope.project.indicators[indicatorId]; },
+	// 			forbiddenIds: function() { return Object.keys($scope.project.indicators); }
+	// 		}
+	// 	});
+
+	// 	modalInstance.result.then(function(result) {
+	// 		if (result.action === 'add' || result.action === 'edit')
+	// 			$scope.project.indicators[result.indicatorId] = result.indicator;
+	// 		else if (result.action === 'delete') {
+	// 			target.splice(target.indexOf(result.indicatorId));
+	// 			delete $scope.project.indicators[result.indicatorId];
+	// 		}
+	// 		if (result.action === 'add')
+	// 			target.push(result.indicatorId);
+
+	// 		mtDatabase.current.get(result.indicatorId).then(function(indicator) {
+	// 			$scope.indicatorsById[indicator._id] = indicator;
+	// 		});
+	// 	});
+	// };
+
+	// console.log(project)
+	// console.log($stateParams);
+
+	// $scope.container = {};
+	// $scope.container.isNew = !indicatorId;
+
+	// if ($scope.container.isNew)
+	// 	$q.all([mtFetch.indicatorHierarchy(forbiddenIds), mtFetch.typesById(), mtFetch.themesById()]).then(function(result) {
+	// 		$scope.indicatorHierarchy = result[0];
+	// 		$scope.types  = result[1];
+	// 		$scope.themes = result[2];
+	// 	});
+	// else
+	// 	mtDatabase.current.get(indicatorId).then(function(indicator) {
+	// 		$scope.container.indicator = indicator;
+	// 	});
+
+	// $scope.planning = planning || {
+	// 	relevance: '',
+	// 	baseline: 0,
+	// 	minimum: 0, orangeMinimum: 20, greenMinimum: 40, greenMaximum: 60, orangeMaximum: 80, maximum: 100,
+	// 	targets: []
+	// };
+
+	// $scope.addTarget = function() {
+	// 	$scope.planning.targets.push({period: null, value: 0});
+	// };
+
+	// $scope.removeTarget = function(target) {
+	// 	$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
+	// };
+
+	// $scope.add = function() {
+	// 	$modalInstance.close({action: 'add', indicatorId: $scope.container.indicator._id, indicator: $scope.planning});
+	// };
+
+	// $scope.save = function() {
+	// 	$modalInstance.close({action: 'edit', indicatorId: $scope.container.indicator._id, indicator: $scope.planning});
+	// };
+
+	// $scope.delete = function() {
+	// 	$modalInstance.close({action: 'delete', indicatorId: indicatorId});
+	// };
+
+	$scope.cancel = function() {
+		$modalInstance.close();
 	};
-
-	$scope.addTarget = function() {
-		$scope.planning.targets.push({period: null, value: 0});
-	};
-
-	$scope.removeTarget = function(target) {
-		$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
-	};
-
-	$scope.add = function() {
-		$modalInstance.close({action: 'add', indicatorId: $scope.container.indicator._id, indicator: $scope.planning});
-	};
-
-	$scope.save = function() {
-		$modalInstance.close({action: 'edit', indicatorId: $scope.container.indicator._id, indicator: $scope.planning});
-	};
-
-	$scope.delete = function() {
-		$modalInstance.close({action: 'delete', indicatorId: indicatorId});
-	};
-
-	$scope.cancel = function() { $modalInstance.dismiss('cancel'); };
 });
 
 
@@ -178,22 +186,22 @@ projectControllers.controller('ProjectInputEntitiesController', function($scope,
 		$scope.project.inputEntities.push({id: PouchDB.utils.uuid().toLowerCase(), name: ''});
 	};
 
-	$scope.save = function() {
-		mtDatabase.current.put($scope.project).then(function(result) {
-			$scope.project._rev = result.rev;
-			$scope.master = angular.copy($scope.project);
-		}).catch(function(error) {
-			$scope.error = error;
-		});
-	};
+	// $scope.save = function() {
+	// 	mtDatabase.current.put($scope.project).then(function(result) {
+	// 		$scope.project._rev = result.rev;
+	// 		$scope.master = angular.copy($scope.project);
+	// 	}).catch(function(error) {
+	// 		$scope.error = error;
+	// 	});
+	// };
 
-	$scope.isUnchanged = function() {
-		return angular.equals($scope.master, $scope.project);
-	};
+	// $scope.isUnchanged = function() {
+	// 	return angular.equals($scope.master, $scope.project);
+	// };
 
-	$scope.reset = function() {
-		$scope.project = angular.copy($scope.master);
-	};
+	// $scope.reset = function() {
+	// 	$scope.project = angular.copy($scope.master);
+	// };
 });
 
 
@@ -210,22 +218,23 @@ projectControllers.controller('ProjectInputGroupsController', function($scope, p
 		$scope.project.inputGroups.push({id: PouchDB.utils.uuid().toLowerCase(), name: ''});
 	};
 
-	$scope.save = function() {
-		mtDatabase.current.put($scope.project).then(function(result) {
-			$scope.project._rev = result.rev;
-			$scope.master = angular.copy($scope.project);
-		}).catch(function(error) {
-			$scope.error = error;
-		});
-	};
+	// $scope.save = function() {
+	// 	mtDatabase.current.put($scope.project).then(function(result) {
+	// 		$scope.project._rev = result.rev;
+	// 		$scope.master = angular.copy($scope.project);
+	// 	}).catch(function(error) {
+	// 		$scope.error = error;
+	// 	});
+	// };
 
-	$scope.isUnchanged = function() {
-		return angular.equals($scope.master, $scope.project);
-	};
+	// $scope.isUnchanged = function() {
+	// 	return angular.equals($scope.master, $scope.project);
+	// };
 
-	$scope.reset = function() {
-		$scope.project = angular.copy($scope.master);
-	};});
+	// $scope.reset = function() {
+	// 	$scope.project = angular.copy($scope.master);
+	// };
+});
 
 
 projectControllers.controller('ProjectFormsController', function($scope, project) {
@@ -533,10 +542,26 @@ projectControllers.controller('ProjectReportingController', function($scope, $st
 });
 
 
-projectControllers.controller('ProjectUserListController', function($scope) {
+projectControllers.controller('ProjectUserListController', function($scope, mtDatabase, project, users) {
+	$scope.users = users;
+	$scope.master = angular.copy(project);
 
+	// $scope.save = function() {
+	// 	mtDatabase.current.put($scope.project).then(function(result) {
+	// 		$scope.project._rev = result.rev;
+	// 		$scope.master = angular.copy($scope.project);
+	// 	}).catch(function(error) {
+	// 		$scope.error = error;
+	// 	});
+	// };
 
+	// $scope.isUnchanged = function() {
+	// 	return angular.equals($scope.master, $scope.project);
+	// };
 
+	// $scope.reset = function() {
+	// 	$scope.project = angular.copy($scope.master);
+	// };
 });
 
 

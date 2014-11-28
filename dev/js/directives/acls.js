@@ -37,9 +37,13 @@ angular.module('monitool.directives.acl', [])
 	.directive('aclRequireProjectRole', function() {
 		return {
 			link: function(scope, element, attributes) {
-				var isAllowed = scope.userCtx.roles.indexOf('project:' + scope.project._id) !== -1;
-				if (!isAllowed)
-					_makeReadOnly(scope, element, attributes);
+				if (!scope.project._id)
+					return scope.userCtx.roles.indexOf('project_create') !== -1;
+				else {
+					var isAllowed = scope.project.owners.indexOf(scope.userCtx.name) !== -1;
+					if (!isAllowed)
+						_makeReadOnly(scope, element, attributes);
+				}
 			}
 		}
 	});
