@@ -2,9 +2,12 @@
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
 
 		<div ng-if="!container.indicator">
-			<legend translate>shared.choose_indicator</legend>
+			<legend translate="shared.choose_indicator"></legend>
 
-			<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in indicatorHierarchy" ng-if="!container.indicator">
+			<div class="indicator-level-1"
+				 ng-repeat="(themeId, indicatorByTypes) in indicatorHierarchy"
+				 ng-if="!project.indicators[$scope.indicatorId]">
+
 				<div class="indicator-header" ng-click="open1 = !open1">
 					<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
 					{{(themes[themeId].name || 'indicator.no_theme') | translate}}
@@ -17,26 +20,35 @@
 					</div>
 
 					<div class="indicator-level-3" ng-repeat="indicator in indicators" ng-if="open2">
-						<span class="color" ng-class="{green: indicator.standard}"></span>
-						<span class="name">{{indicator.name}} ({{indicator.main}} suivis, {{indicator.dependency}} dépendances, {{indicator.input}} saisies)</span>
-						<a ng-click="container.indicator=indicator" translate>shared.choose</a>
+						<i class="fa fa-circle-o" ng-style="{color: indicator.standard ? '#72bb53' : '#d68227'}"></i>
+
+						<span>{{indicator.name}}</span>
+
+						<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
+							<a class="btn btn-xs btn-default" ng-click="select(indicator)" translate="shared.choose"></a>
+						</span>
+
+						<span class="pull-right">
+							<span style="display: inline-block; width: 40px; text-align: right">{{indicator.main}} <i class="fa fa-building-o"></i></span>
+							<span style="display: inline-block; width: 50px; text-align: right">{{indicator.input}} <i class="fa fa-pencil-square-o"></i></span>
+						</span>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<div ng-if="container.indicator">
-			<legend translate>shared.edition</legend>
+			<legend translate="shared.edition"></legend>
 
 			<div class="form-group">
-				<label for="relevance-input" class="col-sm-2 control-label" translate>shared.indicator</label>
+				<label for="relevance-input" class="col-sm-2 control-label" translate="shared.indicator"></label>
 				<div class="col-sm-10">
 					<input type="text" ng-model="container.indicator.name" class="form-control" disabled />
 				</div>
 			</div>
 
 			<div class="form-group" show-errors>
-				<label for="relevance-input" class="col-sm-2 control-label" translate>project.relevance</label>
+				<label for="relevance-input" class="col-sm-2 control-label" translate="project.relevance"></label>
 				<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="planning.relevance">
 					<textarea class="form-control"
 							  id="relevance-input"
@@ -45,12 +57,12 @@
 							  placeholder="{{'project.relevance_ph'|translate}}"
 							  required></textarea>
 
-					<p class="help-block" ng-if="planningForm.source.$error.required" translate>form.mandatory</p>
+					<p class="help-block" ng-if="planningForm.source.$error.required" translate="form.mandatory"></p>
 				</div>
 			</div>
 
 			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label" translate>project.limits</label>
+				<label class="col-sm-2 control-label" translate="project.limits"></label>
 				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-require-project-role="owner" acl-fallback="planning.minimum">
 					<input class="form-control"
 						   type="number"
@@ -72,7 +84,7 @@
 			</div>
 
 			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label" translate>project.orange_zone</label>
+				<label class="col-sm-2 control-label" translate="project.orange_zone"></label>
 				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-require-project-role="owner" acl-fallback="planning.orangeMinimum">
 					<input class="form-control"
 						   type="number"
@@ -96,7 +108,7 @@
 			</div>
 
 			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label" translate>project.green_zone</label>
+				<label class="col-sm-2 control-label" translate="project.green_zone"></label>
 				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-require-project-role="owner" acl-fallback="planning.greenMinimum">
 					<input class="form-control"
 						   type="number"
@@ -120,7 +132,7 @@
 			</div>
 
 			<div class="form-group" show-errors>
-				<label for="baseline-input" class="col-sm-2 control-label" translate>project.baseline</label>
+				<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
 				<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="planning.baseline">
 					<input class="form-control"
 						   id="baseline-input"
@@ -135,7 +147,7 @@
 			</div>
 			
 			<div class="form-group">
-				<label for="targets" class="col-sm-2 control-label" translate>project.targets</label>
+				<label for="targets" class="col-sm-2 control-label" translate="project.targets"></label>
 				<div class="col-sm-10">
 					<div ng-repeat="target in planning.targets" class="row" style="padding-bottom: 10px">
 						<ng-form name="targetForm">
@@ -146,14 +158,14 @@
 								<input type="text" class="form-control" ng-model="target.value" name="value" placeholder="{{'project.target_value_ph'|translate}}" required />
 							</div>
 							<div class="col-sm-2">
-								<button class="btn btn-danger" ng-click="removeTarget(target)" translate>shared.delete</button>
+								<button class="btn btn-danger" ng-click="removeTarget(target)" translate="shared.delete"></button>
 							</div>
 						</ng-form>
 					</div>
 
 					<div class="row">
 						<div class="col-sm-12">
-							<button class="btn btn-default" ng-click="addTarget()" translate>project.add_target</button>
+							<button class="btn btn-default" ng-click="addTarget()" translate="project.add_target"></button>
 						</div>
 					</div>
 				</div>
@@ -164,7 +176,7 @@
 
 <div class="modal-footer">
 	<div ng-if="container.indicator">
-		<button ng-click="add()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="container.isNew">
+		<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="container.isNew">
 			<i class="fa fa-plus"></i>
 			<span translate="shared.add"></span>
 		</button>
@@ -184,6 +196,7 @@
 			<span translate="shared.cancel"></span>
 		</button>
 	</div>
+
 	<div ng-if="!container.indicator">
 		<button ng-click="cancel()" class="btn btn-default">
 			<i class="fa fa-undo"></i>

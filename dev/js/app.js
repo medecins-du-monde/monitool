@@ -144,17 +144,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				size: 'lg',
 				resolve: {
 					project: function() { return project; },
-					userCtx: function() { return session.userCtxl; }
-					// indicatorId: function() { return $stateParams; },
-					// target: function() { return target; }
-
-
-					// indicatorId:  function() {},//return indicatorId; },
-					// planning:     function() {},//return $scope.project.indicators[indicatorId]; },
-					// forbiddenIds: function() {},//return Object.keys($scope.project.indicators); }
+					userCtx: function() { return session.userCtxl; },
+					indicatorId: function() { return $stateParams.indicatorId; },
+					target: function() { return $stateParams.target; }
 				}
-
-			}).result.then(function() { $state.go('main.project.logical_frame'); })
+			}).result.then(function() {
+				$state.go('main.project.logical_frame');
+			});
 		}
 	});
 
