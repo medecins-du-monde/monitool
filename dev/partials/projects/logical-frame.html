@@ -10,7 +10,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
-			<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="project.name">
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.name">
 				<input type="text"
 					   class="form-control"
 					   id="input-name"
@@ -25,7 +25,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-begin" class="col-sm-2 control-label" translate="project.begin_date"></label>
-			<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="project.begin">
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.begin">
 				<input type="month"
 					   class="form-control"
 					   id="input-begin"
@@ -43,7 +43,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-end" class="col-sm-2 control-label" translate="project.end_date"></label>
-			<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="project.end">
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.end">
 				<input type="month"
 					   class="form-control"
 					   id="input-end"
@@ -64,7 +64,7 @@
 		<div class="form-group" show-errors>
 			<label for="input-name" class="col-sm-2 control-label" translate="project.intervention_logic"></label>
 
-			<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="project.logicalFrame.goal">
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.logicalFrame.goal">
 				<textarea class="form-control"
 						  name="goalDesc"
 						  required
@@ -83,7 +83,7 @@
 						{{indicatorsById[indicatorId].name}}
 						(<a ng-click="editIndicator(indicatorId, 'root')" translate="shared.edit"></a>)
 					</li>
-					<li acl-require-project-role="owner">
+					<li acl-has-project-role="owner">
 						<a ng-click="editIndicator('new', 'root')" translate="project.add_indicator"></a>
 					</li>
 				</ul>
@@ -98,7 +98,7 @@
 
 			<div class="panel-heading">
 				<div class="panel-title">
-					<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)" acl-require-project-role="owner">
+					<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)" acl-has-project-role="owner">
 						<i class="fa fa-remove"></i>
 						<span translate="shared.delete"></span>
 					</button>
@@ -112,7 +112,7 @@
 				<ng-form name="purposeForm">
 					<div class="form-group" show-errors>
 						<label for="input-name" class="col-sm-2 control-label" translate="project.intervention_logic"></label>
-						<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="purpose.description">
+						<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.description">
 							<input type="text"
 								   class="form-control"
 								   name="description"
@@ -126,7 +126,7 @@
 
 					<div class="form-group" show-errors>
 						<label for="input-name" class="col-sm-2 control-label" translate="project.assumptions"></label>
-						<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="purpose.assumptions">
+						<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.assumptions">
 							<textarea class="form-control"
 									  name="assumptions"
 									  placeholder="{{'project.assumptions_purpose_ph'|translate}}"
@@ -145,7 +145,7 @@
 									{{indicatorsById[indicatorId].name}}
 									(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId)" translate="shared.edit"></a>)
 								</li>
-								<li acl-require-project-role="owner">
+								<li acl-has-project-role="owner">
 									<a ng-click="editIndicator('new', 'root.' + purposeId)" translate="project.add_indicator"></a>
 								</li>
 							</ul>
@@ -155,7 +155,7 @@
 					<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs" ng-init="tabOpen=false">
 						<div class="panel-heading">
 							<div class="panel-title">
-								<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)" acl-require-project-role="owner">
+								<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)" acl-has-project-role="owner">
 									<i class="fa fa-remove"></i>
 									<span translate="shared.delete"></span>
 								</button>
@@ -169,7 +169,7 @@
 							<ng-form name="outputForm">
 								<div class="form-group" show-errors>
 									<label for="input-name" class="col-sm-2 control-label" translate="shared.description"></label>
-									<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="output.description">
+									<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.description">
 										<textarea class="form-control"
 												  required
 												  name="description"
@@ -182,7 +182,7 @@
 
 								<div class="form-group" show-errors>
 									<label for="input-name" class="col-sm-2 control-label" translate="project.assumptions"></label>
-									<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="output.assumptions">
+									<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.assumptions">
 										<textarea class="form-control"
 												  required
 												  name="assumptions"
@@ -201,7 +201,7 @@
 												{{indicatorsById[indicatorId].name}}
 												(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId + '.' + outputId)" translate="shared.edit"></a>)
 											</li>
-											<li acl-require-project-role="owner">
+											<li acl-has-project-role="owner">
 												<a ng-click="editIndicator('new', 'root.' + purposeId + '.' + outputId)" translate="project.add_indicator"></a>
 											</li>
 										</ul>
@@ -211,7 +211,7 @@
 								<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities" ng-init="tabOpen=false">
 									<div class="panel-heading">
 										<div class="panel-title">
-											<button class="btn btn-danger btn-xs pull-right" ng-click="removeActivity(activity, output)" acl-require-project-role="owner">
+											<button class="btn btn-danger btn-xs pull-right" ng-click="removeActivity(activity, output)" acl-has-project-role="owner">
 												<i class="fa fa-remove"></i>
 												<span translate="shared.delete"></span>
 											</button>
@@ -224,7 +224,7 @@
 										<ng-form name="activityForm">
 											<div class="form-group" show-errors>
 												<label for="input-name" class="col-sm-2 control-label" translate="shared.description"></label>
-												<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="activity.description">
+												<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="activity.description">
 													<input type="text" class="form-control" name="description" placeholder="{{'project.activity_desc_ph'|translate}}" ng-model="activity.description" required/>
 
 													<p class="help-block" ng-if="activityForm.description.$error.required" translate="form.mandatory"></p>
@@ -233,7 +233,7 @@
 
 											<div class="form-group" show-errors>
 												<label for="input-name" class="col-sm-2 control-label" translate="project.prerequisite"></label>
-												<div class="col-sm-10" acl-require-project-role="owner" acl-fallback="activity.prerequesites">
+												<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="activity.prerequesites">
 													<input type="text" class="form-control" placeholder="{{'project.activity_prereq_ph'|translate}}" ng-model="activity.prerequesites" name="prerequesites" required/>
 
 													<p class="help-block" ng-if="activityForm.prerequesites.$error.required" translate="form.mandatory"></p>
@@ -243,7 +243,7 @@
 									</div>
 								</div>
 
-								<button class="btn btn-default" ng-click="addActivity(output)" acl-require-project-role="owner">
+								<button class="btn btn-default" ng-click="addActivity(output)" acl-has-project-role="owner">
 									<i class="fa fa-plus"></i>
 									<span translate="project.add_activity"></span>
 								</button>
@@ -251,7 +251,7 @@
 						</div>
 					</div>
 					
-					<button class="btn btn-default" ng-click="addOutput(purpose)" acl-require-project-role="owner">
+					<button class="btn btn-default" ng-click="addOutput(purpose)" acl-has-project-role="owner">
 						<i class="fa fa-plus"></i>
 						<span translate="project.add_output"></span>
 					</button>
@@ -259,13 +259,13 @@
 			</div>
 		</div>
 
-		<button class="btn btn-default" ng-click="addPurpose()" acl-require-project-role="owner">
+		<button class="btn btn-default" ng-click="addPurpose()" acl-has-project-role="owner">
 			<i class="fa fa-plus"></i>
 			<span translate="project.add_purpose"></span>
 		</button>
 	</fieldset>
 	
-	<div acl-require-project-role="owner">
+	<div acl-has-project-role="owner">
 		<br/><br/>
 
 		<button ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">

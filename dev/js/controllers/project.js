@@ -17,6 +17,7 @@ projectControllers.controller('ProjectListController', function($scope, projects
 
 projectControllers.controller('ProjectMenuController', function($scope, $state, $stateParams, project, mtDatabase) {
 	$scope.project = project;
+	$scope.master = angular.copy(project);
 
 	// save, reset and isUnchanged are all defined here, because those are shared between all project views.
 	$scope.save = function() {
@@ -44,8 +45,6 @@ projectControllers.controller('ProjectMenuController', function($scope, $state, 
 });
 
 projectControllers.controller('ProjectLogicalFrameController', function($scope, $modal, $state, $stateParams, project, indicatorsById) {
-	$scope.project = project;
-	$scope.master = angular.copy(project);
 	$scope.indicatorsById = indicatorsById;
 
 	// handle indicator add, edit and remove in a modal window.
@@ -99,7 +98,7 @@ projectControllers.controller('ProjectLogicalFrameIndicatorController', function
 		else if (path.length === 2)
 			return $scope.project.logicalFrame.purposes[path[1]].indicators;
 		else
-			return $scope.project.logicalFrame.purposes[path[1]].results[path[2]].indicators;
+			return $scope.project.logicalFrame.purposes[path[1]].outputs[path[2]].indicators;
 	};
 
 	$scope.project = project;
@@ -166,8 +165,9 @@ projectControllers.controller('ProjectLogicalFrameIndicatorController', function
 
 
 projectControllers.controller('ProjectInputEntitiesController', function($scope, project, mtDatabase) {
-	$scope.project = project;
-	$scope.master  = angular.copy(project);
+	$scope.create = function() {
+		$scope.project.inputEntities.push({id: PouchDB.utils.uuid().toLowerCase(), name: ''});
+	};
 
 	$scope.delete = function(inputEntityId) {
 		var message = 'Si vous supprimez un lieu d\'activité vous perdrez toutes les saisies associées. Tapez "supprimer" pour confirmer';
@@ -177,64 +177,23 @@ projectControllers.controller('ProjectInputEntitiesController', function($scope,
 				$scope.project.inputEntities.filter(function(entity) { return entity.id !== inputEntityId; });
 		}
 	};
-
-	$scope.create = function() {
-		$scope.project.inputEntities.push({id: PouchDB.utils.uuid().toLowerCase(), name: ''});
-	};
-
-	// $scope.save = function() {
-	// 	mtDatabase.current.put($scope.project).then(function(result) {
-	// 		$scope.project._rev = result.rev;
-	// 		$scope.master = angular.copy($scope.project);
-	// 	}).catch(function(error) {
-	// 		$scope.error = error;
-	// 	});
-	// };
-
-	// $scope.isUnchanged = function() {
-	// 	return angular.equals($scope.master, $scope.project);
-	// };
-
-	// $scope.reset = function() {
-	// 	$scope.project = angular.copy($scope.master);
-	// };
 });
 
 
 projectControllers.controller('ProjectInputGroupsController', function($scope, project, mtDatabase) {
-	$scope.project = project;
-	$scope.master  = angular.copy(project);
+	$scope.create = function() {
+		$scope.project.inputGroups.push({id: PouchDB.utils.uuid().toLowerCase(), name: ''});
+	};
 
 	$scope.delete = function(inputEntityId) {
 		$scope.project.inputGroups = 
 			$scope.project.inputGroups.filter(function(entity) { return entity.id !== inputEntityId; });
 	};
-
-	$scope.create = function() {
-		$scope.project.inputGroups.push({id: PouchDB.utils.uuid().toLowerCase(), name: ''});
-	};
-
-	// $scope.save = function() {
-	// 	mtDatabase.current.put($scope.project).then(function(result) {
-	// 		$scope.project._rev = result.rev;
-	// 		$scope.master = angular.copy($scope.project);
-	// 	}).catch(function(error) {
-	// 		$scope.error = error;
-	// 	});
-	// };
-
-	// $scope.isUnchanged = function() {
-	// 	return angular.equals($scope.master, $scope.project);
-	// };
-
-	// $scope.reset = function() {
-	// 	$scope.project = angular.copy($scope.master);
-	// };
 });
 
 
 projectControllers.controller('ProjectFormsController', function($scope, project) {
-	$scope.project = project;
+
 });
 
 projectControllers.controller('ProjectFormEditionController', function($scope, $state, $stateParams, mtDatabase, project, indicatorsById) {
@@ -306,18 +265,6 @@ projectControllers.controller('ProjectFormEditionController', function($scope, $
 		});
 	};
 
-	$scope.save = function() {
-		mtDatabase.current.put($scope.project).then(function(result) {
-			$scope.project._rev = result.rev;
-			$scope.master = angular.copy($scope.project);
-
-			if ($stateParams.formId === 'new')
-				$state.go('main.project.form', {formId: $scope.form.id});
-		}).catch(function(error) {
-			$scope.error = error;
-		});
-	};
-
 	$scope.reset = function() {
 		$scope.project = angular.copy($scope.master);
 		
@@ -340,24 +287,17 @@ projectControllers.controller('ProjectFormEditionController', function($scope, $
 		rebuildChosenIndicators();
 	};
 
-	$scope.isUnchanged = function() {
-		return angular.equals($scope.master, $scope.project);
-	};
-
-	$scope.master = angular.copy(project);
 	$scope.reset();
 	$scope.indicatorsById = indicatorsById;
 });
 
 
 projectControllers.controller('ProjectInputListController', function($scope, project, inputs) {
-	$scope.project = project;
-	$scope.inputs  = inputs;
+	$scope.inputs = inputs;
 });
 
 
 projectControllers.controller('ProjectInputController', function($state, $stateParams, $scope, mtDatabase, mtReporting, project, inputs) {
-	$scope.project       = project;
 	$scope.input         = inputs.current;
 	$scope.previousInput = inputs.previous;
 
@@ -448,7 +388,6 @@ projectControllers.controller('ProjectInputController', function($state, $stateP
 projectControllers.controller('ProjectReportingController', function($scope, $stateParams, mtReporting, type, project, indicatorsById) {
 	var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
 
-	$scope.project        = project;
 	$scope.indicatorsById = indicatorsById;
 	$scope.begin          = moment().subtract(1, 'year').format('YYYY-MM');
 	$scope.end            = moment().format('YYYY-MM');
@@ -539,25 +478,5 @@ projectControllers.controller('ProjectReportingController', function($scope, $st
 
 
 projectControllers.controller('ProjectUserListController', function($scope, mtDatabase, project, users) {
-	$scope.users = users;
-	$scope.master = angular.copy(project);
-
-	// $scope.save = function() {
-	// 	mtDatabase.current.put($scope.project).then(function(result) {
-	// 		$scope.project._rev = result.rev;
-	// 		$scope.master = angular.copy($scope.project);
-	// 	}).catch(function(error) {
-	// 		$scope.error = error;
-	// 	});
-	// };
-
-	// $scope.isUnchanged = function() {
-	// 	return angular.equals($scope.master, $scope.project);
-	// };
-
-	// $scope.reset = function() {
-	// 	$scope.project = angular.copy($scope.master);
-	// };
+	$scope.users = users;	
 });
-
-

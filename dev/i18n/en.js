@@ -133,7 +133,8 @@ var ENGLISH_TRANSLATION = {
 		add_output: 'Add output',
 		add_purpose: 'Add purpose',
 		users: "Users",
-		owner: "Owner",
+		owners: "Owners",
+		dataEntryOperators: "Data entry clerks",
 	},
 	indicator: {
 		no_theme: 'No theme',

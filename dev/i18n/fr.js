@@ -136,7 +136,8 @@ var FRENCH_TRANSLATION = {
 		add_purpose: 'Ajouter un objectif spécifique',
 
 		users: "Utilisateurs",
-		owner: "Propriétaire",
+		owners: "Propriétaires",
+		dataEntryOperators: "Opérateurs de saisie",
 	},
 	indicator: {
 		no_theme: 'Sans thématique',

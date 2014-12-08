@@ -17,7 +17,7 @@
 				<td colspan="2" style="text-align: center" translate>project.no_input_entities</td>
 			</tr>
 			<tr ng-repeat="inputEntity in project.inputEntities">
-				<td acl-require-project-role="owner" acl-fallback="inputEntity.name">
+				<td acl-has-project-role="owner" acl-fallback="inputEntity.name">
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
 							<input type="text" name="name" ng-model="inputEntity.name" class="form-control input-sm" required />
@@ -29,14 +29,14 @@
 						<i class="fa fa-line-chart"></i>
 						<span translate="shared.view_stats"></span>
 					</a>
-					<button class="btn btn-danger btn-sm" ng-click="delete(inputEntity.id)" acl-require-project-role="owner">
+					<button class="btn btn-danger btn-sm" ng-click="delete(inputEntity.id)" acl-has-project-role="owner">
 						<i class="fa fa-remove"></i>
 						<span translate>shared.delete</span>
 					</button>
 				</td>
 			</tr>
 		</tbody>
-		<tfoot acl-require-project-role="owner">
+		<tfoot acl-has-project-role="owner">
 			<tr>
 				<td colspan="3">
 					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
@@ -45,7 +45,7 @@
 		</tfoot>
 	</table>
 
-	<div acl-require-project-role="owner">
+	<div acl-has-project-role="owner">
 		<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>

@@ -18,7 +18,7 @@
 				<td colspan="3" style="text-align: center" translate>project.no_input_groups</td>
 			</tr>
 			<tr ng-repeat="inputGroup in project.inputGroups">
-				<td acl-require-project-role="owner" acl-fallback="inputGroup.name">
+				<td acl-has-project-role="owner" acl-fallback="inputGroup.name">
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
 							<input type="text" name="name" ng-model="inputGroup.name" class="form-control error input-sm" required />
@@ -26,26 +26,30 @@
 					</ng-form>
 				</td>
 				<td>
-					<ui-select multiple ng-model="inputGroup.members" theme="bootstrap">
+					<ui-select multiple ng-model="inputGroup.members" theme="bootstrap" acl-has-project-role="owner">
 						<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
 						<ui-select-choices repeat="inputEntity.id as inputEntity in project.inputEntities">
 							{{inputEntity.name}}
 						</ui-select-choices>
 					</ui-select>
+
+					<span acl-lacks-project-role="owner">
+						{{inputGroup.members | getObjects:project.inputEntities | pluck:'name' | join:', '}}
+					</span>
 				</td>
 				<td>
 					<a class="btn btn-default btn-sm" ui-sref="main.project.input_groups_reporting({groupId: inputGroup.id})">
 						<i class="fa fa-line-chart"></i>
 						<span translate="shared.view_stats"></span>
 					</a>
-					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)" acl-require-project-role="owner">
+					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)" acl-has-project-role="owner">
 						<i class="fa fa-remove"></i>
 						<span translate>shared.delete</span>
 					</button>
 				</td>
 			</tr>
 		</tbody>
-		<tfoot acl-require-project-role="owner">
+		<tfoot acl-has-project-role="owner">
 			<tr>
 				<td colspan="3">
 					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
@@ -54,7 +58,7 @@
 		</tfoot>
 	</table>
 
-	<div acl-require-project-role="owner">
+	<div acl-has-project-role="owner">
 		<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>

@@ -135,7 +135,8 @@ var SPANISH_TRANSLATION = {
 		add_output: 'Añadir un resultado esperado',
 		add_purpose: 'Añadir un objetivo específico',
 		users: "Usuarios",
-		owner: "Proprietario",
+		owners: "Proprietarios",
+		dataEntryOperators: "Capturistas",
 	},
 	indicator: {
 		no_theme: 'Sin temática',

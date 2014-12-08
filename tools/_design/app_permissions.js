@@ -3,24 +3,29 @@ module.exports = {
 	_id: '_design/permissions',
 
 	validate_doc_update: function(newDoc, savedDoc, userCtx) {
-		// admins can do what they want
+		// Admins can do what they want
 		if (userCtx.roles.indexOf('_admin') !== -1)
 			return;
 
+		// Deletion is forbidden for everybody
+		if (!newDoc || newDoc._deleted)
+			throw {forbidden: "Only admins can delete projects."};
+
+		// Handle create/update permissions
 		var type = savedDoc ? savedDoc.type : newDoc.type;
 		if (!type)
-			throw "Document must have a type.";
+			throw {forbidden: "Document must have a type."};
 		else if (type === 'project') {
 			if (savedDoc) {
 				if (savedDoc.owners.indexOf(userCtx.name) !== -1)
 					permission = null; // no need for permission.
 				else
-					throw "You need to own the project to change it.";
+					throw {forbidden: "You need to own the project to change it."};
 			}
 			else {
 				permission = 'project_create';
 				if (newDoc.owners.indexOf(userCtx.name) !== -1)
-					throw "When you create a project you need to own it";
+					throw {forbidden: "When you create a project you need to own it"};
 			}
 		}
 		else if (type === 'indicator' || type === 'type' || type === 'theme')
@@ -28,10 +33,11 @@ module.exports = {
 		else if (type === 'input')
 			permission = 'input:' + doc.project;
 		else
-			throw "Document type is unknown.";
+			throw {forbidden: "Document type is unknown."};
 
 		if (permission && userCtx.roles.indexOf(permission) === -1)
-			throw "Permission '" + permission + "' is required to make this change";
+			throw {forbidden: "Permission '" + permission + "' is required to make this change"};
+			
 	}.toString(),
 
 	filters: {
@@ -40,9 +46,13 @@ module.exports = {
 		}.toString(),
 
 		offline: function(doc, request) {
-			if (doc.type === 'type' || doc.type === 'theme' || doc.type === 'indicator' || doc._id === '_design/monitool')
+			if (doc._id.substring(0, '_design/'.length) === '_design/')
 				return true;
-			else if (request.query.projects) {
+
+			if (doc.type === 'type' || doc.type === 'theme' || doc.type === 'indicator')
+				return true;
+			
+			if (request.query.projects) {
 				try {
 					var ids = JSON.parse(request.query.projects);
 					if (doc.type === 'project')
@@ -56,9 +66,8 @@ module.exports = {
 					return false;
 				}
 			}
-			else
-				return false;
+			
+			return false;
 		}.toString(),
 	}
-
 };

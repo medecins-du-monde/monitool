@@ -144,7 +144,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				size: 'lg',
 				resolve: {
 					project: function() { return project; },
-					userCtx: function() { return session.userCtxl; },
+					userCtx: function() { return session.userCtx; },
 					indicatorId: function() { return $stateParams.indicatorId; },
 					target: function() { return $stateParams.target; }
 				}

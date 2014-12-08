@@ -9,14 +9,14 @@
 
 		<div class="form-group">
 			<label for="input-standard" class="col-sm-2 control-label" translate="indicator.standard"></label>
-			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.standard">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.standard">
 				<input id="input-standard" type="checkbox" ng-model="indicator.standard" name="standard" />
 			</div>
 		</div>
 
 		<div class="form-group" show-errors>
 			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
-			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.name">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.name">
 				<input id="input-name"
 					   class="form-control"
 					   type="text"
@@ -31,7 +31,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-description" class="col-sm-2 control-label" translate="shared.description"></label>
-			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.description">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.description">
 				<textarea id="input-description"
 						  name="description"
 						  class="form-control"
@@ -45,7 +45,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-history" class="col-sm-2 control-label" translate="indicator.history"></label>
-			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.history">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.history">
 				<textarea id="input-history"
 						  name="history"
 						  ng-model="indicator.history"
@@ -56,7 +56,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-unit" class="col-sm-2 control-label" translate>indicator.unit</label>
-			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.unit">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.unit">
 				<select id="input-unit"
 						name="unit"
 						ng-model="indicator.unit"
@@ -69,26 +69,31 @@
 		</div>
 	</fieldset>
 
-	<fieldset acl-require-role="indicator">
+	<fieldset>
 		<legend translate>indicator.categorization</legend>
 
 		<div class="form-group">
 			<label for="input-types" class="col-sm-2 control-label" translate>indicator.types</label>
+
 			<div class="col-sm-10">
-				<ui-select id="input-types" multiple ng-model="indicator.types" name="types" theme="bootstrap" required>
+				<ui-select id="input-types" multiple ng-model="indicator.types" name="types" theme="bootstrap" required acl-has-role="indicator">
 					<ui-select-match placeholder="{{'indicator.select_types'|translate}}">{{$item.name}}</ui-select-match>
 					<ui-select-choices repeat="type._id as type in types | filter: {name: $select.search}">{{type.name}}</ui-select-choices>
 				</ui-select>
+
+				<p class="form-control-static" acl-lacks-role="indicator">{{indicator.types | getObjects:types | pluck:'name' | join:', '}}</p>
 			</div>
 		</div>
 
 		<div class="form-group">
 			<label for="input-themes" class="col-sm-2 control-label" translate>indicator.themes</label>
 			<div class="col-sm-10">
-				<ui-select id="input-themes" multiple ng-model="indicator.themes" name="themes" theme="bootstrap" required>
+				<ui-select id="input-themes" multiple ng-model="indicator.themes" name="themes" theme="bootstrap" required acl-has-role="indicator">
 					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name}}</ui-select-match>
 					<ui-select-choices repeat="theme._id as theme in themes | filter: {name: $select.search}">{{theme.name}}</ui-select-choices>
 				</ui-select>
+
+				<p class="form-control-static" acl-lacks-role="indicator">{{indicator.themes | getObjects:themes | pluck:'name' | join:', '}}</p>
 			</div>
 		</div>
 	</fieldset>
@@ -98,7 +103,7 @@
 
 		<div class="form-group">
 			<label for="input-sum-allowed" class="col-sm-2 control-label" translate>indicator.sum_allowed</label>
-			<div class="col-sm-10" acl-require-role="indicator" acl-fallback="indicator.sumAllowed">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sumAllowed">
 				<input id="input-sum-allowed" type="checkbox" ng-model="indicator.sumAllowed">
 			</div>
 		</div>
@@ -111,7 +116,7 @@
 					   style="border-width: 0 0 0 5px; border-color: {{indicator.formulas[formulaId].isValid ? '#ddd' : 'darkred'}}">
 					<tr>
 						<td style="width: 250px" translate>shared.name</td>
-						<td acl-require-role="indicator" acl-fallback="indicator.formulas[formulaId].name">
+						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].name">
 							<div class="input-group">
 								<input type="text"
 									   class="form-control"
@@ -126,7 +131,7 @@
 					</tr>
 					<tr>
 						<td translate>indicator.formula</td>
-						<td acl-require-role="indicator" acl-fallback="indicator.formulas[formulaId].expression">
+						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].expression">
 							<input type="text"
 								   class="form-control"
 								   ng-model="indicator.formulas[formulaId].expression"
@@ -150,7 +155,7 @@
 					</tr>
 				</table>
 
-				<button class="btn btn-default" ng-click="addFormula()" acl-require-role="indicator">
+				<button class="btn btn-default" ng-click="addFormula()" acl-has-role="indicator">
 					<i class="fa fa-plus"></i>
 					<span translate="indicator.add_formula"></span>
 				</button>
@@ -158,7 +163,7 @@
 		</div>
 	</fieldset>
 
-	<div class="pull-right" acl-require-role="indicator">
+	<div class="pull-right" acl-has-role="indicator">
 		<button class="btn btn-primary"
 				ng-disabled="indicatorForm.$invalid || isUnchanged() || formulaInvalid()"
 				ng-click="save()">

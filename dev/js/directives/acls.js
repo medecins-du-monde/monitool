@@ -1,7 +1,9 @@
 "use strict";
 
-// acl-require-role
-// acl-require-project-role
+// acl-has-role
+// acl-has-project-role
+// acl-lacks-role
+// acl-lacks-project-role
 // acl-fallback
 
 function _makeReadOnly(scope, element, attributes) {
@@ -25,25 +27,58 @@ function _makeReadOnly(scope, element, attributes) {
 };
 
 angular.module('monitool.directives.acl', [])
-	.directive('aclRequireRole', function() {
+	.directive('aclHasRole', function() {
 		return {
 			link: function(scope, element, attributes) {
-				var isAllowed = scope.userCtx.roles.indexOf(attributes.aclRequireRole) !== -1;
+				var roles = scope.userCtx.roles || [],
+					isAllowed = roles.indexOf(attributes.aclRequireRole) !== -1 || roles.indexOf('_admin') !== -1;
+
 				if (!isAllowed)
 					_makeReadOnly(scope, element, attributes);
 			}
 		}
 	})
-	.directive('aclRequireProjectRole', function() {
+	.directive('aclHasProjectRole', function() {
 		return {
 			link: function(scope, element, attributes) {
+				var roles = scope.userCtx.roles || [],
+					owners = scope.project.owners || [];
+
 				if (!scope.project._id)
-					return scope.userCtx.roles.indexOf('project_create') !== -1;
+					return roles.indexOf('project_create') !== -1 || roles.indexOf('_admin') !== -1;
 				else {
-					var isAllowed = scope.project.owners.indexOf(scope.userCtx.name) !== -1;
+					var isAllowed = owners.indexOf(scope.userCtx.name) !== -1 || roles.indexOf('_admin') !== -1;
 					if (!isAllowed)
 						_makeReadOnly(scope, element, attributes);
 				}
 			}
 		}
-	});
+	})
+	.directive('aclLacksRole', function() {
+		return {
+			link: function(scope, element, attributes) {
+				var roles = scope.userCtx.roles || [],
+					isForbidden = roles.indexOf(attributes.aclRequireRole) === -1 && roles.indexOf('_admin') === -1;
+
+				if (!isForbidden)
+					_makeReadOnly(scope, element, attributes);
+			}
+		}
+	})
+	.directive('aclLacksProjectRole', function() {
+		return {
+			link: function(scope, element, attributes) {
+				var roles = scope.userCtx.roles || [],
+					owners = scope.project.owners || [];
+
+				if (!scope.project._id)
+					return roles.indexOf('project_create') === -1 && roles.indexOf('_admin') === -1;
+				else {
+					var isForbidden = owners.indexOf(scope.userCtx.name) === -1 && roles.indexOf('_admin') === -1;
+					if (!isForbidden)
+						_makeReadOnly(scope, element, attributes);
+				}
+			}
+		}
+	})
+	;
