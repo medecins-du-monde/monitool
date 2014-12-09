@@ -1,7 +1,6 @@
 <div class="row">
 	<div class="col-md-2">
-		<ul class="nav nav-pills nav-stacked">
-
+		<ul class="nav nav-pills nav-stacked" ng-if="project._id">
 			<li ui-sref-active="active">
 				<a ui-sref="main.project.logical_frame({projectId: project._id})"
 				   tooltip="{{'project.logical_frame_tooltip'|translate}}"
@@ -10,7 +9,7 @@
 				   <span translate="shared.logical_frame"></span>
 				</a>
 			</li>
-			
+
 			<li ng-class="{disabled: !project._id, active: $state.is('main.project.input_entities') || $state.is('main.project.input_entities_reporting')}">
 				<a ui-sref="main.project.input_entities({projectId: project._id})"
 				   tooltip="{{'project.input_entities_tooltip'|translate}}"
@@ -62,6 +61,57 @@
 				<a ui-sref="main.project.user_list"
 				   tooltip="{{'project.user_list_tooltip'|translate}}"
 				   tooltip-popup-delay="1000">
+				   <i class="fa fa-users fa-fw"></i>
+				   <span translate="project.users"></span>
+				</a>
+			</li>
+		</ul>
+
+		<ul class="nav nav-pills nav-stacked" ng-if="!project._id">
+			<li class="active">
+				<a>
+				   <i class="fa fa-building-o fa-fw"></i>
+				   <span translate="shared.logical_frame"></span>
+				</a>
+			</li>
+
+			<li class="disabled">
+				<a>
+					<i class="fa fa-map-marker fa-fw"></i>
+					<span translate="shared.input_entities"></span>
+				</a>
+			</li>
+
+			<li class="disabled">
+				<a>
+					<i class="fa fa-map-marker fa-fw"></i>
+					<span translate="shared.input_groups"></span>
+				</a>
+			</li>
+
+			<li class="disabled">
+				<a>
+					<i class="fa fa-file-text-o fa-fw"></i>
+					<span translate="project.input_forms"></span>
+				</a>
+			</li>
+			
+			<li class="disabled">
+				<a>
+					<i class="fa fa-clock-o fa-fw"></i>
+					<span translate="project.waiting_inputs"></span>
+				</a>
+			</li>
+
+			<li class="disabled">
+				<a>
+				   <i class="fa fa-line-chart fa-fw"></i>
+				   <span translate="shared.reporting"></span>
+				</a>
+			</li>
+
+			<li class="disabled">
+				<a>
 				   <i class="fa fa-users fa-fw"></i>
 				   <span translate="project.users"></span>
 				</a>

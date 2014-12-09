@@ -18,6 +18,9 @@
 		</tr>
 	</thead>
 	<tbody>
+		<tr ng-if="!inputs.length">
+			<td colspan="5" style="text-align: center" translate>project.no_waiting_inputs</td>
+		</tr>
 		<tr ng-repeat="input in inputs" ng-if="!input.filled || showFinished">
 			<td>
 				<i ng-init="ok=input.filled"

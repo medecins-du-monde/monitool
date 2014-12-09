@@ -31,7 +31,7 @@ angular.module('monitool.directives.acl', [])
 		return {
 			link: function(scope, element, attributes) {
 				var roles = scope.userCtx.roles || [],
-					isAllowed = roles.indexOf(attributes.aclRequireRole) !== -1 || roles.indexOf('_admin') !== -1;
+					isAllowed = roles.indexOf(attributes.aclHasRole) !== -1 || roles.indexOf('_admin') !== -1;
 
 				if (!isAllowed)
 					_makeReadOnly(scope, element, attributes);
@@ -64,7 +64,7 @@ angular.module('monitool.directives.acl', [])
 		return {
 			link: function(scope, element, attributes) {
 				var roles = scope.userCtx.roles || [],
-					isForbidden = roles.indexOf(attributes.aclRequireRole) === -1 && roles.indexOf('_admin') === -1;
+					isForbidden = roles.indexOf(attributes.aclLacksRole) === -1 && roles.indexOf('_admin') === -1;
 
 				if (!isForbidden)
 					_makeReadOnly(scope, element, attributes);
@@ -92,5 +92,4 @@ angular.module('monitool.directives.acl', [])
 				}
 			}
 		}
-	})
-	;
+	});

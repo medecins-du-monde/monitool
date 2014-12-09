@@ -24,7 +24,7 @@ module.exports = {
 			}
 			else {
 				permission = 'project_create';
-				if (newDoc.owners.indexOf(userCtx.name) !== -1)
+				if (newDoc.owners.indexOf(userCtx.name) === -1)
 					throw {forbidden: "When you create a project you need to own it"};
 			}
 		}

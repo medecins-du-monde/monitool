@@ -85,8 +85,9 @@ var SPANISH_TRANSLATION = {
 		quarterly: 'Cada trimestre',
 		planned: 'Planificado',
 
-		no_input_entities: '¡Ningun lugar de actividad ha sido creado!',
-		no_input_groups: '¡Ningun grupo de actividad ha sido creado!',
+		no_input_entities: '¡Ningún lugar de actividad ha sido creado!',
+		no_input_groups: '¡Ningún grupo de actividad ha sido creado!',
+		no_forms: '¡Ningún formulario ha sido creado!',
 		waiting_inputs: 'Entradas en espera',
 		no_waiting_inputs: 'Ninguna entrada en espera.',
 		input: 'Entrar datos',

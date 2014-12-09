@@ -12,6 +12,9 @@
 		</tr>
 	</thead>
 	<tbody>
+		<tr ng-if="noFormsYet">
+			<td colspan="2" style="text-align: center" translate="project.no_forms"></td>
+		</tr>
 		<tr ng-repeat="form in project.dataCollection">
 			<td>{{form.name}}</td>
 			<td>

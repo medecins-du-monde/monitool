@@ -85,6 +85,8 @@ var ENGLISH_TRANSLATION = {
 
 		no_input_entities: 'No input entity was created yet!',
 		no_input_groups: 'No input group was created yet!',
+		no_forms: 'No form was created yet!',
+
 		waiting_inputs: 'Late inputs',
 		no_waiting_inputs: 'No late inputs.',
 		input: 'Input now',

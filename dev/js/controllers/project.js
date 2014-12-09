@@ -16,6 +16,9 @@ projectControllers.controller('ProjectListController', function($scope, projects
 
 
 projectControllers.controller('ProjectMenuController', function($scope, $state, $stateParams, project, mtDatabase) {
+	if ($stateParams.projectId === 'new')
+		project.owners.push($scope.userCtx.name);
+
 	$scope.project = project;
 	$scope.master = angular.copy(project);
 
@@ -193,7 +196,7 @@ projectControllers.controller('ProjectInputGroupsController', function($scope, p
 
 
 projectControllers.controller('ProjectFormsController', function($scope, project) {
-
+	$scope.noFormsYet = Object.keys(project.dataCollection).length === 0;
 });
 
 projectControllers.controller('ProjectFormEditionController', function($scope, $state, $stateParams, mtDatabase, project, indicatorsById) {
