@@ -9,7 +9,7 @@
 function _makeReadOnly(scope, element, attributes) {
 	// replace by raw text
 	if (attributes.aclFallback) {
-		var fallback = scope.$eval(attributes.aclFallback);
+		var fallback = scope.$eval(attributes.aclFallback) || '';
 		
 		// handle boolean case.
 		if (fallback === true)
@@ -20,7 +20,7 @@ function _makeReadOnly(scope, element, attributes) {
 		if (element.parent().hasClass('form-group'))
 			fallback = '<p class="form-control-static">' + fallback + '</p>';
 
-		element.html(fallback);
+		element.html(fallback.toString());
 	}
 	else
 		element.remove();
@@ -41,8 +41,14 @@ angular.module('monitool.directives.acl', [])
 	.directive('aclHasProjectRole', function() {
 		return {
 			link: function(scope, element, attributes) {
-				var roles = scope.userCtx.roles || [],
+				var roles = scope.userCtx.roles || [];
+				var owners;
+				if (attributes.aclHasProjectRole === 'owner')
 					owners = scope.project.owners || [];
+				else if (attributes.aclHasProjectRole === 'input')
+					owners = scope.project.dataEntryOperators || [];
+				else
+					throw new Error();
 
 				if (!scope.project._id)
 					return roles.indexOf('project_create') !== -1 || roles.indexOf('_admin') !== -1;
@@ -68,8 +74,14 @@ angular.module('monitool.directives.acl', [])
 	.directive('aclLacksProjectRole', function() {
 		return {
 			link: function(scope, element, attributes) {
-				var roles = scope.userCtx.roles || [],
+				var roles = scope.userCtx.roles || [];
+				var owners;
+				if (attributes.aclLacksProjectRole === 'owner')
 					owners = scope.project.owners || [];
+				else if (attributes.aclLacksProjectRole === 'input')
+					owners = scope.project.dataEntryOperators || [];
+				else
+					throw new Error();
 
 				if (!scope.project._id)
 					return roles.indexOf('project_create') === -1 && roles.indexOf('_admin') === -1;

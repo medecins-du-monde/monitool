@@ -1,7 +1,7 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
 	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
-	<li><a ui-sref="main.project.inputs({projectId: project._id})" translate>project.waiting_inputs</a></li>
+	<li><a ui-sref="main.project.input_list({projectId: project._id})" translate>project.waiting_inputs</a></li>
 	<li class="active">{{inputEntity.name}}</li>
 	<li class="active">{{form.name}}</li>
 </ol>
@@ -25,7 +25,7 @@
 					{{indicatorsById[field.id].name}}
 				</label>
 			</td>
-			<td>
+			<td acl-has-project-role="input" acl-fallback="input.indicators[field.id]">
 				<input id="input-{{field.id}}"
 					   type="number"
 					   ng-model="input.indicators[field.id]"
@@ -35,7 +35,7 @@
 					   tooltip-trigger="focus"
 					   class="form-control" />
 			</td>
-			<td ng-if="previousInput">
+			<td ng-if="previousInput" acl-has-project-role="input" acl-fallback="previousInput.indicators[field.id]">
 				<div class="input-group" style="width: 100%">
 					<input type="number"
 						   value="{{previousInput.indicators[field.id]}}"
@@ -51,12 +51,14 @@
 	</tbody>
 </table>
 
-<button class="btn btn-default" ng-click="save()">
-	<i class="fa fa-floppy-o"></i>
-	<span translate="shared.save"></span>
-</button>
+<div acl-has-project-role="input">
+	<button class="btn btn-default" ng-click="save()">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</button>
 
-<button class="btn btn-danger" ng-click="delete()">
-	<i class="fa fa-remove"></i>
-	<span translate>shared.delete</span>
-</button>
+	<button class="btn btn-danger" ng-click="delete()">
+		<i class="fa fa-remove"></i>
+		<span translate>shared.delete</span>
+	</button>
+</div>

@@ -81,7 +81,8 @@
 				<ul class="form-control-static">
 					<li ng-repeat="indicatorId in project.logicalFrame.indicators">
 						{{indicatorsById[indicatorId].name}}
-						(<a ng-click="editIndicator(indicatorId, 'root')" translate="shared.edit"></a>)
+						<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, 'root')" translate="shared.edit"></a>)</span>
+						<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, 'root')" translate="shared.display"></a>)</span>
 					</li>
 					<li acl-has-project-role="owner">
 						<a ng-click="editIndicator('new', 'root')" translate="project.add_indicator"></a>
@@ -143,7 +144,8 @@
 							<ul class="form-control-static">
 								<li ng-repeat="indicatorId in purpose.indicators">
 									{{indicatorsById[indicatorId].name}}
-									(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId)" translate="shared.edit"></a>)
+									<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId)" translate="shared.edit"></a>)</span>
+									<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId)" translate="shared.display"></a>)</span>
 								</li>
 								<li acl-has-project-role="owner">
 									<a ng-click="editIndicator('new', 'root.' + purposeId)" translate="project.add_indicator"></a>
@@ -199,7 +201,8 @@
 										<ul class="form-control-static">
 											<li ng-repeat="indicatorId in output.indicators">
 												{{indicatorsById[indicatorId].name}}
-												(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId + '.' + outputId)" translate="shared.edit"></a>)
+												<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId + '.' + outputId)" translate="shared.edit"></a>)</span>
+												<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, 'root.' + purposeId + '.' + outputId)" translate="shared.display"></a>)</span>
 											</li>
 											<li acl-has-project-role="owner">
 												<a ng-click="editIndicator('new', 'root.' + purposeId + '.' + outputId)" translate="project.add_indicator"></a>

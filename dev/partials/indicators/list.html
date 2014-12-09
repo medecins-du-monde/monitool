@@ -31,7 +31,8 @@
 			<span>{{indicator.name}}</span>
 
 			<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
-				<a class="btn btn-xs btn-default" ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate>shared.edit</a>
+				<a class="btn btn-xs btn-default" ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate acl-has-role="indicator">shared.edit</a>
+				<a class="btn btn-xs btn-default" ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate acl-lacks-role="indicator">shared.display</a>
 				<a class="btn btn-xs btn-default" ui-sref="main.indicator.reporting({indicatorId: indicator._id})" ng-if="indicator.main" translate>shared.reporting</a>
 			</span>
 
