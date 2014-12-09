@@ -104,7 +104,7 @@
 		</table>
 
 		<span acl-lacks-project-role="owner">
-			{{chosenIndicators|getObjects:indicatorsById|pluck:'name'|join:', '}}
+			{{chosenIndicators|pluck:'id'|getObjects:indicatorsById|pluck:'name'|join:', '}}
 		</span>
 	</fieldset>
 
@@ -117,7 +117,7 @@
 					<th translate="project.sumable"></th>
 					<th translate="project.input_field"></th>
 					<th translate="project.value_source"></th>
-					<th translate="project.input_mode"></th>
+					<th translate="project.input_mode" acl-has-project-role="owner"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -127,10 +127,10 @@
 						<i class="fa fa-times" style="color: red" ng-hide="indicatorsById[indicatorId].sumAllowed"></i>
 					</td>
 					<td>{{indicatorsById[indicatorId].name}}</td>
-					<td>
+					<td acl-has-project-role="owner" acl-fallback="field.source">
 						<input type="text" ng-model="field.source" class="form-control" />
 					</td>
-					<td>
+					<td acl-has-project-role="owner">
 						<div class="btn-group">
 							<button class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
 								{{'project.manual_input'|translate}}
