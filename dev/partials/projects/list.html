@@ -1,4 +1,4 @@
-<input type="checkbox" ng-model="filterFinished" id="filter-finished" />
+<input type="checkbox" ng-model="showFinished" id="filter-finished" />
 <label for="filter-finished" translate>project.show_finished</label>
 
 <table class="table table-bordered table-stripped table-condensed">
@@ -11,15 +11,9 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="project in projects | filter:isFinished | orderBy:pred:rev">
-			<td>
-				<i class="fa" ng-class="{'fa-star': offline[project._id], 'fa-star-o': !offline[project._id]}"></i>
-			</td>
-			<td>
-				<a ui-sref="main.project.logical_frame({projectId: project._id})">
-					{{project.name}}
-				</a>
-			</td>
+		<tr ng-repeat="project in projects | filter:isDisplayed | orderBy:pred:rev">
+			<td><i class="fa" ng-class="{'fa-star': offline[project._id], 'fa-star-o': !offline[project._id]}"></i></td>
+			<td><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></td>
 			<td>{{project.begin}}</td>
 			<td>{{project.end}}</td>
 		</tr>

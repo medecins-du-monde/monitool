@@ -9,8 +9,8 @@ projectControllers.controller('ProjectListController', function($scope, projects
 	$scope.now            = moment().format('YYYY-MM');
 	$scope.pred           = 'name'; // default sorting predicate
 
-	$scope.isFinished = function(project) {
-		return !$scope.filterFinished || project.end > $scope.now;
+	$scope.isDisplayed = function(project) {
+		return $scope.showFinished || project.end > $scope.now;
 	};
 });
 
