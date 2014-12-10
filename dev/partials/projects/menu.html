@@ -29,7 +29,7 @@
 				</a>
 			</li>
 
-			<li ui-sref-active="active" ng-class="{disabled: !project._id}">
+			<li ng-class="{disabled: !project._id, active: $state.is('main.project.forms') || $state.is('main.project.form')}">
 				<a ui-sref="main.project.forms({projectId: project._id})"
 				   tooltip="{{'project.input_forms_tooltip'|translate}}"
 				   tooltip-popup-delay="1000">
