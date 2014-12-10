@@ -1,6 +1,6 @@
 <ol class="breadcrumb">
-	<li class="active" translate>shared.indicators</li>
-	<li class="active" translate>shared.list</li>
+	<li class="active" translate="shared.indicators"></li>
+	<li class="active" translate="shared.list"></li>
 </ol>
 
 {{'indicator.order_by'|translate}}:
@@ -12,40 +12,9 @@
 
 <br/><br/>
 
-<div class="indicator-level-1" ng-repeat="(themeId, indicatorByTypes) in hierarchy">
-	<div class="indicator-header" ng-click="open1 = !open1">
-		<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
-		{{(themes[themeId].name || 'indicator.no_theme')|translate}}
-	</div>
-
-	<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes" ng-if="open1">
-		
-		<div class="indicator-header" ng-click="open2 = !open2">
-			<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open2, 'fa-minus-circle': open2}"></i>
-			{{(types[typeId].name || 'indicator.no_type')|translate}}
-		</div>
-
-		<div class="indicator-level-3" ng-repeat="indicator in indicators | orderBy:orderField" ng-if="open2">
-			<i class="fa fa-circle-o" ng-style="{color: indicator.standard ? '#72bb53' : '#d68227'}"></i>
-
-			<span>{{indicator.name}}</span>
-
-			<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
-				<a class="btn btn-xs btn-default" ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate acl-has-role="indicator">shared.edit</a>
-				<a class="btn btn-xs btn-default" ui-sref="main.indicator.edit({indicatorId: indicator._id})" translate acl-lacks-role="indicator">shared.display</a>
-				<a class="btn btn-xs btn-default" ui-sref="main.indicator.reporting({indicatorId: indicator._id})" ng-if="indicator.main" translate>shared.reporting</a>
-			</span>
-
-			<span class="pull-right">
-				<span style="display: inline-block; width: 40px; text-align: right">{{indicator.main}} <i class="fa fa-building-o"></i></span>
-				<span style="display: inline-block; width: 50px; text-align: right">{{indicator.input}} <i class="fa fa-pencil-square-o"></i></span>
-			</span>
-		</div>
-	</div>
-</div>
+<indicator-select buttons="edit,reporting"></indicator-select>
 
 <a class="btn btn-default" ui-sref="main.indicator.edit({indicatorId: 'new'})" acl-has-role="indicator">
 	<i class="fa fa-plus"></i>
 	<span translate="indicator.create_new"></span>
 </a>
-

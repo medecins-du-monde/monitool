@@ -1,211 +1,165 @@
 <div class="modal-body">
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
 
-		<div ng-if="!container.indicator">
-			<legend translate="shared.choose_indicator"></legend>
+		<legend translate="shared.edition"></legend>
 
-			<div class="indicator-level-1"
-				 ng-repeat="(themeId, indicatorByTypes) in indicatorHierarchy"
-				 ng-if="!project.indicators[$scope.indicatorId]">
-
-				<div class="indicator-header" ng-click="open1 = !open1">
-					<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open1, 'fa-minus-circle': open1}"></i>
-					{{(themes[themeId].name || 'indicator.no_theme') | translate}}
-				</div>
-
-				<div class="indicator-level-2" ng-repeat="(typeId, indicators) in indicatorByTypes" ng-if="open1">
-					<div class="indicator-header" ng-click="open2 = !open2">
-						<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !open2, 'fa-minus-circle': open2}"></i>
-						{{(types[typeId].name || 'indicator.no_type') | translate}}
-					</div>
-
-					<div class="indicator-level-3" ng-repeat="indicator in indicators" ng-if="open2">
-						<i class="fa fa-circle-o" ng-style="{color: indicator.standard ? '#72bb53' : '#d68227'}"></i>
-
-						<span>{{indicator.name}}</span>
-
-						<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
-							<a class="btn btn-xs btn-default" ng-click="select(indicator)" translate="shared.choose"></a>
-						</span>
-
-						<span class="pull-right">
-							<span style="display: inline-block; width: 40px; text-align: right">{{indicator.main}} <i class="fa fa-building-o"></i></span>
-							<span style="display: inline-block; width: 50px; text-align: right">{{indicator.input}} <i class="fa fa-pencil-square-o"></i></span>
-						</span>
-					</div>
-				</div>
+		<div class="form-group">
+			<label for="relevance-input" class="col-sm-2 control-label" translate="shared.indicator"></label>
+			<div class="col-sm-10">
+				<input type="text" ng-model="indicator.name" class="form-control" disabled />
 			</div>
 		</div>
 
-		<div ng-if="container.indicator">
-			<legend translate="shared.edition"></legend>
+		<div class="form-group" show-errors>
+			<label for="relevance-input" class="col-sm-2 control-label" translate="project.relevance"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.relevance">
+				<textarea class="form-control"
+						  id="relevance-input"
+						  name="relevance"
+						  ng-model="planning.relevance"
+						  placeholder="{{'project.relevance_ph'|translate}}"
+						  required></textarea>
 
-			<div class="form-group">
-				<label for="relevance-input" class="col-sm-2 control-label" translate="shared.indicator"></label>
-				<div class="col-sm-10">
-					<input type="text" ng-model="container.indicator.name" class="form-control" disabled />
-				</div>
+				<p class="help-block" ng-if="planningForm.source.$error.required" translate="form.mandatory"></p>
 			</div>
+		</div>
 
-			<div class="form-group" show-errors>
-				<label for="relevance-input" class="col-sm-2 control-label" translate="project.relevance"></label>
-				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.relevance">
-					<textarea class="form-control"
-							  id="relevance-input"
-							  name="relevance"
-							  ng-model="planning.relevance"
-							  placeholder="{{'project.relevance_ph'|translate}}"
-							  required></textarea>
-
-					<p class="help-block" ng-if="planningForm.source.$error.required" translate="form.mandatory"></p>
-				</div>
+		<div class="row" style="margin-bottom: 15px">
+			<label class="col-sm-2 control-label" translate="project.limits"></label>
+			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.minimum">
+				<input class="form-control"
+					   type="number"
+					   name="minimum"
+					   ng-model="planning.minimum"
+					   placeholder="{{'project.minimum_ph'|translate}}"
+					   required
+					   ng-max="planning.orangeMinimum" />
 			</div>
-
-			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label" translate="project.limits"></label>
-				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.minimum">
-					<input class="form-control"
-						   type="number"
-						   name="minimum"
-						   ng-model="planning.minimum"
-						   placeholder="{{'project.minimum_ph'|translate}}"
-						   required
-						   ng-max="planning.orangeMinimum" />
-				</div>
-				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.maximum">
-					<input class="form-control"
-						   type="number"
-						   name="maximum"
-						   ng-model="planning.maximum"
-						   placeholder="{{'project.maximum_ph'|translate}}"
-						   required
-						   ng-min="planning.orangeMaximum" />
-				</div>
+			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.maximum">
+				<input class="form-control"
+					   type="number"
+					   name="maximum"
+					   ng-model="planning.maximum"
+					   placeholder="{{'project.maximum_ph'|translate}}"
+					   required
+					   ng-min="planning.orangeMaximum" />
 			</div>
+		</div>
 
-			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label" translate="project.orange_zone"></label>
-				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.orangeMinimum">
-					<input class="form-control"
-						   type="number"
-						   name="orangeMinimum"
-						   ng-model="planning.orangeMinimum"
-						   placeholder="{{'project.minimum_ph'|translate}}"
-						   ng-min="planning.minimum"
-						   ng-max="planning.greenMinimum"
-						   required />
-				</div>
-				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.orangeMaximum">
-					<input class="form-control"
-						   type="number"
-						   name="orangeMaximum"
-						   ng-model="planning.orangeMaximum"
-						   placeholder="{{'project.maximum_ph'|translate}}"
-						   ng-min="planning.greenMaximum"
-						   ng-max="planning.maximum"
-						   required />
-				</div>
+		<div class="row" style="margin-bottom: 15px">
+			<label class="col-sm-2 control-label" translate="project.orange_zone"></label>
+			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.orangeMinimum">
+				<input class="form-control"
+					   type="number"
+					   name="orangeMinimum"
+					   ng-model="planning.orangeMinimum"
+					   placeholder="{{'project.minimum_ph'|translate}}"
+					   ng-min="planning.minimum"
+					   ng-max="planning.greenMinimum"
+					   required />
 			</div>
-
-			<div class="row" style="margin-bottom: 15px">
-				<label class="col-sm-2 control-label" translate="project.green_zone"></label>
-				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.greenMinimum">
-					<input class="form-control"
-						   type="number"
-						   name="greenMinimum"
-						   ng-model="planning.greenMinimum"
-						   placeholder="{{'project.minimum_ph'|translate}}"
-						   required
-						   ng-min="planning.orangeMinimum"
-						   ng-max="planning.greenMaximum" />
-				</div>
-				<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.greenMaximum">
-					<input class="form-control"
-						   type="number"
-						   name="greenMaximum"
-						   ng-model="planning.greenMaximum"
-						   placeholder="{{'project.maximum_ph'|translate}}"
-						   required
-						   ng-min="planning.greenMinimum"
-						   ng-max="planning.orangeMaximum" />
-				</div>
+			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.orangeMaximum">
+				<input class="form-control"
+					   type="number"
+					   name="orangeMaximum"
+					   ng-model="planning.orangeMaximum"
+					   placeholder="{{'project.maximum_ph'|translate}}"
+					   ng-min="planning.greenMaximum"
+					   ng-max="planning.maximum"
+					   required />
 			</div>
+		</div>
 
-			<div class="form-group" show-errors>
-				<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
-				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
-					<input class="form-control"
-						   id="baseline-input"
-						   name="baseline"
-						   type="number"
-						   ng-model="planning.baseline"
-						   placeholder="{{'baseline_ph'|translate}}"
-						   ng-min="planning.minimum"
-						   ng-max="planning.maximum"
-						   required />
-				</div>
+		<div class="row" style="margin-bottom: 15px">
+			<label class="col-sm-2 control-label" translate="project.green_zone"></label>
+			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.greenMinimum">
+				<input class="form-control"
+					   type="number"
+					   name="greenMinimum"
+					   ng-model="planning.greenMinimum"
+					   placeholder="{{'project.minimum_ph'|translate}}"
+					   required
+					   ng-min="planning.orangeMinimum"
+					   ng-max="planning.greenMaximum" />
 			</div>
-			
-			<div class="form-group">
-				<label for="targets" class="col-sm-2 control-label" translate="project.targets"></label>
-				<div class="col-sm-10">
+			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.greenMaximum">
+				<input class="form-control"
+					   type="number"
+					   name="greenMaximum"
+					   ng-model="planning.greenMaximum"
+					   placeholder="{{'project.maximum_ph'|translate}}"
+					   required
+					   ng-min="planning.greenMinimum"
+					   ng-max="planning.orangeMaximum" />
+			</div>
+		</div>
 
-					<ul acl-lacks-project-role="owner">
-						<li ng-repeat="target in planning.targets">{{target.period}}: {{target.value}}</li>
-					</ul>
+		<div class="form-group" show-errors>
+			<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
+				<input class="form-control"
+					   id="baseline-input"
+					   name="baseline"
+					   type="number"
+					   ng-model="planning.baseline"
+					   placeholder="{{'baseline_ph'|translate}}"
+					   ng-min="planning.minimum"
+					   ng-max="planning.maximum"
+					   required />
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="targets" class="col-sm-2 control-label" translate="project.targets"></label>
+			<div class="col-sm-10">
 
-					<div ng-repeat="target in planning.targets" class="row" style="padding-bottom: 10px" acl-has-project-role="owner">
-						<ng-form name="targetForm">
-							<div class="col-sm-5 form-group" show-errors style="margin: 0">
-								<input type="month" class="form-control" ng-model="target.period" name="period" required />
-							</div>
-							<div class="col-sm-5 form-group" show-errors style="margin: 0">
-								<input type="text" class="form-control" ng-model="target.value" name="value" placeholder="{{'project.target_value_ph'|translate}}" required />
-							</div>
-							<div class="col-sm-2">
-								<button class="btn btn-danger" ng-click="removeTarget(target)" translate="shared.delete"></button>
-							</div>
-						</ng-form>
-					</div>
+				<ul acl-lacks-project-role="owner">
+					<li ng-repeat="target in planning.targets">{{target.period}}: {{target.value}}</li>
+				</ul>
 
-					<div class="row" acl-has-project-role="owner">
-						<div class="col-sm-12">
-							<button class="btn btn-default" ng-click="addTarget()" translate="project.add_target"></button>
+				<div ng-repeat="target in planning.targets" class="row" style="padding-bottom: 10px" acl-has-project-role="owner">
+					<ng-form name="targetForm">
+						<div class="col-sm-5 form-group" show-errors style="margin: 0">
+							<input type="month" class="form-control" ng-model="target.period" name="period" required />
 						</div>
+						<div class="col-sm-5 form-group" show-errors style="margin: 0">
+							<input type="text" class="form-control" ng-model="target.value" name="value" placeholder="{{'project.target_value_ph'|translate}}" required />
+						</div>
+						<div class="col-sm-2">
+							<button class="btn btn-danger" ng-click="removeTarget(target)" translate="shared.delete"></button>
+						</div>
+					</ng-form>
+				</div>
+
+				<div class="row" acl-has-project-role="owner">
+					<div class="col-sm-12">
+						<button class="btn btn-default" ng-click="addTarget()" translate="project.add_target"></button>
 					</div>
 				</div>
 			</div>
 		</div>
+
 	</form>
 </div>
 
 <div class="modal-footer">
-	<div ng-if="container.indicator">
-		<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="container.isNew" acl-has-project-role="owner">
-			<i class="fa fa-plus"></i>
-			<span translate="shared.add"></span>
-		</button>
+	<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="isNew" acl-has-project-role="owner">
+		<i class="fa fa-plus"></i>
+		<span translate="shared.add"></span>
+	</button>
 
-		<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="!container.isNew" acl-has-project-role="owner">
-			<i class="fa fa-floppy-o"></i>
-			<span translate="shared.save"></span>
-		</button>
+	<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="!isNew" acl-has-project-role="owner">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</button>
 
-		<button ng-click="delete()" class="btn btn-danger" ng-if="!container.isNew" acl-has-project-role="owner">
-			<i class="fa fa-remove"></i>
-			<span translate="shared.delete">
-		</button>
+	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew" acl-has-project-role="owner">
+		<i class="fa fa-remove"></i>
+		<span translate="shared.delete">
+	</button>
 
-		<button ng-click="cancel()" class="btn btn-default">
-			<i class="fa fa-undo"></i>
-			<span translate="shared.cancel"></span>
-		</button>
-	</div>
-
-	<div ng-if="!container.indicator">
-		<button ng-click="cancel()" class="btn btn-default">
-			<i class="fa fa-undo"></i>
-			<span translate="shared.cancel">
-		</button>
-	</div>
+	<button ng-click="cancel()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.cancel"></span>
+	</button>
 </div>

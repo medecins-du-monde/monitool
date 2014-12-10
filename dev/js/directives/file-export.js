@@ -66,7 +66,6 @@ angular.module('monitool.directives.fileexport', [])
 
 		return {
 			link: function(scope, element, attributes) {
-				console.log('coucou')
 				element.bind('click', function() {
 					var filename  = (attributes.svgSave || 'file.png'),
 						sourceSVG = document.querySelector("svg");

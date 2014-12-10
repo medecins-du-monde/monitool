@@ -8,6 +8,7 @@ var app = angular.module('monitool.app', [
 	'monitool.directives.acl',
 	'monitool.directives.form',
 	'monitool.directives.fileexport',
+	'monitool.directives.indicatorselect',
 	'monitool.filters',
 	'monitool.services.database',
 	'monitool.services.fetch',
@@ -124,7 +125,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			indicatorsById: function(project, mtDatabase) {
 				var ids = Object.keys(project.indicators);
 				if (ids.length)
-					return mtDatabase.current.query('shortlists/indicators_short', {group: true, keys: ids}).then(function(result) {
+					return mtDatabase.current.query('shortlists/indicators_short', {keys: ids}).then(function(result) {
 						var indicatorsById = {};
 						result.rows.forEach(function(row) { indicatorsById[row.key] = row.value; });
 						return indicatorsById;
@@ -343,7 +344,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
 		resolve: {
-			indicatorHierarchy: function(mtFetch) { return mtFetch.indicatorHierarchy(); },
 			typesById: function(mtFetch) { return mtFetch.typesById(); },
 			themesById: function(mtFetch) { return mtFetch.themesById(); }
 		}
@@ -393,7 +393,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/edit.html',
 		controller: 'IndicatorEditController',
 		resolve: {
-			indicators: function(mtFetch) { return mtFetch.indicators(); },
+			indicatorsById: function(mtDatabase, indicator) {
+				var ids = {};
+				for (var i in indicator.formulas)
+					for (var j in indicator.formulas[i].parameters)
+						ids[indicator.formulas[i].parameters[j]] = true;
+				return mtDatabase.current.allDocs({keys: Object.keys(ids), include_docs: true}).then(function(result) {
+					var r = {};
+					result.rows.forEach(function(row) { r[row.key] = row.doc; });
+					return r;
+				});
+			},
 			types: function(mtFetch) { return mtFetch.types(); },
 			themes: function(mtFetch) { return mtFetch.themes(); }
 		}

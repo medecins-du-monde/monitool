@@ -38,55 +38,11 @@ module.exports = {
 
 		indicators_short: {
 			map: function(doc) {
-				if (doc.type === 'project') {
-					var main = {}, dependency = {}, indicatorId = null;
-
-					for (indicatorId in doc.indicators)
-						main[indicatorId] = true;
-
-					var numForms = doc.dataCollection.length;
-					for (var i = 0; i < numForms; ++i)
-						for (indicatorId in doc.dataCollection[i].fields)
-							if (!main[indicatorId])
-								dependency[indicatorId] = true;
-
-					for (indicatorId in main)
-						emit(indicatorId, {main: 1});
-
-					for (indicatorId in dependency)
-						emit(indicatorId, {dependency: 1});
-				}
-				else if (doc.type === 'indicator')
-					emit(doc._id, {name: doc.name, standard: doc.standard, types: doc.types, themes: doc.themes});
-
-				// this may be a bit overkill
-				else if (doc.type === 'input')
-					for (var indicatorId in doc.indicators)
-						emit(indicatorId, {input: 1});
-			}.toString(),
-
-			reduce: function(keys, values, rereduce) {
-				var memo      = {main: 0, dependency: 0, input: 0},
-					numValues = values.length;
-
-				for (var i = 0; i < numValues; ++i) {
-					var value = values[i];
-
-					if (value.name) {
-						memo.name     = value.name;
-						memo.standard = value.standard;
-						memo.types    = value.types;
-						memo.themes   = value.themes;
-					}
-
-					value.main       && (memo.main       += value.main);
-					value.dependency && (memo.dependency += value.dependency);
-					value.input      && (memo.input      += value.input);
-				}
-
-				return memo;
+				if (doc.type === 'indicator')
+					emit(doc._id, {name: doc.name, standard: doc.standard});
 			}.toString()
 		},
+		
 		types_short: {
 			map: function(doc) {
 				if (doc.type === 'indicator')
@@ -113,5 +69,49 @@ module.exports = {
 			reduce: reduceTypeTheme
 		},
 
+		// indicator tree
+		indicator_full_tree: {
+			map: function(doc) {
+				if (doc.type === 'indicator') {
+					doc.themes.forEach(function(theme) {
+						doc.types.forEach(function(type) {
+							emit([theme, type], doc.name);
+						});
+					});
+				}
+			}.toString(),
+
+			reduce: "_count"
+		},
+
+		indicator_partial_tree: {
+			map: function(doc) {
+				if (doc.type === 'indicator' && doc.standard) {
+					doc.themes.forEach(function(theme) {
+						doc.types.forEach(function(type) {
+							emit([theme, type], doc.name);
+						});
+					});
+				}
+			}.toString(),
+
+			reduce: "_count"
+		},
+
+		indicator_usage: {
+			map: function(doc) {
+				var indicatorId;
+
+				if (doc.type === 'project')
+					for (indicatorId in doc.indicators)
+						emit('main:' + indicatorId);
+				
+				if (doc.type === 'input')
+					for (indicatorId in doc.indicators)
+						emit('input:' + indicatorId);
+			}.toString(),
+
+			reduce: "_count"
+		}
 	}
 };

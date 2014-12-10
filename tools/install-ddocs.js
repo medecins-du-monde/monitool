@@ -16,8 +16,7 @@ var ddocs = {
 	_bucket: {
 		permissions: require('./_design/app_permissions'),
 		reporting: require('./_design/app_reporting'),
-		shortlists: require('./_design/app_shortlists'),
-		test: require('./_design/app_test')
+		shortlists: require('./_design/app_shortlists')
 	}
 };
 

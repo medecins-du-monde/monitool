@@ -141,16 +141,18 @@
 					</tr>
 					<tr ng-repeat="symbol in indicator.formulas[formulaId].symbols">
 						<td>{{'indicator.parameter'|translate}} <strong>"{{symbol}}"</strong></td>
-						<td>
-							<ui-select ng-model="indicator.formulas[formulaId].parameters[symbol]"
-									   ng-change="annotateFormula(formulaId)"
-									   theme="bootstrap">
+						<td acl-has-role="indicator" acl-fallback="indicatorsById[indicator.formulas[formulaId].parameters[symbol]].name">
+							<div class="input-group">
+								<input type="text"
+									   class="form-control"
+									   disabled
+									   ng-value="indicatorsById[indicator.formulas[formulaId].parameters[symbol]].name"
+									   placeholder="{{'shared.choose_indicator'|translate}}" />
 
-								<ui-select-match placeholder="{{'shared.choose_indicator'|translate}}">{{$select.selected.name}}</ui-select-match>
-								<ui-select-choices repeat="indicator._id as indicator in indicators | filter: {name: $select.search}">
-									<span>{{indicator.name}}</span>
-								</ui-select-choices>
-							</ui-select>
+								<span class="input-group-btn">
+									<button class="btn btn-default" ng-click="chooseIndicator(formulaId, symbol)" translate="shared.choose"></button>
+								</span>
+							</div>
 						</td>
 					</tr>
 				</table>

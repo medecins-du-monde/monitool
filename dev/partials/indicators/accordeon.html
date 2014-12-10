@@ -1,0 +1,51 @@
+
+<div class="indicator-level-1" ng-repeat="theme in hierarchy">
+	<div class="indicator-header" ng-click="toggleTheme(theme)">
+		<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !theme.open, 'fa-minus-circle': theme.open}"></i>
+		{{(theme.name || 'indicator.no_theme')|translate}}
+		<span class="badge pull-right">{{theme.numIndicators}}</span>
+	</div>
+
+	<div class="indicator-level-2" ng-repeat="type in theme.types" ng-if="theme.open">
+		<div class="indicator-header" ng-click="toggleType(theme, type)">
+			<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle': !type.open, 'fa-minus-circle': type.open}"></i>
+			{{(type.name || 'indicator.no_type')|translate}}
+			<span class="badge pull-right">{{type.numIndicators}}</span>
+		</div>
+
+		<div class="indicator-level-3" ng-repeat="indicator in type.indicators | orderBy:orderField" ng-if="type.open">
+			<i class="fa fa-circle-o" ng-style="{color: indicator.standard ? '#72bb53' : '#d68227'}"></i>
+
+			<span>{{indicator.name}}</span>
+
+			<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
+				<a class="btn btn-xs btn-default"
+				   ng-click="choose(indicator.id)"
+				   ng-if="buttons.choose"
+				   translate="shared.choose"></a>
+
+				<span ng-if="buttons.edit">
+					<a class="btn btn-xs btn-default"
+					   ui-sref="main.indicator.edit({indicatorId: indicator.id})"
+					   acl-has-role="indicator"
+					   translate="shared.edit"></a>
+
+					<a class="btn btn-xs btn-default"
+					   ui-sref="main.indicator.edit({indicatorId: indicator.id})"
+					   acl-lacks-role="indicator"
+					   translate="shared.display"></a>
+				</span>
+
+				<a class="btn btn-xs btn-default"
+				   ui-sref="main.indicator.reporting({indicatorId: indicator.id})"
+				   ng-if="indicator.main && buttons.reporting"
+				   translate="shared.reporting"></a>
+			</span>
+
+			<span class="pull-right">
+				<span style="display: inline-block; width: 40px; text-align: right">{{indicator.main}} <i class="fa fa-building-o"></i></span>
+				<span style="display: inline-block; width: 50px; text-align: right">{{indicator.input}} <i class="fa fa-pencil-square-o"></i></span>
+			</span>
+		</div>
+	</div>
+</div>

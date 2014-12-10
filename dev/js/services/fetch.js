@@ -65,37 +65,7 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 			else
 				return mtDatabase.current.get(indicatorId);
 		},
-		indicators: function() {
-			return mtDatabase.current.query('shortlists/indicators_short', {group: true}).then(reformatArray);
-		},		
-		indicatorHierarchy: function(forbiddenIds) {
-			return mtDatabase.current.query('shortlists/indicators_short', {group: true}).then(function(result) {
-				var hierarchy = {};
-
-				result.rows.forEach(function(row) {
-					// skip forbidden indicators if parameter was provided (for logical frame edition, and avoiding double indicators)
-					if (forbiddenIds && forbiddenIds.indexOf(row.key) !== -1)
-						return;
-
-					// add dummy types and themes
-					!row.value.themes.length && row.value.themes.push('');
-					!row.value.types.length  && row.value.types.push('');
-
-					row.value.themes.forEach(function(theme) {
-						row.value.types.forEach(function(type) {
-							// add empty tree branches if those are undefined
-							!hierarchy[theme] && (hierarchy[theme] = {});
-							!hierarchy[theme][type] && (hierarchy[theme][type] = []);
-
-							row.value._id = row.key;
-							hierarchy[theme][type].push(row.value);
-						});
-					});
-				});
-
-				return hierarchy;
-			});
-		},
+	
 		themes: function() {
 			return mtDatabase.current.query('shortlists/themes_short', {group: true}).then(reformatArray);
 		},

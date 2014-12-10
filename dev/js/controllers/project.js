@@ -47,12 +47,20 @@ projectControllers.controller('ProjectMenuController', function($scope, $state, 
 	};
 });
 
-projectControllers.controller('ProjectLogicalFrameController', function($scope, $modal, $state, $stateParams, project, indicatorsById) {
+projectControllers.controller('ProjectLogicalFrameController', function($scope, $state, $q, $modal, indicatorsById) {
+	// contains description of indicators for the loaded project.
 	$scope.indicatorsById = indicatorsById;
 
-	// handle indicator add, edit and remove in a modal window.
+	// handle indicator add, edit and remove are handled in a modal window.
 	$scope.editIndicator = function(indicatorId, target) {
-		$state.go('main.project.logical_frame.indicator_edit', {indicatorId: indicatorId, target: target});
+		if (indicatorId === 'new')
+			indicatorId = $modal.open({templateUrl: 'partials/indicators/selector-popup.html', controller: 'IndicatorChooseController', size: 'lg'}).result;
+		else
+			indicatorId = $q.when(indicatorId);
+
+		indicatorId.then(function(indicatorId) {
+			$state.go('main.project.logical_frame.indicator_edit', {indicatorId: indicatorId, target: target});
+		});
 	};
 
 	// handle purpose add and remove
@@ -92,7 +100,7 @@ projectControllers.controller('ProjectLogicalFrameController', function($scope, 
  * This controller is a modal and DOES NOT inherit from ProjectLogicalFrameController
  * Hence the need for project and userCtx to be passed explicitly.
  */
-projectControllers.controller('ProjectLogicalFrameIndicatorController', function($scope, $modalInstance, $q, mtDatabase, mtFetch, project, userCtx, indicatorId, target) {
+projectControllers.controller('ProjectLogicalFrameIndicatorController', function($scope, $modalInstance, mtDatabase, project, userCtx, indicatorId, target) {
 	// Retrieve indicator array where we need to add or remove indicator ids.
 	var getIndicatorsList = function() {
 		var path = target.split('.');
@@ -104,35 +112,19 @@ projectControllers.controller('ProjectLogicalFrameIndicatorController', function
 			return $scope.project.logicalFrame.purposes[path[1]].outputs[path[2]].indicators;
 	};
 
-	$scope.project = project;
-	$scope.userCtx = userCtx;
-
-	$scope.container = {};
-	if (indicatorId !== 'new')
-		mtDatabase.current.get(indicatorId).then(function(indicator) {
-			$scope.container.isNew = false;
-			$scope.container.indicator = indicator;
-			$scope.planning = angular.copy(project.indicators[indicator._id]);
-		});
-	else {
-		var forbiddenIds = Object.keys(project.indicators);
-		$scope.container.isNew = true;
-		$q.all([mtFetch.indicatorHierarchy(forbiddenIds), mtFetch.typesById(), mtFetch.themesById()]).then(function(result) {
-			$scope.indicatorHierarchy = result[0];
-			$scope.types = result[1];
-			$scope.themes = result[2];
-		});
-	}
-
-	$scope.select = function(indicator) {
-		$scope.container.indicator = indicator;
-		$scope.planning = {
-			relevance: '',
-			baseline: 0,
-			minimum: 0, orangeMinimum: 20, greenMinimum: 40, greenMaximum: 60, orangeMaximum: 80, maximum: 100,
-			targets: []
-		};
+	$scope.project  = project;
+	$scope.userCtx  = userCtx;
+	$scope.isNew    = !project.indicators[indicatorId];
+	$scope.planning = angular.copy(project.indicators[indicatorId]) || {
+		relevance: '', baseline: 0,
+		minimum: 0, orangeMinimum: 20, greenMinimum: 40,
+		greenMaximum: 60, orangeMaximum: 80, maximum: 100,
+		targets: []
 	};
+
+	mtDatabase.current.get(indicatorId).then(function(indicator) {
+		$scope.indicator = indicator;
+	});
 
 	$scope.addTarget = function() {
 		$scope.planning.targets.push({period: null, value: 0});
@@ -143,21 +135,21 @@ projectControllers.controller('ProjectLogicalFrameIndicatorController', function
 	};
 
 	$scope.isUnchanged = function() {
-		return angular.equals($scope.planning, $scope.project.indicators[$scope.container.indicator._id]);
+		return angular.equals($scope.planning, $scope.project.indicators[indicatorId]);
 	};
 
 	$scope.save = function() {
 		if ($scope.container.isNew)
-			getIndicatorsList().push($scope.container.indicator._id);
+			getIndicatorsList().push(indicatorId);
 
-		$scope.project.indicators[$scope.container.indicator._id] = $scope.planning;
+		$scope.project.indicators[indicatorId] = $scope.planning;
 		$modalInstance.close();
 	};
 
 	$scope.delete = function() {
 		var indicators = getIndicatorsList();
-		indicators.splice(indicators.indexOf($scope.container.indicator._id), 1);
-		delete $scope.project.indicators[$scope.container.indicator._id];
+		indicators.splice(indicators.indexOf(indicatorId), 1);
+		delete $scope.project.indicators[indicatorId];
 		$modalInstance.close();
 	};
 

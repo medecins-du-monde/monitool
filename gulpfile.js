@@ -57,17 +57,17 @@ var files = {
 			'dev/i18n/fr.js',
 			'dev/i18n/es.js',
 			'dev/i18n/en.js',
-			'dev/js/image-exporter.js',
 			'dev/js/services/database.js',
 			'dev/js/services/fetch.js',
 			'dev/js/services/reporting.js',
 			'dev/js/controllers/helper.js',
 			'dev/js/controllers/project.js',
 			'dev/js/controllers/indicator.js',
-			'dev/js/app.js',
-			'dev/js/directives/forms.js',
 			'dev/js/directives/acls.js',
+			'dev/js/directives/file-export.js',
+			'dev/js/directives/forms.js',
 			'dev/js/filters.js',
+			'dev/js/app.js',
 		]
 	}
 };
