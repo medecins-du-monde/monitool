@@ -10,9 +10,11 @@ angular
 			restrict: "E",
 			// transclude: true,
 			scope: {
+				choose: '=choose',
 				userCtx: '=userCtx',
 				standard: '=standard',
-				orderField: '=orderField'
+				orderField: '=orderField',
+				forbidden: '=forbidden'
 			},
 			link: function(scope, element, attributes, controller, transclude) {
 				var themesById = {},

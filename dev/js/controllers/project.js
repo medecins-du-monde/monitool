@@ -46,7 +46,16 @@ angular.module('monitool.controllers.project', [])
 
 		// We restore $scope.master on $scope.project to avoid unsaved changes from a given tab to pollute changes to another one.
 		$scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-			$scope.reset();
+			var pages = ['main.project.logical_frame', 'main.project.input_entities', 'main.project.input_groups', 'main.project.user_list'];
+
+			// if unsaved changes were made
+			if (pages.indexOf(fromState.name) !== -1 && !angular.equals($scope.master, $scope.project)) {
+				// then ask the user if he meant it
+				if (window.confirm('Vous avez réalisé des modifications. Êtes-vous sûr de vouloir changer de page sans sauvegarder?'))
+					$scope.reset();
+				else
+					event.preventDefault();
+			}
 		});
 	})
 
@@ -57,12 +66,25 @@ angular.module('monitool.controllers.project', [])
 		// handle indicator add, edit and remove are handled in a modal window.
 		$scope.editIndicator = function(indicatorId, target) {
 			if (indicatorId === 'new')
-				indicatorId = $modal.open({templateUrl: 'partials/indicators/selector-popup.html', controller: 'IndicatorChooseController', size: 'lg'}).result;
+				indicatorId = $modal.open({
+					templateUrl: 'partials/indicators/selector-popup.html',
+					controller: 'IndicatorChooseController',
+					size: 'lg',
+					resolve: {
+						forbiddenIds: function() { return Object.keys($scope.project.indicators); }
+					}
+				}).result;
 			else
 				indicatorId = $q.when(indicatorId);
 
 			indicatorId.then(function(indicatorId) {
-				$state.go('main.project.logical_frame.indicator_edit', {indicatorId: indicatorId, target: target});
+				$modal.open({
+					templateUrl: 'partials/projects/logical-frame-indicator.html',
+					controller: 'ProjectLogicalFrameIndicatorController',
+					size: 'lg',
+					scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
+					resolve: {indicatorId: function() { return indicatorId; }, target: function() { return target; }}
+				});
 			});
 		};
 
@@ -102,7 +124,7 @@ angular.module('monitool.controllers.project', [])
 	 * This controller is a modal and DOES NOT inherit from ProjectLogicalFrameController
 	 * Hence the need for project and userCtx to be passed explicitly.
 	 */
-	.controller('ProjectLogicalFrameIndicatorController', function($scope, $modalInstance, mtDatabase, project, userCtx, indicatorId, target) {
+	.controller('ProjectLogicalFrameIndicatorController', function($scope, $modalInstance, mtDatabase, indicatorId, target) {
 		// Retrieve indicator array where we need to add or remove indicator ids.
 		var getIndicatorsList = function() {
 			var path = target.split('.');
@@ -114,16 +136,15 @@ angular.module('monitool.controllers.project', [])
 				return $scope.project.logicalFrame.purposes[path[1]].outputs[path[2]].indicators;
 		};
 
-		$scope.project  = project;
-		$scope.userCtx  = userCtx;
-		$scope.isNew    = !project.indicators[indicatorId];
-		$scope.planning = angular.copy(project.indicators[indicatorId]) || {
+		$scope.isNew = !$scope.project.indicators[indicatorId];
+		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
 			relevance: '', baseline: 0,
 			minimum: 0, orangeMinimum: 20, greenMinimum: 40,
 			greenMaximum: 60, orangeMaximum: 80, maximum: 100,
 			targets: []
 		};
 
+		// FIXME, this query is useless, we could avoid it and pass the full indicator from the calling controller.
 		mtDatabase.current.get(indicatorId).then(function(indicator) {
 			$scope.indicator = indicator;
 		});
@@ -141,10 +162,11 @@ angular.module('monitool.controllers.project', [])
 		};
 
 		$scope.save = function() {
-			if ($scope.container.isNew)
+			if ($scope.isNew)
 				getIndicatorsList().push(indicatorId);
 
 			$scope.project.indicators[indicatorId] = $scope.planning;
+			$scope.indicatorsById[indicatorId] = $scope.indicator; // inject the indicator in the parent scope.
 			$modalInstance.close();
 		};
 
@@ -177,7 +199,7 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectInputGroupsController', function($scope, project, mtDatabase) {
 		$scope.create = function() {
-			$scope.project.inputGroups.push({id: PouchDB.utils.uuid().toLowerCase(), name: ''});
+			$scope.project.inputGroups.push({id: PouchDB.utils.uuid().toLowerCase(), name: '', members: []});
 		};
 
 		$scope.delete = function(inputEntityId) {

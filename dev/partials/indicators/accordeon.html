@@ -22,6 +22,7 @@
 				<a class="btn btn-xs btn-default"
 				   ng-click="choose(indicator.id)"
 				   ng-if="buttons.choose"
+				   ng-disabled="forbidden.indexOf(indicator.id) !== -1"
 				   translate="shared.choose"></a>
 
 				<span ng-if="buttons.edit">

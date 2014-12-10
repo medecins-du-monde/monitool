@@ -7,8 +7,9 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.standard = false;
 	})
 	
-	.controller('IndicatorChooseController', function($scope, $modalInstance) {
+	.controller('IndicatorChooseController', function($scope, $modalInstance, forbiddenIds) {
 		$scope.standard = true;
+		$scope.forbidden = forbiddenIds;
 
 		$scope.choose = function(indicatorId) {
 			$modalInstance.close(indicatorId);
@@ -43,7 +44,15 @@ angular.module('monitool.controllers.indicator', [])
 		};
 
 		$scope.chooseIndicator = function(formulaId, symbol) {
-			var indicatorId = $modal.open({templateUrl: 'partials/indicators/selector-popup.html', controller: 'IndicatorChooseController', size: 'lg'}).result;
+			var indicatorId = $modal.open({
+				templateUrl: 'partials/indicators/selector-popup.html',
+				controller: 'IndicatorChooseController',
+				size: 'lg',
+				resolve: {
+					forbiddenIds: function() { return []; }
+				}
+			}).result;
+			
 			indicatorId.then(function(indicatorId) {
 				mtDatabase.current.get(indicatorId).then(function(indicator) {
 					$scope.indicatorsById[indicatorId] = indicator;

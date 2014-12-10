@@ -136,25 +136,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.logical_frame.indicator_edit', {
-		url: '/indicator/:indicatorId/:target',
-		onEnter: function($state, $stateParams, $modal, project, session) {
-			$modal.open({
-				templateUrl: 'partials/projects/logical-frame-indicator.html',
-				controller: 'ProjectLogicalFrameIndicatorController',
-				size: 'lg',
-				resolve: {
-					project: function() { return project; },
-					userCtx: function() { return session.userCtx; },
-					indicatorId: function() { return $stateParams.indicatorId; },
-					target: function() { return $stateParams.target; }
-				}
-			}).result.then(function() {
-				$state.go('main.project.logical_frame');
-			});
-		}
-	});
-
 	$stateProvider.state('main.project.input_entities', {
 		url: '/input-entities',
 		templateUrl: 'partials/projects/input-entities.html',
