@@ -53,7 +53,7 @@ angular
 
 						var opts = {reduce: false, startkey: [theme.id, type.id], endkey: [theme.id, type.id, {}]};
 						mtDatabase.current.query('shortlists/indicator_full_tree', opts).then(function(result) {
-							type.indicators = result.rows.map(function(row) { return {id: row.id, name: row.value}; });
+							type.indicators = result.rows.map(function(row) { return {id: row.id, name: row.value.name, standard: row.value.standard}; });
 
 							var opts = {group: true, keys: []}
 							result.rows.map(function(row) { opts.keys.push('input:' + row.id, 'main:' + row.id); });

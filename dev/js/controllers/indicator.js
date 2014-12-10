@@ -2,7 +2,6 @@
 
 angular.module('monitool.controllers.indicator', [])
 
-
 	.controller('IndicatorListController', function($scope) {
 		$scope.orderField = 'name';
 	})

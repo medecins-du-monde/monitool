@@ -75,7 +75,7 @@ module.exports = {
 				if (doc.type === 'indicator') {
 					doc.themes.forEach(function(theme) {
 						doc.types.forEach(function(type) {
-							emit([theme, type], doc.name);
+							emit([theme, type], {name: doc.name, standard: doc.standard});
 						});
 					});
 				}
@@ -89,7 +89,7 @@ module.exports = {
 				if (doc.type === 'indicator' && doc.standard) {
 					doc.themes.forEach(function(theme) {
 						doc.types.forEach(function(type) {
-							emit([theme, type], doc.name);
+							emit([theme, type], {name: doc.name, standard: doc.standard});
 						});
 					});
 				}
