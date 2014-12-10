@@ -276,7 +276,7 @@
 			<span translate="shared.save"></span>
 		</button>
 
-		<button ng-click="reset()" class="btn btn-default">
+		<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
 			<i class="fa fa-undo"></i>
 			<span translate="shared.remove_changes"></span>
 		</button>

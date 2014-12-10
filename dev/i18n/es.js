@@ -147,7 +147,7 @@ var SPANISH_TRANSLATION = {
 		description_ph: 'Por ejemplo: Medir el nivel de formación del personal medical que completa las fichas de pacientes. Medir este indicador es facil en proyectos pequeños, evitar usarlo en otras circunstancias.',
 		history_ph: 'Por ejemplo: Creado en 2007 en el cuadro de un proyecto de UNICEF ... este indicador permitio seguir los objetivos de ...',
 		definition: 'Definición',
-		standard: 'Estandar',
+		core: 'Recomendado',
 		history: 'Historico',
 		unit: 'Unidad',
 		other: 'Otro',
@@ -179,6 +179,7 @@ var SPANISH_TRANSLATION = {
 		
 		new_type_name: "Nombre del nuevo tipo",
 		new_theme_name: "Nombre de la nueva temática",
+		only_core: "Ver unicamente los indicadores recomendados"
 	},
 	login: {
 		error: "Usuario o contraseña inválido",

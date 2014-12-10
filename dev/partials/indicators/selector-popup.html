@@ -1,7 +1,10 @@
 <div class="modal-body">
 	<legend translate="shared.choose_indicator"></legend>
 
-	<indicator-select buttons="choose"></indicator-select>
+	<label for="standard-input" style="text-weight: normal" translate="indicator.only_core"></label>
+	<input id="standard-input" type="checkbox" ng-model="standard" />
+
+	<indicator-select buttons="choose" standard="standard" order-field="'name'" user-ctx="userCtx" />
 </div>
 
 <div class="modal-footer">

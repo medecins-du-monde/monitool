@@ -148,7 +148,7 @@ var FRENCH_TRANSLATION = {
 		description_ph: 'Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
 		history_ph: 'Exemple: Défini en 2007 par l\'OMS et utilisé sur les projets de UNICEF ... cet indicateur a permi de suivre les objectifs ...',
 		definition: 'Définition',
-		standard: 'Standard',
+		core: 'Recommandé',
 		history: 'Historique',
 		unit: 'Unité',
 		other: 'Autre',
@@ -180,6 +180,7 @@ var FRENCH_TRANSLATION = {
 		
 		new_type_name: "Nom du nouveau type",
 		new_theme_name: "Nom de la nouvelle thématique",
+		only_core: "Ne voir que les indicateurs recommandés"
 	},
 	login: {
 		error: "Identifiant ou mot de passe invalide",

@@ -43,6 +43,11 @@ angular.module('monitool.controllers.project', [])
 		$scope.isUnchanged = function() {
 			return angular.equals($scope.master, $scope.project);
 		};
+
+		// We restore $scope.master on $scope.project to avoid unsaved changes from a given tab to pollute changes to another one.
+		$scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+			$scope.reset();
+		});
 	})
 
 	.controller('ProjectLogicalFrameController', function($scope, $state, $q, $modal, indicatorsById) {

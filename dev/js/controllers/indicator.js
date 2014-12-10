@@ -4,9 +4,12 @@ angular.module('monitool.controllers.indicator', [])
 
 	.controller('IndicatorListController', function($scope) {
 		$scope.orderField = 'name';
+		$scope.standard = false;
 	})
 	
 	.controller('IndicatorChooseController', function($scope, $modalInstance) {
+		$scope.standard = true;
+
 		$scope.choose = function(indicatorId) {
 			$modalInstance.close(indicatorId);
 		};

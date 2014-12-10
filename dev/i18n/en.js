@@ -146,7 +146,7 @@ var ENGLISH_TRANSLATION = {
 		description_ph: '',		// Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
 		history_ph: '',			// Exemple: Défini en 2007 par l\'OMS et utilisé sur les projets de UNICEF ... cet indicateur a permi de suivre les objectifs ...
 		definition: 'Definition',
-		standard: 'Standard',
+		core: 'Core',
 		history: 'History',
 		unit: 'Unit',
 		other: 'Other',
@@ -178,6 +178,7 @@ var ENGLISH_TRANSLATION = {
 		
 		new_type_name: "New type name",
 		new_theme_name: "New theme name",
+		only_core: "Only display core indicators"
 
 	},
 	login: {

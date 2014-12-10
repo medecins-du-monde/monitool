@@ -8,27 +8,16 @@ angular
 		return {
 			templateUrl: 'partials/indicators/accordeon.html',
 			restrict: "E",
-			transclude: true,
-			
+			// transclude: true,
+			scope: {
+				userCtx: '=userCtx',
+				standard: '=standard',
+				orderField: '=orderField'
+			},
 			link: function(scope, element, attributes, controller, transclude) {
-
-				scope.buttons = {};
-				attributes.buttons.split(',').forEach(function(button) {
-					scope.buttons[button] = true;
-				});
-
-				var themesById, typesById;
-
-				$q.all([mtFetch.themesById(), mtFetch.typesById()]).then(function(result) {
-					scope.themes = themesById = result[0];
-					scope.types = typesById = result[1];
-
-					scope.orderField = 'name';
-					scope.hierarchy = [];
-					for (var id in themesById)
-						if (themesById[id].usage)
-							scope.hierarchy.push({id: id, name: themesById[id].name, numIndicators: themesById[id].usage, open: false, loaded: false});
-				});
+				var themesById = {},
+					typesById  = {},
+					viewName   = null;
 
 				scope.toggleTheme = function(theme) {
 					theme.open = !theme.open;
@@ -37,7 +26,7 @@ angular
 						theme.loaded = true; // before callback...
 
 						var opts = {group_level: 2, startkey: [theme.id], endkey: [theme.id, {}]};
-						mtDatabase.current.query('shortlists/indicator_full_tree', opts).then(function(result) {
+						mtDatabase.current.query(viewName, opts).then(function(result) {
 							theme.types = result.rows.map(function(row) {
 								return {id: row.key[1], name: typesById[row.key[1]].name, numIndicators: row.value, open: false, loaded: false, indicators: []};
 							});
@@ -52,7 +41,7 @@ angular
 						type.loaded = true; // before callback...
 
 						var opts = {reduce: false, startkey: [theme.id, type.id], endkey: [theme.id, type.id, {}]};
-						mtDatabase.current.query('shortlists/indicator_full_tree', opts).then(function(result) {
+						mtDatabase.current.query(viewName, opts).then(function(result) {
 							type.indicators = result.rows.map(function(row) { return {id: row.id, name: row.value.name, standard: row.value.standard}; });
 
 							var opts = {group: true, keys: []}
@@ -73,6 +62,36 @@ angular
 						});
 					}
 				};
+
+				// Load all themes and types.
+				$q.all([mtFetch.themesById(), mtFetch.typesById()]).then(function(result) {
+					scope.themes = themesById = result[0];
+					scope.types = typesById = result[1];
+
+					scope.buttons = {};
+					attributes.buttons.split(',').forEach(function(button) {
+						scope.buttons[button] = true;
+					});
+					
+					scope.$watch('standard', function(newValue, oldValue) {
+						scope.hierarchy = [];
+						if (newValue) {
+							viewName = 'shortlists/indicator_partial_tree';
+							mtDatabase.current.query(viewName, {group_level: 1}).then(function(result) {
+								scope.hierarchy = result.rows.map(function(row) {
+									return {id: row.key[0], name: themesById[row.key[0]].name, numIndicators: row.value, open: false, loaded: false};
+								});
+							});
+						}
+						else {
+							viewName = 'shortlists/indicator_full_tree';
+							for (var id in themesById)
+								if (themesById[id].usage)
+									scope.hierarchy.push({id: id, name: themesById[id].name, numIndicators: themesById[id].usage, open: false, loaded: false});
+						}
+					});		
+				});
+
 			}
 		}
 	});
