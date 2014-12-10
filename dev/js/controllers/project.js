@@ -491,5 +491,5 @@ angular.module('monitool.controllers.project', [])
 	})
 
 	.controller('ProjectUserListController', function($scope, mtDatabase, project, users) {
-		$scope.users = users;	
+		$scope.users = users;
 	});

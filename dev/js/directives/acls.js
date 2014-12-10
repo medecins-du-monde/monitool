@@ -41,16 +41,18 @@ angular.module('monitool.directives.acl', [])
 	.directive('aclHasProjectRole', function() {
 		return {
 			link: function(scope, element, attributes) {
-				var roles = scope.userCtx.roles || [];
-				var owners;
-				if (attributes.aclHasProjectRole === 'owner')
-					owners = scope.project.owners || [];
-				else if (attributes.aclHasProjectRole === 'input')
-					owners = scope.project.dataEntryOperators || [];
-				else
-					throw new Error();
+				var roles = scope.userCtx.roles || [],
+					project = scope.$eval(attributes.project) || scope.project,
+					owners;
 
-				if (!scope.project._id)
+				if (attributes.aclHasProjectRole === 'owner')
+					owners = project.owners || [];
+				else if (attributes.aclHasProjectRole === 'input')
+					owners = project.dataEntryOperators || [];
+				else
+					throw new Error("acl-has-project-role must be called with either 'owner' or 'input'");
+
+				if (!project._id)
 					return roles.indexOf('project_create') !== -1 || roles.indexOf('_admin') !== -1;
 				else {
 					var isAllowed = owners.indexOf(scope.userCtx.name) !== -1 || roles.indexOf('_admin') !== -1;
@@ -74,14 +76,15 @@ angular.module('monitool.directives.acl', [])
 	.directive('aclLacksProjectRole', function() {
 		return {
 			link: function(scope, element, attributes) {
-				var roles = scope.userCtx.roles || [];
-				var owners;
+				var roles = scope.userCtx.roles || [],
+					project = scope.$eval(attributes.project) || scope.project,
+					owners;
 				if (attributes.aclLacksProjectRole === 'owner')
 					owners = scope.project.owners || [];
 				else if (attributes.aclLacksProjectRole === 'input')
 					owners = scope.project.dataEntryOperators || [];
 				else
-					throw new Error();
+					throw new Error("acl-lacks-project-role must be called with either 'owner' or 'input'");
 
 				if (!scope.project._id)
 					return roles.indexOf('project_create') === -1 && roles.indexOf('_admin') === -1;

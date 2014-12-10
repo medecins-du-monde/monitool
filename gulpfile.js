@@ -119,7 +119,7 @@ gulp.task('build-js', function() {
 		gulp.src('dev/partials/**/*.html')
 			.pipe(replace(/<!--[\s\S]*?-->/g, ''))	// Remove HTML comments
 			.pipe(replace(/[  \t\n\r]+/g, ' '))		// Merge spaces
-			.pipe(replace(/> </g, '><'))			// Remove spaces between tags (but keep others)
+			// .pipe(replace(/> </g, '><'))			// Remove spaces between tags (but keep others)
 			.pipe(templateCache({module: 'monitool.app', root: 'partials'}))
 	);
 

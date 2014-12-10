@@ -32,7 +32,7 @@ module.exports = {
 		projects_short: {
 			map: function(doc) {
 				if (doc.type === 'project')
-					emit(doc._id, {name: doc.name, begin: doc.begin, end: doc.end});
+					emit(doc._id, {name: doc.name, begin: doc.begin, end: doc.end, owners: doc.owners, dataEntryOperators: doc.dataEntryOperators});
 			}.toString()
 		},
 
