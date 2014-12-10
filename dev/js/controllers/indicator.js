@@ -44,15 +44,17 @@ angular.module('monitool.controllers.indicator', [])
 		};
 
 		$scope.chooseIndicator = function(formulaId, symbol) {
+			var usedIndicators = $scope.indicator.formulas[formulaId].symbols.map(function(s) {
+				return $scope.indicator.formulas[formulaId].parameters[s];
+			}).filter(function(e) { return !!e; });
+
 			var indicatorId = $modal.open({
 				templateUrl: 'partials/indicators/selector-popup.html',
 				controller: 'IndicatorChooseController',
 				size: 'lg',
-				resolve: {
-					forbiddenIds: function() { return []; }
-				}
+				resolve: { forbiddenIds: function() { return usedIndicators; } }
 			}).result;
-			
+
 			indicatorId.then(function(indicatorId) {
 				mtDatabase.current.get(indicatorId).then(function(indicator) {
 					$scope.indicatorsById[indicatorId] = indicator;
