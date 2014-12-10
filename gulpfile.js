@@ -66,6 +66,7 @@ var files = {
 			'dev/js/directives/acls.js',
 			'dev/js/directives/file-export.js',
 			'dev/js/directives/forms.js',
+			'dev/js/directives/indicator-select.js',
 			'dev/js/filters.js',
 			'dev/js/app.js',
 		]
@@ -86,7 +87,7 @@ gulp.task('copy-files-to-s3', ['build'], function() {
 	return gulp.src('build/**/*')
 			   .pipe(awspublish.gzip())
 			   .pipe(publisher.publish(headers))
-			   // .pipe(publisher.cache())
+			   .pipe(publisher.cache())
 			   .pipe(awspublish.reporter())
 			   .on('error', function(err) { console.error('failed to publish err code: ', err.statusCode); } );
 });

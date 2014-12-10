@@ -3,12 +3,11 @@
 angular.module('monitool.controllers.indicator', [])
 
 
-	.controller('IndicatorListController', function($modal, $scope, $q, mtDatabase, themesById, typesById) {
+	.controller('IndicatorListController', function($scope) {
 		$scope.orderField = 'name';
-		// everything is handled in a directive to factorize code.
 	})
 	
-	.controller('IndicatorChooseController', function($scope, $q, $modalInstance, mtFetch, mtDatabase) {
+	.controller('IndicatorChooseController', function($scope, $modalInstance) {
 		$scope.choose = function(indicatorId) {
 			$modalInstance.close(indicatorId);
 		};

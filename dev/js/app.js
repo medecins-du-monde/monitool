@@ -338,17 +338,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		abstract: true,
 		templateUrl: 'partials/indicators/menu.html'
 	});
-
+	
 	$stateProvider.state('main.indicators.list', {
 		url: '/indicators',
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
-		resolve: {
-			typesById: function(mtFetch) { return mtFetch.typesById(); },
-			themesById: function(mtFetch) { return mtFetch.themesById(); }
-		}
 	});
-
+	
 	$stateProvider.state('main.indicators.theme_list', {
 		url: '/themes',
 		templateUrl: 'partials/indicators/theme-type-list.html',
