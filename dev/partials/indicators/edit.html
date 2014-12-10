@@ -106,7 +106,9 @@
 		<div class="form-group">
 			<label for="input-sum-allowed" class="col-sm-2 control-label" translate>indicator.sum_allowed</label>
 			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sumAllowed">
-				<input id="input-sum-allowed" type="checkbox" ng-model="indicator.sumAllowed">
+				<p class="form-control-static">
+					<input id="input-sum-allowed" type="checkbox" ng-model="indicator.sumAllowed">
+				</p>
 			</div>
 		</div>
 
@@ -175,18 +177,11 @@
 			<span translate>shared.save</span>
 		</button>
 
-		<button class="btn btn-warning"
+		<button class="btn btn-default"
 				ng-disabled="isUnchanged()"
 				ng-click="reset()">
 			<i class="fa fa-undo"></i>
 			<span translate>shared.remove_changes</span>
-		</button>
-		
-		<button class="btn btn-danger"
-				ng-click="remove()"
-				ng-if="indicator._id">
-			<i class="fa fa-remove"></i>
-			<span translate>shared.delete</span>
 		</button>
 	</div>
 </form>

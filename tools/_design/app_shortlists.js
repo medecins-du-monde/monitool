@@ -73,11 +73,20 @@ module.exports = {
 		indicator_full_tree: {
 			map: function(doc) {
 				if (doc.type === 'indicator') {
-					doc.themes.forEach(function(theme) {
-						doc.types.forEach(function(type) {
-							emit([theme, type], {name: doc.name, standard: doc.standard});
+					var newDoc = {name: doc.name, standard: doc.standard};
+
+					if (doc.themes.length === 0 && doc.types.length === 0)
+						emit(['', ''], newDoc);
+					else if (doc.themes.length === 0 && doc.types.length !== 0)
+						doc.types.forEach(function(type) { emit(['', type], newDoc); });
+					else if (doc.themes.length !== 0 && doc.types.length === 0)
+						doc.themes.forEach(function(theme) { emit([theme, ''], newDoc); });
+					else
+						doc.themes.forEach(function(theme) {
+							doc.types.forEach(function(type) {
+								emit([theme, type], newDoc);
+							});
 						});
-					});
 				}
 			}.toString(),
 
@@ -87,11 +96,20 @@ module.exports = {
 		indicator_partial_tree: {
 			map: function(doc) {
 				if (doc.type === 'indicator' && doc.standard) {
-					doc.themes.forEach(function(theme) {
-						doc.types.forEach(function(type) {
-							emit([theme, type], {name: doc.name, standard: doc.standard});
+					var newDoc = {name: doc.name, standard: doc.standard};
+
+					if (doc.themes.length === 0 && doc.types.length === 0)
+						emit(['', ''], newDoc);
+					else if (doc.themes.length === 0 && doc.types.length !== 0)
+						doc.types.forEach(function(type) { emit(['', type], newDoc); });
+					else if (doc.themes.length !== 0 && doc.types.length === 0)
+						doc.themes.forEach(function(theme) { emit([theme, ''], newDoc); });
+					else
+						doc.themes.forEach(function(theme) {
+							doc.types.forEach(function(type) {
+								emit([theme, type], newDoc);
+							});
 						});
-					});
 				}
 			}.toString(),
 

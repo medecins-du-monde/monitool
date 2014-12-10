@@ -60,18 +60,12 @@ angular.module('monitool.controllers.indicator', [])
 			mtDatabase.current.put($scope.indicator).then(function(result) {
 				$scope.indicator._rev = result.rev;
 				$scope.master = angular.copy($scope.indicator);
-
-				if ($stateParams.indicatorId === 'new')
-					$state.go('main.indicator.edit', {indicatorId: result.id});
+				$state.go('main.indicators.list');
 			});
 		};
 
 		$scope.isUnchanged = function() {
 			return angular.equals($scope.master, $scope.indicator);
-		};
-
-		$scope.remove = function() {
-			console.log($scope.indicator);
 		};
 
 		$scope.reset = function() {

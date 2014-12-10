@@ -28,7 +28,8 @@ angular
 						var opts = {group_level: 2, startkey: [theme.id], endkey: [theme.id, {}]};
 						mtDatabase.current.query(viewName, opts).then(function(result) {
 							theme.types = result.rows.map(function(row) {
-								return {id: row.key[1], name: typesById[row.key[1]].name, numIndicators: row.value, open: false, loaded: false, indicators: []};
+								var type = typesById[row.key[1]] || {};
+								return {id: row.key[1], name: type.name, numIndicators: row.value, open: false, loaded: false, indicators: []};
 							});
 						});
 					}
@@ -75,23 +76,15 @@ angular
 					
 					scope.$watch('standard', function(newValue, oldValue) {
 						scope.hierarchy = [];
-						if (newValue) {
-							viewName = 'shortlists/indicator_partial_tree';
-							mtDatabase.current.query(viewName, {group_level: 1}).then(function(result) {
-								scope.hierarchy = result.rows.map(function(row) {
-									return {id: row.key[0], name: themesById[row.key[0]].name, numIndicators: row.value, open: false, loaded: false};
-								});
+						viewName = newValue ? 'shortlists/indicator_partial_tree' : 'shortlists/indicator_full_tree';
+						mtDatabase.current.query(viewName, {group_level: 1}).then(function(result) {
+							scope.hierarchy = result.rows.map(function(row) {
+								var theme = themesById[row.key[0]] || {};
+								return {id: row.key[0], name: theme.name, numIndicators: row.value, open: false, loaded: false};
 							});
-						}
-						else {
-							viewName = 'shortlists/indicator_full_tree';
-							for (var id in themesById)
-								if (themesById[id].usage)
-									scope.hierarchy.push({id: id, name: themesById[id].name, numIndicators: themesById[id].usage, open: false, loaded: false});
-						}
+						});
 					});		
 				});
-
 			}
 		}
 	});
