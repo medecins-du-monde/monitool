@@ -48,6 +48,7 @@ var ENGLISH_TRANSLATION = {
 		list: 'List',
 		logout: 'Log Out',
 		change_password: "Change password",
+		detach: "Detach"
 	},
 	menu: {
 		toggle_nav: "Toggle navigation",
@@ -178,8 +179,10 @@ var ENGLISH_TRANSLATION = {
 		
 		new_type_name: "New type name",
 		new_theme_name: "New theme name",
-		only_core: "Only display core indicators"
+		only_core: "Only display core indicators",
 
+		is_recommended: "This is a core indicator",
+		is_not_recommended: "This is not a core indicator",
 	},
 	login: {
 		error: "Invalid username or password",

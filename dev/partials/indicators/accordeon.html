@@ -14,7 +14,8 @@
 		</div>
 
 		<div class="indicator-level-3" ng-repeat="indicator in type.indicators | orderBy:orderField" ng-if="type.open">
-			<i class="fa fa-circle-o" ng-style="{color: indicator.standard ? '#72bb53' : '#d68227'}"></i>
+			<i class="fa fa-circle-o" style="color: #72bb53" ng-if="indicator.standard" tooltip="{{'indicator.is_recommended'|translate}}" tooltip-placement="right"></i>
+			<i class="fa fa-circle-o" style="color: #d68227" ng-if="!indicator.standard" tooltip="{{'indicator.is_not_recommended'|translate}}" tooltip-placement="right"></i>
 
 			<span style="overflow: hidden;">{{indicator.name}}</span>
 

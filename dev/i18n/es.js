@@ -49,7 +49,7 @@ var SPANISH_TRANSLATION = {
 		list: 'Lista',
 		logout: 'Desconectar',
 		change_password: "Cambiar contraseña",
-
+		detach: "Desconectar"
 	},
 	menu: {
 		toggle_nav: "Ver el menu",
@@ -179,7 +179,11 @@ var SPANISH_TRANSLATION = {
 		
 		new_type_name: "Nombre del nuevo tipo",
 		new_theme_name: "Nombre de la nueva temática",
-		only_core: "Ver unicamente los indicadores recomendados"
+		only_core: "Ver unicamente los indicadores recomendados",
+
+		is_recommended: "Este indicador esta recomendado",
+		is_not_recommended: "Este indicador no esta recomendado",
+
 	},
 	login: {
 		error: "Usuario o contraseña inválido",

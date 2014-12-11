@@ -49,7 +49,7 @@ var FRENCH_TRANSLATION = {
 		list: 'Liste',
 		logout: 'Déconnecter',
 		change_password: "Changer le mot de passe",
-
+		detach: "Détacher"
 	},
 	menu: {
 		toggle_nav: "Voir le menu",
@@ -180,7 +180,10 @@ var FRENCH_TRANSLATION = {
 		
 		new_type_name: "Nom du nouveau type",
 		new_theme_name: "Nom de la nouvelle thématique",
-		only_core: "Ne voir que les indicateurs recommandés"
+		only_core: "Ne voir que les indicateurs recommandés",
+
+		is_recommended: "Cet indicateur est recommandé",
+		is_not_recommended: "Cet indicateur n'est pas recommandé",
 	},
 	login: {
 		error: "Identifiant ou mot de passe invalide",

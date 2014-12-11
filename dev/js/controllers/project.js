@@ -63,29 +63,52 @@ angular.module('monitool.controllers.project', [])
 		// contains description of indicators for the loaded project.
 		$scope.indicatorsById = indicatorsById;
 
+		$scope.getAssignedIndicators = function() {
+			var result = [];
+			result = $scope.project.logicalFrame.indicators.concat(result);
+			$scope.project.logicalFrame.purposes.forEach(function(purpose) {
+				result = purpose.indicators.concat(result);
+				purpose.outputs.forEach(function(output) {
+					result = output.indicators.concat(result);
+				});
+			});
+			return result;
+		};
+
 		// handle indicator add, edit and remove are handled in a modal window.
 		$scope.editIndicator = function(indicatorId, target) {
+			var indicatorIdPromise;
 			if (indicatorId === 'new')
-				indicatorId = $modal.open({
+				indicatorIdPromise = $modal.open({
 					templateUrl: 'partials/indicators/selector-popup.html',
 					controller: 'IndicatorChooseController',
 					size: 'lg',
 					resolve: {
-						forbiddenIds: function() { return Object.keys($scope.project.indicators); }
+						forbiddenIds: function() { return target ? $scope.getAssignedIndicators() : Object.keys($scope.project.indicators); }
 					}
 				}).result;
 			else
-				indicatorId = $q.when(indicatorId);
+				indicatorIdPromise = $q.when(indicatorId);
 
-			indicatorId.then(function(indicatorId) {
-				$modal.open({
-					templateUrl: 'partials/projects/logical-frame-indicator.html',
-					controller: 'ProjectLogicalFrameIndicatorController',
-					size: 'lg',
-					scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
-					resolve: {indicatorId: function() { return indicatorId; }, target: function() { return target; }}
-				});
+			indicatorIdPromise.then(function(chosenIndicatorId) {
+				// are we only reparenting an indicator?
+				if (indicatorId === 'new' && $scope.project.indicators[chosenIndicatorId])
+					// put it into new target
+					target.push(chosenIndicatorId);
+				else
+					// edit.
+					$modal.open({
+						templateUrl: 'partials/projects/logical-frame-indicator.html',
+						controller: 'ProjectLogicalFrameIndicatorController',
+						size: 'lg',
+						scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
+						resolve: {indicatorId: function() { return chosenIndicatorId; }, target: function() { return target; }}
+					});
 			});
+		};
+
+		$scope.detachIndicator = function(indicatorId, target) {
+			target.splice(target.indexOf(indicatorId), 1);
 		};
 
 		// handle purpose add and remove
@@ -118,6 +141,14 @@ angular.module('monitool.controllers.project', [])
 		$scope.removeActivity = function(activity, output) {
 			output.activities.splice(output.activities.indexOf(activity), 1);
 		};
+
+		$scope.$watch('project', function(project) {
+			$scope.otherIndicators = Object.keys($scope.project.indicators);
+			$scope.getAssignedIndicators().forEach(function(indicatorId) {
+				if ($scope.otherIndicators.indexOf(indicatorId) !== -1)
+					$scope.otherIndicators.splice($scope.otherIndicators.indexOf(indicatorId), 1);
+			});
+		}, true);
 	})
 
 	/**
@@ -126,16 +157,6 @@ angular.module('monitool.controllers.project', [])
 	 */
 	.controller('ProjectLogicalFrameIndicatorController', function($scope, $modalInstance, mtDatabase, indicatorId, target) {
 		// Retrieve indicator array where we need to add or remove indicator ids.
-		var getIndicatorsList = function() {
-			var path = target.split('.');
-			if (path.length === 1)
-				return $scope.project.logicalFrame.indicators;
-			else if (path.length === 2)
-				return $scope.project.logicalFrame.purposes[path[1]].indicators;
-			else
-				return $scope.project.logicalFrame.purposes[path[1]].outputs[path[2]].indicators;
-		};
-
 		$scope.isNew = !$scope.project.indicators[indicatorId];
 		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
 			relevance: '', baseline: 0,
@@ -163,7 +184,7 @@ angular.module('monitool.controllers.project', [])
 
 		$scope.save = function() {
 			if ($scope.isNew)
-				getIndicatorsList().push(indicatorId);
+				target && target.push(indicatorId);
 
 			$scope.project.indicators[indicatorId] = $scope.planning;
 			$scope.indicatorsById[indicatorId] = $scope.indicator; // inject the indicator in the parent scope.
@@ -171,8 +192,7 @@ angular.module('monitool.controllers.project', [])
 		};
 
 		$scope.delete = function() {
-			var indicators = getIndicatorsList();
-			indicators.splice(indicators.indexOf(indicatorId), 1);
+			target && target.splice(target.indexOf(indicatorId), 1);
 			delete $scope.project.indicators[indicatorId];
 			$modalInstance.close();
 		};
