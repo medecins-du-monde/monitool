@@ -193,19 +193,49 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			indicatorsById: function($stateParams, mtDatabase, project) {
 				var indicatorsById = {};
-				Object.keys(project.indicators).forEach(function(id) { indicatorsById[id] = true; });
 
-				if ($stateParams.formId !== 'new') {
-					var form = 	project.dataCollection.filter(function(form) { return form.id == $stateParams.formId; })[0];
-					Object.keys(form.fields).forEach(function(id) { indicatorsById[id] = true; });
-				}
-
-				mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(indicatorsById)}).then(function(result) {
+				// for now let's say that loading 2 levels is enought for all cases.
+				return mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(project.indicators)}).then(function(result) {
 					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
-				});
 
-				return indicatorsById;
-			}
+					var newIndicatorsIds = {};
+					result.rows.forEach(function(row) {
+						for (var formulaId in row.doc.formulas)
+							for (var key in row.doc.formulas[formulaId].parameters)
+								if (!indicatorsById[row.doc.formulas[formulaId].parameters[key]]) // avoid double retrieve
+									newIndicatorsIds[row.doc.formulas[formulaId].parameters[key]] = true;
+					});
+
+					if (!Object.keys(newIndicatorsIds).length)
+						return indicatorsById;
+					else
+						return mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(newIndicatorsIds)}).then(function(result) {
+							result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
+							return indicatorsById;
+						});
+				});
+			},
+			formulasById: function(indicatorsById) {
+				var formulasById = {};
+				for (var indicatorId in indicatorsById)
+					for (var formulaId in indicatorsById[indicatorId].formulas)
+						formulasById[formulaId] = indicatorsById[indicatorId].formulas[formulaId];
+
+				return formulasById;
+			},
+			form: function($stateParams, project) {
+				if ($stateParams.formId === 'new')
+					return {
+						id: PouchDB.utils.uuid().toLowerCase(), name: "",
+						periodicity: "monthly", useProjectStart: true, useProjectEnd: true,
+						fields: []
+					};
+				else
+					return project.dataCollection.filter(function(form) {
+						return form.id == $stateParams.formId;
+					})[0];
+			},
+
 		}
 	});
 

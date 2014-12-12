@@ -40,7 +40,7 @@
 			</div>
 		</div>
 
-		<div ng-if="form.periodicity == 'monthly' || form.periodicity == 'quarterly' ">
+		<div ng-if="form.periodicity == 'monthly' || form.periodicity == 'quarterly'">
 			<div class="form-group" show-errors>
 				<label for="periodicity" class="col-sm-2 control-label" translate="shared.begin"></label>
 				<div class="col-sm-10">
@@ -89,63 +89,139 @@
 				</div>
 			</div>
 		</div>
-	</fieldset>
 
-	<fieldset>
-		<legend translate="shared.indicators"></legend>
-		
-		<table class="table table-bordered table-stripped" acl-has-project-role="owner">
-			<tr ng-repeat="indicator in chosenIndicators">
-				<td>
-					<input id="ind-{{indicator.id}}" type="checkbox" ng-disabled="indicator.disabled" ng-model="indicator.selected" ng-change="updateFields()" />
-				</td>
-				<td><label style="font-weight: normal" for="ind-{{indicator.id}}">{{indicatorsById[indicator.id].name}}</label></td>
-			</tr>
-		</table>
+		<div class="form-group">
+			<label for="indicators-input" class="col-md-2 control-label" translate="shared.indicators"></label>
+			<div class="col-sm-10">
+				<ui-select multiple ng-model="container.chosenIndicatorIds" theme="bootstrap" acl-has-project-role="owner">
+					<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
+					<ui-select-choices repeat="indicator._id as indicator in availableIndicators">{{indicator.name}}</ui-select-choices>
+				</ui-select>
 
-		<span acl-lacks-project-role="owner">
-			{{chosenIndicators|pluck:'id'|getObjects:indicatorsById|pluck:'name'|join:', '}}
-		</span>
+				<span acl-lacks-project-role="owner">
+					{{container.chosenIndicators | getObjects:availableIndicators | pluck:'name' | join:', '}}
+				</span>
+			</div>
+		</div>
 	</fieldset>
 
 	<fieldset>
 		<legend translate="project.input_form"></legend>
-		
-		<table class="table table-bordered table-stripped">
-			<thead>
-				<tr>
-					<th translate="project.sumable"></th>
-					<th translate="project.input_field"></th>
-					<th translate="project.value_source"></th>
-					<th translate="project.input_mode" acl-has-project-role="owner"></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="(indicatorId, field) in form.fields" ng-if="field.type == 'manual'">
-					<td>
-						<i class="fa fa-check" style="color: green" ng-show="indicatorsById[indicatorId].sumAllowed"></i>
-						<i class="fa fa-times" style="color: red" ng-hide="indicatorsById[indicatorId].sumAllowed"></i>
-					</td>
-					<td>{{indicatorsById[indicatorId].name}}</td>
-					<td acl-has-project-role="owner" acl-fallback="field.source">
-						<input type="text" ng-model="field.source" class="form-control" />
-					</td>
-					<td acl-has-project-role="owner">
-						<div class="btn-group">
-							<button class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-								{{'project.manual_input'|translate}}
-								<span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu" role="menu">
-								<li ng-repeat="(formulaId, formula) in indicatorsById[indicatorId].formulas">
-									<a ng-click="useFormula(indicatorId, formulaId)">{{formula.name}}</a>
-								</li>
-							</ul>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+
+		<!-- FIXME move this to another file... -->
+		<script type="text/ng-template" id="form-sub-element.html">
+			<div class="panel-heading">
+				<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>
+				<i class="fa fa-calculator" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'"></i>
+				<i class="fa fa-link" ng-if="indicator.type.substring(0, 'link'.length) === 'link'"></i>
+
+				<span ng-if="!key"><span translate="shared.indicator"></span>: </span>
+				<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
+				{{indicator.name}}
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-sm-2 control-label" translate="project.indicator_source"></label>
+					<div class="col-sm-10">
+						<select class="form-control"
+								ng-model="indicator.type"
+								ng-change="sourceChanged(indicator)"
+								ng-options="i.value as i.label group by i.group for i in indicator.availableTypes">
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group" ng-if="indicator.type == 'input'">
+					<label class="col-sm-2 control-label" translate="project.source"></label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" ng-model="indicator.source" />
+					</div>
+				</div>
+
+				<div class="panel panel-info"
+					 ng-repeat="(key, indicator) in indicator.parameters"
+					 ng-include="'form-sub-element.html'"></div>
+			</div>
+		</script>
+	
+		<div class="panel panel-primary" ng-repeat="indicator in formElements" ng-include="'form-sub-element.html'"></div>
+
+
+		<!-- [
+			{
+				id: "{indicatorId}",
+				name: "{indicatorName}",
+				source: "sdfjskldf"
+				availableInputs: [
+					{value: 'input', label: '', group: null},
+					{value: 'link:6b533df6-a3e7-486c-b786-99031480c6d0', label: 'another indicator name', group: "link"},
+					{value: 'link:f435209b-778d-480c-ae24-47594d1e1cee', label: 'another indicator name 2', group: "link"},
+					{value: 'compute:738efc88-7c00-4ce4-b451-5cfccd0130ea', label: "formula name", group: "formula"}
+				],
+				input: "link:6b533df6-a3e7-486c-b786-99031480c6d0",
+				dependencies: {
+					a: **RECURSE**,
+					b: **RECURSE**
+				}
+			}
+		]
+
+
+
+
+		<script type="text/ng-template" id="field_renderer.html">
+			{{key}}: 
+			{{indicatorsById[field.id].name}}
+
+			<select ng-options="">
+				<option>Input</option>
+			</select>
+
+			<ul>
+				<li ng-repeat="(key, field) in field.parameters" ng-include="'field_renderer.html'"></li>
+			</ul>
+		</script>
+
+		<ul>
+			<li ng-repeat="field in form.fields" ng-include="'field_renderer.html'"></li>
+		</ul>
+
+<table class="table table-bordered table-stripped">
+	<thead>
+		<tr>
+			<th translate="project.sumable"></th>
+			<th translate="project.input_field"></th>
+			<th translate="project.value_source"></th>
+			<th translate="project.input_mode" acl-has-project-role="owner"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="(indicatorId, field) in form.fields">
+			<td>
+				<i class="fa fa-check" style="color: green" ng-show="indicatorsById[indicatorId].sumAllowed"></i>
+				<i class="fa fa-times" style="color: red" ng-hide="indicatorsById[indicatorId].sumAllowed"></i>
+			</td>
+			<td>{{indicatorsById[indicatorId].name}}</td>
+			<td acl-has-project-role="owner" acl-fallback="field.source">
+				<input type="text" ng-model="field.source" class="form-control" />
+			</td>
+			<td acl-has-project-role="owner">
+				<div class="btn-group">
+					<button class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+						{{'project.manual_input'|translate}}
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+						<li ng-repeat="(formulaId, formula) in indicatorsById[indicatorId].formulas">
+							<a ng-click="useFormula(indicatorId, formulaId)">{{formula.name}}</a>
+						</li>
+					</ul>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+-->
 	</fieldset>
 
 	<div acl-has-project-role="owner">
@@ -155,7 +231,7 @@
 			<span translate="shared.save"></span>
 		</button>
 
-		<button ng-click="reset()" class="btn btn-default">
+		<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
 			<i class="fa fa-undo"></i>
 			<span translate="shared.remove_changes"></span>
 		</button>

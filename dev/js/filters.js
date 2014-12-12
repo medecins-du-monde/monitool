@@ -31,6 +31,9 @@ angular.module('monitool.filters', [])
 	})
 	.filter('getObjects', function() {
 		return function(ids, objects) {
+			objects = objects || {};
+			ids = ids || [];
+
 			var objectsById = {};
 			for (var key in objects) {
 				var obj = objects[key];
@@ -39,5 +42,6 @@ angular.module('monitool.filters', [])
 
 			return ids.map(function(id) { return objectsById[id]; });
 		}
-	});
+	})
+	
 

@@ -1,5 +1,68 @@
 "use strict";
 
+var annotateFormElement = function(formElement, currentPath, indicatorsById) {
+	var indicator = indicatorsById[formElement.id];
+	formElement.name = indicator.name;
+	formElement.path = currentPath;
+	formElement.availableTypes = [{value: 'input', label: 'Input', group: null}]; // input is always allowed
+
+	for (var formulaId in indicator.formulas) {
+		var formula = indicator.formulas[formulaId];
+
+		// Add each formula to the element
+		formElement.availableTypes.push({value: 'compute:' + formulaId, label: formula.name, group: "compute"});
+
+		// if the element is computed, annotate it's sons with the relevant formula and traverse them!
+		if (formElement.type === 'compute:' + formulaId)
+			for (var key in formula.parameters) {
+				formElement.parameters[key].id = indicator.formulas[formulaId].parameters[key];
+				annotateFormElement(formElement.parameters[key], currentPath + '.' + key, indicatorsById);
+			}
+	}
+};
+
+var flatten = function(formElement) {
+	var result = [formElement];
+	for (var key in formElement.parameters)
+		result = result.concat(flatten(formElement.parameters[key]))
+	return result;
+};
+
+var buildLinks = function(formElements, indicatorsById) {
+	// flatten all form elements in an array to iterate it with native methods
+	var flatFormElements = [];
+	formElements.forEach(function(formElement) {
+		flatFormElements = flatFormElements.concat(flatten(formElement));
+	});
+	
+	// we need to add all valid links now.
+	flatFormElements.forEach(function(changingFormElement) {
+		// Remove previously build links.
+		changingFormElement.availableTypes = changingFormElement.availableTypes.filter(function(type) {
+			return type.value.substring(0, "link".length) !== 'link';
+		});
+
+		// Search for all possible links, in O(n), because we're lazy.
+		flatFormElements.forEach(function(linkFormElement) {
+			if (changingFormElement.id === linkFormElement.id
+				&& changingFormElement.path !== linkFormElement.path 
+				&& linkFormElement.type.substring(0, "link".length) !== 'link') {
+
+				var name = indicatorsById[linkFormElement.path.split('.')[0]].name;
+
+				changingFormElement.availableTypes.push({
+					value: 'link:' + linkFormElement.path,
+					label: name + ' > ' + linkFormElement.path.split('.').slice(1).join(' > '),
+					group: 'Lien'
+				});
+			}
+		});
+	});
+};
+
+
+
+
 angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectListController', function($scope, projects) {
@@ -232,99 +295,292 @@ angular.module('monitool.controllers.project', [])
 		$scope.noFormsYet = Object.keys(project.dataCollection).length === 0;
 	})
 
-	.controller('ProjectFormEditionController', function($scope, $state, $stateParams, mtDatabase, project, indicatorsById) {
-		// Build indicator selection
-		var rebuildChosenIndicators = function() {
-			$scope.chosenIndicators = [];
-			Object.keys($scope.project.indicators).forEach(function(indicatorId) {
-				if ($scope.form.fields[indicatorId])
-					$scope.chosenIndicators.push({id: indicatorId, selected: true, disabled: false});
-				else {
-					var disabled = false;
-					$scope.project.dataCollection.forEach(function(form) {
-						if (form.id !== $scope.form.id && form.fields[indicatorId])
-							disabled = true;
-					});
-					$scope.chosenIndicators.push({id: indicatorId, selected: false, disabled: disabled});
-				}
-			});
-		};
-
-		$scope.updateFields = function() {
-			// Retrieve all dependencies of a given indicator, with duplicates (which we do not care about).
-			var getDependenciesRec = function(indicatorId) {
-				var list  = [indicatorId],
-					field = $scope.form.fields[indicatorId];
-				if (field.type === 'computed')
-					for (var key in field.parameters)
-						list = getDependenciesRec(field.parameters[key]).concat(list);
-				return list;
-			};
-
-			var chosenIndicatorIds = $scope.chosenIndicators.filter(function(i) { return i.selected; }).map(function(i) { return i.id; });
-			var usedIndicators = [];
-
-			chosenIndicatorIds.forEach(function(indicatorId) {
-				// if a new indicator was added in the list, add it to fields
-				if (!$scope.form.fields[indicatorId])
-					$scope.form.fields[indicatorId] = {type: 'manual'};
-
-				// traverse dependency tree to remove redundant indicators
-				usedIndicators = getDependenciesRec(indicatorId).concat(usedIndicators);
-			});
-
-			// remove redundant
-			Object.keys($scope.form.fields).forEach(function(indicatorId) {
-				if (usedIndicators.indexOf(indicatorId) === -1)
-					delete $scope.form.fields[indicatorId];
-			});
-		};
-
-		$scope.useFormula = function(indicatorId, formulaId) {
-			var field   = $scope.form.fields[indicatorId],
-				formula = $scope.indicatorsById[indicatorId].formulas[formulaId];
-
-			field.type = 'computed';
-			field.expression = formula.expression;
-			field.parameters = formula.parameters;
-
-			var toLoad = [];
-			for (var parameterName in field.parameters) {
-				var indicatorId = field.parameters[parameterName];
-				if (!$scope.form.fields[indicatorId]) {
-					$scope.form.fields[indicatorId] = {type: 'manual'};
-					toLoad.push(indicatorId);
-				}
-			}
-			mtDatabase.current.allDocs({include_docs: true, keys: toLoad}).then(function(result) {
-				result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
-			});
-		};
-
-		$scope.reset = function() {
-			$scope.project = angular.copy($scope.master);
-			
-			if ($stateParams.formId === 'new') {
-				$scope.form = {
-					id: PouchDB.utils.uuid().toLowerCase(),
-					name: "",
-					periodicity: "monthly",
-					useProjectStart: true,
-					useProjectEnd: true,
-					fields: {}
-				};
-				$scope.project.dataCollection.push($scope.form);
-			}
-			else
-				$scope.form = $scope.project.dataCollection.filter(function(form) {
-					return form.id == $stateParams.formId;
-				})[0];
-
-			rebuildChosenIndicators();
-		};
-
-		$scope.reset();
+	.controller('ProjectFormEditionController', function($scope, $state, $stateParams, mtDatabase, form, indicatorsById, formulasById) {
+		$scope.form = form;
 		$scope.indicatorsById = indicatorsById;
+		$scope.availableIndicators = [];
+		$scope.container = { chosenIndicators: [] };
+
+		if ($stateParams.formId === 'new')
+			$scope.project.dataCollection.push($scope.form);
+
+		// There might be some magic here
+		// Should this watch be executed also when editing scope.form.fields?
+		$scope.$watch(['form.useProjectStart', 'form.start', 'form.useProjectEnd', 'form.end'], function(newValue) {
+			// FIXME WE SHOULD PROMPT THE USER BEFORE CHANGING THE LIST OF INDICATORS.
+
+			// when begin and end change, we need to update the list of available indicators.
+			// the user cannot choose an indicator which is already collected in the same period.
+			$scope.availableIndicators = Object.keys($scope.project.indicators)
+				// .filter(function(indicatorId) { return true; })
+				.map(function(indicatorId) { return indicatorsById[indicatorId]; });
+
+			// Remove those indicators from the list of chosen ones.
+			$scope.container.chosenIndicatorIds = $scope.form.fields
+				.map(function(field) { return field.id; })
+				.filter(function(indicatorId) {
+					return !!$scope.availableIndicators.filter(function(indicator) { return indicator._id == indicatorId; }).length;
+				});
+		});
+
+		// the db version it DRY, and a lot of information is missing for use to display it properly.
+		// We make a copy and annotate it, adding all the data we need
+		$scope.formElements = angular.copy($scope.form.fields);
+		$scope.formElements.forEach(function(formElement) {
+			annotateFormElement(formElement, formElement.id, indicatorsById);
+		});
+		buildLinks($scope.formElements, indicatorsById);
+
+		var deleteFormElement = function(formElements, formElement) {
+
+		};
+
+		// now that's done, we "only" need to monitor changes on the types selects.
+		$scope.sourceChanged = function(indicator) {
+			if (indicator.type === 'input' || indicator.type.substring(0, 'link:'.length) === 'link:')
+				// that's easy, only delete parameters *cleanly*
+				delete indicator.parameters;
+			else {
+				var formula = formulasById[indicator.type.substring('compute:'.length)];
+				indicator.parameters = {};
+				for (var key in formula.parameters) {
+					indicator.parameters[key] = {id: formula.parameters[key], type: "input", source: ''};
+					annotateFormElement(indicator.parameters[key], indicator.path + '.' + key, indicatorsById);
+				}
+			}
+
+			buildLinks($scope.formElements, indicatorsById);
+		};
+
+
+
+
+
+
+		// $scope.formElements = [
+		// 	{
+		// 		id: "97ab3f8e-cdc4-44be-baee-1c8ab7255c07",
+		// 		name: "Nom de l'indicateur",
+		// 		source: "sdfjskldf",
+		// 		type: "compute:738efc88-7c00-4ce4-b451-5cfccd0130ea",
+		// 		availableTypes: [
+		// 			{value: 'input', label: 'Input', group: null},
+		// 			{value: 'link:6b533df6-a3e7-486c-b786-99031480c6d0', label: 'another indicator name', group: "link"},
+		// 			{value: 'link:f435209b-778d-480c-ae24-47594d1e1cee', label: 'another indicator name 2', group: "link"},
+		// 			{value: 'compute:738efc88-7c00-4ce4-b451-5cfccd0130ea', label: "formula name", group: "formula"}
+		// 		],
+		// 		parameters: {
+		// 			a: {
+		// 				id: "e0e0a1dd-e4bf-402f-b605-35c11716b4a9",
+		// 				name: "{indicatorName 1}",
+		// 				source: "sdfjskldf",
+		// 				type: "input",
+		// 				availableTypes: [
+		// 					{value: 'input', label: 'Input', group: null},
+		// 					{value: 'link:6b533df6-a3e7-486c-b786-99031480c6d0', label: 'another indicator name', group: "link"},
+		// 					{value: 'link:f435209b-778d-480c-ae24-47594d1e1cee', label: 'another indicator name 2', group: "link"},
+		// 					{value: 'compute:738efc88-7c00-4ce4-b451-5cfccd0130ea', label: "formula name", group: "formula"}
+		// 				],
+		// 			},
+		// 			b: {
+		// 				id: "320895ac-bf08-44de-989f-f4040ff27867",
+		// 				name: "{indicatorName 2}",
+		// 				source: "sdfjskldf",
+		// 				type: "input",
+		// 				availableTypes: [
+		// 					{value: 'input', label: 'Input', group: null},
+		// 					{value: 'link:6b533df6-a3e7-486c-b786-99031480c6d0', label: 'another indicator name', group: "link"},
+		// 					{value: 'link:f435209b-778d-480c-ae24-47594d1e1cee', label: 'another indicator name 2', group: "link"},
+		// 					{value: 'compute:738efc88-7c00-4ce4-b451-5cfccd0130ea', label: "formula name", group: "formula"}
+		// 				],
+		// 			}
+		// 		}
+		// 	}
+		// ];
+
+
+
+		// when chosenIndicators changes, we need to udate the form's fields
+		// $scope.$watchCollection('container.chosenIndicatorIds', function(newValue, oldValue) {
+		// 	var added   = newValue.filter(function(i) { return oldValue.indexOf(i) === -1; }),
+		// 		removed = oldValue.filter(function(i) { return newValue.indexOf(i) === -1; });
+
+		// 	// Adding indicators means we need to add a manual input
+		// 	added.forEach(function(indicatorId) {
+		// 		$scope.form.fields.push({id: indicatorId, type: 'input'});
+		// 	});
+
+		// 	// Removing indicators means we need to
+		// 	// - delete the entry in the tree.
+		// 	// - promote the first link to it to whatever it is supposed to be really.
+		// 	// - change all links in the rest of the tree.
+		// 	removed.forEach(function(indicatorId) {
+		// 		// we know the indicator is present in the array => this ain't an infinite loop
+		// 		for (var i = 0; i < $scope.form.fields[i].id !== indicatorId; ++i)
+		// 			continue;
+
+		// 		var entry = $scope.form.fields.splice(i, 1)[0];
+		// 		throw new Error('not yet implemented');
+		// 	});
+		// });
+
+		// $scope.$watch('form.fields', function(newValue) {
+		// 	var annotate = function(subForm) {
+		// 		// On a toujours le droit de saisir une feuille a la main
+		// 		subForm.available = [{value: "input", label: "Input"}];
+		// 		// Etablir la liste des formules de calcul.
+		// 		// Faire la recherche de tous les autres indicateurs qui sont en input ou computed pour les liens
+		// 	};
+		// }, true)
+
+
+		// // There might be some magic here
+		// // Should this watch be executed also when editing scope.form.fields?
+		// $scope.$watch(['form.useProjectStart', 'form.start', 'form.useProjectEnd', 'form.end'], function(newValue) {
+		// 	// when begin and end change, we need to update the list of available indicators.
+		// 	// the user cannot choose an indicator which is already collected in the same period.
+		// 	$scope.availableIndicators = Object.keys($scope.project.indicators)
+		// 		// .filter(function(indicatorId) { return true; })
+		// 		.map(function(indicatorId) { return indicatorsById[indicatorId]; });
+
+		// 	// Remove those indicators from the list of chosen ones.
+		// 	$scope.container.chosenIndicatorIds = Object.keys($scope.form.fields).filter(function(indicatorId) {
+		// 		return !!$scope.availableIndicators.filter(function(indicator) {
+		// 			return indicator._id == indicatorId;
+		// 		}).length;
+		// 	});
+		// });
+
+
+		// // when chosenIndicators changes, we need to udate the form's fields
+		// $scope.$watchCollection('container.chosenIndicatorIds', function(newValue) {
+		// 	// Remove from form.fields all indicators that are not relevant, and add missing ones.
+		// 	var indicatorId,
+		// 		relevantIndicatorIds  = angular.copy($scope.container.chosenIndicatorIds),
+		// 		numRelevantIndicators = relevantIndicatorIds.length;
+
+		// 	for (var i = 0; i < numRelevantIndicators; ++i) {
+		// 		indicatorId = relevantIndicatorIds[i];
+				
+		// 		// add missing indicator
+		// 		if (!$scope.form.fields[indicatorId])
+		// 			$scope.form.fields[indicatorId] = {type: "manual", source: ""};
+
+		// 		// queue new relevant indicators that we need to check if they are not already present.
+		// 		else if ($scope.form.fields[indicatorId].type === 'computed')
+		// 			for (var key in $scope.form.fields[indicatorId].parameters)
+		// 				if (relevantIndicatorIds.indexOf($scope.form.fields[indicatorId].parameters[key]) === -1) {
+		// 					relevantIndicatorIds.push($scope.form.fields[indicatorId].parameters[key]);
+		// 					++numRelevantIndicators;
+		// 				}
+		// 	}
+
+		// 	for (indicatorId in $scope.form.fields)
+		// 		if (relevantIndicatorIds.indexOf(indicatorId) === -1)
+		// 			delete $scope.form.fields[indicatorId];
+		// });
+
+
+
+
+
+		// Build indicator selection
+		// var rebuildChosenIndicators = function() {
+		// 	$scope.chosenIndicators = [];
+		// 	Object.keys($scope.project.indicators).forEach(function(indicatorId) {
+		// 		if ($scope.form.fields[indicatorId])
+		// 			$scope.chosenIndicators.push({id: indicatorId, selected: true, disabled: false});
+		// 		else {
+		// 			var disabled = false;
+		// 			$scope.project.dataCollection.forEach(function(form) {
+		// 				if (form.id !== $scope.form.id && form.fields[indicatorId])
+		// 					disabled = true;
+		// 			});
+		// 			$scope.chosenIndicators.push({id: indicatorId, selected: false, disabled: disabled});
+		// 		}
+		// 	});
+		// };
+
+
+		// $scope.updateFields = function() {
+		// 	// Retrieve all dependencies of a given indicator, with duplicates (which we do not care about).
+		// 	var getDependenciesRec = function(indicatorId) {
+		// 		var list  = [indicatorId],
+		// 			field = $scope.form.fields[indicatorId];
+		// 		if (field.type === 'computed')
+		// 			for (var key in field.parameters)
+		// 				list = getDependenciesRec(field.parameters[key]).concat(list);
+		// 		return list;
+		// 	};
+
+
+		// 	var chosenIndicatorIds = $scope.chosenIndicators.filter(function(i) { return i.selected; }).map(function(i) { return i.id; });
+		// 	var usedIndicators = [];
+
+
+		// 	chosenIndicatorIds.forEach(function(indicatorId) {
+		// 		// if a new indicator was added in the list, add it to fields
+		// 		if (!$scope.form.fields[indicatorId])
+		// 			$scope.form.fields[indicatorId] = {type: 'manual'};
+
+		// 		// traverse dependency tree to remove redundant indicators
+		// 		usedIndicators = getDependenciesRec(indicatorId).concat(usedIndicators);
+		// 	});
+
+
+		// 	// remove redundant
+		// 	Object.keys($scope.form.fields).forEach(function(indicatorId) {
+		// 		if (usedIndicators.indexOf(indicatorId) === -1)
+		// 			delete $scope.form.fields[indicatorId];
+		// 	});
+		// };
+
+
+		// $scope.useFormula = function(indicatorId, formulaId) {
+		// 	var field   = $scope.form.fields[indicatorId],
+		// 		formula = $scope.indicatorsById[indicatorId].formulas[formulaId];
+
+		// 	field.type = 'computed';
+		// 	field.expression = formula.expression;
+		// 	field.parameters = formula.parameters;
+
+		// 	var toLoad = [];
+		// 	for (var parameterName in field.parameters) {
+		// 		var indicatorId = field.parameters[parameterName];
+		// 		if (!$scope.form.fields[indicatorId]) {
+		// 			$scope.form.fields[indicatorId] = {type: 'manual'};
+		// 			toLoad.push(indicatorId);
+		// 		}
+		// 	}
+		// 	mtDatabase.current.allDocs({include_docs: true, keys: toLoad}).then(function(result) {
+		// 		result.rows.forEach(function(row) { $scope.indicatorsById[row.id] = row.doc; });
+		// 	});
+		// };
+
+
+		// $scope.reset = function() {
+		// 	$scope.project = angular.copy($scope.master);
+			
+		// 	if ($stateParams.formId === 'new') {
+		// 		$scope.form = {
+		// 			id: PouchDB.utils.uuid().toLowerCase(),
+		// 			name: "",
+		// 			periodicity: "monthly",
+		// 			useProjectStart: true,
+		// 			useProjectEnd: true,
+		// 			fields: {}
+		// 		};
+		// 		$scope.project.dataCollection.push($scope.form);
+		// 	}
+		// 	else
+		// 		$scope.form = $scope.project.dataCollection.filter(function(form) {
+		// 			return form.id == $stateParams.formId;
+		// 		})[0];
+
+		// 	rebuildChosenIndicators();
+		// };
+
+		// $scope.reset();
 	})
 
 	.controller('ProjectInputListController', function($scope, project, inputs) {
