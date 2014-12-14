@@ -271,15 +271,16 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 	};
 
 	var getStatsColumns = function(query) {
-		if (query.groupBy === 'month' || query.groupBy === 'year') {
-			var begin   = moment(query.begin, 'YYYY-MM-DD'),
-				end     = moment(query.end, 'YYYY-MM-DD'),
-				format  = query.groupBy === 'month' ? 'YYYY-MM-DD' : 'YYYY',
+		if (['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1) {
+			var begin   = moment(query.begin, 'YYYY-MM-DD').startOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
+				end     = moment(query.end, 'YYYY-MM-DD').endOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
+				format  = {'year': 'YYYY', 'month': 'YYYY-MM', 'week': 'YYYY-MM-[W]WW', 'day': 'YYYY-MM-DD'}[query.groupBy],
 				current = begin.clone(),
 				cols    = [];
 
 			while (current.isBefore(end) || current.isSame(end)) {
-				cols.push({id: current.format(format), name: current.format(format)});
+				var date = current.format(format);
+				cols.push({id: date, name: date});
 				current.add(1, query.groupBy);
 			}
 
@@ -389,8 +390,9 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 				});
 
 				input.yearAgg   = ['total', period.slice(0, 1).join('-')];
+				input.weekAgg   = ['total', moment(period, 'YYYY-MM-DD').format('YYYY-MM-WW')];
 				input.monthAgg  = ['total', period.slice(0, 2).join('-')];
-				input.dayAgg    = ['total', period.slice(0, 3).join('-')];
+				input.dayAgg    = ['total', period];
 				input.entityAgg = ['total', input.entity];
 				input.groupAgg  = groupIds; // no total here, groups don't sum
 			});
@@ -408,7 +410,7 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 	 * it could be optimized a bit, and extra copy is done at the end
 	 */
 	var regroup = function(inputs, query) {
-		var aggregationKey  = ['year', 'month', 'day'].indexOf(query.groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation',
+		var aggregationKey  = ['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation',
 			globalRegrouped = {};
 
 		// we want to compute all data
