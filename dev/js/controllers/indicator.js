@@ -97,14 +97,14 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.indicator = indicator;
 		$scope.projects = projects;
 
-		$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM');
-		$scope.end     = moment().format('YYYY-MM');
+		$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM-DD');
+		$scope.end     = moment().format('YYYY-MM-DD');
 		$scope.groupBy = 'month';
 		$scope.display = 'value';
 		$scope.plots   = {};
 
-		if ($scope.end > moment().format('YYYY-MM'))
-			$scope.end = moment().format('YYYY-MM');
+		if ($scope.end > moment().format('YYYY-MM-DD'))
+			$scope.end = moment().format('YYYY-MM-DD');
 
 		var getName = function(entityId) {
 			var numProjects = $scope.projects.length;
@@ -178,8 +178,6 @@ angular.module('monitool.controllers.indicator', [])
 	})
 	
 	.controller('ThemeTypeListController', function($scope, $state, entities, mtDatabase) {
-		$scope.canEdit = true;
-
 		entities.sort(function(entity1, entity2) {
 			return entity1.name.localeCompare(entity2.name);
 		});

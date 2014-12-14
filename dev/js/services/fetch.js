@@ -52,20 +52,39 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 		indicator: function(indicatorId) {
 			if (indicatorId === 'new')
 				return $q.when({
-					type: 'indicator',
-					name: '',
-					description: '',
-					history: '',
-					standard: false,
-					sumAllowed: false,
-					types: [],
-					themes: [],
-					formulas: {}
+					type: 'indicator', name: '', description: '', history: '',
+					standard: false, geoAggregation: 'none', timeAggregation: 'none',
+					types: [], themes: [], formulas: {}
 				});
 			else
 				return mtDatabase.current.get(indicatorId);
 		},
-	
+		
+		indicatorsByProject: function(project) {
+			var indicatorsById = {};
+
+			// FIXME for now let's say that loading 2 levels is enought for all cases.
+			return mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(project.indicators)}).then(function(result) {
+				result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
+
+				var newIndicatorsIds = {};
+				result.rows.forEach(function(row) {
+					for (var formulaId in row.doc.formulas)
+						for (var key in row.doc.formulas[formulaId].parameters)
+							if (!indicatorsById[row.doc.formulas[formulaId].parameters[key]]) // avoid double retrieve
+								newIndicatorsIds[row.doc.formulas[formulaId].parameters[key]] = true;
+				});
+
+				if (!Object.keys(newIndicatorsIds).length)
+					return indicatorsById;
+				else
+					return mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(newIndicatorsIds)}).then(function(result) {
+						result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
+						return indicatorsById;
+					});
+			});
+		},
+
 		themes: function() {
 			return mtDatabase.current.query('shortlists/themes_short', {group: true}).then(reformatArray);
 		},
@@ -116,7 +135,7 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 					current = {
 						_id: id, type: 'input',
 						project: p.projectId, entity: p.entityId, form: p.formId, period: p.period,
-						indicators: { }
+						values: { count: 1 }
 					};
 
 				return {current: current, previous: previous};

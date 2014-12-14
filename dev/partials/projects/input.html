@@ -6,50 +6,37 @@
 	<li class="active">{{form.name}}</li>
 </ol>
 
-<table class="table table-bordered table-stripped table-condensed">
-	<thead>
-		<tr>
-			<th ng-style="{width:previousInput?'33%':'50%'}" translate>shared.name</th>
-			<th ng-style="{width:previousInput?'33%':'50%'}">{{input.period}}</th>
-			<th ng-style="{width:previousInput?'33%':'50%'}" ng-if="previousInput">{{previousInput.period}}</th>
-		</tr>
-	</thead>
-	<tbody ng-repeat="(fieldId, field) in fields">
-		<tr>
-			<td>
-				<div>
-				<div>
-				<label for="input-{{field.id}}">
-					<span ng-repeat="color in field.colors"
-						  ng-style="{'background-color': color}">&nbsp;&nbsp;</span> 
-					{{indicatorsById[field.id].name}}
-				</label>
-			</td>
-			<td acl-has-project-role="input" acl-fallback="input.indicators[field.id]">
-				<input id="input-{{field.id}}"
-					   type="number"
-					   ng-model="input.indicators[field.id]"
-					   ng-change="evaluate()"
-					   ng-disabled="field.type == 'computed'"
-					   tooltip-html-unsafe="Source: {{field.source}}"
-					   tooltip-trigger="focus"
-					   class="form-control" />
-			</td>
-			<td ng-if="previousInput" acl-has-project-role="input" acl-fallback="previousInput.indicators[field.id]">
-				<div class="input-group" style="width: 100%">
-					<input type="number"
-						   value="{{previousInput.indicators[field.id]}}"
-						   class="form-control"
-						   disabled />
 
-					<span class="input-group-btn" ng-if="field.type !== 'computed'">
-						<button class="btn btn-primary" type="button" ng-click="copy(field.id)" translate>shared.copy</button>
-					</span>
-				</div>
-			</td>
-		</tr>
-	</tbody>
-</table>
+<script type="text/ng-template" id="form-sub-3.html">
+	<div class="panel-heading">
+		<div class="row">
+			<div class="col-sm-4">
+				<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>
+				<i class="fa fa-calculator" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'" tooltip="{{indicator.expression}}"></i>
+				<i class="fa fa-link" ng-if="indicator.type.substring(0, 'link'.length) === 'link'"></i>
+
+				<span ng-if="!key"><span translate="shared.indicator"></span>: </span>
+				<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
+				{{indicator.name}}
+			</div>
+
+			<div class="col-sm-8" acl-project-has-role="input" acl-fallback="currentInput.values[indicator.model]">
+				<input type="number"
+					   class="form-control input-sm"
+					   ng-model="currentInput.values[indicator.model]"
+					   placeholder="Saisie précédente: {{previousInput.values[indicator.model] || '?'}}"
+					   ng-disabled="indicator.type !== 'input'">
+			</div>
+		</div>
+	</div>
+	<div class="panel-body" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'">
+		<div class="panel panel-info"
+			 ng-repeat="(key, indicator) in indicator.parameters"
+			 ng-include="'form-sub-3.html'"></div>
+	</div>
+</script>
+
+<div class="panel panel-primary" ng-repeat="indicator in form.fields" ng-include="'form-sub-3.html'"></div>
 
 <div acl-has-project-role="input">
 	<button class="btn btn-default" ng-click="save()">

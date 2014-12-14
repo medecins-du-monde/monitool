@@ -39,7 +39,7 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-						<input type="month" class="form-control" ng-model="begin" ng-change="updateData()" required />
+						<input type="date" class="form-control" ng-model="query.begin" ng-change="updateData()" required />
 					</div>
 				</div>
 			</div>
@@ -50,7 +50,9 @@
 
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
-						<select class="form-control" id="group-by-input" ng-model="groupBy" ng-change="updateData()">
+						<select class="form-control" id="group-by-input" ng-model="query.groupBy" ng-change="updateData()">
+							<option value="day" translate>shared.day</option>
+							<option value="week" translate>shared.week</option>
 							<option value="month" translate>shared.month</option>
 							<option value="year" translate>shared.year</option>
 							<option value="entity" translate>shared.input_entity</option>
@@ -64,7 +66,7 @@
 				<label for="colorize-input" class="col-sm-2 control-label" translate>shared.colorize</label>
 				<div class="col-sm-10">
 					<p class="form-control-static">
-						<input type="checkbox" id="colorize-input" ng-model="colorize" />
+						<input type="checkbox" id="colorize-input" ng-model="presentation.colorize" />
 					</p>
 				</div>
 			</div>
@@ -76,7 +78,7 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-						<input type="month" class="form-control" ng-model="end" ng-change="updateData()" required />
+						<input type="date" class="form-control" ng-model="query.end" ng-change="updateData()" required />
 					</div>
 				</div>
 			</div>
@@ -86,7 +88,7 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-eye"></i></span>
-						<select class="form-control" id="display-input" ng-model="display">
+						<select class="form-control" id="display-input" ng-model="presentation.display">
 							<option value="value" translate>shared.values</option>
 							<option value="targetPart" translate>shared.target_percentage</option>
 							<option value="baselinePart" translate>shared.baseline_percentage</option>
@@ -99,7 +101,7 @@
 				<label for="plot-input" class="col-sm-2 control-label" translate>shared.plot</label>
 				<div class="col-sm-10">
 					<p class="form-control-static">
-						<input type="checkbox" id="plot-input" ng-model="plot" />
+						<input type="checkbox" id="plot-input" ng-model="presentation.plot" />
 					</p>
 				</div>
 			</div>
@@ -108,13 +110,13 @@
 </form>
 
 <div class="clearfix">
-	<button class="btn btn-primary btn-xs pull-right" ng-show="plot" ng-click="downloadGraph()">
+	<button class="btn btn-primary btn-xs pull-right" ng-show="presentation.plot" ng-click="downloadGraph()">
 		<i class="fa fa-download"></i>
 		<span translate>shared.download_plot</span>
 	</button>
 </div>
 
-<div id="chart" ng-show="plot" style="overflow: hidden;"></div>
+<div id="chart" ng-show="presentation.plot" style="overflow: hidden;"></div>
 
 <button class="btn btn-primary btn-xs pull-right" ng-click="downloadCSV()" style="margin-bottom: 10px;">
 	<i class="fa fa-download"></i>
@@ -124,23 +126,23 @@
 <table class="table table-bordered table-stripped table-condensed" ng-init="purposeOpen=true">
 	<thead>
 		<tr>
-			<th ng-show="plot"></th>
+			<th ng-show="presentation.plot"></th>
 			<th></th>
 			<th ng-repeat="col in cols">{{col.name || col}}</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td ng-show="plot"></td>
+			<td ng-show="presentation.plot"></td>
 			<td class="section" colspan="{{cols.length + 1}}">
 				{{'project.goal_short'|translate}}: {{project.logicalFrame.goal}}
 			</td>
 		</tr>
 		<tr ng-repeat="indicatorId in project.logicalFrame.indicators">
-			<td ng-show="plot"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" /></td>
+			<td ng-show="presentation.plot"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" /></td>
 			<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-				<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
 					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
 					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
 					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
@@ -150,7 +152,7 @@
 	</tbody>
 	<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
 		<tr>
-			<td ng-show="plot"></td>
+			<td ng-show="presentation.plot"></td>
 			<td class="section indent1" colspan="{{cols.length + 1}}">
 				<a ng-click="purposeOpen=!purposeOpen">
 					<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
@@ -159,7 +161,7 @@
 			</td>
 		</tr>
 		<tr ng-repeat="indicatorId in purpose.indicators" ng-if="purposeOpen">
-			<td ng-show="plot">
+			<td ng-show="presentation.plot">
 				<input id="plot-{{indicatorId}}"
 					   type="checkbox"
 					   ng-model="plots[indicatorId]"
@@ -171,7 +173,7 @@
 				</label>
 			</td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-				<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
 					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
 					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
 					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
@@ -181,7 +183,7 @@
 	</tbody>
 	<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
 		<tr>
-			<td ng-show="plot"></td>
+			<td ng-show="presentation.plot"></td>
 			<td class="section indent2" colspan="{{cols.length + 1}}">
 				<a ng-click="outputOpen=!outputOpen">
 					<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
@@ -190,7 +192,7 @@
 			</td>
 		</tr>
 		<tr ng-repeat="indicatorId in output.indicators" ng-if="outputOpen">
-			<td ng-show="plot">
+			<td ng-show="presentation.plot">
 				<input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" />
 			</td>
 			<td class="indent2">
@@ -199,7 +201,7 @@
 				</label>
 			</td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-				<span ng-switch="display" ng-if="data[col.id][indicatorId]">
+				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
 					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
 					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
 					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>

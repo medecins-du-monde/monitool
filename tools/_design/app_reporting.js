@@ -20,26 +20,41 @@ module.exports = {
 	_id: '_design/reporting',
 
 	views: {
-		// For project by X stats and inputGroup by X stats
-		inputs_by_project_year_month_entity: {
+
+		inputs_by_project_date: {
 			map: function(doc) {
-				if (doc.type === 'input') {
-					var p = doc.period.split('-');
-					emit([doc.project, p[0], p[1], doc.entity], doc.indicators);
-				}
-			}.toString(),
-			reduce: reduceInputs
+				if (doc.type === 'input')
+					emit([doc.project, doc.period]);
+			}.toString()
 		},
 
-		// For input entity by X stats
-		inputs_by_entity_year_month: {
+		inputs_by_entity_date: {
 			map: function(doc) {
-				if (doc.type === 'input') {
-					var p = doc.period.split('-');
-					emit([doc.entity, p[0], p[1]], doc.indicators);
-				}
-			}.toString(),
-			reduce: reduceInputs
-		}
+				if (doc.type === 'input')
+					emit([doc.entity, doc.period]);
+			}.toString()
+		},
+
+		// // For project by X stats and inputGroup by X stats
+		// inputs_by_project_year_month_entity: {
+		// 	map: function(doc) {
+		// 		if (doc.type === 'input') {
+		// 			var p = doc.period.split('-');
+		// 			emit([doc.project, p[0], p[1], doc.entity], doc.values);
+		// 		}
+		// 	}.toString(),
+		// 	reduce: reduceInputs
+		// },
+
+		// // For input entity by X stats
+		// inputs_by_entity_year_month: {
+		// 	map: function(doc) {
+		// 		if (doc.type === 'input') {
+		// 			var p = doc.period.split('-');
+		// 			emit([doc.entity, p[0], p[1]], doc.values);
+		// 		}
+		// 	}.toString(),
+		// 	reduce: reduceInputs
+		// }
 	}
 };

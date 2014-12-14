@@ -143,19 +143,18 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	$stateProvider.state('main.project.input_entities_reporting', {
-		url: '/input-entities/:entityId',
+		url: '/input-entities/:id',
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
 		resolve: {
-			type: function() { return 'entity'; },
-			indicatorsById: function(mtDatabase, project) {
-				var indicatorsById = {};
-				mtDatabase.current.allDocs({keys: Object.keys(project.indicators), include_docs: true}).then(function(result) {
-					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
-				});
-				return indicatorsById;
+			indicatorsById: function(mtFetch, project) {
+				return mtFetch.indicatorsByProject(project);
 			}
+		},
+		data: {
+			type: 'entity',
 		}
+
 	});
 
 	$stateProvider.state('main.project.input_groups', {
@@ -165,18 +164,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	$stateProvider.state('main.project.input_groups_reporting', {
-		url: '/input-groups/:groupId',
+		url: '/input-groups/:id',
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
 		resolve: {
-			type: function() { return 'group'; },
-			indicatorsById: function(mtDatabase, project) {
-				var indicatorsById = {};
-				mtDatabase.current.allDocs({keys: Object.keys(project.indicators), include_docs: true}).then(function(result) {
-					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
-				});
-				return indicatorsById;
+			indicatorsById: function(mtFetch, project) {
+				return mtFetch.indicatorsByProject(project);
 			}
+		},
+		data: {
+			type: 'group',
 		}
 	});
 
@@ -191,29 +188,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/form-edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
-			indicatorsById: function($stateParams, mtDatabase, project) {
-				var indicatorsById = {};
-
-				// for now let's say that loading 2 levels is enought for all cases.
-				return mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(project.indicators)}).then(function(result) {
-					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
-
-					var newIndicatorsIds = {};
-					result.rows.forEach(function(row) {
-						for (var formulaId in row.doc.formulas)
-							for (var key in row.doc.formulas[formulaId].parameters)
-								if (!indicatorsById[row.doc.formulas[formulaId].parameters[key]]) // avoid double retrieve
-									newIndicatorsIds[row.doc.formulas[formulaId].parameters[key]] = true;
-					});
-
-					if (!Object.keys(newIndicatorsIds).length)
-						return indicatorsById;
-					else
-						return mtDatabase.current.allDocs({include_docs: true, keys: Object.keys(newIndicatorsIds)}).then(function(result) {
-							result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
-							return indicatorsById;
-						});
-				});
+			indicatorsById: function(mtFetch, project) {
+				return mtFetch.indicatorsByProject(project)
 			},
 			formulasById: function(indicatorsById) {
 				var formulasById = {};
@@ -231,11 +207,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						fields: []
 					};
 				else
-					return project.dataCollection.filter(function(form) {
-						return form.id == $stateParams.formId;
-					})[0];
-			},
-
+					return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
+			}
 		}
 	});
 
@@ -255,8 +228,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 							project.dataCollection.forEach(function(form) {
 								var periods;
 								if (form.periodicity == 'monthly' || form.periodicity == 'quarterly') {
-									var current = moment(form.useProjectStart ? project.begin : form.begin, 'YYYY-MM'),
-										end     = moment(form.useProjectEnd ? project.end : project.end, 'YYYY-MM');
+									var current = moment(form.useProjectStart ? project.begin : form.begin, 'YYYY-MM-DD'),
+										end     = moment(form.useProjectEnd ? project.end : project.end, 'YYYY-MM-DD');
 
 									if (end.isAfter()) // do not allow to go in the future
 										end = moment();
@@ -275,7 +248,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 								periods.forEach(function(period) {
 									inputs.push({
-										filled: inputExists[[project._id, inputEntity.id, form.id, period.format('YYYY-MM')].join(':')],
+										filled: inputExists[[project._id, inputEntity.id, form.id, period.format('YYYY-MM-DD')].join(':')],
 										period: period,
 										formId: form.id, formName: form.name,
 										inputEntityId: inputEntity.id, inputEntityName: inputEntity.name
@@ -304,7 +277,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/input.html',
 		controller: 'ProjectInputController',
 		resolve: {
-			inputs: function(mtFetch, $stateParams) { return mtFetch.currentPreviousInput($stateParams); }
+			inputs: function(mtFetch, $stateParams) {
+				return mtFetch.currentPreviousInput($stateParams);
+			},
+			indicatorsById: function(mtFetch, project) {
+				return mtFetch.indicatorsByProject(project);
+			},
+			form: function($stateParams, project) {
+				return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
+			}
 		}
 	});
 
@@ -313,16 +294,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
 		resolve: {
-			type: function() { return 'project'; },
-			indicatorsById: function(mtDatabase, project) {
-				var indicatorsById = {};
-				mtDatabase.current.allDocs({keys: Object.keys(project.indicators), include_docs: true}).then(function(result) {
-					result.rows.forEach(function(row) { indicatorsById[row.id] = row.doc; });
-				});
-				return indicatorsById;
+			indicatorsById: function(mtFetch, project) {
+				return mtFetch.indicatorsByProject(project);
 			}
 		},
-
+		data: {
+			type: 'project',
+		}
 	});
 
 	$stateProvider.state('main.project.user_list', {
