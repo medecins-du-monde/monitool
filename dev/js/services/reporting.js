@@ -426,7 +426,7 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 
 			// Retrieve all forms that were made by current form and group them as asked.
 			var formInputs         = inputs.filter(function(input) { return input.form === form.id; }),
-				formRawRegrouped   = sumBy(inputs, query.groupBy + 'Agg'),
+				formRawRegrouped   = sumBy(formInputs, query.groupBy + 'Agg'),
 				formFinalRegrouped = {};
 
 			// "for each month" "for each year" "for each inputEntity", etc...
@@ -464,7 +464,6 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 						if (formRawRegrouped[groupkey][formElement.model] !== undefined)
 							formFinalRegrouped[groupkey][formElement.id] = formRawRegrouped[groupkey][formElement.model];
 					}
-					
 				});
 			}
 
