@@ -203,7 +203,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				if ($stateParams.formId === 'new')
 					return {
 						id: PouchDB.utils.uuid().toLowerCase(), name: "",
-						periodicity: "monthly", useProjectStart: true, useProjectEnd: true,
+						periodicity: "monthly", 
+						useProjectStart: true, useProjectEnd: true, start: project.begin, end: project.end, intermediaryDates: [],
 						fields: []
 					};
 				else
@@ -227,9 +228,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						project.inputEntities.forEach(function(inputEntity) {
 							project.dataCollection.forEach(function(form) {
 								var periods;
-								if (form.periodicity == 'monthly' || form.periodicity == 'quarterly') {
-									var current = moment(form.useProjectStart ? project.begin : form.begin, 'YYYY-MM-DD'),
-										end     = moment(form.useProjectEnd ? project.end : project.end, 'YYYY-MM-DD');
+								if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
+									var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
+
+									var current = moment(form.useProjectStart ? project.begin : form.begin, 'YYYY-MM-DD').startOf(period),
+										end     = moment(form.useProjectEnd ? project.end : project.end, 'YYYY-MM-DD').endOf(period);
 
 									if (end.isAfter()) // do not allow to go in the future
 										end = moment();
@@ -237,23 +240,43 @@ app.config(function($stateProvider, $urlRouterProvider) {
 									periods = [];
 									while (current.isBefore(end)) {
 										periods.push(current.clone());
-										current.add(form.periodicity === 'monthly' ? 1 : 3, 'month');
+										current.add(1, form.periodicity);
 									}
 								}
 								else if (form.periodicity === 'planned') {
-									periods = form.periods;
+									periods = form.intermediaryDates.map(function(period) {
+										return moment(period, 'YYYY-MM-DD');
+									});
+									periods.unshift(moment(form.start, 'YYYY-MM-DD'));
+									periods.push(moment(form.end, 'YYYY-MM-DD'));
 								}
 								else
 									throw new Error(form.periodicity + ' is not a valid periodicity');
 
 								periods.forEach(function(period) {
+									var inputId = [project._id, inputEntity.id, form.id, period.format('YYYY-MM-DD')].join(':');
 									inputs.push({
-										filled: inputExists[[project._id, inputEntity.id, form.id, period.format('YYYY-MM-DD')].join(':')],
+										filled: inputExists[inputId] ? 'yes' : 'no',
 										period: period,
 										formId: form.id, formName: form.name,
-										inputEntityId: inputEntity.id, inputEntityName: inputEntity.name
+										inputEntityId: inputEntity.id,
+										inputEntityName: inputEntity.name
 									});
+
+									delete inputExists[inputId];
 								});
+							});
+						});
+						
+						Object.keys(inputExists).forEach(function(inputId) {
+							var parts = inputId.split(':');
+							inputs.push({
+								filled: 'invalid',
+								period: moment(parts[3], 'YYYY-MM-DD'),
+								formId: parts[2],
+								formName: project.dataCollection.find(function(form) { return form.id === parts[2]; }).name,
+								inputEntityId: parts[1],
+								inputEntityName: project.inputEntities.find(function(entity) { return entity.id === parts[1]; }).name
 							});
 						});
 

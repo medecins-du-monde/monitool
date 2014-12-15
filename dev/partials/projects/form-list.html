@@ -7,16 +7,20 @@
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th translate>shared.name</th>
+			<th translate="shared.name"></th>
+			<th translate="shared.begin"></th>
+			<th translate="shared.end"></th>
 			<th style="width:250px"></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-if="noFormsYet">
-			<td colspan="2" style="text-align: center" translate="project.no_forms"></td>
+			<td colspan="4" style="text-align: center" translate="project.no_forms"></td>
 		</tr>
 		<tr ng-repeat="form in project.dataCollection">
 			<td>{{form.name}}</td>
+			<td>{{form.begin || form.periods[0] || project.begin}}</td>
+			<td>{{form.end || form.periods[form.periods.length - 1] || project.end}}</td>
 			<td>
 				<a class="btn btn-default btn-xs" ui-sref="main.project.form({formId: form.id})">
 					<i class="fa fa-pencil"></i>
@@ -32,7 +36,7 @@
 	</tbody>
 	<tfoot acl-has-project-role="owner">
 		<tr>
-			<td colspan="3">
+			<td colspan="4">
 				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.form({formId: 'new'})" translate>shared.add</button>
 			</td>
 		</tr>

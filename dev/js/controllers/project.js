@@ -44,6 +44,27 @@ angular.module('monitool.controllers.project', [])
 			return angular.equals($scope.master, $scope.project);
 		};
 
+		$scope.getAssignedIndicators = function() {
+			var result = [];
+			result = $scope.project.logicalFrame.indicators.concat(result);
+			$scope.project.logicalFrame.purposes.forEach(function(purpose) {
+				result = purpose.indicators.concat(result);
+				purpose.outputs.forEach(function(output) {
+					result = output.indicators.concat(result);
+				});
+			});
+			return result;
+		};
+
+		$scope.getUnassignedIndicators = function() {
+			var otherIndicators = Object.keys($scope.project.indicators);
+			$scope.getAssignedIndicators().forEach(function(indicatorId) {
+				if (otherIndicators.indexOf(indicatorId) !== -1)
+					otherIndicators.splice(otherIndicators.indexOf(indicatorId), 1);
+			});
+			return otherIndicators;
+		};
+
 		// We restore $scope.master on $scope.project to avoid unsaved changes from a given tab to pollute changes to another one.
 		$scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
 			var pages = ['main.project.logical_frame', 'main.project.input_entities', 'main.project.input_groups', 'main.project.user_list'];
@@ -62,18 +83,6 @@ angular.module('monitool.controllers.project', [])
 	.controller('ProjectLogicalFrameController', function($scope, $state, $q, $modal, indicatorsById) {
 		// contains description of indicators for the loaded project.
 		$scope.indicatorsById = indicatorsById;
-
-		$scope.getAssignedIndicators = function() {
-			var result = [];
-			result = $scope.project.logicalFrame.indicators.concat(result);
-			$scope.project.logicalFrame.purposes.forEach(function(purpose) {
-				result = purpose.indicators.concat(result);
-				purpose.outputs.forEach(function(output) {
-					result = output.indicators.concat(result);
-				});
-			});
-			return result;
-		};
 
 		// handle indicator add, edit and remove are handled in a modal window.
 		$scope.editIndicator = function(indicatorId, target) {
@@ -143,11 +152,7 @@ angular.module('monitool.controllers.project', [])
 		};
 
 		$scope.$watch('project', function(project) {
-			$scope.otherIndicators = Object.keys($scope.project.indicators);
-			$scope.getAssignedIndicators().forEach(function(indicatorId) {
-				if ($scope.otherIndicators.indexOf(indicatorId) !== -1)
-					$scope.otherIndicators.splice($scope.otherIndicators.indexOf(indicatorId), 1);
-			});
+			$scope.otherIndicators = $scope.getUnassignedIndicators();
 		}, true);
 	})
 
@@ -245,6 +250,12 @@ angular.module('monitool.controllers.project', [])
 		$scope.container.chosenIndicatorIds = $scope.form.fields.map(function(field) { return field.id; });
 
 		$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue) {
+			if ($scope.form.useProjectStart)
+				$scope.form.start = $scope.project.begin;
+
+			if ($scope.form.useProjectEnd)
+				$scope.form.end = $scope.project.end;
+
 			// when begin and end change, we need to update the list of available indicators.
 			// the user cannot choose an indicator which is already collected in the same period.
 			$scope.availableIndicators = Object.keys($scope.project.indicators)
@@ -283,6 +294,15 @@ angular.module('monitool.controllers.project', [])
 			// available links are broken because we added/removed elements => rebuild them
 			mtForms.buildLinks($scope.form.fields, indicatorsById);
 		});
+
+		$scope.addIntermediary = function() {
+			if (-1 === $scope.form.intermediaryDates.findIndex(function(key) { return !key; }))
+				$scope.form.intermediaryDates.push(null);
+		};
+
+		$scope.removeIntermediary = function(index) {
+			$scope.form.intermediaryDates.splice(index, 1);
+		};
 
 		// now that's done, we only need to monitor changes on the types selects.
 		$scope.sourceChanged = function(indicator) {
@@ -355,10 +375,12 @@ angular.module('monitool.controllers.project', [])
 	})
 
 	.controller('ProjectReportingController', function($scope, $state, $stateParams, mtReporting, mtForms, indicatorsById) {
-		$scope.entity         = $scope.project.inputEntities.find(function(e) { return e.id === $state.current.data.id; });
-		$scope.group          = $scope.project.inputGroups.find(function(g) { return g.id === $state.current.data.id; });
-		$scope.indicatorsById = indicatorsById;
+		$scope.entity                  = $scope.project.inputEntities.find(function(e) { return e.id === $state.current.data.id; });
+		$scope.group                   = $scope.project.inputGroups.find(function(g) { return g.id === $state.current.data.id; });
+		$scope.indicatorsById          = indicatorsById;
+		$scope.unassignedIndicatorsIds = $scope.getUnassignedIndicators();
 
+		// those 2 hashes represent what the user sees.
 		$scope.presentation = {display: 'value', plot: false, colorize: false};
 		$scope.query = {
 			project: mtReporting.getAnnotatedProjectCopy($scope.project, indicatorsById),
@@ -369,6 +391,7 @@ angular.module('monitool.controllers.project', [])
 			id:      $stateParams.id			// undefined/entityId/groupId
 		};
 
+		// Update loaded inputs when query.begin or query.end changes.
 		$scope.inputs = [];
 		$scope.$watch("[query.begin, query.end]", function() {
 			mtReporting.getInputs($scope.query).then(function(inputs) {
@@ -376,61 +399,58 @@ angular.module('monitool.controllers.project', [])
 			});
 		}, true);
 
+		// Update cols and data when grouping or inputs changes.
 		$scope.$watch("[query.groupBy, inputs]", function() {
 			$scope.cols = mtReporting.getStatsColumns($scope.query);
 			$scope.data = mtReporting.regroup($scope.inputs, $scope.query);
 		}, true);
 
+		// we should use a proper directive that relies on the scope instead of doing that in the controller with watches.
+		var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
+		$scope.plots = {};
+		$scope.$watch('[plots, query.begin, query.end, query.groupBy, inputs, presentation.display]', function(newValue, oldValue) {
+			var allIndicatorsIds = [], removedIndicatorIds = [];
+			Object.keys($scope.indicatorsById).forEach(function(indicatorId) {
+				newValue[0][indicatorId] && allIndicatorsIds.push(indicatorId);
+				!newValue[0][indicatorId] && oldValue[0][indicatorId] && removedIndicatorIds.push(indicatorId);
+			});
 
-		// var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
-		// $scope.plots          = {};
+			var cols = ['x'].concat($scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; })),
+				rows = allIndicatorsIds.map(function(indicatorId) {
+					var column = [$scope.indicatorsById[indicatorId].name];
+					$scope.cols.forEach(function(col) {
+						if (col.id === 'total')
+							return;
+						
+						if ($scope.data[col.id] && $scope.data[col.id][indicatorId])
+							column.push($scope.data[col.id][indicatorId][$scope.presentation.display] || 0);
+						else
+							column.push(0);
+					});
+					return column;
+				});
 
-		// $scope.updateGraph = function(changedIndicatorId) {
-		// 	var cols      = $scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; }),
-		// 		chartData = {
-		// 			type: $scope.groupBy === 'month' || $scope.groupBy === 'year' ? 'line' : 'bar',
-		// 			columns: [['x'].concat(cols)] // x-axis
-		// 		};
+			chart.load({
+				type: ['year', 'month', 'week', 'day'].indexOf($scope.query.groupBy) !== -1 ? 'line' : 'bar',
+				unload: removedIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId].name; }),
+				columns: [cols].concat(rows)
+			});
+		}, true);
 
-		// 	if (changedIndicatorId && !$scope.plots[changedIndicatorId])
-		// 		chartData.unload = [$scope.indicatorsById[changedIndicatorId].name];
+		$scope.downloadGraph = function() {
+			var filename  = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.png',
+				sourceSVG = document.querySelector("svg");
 
-		// 	for (var indicatorId in $scope.plots) {
-		// 		if ($scope.plots[indicatorId]) {
-		// 			// Retrieve name
-		// 			var column = [$scope.indicatorsById[indicatorId].name];
+			saveSvgAsPng(sourceSVG, filename, 1);
+		};
 
-		// 			// iterate on months, centers, etc
-		// 			$scope.cols.forEach(function(col) {
-		// 				if (col.id !== 'total') {
-		// 					if ($scope.data[col.id] && $scope.data[col.id][indicatorId])
-		// 						column.push($scope.data[col.id][indicatorId][$scope.display] || 0);
-		// 					else
-		// 						column.push(0);
-		// 				}
-		// 			});
+		$scope.downloadCSV = function() {
+			var csvDump = mtReporting.exportProjectStats($scope.cols, $scope.project, $scope.indicatorsById, $scope.data),
+				blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
+				name    = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.csv';
 
-		// 			chartData.columns.push(column);
-		// 		}
-		// 	}
-
-		// 	chart.load(chartData);
-		// };
-
-		// $scope.downloadGraph = function() {
-		// 	var filename  = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.png',
-		// 		sourceSVG = document.querySelector("svg");
-
-		// 	saveSvgAsPng(sourceSVG, filename, 1);
-		// };
-
-		// $scope.downloadCSV = function() {
-		// 	var csvDump = mtReporting.exportProjectStats($scope.cols, $scope.project, $scope.indicatorsById, $scope.data),
-		// 		blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
-		// 		name    = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.csv';
-
-		// 	saveAs(blob, name);
-		// };
+			saveAs(blob, name);
+		};
 	})
 
 	.controller('ProjectUserListController', function($scope, mtDatabase, project, users) {

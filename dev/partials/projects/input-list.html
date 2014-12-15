@@ -21,11 +21,11 @@
 		<tr ng-if="!inputs.length">
 			<td colspan="5" style="text-align: center" translate>project.no_waiting_inputs</td>
 		</tr>
-		<tr ng-repeat="input in inputs" ng-if="!input.filled || showFinished">
+		<tr ng-repeat="input in inputs" ng-if="input.filled == 'no' || input.filled == 'invalid' || showFinished">
 			<td>
 				<i ng-init="ok=input.filled"
-				   ng-class="{fa: true, 'fa-check': ok, 'fa-times': !ok}"
-				   ng-style="{color:ok?'green':'red'}"></i>
+				   ng-class="{fa: true, 'fa-check': input.filled=='yes', 'fa-times': input.filled=='no', 'fa-calendar': input.filled=='invalid'}"
+				   ng-style="{color:{yes:'green',no:'red',invalid:'orange'}[input.filled]}"></i>
 			</td>
 			<td>{{input.period | amDateFormat: 'D MMMM YYYY'}}</td>
 			<td>{{input.inputEntityName}}</td>

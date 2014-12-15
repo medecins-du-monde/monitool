@@ -390,9 +390,9 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 				});
 
 				input.yearAgg   = ['total', period.slice(0, 1).join('-')];
-				input.weekAgg   = ['total', moment(period, 'YYYY-MM-DD').format('YYYY-MM-WW')];
+				input.weekAgg   = ['total', moment(input.period, 'YYYY-MM-DD').format('YYYY-MM-[W]WW')];
 				input.monthAgg  = ['total', period.slice(0, 2).join('-')];
-				input.dayAgg    = ['total', period];
+				input.dayAgg    = ['total', input.period];
 				input.entityAgg = ['total', input.entity];
 				input.groupAgg  = groupIds; // no total here, groups don't sum
 			});
@@ -449,18 +449,20 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 				// This may not succeed, but that's OK: the user was warned when the form was created.
 				formFinalRegrouped[groupkey] = {};
 				form.fields.forEach(function(formElement) {
+
 					// if the value was computed by simple sum or average, take it.
-					if (formRawRegrouped[groupkey][formElement.id] !== undefined)
-						formFinalRegrouped[groupkey][formElement.id] = formRawRegrouped[groupkey][formElement.id];
+					if (formRawRegrouped[groupkey][formElement.model] !== undefined)
+						formFinalRegrouped[groupkey][formElement.id] = formRawRegrouped[groupkey][formElement.model];
 
 					// otherwise, try to compute it.
 					else {
 						mtForms.evaluate(formElement, form.fields, formRawRegrouped[groupkey]);
 
 						// try again to take it
-						if (formRawRegrouped[groupkey][formElement.id] !== undefined)
-							formFinalRegrouped[groupkey][formElement.id] = formRawRegrouped[groupkey][formElement.id];
+						if (formRawRegrouped[groupkey][formElement.model] !== undefined)
+							formFinalRegrouped[groupkey][formElement.id] = formRawRegrouped[groupkey][formElement.model];
 					}
+					
 				});
 			}
 
@@ -470,11 +472,11 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 				if (!globalRegrouped[groupkey])
 					globalRegrouped[groupkey] = {};
 
-				for (var indicatorModel in formFinalRegrouped[groupkey]) {
-					if (globalRegrouped[groupkey][indicatorModel] !== undefined)
-						globalRegrouped[groupkey][indicatorModel] = 'CONFLICT';
+				for (var indicatorId in formFinalRegrouped[groupkey]) {
+					if (globalRegrouped[groupkey][indicatorId] !== undefined)
+						globalRegrouped[groupkey][indicatorId] = 'CONFLICT';
 					else
-						globalRegrouped[groupkey][indicatorModel] = formFinalRegrouped[groupkey][indicatorModel]
+						globalRegrouped[groupkey][indicatorId] = formFinalRegrouped[groupkey][indicatorId]
 				}
 			}
 		});
