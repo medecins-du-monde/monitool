@@ -143,6 +143,8 @@ reportingServices.factory('mtForms', function() {
 		delete formElement.keyPath;
 		delete formElement.indicatorPath;
 		delete formElement.model;
+		delete formElement.timeAggregation;
+		delete formElement.geoAggregation;
 	};
 
 	var deAnnotateAllFormElements = function(formElements) {

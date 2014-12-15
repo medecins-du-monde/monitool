@@ -16,7 +16,7 @@
 			<tr ng-if="!project.inputEntities.length">
 				<td colspan="2" style="text-align: center" translate>project.no_input_entities</td>
 			</tr>
-			<tr ng-repeat="inputEntity in project.inputEntities">
+			<tr ng-repeat="inputEntity in project.inputEntities track by inputEntity.id">
 				<td acl-has-project-role="owner" acl-fallback="inputEntity.name">
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">

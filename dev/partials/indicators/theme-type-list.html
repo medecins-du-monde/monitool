@@ -13,7 +13,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="(entityIndex, entity) in entities">
+		<tr ng-repeat="(entityIndex, entity) in entities track by entity._id">
 			<td acl-has-role="indicator" acl-fallback="entity.name">
 				<ng-form name="entityForm">
 					<div class="form-group" show-errors style="margin: 0">

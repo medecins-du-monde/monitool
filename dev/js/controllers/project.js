@@ -25,7 +25,8 @@ angular.module('monitool.controllers.project', [])
 			if ($stateParams.projectId === 'new')
 				$scope.project._id = PouchDB.utils.uuid().toLowerCase();
 
-			mtDatabase.current.put($scope.project).then(function(result) {
+			var cleanProject = JSON.parse(angular.toJson($scope.project));
+			mtDatabase.current.put(cleanProject).then(function(result) {
 				$scope.project._rev = result.rev;
 				$scope.master = angular.copy($scope.project);
 
@@ -419,13 +420,12 @@ angular.module('monitool.controllers.project', [])
 				rows = allIndicatorsIds.map(function(indicatorId) {
 					var column = [$scope.indicatorsById[indicatorId].name];
 					$scope.cols.forEach(function(col) {
-						if (col.id === 'total')
-							return;
-						
-						if ($scope.data[col.id] && $scope.data[col.id][indicatorId])
-							column.push($scope.data[col.id][indicatorId][$scope.presentation.display] || 0);
-						else
-							column.push(0);
+						if (col.id !== 'total') {
+							if ($scope.data[col.id] && $scope.data[col.id][indicatorId])
+								column.push($scope.data[col.id][indicatorId][$scope.presentation.display] || 0);
+							else
+								column.push(0);
+						}
 					});
 					return column;
 				});

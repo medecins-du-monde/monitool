@@ -17,7 +17,7 @@
 			<tr ng-if="!project.inputGroups.length">
 				<td colspan="3" style="text-align: center" translate>project.no_input_groups</td>
 			</tr>
-			<tr ng-repeat="inputGroup in project.inputGroups">
+			<tr ng-repeat="inputGroup in project.inputGroups track by inputGroup.id">
 				<td acl-has-project-role="owner" acl-fallback="inputGroup.name">
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
