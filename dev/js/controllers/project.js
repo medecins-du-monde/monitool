@@ -422,25 +422,25 @@ angular.module('monitool.controllers.project', [])
 				newValue[0][indicatorId] && allIndicatorsIds.push(indicatorId);
 				!newValue[0][indicatorId] && oldValue[0][indicatorId] && removedIndicatorIds.push(indicatorId);
 			});
-
-			var cols = ['x'].concat($scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; })),
-				rows = allIndicatorsIds.map(function(indicatorId) {
-					var column = [$scope.indicatorsById[indicatorId].name];
-					$scope.cols.forEach(function(col) {
-						if (col.id !== 'total') {
-							if ($scope.data[col.id] && $scope.data[col.id][indicatorId])
-								column.push($scope.data[col.id][indicatorId][$scope.presentation.display] || 0);
-							else
-								column.push(0);
-						}
-					});
-					return column;
-				});
-
+			
 			chart.load({
 				type: ['year', 'month', 'week', 'day'].indexOf($scope.query.groupBy) !== -1 ? 'line' : 'bar',
 				unload: removedIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId].name; }),
-				columns: [cols].concat(rows)
+				columns: [
+						['x'].concat($scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; }))
+					]
+					.concat(allIndicatorsIds.map(function(indicatorId) {
+						var column = [$scope.indicatorsById[indicatorId].name];
+						$scope.cols.forEach(function(col) {
+							if (col.id !== 'total') {
+								if ($scope.data[col.id] && $scope.data[col.id][indicatorId])
+									column.push($scope.data[col.id][indicatorId][$scope.presentation.display] || 0);
+								else
+									column.push(0);
+							}
+						});
+						return column;
+					}))
 			});
 		}, true);
 

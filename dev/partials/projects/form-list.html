@@ -19,8 +19,8 @@
 		</tr>
 		<tr ng-repeat="form in project.dataCollection">
 			<td>{{form.name}}</td>
-			<td>{{form.begin || form.periods[0] || project.begin}}</td>
-			<td>{{form.end || form.periods[form.periods.length - 1] || project.end}}</td>
+			<td>{{form.start}}</td>
+			<td>{{form.end}}</td>
 			<td>
 				<a class="btn btn-default btn-xs" ui-sref="main.project.form({formId: form.id})">
 					<i class="fa fa-pencil"></i>
@@ -36,5 +36,5 @@
 				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.form({formId: 'new'})" translate>shared.add</button>
 			</td>
 		</tr>
-	</tfoot>	
+	</tfoot>
 </table>

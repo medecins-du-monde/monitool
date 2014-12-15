@@ -409,7 +409,7 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 
 	/**
 	 * This function regroup inputs into a usable 2 level hash. ex: {2014-01: {indicatorId: 455}}
-	 * it could be optimized a bit, and extra copy is done at the end
+	 * it could be optimized a bit: an extra copy is done at the end, and when we have nested compute: values, the subtree is evaluated as many times.
 	 */
 	var regroup = function(inputs, query) {
 		var aggregationKey  = ['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation',
