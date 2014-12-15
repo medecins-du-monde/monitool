@@ -238,7 +238,7 @@ angular.module('monitool.controllers.project', [])
 		$scope.noFormsYet = Object.keys(project.dataCollection).length === 0;
 	})
 
-	.controller('ProjectFormEditionController', function($scope, mtForms, form, indicatorsById, formulasById) {
+	.controller('ProjectFormEditionController', function($scope, $stateParams, mtForms, form, indicatorsById, formulasById) {
 		$scope.availableIndicators = [];
 		$scope.container = { chosenIndicators: [] }; // we wrap chosenIndicators in a container for ui-select...
 
@@ -248,6 +248,7 @@ angular.module('monitool.controllers.project', [])
 		mtForms.annotateAllFormElements($scope.form.fields, indicatorsById);
 		mtForms.buildLinks($scope.form.fields, indicatorsById);
 		$scope.master = angular.copy($scope.form);
+		$scope.isNew = $stateParams.formId === 'new';
 		$scope.container.chosenIndicatorIds = $scope.form.fields.map(function(field) { return field.id; });
 
 		$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue) {
@@ -303,6 +304,12 @@ angular.module('monitool.controllers.project', [])
 
 		$scope.removeIntermediary = function(index) {
 			$scope.form.intermediaryDates.splice(index, 1);
+		};
+
+		$scope.move = function(index, direction) {
+			var element = $scope.form.fields.splice(index, 1);
+			// if (direction === 1)
+				$scope.form.fields.splice(index + direction, 0, element[0]);
 		};
 
 		// now that's done, we only need to monitor changes on the types selects.

@@ -203,7 +203,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				if ($stateParams.formId === 'new')
 					return {
 						id: PouchDB.utils.uuid().toLowerCase(), name: "",
-						periodicity: "monthly", 
+						periodicity: "month", 
 						useProjectStart: true, useProjectEnd: true, start: project.begin, end: project.end, intermediaryDates: [],
 						fields: []
 					};

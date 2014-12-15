@@ -7,6 +7,20 @@
 </ol>
 
 <form class="form-horizontal" role="form" name="formForm" novalidate>
+	<div class="alert alert-danger" ng-if="!isNew">
+		<strong>Attention</strong><br/>
+		Tous les changements que vous réalisez sur un formulaire sont rétroactifs.<br/>
+		<ul>
+			<li>Si vous changez les dates de début et fin ou la périodicité, les saisies supplémentaires seront invalidés.</li>
+			<li>Si vous supprimez, ou changez la méthode de calcul d'un indicateur tout son historique de saisie sera invalidé.</li>
+		</ul>
+		<br/>
+		Plutôt que réaliser des modifications, la bonne approche est le plus souvent de:
+		<ul>
+			<li>Changer la date de fin du formulaire utilisé.</li>
+			<li>De créer un nouveau formulaire qui commence à cette date avec les modifications à réaliser.</li>
+		</ul>
+	</div>
 
 	<fieldset>
 		<legend translate="project.data_collection"></legend>
@@ -28,11 +42,8 @@
 
 		<div class="form-group" show-errors>
 			<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="'project.'+form.periodicity|translate">
-				<select class="form-control"
-						name="periodicity"
-						id="periodicity-input"
-						ng-model="form.periodicity">
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="'project.'+form.periodicity+'ly'|translate">
+				<select class="form-control" name="periodicity" id="periodicity-input" ng-model="form.periodicity">
 					<option value="day" translate="project.daily"></option>
 					<option value="week" translate="project.weekly"></option>
 					<option value="month" translate="project.monthly"></option>
@@ -100,9 +111,9 @@
 
 					<input type="date"
 						   class="form-control"
+						   name="end"
 						   ng-model="form.end"
 						   ng-disabled="form.useProjectEnd"
-						   name="end"
 						   ng-required="!form.useProjectEnd" />
 				</div>
 
@@ -136,8 +147,10 @@
 		<script type="text/ng-template" id="form-sub-element.html">
 			<div class="panel-heading">
 				<span class="pull-right" style="font-size: 18px;">
-					<i class="fa fa-compass" ng-style="{color: indicator.geoAggregation != 'none' ? 'green' : 'red'}" tooltip="Aggrégation géographique"></i>
-					<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregation != 'none' ? 'green' : 'red'}" tooltip="Aggrégation dans le temps"></i>
+					<i class="fa fa-caret-square-o-up" ng-if="!key && !$first" ng-click="move($index, -1)" tooltip="{{'project.move_up'|translate}}"></i>
+					<i class="fa fa-caret-square-o-down" ng-if="!key && !$last" ng-click="move($index, 1)" tooltip="{{'project.move_down'|translate}}"></i>
+					<i class="fa fa-compass" ng-style="{color: indicator.geoAggregation != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.geo_aggregation'|translate}}"></i>
+					<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregation != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.time_aggregation'|translate}}"></i>
 				</span>
 
 				<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>
