@@ -85,15 +85,17 @@
 </form>
 
 <div class="clearfix">
-	<button class="btn btn-primary btn-xs pull-right" ng-show="presentation.plot" ng-click="downloadGraph()">
+	<button class="btn btn-primary btn-xs pull-right" ng-show="presentation.plot" svg-save="imageFilename">
 		<i class="fa fa-download"></i>
-		<span translate>shared.download_plot</span>
+		<span translate="shared.download_plot"></span>
 	</button>
 </div>
 
 <div id="chart" ng-show="presentation.plot" style="overflow: hidden;"></div>
 
-<button class="btn btn-primary btn-xs pull-right" ng-click="downloadCSV()" style="margin-bottom: 10px;">
+<button class="btn btn-primary btn-xs pull-right"
+		style="margin-bottom: 10px;"
+		project-csv-save indicators-by-id="indicatorsById" query="query" data="data" cols="cols">
 	<i class="fa fa-download"></i>
 	<span translate>shared.download_table</span>
 </button>

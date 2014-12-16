@@ -470,22 +470,9 @@ angular.module('monitool.controllers.project', [])
 						return column;
 					}))
 			});
+
+			$scope.imageFilename = [$scope.query.project.name, $scope.query.begin, $scope.query.end].join('_') + '.png';
 		}, true);
-
-		$scope.downloadGraph = function() {
-			var filename  = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.png',
-				sourceSVG = document.querySelector("svg");
-
-			saveSvgAsPng(sourceSVG, filename, 1);
-		};
-
-		$scope.downloadCSV = function() {
-			var csvDump = mtReporting.exportProjectStats($scope.cols, $scope.project, $scope.indicatorsById, $scope.data),
-				blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
-				name    = [$scope.project.name, $scope.begin, $scope.end].join('_') + '.csv';
-
-			saveAs(blob, name);
-		};
 	})
 
 	.controller('ProjectUserListController', function($scope, mtDatabase, project, users) {

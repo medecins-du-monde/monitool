@@ -35,6 +35,14 @@ module.exports = {
 			}.toString()
 		},
 
+		inputs_by_form_date: {
+			map: function(doc) {
+				if (doc.type === 'input')
+					emit([doc.form, doc.period]);
+			}.toString()
+		},
+
+
 		// // For project by X stats and inputGroup by X stats
 		// inputs_by_project_year_month_entity: {
 		// 	map: function(doc) {

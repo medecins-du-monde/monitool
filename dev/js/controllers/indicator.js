@@ -91,90 +91,72 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.themes = themes;
 	})
 	
-	.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects) {
-		var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
-
+	.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, indicatorsById) {
 		$scope.indicator = indicator;
-		$scope.projects = projects;
+		$scope.projects  = projects;
 
-		$scope.begin   = moment().subtract(1, 'year').format('YYYY-MM-DD');
-		$scope.end     = moment().format('YYYY-MM-DD');
-		$scope.groupBy = 'month';
-		$scope.display = 'value';
-		$scope.plots   = {};
-
-		if ($scope.end > moment().format('YYYY-MM-DD'))
-			$scope.end = moment().format('YYYY-MM-DD');
-
-		var getName = function(entityId) {
-			var numProjects = $scope.projects.length;
-			for (var i = 0; i < numProjects; ++i) {
-				if ($scope.projects[i]._id == entityId)
-					return $scope.projects[i].name;
-
-				var numEntities = $scope.projects[i].inputEntities.length;
-				for (var j = 0; j < numEntities; ++j)
-					if ($scope.projects[i].inputEntities[j].id === entityId)
-						return $scope.projects[i].inputEntities[j].name;
-			}
+		$scope.presentation = {display: 'value', plot: false, colorize: false};
+		$scope.query = {
+			type: "indicator",
+			indicator: $scope.indicator,
+			projects: $scope.projects.map(function(p) { return mtReporting.getAnnotatedProjectCopy(p, indicatorsById); }),
+			begin: mtReporting.getDefaultStartDate(),
+			end: mtReporting.getDefaultEndDate(),
+			groupBy: 'month',
 		};
 
-		// Retrieve inputs
-		$scope.updateData = function() {
-			$scope.cols = mtReporting.getStatsColumns(null, $scope.begin, $scope.end, $scope.groupBy, null, null);
-
-			mtReporting.getIndicatorStats($scope.indicator, $scope.projects, $scope.begin, $scope.end, $scope.groupBy).then(function(data) {
-				$scope.data = data;
-				if ($scope.plot)
-					$scope.updateGraph();
+		$scope.inputs = [];
+		$scope.$watch("[query.begin, query.end]", function() {
+			mtReporting.getInputs($scope.query).then(function(inputs) {
+				$scope.inputs = inputs;
 			});
-		};
+		}, true);
 
-		$scope.updateGraph = function(changedEntityId) {
-			var cols      = $scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; }),
-				chartData = {type: 'line', columns: [['x'].concat(cols)]};
+		// Update cols and data when grouping or inputs changes.
+		$scope.$watch("[query.groupBy, inputs]", function() {
+			$scope.cols = mtReporting.getStatsColumns($scope.query);
+			$scope.data = mtReporting.regroupIndicator($scope.inputs, $scope.query);
+		}, true);
 
-			if (changedEntityId && !$scope.plots[changedEntityId])
-				chartData.unload = [getName(changedEntityId)];
+		var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
+		$scope.plots = {};
+		$scope.$watch('[plots, query.begin, query.end, query.groupBy, inputs, presentation.display]', function(newValue, oldValue) {
+			var allEntityIds = [], removedEntityIds = [], idToName = {};
+			$scope.query.projects.forEach(function(project) {
+				newValue[0][project._id] && allEntityIds.push(project._id);
+				!newValue[0][project._id] && oldValue[0][project._id] && removedEntityIds.push(project._id);
+				idToName[project._id] = project.name;
+				
+				project.inputEntities.forEach(function(entity) {
+					newValue[0][entity.id] && allEntityIds.push(entity.id);
+					!newValue[0][entity.id] && oldValue[0][entity.id] && removedEntityIds.push(entity.id);
+					idToName[entity.id] = entity.name;
+				});
+			});
 
-			for (var entityId in $scope.plots) {
-				if ($scope.plots[entityId]) {
-					// Retrieve name
-					var column = [getName(entityId)];
+			chart.load({
+				type: 'line',
+				unload: removedEntityIds.map(function(entityId) { return idToName[entityId]; }),
+				columns: [
+						['x'].concat($scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; }))
+					]
+					.concat(allEntityIds.map(function(entityId) {
+						var column = [idToName[entityId]];
+						$scope.cols.forEach(function(col) {
+							if (col.id !== 'total') {
+								if ($scope.data[entityId] && $scope.data[entityId][col.id] && $scope.data[entityId][col.id][indicator._id])
+									column.push($scope.data[entityId][col.id][indicator._id][$scope.presentation.display] || 0);
+								else
+									column.push(0);
+							}
+						});
+						return column;
+					}))
+			});
 
-					// iterate on months, centers, etc
-					$scope.cols.forEach(function(col) {
-						if (col.id !== 'total') {
-							if ($scope.data[col.id] && $scope.data[col.id][entityId] && $scope.data[col.id][entityId][indicator._id])
-								column.push($scope.data[col.id][entityId][indicator._id][$scope.display] || 0);
-							else
-								column.push(0);
-						}
-					});
+			$scope.imageFilename = [$scope.query.indicator.name, $scope.query.begin, $scope.query.end].join('_') + '.png';
 
-					chartData.columns.push(column);
-				}
-			}
-
-			chart.load(chartData);
-		};
-
-		$scope.downloadCSV = function() {
-			var csvDump = mtReporting.exportIndicatorStats($scope.cols, $scope.projects, indicator, $scope.data),
-				blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
-				name    = [indicator.name, $scope.begin, $scope.end].join('_') + '.csv';
-
-			saveAs(blob, name);
-		};
-
-		// $scope.downloadGraph = function() {
-		// 	var filename  = [indicator.name, $scope.begin, $scope.end].join('_') + '.png',
-		// 		sourceSVG = document.querySelector("svg");
-			
-		// 	saveSvgAsPng(sourceSVG, filename, 1);
-		// };
-
-		$scope.updateData();
+		}, true);
 	})
 	
 	.controller('ThemeTypeListController', function($scope, $state, entities, mtDatabase) {

@@ -24,8 +24,12 @@ var ENGLISH_TRANSLATION = {
 
 		view_stats: 'Display reporting',
 		members: 'Members',
+
+		day: 'Day',
+		week: 'Week',
 		month: 'Month',
 		year: "Year",
+		
 		done: 'Done',
 		copy: 'Copy',
 		choose: 'Choose',
@@ -111,7 +115,7 @@ var ENGLISH_TRANSLATION = {
 
 		goal: 'Main goal',
 		goal_short: "Goal",
-		intervention_logic: '',				// Logique d\'intervention
+		intervention_logic: 'Description',				// Logique d\'intervention
 		intervention_logic_goal_ph: '',		// Description de la contribution du projet aux objectifs (impact) d\'une politique ou d\'un programme
 		intervention_logic_purpose_ph: '',	// Description des avantages directs destinés au(x) groupe(s) cible(s)
 		assumptions_purpose_ph: '',			// Si l\'objectif spécifique est atteint, quelles hypothèses doivent être confirmées pour atteindre l\'objectif général?
@@ -149,6 +153,8 @@ var ENGLISH_TRANSLATION = {
 		source: "Reponsible person",
 		you_are_owner: "You can edit this project",
 		you_are_editor: "You can input on this project",
+		you_are_not_owner: "You cannot edit this project",
+		you_are_not_editor: "You cannot input on this project",
 		form_warning: [
 			"<strong>Take care</strong><br/>",
 			"All changes that are done on this form are retroactive.<br/>",

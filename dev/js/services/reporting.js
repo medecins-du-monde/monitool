@@ -366,26 +366,49 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 
 	var getInputs = function(query) {
 		// Retrieve all relevant inputs.
-		var view, opts;
-		if (query.type === 'project' || query.type === 'group') {
-			view = 'reporting/inputs_by_project_date';
-			opts = {startkey: [query.project._id, query.begin], endkey: [query.project._id, query.end], include_docs: true};
-		}
-		else if (query.type === 'entity') {
-			view = 'reporting/inputs_by_entity_date';
-			opts = {startkey: [query.id, query.begin], endkey: [query.id, query.end], include_docs: true};
-		}
-		else
-			throw new Error('query.type must be project, group or entity');
-
-		return mtDatabase.current.query(view, opts).then(function(result) {
-			var inputs = result.rows.map(function(row) { return row.doc; });
+		var cbQueries = [];
+		if (query.type === 'project' || query.type === 'group')
+			cbQueries.push({
+				view: 'reporting/inputs_by_project_date',
+				opts: {startkey: [query.project._id, query.begin], endkey: [query.project._id, query.end], include_docs: true}
+			});
+		else if (query.type === 'entity')
+			cbQueries.push({
+				view: 'reporting/inputs_by_entity_date',
+				opts: {startkey: [query.id, query.begin], endkey: [query.id, query.end], include_docs: true}
+			});
+		else if (query.type === 'indicator')
+			// Retrieve all form ids that contain the indicator among the projects.
+			query.projects.forEach(function(project) {
 			
+				project.dataCollection.filter(function(form) {
+					return form.fields.find(function(formElement) {
+						return formElement.id === query.indicator._id;
+					});
+				}).forEach(function(form) {
+					cbQueries.push({
+						view: 'reporting/inputs_by_form_date',
+						opts: {startkey: [form.id, query.begin], endkey: [form.id, query.end], include_docs: true}
+					});
+				});
+			});
+		else
+			throw new Error('query.type must be indicator, project, group or entity');
+
+		return $q.all(cbQueries.map(function(cbQuery) {
+			return mtDatabase.current.query(cbQuery.view, cbQuery.opts);
+		})).then(function(results) {
+			var inputs = [];
+
+			results.forEach(function(result) {
+				inputs = inputs.concat(result.rows.map(function(row) { return row.doc; }));
+			});
+
 			// annotate each input with keys that will later tell the sumBy function how to aggregate the data.
 			inputs.forEach(function(input) {
 				var period = input.period.split('-');
-
-				var groupIds = query.project.inputGroups.filter(function(group) {
+				var project = query.project || query.projects.find(function(p) { return p._id === input.project; });
+				var groupIds = project.inputGroups.filter(function(group) {
 					return group.members.indexOf(input.entity) !== -1;
 				}).map(function(group) {
 					return group.id;
@@ -485,57 +508,36 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 		return retrieveMetadata(query.project, globalRegrouped, moment(query.begin), query.groupBy);
 	};
 
+	var regroupIndicator = function(inputs, query) {
+		var result = {}, begin = moment(query.begin, 'YYYY-MM-DD');
 
-	// var getIndicatorStats = function(indicator, projects, begin, end, groupBy) {
-	// 	begin = moment(begin, 'YYYY-MM-DD');
-	// 	end   = moment(end, 'YYYY-MM-DD');
+		query.projects.forEach(function(project) {
+			var projectInputs = inputs.filter(function(input) { return input.project === project._id; }),
+				projectQuery  = {begin: query.begin, project: project, groupBy: query.groupBy},
+				data          = regroup(projectInputs, projectQuery);
 
-	// 	var queries = projects.map(function(project) {
-	// 		return mtDatabase.current.query('reporting/inputs_by_project_year_month_entity', {
-	// 			startkey: [project._id, begin.format('YYYY'), begin.format('MM')],
-	// 			endkey: [project._id, end.format('YYYY'), end.format('MM'), {}],
-	// 			group: true // we need centers...
-	// 		});
-	// 	});
+			result[project._id] = data//retrieveMetadata(project, data, begin, query.groupBy);
 
-	// 	return $q.all(queries).then(function(results) {
-	// 		var regrouped = {};
+			project.inputEntities.forEach(function(entity) {
+				var entityInputs = projectInputs.filter(function(input) { return input.entity === entity.id; }),
+					entityQuery  = {begin: query.begin, project: project, groupBy: query.groupBy, type: 'entity', id: entity.id};
+					data         = regroup(entityInputs, entityQuery);
 
-	// 		results.map(function(result, index) {
-	// 			// regroup, and add metadata for each project stats (they all use different settings)
-	// 			// this use JSON compound keys to keep time and project/entity
-	// 			var pRegrouped = regroup(result.rows, function(key) {
-	// 				var period  = groupBy === 'month' ? key[1] + '-' + key[2] : key[1],
-	// 					project = key[0],
-	// 					center  = key[3],
-	// 					keys    = [[period, center], [period, project], ['total', center], ['total', project]];
+				result[entity.id] = data;//retrieveMetadata(project, data, begin, query.groupBy);
+			});
+		});
 
-	// 				return keys.map(JSON.stringify);
-	// 			});
-
-	// 			evaluateAll(projects[index], pRegrouped);
-	// 			return retrieveMetadata(projects[index], pRegrouped, begin, groupBy);
-	// 		}).forEach(function(pRegrouped) {
-	// 			// Nest the JSON.keys into a 2 level hash.
-	// 			for (var compoundKey in pRegrouped) {
-	// 				var key = JSON.parse(compoundKey);
-	// 				if (!regrouped[key[0]])
-	// 					regrouped[key[0]] = {};
-	// 				regrouped[key[0]][key[1]] = pRegrouped[compoundKey];
-	// 			}
-	// 		});
-	// 		return regrouped;
-	// 	});
-	// };
+		return result;
+	};
 
 	var getDefaultStartDate = function(project) {
 		var date = moment().subtract(1, 'year').format('YYYY-MM-DD');
-		return date < project.begin ? project.begin : date;
+		return project && project.begin > date ? project.begin : date;
 	};
 
 	var getDefaultEndDate = function(project) {
-		var date = moment().format('YYYY-MM-DD');
-		return date > moment().format('YYYY-MM-DD') ? moment().format('YYYY-MM-DD') : date;
+		// "now"
+		return moment().format('YYYY-MM-DD');
 	};
 
 	var getAnnotatedProjectCopy = function(project, indicatorsById) {
@@ -546,88 +548,15 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 		return project;
 	};
 
-	var exportProjectStats = function(cols, project, indicatorsById, data) {
-		var csvDump = 'os;res;indicator';
-		cols.forEach(function(col) { csvDump += ';' + col.name; })
-		csvDump += "\n";
-
-		project.logicalFrame.indicators.forEach(function(indicatorId) {
-			csvDump += 'None;None;' + indicatorsById[indicatorId].name;
-			cols.forEach(function(col) {
-				csvDump += ';';
-				try { csvDump += data[col.id][indicatorId].value }
-				catch (e) {}
-			});
-			csvDump += "\n";
-		});
-
-		project.logicalFrame.purposes.forEach(function(purpose) {
-			purpose.indicators.forEach(function(indicatorId) {
-				csvDump += purpose.description + ';None;' + indicatorsById[indicatorId].name;
-				cols.forEach(function(col) {
-					csvDump += ';';
-					try { csvDump += data[col.id][indicatorId].value }
-					catch (e) {}
-				});
-				csvDump += "\n";
-			});
-
-			purpose.outputs.forEach(function(output) {
-				output.indicators.forEach(function(indicatorId) {
-					csvDump += purpose.description + ';' + output.description + ';' + indicatorsById[indicatorId].name;
-					cols.forEach(function(col) {
-						csvDump += ';';
-						try { csvDump += data[col.id][indicatorId].value }
-						catch (e) {}
-					});
-					csvDump += "\n";
-				});
-			});
-		});
-
-		return csvDump;
-	};
-
-	var exportIndicatorStats = function(cols, projects, indicator, data) {
-		var csvDump = 'type;nom';
-
-		// header
-		cols.forEach(function(col) { csvDump += ';' + col.name; })
-		csvDump += "\n";
-
-		projects.forEach(function(project) {
-			csvDump += 'project;' + project.name;
-			cols.forEach(function(col) {
-				csvDump += ';';
-				try { csvDump += data[col.id][project._id][indicator._id].value }
-				catch (e) {}
-			});
-			csvDump += "\n";
-
-			project.inputEntities.forEach(function(entity) {
-				csvDump += 'entity;' + entity.name;
-				cols.forEach(function(col) {
-					csvDump += ';';
-					try { csvDump += data[col.id][project._id][indicator._id].value; }
-					catch (e) {}
-				});
-				csvDump += "\n";
-			});
-		});
-
-		return csvDump;
-	};
-
-
+	
 	return {
-		exportProjectStats: exportProjectStats,
-		exportIndicatorStats: exportIndicatorStats,
 		getStatsColumns: getStatsColumns,
 		getDefaultStartDate: getDefaultStartDate,
 		getDefaultEndDate: getDefaultEndDate,
 		getInputs : getInputs,
 		getAnnotatedProjectCopy: getAnnotatedProjectCopy,
 		regroup: regroup,
+		regroupIndicator: regroupIndicator,
 	};
 });
 

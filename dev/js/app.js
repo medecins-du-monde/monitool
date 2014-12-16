@@ -425,6 +425,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			projects: function($stateParams, mtFetch) {
 				return mtFetch.projectsByIndicator($stateParams.indicatorId);
+			},
+			indicatorsById: function($q, mtFetch, projects) {
+				var promises = projects.map(function(p) { return mtFetch.indicatorsByProject(p); });
+				return $q.all(promises).then(function(result) {
+					var r = {};
+					result.forEach(function(indicatorsById) {
+						for (var indicatorId in indicatorsById)
+							r[indicatorId] = indicatorsById[indicatorId];
+					});
+					return r;
+				});
 			}
 		}
 	});

@@ -65,12 +65,130 @@ angular.module('monitool.directives.fileexport', [])
 		};
 
 		return {
+			restrict: "A",
+			scope: {
+				'svgSave': '=svgSave'
+			},
 			link: function(scope, element, attributes) {
 				element.bind('click', function() {
-					var filename  = (attributes.svgSave || 'file.png'),
+					var filename  = (scope.svgSave || 'file.png'),
 						sourceSVG = document.querySelector("svg");
 
 					saveSvgAsPng(sourceSVG, filename, 1);
+				});
+			}
+		}
+	})
+
+	.directive('projectCsvSave', function() {
+
+		var exportProjectStats = function(cols, project, indicatorsById, data) {
+			var csvDump = 'os;res;indicator';
+			cols.forEach(function(col) { csvDump += ';' + col.name; })
+			csvDump += "\n";
+
+			project.logicalFrame.indicators.forEach(function(indicatorId) {
+				csvDump += 'None;None;' + indicatorsById[indicatorId].name;
+				cols.forEach(function(col) {
+					csvDump += ';';
+					try { csvDump += data[col.id][indicatorId].value }
+					catch (e) {}
+				});
+				csvDump += "\n";
+			});
+
+			project.logicalFrame.purposes.forEach(function(purpose) {
+				purpose.indicators.forEach(function(indicatorId) {
+					csvDump += purpose.description + ';None;' + indicatorsById[indicatorId].name;
+					cols.forEach(function(col) {
+						csvDump += ';';
+						try { csvDump += data[col.id][indicatorId].value }
+						catch (e) {}
+					});
+					csvDump += "\n";
+				});
+
+				purpose.outputs.forEach(function(output) {
+					output.indicators.forEach(function(indicatorId) {
+						csvDump += purpose.description + ';' + output.description + ';' + indicatorsById[indicatorId].name;
+						cols.forEach(function(col) {
+							csvDump += ';';
+							try { csvDump += data[col.id][indicatorId].value }
+							catch (e) {}
+						});
+						csvDump += "\n";
+					});
+				});
+			});
+
+			return csvDump;
+		};
+		return {
+			restrict: "A",
+			scope: {
+				query: "=query",
+				indicatorsById: "=indicatorsById",
+				data: "=data",
+				cols: "=cols",
+			},
+			link: function(scope, element, attributes) {
+				element.bind('click', function() {
+					var csvDump = exportProjectStats(scope.cols, scope.query.project, scope.indicatorsById, scope.data),
+						blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
+						name    = [scope.query.project.name, scope.query.begin, scope.query.end].join('_') + '.csv';
+
+					saveAs(blob, name);
+				});
+			}
+		};
+	})
+
+	.directive('indicatorCsvSave', function() {
+
+		var exportIndicatorStats = function(cols, projects, indicator, data) {
+			var csvDump = 'type;nom';
+
+			// header
+			cols.forEach(function(col) { csvDump += ';' + col.name; })
+			csvDump += "\n";
+
+			projects.forEach(function(project) {
+				csvDump += 'project;' + project.name;
+				cols.forEach(function(col) {
+					csvDump += ';';
+					try { csvDump += data[project._id][col.id][indicator._id].value }
+					catch (e) {}
+				});
+				csvDump += "\n";
+
+				project.inputEntities.forEach(function(entity) {
+					csvDump += 'entity;' + entity.name;
+					cols.forEach(function(col) {
+						csvDump += ';';
+						try { csvDump += data[entity.id][col.id][indicator._id].value; }
+						catch (e) {}
+					});
+					csvDump += "\n";
+				});
+			});
+
+			return csvDump;
+		};
+
+		return {
+			restrict: "A",
+			scope: {
+				cols: '=cols',
+				query: '=query',
+				data: '=data'
+			},
+			link: function(scope, element, attributes) {
+				element.bind('click', function() {
+					var csvDump = exportIndicatorStats(scope.cols, scope.query.projects, scope.query.indicator, scope.data),
+						blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
+						name    = [scope.query.indicator.name, scope.query.begin, scope.query.end].join('_') + '.csv';
+
+					saveAs(blob, name);
 				});
 			}
 		}

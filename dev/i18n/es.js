@@ -24,8 +24,12 @@ var SPANISH_TRANSLATION = {
 
 		view_stats: 'Ver las estadísticas',
 		members: 'Miembros',
+		
+		day: 'Dia',
+		week: 'Semana',
 		month: 'Mes',
 		year: "Año",
+
 		done: 'Hecho',
 		copy: 'Copiar',
 		choose: 'Elegir',
@@ -148,6 +152,8 @@ var SPANISH_TRANSLATION = {
 		source: "Persona responsable",
 		you_are_owner: "Puede editar este proyecto",
 		you_are_editor: "Puede entrar indicadores en este proyecto",
+		you_are_not_owner: "No puede editar este proyecto",
+		you_are_not_editor: "No puede entrar indicadores en este proyecto",
 		form_warning: [
 			"<strong>Cuidado</strong><br/>",
 			"Todo cambio realizado en un formulario es retro-activo.<br/>",

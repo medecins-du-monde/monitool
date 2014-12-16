@@ -24,8 +24,12 @@ var FRENCH_TRANSLATION = {
 
 		view_stats: 'Voir les statistiques',
 		members: 'Membres',
+
+		day: 'Jour',
+		week: 'Semaine',
 		month: 'Mois',
 		year: "Année",
+		
 		done: 'Fait',
 		copy: 'Copier',
 		choose: 'Choisir',
@@ -149,6 +153,8 @@ var FRENCH_TRANSLATION = {
 		source: "Personne responsable",
 		you_are_owner: "Vous pouvez éditer ce projet",
 		you_are_editor: "Vous pouvez saisir sur ce projet",
+		you_are_not_owner: "Vous ne pouvez pas éditer ce projet",
+		you_are_not_editor: "Vous ne pouvez pas saisir sur ce projet",
 		form_warning: [
 			"<strong>Attention</strong><br/>",
 			"Tous les changements que vous réalisez sur un formulaire sont rétroactifs.<br/>",
