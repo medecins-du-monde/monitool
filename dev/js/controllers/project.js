@@ -251,7 +251,7 @@ angular.module('monitool.controllers.project', [])
 		$scope.isNew = $stateParams.formId === 'new';
 		$scope.container.chosenIndicatorIds = $scope.form.fields.map(function(field) { return field.id; });
 
-		$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue) {
+		$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue, oldValue) {
 			if ($scope.form.useProjectStart)
 				$scope.form.start = $scope.project.begin;
 
@@ -282,10 +282,21 @@ angular.module('monitool.controllers.project', [])
 				.map(function(indicatorId) { return indicatorsById[indicatorId]; });
 
 			// Remove those indicators from the list of chosen ones.
-			$scope.container.chosenIndicatorIds = $scope.container.chosenIndicatorIds
+			var keptIndicators = $scope.container.chosenIndicatorIds
 				.filter(function(indicatorId) {
 					return $scope.availableIndicators.find(function(i) { return i._id == indicatorId; });
 				});
+
+			if (keptIndicators.length !== $scope.container.chosenIndicatorIds.length) {
+				if (confirm('Indicators will be removed because of collision. Are you sure?'))
+					$scope.container.chosenIndicatorIds = keptIndicators;
+				else {
+					$scope.form.useProjectStart = oldValue[0];
+					$scope.form.start = oldValue[1];
+					$scope.form.useProjectEnd = oldValue[2];
+					$scope.form.end = oldValue[3];
+				}
+			}
 		}, true);
 
 		// when chosenIndicators changes, we need to udate the form's fields
