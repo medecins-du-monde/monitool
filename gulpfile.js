@@ -69,6 +69,7 @@ var files = {
 			'dev/js/directives/indicator-select.js',
 			'dev/js/filters.js',
 			'dev/js/app.js',
+			'dev/js/polyfills.js',
 		]
 	}
 };
