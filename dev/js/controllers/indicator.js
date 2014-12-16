@@ -47,6 +47,7 @@ angular.module('monitool.controllers.indicator', [])
 			var usedIndicators = $scope.indicator.formulas[formulaId].symbols.map(function(s) {
 				return $scope.indicator.formulas[formulaId].parameters[s];
 			}).filter(function(e) { return !!e; });
+			usedIndicators.push(indicator._id);
 
 			var indicatorId = $modal.open({
 				templateUrl: 'partials/indicators/selector-popup.html',
