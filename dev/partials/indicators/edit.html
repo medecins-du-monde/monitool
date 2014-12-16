@@ -108,31 +108,12 @@
 			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sumAllowed">
 				<p class="form-control-static">
 					<select class="form-control" ng-model="indicator.timeAggregation">
-						<option value="sum">Somme (ex: nombre de consultations, de naissances, ...)</option>
-						<option value="average">Moyenne non pondérée (ex: population, nombre de médecins, de véhicules, ...)</option>
-						<option value="none">Pas d'aggrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)</option>
+						<option value="sum" translate="indicator.time_aggregation_sum"></option>
+						<option value="average" translate="indicator.time_aggregation_average"></option>
+						<option value="none" translate="indicator.time_aggregation_none"></option>
 					</select>
 
-					<div class="alert alert-info" role="alert">
-						<strong>Aide à la saisie</strong>
-
-						<ul>
-							<li>
-								Si un hôpital réalise 100 consultations en janvier, en février et en mars, il en aura réalisé 300 au
-								cours du premier trimestre de l'année. Le mode d'aggrégation de l'indicateur <strong>"Nombre de consultations"</strong>
-								vaut donc <strong>"Somme"</strong>
-							</li>
-							<li>
-								Si un bloc chirurgical a un taux de mortalité de 5% en janvier, 7% en février et 10% en mars, on ne peut pas calculer
-								son taux de mortalité sur le premier trimestre de l'année sans connaître le nombre d'opérations sur chaque mois.
-								Le mode d'aggrégation de l'indicateur <strong>"Taux de mortalité opératoire"</strong> vaut donc <strong>"Pas d'aggrégation directe possible"</strong>
-							</li>
-							<li>
-								Si un village a une population de 510 habitants en janvier, 600 en février et 550 en mars, on peut dire que sa population
-								au premier trimestre de l'année vaut 553. Le mode d'aggrégation de l'indicateur <strong>"Population"</strong>à choisir est
-								donc <strong>"Moyenne non pondérée"</strong>
-							</li>
-						</ul>
+					<div class="alert alert-info" role="alert" translate="indicator.time_aggregation_help">
 					</div>					
 				</p>
 			</div>
@@ -143,9 +124,9 @@
 			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sumAllowed">
 				<p class="form-control-static">
 					<select class="form-control" ng-model="indicator.geoAggregation">
-						<option value="sum">Somme (ex: population, nombre de médecins, de véhicules disponibles, de consultations, de naissances, ...)</option>
-						<option value="average">Moyenne non pondérée (à n'utiliser uniquement que pour des indicateurs qui sont déjà des moyennes par centre: "nombre de médecins par centre")</option>
-						<option value="none">Pas d'aggrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)</option>
+						<option value="sum" translate="indicator.geo_aggregation_sum"></option>
+						<option value="average" translate="indicator.geo_aggregation_average"></option>
+						<option value="none" translate="indicator.geo_aggregation_none"></option>
 					</select>
 				</p>
 			</div>

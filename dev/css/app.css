@@ -118,3 +118,25 @@ textarea {
 }
 
 
+
+  table.project-reporting {
+    font-size: 12px;
+  }
+
+  table.project-reporting label {
+    font-weight: normal;
+  }
+
+  table.project-reporting .section, table.project-reporting .section a {
+    color: black;
+    text-decoration: underline;
+    font-weight: bold;
+  }
+
+  table.project-reporting .indent1 {
+    padding-left: 25px !important;
+  }
+
+  table.project-reporting .indent2 {
+    padding-left: 50px !important;
+  }

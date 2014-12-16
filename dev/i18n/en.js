@@ -1,6 +1,7 @@
 var ENGLISH_TRANSLATION = {
 	shared: {
 		projects: 'Projects',
+
 		indicator: 'Indicator',
 		indicators: 'Indicators',
 		indicators_catalog: 'Indicators Catalog',
@@ -43,6 +44,7 @@ var ENGLISH_TRANSLATION = {
 		download_plot: 'Download plot',
 		download_table: 'Download table',
 		unknown_indicator: "Unknown indicator",
+		active: "Active",
 
 		choose_indicator: 'Choose an indicator',
 		list: 'List',
@@ -135,9 +137,32 @@ var ENGLISH_TRANSLATION = {
 		add_activity: 'Add activity',
 		add_output: 'Add output',
 		add_purpose: 'Add purpose',
+
 		users: "Users",
 		owners: "Owners",
 		dataEntryOperators: "Data entry clerks",
+
+		move_up: "Move up",
+		move_down: "Move down",
+
+		indicator_source: "Acquisition",
+		source: "Reponsible person",
+		you_are_owner: "You can edit this project",
+		you_are_editor: "You can input on this project",
+		form_warning: [
+			"<strong>Take care</strong><br/>",
+			"All changes that are done on this form are retroactive.<br/>",
+			"<ul>",
+				"<li>If you change the begin date, end date or periodicity, all additional inputs will be invalidated.</li>",
+				"<li>If you delete or change the computation method of an indicator all of its input history will be invalidated.</li>",
+			"</ul>",
+			"<br/>",
+			"Most of the time, to make changes, the best approach is:",
+			"<ul>",
+				"<li>Change the end date of current form, and unactivate it.</li>",
+				"<li>Create a new form which start at this date.</li>",
+			"</ul>",
+		].join(' '),
 	},
 	indicator: {
 		no_theme: 'No theme',
@@ -183,6 +208,36 @@ var ENGLISH_TRANSLATION = {
 
 		is_recommended: "This is a core indicator",
 		is_not_recommended: "This is not a core indicator",
+
+		time_aggregation: "Time aggregation",
+		time_aggregation_sum: "Sum (for instance: number of consultations, births, ...)",
+		time_aggregation_average: "Average (for instance: population, number of doctors, cars, ...)",
+		time_aggregation_none: "None (all percentages and computed indicators)",
+		time_aggregation_help: [
+			"<strong>Tip</strong>",
+			"<ul>",
+				"<li>",
+					"If an hospital makes 100 in january, february and march, it has made 300 on the first quarter of the year.",
+					"The aggregation mode of <strong>\"Number of consultations\"</strong> will be <strong>\"Sum\"</strong>",
+					"",
+				"</li>",
+				"<li>",
+					"If a surgical unit has a mortality rate of 5% in january, 7% in february and 10% in march, it is impossible to compute",
+					"its mortality rate over the first quarter of the year without knowing the number of surgeries on each month.",
+					"The aggregation of the indicator <strong>\"operative mortality\"</strong> is <strong>\"None\"</strong>",
+				"</li>",
+				"<li>",
+					"If a town has a population of 512 people in january, 600 in february and 550 in march, we can say that it's population",
+					"over the first quarter is 553. The aggregation mode of the indicator <strong>\"Population\"</strong> is ",
+					"<strong>\"Average\"</strong>",
+				"</li>",
+			"</ul>"
+		].join(' '),
+
+		geo_aggregation: "Geographic aggregation",
+		geo_aggregation_sum: "Sum (for instance: population, number of doctors, cars, consultations, births, ...)",
+		geo_aggregation_average: "Average (only use for indicators that already are averages over input entities)",
+		geo_aggregation_none: "None (all percentages and computed indicators)",
 	},
 	login: {
 		error: "Invalid username or password",

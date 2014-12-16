@@ -44,6 +44,7 @@ var FRENCH_TRANSLATION = {
 		download_plot: 'Télécharger le graphique',
 		download_table: 'Télécharger le tableau',
 		unknown_indicator: "Indicateur inconnu",
+		active: "Actif",
 
 		choose_indicator: 'Choisissez un indicateur',
 		list: 'Liste',
@@ -88,6 +89,7 @@ var FRENCH_TRANSLATION = {
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',
 		no_input_groups: 'Aucun groupe d\'activité n\'a encore été créé!',
 		no_forms: 'Aucun formulaire n\'a encore été créé',
+
 		waiting_inputs: 'Saisies en attente',
 		no_waiting_inputs: 'Aucune saisie en attente.',
 		input: 'Saisir',
@@ -139,6 +141,28 @@ var FRENCH_TRANSLATION = {
 		users: "Utilisateurs",
 		owners: "Propriétaires",
 		dataEntryOperators: "Opérateurs de saisie",
+
+		move_up: "Monter",
+		move_down: "Descendre",
+
+		indicator_source: "Obtention",
+		source: "Personne responsable",
+		you_are_owner: "Vous pouvez éditer ce projet",
+		you_are_editor: "Vous pouvez saisir sur ce projet",
+		form_warning: [
+			"<strong>Attention</strong><br/>",
+			"Tous les changements que vous réalisez sur un formulaire sont rétroactifs.<br/>",
+			"<ul>",
+				"<li>Si vous changez les dates de début et fin ou la périodicité, les saisies supplémentaires seront invalidés.</li>",
+				"<li>Si vous supprimez, ou changez la méthode de calcul d'un indicateur tout son historique de saisie sera invalidé.</li>",
+			"</ul>",
+			"<br/>",
+			"Plutôt que réaliser des modifications, la bonne approche est le plus souvent de:",
+			"<ul>",
+				"<li>Changer la date de fin du formulaire utilisé et le désactiver.</li>",
+				"<li>De créer un nouveau formulaire qui commence à cette date avec les modifications à réaliser.</li>",
+			"</ul>",
+		].join(' '),
 	},
 	indicator: {
 		no_theme: 'Sans thématique',
@@ -184,6 +208,36 @@ var FRENCH_TRANSLATION = {
 
 		is_recommended: "Cet indicateur est recommandé",
 		is_not_recommended: "Cet indicateur n'est pas recommandé",
+
+		time_aggregation: "Aggrégation par rapport au temps",
+		time_aggregation_sum: "Somme (ex: nombre de consultations, de naissances, ...)",
+		time_aggregation_average: "Moyenne non pondérée (ex: population, nombre de médecins, de véhicules, ...)",
+		time_aggregation_none: "Pas d'aggrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
+		time_aggregation_help: [
+			"<strong>Aide à la saisie</strong>",
+			"<ul>",
+				"<li>",
+					"Si un hôpital réalise 100 consultations en janvier, en février et en mars, il en aura réalisé 300 au",
+					"cours du premier trimestre de l'année. Le mode d'aggrégation de l'indicateur <strong>\"Nombre de consultations\"</strong>",
+					"vaut donc <strong>\"Somme\"</strong>",
+				"</li>",
+				"<li>",
+					"Si un bloc chirurgical a un taux de mortalité de 5% en janvier, 7% en février et 10% en mars, on ne peut pas calculer",
+					"son taux de mortalité sur le premier trimestre de l'année sans connaître le nombre d'opérations sur chaque mois.",
+					"Le mode d'aggrégation de l'indicateur <strong>\"Taux de mortalité opératoire\"</strong> vaut donc <strong>\"Pas d'aggrégation directe possible\"</strong>",
+				"</li>",
+				"<li>",
+					"Si un village a une population de 510 habitants en janvier, 600 en février et 550 en mars, on peut dire que sa population",
+					"au premier trimestre de l'année vaut 553. Le mode d'aggrégation de l'indicateur <strong>\"Population\"</strong>à choisir est",
+					"donc <strong>\"Moyenne non pondérée\"</strong>",
+				"</li>",
+			"</ul>"
+		].join(' '),
+
+		geo_aggregation: "Aggrégation géographique",
+		geo_aggregation_sum: "Somme (ex: population, nombre de médecins, de véhicules disponibles, de consultations, de naissances, ...)",
+		geo_aggregation_average: "Moyenne non pondérée (à n'utiliser uniquement que pour des indicateurs qui sont déjà des moyennes par centre: \"nombre de médecins par centre\")",
+		geo_aggregation_none: "Pas d'aggrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
 	},
 	login: {
 		error: "Identifiant ou mot de passe invalide",

@@ -204,7 +204,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					return {
 						id: PouchDB.utils.uuid().toLowerCase(), name: "",
 						periodicity: "month", 
-						useProjectStart: true, useProjectEnd: true, start: project.begin, end: project.end, intermediaryDates: [],
+						useProjectStart: true, useProjectEnd: true, start: project.begin, end: project.end, intermediaryDates: [], active: true,
 						fields: []
 					};
 				else
@@ -255,13 +255,14 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 								periods.forEach(function(period) {
 									var inputId = [project._id, inputEntity.id, form.id, period.format('YYYY-MM-DD')].join(':');
-									inputs.push({
-										filled: inputExists[inputId] ? 'yes' : 'no',
-										period: period,
-										formId: form.id, formName: form.name,
-										inputEntityId: inputEntity.id,
-										inputEntityName: inputEntity.name
-									});
+									if (form.active || inputExists[inputId])
+										inputs.push({
+											filled: inputExists[inputId] ? 'yes' : 'no',
+											period: period,
+											formId: form.id, formName: form.name,
+											inputEntityId: inputEntity.id,
+											inputEntityName: inputEntity.name
+										});
 
 									delete inputExists[inputId];
 								});
