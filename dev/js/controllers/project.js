@@ -261,7 +261,24 @@ angular.module('monitool.controllers.project', [])
 			// when begin and end change, we need to update the list of available indicators.
 			// the user cannot choose an indicator which is already collected in the same period.
 			$scope.availableIndicators = Object.keys($scope.project.indicators)
-				// .filter(function(indicatorId) { return true; })
+				.filter(function(indicatorId) {
+					// look up other forms to check if the indicator is available
+					var numForms = $scope.project.dataCollection.length;
+					for (var index = 0; index < numForms; ++index) {
+						var otherForm = $scope.project.dataCollection[index];
+
+						if (otherForm.start > $scope.form.end)
+							continue;
+						
+						if (otherForm.end < $scope.form.start)
+							continue;
+
+						if (otherForm.id !== $scope.form.id &&
+							otherForm.fields.find(function(formElement) { return formElement.id === indicatorId; }))
+							return false;
+					}
+					return true;
+				})
 				.map(function(indicatorId) { return indicatorsById[indicatorId]; });
 
 			// Remove those indicators from the list of chosen ones.
