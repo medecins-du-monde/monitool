@@ -33,16 +33,6 @@ angular.module('monitool.controllers.indicator', [])
 			delete $scope.indicator.formulas[formulaId];
 		};
 
-		$scope.annotateFormula = function(formulaId) {
-			mtFormula.annotate($scope.indicator.formulas[formulaId]);
-		};
-
-		$scope.formulaInvalid = function() {
-			return Object.keys($scope.indicator.formulas).some(function(formulaId) {
-				return !$scope.indicator.formulas[formulaId].isValid;
-			});
-		};
-
 		$scope.chooseIndicator = function(formulaId, symbol) {
 			var usedIndicators = $scope.indicator.formulas[formulaId].symbols.map(function(s) {
 				return $scope.indicator.formulas[formulaId].parameters[s];
@@ -63,6 +53,16 @@ angular.module('monitool.controllers.indicator', [])
 				});
 			});
 		};
+
+		$scope.formulasAreValid = true;
+		$scope.$watch('indicator.formulas', function() {
+			$scope.formulasAreValid = true;
+			for (var formulaId in $scope.indicator.formulas) {
+				mtFormula.annotate($scope.indicator.formulas[formulaId]);
+				if (!$scope.indicator.formulas[formulaId].isValid)
+					$scope.formulasAreValid = false;
+			}
+		}, true);
 
 		// Form actions
 		$scope.save = function() {
