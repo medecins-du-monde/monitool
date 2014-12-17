@@ -393,6 +393,7 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectInputController', function($scope, $state, mtForms, mtDatabase, form, indicatorsById, inputs) {
 		$scope.form          = angular.copy(form);
+		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
 		$scope.previousInput = inputs.previous;
 		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
@@ -408,6 +409,12 @@ angular.module('monitool.controllers.project', [])
 				$state.go('main.project.input_list');
 			});
 		};
+
+		$scope.delete = function() {
+			mtDatabase.current.remove($scope.currentInput).then(function() {
+				$state.go('main.project.input_list');
+			});
+		}
 	})
 
 	.controller('ProjectReportingController', function($scope, $state, $stateParams, mtReporting, mtForms, indicatorsById) {
@@ -477,4 +484,8 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectUserListController', function($scope, mtDatabase, project, users) {
 		$scope.users = users;
+		project.dataEntryOperators.concat(project.owners).forEach(function(username) {
+			if ($scope.users.indexOf(username) === -1)
+				$scope.users.push(username);
+		});
 	});

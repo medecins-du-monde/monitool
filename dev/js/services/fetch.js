@@ -106,7 +106,7 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 
 			return mtDatabase.current.allDocs(options).then(function(result) {
 				// retrieve current and previous from view result.
-				var current, previous;
+				var current, previous, isNew;
 
 				if (result.rows.length == 0) // we got no result at all.
 					current = previous = null;
@@ -131,14 +131,18 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 					}
 				}
 
-				if (!current)
+				if (!current) {
+					isNew = true
 					current = {
 						_id: id, type: 'input',
 						project: p.projectId, entity: p.entityId, form: p.formId, period: p.period,
 						values: { count: 1 }
 					};
+				}
+				else
+					isNew = false;
 
-				return {current: current, previous: previous};
+				return {current: current, previous: previous, isNew: isNew};
 			});
 		}
 	};

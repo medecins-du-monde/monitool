@@ -44,9 +44,8 @@
 		<span translate="shared.save"></span>
 	</button>
 
-	<button class="btn btn-danger" ng-click="delete()">
+	<button class="btn btn-danger" ng-click="delete()" ng-if="!isNew">
 		<i class="fa fa-remove"></i>
 		<span translate>shared.delete</span>
 	</button>
 </div>
-

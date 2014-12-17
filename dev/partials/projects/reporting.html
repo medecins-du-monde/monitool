@@ -114,7 +114,9 @@
 			<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (presentation.colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
 				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
-					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+					<span ng-switch-when="value" tooltip="Cible: {{data[col.id][indicatorId].target}}{{indicatorsById[indicatorId].target}}">
+						{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}
+					</span>
 					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
 					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
 				</span>
@@ -133,7 +135,9 @@
 			<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (presentation.colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
 				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
-					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+					<span ng-switch-when="value" tooltip="Cible: {{data[col.id][indicatorId].target}}{{indicatorsById[indicatorId].target}}">
+						{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}
+					</span>
 					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
 					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
 				</span>
@@ -164,7 +168,9 @@
 			</td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (presentation.colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
 				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
-					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+					<span ng-switch-when="value" tooltip="Cible: {{data[col.id][indicatorId].target}}{{indicatorsById[indicatorId].target}}">
+						{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}
+					</span>
 					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
 					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
 				</span>
@@ -192,7 +198,9 @@
 			</td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (presentation.colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
 				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
-					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
+					<span ng-switch-when="value" tooltip="Cible: {{data[col.id][indicatorId].target}}{{indicatorsById[indicatorId].target}}">
+						{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}
+					</span>
 					<span ng-switch-when="targetPart">{{data[col.id][indicatorId].targetPart}}%</span>
 					<span ng-switch-when="baselinePart">{{data[col.id][indicatorId].baselinePart}}%</span>
 				</span>

@@ -343,10 +343,10 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 
 				// compute display value
 				if (params) {
-					var targetValue = getTargetValue(groupBy === 'month' ? key : begin.format('YYYY-MM-DD'), params);
-
+					metadata.target = getTargetValue(groupBy === 'month' ? key : begin.format('YYYY-MM-DD'), params);
+					metadata.baseline = params.baseline;
 					metadata.baselinePart = Math.round(100 * metadata.value / params.baseline);
-					metadata.targetPart = Math.round(100 * metadata.value / targetValue);
+					metadata.targetPart = Math.round(100 * metadata.value / metadata.target);
 
 					// compute color
 					if (params.greenMinimum <= metadata.value && metadata.value <= params.greenMaximum)
