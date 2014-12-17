@@ -399,9 +399,23 @@ angular.module('monitool.controllers.project', [])
 		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
 		mtForms.annotateAllFormElements($scope.form.fields, indicatorsById);
-		
+
+		$scope.status = {};
 		$scope.$watch('currentInput.values', function() {
 			mtForms.evaluateAll($scope.form.fields, $scope.currentInput.values);
+			$scope.form.fields.forEach(function(field) {
+				var indicatorMeta = $scope.project.indicators[field.id];
+				console.log(indicatorMeta)
+
+				if (indicatorMeta.greenMinimum < $scope.currentInput.values[field.model] && $scope.currentInput.values[field.model] < indicatorMeta.greenMaximum)
+					$scope.status[field.id] = 'green';
+				else if (indicatorMeta.orangeMinimum < $scope.currentInput.values[field.model] && $scope.currentInput.values[field.model] < indicatorMeta.orangeMaximum)
+					$scope.status[field.id] = 'orange';
+				else if (indicatorMeta.minimum < $scope.currentInput.values[field.model] && $scope.currentInput.values[field.model] < indicatorMeta.maximum)
+					$scope.status[field.id] = 'red';
+				else
+					$scope.status[field.id] = 'darkred';
+			});
 		}, true);
 
 		$scope.save = function() {
@@ -414,7 +428,7 @@ angular.module('monitool.controllers.project', [])
 			mtDatabase.current.remove($scope.currentInput).then(function() {
 				$state.go('main.project.input_list');
 			});
-		}
+		};
 	})
 
 	.controller('ProjectReportingController', function($scope, $state, $stateParams, mtReporting, mtForms, indicatorsById) {

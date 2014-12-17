@@ -168,6 +168,11 @@ var SPANISH_TRANSLATION = {
 				"<li>Crear un nuevo formulario a partir de dicha fecha.</li>",
 			"</ul>",
 		].join(' '),
+
+		status_green: "Este indicador esta en zona verde",
+		status_orange: "Este indicador esta en zona naranja",
+		status_red: "Este indicador esta en zona roja",
+		status_darkred: "Este indicador esta fuera<br/>de los limites establecidos<br/>en el marco lógico"
 	},
 	indicator: {
 		no_theme: 'Sin temática',

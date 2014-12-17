@@ -105,7 +105,7 @@ var ENGLISH_TRANSLATION = {
 		minimum_ph: 'minimum',
 		maximum_ph: 'maximum',
 		orange_zone: 'Orange Zone',
-		green_zone: 'Verte Zone',
+		green_zone: 'Green Zone',
 		baseline: 'Baseline',
 		baseline_ph: 'Reference value',
 		target_value_ph: 'value',
@@ -169,6 +169,12 @@ var ENGLISH_TRANSLATION = {
 				"<li>Create a new form which start at this date.</li>",
 			"</ul>",
 		].join(' '),
+
+
+		status_green: "This indicator is in its green zone",
+		status_orange: "This indicator is in its orange zone",
+		status_red: "This indicator is in its red zone",
+		status_darkred: "This indicator is out of bounds"		
 	},
 	indicator: {
 		no_theme: 'No theme',

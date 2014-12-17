@@ -169,6 +169,11 @@ var FRENCH_TRANSLATION = {
 				"<li>De créer un nouveau formulaire qui commence à cette date avec les modifications à réaliser.</li>",
 			"</ul>",
 		].join(' '),
+
+		status_green: "Cet indicateur est en zone verte",
+		status_orange: "Cet indicateur est en zone orange",
+		status_red: "Cet indicateur est en zone rouge",
+		status_darkred: "Cet indicateur est en dehors<br/>des limites fixées<br/>dans le cadre logique"
 	},
 	indicator: {
 		no_theme: 'Sans thématique',
