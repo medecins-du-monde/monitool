@@ -67,8 +67,7 @@ reportingServices.factory('mtForms', function() {
 	};
 
 
-	// FIXME: creating infinite loops is possible when using 2 indicators that links to each other
-	// compute parameters.
+	// FIXME: creating infinite loops is possible when using 2 indicators that links to each other compute parameters.
 	var buildLinks = function(formElements, indicatorsById) {
 		// flatten all form elements in an array to iterate it with native methods
 		var flatFormElements = flatten(formElements);
@@ -98,6 +97,42 @@ reportingServices.factory('mtForms', function() {
 					});
 				}
 			});
+		});
+	};
+
+	var buildSumability = function(formElements) {
+		var formElementsByKeyPath = {};
+		flatten(formElements).forEach(function(formElement) {
+			formElementsByKeyPath[formElement.keyPath] = formElement;
+		});
+
+		var buildSumabilityRec = function(formElement) {
+			var type = formElement.type.split(':');
+
+			if (type[0] === "compute") {
+				var time = true, geo = true;
+				for (var key in formElement.parameters) {
+					buildSumabilityRec(formElement.parameters[key]);
+					if (!formElement.parameters[key].timeAggregation)
+						time = false;
+					if (!formElement.parameters[key].geoAggregation)
+						geo = false;
+				}
+				formElement.timeAggregationRec = time;
+				formElement.geoAggregationRec = geo;
+			}
+			else if (type[0] === "link") {
+				formElement.timeAggregationRec = formElementsByKeyPath[type[1]].timeAggregation;
+				formElement.geoAggregationRec = formElementsByKeyPath[type[1]].geoAggregation;
+			}
+			else { // == input
+				formElement.timeAggregationRec = formElement.timeAggregation;
+				formElement.geoAggregationRec = formElement.geoAggregation;
+			}
+		};
+
+		formElements.forEach(function(formElement) {
+			buildSumabilityRec(formElement);
 		});
 	};
 
@@ -145,6 +180,8 @@ reportingServices.factory('mtForms', function() {
 		delete formElement.model;
 		delete formElement.timeAggregation;
 		delete formElement.geoAggregation;
+		delete formElement.timeAggregationRec;
+		delete formElement.geoAggregationRec;
 	};
 
 	var deAnnotateAllFormElements = function(formElements) {
@@ -194,6 +231,7 @@ reportingServices.factory('mtForms', function() {
 		deleteFormElement: deleteFormElement,
 		deAnnotateFormElements: deAnnotateFormElements,
 		deAnnotateAllFormElements: deAnnotateAllFormElements,
+		buildSumability: buildSumability
 	};
 });
 

@@ -143,8 +143,8 @@
 						<i class="fa fa-caret-square-o-down" ng-if="!key && !$last" ng-click="move($index, 1)" tooltip="{{'project.move_down'|translate}}"></i>
 					</span>
 
-					<i class="fa fa-compass" ng-style="{color: indicator.geoAggregation != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.geo_aggregation'|translate}}"></i>
-					<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregation != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.time_aggregation'|translate}}"></i>
+					<i class="fa fa-compass" ng-style="{color: indicator.geoAggregationRec != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.geo_aggregation'|translate}}"></i>
+					<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregationRec != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.time_aggregation'|translate}}"></i>
 				</span>
 
 				<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>

@@ -247,6 +247,7 @@ angular.module('monitool.controllers.project', [])
 		$scope.form = angular.copy(form);
 		mtForms.annotateAllFormElements($scope.form.fields, indicatorsById);
 		mtForms.buildLinks($scope.form.fields, indicatorsById);
+		mtForms.buildSumability($scope.form.fields);
 		$scope.master = angular.copy($scope.form);
 		$scope.isNew = $stateParams.formId === 'new';
 		$scope.container.chosenIndicatorIds = $scope.form.fields.map(function(field) { return field.id; });
@@ -323,6 +324,7 @@ angular.module('monitool.controllers.project', [])
 
 			// available links are broken because we added/removed elements => rebuild them
 			mtForms.buildLinks($scope.form.fields, indicatorsById);
+			mtForms.buildSumability($scope.form.fields);
 		});
 
 		$scope.addIntermediary = function() {
@@ -358,6 +360,7 @@ angular.module('monitool.controllers.project', [])
 			}
 
 			mtForms.buildLinks($scope.form.fields, indicatorsById);
+			mtForms.buildSumability($scope.form.fields);
 		};
 
 		$scope.save = function() {
@@ -405,7 +408,6 @@ angular.module('monitool.controllers.project', [])
 			mtForms.evaluateAll($scope.form.fields, $scope.currentInput.values);
 			$scope.form.fields.forEach(function(field) {
 				var indicatorMeta = $scope.project.indicators[field.id];
-				console.log(indicatorMeta)
 
 				if (indicatorMeta.greenMinimum < $scope.currentInput.values[field.model] && $scope.currentInput.values[field.model] < indicatorMeta.greenMaximum)
 					$scope.status[field.id] = 'green';
