@@ -39,8 +39,6 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 
 	var beforeSave = function(model) {
 		var beforeSaveRec = function(model) {
-
-			console.log(Object.prototype.toString.call(model));
 			if (Object.prototype.toString.call(model) === '[object Date]')
 				return moment(model).format('YYYY-MM-DD');
 

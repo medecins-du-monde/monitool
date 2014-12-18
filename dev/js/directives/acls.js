@@ -13,9 +13,13 @@ function _makeReadOnly(scope, element, attributes) {
 		
 		// handle boolean case.
 		if (fallback === true)
-			fallback = '<i class="fa fa-check" style="color: green"></i>'
+			fallback = '<i class="fa fa-check" style="color: green"></i>';
 		else if (fallback === false)
-			fallback = '<i class="fa fa-times" style="color: red"></i>'
+			fallback = '<i class="fa fa-times" style="color: red"></i>';
+
+		// handle dates
+		if (Object.prototype.toString.call(fallback) === '[object Date]')
+			fallback = moment(fallback).format('YYYY-MM-DD');
 
 		if (element.parent().hasClass('form-group'))
 			fallback = '<p class="form-control-static">' + fallback + '</p>';

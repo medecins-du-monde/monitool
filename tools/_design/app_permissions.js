@@ -31,7 +31,8 @@ module.exports = {
 		else if (type === 'indicator' || type === 'type' || type === 'theme')
 			permission = 'indicator';
 		else if (type === 'input')
-			permission = 'input:' + doc.project;
+			// permission = 'input:' + newDoc.project;
+			permission = null;
 		else
 			throw {forbidden: "Document type is unknown."};
 
@@ -71,3 +72,4 @@ module.exports = {
 		}.toString(),
 	}
 };
+
