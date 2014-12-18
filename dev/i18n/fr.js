@@ -178,7 +178,11 @@ var FRENCH_TRANSLATION = {
 		status_green: "Cet indicateur est en zone verte",
 		status_orange: "Cet indicateur est en zone orange",
 		status_red: "Cet indicateur est en zone rouge",
-		status_darkred: "Cet indicateur est en dehors<br/>des limites fixées<br/>dans le cadre logique"
+		status_darkred: "Cet indicateur est en dehors<br/>des limites fixées<br/>dans le cadre logique",
+
+		formula: "Formule: {{name}}",
+		link: "Lien: {{name}}",
+		links: "Liens"
 	},
 	indicator: {
 		no_theme: 'Sans thématique',

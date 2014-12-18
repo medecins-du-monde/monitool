@@ -179,7 +179,11 @@ var ENGLISH_TRANSLATION = {
 		status_green: "This indicator is in its green zone",
 		status_orange: "This indicator is in its orange zone",
 		status_red: "This indicator is in its red zone",
-		status_darkred: "This indicator is out of bounds"		
+		status_darkred: "This indicator is out of bounds",
+
+		formula: "Formula: {{name}}",
+		link: "Link: {{name}}",
+		links: "Links"
 	},
 	indicator: {
 		no_theme: 'No theme',

@@ -177,7 +177,11 @@ var SPANISH_TRANSLATION = {
 		status_green: "Este indicador esta en zona verde",
 		status_orange: "Este indicador esta en zona naranja",
 		status_red: "Este indicador esta en zona roja",
-		status_darkred: "Este indicador esta fuera<br/>de los limites establecidos<br/>en el marco lógico"
+		status_darkred: "Este indicador esta fuera<br/>de los limites establecidos<br/>en el marco lógico",
+
+		formula: "Formula: {{name}}",
+		link: "Vínculo: {{name}}",
+		links: "Vínculos"
 	},
 	indicator: {
 		no_theme: 'Sin temática',

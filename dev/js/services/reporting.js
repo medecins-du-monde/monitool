@@ -9,10 +9,18 @@ reportingServices.factory('mtForms', function() {
 		formElement.name = indicator.name;
 		formElement.keyPath = currentKeyPath;
 		formElement.indicatorPath = currentIndicatorPath;
-		formElement.availableTypes = [{value: 'input', label: 'Input', group: null}]; // input is always allowed
 		formElement.model = formElement.type.substring(0, 5) === 'link:' ? formElement.type.substring(5) : formElement.keyPath;
 		formElement.timeAggregation = indicator.timeAggregation;
 		formElement.geoAggregation = indicator.geoAggregation;
+
+		// input is always allowed
+		formElement.availableTypes = [
+			{
+				value: 'input',
+				label: 'project.manual_input',
+				group: null
+			}
+		]; 
 
 		formulaLoop:for (var formulaId in indicator.formulas) {
 			var formula = indicator.formulas[formulaId];
@@ -25,7 +33,12 @@ reportingServices.factory('mtForms', function() {
 					continue formulaLoop;
 
 			// Add each formula to the element
-			formElement.availableTypes.push({value: 'compute:' + formulaId, label: formula.name, group: "compute"});
+			formElement.availableTypes.push({
+				value: 'compute:' + formulaId,
+				label: "project.formula",
+				name: formula.name,
+				group: "indicator.formulas"
+			});
 
 			// if the element is computed using the current formula
 			// => recurse and annotate children
@@ -92,8 +105,9 @@ reportingServices.factory('mtForms', function() {
 
 					changingFormElement.availableTypes.push({
 						value: 'link:' + linkFormElement.keyPath,
-						label: name,
-						group: 'Lien'
+						label: 'project.link',
+						name: name,
+						group: 'project.links'
 					});
 				}
 			});
