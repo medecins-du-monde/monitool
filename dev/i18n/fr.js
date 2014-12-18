@@ -138,7 +138,7 @@ var FRENCH_TRANSLATION = {
 		output: "Résultat",
 		activity: 'Activité',
 		prerequisite: 'Prérequis',
-		activity_prereq_ph: 'Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l\'objectif spécifique?',
+		activity_prereq_ph: 'Quels sont les prérequis pour mettre en place d\'activité?',
 		activity_desc_ph: 'Produit ou service tangibles apportés par le projet.',
 		output_assumptions_ph: 'Si le résultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l\'objectif spécifique?',
 		output_desc_ph: 'Produit ou service tangibles apportés par le projet.',

@@ -120,10 +120,10 @@ var ENGLISH_TRANSLATION = {
 
 		goal: 'Main goal',
 		goal_short: "Goal",
-		intervention_logic: 'Description',				// Logique d\'intervention
-		intervention_logic_goal_ph: '',		// Description de la contribution du projet aux objectifs (impact) d\'une politique ou d\'un programme
-		intervention_logic_purpose_ph: '',	// Description des avantages directs destinés au(x) groupe(s) cible(s)
-		assumptions_purpose_ph: '',			// Si l\'objectif spécifique est atteint, quelles hypothèses doivent être confirmées pour atteindre l\'objectif général?
+		intervention_logic: 'Description',
+		intervention_logic_goal_ph: 'Describe the project\'s contribution on a program or policy',
+		intervention_logic_purpose_ph: 'Describe the tangible advantages that are provided to the beneficiaries',
+		assumptions_purpose_ph: 'If the purpose is achieved, what assumptions must hold to met the goal?',
 		purpose_short: 'Purpose',
 		output_short: 'Output',
 
@@ -138,10 +138,10 @@ var ENGLISH_TRANSLATION = {
 		output: "Output",
 		activity: 'Activity',
 		prerequisite: 'Prerequisite',
-		activity_prereq_ph: '',		// Si le resultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l\'objectif spécifique?
-		activity_desc_ph: '',		// Produit ou service tangibles apportés par le projet.
-		output_assumptions_ph: '',	// Si le résultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l\'objectif spécifique?',
-		output_desc_ph: '',			// Produit ou service tangibles apportés par le projet.
+		activity_prereq_ph: 'What are the prerequisites that have to be met before starting the activity?',
+		activity_desc_ph: 'Product or tangible service brought by the project',
+		output_assumptions_ph: 'If the output is achieved, what assumptions must hold to to met the purpose?',
+		output_desc_ph: 'Product or tangible service brought by the project',
 
 		add_activity: 'Add activity',
 		add_output: 'Add output',

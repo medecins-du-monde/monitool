@@ -137,7 +137,7 @@ var SPANISH_TRANSLATION = {
 		output: "Resultado",
 		activity: 'Actividad',
 		prerequisite: 'Requisito previo',
-		activity_prereq_ph: 'Si el resultado se obtiene, que hipotesis se deben confirmar para alcanzar el objetivo específico?',
+		activity_prereq_ph: '¿Qué requisitos previos se deben verificar antes de poder empezar esta actividad?',
 		activity_desc_ph: 'Producto o servicio tangible aportado por el proyecto.',
 		output_assumptions_ph: 'Si el resultado es obtenido, ¿que hipotesis se deben confirmar para alcanzar el objetivo específico?',
 		output_desc_ph: 'Producto o servicio tangible aportado por el proyecto.',

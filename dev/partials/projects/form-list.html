@@ -19,8 +19,8 @@
 		</tr>
 		<tr ng-repeat="form in project.dataCollection">
 			<td>{{form.name}}</td>
-			<td>{{form.start}}</td>
-			<td>{{form.end}}</td>
+			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
+			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>
 			<td>
 				<a class="btn btn-default btn-xs" ui-sref="main.project.form({formId: form.id})">
 					<i class="fa fa-pencil"></i>
