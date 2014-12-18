@@ -86,9 +86,14 @@ var FRENCH_TRANSLATION = {
 		input_mode: 'Mode de saisie',
 		manual_input: 'Saisie manuelle',
 
+		daily: 'Tous les jours',
+		weekly: 'Toutes les semaines',
 		monthly: 'Tous les mois',
 		quarterly: 'Tous les trimestres',
+		yearly: 'Tous les ans',
 		planned: 'Planifiée',
+		add_intermediary: "Ajouter une saisie",
+		intermediary_periods: "Dates supplémentaires",
 
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',
 		no_input_groups: 'Aucun groupe d\'activité n\'a encore été créé!',

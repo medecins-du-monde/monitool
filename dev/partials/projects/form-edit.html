@@ -59,12 +59,19 @@
 						{{'project.begin'|translate}}
 					</div>
 
-					<input type="date"
-						   class="form-control"
-						   ng-model="form.start"
-						   ng-disabled="form.useProjectStart"
+					<input type="text" 
+						   datepicker-popup="yyyy/MM/dd"
 						   name="start"
-						   ng-required="!form.useProjectStart" />
+						   ng-model="form.start"
+						   is-open="startDateOpen"
+						   show-button-bar="false"
+						   ng-click = "startDateOpen = true"
+						   starting-day="1"
+						   show-weeks="0"
+						   ng-disabled="form.useProjectStart"
+						   ng-required="!form.useProjectStart"
+						   ng-max="form.end"
+						   class="form-control" />
 				</div>
 
 				<p class="form-control-static" acl-lacks-project-role="owner">
@@ -80,7 +87,19 @@
 				<div ng-repeat="(index, period) in form.intermediaryDates" class="row" style="padding-bottom: 10px">
 					<ng-form name="intermediaryForm">
 						<div class="col-sm-10 form-group" show-errors style="margin: 0">
-							<input type="date" class="form-control" ng-model="form.intermediaryDates[index]" name="period" required />
+							<input type="text" 
+								   datepicker-popup="yyyy/MM/dd"
+								   name="period"
+								   ng-model="form.intermediaryDates[index]"
+								   is-open="periodDateOpen"
+								   show-button-bar="false"
+								   ng-click="periodDateOpen=true"
+								   starting-day="1"
+								   show-weeks="0"
+								   required
+								   ng-min="form.start"
+								   ng-max="form.end"
+								   class="form-control" />
 						</div>
 						<div class="col-sm-2">
 							<button class="btn btn-danger" ng-click="removeIntermediary(index)" translate="shared.delete"></button>
@@ -105,12 +124,19 @@
 						{{'project.end'|translate}}
 					</div>
 
-					<input type="date"
-						   class="form-control"
+					<input type="text" 
+						   datepicker-popup="yyyy/MM/dd"
 						   name="end"
 						   ng-model="form.end"
+						   is-open="endDateOpen"
+						   show-button-bar="false"
+						   ng-click="endDateOpen=true"
+						   starting-day="1"
+						   show-weeks="0"
 						   ng-disabled="form.useProjectEnd"
-						   ng-required="!form.useProjectEnd" />
+						   ng-required="!form.useProjectEnd"
+						   ng-min="form.start"
+						   class="form-control" />
 				</div>
 
 				<p class="form-control-static" acl-lacks-project-role="owner">

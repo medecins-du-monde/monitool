@@ -236,7 +236,7 @@ reportingServices.factory('mtForms', function() {
 });
 
 
-reportingServices.factory('mtFormula', function($q, mtDatabase) {
+reportingServices.factory('mtFormula', function($q) {
 	return {
 		/**
 		 * In: {expression: "a + b", parameters: {a: 42}}
@@ -358,7 +358,7 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 		if (numTargets == 0)
 			return 0;
 		
-		targets.sort(function(a, b) { return a.period.localeCompare(b.period); });
+		targets.sort(function(a, b) { return a.period > b.period ? 1 : -1 });
 		var index = 0;
 		while (index < numTargets) {
 			if (targets[index].period > period)
@@ -551,17 +551,15 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 
 		query.projects.forEach(function(project) {
 			var projectInputs = inputs.filter(function(input) { return input.project === project._id; }),
-				projectQuery  = {begin: query.begin, project: project, groupBy: query.groupBy},
-				data          = regroup(projectInputs, projectQuery);
+				projectQuery  = {begin: query.begin, project: project, groupBy: query.groupBy};
 
-			result[project._id] = data//retrieveMetadata(project, data, begin, query.groupBy);
+			result[project._id] = regroup(projectInputs, projectQuery);
 
 			project.inputEntities.forEach(function(entity) {
 				var entityInputs = projectInputs.filter(function(input) { return input.entity === entity.id; }),
 					entityQuery  = {begin: query.begin, project: project, groupBy: query.groupBy, type: 'entity', id: entity.id};
-					data         = regroup(entityInputs, entityQuery);
 
-				result[entity.id] = data;//retrieveMetadata(project, data, begin, query.groupBy);
+				result[entity.id] = regroup(entityInputs, entityQuery);
 			});
 		});
 

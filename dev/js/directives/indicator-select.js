@@ -8,7 +8,6 @@ angular
 		return {
 			templateUrl: 'partials/indicators/accordeon.html',
 			restrict: "E",
-			// transclude: true,
 			scope: {
 				choose: '=choose',
 				userCtx: '=userCtx',

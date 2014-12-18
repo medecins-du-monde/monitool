@@ -106,6 +106,13 @@ angular.module('monitool.controllers.indicator', [])
 			groupBy: 'month',
 		};
 
+		// h@ck
+		$scope.dates = {begin: new Date($scope.query.begin), end: new Date($scope.query.end)};
+		$scope.$watch("dates", function() {
+			$scope.query.begin = moment($scope.dates.begin).format('YYYY-MM-DD');
+			$scope.query.end = moment($scope.dates.end).format('YYYY-MM-DD');
+		}, true);
+
 		$scope.inputs = [];
 		$scope.$watch("[query.begin, query.end]", function() {
 			mtReporting.getInputs($scope.query).then(function(inputs) {
@@ -114,7 +121,7 @@ angular.module('monitool.controllers.indicator', [])
 		}, true);
 
 		// Update cols and data when grouping or inputs changes.
-		$scope.$watch("[query.groupBy, inputs]", function() {
+		$scope.$watch("[query.begin, query.end, query.groupBy, inputs]", function() {
 			$scope.cols = mtReporting.getStatsColumns($scope.query);
 			$scope.data = mtReporting.regroupIndicator($scope.inputs, $scope.query);
 		}, true);

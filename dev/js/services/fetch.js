@@ -18,9 +18,54 @@ fetchServices.factory('mtFetch', function($q, mtDatabase) {
 
 	var handleError = function(error) {
 		console.log(error)
-	}
+	};
+
+	var afterLoad = function(model) {
+		if (typeof model === 'string' && model.match(/\d\d\d\d\-\d\d\-\d\d/))
+			return new Date(model);
+
+		if (Array.isArray(model)) {
+			var numChildren = model.length;
+			for (var i = 0; i < numChildren; ++i)
+				model[i] = afterLoad(model[i]);
+		}
+		else if (typeof model === 'object' && model !== null) {
+			for (var key in model)
+				model[key] = afterLoad(model[key]);
+		}
+
+		return model;
+	};
+
+	var beforeSave = function(model) {
+		var beforeSaveRec = function(model) {
+
+			console.log(Object.prototype.toString.call(model));
+			if (Object.prototype.toString.call(model) === '[object Date]')
+				return moment(model).format('YYYY-MM-DD');
+
+			if (Array.isArray(model)) {
+				var numChildren = model.length;
+				for (var i = 0; i < numChildren; ++i)
+					model[i] = beforeSaveRec(model[i]);
+			}
+			else if (typeof model === 'object' && model !== null) {
+				for (var key in model)
+					model[key] = beforeSaveRec(model[key]);
+			}
+
+			return model;
+		};
+
+		model = beforeSaveRec(angular.copy(model));
+		return JSON.parse(angular.toJson(model));
+	};
 
 	return {
+
+		afterLoad: afterLoad,
+		beforeSave: beforeSave,
+
 		project: function(projectId) {
 			if (projectId === 'new') {
 				return $q.when({

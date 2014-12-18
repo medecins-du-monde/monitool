@@ -231,8 +231,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 								if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
 									var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
 
-									var current = moment(form.useProjectStart ? project.begin : form.begin, 'YYYY-MM-DD').startOf(period),
-										end     = moment(form.useProjectEnd ? project.end : project.end, 'YYYY-MM-DD').endOf(period);
+									var current = moment(form.useProjectStart ? project.begin : form.begin).startOf(period),
+										end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
 
 									if (end.isAfter()) // do not allow to go in the future
 										end = moment();
@@ -245,10 +245,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 								}
 								else if (form.periodicity === 'planned') {
 									periods = form.intermediaryDates.map(function(period) {
-										return moment(period, 'YYYY-MM-DD');
+										return moment(period);
 									});
-									periods.unshift(moment(form.start, 'YYYY-MM-DD'));
-									periods.push(moment(form.end, 'YYYY-MM-DD'));
+									periods.unshift(moment(form.start));
+									periods.push(moment(form.end));
 								}
 								else
 									throw new Error(form.periodicity + ' is not a valid periodicity');

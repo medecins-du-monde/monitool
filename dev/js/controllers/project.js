@@ -13,11 +13,11 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectMenuController', function($scope, $state, $stateParams, project, mtDatabase) {
+	.controller('ProjectMenuController', function($scope, $state, $stateParams, project, mtDatabase, mtFetch) {
 		if ($stateParams.projectId === 'new')
 			project.owners.push($scope.userCtx.name);
 
-		$scope.project = project;
+		$scope.project = mtFetch.afterLoad(project);
 		$scope.master = angular.copy(project);
 
 		// save, reset and isUnchanged are all defined here, because those are shared between all project views.
@@ -25,8 +25,7 @@ angular.module('monitool.controllers.project', [])
 			if ($stateParams.projectId === 'new')
 				$scope.project._id = PouchDB.utils.uuid().toLowerCase();
 
-			var cleanProject = JSON.parse(angular.toJson($scope.project));
-			mtDatabase.current.put(cleanProject).then(function(result) {
+			mtDatabase.current.put(mtFetch.beforeSave($scope.project)).then(function(result) {
 				$scope.project._rev = result.rev;
 				$scope.master = angular.copy($scope.project);
 
@@ -450,6 +449,13 @@ angular.module('monitool.controllers.project', [])
 			id:      $stateParams.id			// undefined/entityId/groupId
 		};
 
+		// h@ck
+		$scope.dates = {begin: new Date($scope.query.begin), end: new Date($scope.query.end)};
+		$scope.$watch("dates", function() {
+			$scope.query.begin = moment($scope.dates.begin).format('YYYY-MM-DD');
+			$scope.query.end = moment($scope.dates.end).format('YYYY-MM-DD');
+		}, true);
+
 		// Update loaded inputs when query.begin or query.end changes.
 		$scope.inputs = [];
 		$scope.$watch("[query.begin, query.end]", function() {
@@ -459,7 +465,7 @@ angular.module('monitool.controllers.project', [])
 		}, true);
 
 		// Update cols and data when grouping or inputs changes.
-		$scope.$watch("[query.groupBy, inputs]", function() {
+		$scope.$watch("[query.begin, query.end, query.groupBy, inputs]", function() {
 			$scope.cols = mtReporting.getStatsColumns($scope.query);
 			$scope.data = mtReporting.regroup($scope.inputs, $scope.query);
 		}, true);

@@ -86,9 +86,14 @@ var ENGLISH_TRANSLATION = {
 		input_mode: 'Input mode',
 		manual_input: 'Manual input',
 
+		daily: "Every day",
+		weekly: "Every week",
 		monthly: 'Every month',
 		quarterly: 'Every quarter',
+		yearly: "Every year",
 		planned: 'Planned',
+		add_intermediary: "Add a date",
+		intermediary_periods: "Extra dates",
 
 		no_input_entities: 'No input entity was created yet!',
 		no_input_groups: 'No input group was created yet!',

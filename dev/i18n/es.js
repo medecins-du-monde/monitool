@@ -86,9 +86,14 @@ var SPANISH_TRANSLATION = {
 		input_mode: 'Modo de entrada',
 		manual_input: 'Entrada manual',
 
+		daily: 'Diario',
+		weekly: 'Cada semana',
 		monthly: 'Cada mes',
 		quarterly: 'Cada trimestre',
+		yearly: 'Cada año',
 		planned: 'Planificado',
+		add_intermediary: "Añadir una fecha",
+		intermediary_periods: "Fechas adicionales",
 
 		no_input_entities: '¡Ningún lugar de actividad ha sido creado!',
 		no_input_groups: '¡Ningún grupo de actividad ha sido creado!',
