@@ -102,6 +102,7 @@ gulp.task('build', ['build-js', 'build-css', 'copy-static']);
 gulp.task('copy-static', function() {
 	gulp.src('dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('build'));
 	gulp.src('dev/bower_components/fontawesome/fonts/*').pipe(gulp.dest('build/fonts'));
+	gulp.src('dev/bower_components/bootstrap/fonts/*').pipe(gulp.dest('build/fonts'));
 	gulp.src('dev/monitool.appcache').pipe(gulp.dest('build'));
 });
 
