@@ -76,7 +76,7 @@
 
 				<p class="form-control-static" acl-lacks-project-role="owner">
 					<span ng-if="form.useProjectStart" translate="project.begin"></span>
-					<span ng-if="!form.useProjectStart">form.start</span>
+					<span ng-if="!form.useProjectStart">{{form.start | amDateFormat: 'D MMMM YYYY'}}</span>
 				</p>
 			</div>
 		</div>
@@ -141,7 +141,7 @@
 
 				<p class="form-control-static" acl-lacks-project-role="owner">
 					<span ng-if="form.useProjectEnd" translate="project.end"></span>
-					<span ng-if="!form.useProjectEnd">{{form.end}}</span>
+					<span ng-if="!form.useProjectEnd">{{form.end | amDateFormat: 'D MMMM YYYY'}}</span>
 				</p>
 			</div>
 		</div>
@@ -193,7 +193,7 @@
 						</select>
 
 						<p class="form-control-static" acl-lacks-project-role="owner" ng-repeat="i in indicator.availableTypes" ng-if="i.value === indicator.type">
-							{{i.label}}
+							{{i.label|translate:i}}
 						</p>
 					</div>
 				</div>
