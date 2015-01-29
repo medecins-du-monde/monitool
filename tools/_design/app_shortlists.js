@@ -18,7 +18,13 @@ var reduceTypeTheme = function(keys, values, rereduce) {
 module.exports = {
 	_id: '_design/shortlists',
 
-	views: {
+	views: {	
+		by_type: {
+			map: function(doc) {
+				emit(doc.type);
+			}.toString()
+		},
+
 		// secondary key
 		projects_by_indicator: {
 			map: function(doc) {

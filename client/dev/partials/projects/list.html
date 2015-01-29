@@ -1,0 +1,31 @@
+<input type="checkbox" ng-model="showFinished" id="filter-finished" />
+<label for="filter-finished" translate>project.show_finished</label>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th style="width: 55px"></th>
+			<th><a ng-click="pred='name';rev=!rev">{{'shared.name'|translate}}</a></th>
+			<th><a ng-click="pred='begin';rev=!rev">{{'shared.begin'|translate}}</a></th>
+			<th><a ng-click="pred='end';rev=!rev">{{'shared.end'|translate}}</a></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="project in projects | filter:isDisplayed | orderBy:pred:rev">
+			<td style="text-align: center">
+				<i class="fa fa-file-powerpoint-o" tooltip="{{'project.you_are_owner'|translate}}" tooltip-placement="right" acl-has-project-role="owner" acl-project="project"></i>
+				<i class="fa fa-file-powerpoint-o text-danger" tooltip="{{'project.you_are_not_owner'|translate}}" tooltip-placement="right" acl-lacks-project-role="owner" acl-project="project"></i>
+				<i class="fa fa-file-text-o" tooltip="{{'project.you_are_editor'|translate}}" tooltip-placement="right" acl-has-project-role="input" acl-project="project"></i>
+				<i class="fa fa-file-text-o text-danger" tooltip="{{'project.you_are_not_editor'|translate}}" tooltip-placement="right" acl-lacks-project-role="input" acl-project="project"></i>
+			</td>
+			<td><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></td>
+			<td>{{project.begin|amDateFormat:'YYYY-MM-DD'}}</td>
+			<td>{{project.end|amDateFormat:'YYYY-MM-DD'}}</td>
+		</tr>
+	</tbody>
+</table>
+
+<a class="btn btn-default" ui-sref="main.project.logical_frame({projectId: 'new'})" acl-has-role="project_create">
+	<i class="fa fa-plus"></i>
+	<span translate="project.create"></span>
+</a>
