@@ -14,8 +14,10 @@ angular.module('monitool.controllers.project', [])
 	})
 
 	.controller('ProjectMenuController', function($scope, $state, $stateParams, project, mtFetch) {
-		if ($stateParams.projectId === 'new')
-			project.owners.push($scope.userCtx.name);
+		if ($stateParams.projectId === 'new') {
+			project.owners.push($scope.userCtx._id);
+			project.dataEntryOperators.push($scope.userCtx._id);
+		}
 
 		$scope.project = project;
 		$scope.master = angular.copy(project);
@@ -159,7 +161,7 @@ angular.module('monitool.controllers.project', [])
 	 * This controller is a modal and DOES NOT inherit from ProjectLogicalFrameController
 	 * Hence the need for project and userCtx to be passed explicitly.
 	 */
-	.controller('ProjectLogicalFrameIndicatorController', function($scope, $modalInstance, mtDatabase, indicatorId, target) {
+	.controller('ProjectLogicalFrameIndicatorController', function($scope, $modalInstance, mtFetch, indicatorId, target) {
 		// Retrieve indicator array where we need to add or remove indicator ids.
 		$scope.isNew = !$scope.project.indicators[indicatorId];
 		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
@@ -170,7 +172,7 @@ angular.module('monitool.controllers.project', [])
 		};
 
 		// FIXME, this query is useless, we could avoid it and pass the full indicator from the calling controller.
-		mtDatabase.current.get(indicatorId).then(function(indicator) {
+		mtFetch.indicator(indicatorId).then(function(indicator) {
 			$scope.indicator = indicator;
 		});
 
@@ -392,7 +394,7 @@ angular.module('monitool.controllers.project', [])
 		$scope.inputs = inputs;
 	})
 
-	.controller('ProjectInputController', function($scope, $state, mtForms, mtDatabase, form, indicatorsById, inputs) {
+	.controller('ProjectInputController', function($scope, $state, mtForms, form, indicatorsById, inputs) {
 		$scope.form          = angular.copy(form);
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
@@ -419,13 +421,13 @@ angular.module('monitool.controllers.project', [])
 		}, true);
 
 		$scope.save = function() {
-			mtDatabase.current.put($scope.currentInput).then(function() {
+			$scope.currentInput.$save(function() {
 				$state.go('main.project.input_list');
 			});
 		};
 
 		$scope.delete = function() {
-			mtDatabase.current.remove($scope.currentInput).then(function() {
+			$scope.currentInput.$delete(function() {
 				$state.go('main.project.input_list');
 			});
 		};

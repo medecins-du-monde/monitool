@@ -137,7 +137,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectReportingController',
 		resolve: {
 			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({projectId: project._id});
+				return mtFetch.indicators({projectId: project._id}, true);
 			}
 		},
 		data: {
@@ -209,9 +209,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			inputs: function($stateParams, mtFetch, project) {
 
-				return mtFetch.inputs({project: project._id, short: 1}).then(function(result) {
+				return mtFetch.inputs({mode: 'project_input_ids', projectId: project._id}).then(function(result) {
 					var inputExists = {}, inputs = [];
-					result.forEach(function(row) { inputExists[row._id] = true; });
+					result.forEach(function(id) { inputExists[id] = true; });
 					
 					project.inputEntities.forEach(function(inputEntity) {
 						project.dataCollection.forEach(function(form) {
@@ -402,18 +402,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				return mtFetch.projects({indicatorId: $stateParams.indicatorId});
 			},
 			indicatorsById: function($q, mtFetch, projects) {
-				var promises = projects.map(function(p) {
-					return mtFetch.indicators({projectId: p._id}, true);
-				});
-
-				return $q.all(promises).then(function(result) {
-					var r = {};
-					result.forEach(function(indicatorsById) {
-						for (var indicatorId in indicatorsById)
-							r[indicatorId] = indicatorsById[indicatorId];
-					});
-					return r;
-				});
+				var projectIds = projects.map(function(p) { return p._id; });
+				return mtFetch.indicators({projectId: projectIds}, true);
 			}
 		}
 	});

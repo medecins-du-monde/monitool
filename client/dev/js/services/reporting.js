@@ -302,7 +302,7 @@ reportingServices.factory('mtFormula', function($q) {
 });
 
 
-reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
+reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 
 	var sumBy = function(inputs, groupBy) {
 		var result = {};
@@ -418,47 +418,39 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 
 	var getInputs = function(query) {
 		// Retrieve all relevant inputs.
-		var cbQueries = [];
+		var options;
 		if (query.type === 'project' || query.type === 'group')
-			cbQueries.push({
-				view: 'reporting/inputs_by_project_date',
-				opts: {startkey: [query.project._id, query.begin], endkey: [query.project._id, query.end], include_docs: true}
-			});
+			options = {mode: 'project_inputs', begin: query.begin, end: query.end, projectId: query.project._id};
+
 		else if (query.type === 'entity')
-			cbQueries.push({
-				view: 'reporting/inputs_by_entity_date',
-				opts: {startkey: [query.id, query.begin], endkey: [query.id, query.end], include_docs: true}
-			});
+			options = {mode: 'entity_inputs', begin: query.begin, end: query.end, entityId: query.id};
+
 		else if (query.type === 'indicator')
-			// Retrieve all form ids that contain the indicator among the projects.
-			query.projects.forEach(function(project) {
-			
-				project.dataCollection.filter(function(form) {
-					return form.fields.find(function(formElement) {
-						return formElement.id === query.indicator._id;
+			// we want all inputs from a form with the relevant formId
+			options = {
+				mode: 'form_inputs',
+				begin: query.begin, end: query.end,
+				formId: query.projects.map(function(p) {
+					var form = p.dataCollection.find(function(f) {
+						return !!f.fields.find(function(field) { return query.indicator._id === field.id });
 					});
-				}).forEach(function(form) {
-					cbQueries.push({
-						view: 'reporting/inputs_by_form_date',
-						opts: {startkey: [form.id, query.begin], endkey: [form.id, query.end], include_docs: true}
-					});
-				});
-			});
+					return form ? form.id : null;
+				}).filter(function(form) { return form; })
+			};
 		else
 			throw new Error('query.type must be indicator, project, group or entity');
 
-		return $q.all(cbQueries.map(function(cbQuery) {
-			return mtDatabase.current.query(cbQuery.view, cbQuery.opts);
-		})).then(function(results) {
-			var inputs = [];
-
-			results.forEach(function(result) {
-				inputs = inputs.concat(result.rows.map(function(row) { return row.doc; }));
-			});
+		return mtFetch.inputs(options).then(function(inputs) {
+			// This first step should be useless if the API works properly
+			if (query.type === 'project')
+				inputs = inputs.filter(function(input) { return input.project === query.project._id; });
+			else if (query.type === 'entity')
+				inputs = inputs.filter(function(input) { return input.entity === query.id; });
 
 			// annotate each input with keys that will later tell the sumBy function how to aggregate the data.
 			inputs.forEach(function(input) {
-				var period = input.period.split('-');
+
+				var period = moment(input.period);
 				var project = query.project || query.projects.find(function(p) { return p._id === input.project; });
 				var groupIds = project.inputGroups.filter(function(group) {
 					return group.members.indexOf(input.entity) !== -1;
@@ -466,15 +458,15 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtDatabase) {
 					return group.id;
 				});
 
-				input.yearAgg   = ['total', period.slice(0, 1).join('-')];
-				input.weekAgg   = ['total', moment(input.period, 'YYYY-MM-DD').format('YYYY-MM-[W]WW')];
-				input.monthAgg  = ['total', period.slice(0, 2).join('-')];
-				input.dayAgg    = ['total', input.period];
+				input.yearAgg   = ['total', period.format('YYYY')];
+				input.monthAgg  = ['total', period.format('YYYY-MM')];
+				input.weekAgg   = ['total', period.format('YYYY-MM-[W]WW')];
+				input.dayAgg    = ['total', period.format('YYYY-MM-DD')];
 				input.entityAgg = ['total', input.entity];
 				input.groupAgg  = groupIds; // no total here, groups don't sum
 			});
 
-			// for a group, discard all inputs that are not relevant...
+			// discard all inputs that are not relevant...
 			if (query.type === 'group')
 				inputs = inputs.filter(function(input) { return input.groupAgg.indexOf(query.id) !== -1 });
 

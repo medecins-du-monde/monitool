@@ -20,7 +20,7 @@ angular.module('monitool.controllers.indicator', [])
 		};
 	})
 
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, $modal, mtDatabase, mtFormula, indicator, indicatorsById, types, themes) {
+	.controller('IndicatorEditController', function($state, $scope, $stateParams, $modal, mtFormula, indicator, indicatorsById, types, themes) {
 		// Formula handlers
 		$scope.addFormula = function() {
 			var uuid  = PouchDB.utils.uuid().toLowerCase(),
@@ -47,7 +47,7 @@ angular.module('monitool.controllers.indicator', [])
 			}).result;
 
 			indicatorId.then(function(indicatorId) {
-				mtDatabase.current.get(indicatorId).then(function(indicator) {
+				mtFetch.indicator(indicatorId).then(function(indicator) {
 					$scope.indicatorsById[indicatorId] = indicator;
 					$scope.indicator.formulas[formulaId].parameters[symbol] = indicatorId;
 				});
@@ -69,8 +69,7 @@ angular.module('monitool.controllers.indicator', [])
 			if ($stateParams.indicatorId === 'new')
 				$scope.indicator._id = PouchDB.utils.uuid().toLowerCase();
 
-			mtDatabase.current.put($scope.indicator).then(function(result) {
-				$scope.indicator._rev = result.rev;
+			$scope.indicator.$save(function() {
 				$scope.master = angular.copy($scope.indicator);
 				$state.go('main.indicators.list');
 			});
@@ -181,11 +180,9 @@ angular.module('monitool.controllers.indicator', [])
 		};
 
 		$scope.create = function() {
-			var newEntity = new mtFetch[$scope.entityType]();
+			var newEntity = mtFetch[$scope.entityType]();
 			newEntity.__isNew = true; // this will be removed on save.
 			newEntity._id = PouchDB.utils.uuid().toLowerCase()
-			newEntity.type = $state.current.data.entityType
-			newEntity.name = '';
 
 			$scope.entities.push(newEntity);
 			$scope.master.push(angular.copy(newEntity));

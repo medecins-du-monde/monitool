@@ -8,10 +8,26 @@ var validator = require('is-my-json-valid'),
 var validate = validator(schema);
 
 module.exports = {
-	list: Abstract.list.bind(this, 'indicator'),
 	get: Abstract.get.bind(this, 'indicator'),
 	delete: Abstract.delete.bind(this, 'indicator'),
 	set: Abstract.set.bind(this),
+
+	list: function(options, callback) {
+		if (options.mode === 'theme_type')
+			// the indicators that match a type and theme
+			;
+		else if (options.mode === 'project_logframe') 
+			// only the indicators used by the project
+			;
+		else if (options.mode === 'project_reporting')
+			// the indicators used by the project + all their dependencies (for the used formulas)
+			;
+		else if (options.mode === 'project_form')
+			// the indicators used by the project + all their dependencies (for all formulas)
+			;
+		else
+			return Abstract.list.bind(this, 'indicator', options, callback);
+	},
 
 	validate: function(item, callback) {
 		validate(item);

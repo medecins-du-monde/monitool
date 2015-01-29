@@ -1,7 +1,7 @@
 "use strict";
 
 angular.module('monitool.services.fetch', [])
-	.factory('mtFetch', function($http, $resource) {
+	.factory('mtFetch', function($http, $resource, $q) {
 		$http.defaults.headers.common.Authorization = 'Basic ' + btoa('');
 
 		$http.defaults.transformRequest.unshift(function(data) {
@@ -68,13 +68,61 @@ angular.module('monitool.services.fetch', [])
 			ModelById = { project: Project, indicator: Indicator, input: Input, theme: Theme, type: Type, user: User };
 
 		// Add common methods exported by this service (project, projects, projectsById, etc).
-		var methods = {}
-		for (var type in ModelById) {
-			// fetch
-			methods[type] = function(type, id) {
-				return id ? ModelById[type].get({id: id}).$promise : new ModelById[type]();
-			}.bind(null, type);
+		var methods = {
+			project: function(id) {
+				if (!id || id === 'new')
+					return new Project({
+						type: "project",
+						name: "",
+						begin: new Date(),
+						end: new Date(),
+						logicalFrame: {goal: "", indicators: [], purposes: []},
+						inputEntities: [],
+						inputGroups: [],
+						dataCollection: [],
+						indicators: {},
+						owners: [],
+						dataEntryOperators: []
+					});
+				else
+					return Project.get({id: id}).$promise
+			},
 
+			indicator: function(id) {
+				if (!id || id === 'new')
+					return new Indicator({
+						type: 'indicator', name: '', description: '', history: '',
+						standard: false, geoAggregation: 'none', timeAggregation: 'none',
+						types: [], themes: [], formulas: {}
+					});
+				else
+					return Indicator.get({id: id}).$promise;
+			},
+
+			input: function(id) {
+				return id && id !== 'new' ? Input.get({id: id}).$promise : new Input();
+			},
+
+			theme: function(id) {
+				if (!id || id === 'new')
+					return new Theme({type: 'theme', name: ''});
+				else
+					return Indicator.get({id: id}).$promise;
+			},
+
+			type: function(id) {
+				if (!id || id === 'new')
+					return new Type({type: 'type', name: ''});
+				else
+					return Indicator.get({id: id}).$promise;
+			},
+
+			user: function(id) {
+				return id && id !== 'new' ? User.get({id: id}).$promise : new User();
+			}
+		};
+
+		for (var type in ModelById) {
 			// list
 			methods[type + 's'] = function(type, filters, byId) {
 				filters = filters || {};

@@ -42,6 +42,6 @@ angular
 		};
 	})
 
-	.controller('ChangePasswordController', function($scope, session, mtDatabase) {
+	.controller('ChangePasswordController', function($scope, session) {
 		$scope.login = session.userCtx.name;
 	});

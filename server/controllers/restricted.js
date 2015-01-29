@@ -43,7 +43,6 @@ var checkEditPermissions = function(user, modelName, modelId, callback) {
 		callback(user.roles.indexOf('_admin') === -1 ? 'missing_permission' : null);
 };
 
-
 router.put('/:modelName(indicator|project|input|theme|type|user)/:id', function(request, response) {
 	var modelName  = request.params.modelName,
 		ModelClass = ModelsByName[request.params.modelName],
