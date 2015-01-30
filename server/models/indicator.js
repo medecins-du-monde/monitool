@@ -7,10 +7,12 @@ var validator = require('is-my-json-valid'),
 
 var validate = validator(schema);
 
-module.exports = {
+var Indicator = module.exports = {
 	get: Abstract.get.bind(this, 'indicator'),
 	delete: Abstract.delete.bind(this, 'indicator'),
 	set: Abstract.set.bind(this),
+
+
 
 	list: function(options, callback) {
 		var opt;
@@ -68,12 +70,38 @@ module.exports = {
 			}
 		}
 
-		else if (options.mode === 'project_reporting')
+		else if (options.mode === 'project_logframe') {
+			if (!options.projectId)
+				return callback('missing_parameter')
+
 			// the indicators used by the project + all their dependencies (for the used formulas)
-			;
-		else if (options.mode === 'project_form')
-			// the indicators used by the project + all their dependencies (for all formulas)
-			;
+			database.get(options.projectId, function(error, project) {
+				if (error)
+					return callback('no_such_project');
+
+				var indicatorIds = Object.keys(project.indicators) || [];
+				Indicator._fetchIndicatorsRec(indicatorIds, 1, callback);
+			});
+		}
+		else if (options.mode === 'project_reporting') {
+			if (!options.projectId)
+				return callback('missing_parameter');
+			
+			// the indicators used by the project + all their dependencies (for the used formulas)
+			database.get(options.projectId, function(error, project) {
+				if (error)
+					return callback('no_such_project');
+
+				var indicatorIds = Object.keys(project.indicators) || [];
+				Indicator._fetchIndicatorsRec(indicatorIds, 10, callback);
+			});
+		}
+		else if (options.mode === 'indicator_edition') {
+			if (!options.indicatorId)
+				return callback('missing_parameter');
+			
+			Indicator._fetchIndicatorsRec([options.indicatorId], 2, callback);
+		}
 		else
 			return Abstract.list('indicator', options, callback);
 	},
@@ -97,6 +125,44 @@ module.exports = {
 
 		Abstract._checkIds(ids, function(errors) {
 			return callback(errors.length ? errors : null)
+		});
+	},
+
+	/**
+	 * Fetch id1, id2 and decendents
+	 * fetchIndicatorRec([id1, id2], 3, function(error, indicators) { ... })
+	 */
+	_fetchIndicatorsRec: function(indicatorIds, numIterations, callback, indicators) {
+		// Recursion init
+		indicators = indicators || [];
+
+		// Recursion termination
+		if (indicators.length === indicatorIds.length || numIterations === 0)
+			return callback(null, indicators);
+
+		var newIndicatorsIds = indicatorIds.slice(indicators.length);
+		database.list({keys: newIndicatorsIds, include_docs: true}, function(error, result) {
+
+			newIndicatorsIds.forEach(function(indicatorId) {
+				// we search in the result rows instead of just iterating them to retrieve
+				// the indicators in a predicable order.
+				var candidates = result.rows.filter(function(row) { return row.id === indicatorId; }),
+					indicator  = candidates.length ? candidates[0].doc : null;
+
+				if (indicator) {
+					// add indicator to the list.
+					indicators.push(indicator);
+
+					// add its dependencies to the id list so that we can fetch them
+					for (var formulaId in indicator.formulas)
+						for (var key in indicator.formulas[formulaId].parameters)
+							if (indicatorIds.indexOf(indicator.formulas[formulaId].parameters[key]) === -1)
+								indicatorIds.push(indicator.formulas[formulaId].parameters[key]);
+				}
+			});
+
+			// recurse to fetch
+			return Indicator._fetchIndicatorsRec(indicatorIds, --numIterations, callback, indicators);
 		});
 	}
 };

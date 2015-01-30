@@ -137,7 +137,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectReportingController',
 		resolve: {
 			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({projectId: project._id}, true);
+				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
 			}
 		},
 		data: {
@@ -158,7 +158,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectReportingController',
 		resolve: {
 			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({projectId: project._id}, true);
+				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
 			}
 		},
 		data: {
@@ -178,7 +178,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectFormEditionController',
 		resolve: {
 			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({projectId: project._id}, true);
+				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
 			},
 			formulasById: function(indicatorsById) {
 				var formulasById = {};
@@ -293,7 +293,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				return mtFetch.currentPreviousInput($stateParams);
 			},
 			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({projectId: project._id}, true);
+				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
 			},
 			form: function($stateParams, project) {
 				return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
@@ -307,7 +307,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectReportingController',
 		resolve: {
 			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({projectId: project._id}, true);
+				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
 			}
 		},
 		data: {
@@ -374,8 +374,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/indicator/:indicatorId',
 		template: '<div ui-view></div>',
 		resolve: {
-			indicator: function(mtFetch, $stateParams) {
-				return mtFetch.indicator($stateParams.indicatorId);
+			indicatorsById: function(mtFetch, $stateParams) {
+				return mtFetch.indicators({mode: "indicator_edition", indicatorId: $stateParams.indicatorId}, true);
+			},
+			indicator: function(mtFetch, $stateParams, indicatorsById) {
+				return indicatorsById[$stateParams.indicatorId]
 			}
 		}
 	});
@@ -385,9 +388,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/edit.html',
 		controller: 'IndicatorEditController',
 		resolve: {
-			indicatorsById: function(mtFetch, indicator) {
-				return mtFetch.indicators({indicatorId: indicator._id});
-			},
 			types: function(mtFetch) { return mtFetch.types(); },
 			themes: function(mtFetch) { return mtFetch.themes(); }
 		}
@@ -400,10 +400,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			projects: function($stateParams, mtFetch) {
 				return mtFetch.projects({indicatorId: $stateParams.indicatorId});
-			},
-			indicatorsById: function($q, mtFetch, projects) {
-				var projectIds = projects.map(function(p) { return p._id; });
-				return mtFetch.indicators({projectId: projectIds}, true);
 			}
 		}
 	});
@@ -413,6 +409,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 app.run(function($rootScope) {
 	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+		console.log(error)
 		console.log(error.stack)
 	});
 })

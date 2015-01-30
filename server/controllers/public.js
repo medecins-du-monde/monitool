@@ -20,7 +20,10 @@ router.get('/:modelName(project|indicator|input|theme|type|user)', function(requ
 	var Model = ModelsByName[request.params.modelName];
 
 	Model.list(request.query, function(error, data) {
-		response.json(data);
+		if (error)
+			response.json({error: true, message: error});
+		else
+			response.json(data);
 	});
 });
 
