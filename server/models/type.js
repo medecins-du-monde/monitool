@@ -13,23 +13,19 @@ var Type = module.exports = {
 	set: Abstract.set.bind(this),
 
 	list: function(options, callback) {
-		if (mode === 'theme_usage')
-			;
-		
-		else
-			database.view('shortlists', 'by_type', {include_docs: true, key: 'type'}, function(error, data) {
-				var types = data.rows.map(function(row) { return row.doc; });
-				if (!options.with_counts)
-					return callback(null, types);
+		database.view('shortlists', 'by_type', {include_docs: true, key: 'type'}, function(error, data) {
+			var types = data.rows.map(function(row) { return row.doc; });
+			if (!options.with_counts)
+				return callback(null, types);
 
-				database.view('server', 'types_usage', {group: true}, function(error, data) {
-					var countByType = {};
-					data.rows.forEach(function(row) { countByType[row.key] = row.value; });
-					types.forEach(function(type) { type.__usage = countByType[type._id] || 0; });
+			database.view('server', 'types_usage', {group: true}, function(error, data) {
+				var countByType = {};
+				data.rows.forEach(function(row) { countByType[row.key] = row.value; });
+				types.forEach(function(type) { type.__usage = countByType[type._id] || 0; });
 
-					return callback(null, types);
-				});
+				return callback(null, types);
 			});
+		});
 	},
 
 	validate: function(item, callback) {

@@ -4,7 +4,7 @@
 
 angular
 	.module('monitool.directives.indicatorselect', [])
-	.directive('indicatorSelect', function($q, mtFetch, mtDatabase) {
+	.directive('indicatorSelect', function($q, mtFetch) {
 		return {
 			templateUrl: 'partials/indicators/accordeon.html',
 			restrict: "E",
@@ -20,17 +20,53 @@ angular
 					typesById  = {},
 					viewName   = null;
 
+				// Load all themes and types.
+				$q.all([mtFetch.themesById(), mtFetch.typesById()]).then(function(result) {
+					// load themes and types and pass them to the view.
+					scope.themes = themesById = result[0];
+					scope.types = typesById = result[1];
+
+					// decide which buttons are visible...
+					scope.buttons = {};
+					attributes.buttons.split(',').forEach(function(button) {
+						scope.buttons[button] = true;
+					});
+					
+					// start up
+					scope.$watch('standard', function(standard) {
+						scope.hierarchy = [];
+						mtFetch.indicators({mode: 'tree_level_1', standard: standard}).then(function(data) {
+							scope.hierarchy = data.map(function(row) {
+								var theme = themesById[row.themeId] || {};
+								return {
+									id: row.themeId,
+									name: theme.name,
+									numIndicators: row.indicators,
+									open: false,
+									loaded: false
+								}
+							});
+						});
+					});
+				});
+
 				scope.toggleTheme = function(theme) {
 					theme.open = !theme.open;
 
 					if (!theme.loaded) {
 						theme.loaded = true; // before callback...
 
-						var opts = {group_level: 2, startkey: [theme.id], endkey: [theme.id, {}]};
-						mtDatabase.current.query(viewName, opts).then(function(result) {
-							theme.types = result.rows.map(function(row) {
-								var type = typesById[row.key[1]] || {};
-								return {id: row.key[1], name: type.name, numIndicators: row.value, open: false, loaded: false, indicators: []};
+						mtFetch.indicators({mode: 'tree_level_2', standard: scope.standard, themeId: theme.id}).then(function(data) {
+							theme.types = data.map(function(row) {
+								var type = typesById[row.typeId] || {};
+								return {
+									id: row.typeId,
+									name: type.name,
+									numIndicators: row.indicators,
+									open: false,
+									loaded: false,
+									indicators: []
+								};
 							});
 						});
 					}
@@ -42,50 +78,19 @@ angular
 					if (!type.loaded) {
 						type.loaded = true; // before callback...
 
-						var opts = {reduce: false, startkey: [theme.id, type.id], endkey: [theme.id, type.id, {}]};
-						mtDatabase.current.query(viewName, opts).then(function(result) {
-							type.indicators = result.rows.map(function(row) { return {id: row.id, name: row.value.name, standard: row.value.standard}; });
-
-							var opts = {group: true, keys: []}
-							result.rows.map(function(row) { opts.keys.push('input:' + row.id, 'main:' + row.id); });
-							mtDatabase.current.query('shortlists/indicator_usage', opts).then(function(result) {
-								// slow!!!
-								type.indicators.forEach(function(indicator) {
-									result.rows.forEach(function(row) {
-										if (row.key == 'main:' + indicator.id)
-											indicator.main = row.value;
-										if (row.key == 'input:' + indicator.id)
-											indicator.input = row.value;
-									});
-									indicator.main = indicator.main || 0;
-									indicator.input = indicator.input || 0;
-								});
+						mtFetch.indicators({mode: 'tree_level_3', standard: scope.standard, themeId: theme.id, typeId: type.id}).then(function(data) {
+							type.indicators = data.map(function(row) {
+								return {
+									id: row._id,
+									name: row.name,
+									standard: row.standard,
+									main: row.__mainUsage,
+									input: row.__inputUsage
+								};
 							});
 						});
 					}
 				};
-
-				// Load all themes and types.
-				$q.all([mtFetch.themesById(), mtFetch.typesById()]).then(function(result) {
-					scope.themes = themesById = result[0];
-					scope.types = typesById = result[1];
-
-					scope.buttons = {};
-					attributes.buttons.split(',').forEach(function(button) {
-						scope.buttons[button] = true;
-					});
-					
-					scope.$watch('standard', function(newValue, oldValue) {
-						scope.hierarchy = [];
-						viewName = newValue ? 'shortlists/indicator_partial_tree' : 'shortlists/indicator_full_tree';
-						mtDatabase.current.query(viewName, {group_level: 1}).then(function(result) {
-							scope.hierarchy = result.rows.map(function(row) {
-								var theme = themesById[row.key[0]] || {};
-								return {id: row.key[0], name: theme.name, numIndicators: row.value, open: false, loaded: false};
-							});
-						});
-					});		
-				});
 			}
 		}
 	});

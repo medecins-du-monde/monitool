@@ -1,10 +1,12 @@
 "use strict";
 
-var express = require('express'),
-	cors    = require('cors');
+var express     = require('express'),
+	compression = require('compression'),
+	cors        = require('cors');
 
 express()
 	.use(cors())
+	.use(compression())
 	.use(require('./middlewares/auth'))
 
 	.use(require('./controllers/public'))
