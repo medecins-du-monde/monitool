@@ -1,0 +1,64 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li><a ui-sref="main.project.input_list({projectId: project._id})" translate>project.waiting_inputs</a></li>
+	<li class="active">{{form.name}}</li>
+	<li class="active">{{inputEntity.name}}</li>
+	<li class="active">{{currentInput.period|amDateFormat:'YYYY-MM-DD'}}</li>
+</ol>
+
+<script type="text/ng-template" id="form-sub-3.html">
+	<div class="panel-heading">
+		<div class="row">
+			<div class="col-sm-4">
+				<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>
+				<i class="fa fa-calculator" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'" tooltip="{{indicator.expression}}"></i>
+				<i class="fa fa-link" ng-if="indicator.type.substring(0, 'link'.length) === 'link'"></i>
+
+				<span ng-if="!key"><span translate="shared.indicator"></span>: </span>
+				<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
+				{{indicator.name}}
+			</div>
+
+			<div class="col-sm-8" acl-has-project-role="input" acl-fallback="currentInput.values[indicator.model]">
+				<div class="input-group" ng-if="!key">
+					<div class="input-group-addon">
+						<i class="fa fa-circle" ng-style="{color:status[indicator.id]}" tooltip-html-unsafe="{{'project.status_' + status[indicator.id]|translate}}"></i>
+					</div>
+					<input type="number"
+						   class="form-control input-sm"
+						   ng-model="currentInput.values[indicator.model]"
+						   placeholder="Saisie précédente: {{previousInput.values[indicator.model] || '?'}}"
+						   ng-disabled="indicator.type !== 'input'" />
+				</div>
+
+				<input type="number"
+					   class="form-control input-sm"
+					   ng-disabled="indicator.type !== 'input'"
+					   ng-if="key"
+					   ng-model="currentInput.values[indicator.model]"
+					   placeholder="Saisie précédente: {{previousInput.values[indicator.model] || '?'}}" />
+
+			</div>
+		</div>
+	</div>
+	<div class="panel-body" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'">
+		<div class="panel panel-info"
+			 ng-repeat="(key, indicator) in indicator.parameters"
+			 ng-include="'form-sub-3.html'"></div>
+	</div>
+</script>
+
+<div class="panel panel-primary" ng-repeat="indicator in form.fields" ng-include="'form-sub-3.html'"></div>
+
+<div acl-has-project-role="input">
+	<button class="btn btn-default" ng-click="save()">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</button>
+
+	<button class="btn btn-danger" ng-click="delete()" ng-if="!isNew">
+		<i class="fa fa-remove"></i>
+		<span translate>shared.delete</span>
+	</button>
+</div>

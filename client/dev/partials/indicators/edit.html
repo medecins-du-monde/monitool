@@ -1,0 +1,206 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.indicators.list" translate>shared.indicators</a></li>
+	<li class="active">{{indicator.name}}</li>
+</ol>
+
+<form class="form-horizontal" role="form" name="indicatorForm" novalidate>
+	<fieldset>
+		<legend translate>indicator.definition</legend>
+
+		<div class="form-group">
+			<label for="input-standard" class="col-sm-2 control-label" translate="indicator.core"></label>
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.standard">
+				<p class="form-control-static">
+					<input id="input-standard" type="checkbox" ng-model="indicator.standard" name="standard" />
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group" show-errors>
+			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.name">
+				<input id="input-name"
+					   class="form-control"
+					   type="text"
+					   ng-model="indicator.name"
+					   name="name"
+					   placeholder="{{'indicator.name_ph'|translate}}"
+					   required />
+			
+				<p class="help-block" ng-if="indicatorForm.name.$error.required" translate="form.mandatory"></p>
+			</div>
+		</div>
+
+		<div class="form-group" show-errors>
+			<label for="input-description" class="col-sm-2 control-label" translate="shared.description"></label>
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.description">
+				<textarea id="input-description"
+						  name="description"
+						  class="form-control"
+						  ng-model="indicator.description"
+						  required
+						  placeholder="{{'indicator.description_ph'|translate}}"></textarea>
+
+				<p class="help-block" ng-if="indicatorForm.description.$error.required" translate="form.mandatory"></p>
+			</div>
+		</div>
+
+		<div class="form-group" show-errors>
+			<label for="input-history" class="col-sm-2 control-label" translate="indicator.history"></label>
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.history">
+				<textarea id="input-history"
+						  name="history"
+						  ng-model="indicator.history"
+						  class="form-control"
+						  placeholder="{{'indicator.history_ph'|translate}}"></textarea>
+			</div>
+		</div>
+
+		<div class="form-group" show-errors>
+			<label for="input-unit" class="col-sm-2 control-label" translate>indicator.unit</label>
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.unit">
+				<select id="input-unit"
+						name="unit"
+						ng-model="indicator.unit"
+						class="form-control">
+					<option value="" translate>indicator.other</option>
+					<option value="%" translate>indicator.percent</option>
+					<option value="‰" translate>indicator.permille</option>
+				</select>
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend translate>indicator.categorization</legend>
+
+		<div class="form-group">
+			<label for="input-types" class="col-sm-2 control-label" translate>indicator.types</label>
+
+			<div class="col-sm-10">
+				<ui-select id="input-types" multiple ng-model="indicator.types" name="types" theme="bootstrap" required acl-has-role="indicator">
+					<ui-select-match placeholder="{{'indicator.select_types'|translate}}">{{$item.name}}</ui-select-match>
+					<ui-select-choices repeat="type._id as type in types | filter: {name: $select.search}">{{type.name}}</ui-select-choices>
+				</ui-select>
+
+				<p class="form-control-static" acl-lacks-role="indicator">{{indicator.types | getObjects:types | pluck:'name' | join:', '}}</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="input-themes" class="col-sm-2 control-label" translate>indicator.themes</label>
+			<div class="col-sm-10">
+				<ui-select id="input-themes" multiple ng-model="indicator.themes" name="themes" theme="bootstrap" required acl-has-role="indicator">
+					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name}}</ui-select-match>
+					<ui-select-choices repeat="theme._id as theme in themes | filter: {name: $select.search}">{{theme.name}}</ui-select-choices>
+				</ui-select>
+
+				<p class="form-control-static" acl-lacks-role="indicator">{{indicator.themes | getObjects:themes | pluck:'name' | join:', '}}</p>
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend translate>indicator.computation</legend>
+
+		<div class="form-group">
+			<label for="input-sum-allowed" class="col-sm-2 control-label" translate="indicator.time_aggregation"></label>
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sumAllowed">
+				<p class="form-control-static">
+					<select class="form-control" ng-model="indicator.timeAggregation">
+						<option value="sum" translate="indicator.time_aggregation_sum"></option>
+						<option value="average" translate="indicator.time_aggregation_average"></option>
+						<option value="none" translate="indicator.time_aggregation_none"></option>
+					</select>
+
+					<div class="alert alert-info" role="alert" translate="indicator.time_aggregation_help">
+					</div>					
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="input-sum-allowed" class="col-sm-2 control-label" translate="indicator.geo_aggregation"></label>
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sumAllowed">
+				<p class="form-control-static">
+					<select class="form-control" ng-model="indicator.geoAggregation">
+						<option value="sum" translate="indicator.geo_aggregation_sum"></option>
+						<option value="average" translate="indicator.geo_aggregation_average"></option>
+						<option value="none" translate="indicator.geo_aggregation_none"></option>
+					</select>
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="name" class="col-sm-2 control-label" translate>indicator.formulas</label>
+			<div class="col-sm-10">
+				<table class="table table-bordered table-condensed"
+					   ng-repeat="(formulaId, formula) in indicator.formulas"
+					   style="border-width: 0 0 0 5px; border-color: {{indicator.formulas[formulaId].__isValid ? '#ddd' : 'darkred'}}">
+					<tr>
+						<td style="width: 250px" translate>shared.name</td>
+						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].name">
+							<div class="input-group">
+								<input type="text"
+									   class="form-control"
+									   placeholder="{{'indicator.formula_name_ph'|translate}}"
+									   ng-model="indicator.formulas[formulaId].name" />
+
+								<span class="input-group-btn">
+									<button class="btn btn-danger" ng-click="deleteFormula(formulaId)" translate>shared.remove</button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td translate>indicator.formula</td>
+						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].expression">
+							<input type="text"
+								   class="form-control"
+								   ng-model="indicator.formulas[formulaId].expression"
+								   placeholder="{{'indicator.formula_expression_ph'|translate}}" />
+						</td>
+					</tr>
+					<tr ng-repeat="symbol in indicator.formulas[formulaId].__symbols">
+						<td>{{'indicator.parameter'|translate}} <strong>"{{symbol}}"</strong></td>
+						<td acl-has-role="indicator" acl-fallback="indicatorsById[indicator.formulas[formulaId].parameters[symbol]].name">
+							<div class="input-group">
+								<input type="text"
+									   class="form-control"
+									   disabled
+									   ng-value="indicatorsById[indicator.formulas[formulaId].parameters[symbol]].name"
+									   placeholder="{{'shared.choose_indicator'|translate}}" />
+
+								<span class="input-group-btn">
+									<button class="btn btn-default" ng-click="chooseIndicator(formulaId, symbol)" translate="shared.choose"></button>
+								</span>
+							</div>
+						</td>
+					</tr>
+				</table>
+
+				<button class="btn btn-default" ng-click="addFormula()" acl-has-role="indicator">
+					<i class="fa fa-plus"></i>
+					<span translate="indicator.add_formula"></span>
+				</button>
+			</div>
+		</div>
+	</fieldset>
+
+	<div class="pull-right" acl-has-role="indicator">
+		<button class="btn btn-primary"
+				ng-disabled="indicatorForm.$invalid || isUnchanged() || !formulasAreValid"
+				ng-click="save()">
+			<i class="fa fa-floppy-o"></i>
+			<span translate>shared.save</span>
+		</button>
+
+		<button class="btn btn-default"
+				ng-disabled="isUnchanged()"
+				ng-click="reset()">
+			<i class="fa fa-undo"></i>
+			<span translate>shared.remove_changes</span>
+		</button>
+	</div>
+</form>
