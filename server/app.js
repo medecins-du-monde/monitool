@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 
 var express      = require('express'),
@@ -8,6 +9,7 @@ var express      = require('express'),
 
 
 express()
+	.disable('x-powered-by')
 	.use(compression())
 	.use(cacheControl)
 	
