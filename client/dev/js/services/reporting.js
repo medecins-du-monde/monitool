@@ -267,35 +267,36 @@ reportingServices.factory('mtFormula', function($q) {
 				return Object.keys(symbols);
 			};
 			
-			formula.isValid = true;
+			formula.__isValid = true;
 			try {
 				var expression = math.parse(formula.expression);
 				// do not allow empty formula
 				if (expression.type === 'ConstantNode' && expression.value === 'undefined')
 					throw new Error();
 				
-				formula.symbols = getSymbolsRec(expression, {});
+				formula.__symbols = getSymbolsRec(expression, {});
 			}
 			catch (e) { 
-				formula.symbols = [];
-				formula.isValid = false;
+				formula.__symbols = [];
+				formula.__isValid = false;
 			}
 
-			var numSymbols = formula.symbols.length;
+			var numSymbols = formula.__symbols.length;
 			for (var i = 0; i < numSymbols; ++i)
-				if (!formula.parameters[formula.symbols[i]])
-					formula.isValid = false;
+				if (!formula.parameters[formula.__symbols[i]])
+					formula.__isValid = false;
 
 			if (!formula.name)
-				formula.isValid = false;
+				formula.__isValid = false;
 		},
 
 		/**
 		 * Clean up
 		 */
 		clean: function(formula) {
-			delete formula.isValid;
-			delete formula.symbols;
+			for (var key in formula.parameters)
+				if (formula.__symbols.indexOf(key) === -1)
+					delete formula.parameters[key];
 		},
 		
 	}

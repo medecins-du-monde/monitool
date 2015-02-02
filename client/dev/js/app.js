@@ -378,7 +378,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				return mtFetch.indicators({mode: "indicator_edition", indicatorId: $stateParams.indicatorId}, true);
 			},
 			indicator: function(mtFetch, $stateParams, indicatorsById) {
-				return indicatorsById[$stateParams.indicatorId]
+				return indicatorsById[$stateParams.indicatorId] || mtFetch.indicator();
 			}
 		}
 	});

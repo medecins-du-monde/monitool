@@ -92,7 +92,7 @@ angular.module('monitool.services.fetch', [])
 				if (!id || id === 'new')
 					return new Indicator({
 						type: 'indicator', name: '', description: '', history: '',
-						standard: false, geoAggregation: 'none', timeAggregation: 'none',
+						standard: false, unit: "", geoAggregation: 'none', timeAggregation: 'none',
 						types: [], themes: [], formulas: {}
 					});
 				else
@@ -143,6 +143,7 @@ angular.module('monitool.services.fetch', [])
 		methods.currentUser = methods.user.bind(null, 'me');
 
 		methods.currentPreviousInput = function(p) {
+
 		};
 
 		return methods;

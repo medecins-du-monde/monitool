@@ -20,7 +20,7 @@ angular.module('monitool.controllers.indicator', [])
 		};
 	})
 
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, $modal, mtFormula, indicator, indicatorsById, types, themes) {
+	.controller('IndicatorEditController', function($state, $scope, $stateParams, $modal, mtFormula, mtFetch, indicator, indicatorsById, types, themes) {
 		// Formula handlers
 		$scope.addFormula = function() {
 			var uuid  = PouchDB.utils.uuid().toLowerCase(),
@@ -34,7 +34,7 @@ angular.module('monitool.controllers.indicator', [])
 		};
 
 		$scope.chooseIndicator = function(formulaId, symbol) {
-			var usedIndicators = $scope.indicator.formulas[formulaId].symbols.map(function(s) {
+			var usedIndicators = $scope.indicator.formulas[formulaId].__symbols.map(function(s) {
 				return $scope.indicator.formulas[formulaId].parameters[s];
 			}).filter(function(e) { return !!e; });
 			usedIndicators.push(indicator._id);
@@ -59,16 +59,22 @@ angular.module('monitool.controllers.indicator', [])
 			$scope.formulasAreValid = true;
 			for (var formulaId in $scope.indicator.formulas) {
 				mtFormula.annotate($scope.indicator.formulas[formulaId]);
-				if (!$scope.indicator.formulas[formulaId].isValid)
+				if (!$scope.indicator.formulas[formulaId].__isValid)
 					$scope.formulasAreValid = false;
 			}
 		}, true);
 
 		// Form actions
 		$scope.save = function() {
+			// remove unused parameters
+			for (var formulaId in $scope.indicator.formulas)
+				mtFormula.clean($scope.indicator.formulas[formulaId]);
+
+			// create random id if new indicator
 			if ($stateParams.indicatorId === 'new')
 				$scope.indicator._id = PouchDB.utils.uuid().toLowerCase();
 
+			// persist
 			$scope.indicator.$save(function() {
 				$scope.master = angular.copy($scope.indicator);
 				$state.go('main.indicators.list');

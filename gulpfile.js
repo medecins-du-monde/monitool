@@ -19,57 +19,57 @@ var addCors       = require('add-cors-to-couchdb'),
 var files = {
 	css: {
 		min: [
-			'dev/bower_components/fontawesome/css/font-awesome.min.css',
-			'dev/bower_components/bootstrap/dist/css/bootstrap.min.css',
-			'dev/bower_components/angular-ui-select/dist/select.min.css',
-			'dev/bower_components/c3/c3.min.css'
+			'client/dev/bower_components/fontawesome/css/font-awesome.min.css',
+			'client/dev/bower_components/bootstrap/dist/css/bootstrap.min.css',
+			'client/dev/bower_components/angular-ui-select/dist/select.min.css',
+			'client/dev/bower_components/c3/c3.min.css'
 		],
 		common: [
-			'dev/css/app.css'
+			'client/dev/css/app.css'
 		]
 	},
 	js: {
 		min: [
-			'dev/bower_components/moment/min/moment.min.js',
-			'dev/bower_components/mathjs/dist/math.min.js',
-			'dev/bower_components/javascript-state-machine/state-machine.min.js',
-			'dev/bower_components/FileSaver.js/FileSaver.min.js',
-			'dev/bower_components/angular/angular.min.js',
-			'dev/bower_components/angular-ui-router/release/angular-ui-router.min.js',
-			'dev/bower_components/angular-moment/angular-moment.min.js',
-			'dev/bower_components/angular-translate/angular-translate.min.js',
-			'dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-			'dev/bower_components/angular-ui-select/dist/select.min.js',
-			'dev/bower_components/angular-bootstrap-show-errors/src/showErrors.min.js',
-			'dev/bower_components/angular-cookies/angular-cookies.min.js',
-			'dev/bower_components/angular-translate/angular-translate.min.js',
-			'dev/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js',
-			'dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js',
-			'dev/bower_components/pouchdb/dist/pouchdb.min.js',
-			'dev/bower_components/pouchdb-authentication/dist/pouchdb.authentication.min.js',
-			'dev/bower_components/d3/d3.min.js',
-			'dev/bower_components/c3/c3.min.js'
+			'client/dev/bower_components/moment/min/moment.min.js',
+			'client/dev/bower_components/mathjs/dist/math.min.js',
+			'client/dev/bower_components/javascript-state-machine/state-machine.min.js',
+			'client/dev/bower_components/FileSaver.js/FileSaver.min.js',
+			'client/dev/bower_components/angular/angular.min.js',
+			'client/dev/bower_components/angular-ui-router/release/angular-ui-router.min.js',
+			'client/dev/bower_components/angular-moment/angular-moment.min.js',
+			'client/dev/bower_components/angular-translate/angular-translate.min.js',
+			'client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+			'client/dev/bower_components/angular-ui-select/dist/select.min.js',
+			'client/dev/bower_components/angular-bootstrap-show-errors/src/showErrors.min.js',
+			'client/dev/bower_components/angular-cookies/angular-cookies.min.js',
+			'client/dev/bower_components/angular-translate/angular-translate.min.js',
+			'client/dev/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js',
+			'client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js',
+			'client/dev/bower_components/pouchdb/dist/pouchdb.min.js',
+			'client/dev/bower_components/pouchdb-authentication/dist/pouchdb.authentication.min.js',
+			'client/dev/bower_components/d3/d3.min.js',
+			'client/dev/bower_components/c3/c3.min.js'
 		],
 		common: [
-			'dev/bower_components/Blob.js/Blob.js',
-			'dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
-			'dev/bower_components/angular-pouchdb/angular-pouchdb.js',
-			'dev/i18n/fr.js',
-			'dev/i18n/es.js',
-			'dev/i18n/en.js',
-			'dev/js/services/database.js',
-			'dev/js/services/fetch.js',
-			'dev/js/services/reporting.js',
-			'dev/js/controllers/helper.js',
-			'dev/js/controllers/project.js',
-			'dev/js/controllers/indicator.js',
-			'dev/js/directives/acls.js',
-			'dev/js/directives/file-export.js',
-			'dev/js/directives/forms.js',
-			'dev/js/directives/indicator-select.js',
-			'dev/js/filters.js',
-			'dev/js/app.js',
-			'dev/js/polyfills.js',
+			'client/dev/bower_components/Blob.js/Blob.js',
+			'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
+			'client/dev/bower_components/angular-pouchdb/angular-pouchdb.js',
+			'client/dev/i18n/fr.js',
+			'client/dev/i18n/es.js',
+			'client/dev/i18n/en.js',
+			'client/dev/js/services/database.js',
+			'client/dev/js/services/fetch.js',
+			'client/dev/js/services/reporting.js',
+			'client/dev/js/controllers/helper.js',
+			'client/dev/js/controllers/project.js',
+			'client/dev/js/controllers/indicator.js',
+			'client/dev/js/directives/acls.js',
+			'client/dev/js/directives/file-export.js',
+			'client/dev/js/directives/forms.js',
+			'client/dev/js/directives/indicator-select.js',
+			'client/dev/js/filters.js',
+			'client/dev/js/app.js',
+			'client/dev/js/polyfills.js',
 		]
 	}
 };
@@ -118,7 +118,7 @@ gulp.task('build-js', function() {
 
 	// merge all templates into one angular module.
 	queue.queue(
-		gulp.src('dev/partials/**/*.html')
+		gulp.src('client/dev/partials/**/*.html')
 			.pipe(replace(/<!--[\s\S]*?-->/g, ''))	// Remove HTML comments
 			.pipe(replace(/[  \t\n\r]+/g, ' '))		// Merge spaces
 			// .pipe(replace(/> </g, '><'))			// Remove spaces between tags (but keep others)
@@ -129,7 +129,7 @@ gulp.task('build-js', function() {
 	return queue.done()
 				.pipe(concat('monitool.js'))
 				.pipe(insert.prepend(clientConf))
-				.pipe(gulp.dest('build/js'));
+				.pipe(gulp.dest('client/build/js'));
 });
 
 gulp.task('build-css', function() {
@@ -139,7 +139,7 @@ gulp.task('build-css', function() {
 
 	return queue.done()
 				.pipe(concat('monitool.css'))
-				.pipe(gulp.dest('build/css'));
+				.pipe(gulp.dest('client/build/css'));
 });
 
 //////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ gulp.task('build-css', function() {
 //////////////////////////////////////////////////////////
 
 gulp.task('clean', function(callback) {
-	rimraf('build', callback);
+	rimraf('client/build', callback);
 });
 
 

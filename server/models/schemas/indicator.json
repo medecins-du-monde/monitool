@@ -4,7 +4,7 @@
 	"type": "object",
 	"additionalProperties": false,
 	"required": [
-		"_id", "_rev", "type", "name", "description", "history", "standard",
+		"_id", "type", "name", "description", "history", "standard",
 		"geoAggregation", "timeAggregation", "unit", "types", "themes", "formulas"
 	],
 	"properties": {
