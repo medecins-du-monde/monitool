@@ -12,8 +12,6 @@ var Indicator = module.exports = {
 	delete: Abstract.delete.bind(this, 'indicator'),
 	set: Abstract.set.bind(this),
 
-
-
 	list: function(options, callback) {
 		var opt;
 

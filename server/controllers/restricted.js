@@ -1,14 +1,16 @@
 "use strict";
 
 var express   = require('express'),
+	crypto    = require('crypto'),
 	Indicator = require('../models/indicator'),
 	Input     = require('../models/input'),
 	Project   = require('../models/project'),
 	Theme     = require('../models/theme'),
 	Type      = require('../models/type'),
+	User      = require('../models/user'),
 	router    = express.Router();
 
-var ModelsByName = {indicator: Indicator, input: Input, project: Project, theme: Theme, type: Type};
+var ModelsByName = {indicator: Indicator, input: Input, project: Project, theme: Theme, type: Type, user: User};
 
 router.use(require('body-parser').json());
 
@@ -38,9 +40,8 @@ var checkEditPermissions = function(user, modelName, modelId, callback) {
 		// users need a role for indicators
 		callback(user.roles.indexOf('indicator') === -1 ? 'missing_permission' : null);
 
-	else if (modelName === "user")
-		// only admins can work with users
-		callback(user.roles.indexOf('_admin') === -1 ? 'missing_permission' : null);
+	else
+		callback('missing_permission');
 };
 
 router.put('/:modelName(indicator|project|input|theme|type|user)/:id', function(request, response) {
@@ -91,6 +92,25 @@ router.delete('/:modelName(indicator|project|input|theme|type|user)/:id', functi
 			else
 				response.json({error: false, message: "The item was deleted."});
 		});
+	});
+});
+
+router.patch('/user/me', function(request, response) {
+	if (!request.body || !request.body.newPassword || request.body.newPassword.length < 6)
+		return response.status(400).json({error: 1, message: 'bad request.'});
+
+	var symbols = "0123456789abcdef", user = request.user;
+
+	var shasum = crypto.createHash('sha1');
+
+	user.salt = '';
+	for (var i = 0; i < 16; ++i)
+		user.salt += symbols.charAt(16 * Math.random() >> 0);
+	
+	shasum.update(user.salt + request.body.newPassword);
+	user.hash = shasum.digest('hex');
+	User.set(user, function(error, data) {
+		response.json(user);
 	});
 });
 

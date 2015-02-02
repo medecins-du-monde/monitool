@@ -2,8 +2,6 @@
 
 angular.module('monitool.services.fetch', [])
 	.factory('mtFetch', function($http, $resource, $q) {
-		$http.defaults.headers.common.Authorization = 'Basic ' + btoa('');
-
 		var Project   = $resource('/project/:id', { id: "@_id" }, { save: { method: "PUT" }}),
 			Indicator = $resource('/indicator/:id', { id: "@_id" }, { save: { method: "PUT" }}),
 			Input     = $resource('/input/:id', { id: "@_id" }, { save: { method: "PUT" }}),
@@ -89,6 +87,9 @@ angular.module('monitool.services.fetch', [])
 
 		// Add custom methods for special needs.
 		methods.currentUser = methods.user.bind(null, 'me');
+		methods.changePassword = function(newPassword) {
+			return $http({ method: 'PATCH', url: '/user/me', data: angular.toJson({newPassword: newPassword})});
+		};
 
 		return methods;
 	});

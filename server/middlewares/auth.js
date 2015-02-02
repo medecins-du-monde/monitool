@@ -7,7 +7,9 @@ var auth   = require('basic-auth'),
 module.exports = function(request, response, next) {
 	var credentials = auth(request);
 	if (!credentials) {
-		response.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+		if (!request.get('X-NoBasicAuth'))
+			response.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+		
 		return response.status(401).json({error: true, message: "Please Authenticate"});
 	}
 

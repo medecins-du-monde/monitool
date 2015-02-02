@@ -55,6 +55,10 @@ app.config(function($translateProvider) {
  * (which allow us to add helper properties on objects, and not submit them).
  */
 app.config(function($httpProvider) {
+	$httpProvider.defaults.headers.common['X-NoBasicAuth'] = '1';
+	if (sessionStorage.Authorization)
+		$httpProvider.defaults.headers.common.Authorization = sessionStorage.Authorization;
+
 	$httpProvider.defaults.transformRequest.unshift(function(data) {
 		if (!data)
 			return data;
@@ -126,14 +130,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main', {
 		abstract: true,
 		controller: 'MainMenuController',
-		templateUrl: 'partials/menu.html',
-		resolve: {
-			session: function(mtFetch) {
-				return mtFetch.currentUser().catch(function(e) {
-					return null;
-				});
-			}
-		}
+		templateUrl: 'partials/menu.html'
 	});
 
 	$stateProvider.state('main.login', {
@@ -519,10 +516,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 });
 
 
-app.run(function($rootScope) {
+app.run(function($rootScope, $state, mtFetch) {
 	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
 		console.log(error)
 		console.log(error.stack)
+	});
+
+	mtFetch.currentUser().then(function(user) {
+		$rootScope.userCtx = user;
+	}).catch(function(error) {
+		$state.go('main.login');
 	});
 })
 
