@@ -91,6 +91,9 @@
 									"type": "string",
 									"pattern": "^input|(link:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\\.[a-z0-9A-Z]+)+)|(compute:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$"
 								},
+								"source": {
+									"type": "string"
+								},
 								"parameters": {
 									"type": "object",
 									"additionalProperties": {

@@ -2,15 +2,26 @@
 
 var validator = require('is-my-json-valid'),
 	Abstract  = require('./abstract'),
-	schema    = require('./schemas/project');
+	schema    = require('./schemas/project'),
+	database  = require('../database');
 
 var validate = validator(schema);
 
 module.exports = {
-	list: Abstract.list.bind(this, 'project'),
+
 	get: Abstract.get.bind(this, 'project'),
 	delete: Abstract.delete.bind(this, 'project'),
 	set: Abstract.set.bind(this),
+
+	list: function(options, callback) {
+		if (options.mode === 'indicator_reporting')
+			database.view('shortlists', 'projects_by_indicator', {key: options.indicatorId, include_docs: true}, function(error, result) {
+				callback(null, result.rows.map(function(row) { return row.doc; }));
+			});
+		
+		else
+			Abstract.list('project', options, callback);
+	},
 
 	validate: function(item, callback) {
 		validate(item);
@@ -32,4 +43,3 @@ module.exports = {
 	},
 
 };
-

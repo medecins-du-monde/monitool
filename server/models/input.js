@@ -1,6 +1,7 @@
 "use strict";
 
-var validator = require('is-my-json-valid'),
+var async     = require('async'),
+	validator = require('is-my-json-valid'),
 	Abstract  = require('./abstract'),
 	Project   = require('./project'),
 	schema    = require('./schemas/input'),
@@ -24,29 +25,66 @@ var Input = module.exports = {
 				callback(null, result.rows.map(function(item) { return item.id; }));
 			});
 		}
-		else if (options.mode === 'project_inputs') {
-			// used for project reporting
-			opt = {startkey: [options.projectId, options.begin], endkey: [options.projectId, options.end], include_docs: true};
-			database.view('reporting', 'inputs_by_project_date', opt, function(error, result) {
-				callback(null, result.rows.map(function(item) { return item.doc; }));
-			});
-		} 
-		else if (options.mode === 'entity_inputs') {
-			// used for entity reporting
-			opt = {startkey: [options.entityId, options.begin], endkey: [options.entityId, options.end], include_docs: true};
-			database.view('reporting', 'inputs_by_entity_date', opt, function(error, result) {
-				callback(null, result.rows.map(function(item) { return item.doc; }));
-			});
+		else if (['project_inputs', 'entity_inputs', 'form_inputs'].indexOf(options.mode) !== -1) {
+			var filter   = options.mode.replace(/_inputs$/, ''),
+				viewName = 'inputs_by_' + filter + '_date',
+				param    = filter + 'Id';
+
+			if (!Array.isArray(options[param]))
+				options[param] = [options[param]]
+
+			async.map(
+				options[param],
+				function(curParamId, callback) {
+					var opt = {startkey: [curParamId, options.begin], endkey: [curParamId, options.end], include_docs: true};
+					database.view('reporting', viewName, opt, function(error, result) {
+						callback(null, result.rows.map(function(item) { return item.doc; }));
+					});
+				},
+				function(error, results) {
+					callback(null, Array.prototype.concat.apply([], results));
+				}
+			);
 		}
-		else if (options.mode === 'form_inputs') {
-			// used for indicator reporting.
-			opt = {startkey: [options.formId, options.begin], endkey: [options.formId, options.end], include_docs: true};
-			database.view('reporting', 'inputs_by_form_date', opt, function(error, result) {
-				callback(null, result.rows.map(function(item) { return item.doc; }));
+		else if (options.mode === 'current+last') {
+			var id       = [options.projectId, options.entityId, options.formId, options.period].join(':'),
+				startKey = id,
+				endKey   = [options.projectId, options.entityId, options.formId].join(':'),
+				options  = {startkey: startKey, endkey: endKey, descending: true, limit: 2, include_docs: true};
+
+			return database.list(options, function(error, result) {
+				// retrieve current and previous from view result.
+				var current = null, previous = null;
+
+				if (result.rows.length === 1) {
+					if (result.rows[0].id !== id) // we only got an old input
+						previous = result.rows[0].doc;
+					else // we only got the current input
+						current = result.rows[0].doc;
+				}
+				else if (result.rows.length === 2) {
+					if (result.rows[0].id !== id) // we got two old inputs
+						previous = result.rows[0].doc;
+					else // we got the current and previous inputs
+						current = result.rows[0].doc;
+						previous = result.rows[1].doc;
+				}
+
+				callback(null, [current, previous].filter(function(input) { return input; }));
 			});
 		}
 		else
 			return Abstract.list('input', options, callback)
+	},
+
+	validate: function(item, callback) {
+		validate(item);
+
+		var errors = validate.errors || [];
+		if (errors.length)
+			return callback(errors);
+
+		callback(null);
 	},
 
 	// listByProject: function(projectId, options, callback) {
@@ -94,4 +132,8 @@ var Input = module.exports = {
 	// 	}
 	// },
 };
+
+
+
+
 

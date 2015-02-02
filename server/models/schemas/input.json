@@ -7,7 +7,10 @@
 	"required": ["_id", "type", "project", "entity", "form", "period", "values"],
 	
 	"properties": {
-		"_id":     { "$ref": "#/definitions/uuid" },
+		"_id":     {
+			"type": "string",
+			"pattern": "^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:\\d{4}-\\d{2}-\\d{2}$"
+		},
 		"_rev":    { "$ref": "#/definitions/couchdb-revision" },
 		
 		"type":    { "type": "string", "pattern": "^input$" },
@@ -21,7 +24,7 @@
 			"type": "object",
 			"patternProperties": {
 				"^count$": { "type": "number" },
-				"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\\.[a-z0-9A-Z]+)+": {"type": "number"}
+				"[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}(\\.[a-z0-9A-Z]+)+": {"type": "number"}
 			}
 		}
 	},
@@ -29,7 +32,7 @@
 	"definitions": {
 		"uuid": {
 			"type": "string",
-			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+			"pattern": "^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}$"
 		},
 		"couchdb-revision": {
 			"type": "string",

@@ -30,6 +30,87 @@ app.config(function($translateProvider) {
 	$translateProvider.preferredLanguage('fr');
 });
 
+// Uncomment to add 1 second of latency to every query
+// http://blog.brillskills.com/2013/05/simulating-latency-for-angularjs-http-calls-with-response-interceptors/
+// 
+// app.config(function($httpProvider) {
+// 
+// 	$httpProvider.responseInterceptors.push(function($q, $timeout) {
+// 		return function(promise) {
+// 			return promise.then(function(response) {
+// 				return $timeout(function() {
+// 					return response;
+// 				}, 1000);
+// 			}, function(response) {
+// 				return $q.reject(response);
+// 			});
+// 		};
+// 	});
+// });
+
+
+/**
+ * Transform all dates that come from the server to date objects, and back
+ * Remove all properties prefixed by "__" when submitting to server
+ * (which allow us to add helper properties on objects, and not submit them).
+ */
+app.config(function($httpProvider) {
+	$httpProvider.defaults.transformRequest.unshift(function(data) {
+		if (!data)
+			return data;
+
+		// FIXME this method is misnamed (it also remove virtual properties)
+		var stringifyDates = function(model) {
+			// transform dates
+			if (Object.prototype.toString.call(model) === '[object Date]')
+				return moment(model).format('YYYY-MM-DD');
+
+			// recurse
+			if (Array.isArray(model)) {
+				var numChildren = model.length;
+				for (var i = 0; i < numChildren; ++i)
+					model[i] = stringifyDates(model[i]);
+			}
+			else if (typeof model === 'object' && model !== null) {
+				for (var key in model)
+					// remove virtual properties
+					if (key.substring(0, 2) === '__')
+						delete model[key];
+					else
+						model[key] = stringifyDates(model[key]);
+			}
+
+			return model;
+		};
+
+		data = angular.copy(data); // we don't want to change the original one do avoid breaking the display.
+		data = stringifyDates(data); // stringify all dates
+		data = JSON.parse(angular.toJson(data)); // remove angular $$hashKeys
+		return data;
+	});
+
+	$httpProvider.defaults.transformResponse.push(function(data) {
+		var parseDatesRec = function(model) {
+			if (typeof model === 'string' && model.match(/^\d\d\d\d\-\d\d\-\d\d$/))
+				return new Date(model);
+
+			if (Array.isArray(model)) {
+				var numChildren = model.length;
+				for (var i = 0; i < numChildren; ++i)
+					model[i] = parseDatesRec(model[i]);
+			}
+			else if (typeof model === 'object' && model !== null) {
+				for (var key in model)
+					model[key] = parseDatesRec(model[key]);
+			}
+
+			return model;
+		};
+
+		return parseDatesRec(data);
+	});
+});
+
 app.config(function($stateProvider, $urlRouterProvider) {
 
 	///////////////////////////
@@ -71,20 +152,20 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Help
 	///////////////////////////
 
-	$stateProvider.state('main.help', {
-		abstract: true,
-		templateUrl: 'partials/help/menu.html'
-	});
+	// $stateProvider.state('main.help', {
+	// 	abstract: true,
+	// 	templateUrl: 'partials/help/menu.html'
+	// });
 
-	$stateProvider.state('main.help.monitoring', {
-		url: '/help/monitoring',
-		templateUrl: 'partials/help/monitoring.html'
-	});
+	// $stateProvider.state('main.help.monitoring', {
+	// 	url: '/help/monitoring',
+	// 	templateUrl: 'partials/help/monitoring.html'
+	// });
 
-	$stateProvider.state('main.help.documentation', {
-		url: '/help/documentation',
-		templateUrl: 'partials/help/documentation.html'
-	});
+	// $stateProvider.state('main.help.documentation', {
+	// 	url: '/help/documentation',
+	// 	templateUrl: 'partials/help/documentation.html'
+	// });
 
 	///////////////////////////
 	// Project
@@ -116,11 +197,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/logical-frame.html',
 		controller: 'ProjectLogicalFrameController',
 		resolve: {
-			indicatorsById: function(project, mtFetch) {
-				return mtFetch.indicators(
-					{ids: Object.keys(project.indicators), short: true},
-					true
-				);
+			indicatorsById: function(mtFetch, $stateParams) {
+				return mtFetch.indicators({mode: 'project_logframe', projectId: $stateParams.projectId}, true);
 			}
 		}
 	});
@@ -136,8 +214,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
 		resolve: {
-			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
+			indicatorsById: function(mtFetch, $stateParams) {
+				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
 			}
 		},
 		data: {
@@ -157,8 +235,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
 		resolve: {
-			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
+			indicatorsById: function(mtFetch, $stateParams) {
+				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
 			}
 		},
 		data: {
@@ -177,8 +255,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/form-edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
-			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
+			indicatorsById: function(mtFetch, $stateParams) {
+				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
 			},
 			formulasById: function(indicatorsById) {
 				var formulasById = {};
@@ -290,10 +368,36 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectInputController',
 		resolve: {
 			inputs: function(mtFetch, $stateParams) {
-				return mtFetch.currentPreviousInput($stateParams);
+				return mtFetch.inputs({
+					mode: "current+last",
+					projectId: $stateParams.projectId,
+					entityId: $stateParams.entityId,
+					formId: $stateParams.formId,
+					period: $stateParams.period
+				}).then(function(result) {
+					var currentInputId = [$stateParams.projectId, $stateParams.entityId, $stateParams.formId, $stateParams.period].join(':');
+					// both where found
+					if (result.length === 2) 
+						return { current: result[0], previous: result[1], isNew: false };
+
+					// only the current one was found
+					else if (result.length === 1 && result[0]._id === currentInputId) 
+						return { current: result[0], previous: null, isNew: false };
+					
+					// the current one was not found (and we may or not have found the previous one).
+					var previousInput = result.length ? result[0] : null,
+						newInput      = mtFetch.input();
+
+					newInput._id     = currentInputId;
+					newInput.project = $stateParams.projectId;
+					newInput.entity  = $stateParams.entityId;
+					newInput.form    = $stateParams.formId;
+					newInput.period  = new Date($stateParams.period);
+					return { current: newInput, previous: previousInput, isNew: true };
+				});
 			},
-			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
+			indicatorsById: function(mtFetch, $stateParams) {
+				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
 			},
 			form: function($stateParams, project) {
 				return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
@@ -306,8 +410,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
 		resolve: {
-			indicatorsById: function(mtFetch, project) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: project._id}, true);
+			indicatorsById: function(mtFetch, $stateParams) {
+				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
 			}
 		},
 		data: {
@@ -346,7 +450,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/theme-type-list.html',
 		controller: 'ThemeTypeListController',
 		resolve: {
-			entities: function(mtFetch) { return mtFetch.themes({with_counts: 1}); }
+			entities: function(mtFetch) {
+				return mtFetch.themes({with_counts: 1});
+			}
 		},
 		data: {
 			entityType: 'theme'
@@ -358,7 +464,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/theme-type-list.html',
 		controller: 'ThemeTypeListController',
 		resolve: {
-			entities: function(mtFetch) { return mtFetch.types({with_counts: 1}); }
+			entities: function(mtFetch) {
+				return mtFetch.types({with_counts: 1});
+			}
 		},
 		data: {
 			entityType: 'type'
@@ -388,8 +496,12 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/edit.html',
 		controller: 'IndicatorEditController',
 		resolve: {
-			types: function(mtFetch) { return mtFetch.types(); },
-			themes: function(mtFetch) { return mtFetch.themes(); }
+			types: function(mtFetch) {
+				return mtFetch.types();
+			},
+			themes: function(mtFetch) {
+				return mtFetch.themes();
+			}
 		}
 	});
 
@@ -399,7 +511,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'IndicatorReportingController',
 		resolve: {
 			projects: function($stateParams, mtFetch) {
-				return mtFetch.projects({indicatorId: $stateParams.indicatorId});
+				return mtFetch.projects({mode: "indicator_reporting", indicatorId: $stateParams.indicatorId});
 			}
 		}
 	});

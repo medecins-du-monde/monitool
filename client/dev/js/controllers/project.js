@@ -421,15 +421,11 @@ angular.module('monitool.controllers.project', [])
 		}, true);
 
 		$scope.save = function() {
-			$scope.currentInput.$save(function() {
-				$state.go('main.project.input_list');
-			});
+			$scope.currentInput.$save(function() { $state.go('main.project.input_list'); });
 		};
 
 		$scope.delete = function() {
-			$scope.currentInput.$delete(function() {
-				$state.go('main.project.input_list');
-			});
+			$scope.currentInput.$delete(function() { $state.go('main.project.input_list'); });
 		};
 	})
 

@@ -6,7 +6,7 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		
-		<link rel="stylesheet" type="text/css" href="css/monitool.css" />
+		<link rel="stylesheet" type="text/css" href="monitool.css" />
 
 	</head>
 	<body ui-view>
@@ -14,7 +14,12 @@
 		Hello!
 		Monitool is currently loading.
 		This will happen only once.
-		
-		<script type="text/javascript" src="js/monitool.js"></script>
+		<script type="text/javascript">
+			window.onerror = function(errorMsg, url, lineNumber, columnNumber, errorObject) {
+				if (errorObject && /<omitted>/.test(errorMsg))
+					console.error('Full exception message: ' + errorObject.message);
+			};
+		</script>
+		<script type="text/javascript" src="monitool.js"></script>
 	</body>
 </html>

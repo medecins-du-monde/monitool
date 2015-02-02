@@ -4,7 +4,7 @@
 	<li><a ui-sref="main.project.input_list({projectId: project._id})" translate>project.waiting_inputs</a></li>
 	<li class="active">{{form.name}}</li>
 	<li class="active">{{inputEntity.name}}</li>
-	<li class="active">{{currentInput.period}}</li>
+	<li class="active">{{currentInput.period|amDateFormat:'YYYY-MM-DD'}}</li>
 </ol>
 
 <script type="text/ng-template" id="form-sub-3.html">

@@ -42,6 +42,7 @@ var files = {
 			'client/dev/bower_components/angular-ui-select/dist/select.min.js',
 			'client/dev/bower_components/angular-bootstrap-show-errors/src/showErrors.min.js',
 			'client/dev/bower_components/angular-cookies/angular-cookies.min.js',
+			'client/dev/bower_components/angular-resource/angular-resource.min.js',
 			'client/dev/bower_components/angular-translate/angular-translate.min.js',
 			'client/dev/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js',
 			'client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js',
@@ -57,9 +58,6 @@ var files = {
 			'client/dev/i18n/fr.js',
 			'client/dev/i18n/es.js',
 			'client/dev/i18n/en.js',
-			'client/dev/js/services/database.js',
-			'client/dev/js/services/fetch.js',
-			'client/dev/js/services/reporting.js',
 			'client/dev/js/controllers/helper.js',
 			'client/dev/js/controllers/project.js',
 			'client/dev/js/controllers/indicator.js',
@@ -67,8 +65,10 @@ var files = {
 			'client/dev/js/directives/file-export.js',
 			'client/dev/js/directives/forms.js',
 			'client/dev/js/directives/indicator-select.js',
-			'client/dev/js/filters.js',
+			'client/dev/js/services/fetch.js',
+			'client/dev/js/services/reporting.js',
 			'client/dev/js/app.js',
+			'client/dev/js/filters.js',
 			'client/dev/js/polyfills.js',
 		]
 	}
@@ -100,17 +100,13 @@ gulp.task('copy-files-to-s3', ['build'], function() {
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
 
 gulp.task('copy-static', function() {
-	gulp.src('dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('build'));
-	gulp.src('dev/bower_components/fontawesome/fonts/*').pipe(gulp.dest('build/fonts'));
-	gulp.src('dev/bower_components/bootstrap/fonts/*').pipe(gulp.dest('build/fonts'));
-	gulp.src('dev/monitool.appcache').pipe(gulp.dest('build'));
+	gulp.src('client/dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('client/build'));
+	gulp.src('client/dev/bower_components/fontawesome/fonts/*').pipe(gulp.dest('client/build'));
+	gulp.src('client/dev/bower_components/bootstrap/fonts/*').pipe(gulp.dest('client/build'));
+	gulp.src('client/dev/monitool.appcache').pipe(gulp.dest('client/build'));
 });
 
 gulp.task('build-js', function() {
-	var clientConf = "";
-	clientConf += "var LOCAL_DB = '" + config.localdb + "';";
-	clientConf += "var REMOTE_DB = '" + config.couchdb.url + '/' + config.couchdb.bucket + "';";
-
 	var queue = new Queue({ objectMode: true });
 	queue.queue()
 	queue.queue(gulp.src(files.js.min));										// min.js are unchanged
@@ -128,8 +124,7 @@ gulp.task('build-js', function() {
 	// concat it all.
 	return queue.done()
 				.pipe(concat('monitool.js'))
-				.pipe(insert.prepend(clientConf))
-				.pipe(gulp.dest('client/build/js'));
+				.pipe(gulp.dest('client/build'));
 });
 
 gulp.task('build-css', function() {
@@ -139,7 +134,8 @@ gulp.task('build-css', function() {
 
 	return queue.done()
 				.pipe(concat('monitool.css'))
-				.pipe(gulp.dest('client/build/css'));
+				.pipe(replace(/\.\.\/fonts\//g, ''))
+				.pipe(gulp.dest('client/build'));
 });
 
 //////////////////////////////////////////////////////////
@@ -149,7 +145,6 @@ gulp.task('build-css', function() {
 gulp.task('clean', function(callback) {
 	rimraf('client/build', callback);
 });
-
 
 
 //////////////////////////////////////////////////////////
