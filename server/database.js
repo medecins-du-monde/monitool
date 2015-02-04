@@ -1,5 +1,7 @@
 "use strict";
 
-var nano = require('nano');
+var nano = require('nano'),
+	config = require('../config.json');
 
-module.exports = nano('http://rgilliotte:33h7hwe9@localhost:5984').use('monitool');
+module.exports = nano(config.couchdb.url).use(config.couchdb.bucket);
+module.exports.auth(config.couchdb.username, config.couchdb.password, function(error, body, header) {});

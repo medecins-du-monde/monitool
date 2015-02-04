@@ -21,4 +21,4 @@ express()
 	.use(require('./controllers/restricted'))
 	.use(require('./controllers/reporting'))
 
-	.listen(8000);
+	.listen(80);
