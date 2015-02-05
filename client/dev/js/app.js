@@ -2,6 +2,7 @@
 
 var app = angular.module('monitool.app', [
 	'angularMoment',
+	'monitool.controllers.admin',
 	'monitool.controllers.helper',
 	'monitool.controllers.indicator',
 	'monitool.controllers.project',
@@ -133,21 +134,60 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/menu.html'
 	});
 
-	// $stateProvider.state('main.login', {
-	// 	controller: 'LoginController',
-	// 	url: '/login',
-	// 	templateUrl: 'partials/login.html'
-	// });
 
-	// $stateProvider.state('main.change_password', {
-	// 	controller: 'ChangePasswordController',
-	// 	url: '/change-password',
-	// 	templateUrl: 'partials/change-password.html'
-	// });
+
+	///////////////////////////
+	// Admin
+	///////////////////////////
+
+	$stateProvider.state('main.admin', {
+		abstract: true,
+		templateUrl: 'partials/admin/menu.html'
+	});
+
+	$stateProvider.state('main.admin.users', {
+		controller: 'UsersController',
+		url: '/admin/users',
+		templateUrl: 'partials/admin/users.html',
+		resolve: {
+			users: function(mtFetch) {
+				return mtFetch.users();
+			}
+		}
+	});
+	
+	$stateProvider.state('main.admin.theme_list', {
+		url: '/admin/themes',
+		templateUrl: 'partials/admin/theme-type-list.html',
+		controller: 'ThemeTypeListController',
+		resolve: {
+			entities: function(mtFetch) {
+				return mtFetch.themes({with_counts: 1});
+			}
+		},
+		data: {
+			entityType: 'theme'
+		}
+	});
+
+	$stateProvider.state('main.admin.type_list', {
+		url: '/admin/types',
+		templateUrl: 'partials/admin/theme-type-list.html',
+		controller: 'ThemeTypeListController',
+		resolve: {
+			entities: function(mtFetch) {
+				return mtFetch.types({with_counts: 1});
+			}
+		},
+		data: {
+			entityType: 'type'
+		}
+	});
 
 	///////////////////////////
 	// Help
 	///////////////////////////
+
 
 	// $stateProvider.state('main.help', {
 	// 	abstract: true,
@@ -173,7 +213,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/list.html',
 		controller: 'ProjectListController',
 		resolve: {
-			projects: function(mtFetch) { return mtFetch.projects(); }
+			projects: function(mtFetch) { return mtFetch.projects(); },
+			themes: function(mtFetch) { return mtFetch.themes({mode: 'indicators'}); }
 		}
 	});
 
@@ -196,6 +237,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			indicatorsById: function(mtFetch, $stateParams) {
 				return mtFetch.indicators({mode: 'project_logframe', projectId: $stateParams.projectId}, true);
+			},
+			themes: function(mtFetch) {
+				return mtFetch.themes();
 			}
 		}
 	});
@@ -430,44 +474,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	///////////////////////////
 	// Indicators
 	///////////////////////////
-
-	$stateProvider.state('main.indicators', {
-		abstract: true,
-		templateUrl: 'partials/indicators/menu.html'
-	});
 	
-	$stateProvider.state('main.indicators.list', {
+	$stateProvider.state('main.indicators', {
 		url: '/indicators',
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
-	});
-	
-	$stateProvider.state('main.indicators.theme_list', {
-		url: '/themes',
-		templateUrl: 'partials/indicators/theme-type-list.html',
-		controller: 'ThemeTypeListController',
-		resolve: {
-			entities: function(mtFetch) {
-				return mtFetch.themes({with_counts: 1});
-			}
-		},
-		data: {
-			entityType: 'theme'
-		}
-	});
-
-	$stateProvider.state('main.indicators.type_list', {
-		url: '/types',
-		templateUrl: 'partials/indicators/theme-type-list.html',
-		controller: 'ThemeTypeListController',
-		resolve: {
-			entities: function(mtFetch) {
-				return mtFetch.types({with_counts: 1});
-			}
-		},
-		data: {
-			entityType: 'type'
-		}
 	});
 
 	///////////////////////////

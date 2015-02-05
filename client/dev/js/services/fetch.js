@@ -34,8 +34,8 @@ angular.module('monitool.services.fetch', [])
 			indicator: function(id) {
 				if (!id || id === 'new')
 					return new Indicator({
-						type: 'indicator', name: '', description: '', history: '',
-						standard: false, unit: "", geoAggregation: 'none', timeAggregation: 'none',
+						type: 'indicator', operation: "common", name: '', description: '', history: '',
+						unit: "", geoAggregation: 'none', timeAggregation: 'none',
 						types: [], themes: [], formulas: {}
 					});
 				else

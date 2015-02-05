@@ -11,12 +11,6 @@
 		
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav" ng-if="userCtx">
-				<li>
-					<a ng-click="logout()">
-						<i class="fa fa-fw fa-arrow-left"></i>
-						<span translate>shared.back_to_intranet</span>
-					</a>
-				</li>
 				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}">
 					<a ui-sref="main.projects">
 						<i class="fa fa-fw fa-building"></i>
@@ -24,17 +18,18 @@
 					</a>
 				</li>
 				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator')}">
-					<a ui-sref="main.indicators.list">
+					<a ui-sref="main.indicators">
 						<i class="fa fa-fw fa-book"></i>
 						<span translate>shared.indicators_catalog</span>
 					</a>
 				</li>
-				<!-- <li ng-class="{active: $state.includes('main.help')}">
-					<a ui-sref="main.help.monitoring">
-						<i class="fa fa-fw fa-question"></i>
-						<span translate>shared.help</span>
+
+				<li ng-class="{active: $state.includes('main.admin')}" acl-has-role="_admin">
+					<a ui-sref="main.admin.users">
+						<i class="fa fa-fw fa-cogs"></i>
+						<span translate>shared.settings</span>
 					</a>
-				</li> -->
+				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">
@@ -51,11 +46,20 @@
 					</ul>
 				</li>
 
-				<li ng-if="userCtx">
-					<a>
+				<li class="dropdown" ng-if="userCtx">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="fa fa-fw fa-user"></i>
 						{{userCtx.name}}
+						<span class="caret"></span>
 					</a>
+					<ul class="dropdown-menu" role="menu">
+						<li>
+							<a ng-click="logout()">
+								<i class="fa fa-fw fa-arrow-left"></i>
+								<span translate>shared.back_to_intranet</span>
+							</a>
+						</li>
+					</ul>
 				</li>
 			</ul>
 		</div>

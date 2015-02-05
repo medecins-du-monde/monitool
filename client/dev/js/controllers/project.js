@@ -2,8 +2,9 @@
 
 angular.module('monitool.controllers.project', [])
 
-	.controller('ProjectListController', function($scope, projects) {
+	.controller('ProjectListController', function($scope, projects, themes) {
 		$scope.projects       = projects;
+		$scope.themes         = themes;
 		$scope.filterFinished = true;
 		$scope.now            = new Date();
 		$scope.pred           = 'name'; // default sorting predicate
@@ -81,16 +82,17 @@ angular.module('monitool.controllers.project', [])
 		});
 	})
 
-	.controller('ProjectLogicalFrameController', function($scope, $state, $q, $modal, indicatorsById) {
+	.controller('ProjectLogicalFrameController', function($scope, $state, $q, $modal, indicatorsById, themes) {
 		// contains description of indicators for the loaded project.
 		$scope.indicatorsById = indicatorsById;
+		$scope.themes = themes;
 
 		// handle indicator add, edit and remove are handled in a modal window.
 		$scope.editIndicator = function(indicatorId, target) {
 			var indicatorIdPromise;
 			if (indicatorId === 'new')
 				indicatorIdPromise = $modal.open({
-					templateUrl: 'partials/indicators/selector-popup.html',
+					templateUrl: 'partials/projects/logical-frame-indicator-selection.html',
 					controller: 'IndicatorChooseController',
 					size: 'lg',
 					resolve: {
@@ -108,7 +110,7 @@ angular.module('monitool.controllers.project', [])
 				else
 					// edit.
 					$modal.open({
-						templateUrl: 'partials/projects/logical-frame-indicator.html',
+						templateUrl: 'partials/projects/logical-frame-indicator-edition.html',
 						controller: 'ProjectLogicalFrameIndicatorController',
 						size: 'lg',
 						scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
@@ -150,6 +152,12 @@ angular.module('monitool.controllers.project', [])
 
 		$scope.removeActivity = function(activity, output) {
 			output.activities.splice(output.activities.indexOf(activity), 1);
+		};
+
+		$scope.isExternal = function(indicatorId) {
+			return $scope.project.themes.filter(function(theme) {
+				return $scope.indicatorsById[indicatorId].themes.indexOf(theme) !== -1
+			}).length === 0;
 		};
 
 		$scope.$watch('project', function(project) {

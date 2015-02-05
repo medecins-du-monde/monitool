@@ -5,7 +5,7 @@
 	"additionalProperties": false,
 
 	"required": [
-		"_id", "type", "name", "begin", "end", "indicators", "dataCollection",
+		"_id", "type", "name", "begin", "end", "indicators", "dataCollection", "themes",
 		"inputEntities", "inputGroups", "logicalFrame", "owners", "dataEntryOperators"
 	],
 
@@ -16,6 +16,14 @@
 		"name":  { "type": "string", "minLength": 1 },
 		"begin": { "type": "string", "format": "date" },
 		"end":   { "type": "string", "format": "date" },
+		
+		"themes": {
+			"type": "array",
+			"uniqueItems": true,
+			"items": {
+				"$ref": "#/definitions/uuid"
+			}
+		},
 
 		"indicators": {
 			"type": "object",

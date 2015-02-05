@@ -6,17 +6,15 @@
 {{'indicator.order_by'|translate}}:
 <select id="sort-input" ng-model="orderField">
 	<option value="name">{{'indicator.alphabetical_order'|translate}}</option>
-	<option value="-input">{{'indicator.num_inputs'|translate}}</option>
-	<option value="-main">{{'indicator.num_projects'|translate}}</option>
+	<option value="-__inputUsage">{{'indicator.num_inputs'|translate}}</option>
+	<option value="-__mainUsage">{{'indicator.num_projects'|translate}}</option>
 </select>
 
 <br/><br/>
 
-<indicator-select buttons="edit,reporting" standard="standard" order-field="orderField" user-ctx="userCtx"></indicator-select>
+<indicator-select buttons="edit,reporting" order-field="orderField" user-ctx="userCtx"></indicator-select>
 
 <a class="btn btn-default" ui-sref="main.indicator.edit({indicatorId: 'new'})" acl-has-role="indicator">
 	<i class="fa fa-plus"></i>
 	<span translate="indicator.create_new"></span>
 </a>
-
-

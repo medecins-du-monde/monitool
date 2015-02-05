@@ -13,19 +13,39 @@ module.exports = {
 	set: Abstract.set.bind(this),
 
 	list: function(options, callback) {
-		database.view('shortlists', 'by_type', {include_docs: true, key: 'theme'}, function(error, data) {
-			var themes = data.rows.map(function(row) { return row.doc; });
-			if (!options.with_counts)
-				return callback(null, themes);
+		if (options.mode === 'indicators')
+			database.view('shortlists', 'by_type', {include_docs: true, key: 'theme'}, function(error, data) {
+				var themes = {"": {indicatorIds: []}};
+				data.rows.forEach(function(row) {
+					row.doc.indicatorIds = [];
+					themes[row.id] = row.doc;
+				});
 
-			database.view('server', 'themes_usage', {group: true}, function(error, data) {
-				var countByTheme = {};
-				data.rows.forEach(function(row) { countByTheme[row.key] = row.value; });
-				themes.forEach(function(theme) { theme.__usage = countByTheme[theme._id] || 0; });
+				database.view('shortlists', 'indicator_tree', {reduce: false}, function(error, indicators) {
+					indicators.rows.forEach(function(row) {
+						themes[row.key[0]].indicatorIds.push(row.id);
+					});
 
-				return callback(null, themes);
+					themes = Object.keys(themes).map(function(t) { return themes[t]; });
+
+					return callback(null, themes);
+				});
 			});
-		});
+
+		else
+			database.view('shortlists', 'by_type', {include_docs: true, key: 'theme'}, function(error, data) {
+				var themes = data.rows.map(function(row) { return row.doc; });
+				if (!options.with_counts)
+					return callback(null, themes);
+
+				database.view('server', 'themes_usage', {group: true}, function(error, data) {
+					var countByTheme = {};
+					data.rows.forEach(function(row) { countByTheme[row.key] = row.value; });
+					themes.forEach(function(theme) { theme.__usage = countByTheme[theme._id] || 0; });
+
+					return callback(null, themes);
+				});
+			});
 	},
 
 	validate: function(item, callback) {

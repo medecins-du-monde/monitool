@@ -58,6 +58,7 @@ var files = {
 			'client/dev/i18n/fr.js',
 			'client/dev/i18n/es.js',
 			'client/dev/i18n/en.js',
+			'client/dev/js/controllers/admin.js',
 			'client/dev/js/controllers/helper.js',
 			'client/dev/js/controllers/project.js',
 			'client/dev/js/controllers/indicator.js',
@@ -150,7 +151,6 @@ gulp.task('clean', function(callback) {
 //////////////////////////////////////////////////////////
 // CouchDB
 //////////////////////////////////////////////////////////
-
 
 gulp.task('prepare-couchdb', function(callback) {
 	var auth         = {user: config.couchdb.username, pass: config.couchdb.password},

@@ -16,11 +16,8 @@ var Indicator = module.exports = {
 		var opt;
 
 		if (['tree_level_1', 'tree_level_2', 'tree_level_3'].indexOf(options.mode) !== -1) {
-			var standard = options.standard && options.standard !== 'false',
-				viewName = standard ? 'indicator_partial_tree' : 'indicator_full_tree';
-			
 			if (options.mode === 'tree_level_1')
-				database.view('shortlists', viewName, {group_level: 1}, function(error, data) {
+				database.view('shortlists', 'indicator_tree', {group_level: 1}, function(error, data) {
 					callback(null, data.rows.map(function(row) {
 						return {themeId: row.key[0], indicators: row.value};
 					}));
@@ -29,7 +26,7 @@ var Indicator = module.exports = {
 			else if (options.mode === 'tree_level_2') {
 				options.themeId = options.themeId || "";
 				opt = {group_level: 2, startkey: [options.themeId], endkey: [options.themeId, {}]};
-				database.view('shortlists', viewName, opt, function(error, data) {
+				database.view('shortlists', 'indicator_tree', opt, function(error, data) {
 					callback(null, data.rows.map(function(row) {
 						return {typeId: row.key[1], indicators: row.value};
 					}))
@@ -42,7 +39,7 @@ var Indicator = module.exports = {
 				options.typeId  = options.typeId  || "";
 
 				opt = {reduce: false, startkey: [options.themeId, options.typeId], endkey: [options.themeId, options.typeId, {}]};
-				database.view('shortlists', viewName, opt, function(error, data) {
+				database.view('shortlists', 'indicator_tree', opt, function(error, data) {
 					var indicators = [], usageKeys = [];
 					data.rows.forEach(function(row) {
 						row.value._id = row.id;

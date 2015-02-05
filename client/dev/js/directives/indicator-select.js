@@ -11,7 +11,6 @@ angular
 			scope: {
 				choose: '=choose',
 				userCtx: '=userCtx',
-				standard: '=standard',
 				orderField: '=orderField',
 				forbidden: '=forbidden'
 			},
@@ -33,21 +32,20 @@ angular
 					});
 					
 					// start up
-					scope.$watch('standard', function(standard) {
-						scope.hierarchy = [];
-						mtFetch.indicators({mode: 'tree_level_1', standard: standard}).then(function(data) {
-							scope.hierarchy = data.map(function(row) {
-								var theme = themesById[row.themeId] || {};
-								return {
-									id: row.themeId,
-									name: theme.name,
-									numIndicators: row.indicators,
-									open: false,
-									loaded: false
-								}
-							});
+					scope.hierarchy = [];
+					mtFetch.indicators({mode: 'tree_level_1'}).then(function(data) {
+						scope.hierarchy = data.map(function(row) {
+							var theme = themesById[row.themeId] || {};
+							return {
+								id: row.themeId,
+								name: theme.name,
+								numIndicators: row.indicators,
+								open: false,
+								loaded: false
+							}
 						});
 					});
+				
 				});
 
 				scope.toggleTheme = function(theme) {
@@ -56,7 +54,7 @@ angular
 					if (!theme.loaded) {
 						theme.loaded = true; // before callback...
 
-						mtFetch.indicators({mode: 'tree_level_2', standard: scope.standard, themeId: theme.id}).then(function(data) {
+						mtFetch.indicators({mode: 'tree_level_2', themeId: theme.id}).then(function(data) {
 							theme.types = data.map(function(row) {
 								var type = typesById[row.typeId] || {};
 								return {
@@ -78,16 +76,8 @@ angular
 					if (!type.loaded) {
 						type.loaded = true; // before callback...
 
-						mtFetch.indicators({mode: 'tree_level_3', standard: scope.standard, themeId: theme.id, typeId: type.id}).then(function(data) {
-							type.indicators = data.map(function(row) {
-								return {
-									id: row._id,
-									name: row.name,
-									standard: row.standard,
-									main: row.__mainUsage,
-									input: row.__inputUsage
-								};
-							});
+						mtFetch.indicators({mode: 'tree_level_3', themeId: theme.id, typeId: type.id}).then(function(data) {
+							type.indicators = data;
 						});
 					}
 				};

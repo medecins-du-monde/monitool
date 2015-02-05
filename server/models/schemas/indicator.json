@@ -4,17 +4,17 @@
 	"type": "object",
 	"additionalProperties": false,
 	"required": [
-		"_id", "type", "name", "description", "history", "standard",
+		"_id", "type", "name", "description", "history",
 		"geoAggregation", "timeAggregation", "unit", "types", "themes", "formulas"
 	],
 	"properties": {
 		"_id":             { "$ref": "#/definitions/uuid" },
 		"_rev":            { "$ref": "#/definitions/couchdb-revision" },
+		"operation":       { "type": "string", "enum": ["parameter", "common", "recommended", "mandatory"]},
 		"type":            { "type": "string", "pattern": "^indicator$" },
 		"name":            { "type": "string", "minLength": 3 },
 		"description":     { "type": "string", "minLength": 3 },
 		"history":         { "type": "string" },
-		"standard":        { "type": "boolean" },
 		"geoAggregation":  { "type": "string", "enum": ["none", "sum", "average"] },
 		"timeAggregation": { "type": "string", "enum": ["none", "sum", "average"] },
 		"unit":            { "type": "string", "enum": ["‰", "%", ""] },

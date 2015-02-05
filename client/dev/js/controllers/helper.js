@@ -16,32 +16,3 @@ angular
 			window.location.href = 'https://mdm1.sharepoint.com';
 		};
 	})
-
-	// .controller('LoginController', function($state, $rootScope, $scope, $http, mtFetch) {
-	// 	$scope.showError = false;
-	// 	$state.showLoading = false;
-
-	// 	$scope.tryLogin = function() {
-	// 		$scope.showLoading = true;
-
-	// 		$http.defaults.headers.common.Authorization = sessionStorage.Authorization = 'Basic ' + btoa($scope.login + ':' + $scope.password);
-
-	// 		mtFetch.currentUser().then(function(user) {
-	// 			$rootScope.userCtx = user;
-	// 			$state.go('main.projects');
-	// 		}).catch(function(error) {
-	// 			$scope.showError = true;
-	// 			$scope.showLoading = false;
-	// 			$scope.login = $scope.password = '';
-	// 		});
-	// 	};
-	// })
-
-	// .controller('ChangePasswordController', function($state, $scope, $http, mtFetch) {
-	// 	$scope.changePassword = function() {
-	// 		mtFetch.changePassword($scope.password).then(function() {
-	// 			$http.defaults.headers.common.Authorization = sessionStorage.Authorization = 'Basic ' + btoa($scope.userCtx._id + ':' + $scope.password);
-	// 			$state.go('main.projects');
-	// 		});
-	// 	};
-	// });

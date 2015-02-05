@@ -31,7 +31,6 @@ var strategy = new OAuth2Strategy({
         var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@'));
 
         User.get(userId, function(error, user) {
-            console.log(user)
             if (error) {
                 user = {_id: userId, type: 'user', name: profile.name, roles: []};
                 User.set(user, function(error, result) {

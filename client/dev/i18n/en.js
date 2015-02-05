@@ -1,9 +1,9 @@
 var ENGLISH_TRANSLATION = {
 	shared: {
-
 		back_to_intranet: "Go back to intranet",
+		settings: "Settings",
 		projects: 'Projects',
-
+		users: "Users",
 		indicator: 'Indicator',
 		indicators: 'Indicators',
 		indicators_catalog: 'Indicators Catalog',
@@ -191,6 +191,8 @@ var ENGLISH_TRANSLATION = {
 		no_theme: 'No theme',
 		no_type: 'No type',
 
+		operation: "Operation mode",
+
 		name_ph: 'For instance: Percentage of correclty filled medical records',
 		description_ph: '',		// Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
 		history_ph: '',			// Exemple: Défini en 2007 par l\'OMS et utilisé sur les projets de UNICEF ... cet indicateur a permi de suivre les objectifs ...
@@ -229,8 +231,10 @@ var ENGLISH_TRANSLATION = {
 		new_theme_name: "New theme name",
 		only_core: "Only display core indicators",
 
-		is_recommended: "This is a core indicator",
-		is_not_recommended: "This is not a core indicator",
+		is_mandatory: "This indicator is mandatory in this thematic",
+		is_common: "This indicator is optional",
+		is_parameter: "This indicator can only be used to compute another one",
+		is_external: "This indicator is from another thematic",
 
 		time_aggregation: "Time aggregation",
 		time_aggregation_sum: "Sum (for instance: number of consultations, births, ...)",

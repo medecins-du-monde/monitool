@@ -1,8 +1,9 @@
 var SPANISH_TRANSLATION = {
 	shared: {
 		back_to_intranet: "Volver a la intranet",
+		settings: "Configuración",
 		projects: 'Proyectos',
-
+		users: "Usuarios",
 		indicator: 'Indicador',
 		indicators: 'Indicadores',
 		indicators_catalog: 'Catálogo de indicadores',
@@ -99,6 +100,7 @@ var SPANISH_TRANSLATION = {
 		no_input_entities: '¡Ningún lugar de actividad ha sido creado!',
 		no_input_groups: '¡Ningún grupo de actividad ha sido creado!',
 		no_forms: '¡Ningún formulario ha sido creado!',
+
 		waiting_inputs: 'Entradas en espera',
 		no_waiting_inputs: 'Ninguna entrada en espera.',
 		input: 'Entrar datos',
@@ -188,6 +190,8 @@ var SPANISH_TRANSLATION = {
 		no_theme: 'Sin temática',
 		no_type: 'Sin tipo',
 
+		operation: "Modo de operación",
+
 		name_ph: 'Por ejemplo: Porcentaje de fichas de paciente completas',
 		description_ph: 'Por ejemplo: Medir el nivel de formación del personal medical que completa las fichas de pacientes. Medir este indicador es facil en proyectos pequeños, evitar usarlo en otras circunstancias.',
 		history_ph: 'Por ejemplo: Creado en 2007 en el cuadro de un proyecto de UNICEF ... este indicador permitio seguir los objetivos de ...',
@@ -226,8 +230,10 @@ var SPANISH_TRANSLATION = {
 		new_theme_name: "Nombre de la nueva temática",
 		only_core: "Ver unicamente los indicadores recomendados",
 
-		is_recommended: "Este indicador esta recomendado",
-		is_not_recommended: "Este indicador no esta recomendado",
+		is_mandatory: "Este indicador es obligatorio para esta temática",
+		is_common: "Este indicador es opcional",
+		is_parameter: "Este indicador se puede usar solo para calcular a otros",
+		is_external: "Este indicator viene de otra temática",
 
 		time_aggregation: "Agregación en el tiempo",
 		time_aggregation_sum: "Suma (por ejemplo: número de consultaciones, de nacimientos, ...)",

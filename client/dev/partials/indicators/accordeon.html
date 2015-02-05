@@ -14,39 +14,52 @@
 		</div>
 
 		<div class="indicator-level-3" ng-repeat="indicator in type.indicators | orderBy:orderField" ng-if="type.open">
-			<i class="fa fa-circle-o" style="color: #72bb53" ng-if="indicator.standard" tooltip="{{'indicator.is_recommended'|translate}}" tooltip-placement="right"></i>
-			<i class="fa fa-circle-o" style="color: #d68227" ng-if="!indicator.standard" tooltip="{{'indicator.is_not_recommended'|translate}}" tooltip-placement="right"></i>
 
+			<i class="fa fa-ban fa-fw"
+				ng-if="indicator.operation == 'parameter'"
+				tooltip="{{'indicator.is_parameter'|translate}}"
+				tooltip-placement="right"></i>
+
+			<i class="fa fa-question fa-fw"
+				ng-if="indicator.operation == 'common'"
+				tooltip="{{'indicator.is_common'|translate}}"
+				tooltip-placement="right"></i>
+
+			<i class="fa fa-asterisk fa-fw"
+				ng-if="indicator.operation == 'mandatory'"
+				tooltip="{{'indicator.is_mandatory'|translate}}"
+				tooltip-placement="right"></i>
+			
 			<span style="overflow: hidden;">{{indicator.name}}</span>
 
 			<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
 				<a class="btn btn-xs btn-default"
-				   ng-click="choose(indicator.id)"
+				   ng-click="choose(indicator._id)"
 				   ng-if="buttons.choose"
-				   ng-disabled="forbidden.indexOf(indicator.id) !== -1"
+				   ng-disabled="forbidden.indexOf(indicator._id) !== -1"
 				   translate="shared.choose"></a>
 
 				<span ng-if="buttons.edit">
 					<a class="btn btn-xs btn-default"
-					   ui-sref="main.indicator.edit({indicatorId: indicator.id})"
+					   ui-sref="main.indicator.edit({indicatorId: indicator._id})"
 					   acl-has-role="indicator"
 					   translate="shared.edit"></a>
 
 					<a class="btn btn-xs btn-default"
-					   ui-sref="main.indicator.edit({indicatorId: indicator.id})"
+					   ui-sref="main.indicator.edit({indicatorId: indicator._id})"
 					   acl-lacks-role="indicator"
 					   translate="shared.display"></a>
 				</span>
 
 				<a class="btn btn-xs btn-default"
-				   ui-sref="main.indicator.reporting({indicatorId: indicator.id})"
+				   ui-sref="main.indicator.reporting({indicatorId: indicator._id})"
 				   ng-if="indicator.main && buttons.reporting"
 				   translate="shared.reporting"></a>
 			</span>
 
 			<span class="pull-right">
-				<span style="display: inline-block; width: 40px; text-align: right">{{indicator.main}} <i class="fa fa-building-o"></i></span>
-				<span style="display: inline-block; width: 50px; text-align: right">{{indicator.input}} <i class="fa fa-pencil-square-o"></i></span>
+				<span style="display: inline-block; width: 40px; text-align: right">{{indicator.__mainUsage}} <i class="fa fa-building-o"></i></span>
+				<span style="display: inline-block; width: 50px; text-align: right">{{indicator.__inputUsage}} <i class="fa fa-pencil-square-o"></i></span>
 			</span>
 		</div>
 	</div>

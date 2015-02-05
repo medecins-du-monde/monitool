@@ -77,7 +77,7 @@ angular.module('monitool.controllers.indicator', [])
 			// persist
 			$scope.indicator.$save(function() {
 				$scope.master = angular.copy($scope.indicator);
-				$state.go('main.indicators.list');
+				$state.go('main.indicators');
 			});
 		};
 
@@ -172,43 +172,3 @@ angular.module('monitool.controllers.indicator', [])
 		}, true);
 	})
 	
-	.controller('ThemeTypeListController', function($scope, $state, mtFetch, entities) {
-		entities.sort(function(entity1, entity2) {
-			return entity1.name.localeCompare(entity2.name);
-		});
-
-		$scope.entities = entities;
-		$scope.master = angular.copy(entities);
-		$scope.entityType = $state.current.data.entityType;
-
-		$scope.hasChanged = function(entityIndex) {
-			return !angular.equals($scope.entities[entityIndex], $scope.master[entityIndex]);
-		};
-
-		$scope.create = function() {
-			var newEntity = mtFetch[$scope.entityType]();
-			newEntity.__isNew = true; // this will be removed on save.
-			newEntity._id = PouchDB.utils.uuid().toLowerCase()
-
-			$scope.entities.push(newEntity);
-			$scope.master.push(angular.copy(newEntity));
-		};
-
-		$scope.save = function(entityIndex) {
-			var entity = $scope.entities[entityIndex],
-				usage  = entity.__usage;
-
-			entity.$save(function(error) {
-				entity.__usage = usage;
-				$scope.master[entityIndex] = angular.copy(entity);
-			});
-		};
-
-		$scope.remove = function(entityIndex) {
-			var entity = $scope.entities.splice(entityIndex, 1)[0];
-			$scope.master.splice(entityIndex, 1);
-
-			if (!entity.__isNew)
-				entity.$delete();
-		};
-	});

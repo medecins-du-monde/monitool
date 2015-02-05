@@ -1,8 +1,9 @@
 var FRENCH_TRANSLATION = {
 	shared: {
 		back_to_intranet: "Retourner sur l'intranet",
+		settings: "Paramètres",
 		projects: 'Projets',
-
+		users: "Utilisateurs",
 		indicator: 'Indicateur',
 		indicators: 'Indicateurs',
 		indicators_catalog: 'Catalogue Indicateurs',
@@ -189,6 +190,8 @@ var FRENCH_TRANSLATION = {
 		no_theme: 'Sans thématique',
 		no_type: 'Sans type',
 
+		operation: "Mode d'opération",
+
 		name_ph: 'Exemple: Part des dossiers patient bien remplis',
 		description_ph: 'Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
 		history_ph: 'Exemple: Défini en 2007 par l\'OMS et utilisé sur les projets de UNICEF ... cet indicateur a permi de suivre les objectifs ...',
@@ -227,8 +230,10 @@ var FRENCH_TRANSLATION = {
 		new_theme_name: "Nom de la nouvelle thématique",
 		only_core: "Ne voir que les indicateurs recommandés",
 
-		is_recommended: "Cet indicateur est recommandé",
-		is_not_recommended: "Cet indicateur n'est pas recommandé",
+		is_mandatory: "Cet indicateur est obligatoire pour les projets de même thématique",
+		is_common: "Cet indicateur est optionnel",
+		is_parameter: "Cet indicateur ne peut être utilisé que pour en calculer un autre",
+		is_external: "Cet indicateur provient d'une autre thématique",
 
 		time_aggregation: "Aggrégation par rapport au temps",
 		time_aggregation_sum: "Somme (ex: nombre de consultations, de naissances, ...)",

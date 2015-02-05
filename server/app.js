@@ -20,7 +20,6 @@ express()
 	.use(passport.initialize())
 	.use(passport.session())
 
-
 	.get('/login', passport.authenticate('oauth2'))
 
 	.get('/logout', function(request, response) {

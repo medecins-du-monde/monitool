@@ -76,51 +76,48 @@ module.exports = {
 		},
 
 		// indicator tree
-		indicator_full_tree: {
+		indicator_tree: {
 			map: function(doc) {
 				if (doc.type === 'indicator') {
-					var newDoc = {name: doc.name, standard: doc.standard};
+					var themes     = [].concat(doc.themes),
+						types      = [].concat(doc.types);
 
-					if (doc.themes.length === 0 && doc.types.length === 0)
-						emit(['', ''], newDoc);
-					else if (doc.themes.length === 0 && doc.types.length !== 0)
-						doc.types.forEach(function(type) { emit(['', type], newDoc); });
-					else if (doc.themes.length !== 0 && doc.types.length === 0)
-						doc.themes.forEach(function(theme) { emit([theme, ''], newDoc); });
-					else
-						doc.themes.forEach(function(theme) {
-							doc.types.forEach(function(type) {
-								emit([theme, type], newDoc);
-							});
+					themes.length == 0 && themes.push('');
+					types.length  == 0 && types.push('');
+
+					themes.forEach(function(theme) {
+						types.forEach(function(type) {
+							emit([theme, type], {_id: doc._id, name: doc.name, operation: doc.operation});
 						});
+					});
 				}
 			}.toString(),
 
 			reduce: "_count"
 		},
 
-		indicator_partial_tree: {
-			map: function(doc) {
-				if (doc.type === 'indicator' && doc.standard) {
-					var newDoc = {name: doc.name, standard: doc.standard};
+		// indicator_partial_tree: {
+		// 	map: function(doc) {
+		// 		if (doc.type === 'indicator' && doc.standard) {
+		// 			var newDoc = {name: doc.name, standard: doc.standard};
 
-					if (doc.themes.length === 0 && doc.types.length === 0)
-						emit(['', ''], newDoc);
-					else if (doc.themes.length === 0 && doc.types.length !== 0)
-						doc.types.forEach(function(type) { emit(['', type], newDoc); });
-					else if (doc.themes.length !== 0 && doc.types.length === 0)
-						doc.themes.forEach(function(theme) { emit([theme, ''], newDoc); });
-					else
-						doc.themes.forEach(function(theme) {
-							doc.types.forEach(function(type) {
-								emit([theme, type], newDoc);
-							});
-						});
-				}
-			}.toString(),
+		// 			if (doc.themes.length === 0 && doc.types.length === 0)
+		// 				emit(['', ''], newDoc);
+		// 			else if (doc.themes.length === 0 && doc.types.length !== 0)
+		// 				doc.types.forEach(function(type) { emit(['', type], newDoc); });
+		// 			else if (doc.themes.length !== 0 && doc.types.length === 0)
+		// 				doc.themes.forEach(function(theme) { emit([theme, ''], newDoc); });
+		// 			else
+		// 				doc.themes.forEach(function(theme) {
+		// 					doc.types.forEach(function(type) {
+		// 						emit([theme, type], newDoc);
+		// 					});
+		// 				});
+		// 		}
+		// 	}.toString(),
 
-			reduce: "_count"
-		},
+		// 	reduce: "_count"
+		// },
 
 		indicator_usage: {
 			map: function(doc) {

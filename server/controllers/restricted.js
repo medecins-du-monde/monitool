@@ -14,6 +14,7 @@ var ModelsByName = {indicator: Indicator, input: Input, project: Project, theme:
 
 router.use(require('body-parser').json());
 
+// FIXME, we should not allow creating users.
 var checkEditPermissions = function(user, modelName, modelId, callback) {
 	if (user.roles.indexOf('_admin') !== -1)
 		// admins can do what they want
