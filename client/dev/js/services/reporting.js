@@ -327,15 +327,15 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 
 	var getStatsColumns = function(query) {
 		if (['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1) {
-			var begin   = moment(query.begin, 'YYYY-MM-DD').startOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
-				end     = moment(query.end, 'YYYY-MM-DD').endOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
-				format  = {'year': 'YYYY', 'month': 'YYYY-MM', 'week': 'YYYY-MM-[W]WW', 'day': 'YYYY-MM-DD'}[query.groupBy],
-				current = begin.clone(),
-				cols    = [];
+			var begin      = moment(query.begin, 'YYYY-MM-DD').startOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
+				end        = moment(query.end, 'YYYY-MM-DD').endOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
+				dispFormat = {'year': 'YYYY', 'month': 'YYYY-MM', 'week': 'YYYY-MM-DD', 'day': 'YYYY-MM-DD'}[query.groupBy],
+				idFormat   = {'year': 'YYYY', 'month': 'YYYY-MM', 'week': 'YYYY-[W]WW', 'day': 'YYYY-MM-DD'}[query.groupBy],
+				current    = begin.clone(),
+				cols       = [];
 
 			while (current.isBefore(end) || current.isSame(end)) {
-				var date = current.format(format);
-				cols.push({id: date, name: date});
+				cols.push({id: current.format(idFormat), name: current.format(dispFormat)});
 				current.add(1, query.groupBy);
 			}
 
@@ -461,7 +461,7 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 
 				input.yearAgg   = ['total', period.format('YYYY')];
 				input.monthAgg  = ['total', period.format('YYYY-MM')];
-				input.weekAgg   = ['total', period.format('YYYY-MM-[W]WW')];
+				input.weekAgg   = ['total', period.format('YYYY-[W]WW')];
 				input.dayAgg    = ['total', period.format('YYYY-MM-DD')];
 				input.entityAgg = ['total', input.entity];
 				input.groupAgg  = groupIds; // no total here, groups don't sum
