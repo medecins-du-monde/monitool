@@ -1,5 +1,6 @@
 var FRENCH_TRANSLATION = {
 	shared: {
+		back_to_intranet: "Retourner sur l'intranet",
 		projects: 'Projets',
 
 		indicator: 'Indicateur',

@@ -1,5 +1,6 @@
 var SPANISH_TRANSLATION = {
 	shared: {
+		back_to_intranet: "Volver a la intranet",
 		projects: 'Proyectos',
 
 		indicator: 'Indicador',

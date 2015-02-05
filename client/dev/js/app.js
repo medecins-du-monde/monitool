@@ -55,9 +55,9 @@ app.config(function($translateProvider) {
  * (which allow us to add helper properties on objects, and not submit them).
  */
 app.config(function($httpProvider) {
-	$httpProvider.defaults.headers.common['X-NoBasicAuth'] = '1';
-	if (sessionStorage.Authorization)
-		$httpProvider.defaults.headers.common.Authorization = sessionStorage.Authorization;
+	// $httpProvider.defaults.headers.common['X-NoBasicAuth'] = '1';
+	// if (sessionStorage.Authorization)
+	// 	$httpProvider.defaults.headers.common.Authorization = sessionStorage.Authorization;
 
 	$httpProvider.defaults.transformRequest.unshift(function(data) {
 		if (!data)
@@ -133,17 +133,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/menu.html'
 	});
 
-	$stateProvider.state('main.login', {
-		controller: 'LoginController',
-		url: '/login',
-		templateUrl: 'partials/login.html'
-	});
+	// $stateProvider.state('main.login', {
+	// 	controller: 'LoginController',
+	// 	url: '/login',
+	// 	templateUrl: 'partials/login.html'
+	// });
 
-	$stateProvider.state('main.change_password', {
-		controller: 'ChangePasswordController',
-		url: '/change-password',
-		templateUrl: 'partials/change-password.html'
-	});
+	// $stateProvider.state('main.change_password', {
+	// 	controller: 'ChangePasswordController',
+	// 	url: '/change-password',
+	// 	templateUrl: 'partials/change-password.html'
+	// });
 
 	///////////////////////////
 	// Help

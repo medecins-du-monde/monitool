@@ -1,5 +1,7 @@
 var ENGLISH_TRANSLATION = {
 	shared: {
+
+		back_to_intranet: "Go back to intranet",
 		projects: 'Projects',
 
 		indicator: 'Indicator',
