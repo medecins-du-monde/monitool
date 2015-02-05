@@ -95,24 +95,5 @@ router.delete('/:modelName(indicator|project|input|theme|type|user)/:id', functi
 	});
 });
 
-router.patch('/user/me', function(request, response) {
-	if (!request.body || !request.body.newPassword || request.body.newPassword.length < 6)
-		return response.status(400).json({error: 1, message: 'bad request.'});
-
-	var symbols = "0123456789abcdef", user = request.user;
-
-	var shasum = crypto.createHash('sha1');
-
-	user.salt = '';
-	for (var i = 0; i < 16; ++i)
-		user.salt += symbols.charAt(16 * Math.random() >> 0);
-	
-	shasum.update(user.salt + request.body.newPassword);
-	user.hash = shasum.digest('hex');
-	User.set(user, function(error, data) {
-		response.json(user);
-	});
-});
-
 
 module.exports = router;
