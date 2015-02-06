@@ -55,6 +55,8 @@ var SPANISH_LOCALE = {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		date: "Fecha",
+
 		back_to_intranet: "Volver a la intranet",
 		settings: "Configuración",
 		projects: 'Proyectos',

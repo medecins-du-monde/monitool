@@ -61,6 +61,8 @@ var ENGLISH_LOCALE = {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		date: "Date",
+
 		back_to_intranet: "Go back to intranet",
 		settings: "Settings",
 		projects: 'Projects',

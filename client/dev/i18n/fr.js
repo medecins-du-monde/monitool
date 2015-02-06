@@ -58,6 +58,8 @@ var FRENCH_LOCALE = {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		date: "Date",
+		
 		back_to_intranet: "Retourner sur l'intranet",
 		settings: "Paramètres",
 		projects: 'Projets',
