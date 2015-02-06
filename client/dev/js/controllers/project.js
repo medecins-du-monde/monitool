@@ -38,6 +38,11 @@ angular.module('monitool.controllers.project', [])
 			});
 		};
 
+		$scope.$on('languageChange', function(e) {
+			// @hack that will make copies of all dates, and force datepickers to redraw...
+			$scope.project = angular.copy($scope.project);
+		});
+
 		$scope.reset = function() {
 			$scope.project = angular.copy($scope.master);
 		};
@@ -400,6 +405,11 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectInputListController', function($scope, project, inputs) {
 		$scope.inputs = inputs;
+		$scope.pred = 'period';
+
+		$scope.isDisplayed = function(input) {
+			return input.filled == 'no' || input.filled == 'invalid' || $scope.showFinished;
+		};
 	})
 
 	.controller('ProjectInputController', function($scope, $state, mtForms, form, indicatorsById, inputs) {
@@ -438,8 +448,8 @@ angular.module('monitool.controllers.project', [])
 	})
 
 	.controller('ProjectReportingController', function($scope, $state, $stateParams, mtReporting, mtForms, indicatorsById) {
-		$scope.entity                  = $scope.project.inputEntities.find(function(e) { return e.id === $state.current.data.id; });
-		$scope.group                   = $scope.project.inputGroups.find(function(g) { return g.id === $state.current.data.id; });
+		$scope.entity                  = $scope.project.inputEntities.find(function(e) { return e.id === $stateParams.id; });
+		$scope.group                   = $scope.project.inputGroups.find(function(g) { return g.id === $stateParams.id; });
 		$scope.indicatorsById          = indicatorsById;
 		$scope.unassignedIndicatorsIds = $scope.getUnassignedIndicators();
 
@@ -460,6 +470,9 @@ angular.module('monitool.controllers.project', [])
 			$scope.query.begin = moment($scope.dates.begin).format('YYYY-MM-DD');
 			$scope.query.end = moment($scope.dates.end).format('YYYY-MM-DD');
 		}, true);
+
+		// @hack
+		$scope.$on('languageChange', function(e) { $scope.dates = angular.copy($scope.dates); });
 
 		// Update loaded inputs when query.begin or query.end changes.
 		$scope.inputs = [];

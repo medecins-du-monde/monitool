@@ -1,3 +1,61 @@
+"use strict";
+
+var FRENCH_LOCALE = {
+	id: "fr-fr",
+	DATETIME_FORMATS: {
+		AMPMS: [ "AM", "PM" ],
+		DAY: [ "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi" ],
+		MONTH: [ "janvier", "f\u00e9vrier", "mars", "avril", "mai", "juin", "juillet", "ao\u00fbt", "septembre", "octobre", "novembre", "d\u00e9cembre" ],
+		SHORTDAY: [ "dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam." ],
+		SHORTMONTH: [ "janv.", "f\u00e9vr.", "mars", "avr.", "mai", "juin", "juil.", "ao\u00fbt", "sept.", "oct.", "nov.", "d\u00e9c." ],
+		fullDate: "EEEE d MMMM y",
+		longDate: "d MMMM y",
+		medium: "d MMM y HH:mm:ss",
+		mediumDate: "d MMM y",
+		mediumTime: "HH:mm:ss",
+		short: "dd/MM/y HH:mm",
+		shortDate: "dd/MM/y",
+		shortTime: "HH:mm"
+	},
+	NUMBER_FORMATS: {
+		CURRENCY_SYM: "\u20ac",
+		DECIMAL_SEP: ",",
+		GROUP_SEP: "\u00a0",
+		PATTERNS: [
+			{
+				gSize: 3,
+				lgSize: 3,
+				maxFrac: 3,
+				minFrac: 0,
+				minInt: 1,
+				negPre: "-",
+				negSuf: "",
+				posPre: "",
+				posSuf: ""
+			},
+			{
+				gSize: 3,
+				lgSize: 3,
+				maxFrac: 2,
+				minFrac: 2,
+				minInt: 1,
+				negPre: "-",
+				negSuf: "\u00a0\u00a4",
+				posPre: "",
+				posSuf: "\u00a0\u00a4"
+			}
+		]
+	},
+	"pluralCat": function(n, opt_precision) {
+		var i = n | 0;
+		if (i == 0 || i == 1)
+			return PLURAL_CATEGORY.ONE;
+		
+		return PLURAL_CATEGORY.OTHER;
+	}
+};
+
+
 var FRENCH_TRANSLATION = {
 	shared: {
 		back_to_intranet: "Retourner sur l'intranet",
@@ -56,7 +114,7 @@ var FRENCH_TRANSLATION = {
 		list: 'Liste',
 		logout: 'Déconnecter',
 		change_password: "Changer le mot de passe",
-		detach: "Détacher"
+		detach: "Déplacer vers supplémentaires"
 	},
 	menu: {
 		toggle_nav: "Voir le menu",
@@ -66,6 +124,11 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		entity_name: "Nom de la structure ou lieu d’intervention",
+		group_name: "Nom du groupe",
+		entity_name_placeholder: "ex: Centre de santé X, Hôpital X, ...",
+		group_name_placeholder: "ex: Hôpitaux régionaux, parti Nord du pays, ...",
+
 		logical_frame_tooltip: 'Décrit les objectifs, resultats attendus et activitées mises en oeuvre par le projet.',
 		input_entities_tooltip: 'Liste les lieux d\'activité du projet où sont collectés les indicateurs. Par exemple des hopitaux, centre de santé, villages...',
 		input_groups_tooltip: 'Permet de grouper les lieux d\'activité par catégories logiques.',
@@ -120,12 +183,12 @@ var FRENCH_TRANSLATION = {
 		add_target: 'Ajouter une cible',
 		general_data: 'Données générales',
 
-		goal: 'Objectif global',
+		goal: 'Objectif général',
 		goal_short: "OG",
 		intervention_logic: 'Logique d\'intervention',
 		intervention_logic_goal_ph: 'Description de la contribution du projet aux objectifs (impact) d\'une politique ou d\'un programme',
 		intervention_logic_purpose_ph: 'Description des avantages directs destinés au(x) groupe(s) cible(s)',
-		assumptions_purpose_ph: 'Si l\'objectif spécifique est atteint, quelles hypothèses doivent être confirmées pour atteindre l\'objectif général?',
+		assumptions_purpose_ph: 'Facteurs externes susceptibles de compromettre l’atteinte de l’objectif',
 		purpose_short: 'OS',
 		output_short: 'R',
 
@@ -142,7 +205,7 @@ var FRENCH_TRANSLATION = {
 		prerequisite: 'Prérequis',
 		activity_prereq_ph: 'Quels sont les prérequis pour mettre en place d\'activité?',
 		activity_desc_ph: 'Produit ou service tangibles apportés par le projet.',
-		output_assumptions_ph: 'Si le résultat est obtenu, quelles hypothèses doivent être confirmées pour atteindre l\'objectif spécifique?',
+		output_assumptions_ph: 'Facteurs externes susceptibles de compromettre l’atteinte du résultat',
 		output_desc_ph: 'Produit ou service tangibles apportés par le projet.',
 
 		add_activity: 'Ajouter une activité',

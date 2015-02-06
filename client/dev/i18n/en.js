@@ -1,3 +1,64 @@
+
+var ENGLISH_LOCALE = {
+	DATETIME_FORMATS: {
+		"AMPMS": [ "AM", "PM" ],
+		"DAY": [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
+		"MONTH": [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
+		"SHORTDAY": [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
+		"SHORTMONTH": [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
+		"fullDate": "EEEE, MMMM d, y",
+		"longDate": "MMMM d, y",
+		"medium": "MMM d, y h:mm:ss a",
+		"mediumDate": "MMM d, y",
+		"mediumTime": "h:mm:ss a",
+		"short": "M/d/yy h:mm a",
+		"shortDate": "M/d/yy",
+		"shortTime": "h:mm a"
+	},
+	"NUMBER_FORMATS": {
+		"CURRENCY_SYM": "$",
+		"DECIMAL_SEP": ".",
+		"GROUP_SEP": ",",
+		"PATTERNS": [
+		{
+			"gSize": 3,
+			"lgSize": 3,
+			"maxFrac": 3,
+			"minFrac": 0,
+			"minInt": 1,
+			"negPre": "-",
+			"negSuf": "",
+			"posPre": "",
+			"posSuf": ""
+		},
+		{
+			"gSize": 3,
+			"lgSize": 3,
+			"maxFrac": 2,
+			"minFrac": 2,
+			"minInt": 1,
+			"negPre": "\u00a4-",
+			"negSuf": "",
+			"posPre": "\u00a4",
+			"posSuf": ""
+		}
+		]
+	},
+	"id": "en-us",
+	"pluralCat": function(n, opt_precision) {
+		var i = n | 0;
+		var vf = getVF(n, opt_precision);
+
+		if (i == 1 && vf.v == 0) {
+			return PLURAL_CATEGORY.ONE;
+		}
+
+		return PLURAL_CATEGORY.OTHER;
+	}
+};
+
+
+
 var ENGLISH_TRANSLATION = {
 	shared: {
 		back_to_intranet: "Go back to intranet",
@@ -125,7 +186,7 @@ var ENGLISH_TRANSLATION = {
 		intervention_logic: 'Description',
 		intervention_logic_goal_ph: 'Describe the project\'s contribution on a program or policy',
 		intervention_logic_purpose_ph: 'Describe the tangible advantages that are provided to the beneficiaries',
-		assumptions_purpose_ph: 'If the purpose is achieved, what assumptions must hold to met the goal?',
+		assumptions_purpose_ph: 'External factors that could jeopardize reaching the purpose',
 		purpose_short: 'Purpose',
 		output_short: 'Output',
 
@@ -142,7 +203,7 @@ var ENGLISH_TRANSLATION = {
 		prerequisite: 'Prerequisite',
 		activity_prereq_ph: 'What are the prerequisites that have to be met before starting the activity?',
 		activity_desc_ph: 'Product or tangible service brought by the project',
-		output_assumptions_ph: 'If the output is achieved, what assumptions must hold to to met the purpose?',
+		output_assumptions_ph: 'External factors that could jeopardize reaching the output',
 		output_desc_ph: 'Product or tangible service brought by the project',
 
 		add_activity: 'Add activity',

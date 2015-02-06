@@ -11,9 +11,9 @@
 		<div class="form-group" show-errors>
 			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.name">
-				<input type="text"
+				<input id="input-name"
+					   type="text"
 					   class="form-control"
-					   id="input-name"
 					   name="name"
 					   ng-model="project.name"
 					   placeholder="{{'project.name_ph'|translate}}"
@@ -40,14 +40,11 @@
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.begin">
 
 				<input type="text" 
-					   datepicker-popup="yyyy/MM/dd"
+					   datepicker-popup="longDate"
 					   name="begin"
 					   ng-model="project.begin"
 					   is-open="beginDateOpen"
-					   show-button-bar="false"
 					   ng-click = "beginDateOpen = true"
-					   starting-day="1"
-					   show-weeks="0"
 					   required
 					   ng-max="project.end"
 					   class="form-control" />
@@ -62,14 +59,11 @@
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.end">
 
 				<input type="text" 
-					   datepicker-popup="yyyy/MM/dd"
+					   datepicker-popup="longDate"
 					   name="end"
 					   ng-model="project.end"
 					   is-open="endDateOpen"
-					   show-button-bar="false"
 					   ng-click = "endDateOpen = true"
-					   starting-day="1"
-					   show-weeks="0"
 					   required
 					   ng-min="project.begin"
 					   class="form-control" />
@@ -78,12 +72,14 @@
 				<p class="help-block" ng-if="projectForm.end.$error.greaterThan" translate="form.end_greater_than_begin"></p>
 			</div>
 		</div>
-	</fieldset>
+
+ 	</fieldset>
 
 	<fieldset>
 		<legend translate="project.goal"></legend>
+
 		<div class="form-group" show-errors>
-			<label for="logframe-goal-input" class="col-sm-2 control-label" translate="project.intervention_logic"></label>
+			<label for="logframe-goal-input" class="col-sm-2 control-label" translate="project.goal"></label>
 
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.logicalFrame.goal">
 				<textarea class="form-control"
@@ -144,14 +140,14 @@
 					</button>
 
 					<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-					<a ng-click="tabOpen = !tabOpen"> {{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}</a>
+					<a ng-click="tabOpen = !tabOpen">{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}</a>
 				</div>
 			</div>
 
 			<div class="panel-body" ng-show="tabOpen">
 				<ng-form name="purposeForm">
 					<div class="form-group" show-errors>
-						<label for="purpose-desc-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.intervention_logic"></label>
+						<label for="purpose-desc-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.purpose"></label>
 						<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.description">
 							<input type="text"
 								   class="form-control"
@@ -172,10 +168,7 @@
 									  name="assumptions"
 									  id="purpose-assum-{{purposeId}}-input"
 									  placeholder="{{'project.assumptions_purpose_ph'|translate}}"
-									  ng-model="purpose.assumptions"
-									  required></textarea>
-
-							<p class="help-block" ng-if="purposeForm.assumptions.$error.required" translate="form.mandatory"></p>
+									  ng-model="purpose.assumptions"></textarea>
 						</div>
 					</div>
 
@@ -212,7 +205,7 @@
 						<div class="panel-body" ng-show="tabOpen">
 							<ng-form name="outputForm">
 								<div class="form-group" show-errors>
-									<label for="output-desc-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="shared.description"></label>
+									<label for="output-desc-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.output"></label>
 									<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.description">
 										<textarea class="form-control"
 												  required
@@ -229,13 +222,10 @@
 									<label for="output-assump-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.assumptions"></label>
 									<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.assumptions">
 										<textarea class="form-control"
-												  required
 												  id="output-assump-{{purposeId}}-{{outputId}}-input"
 												  name="assumptions"
 												  placeholder="{{'project.output_assumptions_ph'|translate}}"
 												  ng-model="output.assumptions"></textarea>
-
-										<p class="help-block" ng-if="outputForm.assumptions.$error.required" translate="form.mandatory"></p>
 									</div>
 								</div>
 
@@ -274,7 +264,7 @@
 											<div class="form-group" show-errors>
 												<label for="activity-desc-{{purposeId}}-{{outputId}}-{{activityId}}-input"
 													   class="col-sm-2 control-label"
-													   translate="shared.description"></label>
+													   translate="project.activity"></label>
 
 												<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="activity.description">
 													<input type="text"
@@ -286,24 +276,6 @@
 														   required/>
 
 													<p class="help-block" ng-if="activityForm.description.$error.required" translate="form.mandatory"></p>
-												</div>
-											</div>
-
-											<div class="form-group" show-errors>
-												<label for="activity-prereq-{{purposeId}}-{{outputId}}-{{activityId}}-input"
-													   class="col-sm-2 control-label"
-													   translate="project.prerequisite"></label>
-
-												<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="activity.prerequisites">
-													<input type="text"
-														   id="activity-prereq-{{purposeId}}-{{outputId}}-{{activityId}}-input"
-														   class="form-control"
-														   placeholder="{{'project.activity_prereq_ph'|translate}}"
-														   ng-model="activity.prerequisites"
-														   name="prerequisites"
-														   required/>
-
-													<p class="help-block" ng-if="activityForm.prerequisites.$error.required" translate="form.mandatory"></p>
 												</div>
 											</div>
 										</ng-form>

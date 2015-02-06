@@ -31,6 +31,16 @@ app.config(function($translateProvider) {
 	$translateProvider.preferredLanguage('fr');
 });
 
+app.run(function($translate, $locale) {
+	var langKey = $translate.use();
+	if (langKey == 'fr')
+		angular.copy(FRENCH_LOCALE, $locale);
+	else if (langKey == 'es')
+		angular.copy(SPANISH_LOCALE, $locale);
+	else
+		angular.copy(ENGLISH_LOCALE, $locale);
+});
+
 // Uncomment to add 1 second of latency to every query
 // http://blog.brillskills.com/2013/05/simulating-latency-for-angularjs-http-calls-with-response-interceptors/
 // 
@@ -48,6 +58,13 @@ app.config(function($translateProvider) {
 // 		};
 // 	});
 // });
+
+app.config(function(datepickerConfig, datepickerPopupConfig) {
+	datepickerConfig.showWeeks = false;
+	datepickerConfig.startingDay = 1;
+
+	datepickerPopupConfig.showButtonBar = false;
+});
 
 
 /**

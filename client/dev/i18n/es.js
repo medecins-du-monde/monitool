@@ -1,3 +1,58 @@
+'use strict';
+
+var SPANISH_LOCALE = {
+	id: "es-es",
+	DATETIME_FORMATS: {
+		AMPMS: [ "a. m.", "p. m." ],
+		DAY: [ "domingo", "lunes", "martes", "mi\u00e9rcoles", "jueves", "viernes", "s\u00e1bado" ],
+		MONTH: [ "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" ],
+		SHORTDAY: [ "dom.", "lun.", "mar.", "mi\u00e9.", "jue.", "vie.", "s\u00e1b." ],
+		SHORTMONTH: [ "ene.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ago.", "sept.", "oct.", "nov.", "dic." ],
+		fullDate: "EEEE, d 'de' MMMM 'de' y",
+		longDate: "d 'de' MMMM 'de' y",
+		medium: "d 'de' MMM 'de' y H:mm:ss",
+		mediumDate: "d 'de' MMM 'de' y",
+		mediumTime: "H:mm:ss",
+		short: "d/M/yy H:mm",
+		shortDate: "d/M/yy",
+		shortTime: "H:mm"
+	},
+	NUMBER_FORMATS: {
+		CURRENCY_SYM: "\u20ac",
+		DECIMAL_SEP: ",",
+		GROUP_SEP: ".",
+		PATTERNS: [
+			{
+				gSize: 3,
+				lgSize: 3,
+				maxFrac: 3,
+				minFrac: 0,
+				minInt: 1,
+				negPre: "-",
+				negSuf: "",
+				posPre: "",
+				posSuf: ""
+			},
+			{
+				gSize: 3,
+				lgSize: 3,
+				maxFrac: 2,
+				minFrac: 2,
+				minInt: 1,
+				negPre: "-",
+				negSuf: "\u00a0\u00a4",
+				posPre: "",
+				posSuf: "\u00a0\u00a4"
+			}
+		]
+	},
+	pluralCat: function(n, opt_precision) {
+		if (n == 1)
+			return PLURAL_CATEGORY.ONE;
+		return PLURAL_CATEGORY.OTHER;
+	}
+};
+
 var SPANISH_TRANSLATION = {
 	shared: {
 		back_to_intranet: "Volver a la intranet",
@@ -125,7 +180,7 @@ var SPANISH_TRANSLATION = {
 		intervention_logic: 'Logica de intervención',
 		intervention_logic_goal_ph: 'Descripción de la contribución del proyecto a los objectivos (impacto) de una política o de un programa',
 		intervention_logic_purpose_ph: 'Descripción de las ventajas directas destinadas a los beneficiarios',
-		assumptions_purpose_ph: 'Si el objetivo esta alcanzado, ¿qué hipotesis se deben confirmar para alcanzar el objetivo general?',
+		assumptions_purpose_ph: 'Factores externos susceptibles de comprometer el alcanze del objetivo',
 		purpose_short: 'OS',
 		output_short: 'R',
 
@@ -142,7 +197,7 @@ var SPANISH_TRANSLATION = {
 		prerequisite: 'Requisito previo',
 		activity_prereq_ph: '¿Qué requisitos previos se deben verificar antes de poder empezar esta actividad?',
 		activity_desc_ph: 'Producto o servicio tangible aportado por el proyecto.',
-		output_assumptions_ph: 'Si el resultado es obtenido, ¿que hipotesis se deben confirmar para alcanzar el objetivo específico?',
+		output_assumptions_ph: 'Factores externos susceptibles de comprometer el alcanze del resultado',
 		output_desc_ph: 'Producto o servicio tangible aportado por el proyecto.',
 
 		add_activity: 'Añadir una actividad',

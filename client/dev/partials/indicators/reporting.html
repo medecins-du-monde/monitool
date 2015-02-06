@@ -21,14 +21,11 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 						<input type="text" 
-							   datepicker-popup="yyyy/MM/dd"
+							   datepicker-popup="longDate"
 							   name="begin"
 							   ng-model="dates.begin"
 							   is-open="beginDateOpen"
-							   show-button-bar="false"
 							   ng-click="beginDateOpen=true"
-							   starting-day="1"
-							   show-weeks="0"
 							   required
 							   ng-max="dates.end"
 							   class="form-control" />
@@ -68,14 +65,11 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 						<input type="text" 
-							   datepicker-popup="yyyy/MM/dd"
+							   datepicker-popup="longDate"
 							   name="end"
 							   ng-model="dates.end"
 							   is-open="endDateOpen"
-							   show-button-bar="false"
 							   ng-click="endDateOpen=true"
-							   starting-day="1"
-							   show-weeks="0"
 							   required
 							   ng-min="dates.begin"
 							   class="form-control" />

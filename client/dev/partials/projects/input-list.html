@@ -10,10 +10,10 @@
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th translate>shared.done</th>
-			<th translate>shared.month</th>
-			<th translate>shared.input_entities</th>
-			<th translate>project.input_forms</th>
+			<th><a ng-click="pred='filled';rev=!rev">{{'shared.done'|translate}}</a></th>
+			<th><a ng-click="pred='period';rev=!rev">{{'shared.date'|translate}}</a></th>
+			<th><a ng-click="pred='inputEntityName';rev=!rev">{{'shared.input_entities'|translate}}</a></th>
+			<th><a ng-click="pred='formName';rev=!rev">{{'project.input_forms'|translate}}</a></th>
 			<th></th>
 		</tr>
 	</thead>
@@ -21,7 +21,7 @@
 		<tr ng-if="!inputs.length">
 			<td colspan="5" style="text-align: center" translate>project.no_waiting_inputs</td>
 		</tr>
-		<tr ng-repeat="input in inputs" ng-if="input.filled == 'no' || input.filled == 'invalid' || showFinished">
+		<tr ng-repeat="input in inputs | filter:isDisplayed | orderBy:pred:rev">
 			<td>
 				<i ng-init="ok=input.filled"
 				   ng-class="{fa: true, 'fa-check': input.filled=='yes', 'fa-times': input.filled=='no', 'fa-calendar': input.filled=='invalid'}"
@@ -54,3 +54,6 @@
 		</tr>
 	</tbody>
 </table>
+
+
+<!-- ng-if="input.filled == 'no' || input.filled == 'invalid' || showFinished" -->

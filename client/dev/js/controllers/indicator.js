@@ -118,6 +118,10 @@ angular.module('monitool.controllers.indicator', [])
 			$scope.query.end = moment($scope.dates.end).format('YYYY-MM-DD');
 		}, true);
 
+		$scope.$on('languageChange', function(e) {
+			$scope.dates = angular.copy($scope.dates);
+		})
+
 		$scope.inputs = [];
 		$scope.$watch("[query.begin, query.end]", function() {
 			mtReporting.getInputs($scope.query).then(function(inputs) {

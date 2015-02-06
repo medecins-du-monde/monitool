@@ -8,7 +8,7 @@
 	<table class="table table-bordered table-stripped table-condensed">
 		<thead>
 			<tr>
-				<th translate>shared.name</th>
+				<th translate="project.entity_name"></th>
 				<th style="width: 255px;"></th>
 			</tr>
 		</thead>
@@ -20,7 +20,12 @@
 				<td acl-has-project-role="owner" acl-fallback="inputEntity.name">
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
-							<input type="text" name="name" ng-model="inputEntity.name" class="form-control input-sm" required />
+							<input type="text"
+								   name="name"
+								   ng-model="inputEntity.name"
+								   class="form-control input-sm"
+								   placeholder="{{'project.entity_name_placeholder'|translate}}"
+								   required />
 						</div>
 					</ng-form>
 				</td>
