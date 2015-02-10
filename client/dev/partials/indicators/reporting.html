@@ -83,9 +83,8 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-eye"></i></span>
 						<select class="form-control" id="display-input" ng-model="presentation.display">
-							<option value="value" translate>shared.values</option>
-							<option value="targetPart" translate>shared.target_percentage</option>
-							<option value="baselinePart" translate>shared.baseline_percentage</option>
+							<option value="value" translate="shared.values"></option>
+							<option value="progress" translate="shared.target_percentage"></option>
 						</select>
 					</div>
 				</div>
@@ -125,6 +124,8 @@
 		<tr>
 			<th ng-show="presentation.plot"></th>
 			<th></th>
+			<th translate="project.baseline"></th>
+			<th translate="project.target"></th>
 			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
@@ -137,11 +138,12 @@
 					{{project.name}}
 				</a>
 			</td>
+			<td>{{project.indicators[indicator._id].baseline}}{{indicator.unit}}</td>
+			<td>{{project.indicators[indicator._id].target}}{{indicator.unit}}</td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[project._id][col.id][indicator._id] ? (presentation.colorize ? data[project._id][col.id][indicator._id].color : white) : '#eeeeee'}">
 				<div ng-switch="presentation.display" ng-if="data[project._id][col.id][indicator._id]">
 					<span ng-switch-when="value">{{data[project._id][col.id][indicator._id].value}}{{indicator.unit}}</span>
-					<span ng-switch-when="targetPart">{{data[project._id][col.id][indicator._id].targetPart}}%</span>
-					<span ng-switch-when="baselinePart">{{data[project._id][col.id][indicator._id].baselinePart}}%</span>
+					<span ng-switch-when="progress">{{data[project._id][col.id][indicator._id].progress}}%</span>
 				</div>
 			</td>
 		</tr>
@@ -150,11 +152,12 @@
 			<td>
 				<label for="plot-{{inputEntity.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{inputEntity.name}}</label>
 			</td>
+			<td>{{project.indicators[indicator._id].baseline}}{{indicator.unit}}</td>
+			<td>{{project.indicators[indicator._id].target}}{{indicator.unit}}</td>
 			<td ng-repeat="col in cols" ng-style="{'background-color': data[inputEntity.id][col.id][indicator._id] ? (presentation.colorize ? data[inputEntity.id][col.id][indicator._id].color : white) : '#eee'}">
-				<div ng-switch="presentation.display" ng-if="data[inputEntity.id][col.id][indicator._id] !== undefined">
+				<div ng-switch="presentation.display" ng-if="data[inputEntity.id][col.id][indicator._id]">
 					<span ng-switch-when="value">{{data[inputEntity.id][col.id][indicator._id].value}}{{indicator.unit}}</span>
-					<span ng-switch-when="targetPart">{{data[inputEntity.id][col.id][indicator._id].targetPart}}%</span>
-					<span ng-switch-when="baselinePart">{{data[inputEntity.id][col.id][indicator._id].baselinePart}}%</span>
+					<span ng-switch-when="progress">{{data[inputEntity.id][col.id][indicator._id].progress}}%</span>
 				</div>
 			</td>
 		</tr>

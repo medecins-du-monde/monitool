@@ -21,7 +21,7 @@ var Type = module.exports = {
 			database.view('server', 'types_usage', {group: true}, function(error, data) {
 				var countByType = {};
 				data.rows.forEach(function(row) { countByType[row.key] = row.value; });
-				types.forEach(function(type) { type.__usage = countByType[type._id] || 0; });
+				types.forEach(function(type) { type.__indicatorUsage = countByType[type._id] || 0; });
 
 				return callback(null, types);
 			});

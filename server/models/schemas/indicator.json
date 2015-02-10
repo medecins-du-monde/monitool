@@ -10,7 +10,8 @@
 	"properties": {
 		"_id":             { "$ref": "#/definitions/uuid" },
 		"_rev":            { "$ref": "#/definitions/couchdb-revision" },
-		"operation":       { "type": "string", "enum": ["parameter", "common", "recommended", "mandatory"]},
+		"operation":       { "type": "string", "enum": ["parameter", "common", "recommended", "mandatory"] },
+		"target": 		   { "type": "string", "enum": ["lower_is_better", "higher_is_better", "around_is_better", "non_relevant"] },
 		"type":            { "type": "string", "pattern": "^indicator$" },
 		"name":            { "type": "string", "minLength": 3 },
 		"description":     { "type": "string", "minLength": 3 },

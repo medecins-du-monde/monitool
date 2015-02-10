@@ -59,7 +59,8 @@ var FRENCH_LOCALE = {
 var FRENCH_TRANSLATION = {
 	shared: {
 		date: "Date",
-		
+		administrator: "Administrateur",
+
 		back_to_intranet: "Retourner sur l'intranet",
 		settings: "Paramètres",
 		projects: 'Projets',
@@ -104,8 +105,7 @@ var FRENCH_TRANSLATION = {
 		colorize: 'Colorer',
 		display: 'Afficher',
 		values: 'Valeurs',
-		target_percentage: 'Pourcentage de la cible',
-		baseline_percentage: 'Pourcentage de la baseline',
+		target_percentage: 'Avancement',
 		plot: 'Grapher',
 		download_plot: 'Télécharger le graphique',
 		download_table: 'Télécharger le tableau',
@@ -180,8 +180,8 @@ var FRENCH_TRANSLATION = {
 		green_zone: 'Zone Verte',
 		baseline: 'Baseline',
 		baseline_ph: 'Valeur de référence',
-		target_value_ph: 'valeur',
-		targets: 'Cibles',
+		target_ph: 'Valeur à atteindre',
+		target: 'Cible',
 		add_target: 'Ajouter une cible',
 		general_data: 'Données générales',
 
@@ -245,13 +245,19 @@ var FRENCH_TRANSLATION = {
 		status_green: "Cet indicateur est en zone verte",
 		status_orange: "Cet indicateur est en zone orange",
 		status_red: "Cet indicateur est en zone rouge",
-		status_darkred: "Cet indicateur est en dehors<br/>des limites fixées<br/>dans le cadre logique",
+		status_unknown: "Cet indicateur est en dehors<br/>des limites fixées<br/>dans le cadre logique",
 
 		formula: "Formule: {{name}}",
 		link: "Lien: {{name}}",
 		links: "Liens"
 	},
 	indicator: {
+		target: "Relation à la cible",
+		higher_is_better: "Atteinte si la saisie est supérieure à la cible",
+		lower_is_better: "Atteinte si la saisie est inférieure à la cible",
+		around_is_better: "Atteinte si la saisie est égale à la cible",
+		non_relevant: "Non pertinent",
+
 		no_theme: 'Sans thématique',
 		no_type: 'Sans type',
 

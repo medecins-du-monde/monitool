@@ -32,30 +32,14 @@
 					"type": "object",
 					"additionalProperties": false,
 					"required": [
-						"relevance", "baseline", "minimum", "orangeMinimum", "greenMinimum",
-						"greenMaximum", "orangeMaximum", "maximum", "targets"
+						"relevance", "baseline", "target"
 					],
 					"properties": {
-						"relevance":     {"type": "string", "minLength": 1},
-						"baseline":      {"type": "number"},
-						"minimum":       {"type": "number"},
-						"orangeMinimum": {"type": "number"},
-						"greenMinimum":  {"type": "number"},
-						"greenMaximum":  {"type": "number"},
-						"orangeMaximum": {"type": "number"},
-						"maximum":       {"type": "number"},
-
-						"targets": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"additionalProperties": false,
-								"properties": {
-									"period": { "type": "string", "format": "date" },
-									"value": { "type": "number" }
-								}
-							}
-						}
+						"relevance": { "type": "string", "minLength": 1 },
+						"baseline": { "type": ["number", "null"] },
+						"target": { "type": ["number", "null"] },
+						"showRed": { "type": "number" },
+						"showYellow": { "type": "number" }
 					}
 				}
 			}

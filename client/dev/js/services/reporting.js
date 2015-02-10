@@ -367,47 +367,56 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 			throw new Error('Invalid groupBy: ' + query.groupBy)
 	};
 
-	// @FIXME Should be a dichotomy, and targets should be sorted all the time (before saving).
-	var getTargetValue = function(period, planning) {
-		var targets = planning.targets, numTargets = targets.length;
-		if (numTargets == 0)
-			return 0;
+	// // @FIXME Should be a dichotomy, and targets should be sorted all the time (before saving).
+	// var getTargetValue = function(period, planning) {
+	// 	var targets = planning.targets, numTargets = targets.length;
+	// 	if (numTargets == 0)
+	// 		return 0;
 		
-		targets.sort(function(a, b) { return a.period > b.period ? 1 : -1 });
-		var index = 0;
-		while (index < numTargets) {
-			if (targets[index].period > period)
-				return targets[index].value;
-			++index;
-		}
+	// 	targets.sort(function(a, b) { return a.period > b.period ? 1 : -1 });
+	// 	var index = 0;
+	// 	while (index < numTargets) {
+	// 		if (targets[index].period > period)
+	// 			return targets[index].value;
+	// 		++index;
+	// 	}
 
-		return targets[numTargets - 1].value;
-	};
+	// 	return targets[numTargets - 1].value;
+	// };
 
-	var retrieveMetadata = function(project, regrouped, begin, groupBy) {
+	var retrieveMetadata = function(regrouped, project, indicatorsById) {
 		// add metadata
 		var regroupedWithMetadata = {};
 		for (var key in regrouped) {
 			regroupedWithMetadata[key] = {};
 
 			for (var indicatorId in regrouped[key]) {
-				var params   = project.indicators[indicatorId],
-					metadata = {value: Math.round(regrouped[key][indicatorId])};
+				var planning  = project.indicators[indicatorId],
+					indicator = indicatorsById[indicatorId];
 
-				// compute display value
-				if (params) {
-					metadata.target = getTargetValue(groupBy === 'month' ? key : begin.format('YYYY-MM-DD'), params);
-					metadata.baseline = params.baseline;
-					metadata.baselinePart = Math.round(100 * metadata.value / params.baseline);
-					metadata.targetPart = Math.round(100 * metadata.value / metadata.target);
+				if (!planning || !indicator)
+					continue;
 
-					// compute color
-					if (params.greenMinimum <= metadata.value && metadata.value <= params.greenMaximum)
-						metadata.color = '#AFA';
-					else if (params.orangeMinimum <= metadata.value && metadata.value <= params.orangeMaximum)
+				var value = regrouped[key][indicatorId];
+				var metadata = {
+					value: Math.round(value),
+					target: planning.target,
+					baseline: planning.baseline,
+				};
+
+				if (planning.baseline !== null && planning.target !== null) {
+					if (indicator.target === 'around_is_better')
+						metadata.progress = 1 - Math.abs(value - metadata.target) / (metadata.target - metadata.baseline);
+					else
+						metadata.progress = (value - metadata.baseline) / (metadata.target - metadata.baseline);
+					metadata.progress = Math.round(100 * metadata.progress);
+
+					if (metadata.progress < planning.showRed)
+						metadata.color = '#F88';
+					else if (metadata.progress < planning.showYellow)
 						metadata.color = '#FC6';
 					else
-						metadata.color = '#F88';
+						metadata.color = '#AFA';
 				}
 
 				regroupedWithMetadata[key][indicatorId] = metadata;
@@ -450,7 +459,6 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 
 			// annotate each input with keys that will later tell the sumBy function how to aggregate the data.
 			inputs.forEach(function(input) {
-
 				var period = moment(input.period);
 				var project = query.project || query.projects.find(function(p) { return p._id === input.project; });
 				var groupIds = project.inputGroups.filter(function(group) {
@@ -479,7 +487,7 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 	 * This function regroup inputs into a usable 2 level hash. ex: {2014-01: {indicatorId: 455}}
 	 * it could be optimized a bit: an extra copy is done at the end, and when we have nested compute: values, the subtree is evaluated as many times.
 	 */
-	var regroup = function(inputs, query) {
+	var regroup = function(inputs, query, indicatorById) {
 		var aggregationKey  = ['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation',
 			globalRegrouped = {};
 
@@ -550,23 +558,24 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 			}
 		});
 		
-		return retrieveMetadata(query.project, globalRegrouped, moment(query.begin), query.groupBy);
+		return retrieveMetadata(globalRegrouped, query.project, indicatorById);
 	};
 
-	var regroupIndicator = function(inputs, query) {
-		var result = {}, begin = moment(query.begin, 'YYYY-MM-DD');
+	var regroupIndicator = function(inputs, query, indicatorById) {
+		var result = {},
+			begin = moment(query.begin, 'YYYY-MM-DD')
 
 		query.projects.forEach(function(project) {
 			var projectInputs = inputs.filter(function(input) { return input.project === project._id; }),
 				projectQuery  = {begin: query.begin, project: project, groupBy: query.groupBy};
 
-			result[project._id] = regroup(projectInputs, projectQuery);
+			result[project._id] = regroup(projectInputs, projectQuery, indicatorById);
 
 			project.inputEntities.forEach(function(entity) {
 				var entityInputs = projectInputs.filter(function(input) { return input.entity === entity.id; }),
 					entityQuery  = {begin: query.begin, project: project, groupBy: query.groupBy, type: 'entity', id: entity.id};
 
-				result[entity.id] = regroup(entityInputs, entityQuery);
+				result[entity.id] = regroup(entityInputs, entityQuery, indicatorById);
 			});
 		});
 
@@ -574,12 +583,13 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 	};
 
 	var getDefaultStartDate = function(project) {
-		var date = moment().subtract(1, 'year').format('YYYY-MM-DD');
-		return project && project.begin > date ? project.begin : date;
+		var result = moment().subtract(1, 'year');
+		if (project && result.isBefore(project.begin))
+			result = moment(project.begin)
+		return result.format('YYYY-MM-DD');
 	};
 
 	var getDefaultEndDate = function(project) {
-		// "now"
 		return moment().format('YYYY-MM-DD');
 	};
 
@@ -591,7 +601,6 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 		return project;
 	};
 
-	
 	return {
 		getStatsColumns: getStatsColumns,
 		getDefaultStartDate: getDefaultStartDate,

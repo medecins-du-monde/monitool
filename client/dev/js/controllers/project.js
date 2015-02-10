@@ -97,11 +97,13 @@ angular.module('monitool.controllers.project', [])
 			var indicatorIdPromise;
 			if (indicatorId === 'new')
 				indicatorIdPromise = $modal.open({
-					templateUrl: 'partials/projects/logical-frame-indicator-selection.html',
-					controller: 'IndicatorChooseController',
+					controller: 'ProjectLogicalFrameIndicatorSelectionController',
+					templateUrl: 'partials/projects/logical-frame-indicator-selector.html',
 					size: 'lg',
+					scope: $scope,
 					resolve: {
-						forbiddenIds: function() { return target ? $scope.getAssignedIndicators() : Object.keys($scope.project.indicators); }
+						forbiddenIds: function() { return target ? $scope.getAssignedIndicators() : Object.keys($scope.project.indicators); },
+						hierarchy: function(mtFetch) { return mtFetch.themes({mode: 'tree', partial: '1'}); }
 					}
 				}).result;
 			else
@@ -115,8 +117,8 @@ angular.module('monitool.controllers.project', [])
 				else
 					// edit.
 					$modal.open({
+						controller: 'ProjectLogicalFrameIndicatorEditionController',
 						templateUrl: 'partials/projects/logical-frame-indicator-edition.html',
-						controller: 'ProjectLogicalFrameIndicatorController',
 						size: 'lg',
 						scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
 						resolve: {indicatorId: function() { return chosenIndicatorId; }, target: function() { return target; }}
@@ -170,19 +172,27 @@ angular.module('monitool.controllers.project', [])
 		}, true);
 	})
 
-	/**
-	 * This controller is a modal and DOES NOT inherit from ProjectLogicalFrameController
-	 * Hence the need for project and userCtx to be passed explicitly.
-	 */
-	.controller('ProjectLogicalFrameIndicatorController', function($scope, $modalInstance, mtFetch, indicatorId, target) {
+	.controller('ProjectLogicalFrameIndicatorSelectionController', function($scope, $modalInstance, forbiddenIds, hierarchy) {
+		$scope.forbidden = forbiddenIds;
+		$scope.hierarchy = hierarchy;
+
+		$scope.choose = function(indicatorId) {
+			$modalInstance.close(indicatorId);
+		};
+
+		$scope.cancel = function() {
+			$modalInstance.dismiss()
+		};
+	})
+
+	.controller('ProjectLogicalFrameIndicatorEditionController', function($scope, $modalInstance, mtFetch, indicatorId, target) {
 		// Retrieve indicator array where we need to add or remove indicator ids.
 		$scope.isNew = !$scope.project.indicators[indicatorId];
 		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
-			relevance: '', baseline: 0,
-			minimum: 0, orangeMinimum: 20, greenMinimum: 40,
-			greenMaximum: 60, orangeMaximum: 80, maximum: 100,
-			targets: []
+			relevance: '', baseline: null, target: null, showRed: 33, showYellow: 66
 		};
+		$scope.planning.__baselineUnknown = $scope.planning.baseline === null;
+		$scope.planning.__targetUnknown = $scope.planning.target === null;
 
 		// FIXME, this query is useless, we could avoid it and pass the full indicator from the calling controller.
 		mtFetch.indicator(indicatorId).then(function(indicator) {
@@ -204,6 +214,9 @@ angular.module('monitool.controllers.project', [])
 		$scope.save = function() {
 			if ($scope.isNew)
 				target && target.push(indicatorId);
+
+			delete $scope.planning.__baselineUnknown;
+			delete $scope.planning.__targetUnknown;
 
 			$scope.project.indicators[indicatorId] = $scope.planning;
 			$scope.indicatorsById[indicatorId] = $scope.indicator; // inject the indicator in the parent scope.
@@ -425,16 +438,26 @@ angular.module('monitool.controllers.project', [])
 		$scope.$watch('currentInput.values', function() {
 			mtForms.evaluateAll($scope.form.fields, $scope.currentInput.values);
 			$scope.form.fields.forEach(function(field) {
-				var indicatorMeta = $scope.project.indicators[field.id];
+				var planning  = $scope.project.indicators[field.id],
+					indicator = indicatorsById[field.id],
+					value = $scope.currentInput.values[field.model];
 
-				if (indicatorMeta.greenMinimum < $scope.currentInput.values[field.model] && $scope.currentInput.values[field.model] < indicatorMeta.greenMaximum)
-					$scope.status[field.id] = 'green';
-				else if (indicatorMeta.orangeMinimum < $scope.currentInput.values[field.model] && $scope.currentInput.values[field.model] < indicatorMeta.orangeMaximum)
-					$scope.status[field.id] = 'orange';
-				else if (indicatorMeta.minimum < $scope.currentInput.values[field.model] && $scope.currentInput.values[field.model] < indicatorMeta.maximum)
-					$scope.status[field.id] = 'red';
-				else
-					$scope.status[field.id] = 'darkred';
+				if (planning.target === null || planning.baseline === null || value === undefined || value === null)
+					$scope.status[field.id] = 'unknown';
+				else {
+					var progress;
+					if (indicator.target === 'around_is_better')
+						progress = 100 * (1 - Math.abs(value - planning.target) / (planning.target - planning.baseline));
+					else
+						progress = 100 * (value - planning.baseline) / (planning.target - planning.baseline);
+
+					if (progress < planning.showRed)
+						$scope.status[field.id] = 'red';
+					else if (progress < planning.showYellow)
+						$scope.status[field.id] = 'orange';
+					else
+						$scope.status[field.id] = 'green';
+				}
 			});
 		}, true);
 
@@ -485,7 +508,7 @@ angular.module('monitool.controllers.project', [])
 		// Update cols and data when grouping or inputs changes.
 		$scope.$watch("[query.begin, query.end, query.groupBy, inputs]", function() {
 			$scope.cols = mtReporting.getStatsColumns($scope.query);
-			$scope.data = mtReporting.regroup($scope.inputs, $scope.query);
+			$scope.data = mtReporting.regroup($scope.inputs, $scope.query, indicatorsById);
 		}, true);
 
 		// we should use a proper directive that relies on the scope instead of doing that in the controller with watches.

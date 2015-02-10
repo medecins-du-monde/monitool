@@ -496,6 +496,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/indicators',
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
+		resolve: {
+			hierarchy: function(mtFetch) { return mtFetch.themes({mode: 'tree'}); }
+		}
 	});
 
 	///////////////////////////
@@ -537,7 +540,12 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			projects: function($stateParams, mtFetch) {
 				return mtFetch.projects({mode: "indicator_reporting", indicatorId: $stateParams.indicatorId});
-			}
+			},
+
+			// FIXME! that patch is the uglyest thing, we are wasting tons of bandwidth
+			indicatorsById: function(mtFetch, $stateParams) {
+				return mtFetch.indicators({}, true);
+			},
 		}
 	});
 

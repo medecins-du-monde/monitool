@@ -7,8 +7,9 @@
 <table class="table table-stripped table-bordered table-condensed">
 	<thead>
 		<tr>
-			<th translate>shared.name</th>
-			<th translate>indicator.num_indicators</th>
+			<th translate="shared.name"></th>
+			<th ng-if="entityType === 'theme'" translate="indicator.num_projects"></th>
+			<th translate="indicator.num_indicators"></th>
 			<th style="width:225px" acl-has-role="indicator"></th>
 		</tr>
 	</thead>
@@ -21,20 +22,21 @@
 					</div>
 				</ng-form>
 			</td>
-			<td>{{entity.__usage || 0}}</td>
+			<td ng-if="entityType === 'theme'">{{entity.__projectUsage || 0}}</td>
+			<td>{{entity.__indicatorUsage || 0}}</td>
 			<td acl-has-role="indicator">
 				<button class="btn btn-primary btn-sm" ng-click="save(entityIndex)" ng-disabled="!entity.name || !hasChanged(entityIndex)">
 					<i class="fa fa-floppy-o"></i>
 					<span translate>shared.save</span>
 				</button>
-				<button class="btn btn-danger btn-sm" ng-disabled="entity.__usage" ng-click="remove(entityIndex)">
+				<button class="btn btn-danger btn-sm" ng-disabled="entity.__projectUsage || entity.__indicatorUsage" ng-click="remove(entityIndex)">
 					<i class="fa fa-remove"></i>
 					<span translate>shared.delete</span>
 				</button>
 			</td>
 		</tr>
 		<tr acl-has-role="indicator">
-			<td colspan="3">
+			<td colspan="{{entityType === 'theme' ? 4 : 3}}">
 				<div class="input-group input-group-sm" style="width: 100%">
 					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
 				</div>

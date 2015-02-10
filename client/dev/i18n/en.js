@@ -62,6 +62,7 @@ var ENGLISH_LOCALE = {
 var ENGLISH_TRANSLATION = {
 	shared: {
 		date: "Date",
+		administrator: "Administrator",
 
 		back_to_intranet: "Go back to intranet",
 		settings: "Settings",
@@ -107,8 +108,7 @@ var ENGLISH_TRANSLATION = {
 		colorize: 'Colorize',
 		display: 'Display',
 		values: 'Values',
-		target_percentage: 'Target percentage',
-		baseline_percentage: 'Baseline percentage',
+		target_percentage: 'Progress',
 		plot: 'Plot',
 		download_plot: 'Download plot',
 		download_table: 'Download table',
@@ -244,7 +244,7 @@ var ENGLISH_TRANSLATION = {
 		status_green: "This indicator is in its green zone",
 		status_orange: "This indicator is in its orange zone",
 		status_red: "This indicator is in its red zone",
-		status_darkred: "This indicator is out of bounds",
+		status_unknown: "This indicator is out of bounds",
 
 		formula: "Formula: {{name}}",
 		link: "Link: {{name}}",

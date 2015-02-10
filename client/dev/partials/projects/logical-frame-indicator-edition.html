@@ -1,6 +1,5 @@
 <div class="modal-body">
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
-
 		<legend translate="shared.edition"></legend>
 
 		<div class="form-group">
@@ -24,129 +23,99 @@
 			</div>
 		</div>
 
-<!-- 
-		<div class="row" style="margin-bottom: 15px">
-			<label class="col-sm-2 control-label" translate="project.limits"></label>
-			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.minimum">
-				<input class="form-control"
-					   type="number"
-					   name="minimum"
-					   ng-model="planning.minimum"
-					   placeholder="{{'project.minimum_ph'|translate}}"
-					   required
-					   ng-max="planning.orangeMinimum" />
-			</div>
-			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.maximum">
-				<input class="form-control"
-					   type="number"
-					   name="maximum"
-					   ng-model="planning.maximum"
-					   placeholder="{{'project.maximum_ph'|translate}}"
-					   required
-					   ng-min="planning.orangeMaximum" />
-			</div>
-		</div>
-
-		<div class="row" style="margin-bottom: 15px">
-			<label class="col-sm-2 control-label" translate="project.orange_zone"></label>
-			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.orangeMinimum">
-				<input class="form-control"
-					   type="number"
-					   name="orangeMinimum"
-					   ng-model="planning.orangeMinimum"
-					   placeholder="{{'project.minimum_ph'|translate}}"
-					   ng-min="planning.minimum"
-					   ng-max="planning.greenMinimum"
-					   required />
-			</div>
-			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.orangeMaximum">
-				<input class="form-control"
-					   type="number"
-					   name="orangeMaximum"
-					   ng-model="planning.orangeMaximum"
-					   placeholder="{{'project.maximum_ph'|translate}}"
-					   ng-min="planning.greenMaximum"
-					   ng-max="planning.maximum"
-					   required />
-			</div>
-		</div>
-
-		<div class="row" style="margin-bottom: 15px">
-			<label class="col-sm-2 control-label" translate="project.green_zone"></label>
-			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.greenMinimum">
-				<input class="form-control"
-					   type="number"
-					   name="greenMinimum"
-					   ng-model="planning.greenMinimum"
-					   placeholder="{{'project.minimum_ph'|translate}}"
-					   required
-					   ng-min="planning.orangeMinimum"
-					   ng-max="planning.greenMaximum" />
-			</div>
-			<div class="form-group col-sm-5" show-errors style="margin: 0" acl-has-project-role="owner" acl-fallback="planning.greenMaximum">
-				<input class="form-control"
-					   type="number"
-					   name="greenMaximum"
-					   ng-model="planning.greenMaximum"
-					   placeholder="{{'project.maximum_ph'|translate}}"
-					   required
-					   ng-min="planning.greenMinimum"
-					   ng-max="planning.orangeMaximum" />
-			</div>
-		</div>
--->
 		<div class="form-group" show-errors>
 			<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
-				<input class="form-control"
-					   id="baseline-input"
-					   name="baseline"
-					   type="number"
-					   ng-model="planning.baseline"
-					   placeholder="{{'baseline_ph'|translate}}"
-					   ng-min="planning.minimum"
-					   ng-max="planning.maximum"
-					   required />
+				<div class="input-group">
+					<span class="input-group-addon">
+						<input type="checkbox" ng-model="planning.__baselineUnknown" id="baseline_unknown_input" ng-change="planning.__baselineUnknown&&(planning.baseline=null);">
+						<label for="baseline_unknown_input" style="font-weight: normal">Inconnu</label>
+					</span>
+
+					<input class="form-control"
+						   id="baseline-input"
+						   name="baseline"
+						   type="number"
+						   ng-model="planning.baseline"
+						   ng-disabled="planning.__baselineUnknown"
+						   placeholder="{{'project.baseline_ph'|translate}}"
+						   ng-required="!planning.__baselineUnknown" />
+				</div>
 			</div>
 		</div>
-		
-		<div class="form-group">
-			<label for="targets" class="col-sm-2 control-label" translate="project.targets"></label>
-			<div class="col-sm-10">
 
-				<ul acl-lacks-project-role="owner">
-					<li ng-repeat="target in planning.targets">{{target.period}}: {{target.value}}</li>
-				</ul>
+		<div class="form-group" show-errors>
+			<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.target">
+				<div class="input-group">
+					<span class="input-group-addon">
+						<input type="checkbox" ng-model="planning.__targetUnknown" id="target_unknown_input" ng-change="planning.__targetUnknown&&(planning.target=null);">
+						<label for="target_unknown_input" style="font-weight: normal">Inconnu</label>
+					</span>
 
-				<div ng-repeat="target in planning.targets" class="row" style="padding-bottom: 10px" acl-has-project-role="owner">
-					<ng-form name="targetForm">
-						<div class="col-sm-5 form-group" show-errors style="margin: 0">
-							<input type="text" 
-								   datepicker-popup="longDate"
-								   name="period"
-								   ng-model="target.period"
-								   is-open="dateOpen"
-								   ng-click = "dateOpen = true"
-								   required
-								   class="form-control" />
-						</div>
-						<div class="col-sm-5 form-group" show-errors style="margin: 0">
-							<input type="number" class="form-control" ng-model="target.value" name="value" placeholder="{{'project.target_value_ph'|translate}}" required />
-						</div>
-						<div class="col-sm-2">
-							<button class="btn btn-danger" ng-click="removeTarget(target)" translate="shared.delete"></button>
-						</div>
-					</ng-form>
+					<input id="target-input"
+						   class="form-control"
+						   type="number"
+						   name="target"
+						   ng-model="planning.target"
+						   ng-disabled="planning.__targetUnknown"
+						   placeholder="{{'project.target_ph'|translate}}"
+						   ng-required="!planning.__targetUnknown" />
 				</div>
+			</div>
+		</div>
 
-				<div class="row" acl-has-project-role="owner">
-					<div class="col-sm-12">
-						<button class="btn btn-default" ng-click="addTarget()" translate="project.add_target"></button>
+		<div class="row" style="margin-bottom: 15px;" ng-if="!planning.__baselineUnknown && !planning.__targetUnknown">
+			<label for="show_red-input" class="col-sm-2 control-label">
+				Couleur
+			</label>
+			<div class="col-sm-10" acl-has-project-role="owner">
+				<div class="form-group" show-errors style="margin: 0">
+					<div class="input-group" style="margin-bottom: 10px">
+						<span class="input-group-addon alert-danger" style="width: 280px;">
+							Rouge pour cible atteinte à moins de 
+						</span>
+						<input id="show_red-input"
+							   class="form-control"
+							   type="number"
+							   name="show_red"
+							   ng-model="planning.showRed"
+							   ng-min="0"
+							   required />
+						<span class="input-group-addon">%</span>
 					</div>
 				</div>
+				<div class="form-group" show-errors style="margin: 0">
+					<div class="input-group" style="margin-bottom: 10px">
+						<span class="input-group-addon alert-warning" style="width: 280px;">
+							Orange pour cible atteinte entre {{planning.showRed || '?'}}% et
+						</span>
+						<input id="show_yellow-input"
+							   class="form-control"
+							   type="number"
+							   name="show_yellow"
+							   ng-model="planning.showYellow"
+							   ng-min="planning.showRed"
+							   ng-max="100"
+							   required />
+
+						<span class="input-group-addon">%</span>
+					</div>
+				</div>
+				<div class="alert alert-success" style="padding: 6px 12px; text-align: center">
+					Vert pour cible atteinte à {{planning.showYellow}}%
+				</div>
+
+				<a class="pull-right" ng-click="show_more=!show_more">
+					<i class="fa fa-info"></i>
+					Qu'appelle-t'on une "cible atteinte à 34%"?
+				</a>
+				<div ng-show="show_more" style="clear: both">
+					On ne peut colorer que les indicateurs qui renseignent leur baseline <strong>et</strong> leur cible.<br/>
+					On calcule où se situe chaque saisie entre la baseline et la cible à l'aide d'une règle de trois.
+				</div>
 			</div>
 		</div>
-
 	</form>
 </div>
 

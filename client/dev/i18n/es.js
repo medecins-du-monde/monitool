@@ -56,6 +56,7 @@ var SPANISH_LOCALE = {
 var SPANISH_TRANSLATION = {
 	shared: {
 		date: "Fecha",
+		administrator: "Administrador",
 
 		back_to_intranet: "Volver a la intranet",
 		settings: "Configuración",
@@ -101,8 +102,7 @@ var SPANISH_TRANSLATION = {
 		colorize: 'Colorear',
 		display: 'Mostrar',
 		values: 'Valores',
-		target_percentage: 'Porcentaje del objetivo',
-		baseline_percentage: 'Porcentaje de la valor base',
+		target_percentage: 'Progreso',
 		plot: 'Mostrar gráfico',
 		download_plot: 'Descargar el gráfico',
 		download_table: 'Descargar la tabla',
@@ -237,7 +237,7 @@ var SPANISH_TRANSLATION = {
 		status_green: "Este indicador esta en zona verde",
 		status_orange: "Este indicador esta en zona naranja",
 		status_red: "Este indicador esta en zona roja",
-		status_darkred: "Este indicador esta fuera<br/>de los limites establecidos<br/>en el marco lógico",
+		status_unknown: "Este indicador esta fuera<br/>de los limites establecidos<br/>en el marco lógico",
 
 		formula: "Formula: {{name}}",
 		link: "Vínculo: {{name}}",

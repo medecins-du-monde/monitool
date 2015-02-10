@@ -7,10 +7,10 @@
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th>Nom</th>
-			<th>Administrateur</th>
-			<th>Projets</th>
-			<th>Indicateurs</th>
+			<th translate="shared.name"></th>
+			<th translate="shared.administrator"></th>
+			<th translate="shared.projects"></th>
+			<th translate="shared.indicators"></th>
 			<th></th>
 		</tr>
 	</thead>
@@ -24,15 +24,13 @@
 				<button
 					class="btn btn-primary btn-xs"
 					ng-disabled="isUnchanged($index)"
-					ng-click="save($index)">
-					Sauvegarder
-				</button>
+					ng-click="save($index)"
+					translate="shared.save"></button>
 				<button
 					class="btn btn-default btn-xs"
 					ng-disabled="isUnchanged($index)"
-					ng-click="reset($index)">
-					Réinitialiser
-				</button>
+					ng-click="reset($index)"
+					translate="shared.remove_changes"></button>
 			</td>
 		</tr>
 	</tbody>

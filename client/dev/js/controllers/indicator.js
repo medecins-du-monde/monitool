@@ -2,14 +2,14 @@
 
 angular.module('monitool.controllers.indicator', [])
 
-	.controller('IndicatorListController', function($scope) {
+	.controller('IndicatorListController', function($scope, hierarchy) {
 		$scope.orderField = 'name';
-		$scope.standard = false;
+		$scope.hierarchy = hierarchy;
 	})
 	
-	.controller('IndicatorChooseController', function($scope, $modalInstance, forbiddenIds) {
-		$scope.standard = true;
+	.controller('IndicatorChooseController', function($scope, $modalInstance, forbiddenIds, hierarchy) {
 		$scope.forbidden = forbiddenIds;
+		$scope.hierarchy = hierarchy;
 
 		$scope.choose = function(indicatorId) {
 			$modalInstance.close(indicatorId);
@@ -43,7 +43,10 @@ angular.module('monitool.controllers.indicator', [])
 				templateUrl: 'partials/indicators/selector-popup.html',
 				controller: 'IndicatorChooseController',
 				size: 'lg',
-				resolve: { forbiddenIds: function() { return usedIndicators; } }
+				resolve: {
+					forbiddenIds: function() { return usedIndicators; },
+					hierarchy: function() { return mtFetch.themes({mode: "tree"}); }
+				}
 			}).result;
 
 			indicatorId.then(function(indicatorId) {
@@ -132,7 +135,7 @@ angular.module('monitool.controllers.indicator', [])
 		// Update cols and data when grouping or inputs changes.
 		$scope.$watch("[query.begin, query.end, query.groupBy, inputs]", function() {
 			$scope.cols = mtReporting.getStatsColumns($scope.query);
-			$scope.data = mtReporting.regroupIndicator($scope.inputs, $scope.query);
+			$scope.data = mtReporting.regroupIndicator($scope.inputs, $scope.query, indicatorsById);
 		}, true);
 
 		var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
