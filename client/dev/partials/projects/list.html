@@ -9,7 +9,6 @@
 			<th><a ng-click="pred='name';rev=!rev">{{'indicator.themes'|translate}}</a></th>
 			<th><a ng-click="pred='begin';rev=!rev">{{'shared.begin'|translate}}</a></th>
 			<th><a ng-click="pred='end';rev=!rev">{{'shared.end'|translate}}</a></th>
-			<th><a ng-click="pred='indicators';rev=!rev">Indicateurs obligatoires</a></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -39,12 +38,11 @@
 			</td>
 			<td>{{project.begin|amDateFormat:'YYYY-MM-DD'}}</td>
 			<td>{{project.end|amDateFormat:'YYYY-MM-DD'}}</td>
-			<td>13 / 43</td>
 		</tr>
 	</tbody>
 </table>
 
-<a class="btn btn-default" ui-sref="main.project.logical_frame({projectId: 'new'})" acl-has-role="project_create">
+<a class="btn btn-default" ui-sref="main.project.logical_frame({projectId: 'new'})" acl-has-role="project">
 	<i class="fa fa-plus"></i>
 	<span translate="project.create"></span>
 </a>

@@ -253,7 +253,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectLogicalFrameController',
 		resolve: {
 			indicatorsById: function(mtFetch, $stateParams) {
-				return mtFetch.indicators({mode: 'project_logframe', projectId: $stateParams.projectId}, true);
+				if ($stateParams.projectId !== 'new')
+					return mtFetch.indicators({mode: 'project_logframe', projectId: $stateParams.projectId}, true);
+				else 
+					return {};
 			},
 			themes: function(mtFetch) {
 				return mtFetch.themes();

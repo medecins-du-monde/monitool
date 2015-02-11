@@ -56,13 +56,13 @@ angular.module('monitool.directives.acl', [])
 				else
 					throw new Error("acl-has-project-role must be called with either 'owner' or 'input'");
 
-				if (!project._id)
-					return roles.indexOf('project_create') !== -1 || roles.indexOf('_admin') !== -1;
-				else {
+				// if (!project._id)
+				// 	return roles.indexOf('project_create') !== -1 || roles.indexOf('_admin') !== -1;
+				// else {
 					var isAllowed = owners.indexOf(scope.userCtx.name) !== -1 || roles.indexOf('_admin') !== -1;
 					if (!isAllowed)
 						_makeReadOnly(scope, element, attributes);
-				}
+				// }
 			}
 		}
 	})
@@ -83,6 +83,10 @@ angular.module('monitool.directives.acl', [])
 				var roles = scope.userCtx.roles || [],
 					project = scope.$eval(attributes.project) || scope.project,
 					owners;
+
+					// console.log(scope.project)
+
+
 				if (attributes.aclLacksProjectRole === 'owner')
 					owners = scope.project.owners || [];
 				else if (attributes.aclLacksProjectRole === 'input')
@@ -90,13 +94,13 @@ angular.module('monitool.directives.acl', [])
 				else
 					throw new Error("acl-lacks-project-role must be called with either 'owner' or 'input'");
 
-				if (!scope.project._id)
-					return roles.indexOf('project_create') === -1 && roles.indexOf('_admin') === -1;
-				else {
+				// if (!scope.project._id)
+				// 	return roles.indexOf('project_create') === -1 && roles.indexOf('_admin') === -1;
+				// else {
 					var isForbidden = owners.indexOf(scope.userCtx.name) === -1 && roles.indexOf('_admin') === -1;
 					if (!isForbidden)
 						_makeReadOnly(scope, element, attributes);
-				}
+				// }
 			}
 		}
 	});
