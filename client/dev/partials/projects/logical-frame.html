@@ -353,8 +353,7 @@
 				tooltip-placement="right"></i>
 
 			{{indicatorsById[indicatorId].name}}
-			<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.edit"></a> |
-				<a ng-click="detachIndicator(indicatorId, null)" translate="shared.detach"></a>)</span>
+			<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.edit"></a>)</span>
 			<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.display"></a>)</span>
 		</p>
 		<p acl-has-project-role="owner">
