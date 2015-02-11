@@ -117,7 +117,6 @@
 						<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)" translate="shared.edit"></a> |
 							<a ng-click="detachIndicator(indicatorId, project.logicalFrame.indicators)" translate="shared.detach"></a>)</span>
 						<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)" translate="shared.display"></a>)</span>
-
 					</p>
 					<p acl-has-project-role="owner">
 						<a ng-click="editIndicator('new', project.logicalFrame.indicators)" translate="project.add_indicator"></a>
@@ -175,17 +174,32 @@
 					<div class="form-group">
 						<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 						<div class="col-sm-10">
-							<ul class="form-control-static">
-								<li ng-repeat="indicatorId in purpose.indicators">
+							<div class="form-control-static">
+								<p ng-repeat="indicatorId in purpose.indicators">
+									<i class="fa fa-external-link fa-fw"
+										ng-if="isExternal(indicatorId)"
+										tooltip="{{'indicator.is_external'|translate}}"
+										tooltip-placement="right"></i>
+
+									<i class="fa fa-question fa-fw"
+										ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
+										tooltip="{{'indicator.is_common'|translate}}"
+										tooltip-placement="right"></i>
+
+									<i class="fa fa-asterisk fa-fw"
+										ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
+										tooltip="{{'indicator.is_mandatory'|translate}}"
+										tooltip-placement="right"></i>
+
 									{{indicatorsById[indicatorId].name}}
 									<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, purpose.indicators)" translate="shared.edit"></a> |
 										<a ng-click="detachIndicator(indicatorId, purpose.indicators)" translate="shared.detach"></a>)</span>
 									<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, purpose.indicators)" translate="shared.display"></a>)</span>
-								</li>
-								<li acl-has-project-role="owner">
+								</p>
+								<p acl-has-project-role="owner">
 									<a ng-click="editIndicator('new', purpose.indicators)" translate="project.add_indicator"></a>
-								</li>
-							</ul>
+								</p>
+							</div>
 						</div>
 					</div>
 
@@ -232,18 +246,32 @@
 								<div class="form-group">
 									<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 									<div class="col-sm-10">
-										<ul class="form-control-static">
-											<li ng-repeat="indicatorId in output.indicators">
+										<div class="form-control-static">
+											<p ng-repeat="indicatorId in output.indicators">
+												<i class="fa fa-external-link fa-fw"
+													ng-if="isExternal(indicatorId)"
+													tooltip="{{'indicator.is_external'|translate}}"
+													tooltip-placement="right"></i>
+
+												<i class="fa fa-question fa-fw"
+													ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
+													tooltip="{{'indicator.is_common'|translate}}"
+													tooltip-placement="right"></i>
+
+												<i class="fa fa-asterisk fa-fw"
+													ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
+													tooltip="{{'indicator.is_mandatory'|translate}}"
+													tooltip-placement="right"></i>
+
 												{{indicatorsById[indicatorId].name}}
 												<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, output.indicators)" translate="shared.edit"></a> |
 													<a ng-click="detachIndicator(indicatorId, output.indicators)" translate="shared.detach"></a>)</span>
-
 												<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, output.indicators)" translate="shared.display"></a>)</span>
-											</li>
-											<li acl-has-project-role="owner">
+											</p>
+											<p acl-has-project-role="owner">
 												<a ng-click="editIndicator('new', output.indicators)" translate="project.add_indicator"></a>
-											</li>
-										</ul>
+											</p>
+										</div>
 									</div>
 								</div>
 
@@ -308,17 +336,30 @@
 	<fieldset>
 		<legend>Indicateurs supplémentaires</legend>
 
-		<ul class="form-control-static">
-			<li ng-repeat="indicatorId in otherIndicators">
-				{{indicatorsById[indicatorId].name}}
-				<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.edit"></a>)</span>
-				<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.display"></a>)</span>
-			</li>
-			<li acl-has-project-role="owner">
-				<a ng-click="editIndicator('new', null)" translate="project.add_indicator"></a>
-			</li>
-		</ul>
+		<p ng-repeat="indicatorId in otherIndicators">
+			<i class="fa fa-external-link fa-fw"
+				ng-if="isExternal(indicatorId)"
+				tooltip="{{'indicator.is_external'|translate}}"
+				tooltip-placement="right"></i>
 
+			<i class="fa fa-question fa-fw"
+				ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
+				tooltip="{{'indicator.is_common'|translate}}"
+				tooltip-placement="right"></i>
+
+			<i class="fa fa-asterisk fa-fw"
+				ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
+				tooltip="{{'indicator.is_mandatory'|translate}}"
+				tooltip-placement="right"></i>
+
+			{{indicatorsById[indicatorId].name}}
+			<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.edit"></a> |
+				<a ng-click="detachIndicator(indicatorId, null)" translate="shared.detach"></a>)</span>
+			<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.display"></a>)</span>
+		</p>
+		<p acl-has-project-role="owner">
+			<a ng-click="editIndicator('new', null)" translate="project.add_indicator"></a>
+		</p>
 	</fieldset>
 	
 	<div acl-has-project-role="owner">

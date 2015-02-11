@@ -123,6 +123,10 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 	project: {
+		missing_mandatory_indicators: "Indicadores obligatorios",
+		other_indicators: "Otros indicadores",
+		see_other_themes: "Ver tambien las otra temáticas",
+
 		logical_frame_tooltip: 'Describe los objectivos, resultados esperados et actividades del proyecto.',
 		input_entities_tooltip: 'Lista de los lugares de actividad donde se collectan los indicadores. Por ejemplo hospitales, centros de salud, pueblos...',
 		input_groups_tooltip: 'Permite reunir lugares de actividad en categorias logicas.',

@@ -126,6 +126,10 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		missing_mandatory_indicators: "Indicateurs obligatoires manquants",
+		other_indicators: "Autres indicateurs",
+		see_other_themes: "Voir aussi les autres thématiques",
+
 		entity_name: "Nom de la structure ou lieu d’intervention",
 		group_name: "Nom du groupe",
 		entity_name_placeholder: "ex: Centre de santé X, Hôpital X, ...",

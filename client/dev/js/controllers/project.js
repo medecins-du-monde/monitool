@@ -176,6 +176,18 @@ angular.module('monitool.controllers.project', [])
 		$scope.forbidden = forbiddenIds;
 		$scope.hierarchy = hierarchy;
 
+		$scope.missingIndicators = {};
+		$scope.hierarchy.forEach(function(theme) {
+			if ($scope.project.themes.indexOf(theme._id) !== -1)
+				theme.children.forEach(function(type) {
+					type.children.forEach(function(indicator) {
+						if (!$scope.project.indicators[indicator._id] && indicator.operation === 'mandatory')
+							$scope.missingIndicators[indicator._id] = indicator;
+					});
+				});
+		});
+		$scope.missingIndicators = Object.keys($scope.missingIndicators).map(function(id) { return $scope.missingIndicators[id]; });
+
 		$scope.choose = function(indicatorId) {
 			$modalInstance.close(indicatorId);
 		};

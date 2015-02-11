@@ -129,6 +129,10 @@ var ENGLISH_TRANSLATION = {
 		english: "English",
 	},
 	project: {
+		missing_mandatory_indicators: "Missing mandatory indicators",
+		other_indicators: "Other indicators",
+		see_other_themes: "See all thematics",
+
 		logical_frame_tooltip: 'Describe purpose, expected outputs and activities implemented by the project.',
 		input_entities_tooltip: 'List of input entities where indicators are collected. For instance hospitals, health centers, villages...',
 		input_groups_tooltip: 'Allow grouping input entities to generate reportings on those groups.',
