@@ -128,8 +128,9 @@ module.exports = {
 						emit('main:' + indicatorId);
 				
 				if (doc.type === 'input')
-					for (indicatorId in doc.indicators)
-						emit('input:' + indicatorId);
+					for (indicatorId in doc.values)
+						if (indicatorId.match(/^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}$/))
+							emit('input:' + indicatorId);
 			}.toString(),
 
 			reduce: "_count"
