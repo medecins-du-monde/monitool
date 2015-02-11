@@ -154,7 +154,7 @@ angular.module('monitool.controllers.project', [])
 
 		// handle output add and remove
 		$scope.addActivity = function(output) {
-			output.activities.push({description: "", prerequisites: ""});
+			output.activities.push({description: ""});
 		};
 
 		$scope.removeActivity = function(activity, output) {
