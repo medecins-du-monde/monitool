@@ -9,7 +9,6 @@ var app = angular.module('monitool.app', [
 	'monitool.directives.acl',
 	'monitool.directives.form',
 	'monitool.directives.fileexport',
-	'monitool.directives.indicatorselect',
 	'monitool.filters',
 	'monitool.services.fetch',
 	'monitool.services.reporting',

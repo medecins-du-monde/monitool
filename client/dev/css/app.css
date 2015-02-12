@@ -32,13 +32,12 @@ textarea {
 .indicator-level-3 {
 	margin-left: 40px;
 	background-color: #f0f0f0;
-
 }
 
-
-.indicator-level-3 a {
-	float: right;
-	margin-right: 10px;
+.indicator-level-3 .pull-right {
+  margin: 0 10px;
+  position: relative;
+  top: -3px;
 }
 
 .input-xs {

@@ -16,6 +16,16 @@
 			</div>
 
 			<div class="indicator-level-3" ng-repeat="indicator in type.children | orderBy:orderField" ng-if="type.open">
+				<span class="pull-right">
+					{{indicator.__mainUsage}} <i class="fa fa-building-o"></i>
+					{{indicator.__inputUsage}} <i class="fa fa-pencil-square-o"></i>
+
+					<a class="btn btn-xs btn-default"
+					   ng-click="choose(indicator._id)"
+					   ng-disabled="forbidden.indexOf(indicator._id) !== -1"
+					   translate="shared.choose"></a>
+				</span>
+
 				<i class="fa fa-ban fa-fw"
 					ng-if="indicator.operation == 'parameter'"
 					tooltip="{{'indicator.is_parameter'|translate}}"
@@ -31,22 +41,9 @@
 					tooltip="{{'indicator.is_mandatory'|translate}}"
 					tooltip-placement="right"></i>
 				
-				<span style="overflow: hidden;">{{indicator.name}}</span>
-
-				<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
-					<a class="btn btn-xs btn-default"
-					   ng-click="choose(indicator._id)"
-					   ng-disabled="forbidden.indexOf(indicator._id) !== -1"
-					   translate="shared.choose"></a>
-				</span>
-
-				<span class="pull-right">
-					<span style="display: inline-block; width: 40px; text-align: right">{{indicator.__mainUsage}} <i class="fa fa-building-o"></i></span>
-					<span style="display: inline-block; width: 50px; text-align: right">{{indicator.__inputUsage}} <i class="fa fa-pencil-square-o"></i></span>
-				</span>
-
+				{{indicator.name}}
+				
 				<div style="clear: both"></div>
-
 			</div>
 		</div>
 	</div>

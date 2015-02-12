@@ -27,6 +27,25 @@
 		</div>
 
 		<div class="indicator-level-3" ng-repeat="indicator in type.children | orderBy:orderField" ng-if="type.open">
+			<span class="pull-right">
+				{{indicator.__mainUsage}} <i class="fa fa-building-o"></i>
+				{{indicator.__inputUsage}} <i class="fa fa-pencil-square-o"></i>
+
+				<a class="btn btn-xs btn-default"
+				   ui-sref="main.indicator.reporting({indicatorId: indicator._id})"
+				   ng-if="indicator.__mainUsage"
+				   translate="shared.reporting"></a>
+
+				<a class="btn btn-xs btn-default"
+				   ui-sref="main.indicator.edit({indicatorId: indicator._id})"
+				   acl-has-role="indicator"
+				   translate="shared.edit"></a>
+
+				<a class="btn btn-xs btn-default"
+				   ui-sref="main.indicator.edit({indicatorId: indicator._id})"
+				   acl-lacks-role="indicator"
+				   translate="shared.display"></a>
+			</span>
 
 			<i class="fa fa-ban fa-fw"
 				ng-if="indicator.operation == 'parameter'"
@@ -43,34 +62,10 @@
 				tooltip="{{'indicator.is_mandatory'|translate}}"
 				tooltip-placement="right"></i>
 			
-			<span style="overflow: hidden;">{{indicator.name}}</span>
-
-			<span class="pull-right" style="display: inline-block; width: 180px; position: relative; top: -3px">
-
-				<a class="btn btn-xs btn-default"
-				   ui-sref="main.indicator.edit({indicatorId: indicator._id})"
-				   acl-has-role="indicator"
-				   translate="shared.edit"></a>
-
-				<a class="btn btn-xs btn-default"
-				   ui-sref="main.indicator.edit({indicatorId: indicator._id})"
-				   acl-lacks-role="indicator"
-				   translate="shared.display"></a>
-				
-				<a class="btn btn-xs btn-default"
-				   ui-sref="main.indicator.reporting({indicatorId: indicator._id})"
-				   ng-if="indicator.__mainUsage"
-				   translate="shared.reporting"></a>
-			</span>
-
-			<span class="pull-right">
-				<span style="display: inline-block; width: 40px; text-align: right">{{indicator.__mainUsage}} <i class="fa fa-building-o"></i></span>
-				<span style="display: inline-block; width: 50px; text-align: right">{{indicator.__inputUsage}} <i class="fa fa-pencil-square-o"></i></span>
-			</span>
+			{{indicator.name}}
 		</div>
 	</div>
 </div>
-
 
 <a class="btn btn-default" ui-sref="main.indicator.edit({indicatorId: 'new'})" acl-has-role="indicator">
 	<i class="fa fa-plus"></i>
