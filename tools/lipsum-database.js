@@ -1,5 +1,9 @@
 "use strict";
 
+console.log("This script is outdated, update it if you need it");
+console.log("The description of the data structures can be found on server/models/schemas");
+process.exit(1);
+
 var lipsum   = require('lorem-ipsum'),
 	moment   = require('moment'),
 	uuid     = require('node-uuid'),

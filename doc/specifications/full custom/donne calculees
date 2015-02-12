@@ -1,0 +1,69 @@
+# Vues
+
+Tous les documents par type
+
+	function(doc) {
+		emit(doc.type, null);
+	}
+
+
+Tous les indicateurs par combinaison thematique/type
+
+	function(doc) {
+		if (doc.type !== 'indicator')
+			return;
+
+		doc.thematics.forEach(function(thematic_id) {
+			doc.types.forEach(function(type_id) {
+				emit(thematic_id + ':' + type_id, null);
+			});
+		});
+	}
+
+
+Tableau des saisies realises, avec leurs etats par projet
+
+	function(doc) {
+		if (doc.type !== 'input')
+			return;
+
+		// on devra compter les saisies de l'autre cote en mattant la def des projets.
+		emit([doc.project, null, doc.period], nombre_d_indicateurs_faits)
+
+		for (var center_id in doc.center_input)
+			emit([doc.project, null, doc.period], nombre_d_indicateurs_faits_pour_ce_centre)
+	}
+
+
+Tableau indicateurs par mois, par (desk, projet, centre)
+
+	function(doc) {
+		if (doc.type !== 'input')
+			return;
+
+		// on s'en sert de ca?
+		emit([doc.project, null, period], doc.input)
+
+		for (center_id in doc.centers)
+			emit([doc.project, doc.center, period], doc.center_input[center_id])
+	}
+
+	function(key, values, rereduce) {
+		??
+	}
+
+
+
+	[desk, projet, centre] {
+
+	}
+
+
+# Besoins
+
+- Liste de tous les projets
+- Liste de tous les indicateurs qui sont sous une categorie et un type
+- Consultation
+	- Pour un desk, projet, ou centre: par indicateurs et par mois
+	- Pour un indicateur: par desk et par mois, par projet et par mois
+	- Pour un projet, 

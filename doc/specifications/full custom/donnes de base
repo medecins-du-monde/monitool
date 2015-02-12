@@ -1,0 +1,100 @@
+{
+	id: <uuid>,
+	type: "project",
+	name: "...",
+	country: "RDC",
+	desk: "afrique",
+
+	indicators: [
+		{
+			indicator_id: <uuid>,
+			type: "planned",
+			start_date: "2014-01-01T00:00:00Z",
+			end_date: "2014-12-01T00:00:00Z",
+			periodicity: "month"
+			target: "center"
+		},
+		{
+			indicator_id: <uuid>,
+			type: "ondemand",
+			target: "center"
+		},
+	],
+
+	centers: [
+		id: <uuid>,
+		name: "romain",
+		latitude: 40,
+		longitude: -4,
+	],
+
+	users: [<uuid>, <uuid>, <uuid>]
+}
+
+{
+	id: <uuid>,
+	type: "indicator",
+	name: "Nombre de personnes dans les 20km du centre",
+
+	thematics: [<uuid>, <uuid>, <uuid>],
+	types: [<uuid>, <uuid>, <uuid>],
+
+	spacial_aggregation: 'sum',
+	time_aggregation: null,
+
+	description: "blabla",
+	source: "blabla",
+	limits: {
+		min: 45,
+		max: 66
+	},
+
+	formulas: [
+		{ method: "percentage", numerator: <uuid>, denominator: <uuid> },
+		{ method: "mathjs", expression: "a + sqrt(b) / c + d", params: {a: <uuid>, b: <uuid>, c: <uuid>} },
+	]
+}
+
+{
+	id: <uuid>,
+	type: "input",
+
+	project: <uuid>,
+	period_begin: "2014-01-12T00:00:00Z", // ca ira de faire ca?
+	period_end: "2014-02-12T00:00:00Z",
+
+	input: {
+		<indicator_uuid>: 45,
+		<indicator_uuid>: 12,
+		<indicator_uuid>: 23,
+		<indicator_uuid>: 12,
+		<indicator_uuid>: 25,
+		<indicator_uuid>: 33
+	},
+	center_input: {
+		<center_uuid>: {
+			<indicator_uuid>: 45,
+			<indicator_uuid>: 12,
+			<indicator_uuid>: 23,
+			<indicator_uuid>: 12,
+			<indicator_uuid>: 25,
+			<indicator_uuid>: 33
+		},
+		<center_uuid>: {
+			<indicator_uuid>: 45,
+			<indicator_uuid>: 12,
+			<indicator_uuid>: 23,
+			<indicator_uuid>: 12,
+			<indicator_uuid>: 25,
+			<indicator_uuid>: 33
+		},
+		<center_uuid>: {
+			<indicator_uuid>: 45,
+			<indicator_uuid>: 12,
+			<indicator_uuid>: 23,
+			<indicator_uuid>: 12,
+			<indicator_uuid>: 25,
+			<indicator_uuid>: 33
+		}
+	}
+}

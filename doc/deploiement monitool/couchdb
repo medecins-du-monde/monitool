@@ -1,0 +1,35 @@
+; CouchDB configuration file
+; On a debian install, goes at /etc/couchdb/local.ini
+
+[httpd]
+enable_cors = true
+port = 5984
+bind_address = 0.0.0.0
+WWW-Authenticate = Basic realm="administrator"
+
+[httpd_global_handlers]
+
+
+[couch_httpd_auth]
+allow_persistent_cookies = true
+timeout = 60000
+require_valid_user = true
+users_db_public = true
+public_fields = first_name, last_name, email
+
+[query_server_config]
+reduce_limit = false
+
+[cors]
+origins = *
+credentials = true
+methods = GET, PUT, POST, HEAD, DELETE
+headers = accept, authorization, content-type, origin, referer
+
+; Also add admin user.
+
+
+
+[vendor]
+name = The Apache Software Foundation
+version = 1.5.0
