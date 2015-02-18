@@ -35,10 +35,11 @@ Structure du manuel:
 	- action dans le domaine de la santé
 
 Pour chaque chapitre:
-	1. standard qualitatif min
-	2. proposition d'actions clefs pour aider à repondre au standard min
-	3. indicateurs clefs pour évaluer si une norme a été atteinte
-	4. notes d'orientation difficultes pratiques, problemes prioritaire et dilemnes
+
+1. standard qualitatif min
+2. proposition d'actions clefs pour aider à repondre au standard min
+3. indicateurs clefs pour évaluer si une norme a été atteinte
+4. notes d'orientation difficultes pratiques, problemes prioritaire et dilemnes
 
 En plus
 - Relation civilo-militaires
