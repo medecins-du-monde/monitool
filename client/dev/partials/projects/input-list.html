@@ -1,11 +1,11 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
+	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
-	<li class="active" translate>project.waiting_inputs</li>
+	<li class="active" translate="project.waiting_inputs"></li>
 </ol>
 
 <input type="checkbox" id="see-all-input" ng-model="showFinished" />
-<label for="see-all-input" translate>project.see_all_inputs</label>
+<label for="see-all-input" translate="project.see_all_inputs"></label>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
@@ -50,7 +50,7 @@
 	</tbody>
 	<tbody ng-if="allDone && !showFinished">
 		<tr>
-			<td colspan="5" translate>project.no_waiting_inputs</td>
+			<td colspan="5" translate="project.no_waiting_inputs"></td>
 		</tr>
 	</tbody>
 </table>

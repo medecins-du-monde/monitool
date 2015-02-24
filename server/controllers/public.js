@@ -42,27 +42,5 @@ router.get('/:modelName(project|indicator|input|theme|type|user)/:id', function(
 	});
 });
 
-router.get('/project/:projectId/input', function(request, response) {
-	var options   = { begin: request.query.begin, end: request.query.end },
-		projectId = request.params.projectId;
-
-	Input.listByProject(projectId, options, function(error, inputs) {
-		response.json(inputs);
-	});
-});
-
-router.get('/project/:projectId/:subType(entity|group|form)/:subTypeId/input', function(request, response) {
-	var options   = { begin: request.query.begin, end: request.query.end },
-		projectId = request.params.projectId,
-		subType   = request.params.subType,
-		subTypeId = request.params.subTypeId;
-
-	Input.listByProjectSubType(projectId, subType, subTypeId, options, function(error, inputs) {
-		response.json(inputs);
-	});
-});
-
-
-
 
 module.exports = router;

@@ -36,7 +36,7 @@ var Input = module.exports = {
 			async.map(
 				options[param],
 				function(curParamId, callback) {
-					var opt = {startkey: [curParamId, options.begin], endkey: [curParamId, options.end], include_docs: true};
+					var opt = {startkey: [curParamId, options.begin || null], endkey: [curParamId, options.end || {}], include_docs: true};
 					database.view('reporting', viewName, opt, function(error, result) {
 						callback(null, result.rows.map(function(item) { return item.doc; }));
 					});

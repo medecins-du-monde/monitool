@@ -1,5 +1,42 @@
 "use strict";
 
+
+
+
+// this has nothing to do on the root scope.
+// => move it to a service and factorize with the similiar function in mtReporting
+var getPeriods = function(form, project) {
+	var periods;
+	if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
+		var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
+
+		var current = moment(form.useProjectStart ? project.begin : form.begin).startOf(period),
+			end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
+
+		if (end.isAfter()) // do not allow to go in the future
+			end = moment();
+
+		periods = [];
+		while (current.isBefore(end)) {
+			periods.push(current.clone());
+			current.add(1, form.periodicity);
+		}
+	}
+	else if (form.periodicity === 'planned') {
+		periods = form.intermediaryDates.map(function(period) {
+			return moment(period);
+		});
+		periods.unshift(moment(form.start));
+		periods.push(moment(form.end));
+	}
+	else
+		throw new Error(form.periodicity + ' is not a valid periodicity');
+
+	return periods;
+};
+
+
+
 var app = angular.module('monitool.app', [
 	'angularMoment',
 	'monitool.controllers.admin',
@@ -346,40 +383,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectInputListController',
 		resolve: {
 			inputs: function($stateParams, mtFetch, project) {
-
 				return mtFetch.inputs({mode: 'project_input_ids', projectId: project._id}).then(function(result) {
 					var inputExists = {}, inputs = [];
 					result.forEach(function(id) { inputExists[id] = true; });
 					
 					project.inputEntities.forEach(function(inputEntity) {
 						project.dataCollection.forEach(function(form) {
-							var periods;
-							if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
-								var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
-
-								var current = moment(form.useProjectStart ? project.begin : form.begin).startOf(period),
-									end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
-
-								if (end.isAfter()) // do not allow to go in the future
-									end = moment();
-
-								periods = [];
-								while (current.isBefore(end)) {
-									periods.push(current.clone());
-									current.add(1, form.periodicity);
-								}
-							}
-							else if (form.periodicity === 'planned') {
-								periods = form.intermediaryDates.map(function(period) {
-									return moment(period);
-								});
-								periods.unshift(moment(form.start));
-								periods.push(moment(form.end));
-							}
-							else
-								throw new Error(form.periodicity + ' is not a valid periodicity');
-
-							periods.forEach(function(period) {
+							getPeriods(form, project).forEach(function(period) {
 								var inputId = [project._id, inputEntity.id, form.id, period.format('YYYY-MM-DD')].join(':');
 								if (form.active || inputExists[inputId])
 									inputs.push({
