@@ -350,6 +350,8 @@ angular.module('monitool.controllers.project', [])
 	})
 
 	.controller('ProjectFormEditionController', function($scope, $stateParams, mtForms, form, indicatorsById, formulasById) {
+		var projectIndicators = Object.keys($scope.project.indicators).map(function(id) { return indicatorsById[id]; });
+
 		$scope.availableIndicators = [];
 		$scope.container = { chosenIndicators: [] }; // we wrap chosenIndicators in a container for ui-select...
 
@@ -359,46 +361,33 @@ angular.module('monitool.controllers.project', [])
 		mtForms.annotateAllFormElements($scope.form.fields, indicatorsById);
 		mtForms.buildLinks($scope.form.fields, indicatorsById);
 		mtForms.buildSumability($scope.form.fields);
+
 		$scope.master = angular.copy($scope.form);
 		$scope.isNew = $stateParams.formId === 'new';
 		$scope.container.chosenIndicatorIds = $scope.form.fields.map(function(field) { return field.id; });
 
 		$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue, oldValue) {
-			if ($scope.form.useProjectStart)
-				$scope.form.start = $scope.project.begin;
+			// Assign start / end dates.
+			$scope.form.useProjectStart && ($scope.form.start = $scope.project.begin);
+			$scope.form.useProjectEnd   && ($scope.form.end   = $scope.project.end);
 
-			if ($scope.form.useProjectEnd)
-				$scope.form.end = $scope.project.end;
-
-			// when begin and end change, we need to update the list of available indicators.
+			// When begin and end change, we need to update the list of indicators we can keep and add.
 			// the user cannot choose an indicator which is already collected in the same period.
-			$scope.availableIndicators = Object.keys($scope.project.indicators)
-				.filter(function(indicatorId) {
-					// look up other forms to check if the indicator is available
-					var numForms = $scope.project.dataCollection.length;
-					for (var index = 0; index < numForms; ++index) {
-						var otherForm = $scope.project.dataCollection[index];
+			var concurrentForms = $scope.project.dataCollection.filter(function(otherForm) {
+				var otherIsAfter  = $scope.form.end.getTime() <= otherForm.start.getTime(),
+					otherIsBefore = $scope.form.start.getTime() >= otherForm.end.getTime();
+				return $scope.form.id !== otherForm.id && !(otherIsBefore || otherIsAfter);
+			});
 
-						if (otherForm.start >= $scope.form.end || otherForm.end <= $scope.form.start)
-							continue;
-
-						if (otherForm.id !== $scope.form.id &&
-							otherForm.fields.find(function(formElement) { return formElement.id === indicatorId; }))
-							return false;
-					}
-					return true;
-				})
-				.map(function(indicatorId) { return indicatorsById[indicatorId]; });
-
-			// Remove those indicators from the list of chosen ones.
-			var keptIndicators = $scope.container.chosenIndicatorIds
-				.filter(function(indicatorId) {
-					return $scope.availableIndicators.find(function(i) { return i._id == indicatorId; });
+			var keepableIndicatorIds = $scope.container.chosenIndicatorIds.filter(function(indicatorId) {
+				return concurrentForms.every(function(form) {
+					return form.fields.every(function(field) { return field.id !== indicatorId; });
 				});
+			});
 
-			if (keptIndicators.length !== $scope.container.chosenIndicatorIds.length) {
+			if (keepableIndicatorIds.length !== $scope.container.chosenIndicatorIds.length) {
 				if (confirm('Indicators will be removed because of collision. Are you sure?'))
-					$scope.container.chosenIndicatorIds = keptIndicators;
+					$scope.container.chosenIndicatorIds = keepableIndicatorIds;
 				else {
 					$scope.form.useProjectStart = oldValue[0];
 					$scope.form.start = oldValue[1];
@@ -406,7 +395,14 @@ angular.module('monitool.controllers.project', [])
 					$scope.form.end = oldValue[3];
 				}
 			}
+
+			$scope.addableIndicators = projectIndicators.filter(function(indicator) {
+				return concurrentForms.concat([$scope.form]).every(function(form) {
+					return form.fields.every(function(field) { return field.id !== indicator._id; });
+				});
+			});
 		}, true);
+
 
 		// when chosenIndicators changes, we need to udate the form's fields
 		$scope.$watchCollection('container.chosenIndicatorIds', function(newValue, oldValue) {
@@ -433,7 +429,31 @@ angular.module('monitool.controllers.project', [])
 			// available links are broken because we added/removed elements => rebuild them
 			mtForms.buildLinks($scope.form.fields, indicatorsById);
 			mtForms.buildSumability($scope.form.fields);
+
+			// FIXME: duplicating code is wrong
+			var concurrentForms = $scope.project.dataCollection.filter(function(otherForm) {
+				var otherIsAfter  = $scope.form.end.getTime() <= otherForm.start.getTime(),
+					otherIsBefore = $scope.form.start.getTime() >= otherForm.end.getTime();
+				return $scope.form.id !== otherForm.id && !(otherIsBefore || otherIsAfter);
+			});
+
+			$scope.addableIndicators = projectIndicators.filter(function(indicator) {
+				return concurrentForms.concat([$scope.form]).every(function(form) {
+					return form.fields.every(function(field) { return field.id !== indicator._id; });
+				});
+			});
 		});
+
+		$scope.add = function() {
+			if ($scope.newIndicatorId) {
+				$scope.container.chosenIndicatorIds.push($scope.newIndicatorId);
+				delete $scope.newIndicatorId;
+			}
+		};
+
+		$scope.remove = function(index) {
+			$scope.container.chosenIndicatorIds.splice(index, 1);
+		};
 
 		$scope.addIntermediary = function() {
 			if (-1 === $scope.form.intermediaryDates.findIndex(function(key) { return !key; }))

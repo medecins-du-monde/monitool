@@ -1,3 +1,38 @@
+<!-- FIXME move this to another file... -->
+<script type="text/ng-template" id="form-sub-element.html">
+
+	<div class="panel-heading">
+		<span class="pull-right" style="font-size: 18px;" acl-has-project-role="owner">
+			<i class="fa fa-caret-square-o-up" ng-if="!key && !$first" ng-click="move($index, -1)" tooltip="{{'project.move_up'|translate}}"></i>
+			<i class="fa fa-caret-square-o-down" ng-if="!key && !$last" ng-click="move($index, 1)" tooltip="{{'project.move_down'|translate}}"></i>
+			<i class="fa fa-times" style="color:red" ng-if="!key" ng-click="remove($index)" tooltip="{{'shared.delete'|translate}}"></i>
+		</span>
+
+		<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>
+		<i class="fa fa-calculator" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'"></i>
+		<i class="fa fa-link" ng-if="indicator.type.substring(0, 'link'.length) === 'link'"></i>
+		<i class="fa fa-compass" ng-style="{color: indicator.geoAggregationRec != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.geo_aggregation'|translate}}"></i>
+		<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregationRec != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.time_aggregation'|translate}}"></i>
+
+		<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
+		{{indicator.name}}
+
+		<select class="form-control"
+				acl-has-project-role="owner"
+				ng-model="indicator.type"
+				ng-change="sourceChanged(indicator)"
+				ng-options="i.value as i.label|translate:i group by i.group|translate for i in indicator.availableTypes">
+		</select>
+
+		<p acl-lacks-project-role="owner" ng-repeat="i in indicator.availableTypes" ng-if="i.value === indicator.type">
+			{{i.label|translate:i}}
+		</p>
+	</div>
+
+	<div class="panel-body" ng-if="indicator.parameters">
+		<div class="panel panel-info" ng-repeat="(key, indicator) in indicator.parameters" ng-include="'form-sub-element.html'"></div>
+	</div>
+</script>
 
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
@@ -137,72 +172,26 @@
 			</div>
 		</div>
 
-		<div class="form-group" acl-has-project-role="owner">
-			<label for="indicators-input" class="col-md-2 control-label" translate="shared.indicators"></label>
-			<div class="col-sm-10">
-				<ui-select multiple ng-model="container.chosenIndicatorIds" theme="bootstrap">
-					<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
-					<ui-select-choices repeat="indicator._id as indicator in availableIndicators">{{indicator.name}}</ui-select-choices>
-				</ui-select>
-			</div>
-		</div>
 	</fieldset>
 
 	<fieldset>
 		<legend translate="project.input_form"></legend>
 
-		<!-- FIXME move this to another file... -->
-		<script type="text/ng-template" id="form-sub-element.html">
-			<div class="panel-heading">
-				<span class="pull-right" style="font-size: 18px;">
-					<span acl-has-project-role="owner">
-						<i class="fa fa-caret-square-o-up" ng-if="!key && !$first" ng-click="move($index, -1)" tooltip="{{'project.move_up'|translate}}"></i>
-						<i class="fa fa-caret-square-o-down" ng-if="!key && !$last" ng-click="move($index, 1)" tooltip="{{'project.move_down'|translate}}"></i>
-					</span>
-
-					<i class="fa fa-compass" ng-style="{color: indicator.geoAggregationRec != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.geo_aggregation'|translate}}"></i>
-					<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregationRec != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.time_aggregation'|translate}}"></i>
-				</span>
-
-				<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>
-				<i class="fa fa-calculator" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'"></i>
-				<i class="fa fa-link" ng-if="indicator.type.substring(0, 'link'.length) === 'link'"></i>
-
-				<span ng-if="!key"><span translate="shared.indicator"></span>: </span>
-				<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
-				{{indicator.name}}
-			</div>
-			<div class="panel-body">
-				<div class="form-group">
-					<label class="col-sm-2 control-label" translate="project.indicator_source"></label>
-					<div class="col-sm-10">
-						<select class="form-control"
-								acl-has-project-role="owner"
-								ng-model="indicator.type"
-								ng-change="sourceChanged(indicator)"
-								ng-options="i.value as i.label|translate:i group by i.group|translate for i in indicator.availableTypes">
-						</select>
-
-						<p class="form-control-static" acl-lacks-project-role="owner" ng-repeat="i in indicator.availableTypes" ng-if="i.value === indicator.type">
-							{{i.label|translate:i}}
-						</p>
-					</div>
-				</div>
-
-				<div class="form-group" ng-if="indicator.type == 'input'">
-					<label class="col-sm-2 control-label" translate="project.source"></label>
-					<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="indicator.source">
-						<input type="text" class="form-control" ng-model="indicator.source" />
-					</div>
-				</div>
-
-				<div class="panel panel-info"
-					 ng-repeat="(key, indicator) in indicator.parameters"
-					 ng-include="'form-sub-element.html'"></div>
-			</div>
-		</script>
-	
 		<div class="panel panel-info" ng-repeat="indicator in form.fields" ng-include="'form-sub-element.html'"></div>
+
+		<div class="input-group">
+			<select class="form-control"
+					acl-has-project-role="owner"
+					ng-model="newIndicatorId"
+					ng-options="i._id as i.name for i in addableIndicators">
+			</select>
+			<span class="input-group-btn">
+				<button class="btn btn-default" ng-click="add()">
+					Ajouter un nouvel indicateur au formulaire
+				</button>
+			</span>
+		</div>
+
 	</fieldset>
 
 	<div acl-has-project-role="owner">
