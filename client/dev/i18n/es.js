@@ -113,7 +113,9 @@ var SPANISH_TRANSLATION = {
 		list: 'Lista',
 		logout: 'Desconectar',
 		change_password: "Cambiar contraseña",
-		detach: "Desconectar"
+		detach: "Desconectar",
+
+		stay_here_check: 'Ha realizado cambios. Selectione acceptar para quedarse en esta página, cancelar para perder los cambios.',
 	},
 	menu: {
 		toggle_nav: "Ver el menu",
@@ -126,6 +128,11 @@ var SPANISH_TRANSLATION = {
 		missing_mandatory_indicators: "Indicadores obligatorios",
 		other_indicators: "Otros indicadores",
 		see_other_themes: "Ver tambien las otra temáticas",
+
+		entity_name: "Nombre de la estructura o del lugar de intervención",
+		group_name: "Nombre del grupo",
+		entity_name_placeholder: "ej: Centro de salud X, Hospital X, ...",
+		group_name_placeholder: "ej: Hospitales regionales, parte Norte del país, ...",
 
 		logical_frame_tooltip: 'Describe los objectivos, resultados esperados et actividades del proyecto.',
 		input_entities_tooltip: 'Lista de los lugares de actividad donde se collectan los indicadores. Por ejemplo hospitales, centros de salud, pueblos...',
@@ -248,6 +255,12 @@ var SPANISH_TRANSLATION = {
 		links: "Vínculos"
 	},
 	indicator: {
+		target: "Relación con el objetivo",
+		higher_is_better: "Alcanzado si la entrada es superior al objetivo",
+		lower_is_better: "Alcanzado si la entrada es inferior al objetivo",
+		around_is_better: "Alcanzado si la entrada es igual al objetivo",
+		non_relevant: "No pertinente",
+
 		no_theme: 'Sin temática',
 		no_type: 'Sin tipo',
 

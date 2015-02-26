@@ -119,7 +119,9 @@ var ENGLISH_TRANSLATION = {
 		list: 'List',
 		logout: 'Log Out',
 		change_password: "Change password",
-		detach: "Detach"
+		detach: "Detach",
+
+		stay_here_check: 'You made changes. Click OK to stay on this page, Cancel to leave.',
 	},
 	menu: {
 		toggle_nav: "Toggle navigation",
@@ -132,6 +134,11 @@ var ENGLISH_TRANSLATION = {
 		missing_mandatory_indicators: "Missing mandatory indicators",
 		other_indicators: "Other indicators",
 		see_other_themes: "See all thematics",
+
+		entity_name: "Entity name",
+		group_name: "Group name",
+		entity_name_placeholder: "For instance: Health center X, Hospital X, ...",
+		group_name_placeholder: "ex: Regional hospitals, North of the country, ...",
 
 		logical_frame_tooltip: 'Describe purpose, expected outputs and activities implemented by the project.',
 		input_entities_tooltip: 'List of input entities where indicators are collected. For instance hospitals, health centers, villages...',
@@ -244,7 +251,6 @@ var ENGLISH_TRANSLATION = {
 			"</ul>",
 		].join(' '),
 
-
 		status_green: "This indicator is in its green zone",
 		status_orange: "This indicator is in its orange zone",
 		status_red: "This indicator is in its red zone",
@@ -255,6 +261,12 @@ var ENGLISH_TRANSLATION = {
 		links: "Links"
 	},
 	indicator: {
+		target: "Relation with target",
+		higher_is_better: "Reached if input is higher than target",
+		lower_is_better: "Reached if input is lower than target",
+		around_is_better: "Reached if input is around target",
+		non_relevant: "Non relevant",
+
 		no_theme: 'No theme',
 		no_type: 'No type',
 

@@ -116,7 +116,9 @@ var FRENCH_TRANSLATION = {
 		list: 'Liste',
 		logout: 'Déconnecter',
 		change_password: "Changer le mot de passe",
-		detach: "Déplacer vers supplémentaires"
+		detach: "Déplacer vers supplémentaires",
+
+		stay_here_check: 'Vous avez realisé des changements. OK pour rester sur cette page, Annuler pour perdre les modifications.',
 	},
 	menu: {
 		toggle_nav: "Voir le menu",

@@ -14,7 +14,7 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectMenuController', function($scope, $state, $stateParams, project, mtFetch) {
+	.controller('ProjectMenuController', function($scope, $state, $stateParams, $filter, project, mtFetch) {
 		if ($stateParams.projectId === 'new') {
 			project.owners.push($scope.userCtx._id);
 			project.dataEntryOperators.push($scope.userCtx._id);
@@ -79,10 +79,10 @@ angular.module('monitool.controllers.project', [])
 			// if unsaved changes were made
 			if (pages.indexOf(fromState.name) !== -1 && !angular.equals($scope.master, $scope.project)) {
 				// then ask the user if he meant it
-				if (window.confirm('Vous avez réalisé des modifications. Êtes-vous sûr de vouloir changer de page sans sauvegarder?'))
-					$scope.reset();
-				else
+				if (window.confirm($filter('translate')('shared.stay_here_check')))
 					event.preventDefault();
+				else
+					$scope.reset();
 			}
 		});
 	})
