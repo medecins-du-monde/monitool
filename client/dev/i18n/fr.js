@@ -146,8 +146,8 @@ var FRENCH_TRANSLATION = {
 
 		show_finished: 'Montrer les projets finis',
 		create: "Créer un nouveau projet",
-		input_forms: 'Formulaires de saisie',
-		input_form: 'Formulaire de saisie',
+		input_forms: 'Plannings de saisie',
+		input_form: 'Planning de saisie',
 		data_collection: 'Collecte',
 		periodicity: "Périodicité",
 		begin: 'Début du projet',

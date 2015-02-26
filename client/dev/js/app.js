@@ -279,6 +279,12 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			project: function(mtFetch, $stateParams) {
 				return mtFetch.project($stateParams.projectId);
+			},
+			indicatorsById: function(mtFetch, $stateParams) {
+				if ($stateParams.projectId !== 'new')
+					return mtFetch.indicators({mode: 'project_reporting', projectId: $stateParams.projectId}, true);
+				else 
+					return {};
 			}
 		}
 	});
@@ -288,12 +294,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/logical-frame.html',
 		controller: 'ProjectLogicalFrameController',
 		resolve: {
-			indicatorsById: function(mtFetch, $stateParams) {
-				if ($stateParams.projectId !== 'new')
-					return mtFetch.indicators({mode: 'project_logframe', projectId: $stateParams.projectId}, true);
-				else 
-					return {};
-			},
 			themes: function(mtFetch) {
 				return mtFetch.themes();
 			}
@@ -310,11 +310,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/input-entities/:id',
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
-		resolve: {
-			indicatorsById: function(mtFetch, $stateParams) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
-			}
-		},
 		data: {
 			type: 'entity',
 		}
@@ -331,11 +326,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/input-groups/:id',
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
-		resolve: {
-			indicatorsById: function(mtFetch, $stateParams) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
-			}
-		},
 		data: {
 			type: 'group',
 		}
@@ -352,9 +342,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/form-edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
-			indicatorsById: function(mtFetch, $stateParams) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
-			},
 			formulasById: function(indicatorsById) {
 				var formulasById = {};
 				for (var indicatorId in indicatorsById)
@@ -466,9 +453,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					return { current: newInput, previous: previousInput, isNew: true };
 				});
 			},
-			indicatorsById: function(mtFetch, $stateParams) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
-			},
 			form: function($stateParams, project) {
 				return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
 			}
@@ -479,11 +463,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/reporting',
 		templateUrl: 'partials/projects/reporting.html',
 		controller: 'ProjectReportingController',
-		resolve: {
-			indicatorsById: function(mtFetch, $stateParams) {
-				return mtFetch.indicators({mode: "project_reporting", projectId: $stateParams.projectId}, true);
-			}
-		},
 		data: {
 			type: 'project',
 		}

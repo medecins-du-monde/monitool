@@ -276,8 +276,77 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectFormsController', function($scope, project) {
-		$scope.noFormsYet = Object.keys(project.dataCollection).length === 0;
+	.controller('ProjectFormsController', function($scope, indicatorsById) {
+		$scope.colors = ['#FBB735', '#E98931', '#EB403B', '#B32E37', '#6C2A6A', '#5C4399', '#274389', '#1F5EA8', '#227FB0', '#2AB0C5', '#39C0B3'];
+		$scope.colors = ["#F2B701", "#E57D04", "#DC0030", "#B10058", "#7C378A", "#3465AA", "#09A275", "#7CB854"].reverse();
+		$scope.indicatorsById = indicatorsById;
+
+		// we retrieve all relevant dates.
+		var relevantDates = [
+			moment($scope.project.begin).format('YYYY-MM-DD'),
+			moment($scope.project.end).format('YYYY-MM-DD')
+		];
+
+		$scope.project.dataCollection.forEach(function(form) {
+			[form.start, form.end].concat(form.intermediaryDates).forEach(function(jsDate) {
+				if (jsDate) {
+					var date = moment(jsDate).format('YYYY-MM-DD');
+					relevantDates.indexOf(date) === -1 && relevantDates.push(date);
+				}
+			});
+		});
+		relevantDates.sort();
+
+		// Then retrieve all intervals.
+		var intervals = [];
+		for (var i = 0; i < relevantDates.length - 1; ++i)
+			intervals.push(relevantDates[i] + ' ' + relevantDates[i + 1]);
+
+		var indicators = {};
+		$scope.project.dataCollection.forEach(function(form, index) {
+			form.fields.forEach(function(field) {
+				if (!indicators[field.id])
+					indicators[field.id] = [];
+
+				var id     = form.id,
+					color  = $scope.colors[index],
+					begin  = moment(form.start).format('YYYY-MM-DD'),
+					end    = moment(form.end).format('YYYY-MM-DD'),
+					length = relevantDates.indexOf(end) - relevantDates.indexOf(begin);
+
+				indicators[field.id].push({id: id, name: form.name, color: color, begin: begin, end: end, length: length});
+			});
+		});
+
+		var result = [];
+		for (var indicatorId in $scope.project.indicators) {
+			var rowResult = [], lastIndex = 0;
+			var h = indicators[indicatorId] || [];
+
+			h.sort(function(a, b) { return a.begin.localeCompare(b.begin); });
+			h.forEach(function(usage) {
+				// push empty slot.
+				if (relevantDates.indexOf(usage.begin) !== lastIndex) {
+					rowResult.push({length: relevantDates.indexOf(usage.begin) - lastIndex });
+					lastIndex = relevantDates.indexOf(usage.begin);
+				}
+
+				// push filled slot.
+				rowResult.push(usage);
+				lastIndex = relevantDates.indexOf(usage.end);
+			});
+
+			if (lastIndex < intervals.length)
+				rowResult.push({length: intervals.length - lastIndex });
+
+			result.push({
+				id: indicatorId,
+				usage: rowResult
+			});
+		}
+
+		$scope.intervals = intervals;
+		$scope.usages = result;
 	})
 
 	.controller('ProjectFormEditionController', function($scope, $stateParams, mtForms, form, indicatorsById, formulasById) {
@@ -310,10 +379,7 @@ angular.module('monitool.controllers.project', [])
 					for (var index = 0; index < numForms; ++index) {
 						var otherForm = $scope.project.dataCollection[index];
 
-						if (otherForm.start > $scope.form.end)
-							continue;
-						
-						if (otherForm.end < $scope.form.start)
+						if (otherForm.start >= $scope.form.end || otherForm.end <= $scope.form.start)
 							continue;
 
 						if (otherForm.id !== $scope.form.id &&

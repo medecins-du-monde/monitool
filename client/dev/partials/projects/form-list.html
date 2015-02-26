@@ -4,9 +4,32 @@
 	<li class="active" translate>project.input_forms</li>
 </ol>
 
+
+
+<table class="table table-bordered table-condensed" ng-if="project.dataCollection.length != 0">
+	<thead>
+		<tr>
+			<td></td>
+			<td ng-repeat="interval in intervals">{{interval}}</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="usage in usages">
+			<td>{{indicatorsById[usage.id].name}}</td>
+			<td ng-repeat="usage in usage.usage" ng-style="{'background-color': usage.color, color: 'white'}" colspan="{{usage.length}}">{{usage.name}}</td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+<!-- 
+<h2>Formulaires de saisie</h2> -->
+
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
+			<th></th>
 			<th translate="shared.name"></th>
 			<th translate="shared.begin"></th>
 			<th translate="shared.end"></th>
@@ -14,10 +37,11 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-if="noFormsYet">
-			<td colspan="4" style="text-align: center" translate="project.no_forms"></td>
+		<tr ng-if="project.dataCollection.length == 0">
+			<td colspan="5" style="text-align: center" translate="project.no_forms"></td>
 		</tr>
 		<tr ng-repeat="form in project.dataCollection">
+			<td ng-style="{'background-color': colors[$index]}"></td>
 			<td>{{form.name}}</td>
 			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
 			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>
@@ -32,7 +56,7 @@
 	</tbody>
 	<tfoot acl-has-project-role="owner">
 		<tr>
-			<td colspan="4">
+			<td colspan="5">
 				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.form({formId: 'new'})" translate>shared.add</button>
 			</td>
 		</tr>
