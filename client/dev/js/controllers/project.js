@@ -562,10 +562,5 @@ angular.module('monitool.controllers.project', [])
 	})
 
 	.controller('ProjectUserListController', function($scope, project, users) {
-		$scope.users = users.map(function(user) { return user._id; });
-
-		project.dataEntryOperators.concat(project.owners).forEach(function(username) {
-			if ($scope.users.indexOf(username) === -1)
-				$scope.users.push(username);
-		});
+		$scope.users = users;
 	});
