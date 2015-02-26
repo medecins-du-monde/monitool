@@ -162,6 +162,7 @@ angular.module('monitool.controllers.project', [])
 		};
 
 		$scope.isExternal = function(indicatorId) {
+			// FIXME: Use !$scope.project.themes.some(is internal)
 			return $scope.project.themes.filter(function(theme) {
 				return $scope.indicatorsById[indicatorId].themes.indexOf(theme) !== -1
 			}).length === 0;
@@ -206,32 +207,35 @@ angular.module('monitool.controllers.project', [])
 		$scope.planning.__baselineUnknown = $scope.planning.baseline === null;
 		$scope.planning.__targetUnknown = $scope.planning.target === null;
 
-		// FIXME, this query is useless, we could avoid it and pass the full indicator from the calling controller.
-		mtFetch.indicator(indicatorId).then(function(indicator) {
-			$scope.indicator = indicator;
+		// Load the indicator if it's a new one. Take is from the hash if not.
+		if ($scope.indicatorsById[indicatorId])
+			$scope.indicator = $scope.indicatorsById[indicatorId];
+		else
+			mtFetch.indicator(indicatorId).then(function(indicator) {
+				// we also store it in the hash for future usage in ProjectLogicalFrameController
+				$scope.indicatorsById[indicatorId] = $scope.indicator = indicator;
+			});
+
+		// if this indicator is already used in a form, we can't delete it from the logical frame.
+		$scope.isDeletable = $scope.project.dataCollection.every(function(form) {
+			return form.fields.every(function(field) { return field.id !== indicatorId; });
 		});
-
-		$scope.addTarget = function() {
-			$scope.planning.targets.push({period: null, value: 0});
-		};
-
-		$scope.removeTarget = function(target) {
-			$scope.planning.targets.splice($scope.planning.targets.indexOf(target), 1);
-		};
 
 		$scope.isUnchanged = function() {
 			return angular.equals($scope.planning, $scope.project.indicators[indicatorId]);
 		};
 
 		$scope.save = function() {
+			// This should be done on the ProjectLogicalFrameController?
 			if ($scope.isNew)
 				target && target.push(indicatorId);
 
+			// we delete this to avoid changing the $scope.isUnchanged() value if we did nothing with the indicator.
 			delete $scope.planning.__baselineUnknown;
 			delete $scope.planning.__targetUnknown;
 
+			// we need to change the project now, because we've been working on a copy of the indicator's planning
 			$scope.project.indicators[indicatorId] = $scope.planning;
-			$scope.indicatorsById[indicatorId] = $scope.indicator; // inject the indicator in the parent scope.
 			$modalInstance.close();
 		};
 
