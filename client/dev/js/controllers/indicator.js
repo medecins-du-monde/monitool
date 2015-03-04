@@ -2,7 +2,7 @@
 
 angular.module('monitool.controllers.indicator', [])
 
-	.controller('IndicatorListController', function($scope, hierarchy) {
+	.controller('IndicatorListController', function($scope, mtRemoveDiacritics, hierarchy) {
 		$scope.orderField = 'name';
 		$scope.searchField = '';
 
@@ -13,12 +13,13 @@ angular.module('monitool.controllers.indicator', [])
 				$scope.hierarchy = hierarchy;
 			}
 			else {
-				var filter = newValue.toLowerCase();
+				var filter = mtRemoveDiacritics(newValue).toLowerCase();
 				$scope.filter = true;
 				$scope.hierarchy = angular.copy(hierarchy).filter(function(theme) {
 					theme.children = theme.children.filter(function(type) {
 						type.children = type.children.filter(function(indicator) {
-							return indicator.name.toLowerCase().indexOf(filter) !== -1;
+							var name = mtRemoveDiacritics(indicator.name).toLowerCase();
+							return name.indexOf(filter) !== -1;
 						});
 						return type.children.length;
 					});
@@ -28,7 +29,7 @@ angular.module('monitool.controllers.indicator', [])
 		});
 	})
 	
-	.controller('IndicatorChooseController', function($scope, $modalInstance, forbiddenIds, hierarchy) {
+	.controller('IndicatorChooseController', function($scope, $modalInstance, mtRemoveDiacritics, forbiddenIds, hierarchy) {
 		$scope.forbidden = forbiddenIds;
 		$scope.searchField = '';
 
@@ -39,12 +40,13 @@ angular.module('monitool.controllers.indicator', [])
 				$scope.hierarchy = hierarchy;
 			}
 			else {
-				var filter = newValue.toLowerCase();
+				var filter = mtRemoveDiacritics(newValue).toLowerCase();
 				$scope.filter = true;
 				$scope.hierarchy = angular.copy(hierarchy).filter(function(theme) {
 					theme.children = theme.children.filter(function(type) {
 						type.children = type.children.filter(function(indicator) {
-							return indicator.name.toLowerCase().indexOf(filter) !== -1;
+							var name = mtRemoveDiacritics(indicator.name).toLowerCase();
+							return name.indexOf(filter) !== -1;
 						});
 						return type.children.length;
 					});

@@ -67,6 +67,7 @@ var files = {
 			'client/dev/js/directives/forms.js',
 			'client/dev/js/services/fetch.js',
 			'client/dev/js/services/reporting.js',
+			'client/dev/js/services/string.js',
 			'client/dev/js/app.js',
 			'client/dev/js/filters.js',
 			'client/dev/js/polyfills.js',

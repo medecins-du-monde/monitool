@@ -49,6 +49,7 @@ var app = angular.module('monitool.app', [
 	'monitool.filters',
 	'monitool.services.fetch',
 	'monitool.services.reporting',
+	'monitool.services.string',
 	'ngCookies',
 	'ngResource',
 	'pascalprecht.translate',
