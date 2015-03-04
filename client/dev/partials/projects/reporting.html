@@ -11,7 +11,7 @@
 	<li class="active" ng-if="entity" ng-bind="entity.name"></li>
 </ol>
 
-<form class="form-horizontal" novalidate>
+<form class="form-horizontal noprint" novalidate>
 	<div class="row">
 		<div class="col-md-6">
 			<div class="form-group">
@@ -105,7 +105,7 @@
 </form>
 
 <div class="clearfix">
-	<button class="btn btn-primary btn-xs pull-right" ng-show="presentation.plot" svg-save="imageFilename">
+	<button class="btn btn-primary btn-xs pull-right noprint" ng-show="presentation.plot" svg-save="imageFilename">
 		<i class="fa fa-download"></i>
 		<span translate="shared.download_plot"></span>
 	</button>
@@ -113,7 +113,7 @@
 
 <div id="chart" ng-show="presentation.plot" style="overflow: hidden;"></div>
 
-<button class="btn btn-primary btn-xs pull-right"
+<button class="btn btn-primary btn-xs pull-right noprint"
 		style="margin-bottom: 10px;"
 		project-csv-save indicators-by-id="indicatorsById" query="query" data="data" cols="cols">
 	<i class="fa fa-download"></i>
@@ -123,7 +123,7 @@
 <table class="table table-bordered table-stripped table-condensed project-reporting" ng-init="purposeOpen=true">
 	<thead>
 		<tr>
-			<th ng-show="presentation.plot"></th>
+			<th ng-show="presentation.plot" class="noprint"></th>
 			<th></th>
 			<th translate="project.baseline"></th>
 			<th translate="project.target"></th>
@@ -138,7 +138,7 @@
 	</thead>
 	<tbody>
 		<tr ng-repeat="indicatorId in unassignedIndicatorsIds">
-			<td ng-show="presentation.plot"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" /></td>
+			<td ng-show="presentation.plot" class="noprint"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" /></td>
 			<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
 			<td>{{project.indicators[indicatorId].baseline}}{{indicatorsById[indicatorId].unit}}</td>
 			<td>{{project.indicators[indicatorId].target}}{{indicatorsById[indicatorId].unit}}</td>
@@ -152,13 +152,13 @@
 	</tbody>
 	<tbody>
 		<tr>
-			<td ng-show="presentation.plot"></td>
+			<td ng-show="presentation.plot" class="noprint"></td>
 			<td class="section" colspan="{{cols.length + 1}}">
 				{{'project.goal_short'|translate}}: {{project.logicalFrame.goal}}
 			</td>
 		</tr>
 		<tr ng-repeat="indicatorId in project.logicalFrame.indicators">
-			<td ng-show="presentation.plot"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" /></td>
+			<td ng-show="presentation.plot" class="noprint"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" /></td>
 			<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
 			<td>{{project.indicators[indicatorId].baseline}}{{indicatorsById[indicatorId].unit}}</td>
 			<td>{{project.indicators[indicatorId].target}}{{indicatorsById[indicatorId].unit}}</td>
@@ -172,7 +172,7 @@
 	</tbody>
 	<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
 		<tr>
-			<td ng-show="presentation.plot"></td>
+			<td ng-show="presentation.plot" class="noprint"></td>
 			<td class="section indent1" colspan="{{cols.length + 1}}">
 				<a ng-click="purposeOpen=!purposeOpen">
 					<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
@@ -181,7 +181,7 @@
 			</td>
 		</tr>
 		<tr ng-repeat="indicatorId in purpose.indicators" ng-if="purposeOpen">
-			<td ng-show="presentation.plot">
+			<td ng-show="presentation.plot" class="noprint">
 				<input id="plot-{{indicatorId}}"
 					   type="checkbox"
 					   ng-model="plots[indicatorId]"
@@ -204,7 +204,7 @@
 	</tbody>
 	<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
 		<tr>
-			<td ng-show="presentation.plot"></td>
+			<td ng-show="presentation.plot" class="noprint"></td>
 			<td class="section indent2" colspan="{{cols.length + 1}}">
 				<a ng-click="outputOpen=!outputOpen">
 					<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
@@ -213,7 +213,7 @@
 			</td>
 		</tr>
 		<tr ng-repeat="indicatorId in output.indicators" ng-if="outputOpen">
-			<td ng-show="presentation.plot">
+			<td ng-show="presentation.plot" class="noprint">
 				<input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" />
 			</td>
 			<td class="indent2">

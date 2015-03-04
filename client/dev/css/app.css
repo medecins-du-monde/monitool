@@ -142,9 +142,15 @@ textarea {
 
 .print { display: none;}
 
+.main-content { padding-top: 70px; }
+
 @media print {
   .noprint { display: none; }
-  .print { display: block !important; }
+  .print-only { display: block !important; }
+  .print-full-width { width: 100% !important; }
+
+  .main-content { padding-top: 0; }
+  .c3-tooltip-container { display: none !important; }
 
 
 

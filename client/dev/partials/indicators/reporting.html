@@ -12,7 +12,7 @@
 	<li class="active" translate>shared.reporting</li>
 </ol>
 
-<form class="form-horizontal" novalidate>
+<form class="form-horizontal noprint" novalidate>
 	<div class="row">
 		<div class="col-md-6">
 			<div class="form-group">
@@ -102,8 +102,7 @@
 	</div>
 </form>
 
-
-<div class="clearfix">
+<div class="clearfix noprint">
 	<button class="btn btn-primary btn-xs pull-right" ng-show="presentation.plot" svg-save="imageFilename">
 		<i class="fa fa-download"></i>
 		<span translate="shared.download_plot"></span>
@@ -112,7 +111,7 @@
 
 <div id="chart" ng-show="presentation.plot" style="overflow: hidden;"></div>
 
-<button class="btn btn-primary btn-xs pull-right"
+<button class="btn btn-primary btn-xs pull-right noprint"
 		style="margin-bottom: 10px;"
 		indicator-csv-save cols="cols" query="query" data="data">
 	<i class="fa fa-download"></i>
