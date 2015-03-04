@@ -139,3 +139,14 @@ textarea {
   table.project-reporting .indent2 {
     padding-left: 50px !important;
   }
+
+.print { display: none;}
+
+@media print {
+  .noprint { display: none; }
+  .print { display: block !important; }
+
+
+
+
+}

@@ -125,6 +125,11 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 	project: {
+		source: "Origen",
+		source_ph: "Ej: NHIS local",
+		in_charge: "Persona responsable",
+		in_charge_ph: "Ex: Enfermera del proyecto",
+
 		missing_mandatory_indicators: "Indicadores obligatorios",
 		other_indicators: "Otros indicadores",
 		see_other_themes: "Ver tambien las otra temáticas",
@@ -225,7 +230,6 @@ var SPANISH_TRANSLATION = {
 		move_down: "Bajar",
 
 		indicator_source: "Adquisición",
-		source: "Persona responsable",
 		you_are_owner: "Puede editar este proyecto",
 		you_are_editor: "Puede entrar indicadores en este proyecto",
 		you_are_not_owner: "No puede editar este proyecto",
@@ -255,6 +259,7 @@ var SPANISH_TRANSLATION = {
 		links: "Vínculos"
 	},
 	indicator: {
+		search: "Buscar",
 		target: "Relación con el objetivo",
 		higher_is_better: "Alcanzado si la entrada es superior al objetivo",
 		lower_is_better: "Alcanzado si la entrada es inferior al objetivo",

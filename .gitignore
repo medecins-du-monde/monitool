@@ -32,3 +32,5 @@ bower_components
 # Users Environment Variables
 .lock-wscript
 .awspublish-mdm-monitool
+
+result

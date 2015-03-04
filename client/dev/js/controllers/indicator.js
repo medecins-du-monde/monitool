@@ -4,12 +4,54 @@ angular.module('monitool.controllers.indicator', [])
 
 	.controller('IndicatorListController', function($scope, hierarchy) {
 		$scope.orderField = 'name';
-		$scope.hierarchy = hierarchy;
+		$scope.searchField = '';
+
+		// FIXME move this to a directive/service....
+		$scope.$watch('searchField', function(newValue, oldValue) {
+			if (newValue.length < 3) {
+				$scope.filter = false;
+				$scope.hierarchy = hierarchy;
+			}
+			else {
+				var filter = newValue.toLowerCase();
+				$scope.filter = true;
+				$scope.hierarchy = angular.copy(hierarchy).filter(function(theme) {
+					theme.children = theme.children.filter(function(type) {
+						type.children = type.children.filter(function(indicator) {
+							return indicator.name.toLowerCase().indexOf(filter) !== -1;
+						});
+						return type.children.length;
+					});
+					return theme.children.length;
+				});
+			}
+		});
 	})
 	
 	.controller('IndicatorChooseController', function($scope, $modalInstance, forbiddenIds, hierarchy) {
 		$scope.forbidden = forbiddenIds;
-		$scope.hierarchy = hierarchy;
+		$scope.searchField = '';
+
+		// FIXME move this to a directive/service....
+		$scope.$watch('searchField', function(newValue, oldValue) {
+			if (newValue.length < 3) {
+				$scope.filter = false;
+				$scope.hierarchy = hierarchy;
+			}
+			else {
+				var filter = newValue.toLowerCase();
+				$scope.filter = true;
+				$scope.hierarchy = angular.copy(hierarchy).filter(function(theme) {
+					theme.children = theme.children.filter(function(type) {
+						type.children = type.children.filter(function(indicator) {
+							return indicator.name.toLowerCase().indexOf(filter) !== -1;
+						});
+						return type.children.length;
+					});
+					return theme.children.length;
+				});
+			}
+		});
 
 		$scope.choose = function(indicatorId) {
 			$modalInstance.close(indicatorId);

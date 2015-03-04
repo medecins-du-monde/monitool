@@ -5,12 +5,9 @@ var express        = require('express'),
 	cookieParser   = require('cookie-parser'),
 	session        = require('express-session'),
 	compression    = require('compression'),
-	cors           = require('cors'),
 	serveStatic    = require('serve-static'),
 	cacheControl   = require('./middlewares/cache-control'),
-
 	passport       = require('./passport');
-
 
 express()
 	.disable('x-powered-by')
@@ -46,9 +43,7 @@ express()
 	.use(cacheControl)
 
 	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? '../client/dev' : '../client/build'))
-	// .use(cors())
 	.use(require('./controllers/public'))
 	.use(require('./controllers/restricted'))
 	.use(require('./controllers/reporting'))
-
 	.listen(8000);

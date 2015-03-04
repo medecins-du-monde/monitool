@@ -131,6 +131,11 @@ var ENGLISH_TRANSLATION = {
 		english: "English",
 	},
 	project: {
+		source: "Source",
+		source_ph: "Ej: NHIS",
+		in_charge: "Person in charge",
+		in_charge_ph: "Ex: Project nurse",
+
 		missing_mandatory_indicators: "Missing mandatory indicators",
 		other_indicators: "Other indicators",
 		see_other_themes: "See all thematics",
@@ -231,7 +236,6 @@ var ENGLISH_TRANSLATION = {
 		move_down: "Move down",
 
 		indicator_source: "Acquisition",
-		source: "Reponsible person",
 		you_are_owner: "You can edit this project",
 		you_are_editor: "You can input on this project",
 		you_are_not_owner: "You cannot edit this project",
@@ -261,6 +265,7 @@ var ENGLISH_TRANSLATION = {
 		links: "Links"
 	},
 	indicator: {
+		search: "Search",
 		target: "Relation with target",
 		higher_is_better: "Reached if input is higher than target",
 		lower_is_better: "Reached if input is lower than target",

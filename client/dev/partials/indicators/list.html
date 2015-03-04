@@ -3,30 +3,40 @@
 	<li class="active" translate="shared.list"></li>
 </ol>
 
-{{'indicator.order_by'|translate}}:
-<select id="sort-input" ng-model="orderField">
-	<option value="name">{{'indicator.alphabetical_order'|translate}}</option>
-	<option value="-__inputUsage">{{'indicator.num_inputs'|translate}}</option>
-	<option value="-__mainUsage">{{'indicator.num_projects'|translate}}</option>
-</select>
-
-<br/><br/>
+<div class="form-horizontal well well-sm">
+	<div class="form-group">
+		<label class="col-sm-1" for="sort-input" translate="indicator.order_by"></label>
+		<div class="col-sm-3">
+			<select id="sort-input" ng-model="orderField" class="form-control input-sm">
+				<option value="name">{{'indicator.alphabetical_order'|translate}}</option>
+				<option value="-__inputUsage">{{'indicator.num_inputs'|translate}}</option>
+				<option value="-__mainUsage">{{'indicator.num_projects'|translate}}</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="search-input" class="col-sm-1" translate="indicator.search"></label>
+		<div class="col-sm-3">
+			<input id="search-input" type="text" ng-model="searchField" class="form-control input-sm" />
+		</div>
+	</div>
+</div>
 
 <div class="indicator-level-1" ng-repeat="theme in hierarchy">
 	<div class="indicator-header" ng-click="theme.open=!theme.open">
-		<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle':!theme.open,'fa-minus-circle':theme.open}"></i>
+		<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle':!(theme.open||filter),'fa-minus-circle':(theme.open||filter)}"></i>
 		{{(theme.name || 'indicator.no_theme')|translate}}
 		<span class="badge pull-right" style="margin-right: 10px;">{{theme.children.length}}</span>
 	</div>
 
-	<div class="indicator-level-2" ng-repeat="type in theme.children" ng-if="theme.open">
+	<div class="indicator-level-2" ng-repeat="type in theme.children" ng-if="theme.open||filter">
 		<div class="indicator-header" ng-click="type.open=!type.open">
-			<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle':!type.open,'fa-minus-circle':type.open}"></i>
+			<i class="fa fa-plus-circle" ng-class="{'fa-plus-circle':!(type.open||filter),'fa-minus-circle':(type.open||filter)}"></i>
 			{{(type.name || 'indicator.no_type')|translate}}
 			<span class="badge pull-right" style="margin-right: 10px;">{{type.children.length}}</span>
 		</div>
 
-		<div class="indicator-level-3" ng-repeat="indicator in type.children | orderBy:orderField" ng-if="type.open">
+		<div class="indicator-level-3" ng-repeat="indicator in type.children | orderBy:orderField" ng-if="type.open||filter">
 			<span class="pull-right">
 				{{indicator.__mainUsage}} <i class="fa fa-building-o"></i>
 				{{indicator.__inputUsage}} <i class="fa fa-pencil-square-o"></i>

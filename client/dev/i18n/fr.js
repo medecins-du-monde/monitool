@@ -128,6 +128,11 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		source: "Source",
+		source_ph: "Ex: NHIS local",
+		in_charge: "Personne responsable",
+		in_charge_ph: "Ex: Infirmière projet",
+
 		missing_mandatory_indicators: "Indicateurs obligatoires manquants",
 		other_indicators: "Autres indicateurs",
 		see_other_themes: "Voir aussi les autres thématiques",
@@ -228,7 +233,6 @@ var FRENCH_TRANSLATION = {
 		move_down: "Descendre",
 
 		indicator_source: "Obtention",
-		source: "Personne responsable",
 		you_are_owner: "Vous pouvez éditer ce projet",
 		you_are_editor: "Vous pouvez saisir sur ce projet",
 		you_are_not_owner: "Vous ne pouvez pas éditer ce projet",
@@ -258,6 +262,7 @@ var FRENCH_TRANSLATION = {
 		links: "Liens"
 	},
 	indicator: {
+		search: "Rechercher",
 		target: "Relation à la cible",
 		higher_is_better: "Atteinte si la saisie est supérieure à la cible",
 		lower_is_better: "Atteinte si la saisie est inférieure à la cible",
