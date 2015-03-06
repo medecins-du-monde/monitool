@@ -4,13 +4,14 @@ var express   = require('express'),
 	crypto    = require('crypto'),
 	Indicator = require('../models/indicator'),
 	Input     = require('../models/input'),
+	Report    = require('../models/report'),
 	Project   = require('../models/project'),
 	Theme     = require('../models/theme'),
 	Type      = require('../models/type'),
 	User      = require('../models/user'),
 	router    = express.Router();
 
-var ModelsByName = {indicator: Indicator, input: Input, project: Project, theme: Theme, type: Type, user: User};
+var ModelsByName = {indicator: Indicator, input: Input, report: Report, project: Project, theme: Theme, type: Type, user: User};
 
 router.use(require('body-parser').json());
 
@@ -45,7 +46,7 @@ var checkEditPermissions = function(user, modelName, modelId, callback) {
 		callback('missing_permission');
 };
 
-router.put('/:modelName(indicator|project|input|theme|type|user)/:id', function(request, response) {
+router.put('/:modelName(indicator|project|input|report|theme|type|user)/:id', function(request, response) {
 	var modelName  = request.params.modelName,
 		ModelClass = ModelsByName[request.params.modelName],
 		newModel   = request.body;
@@ -78,7 +79,7 @@ router.put('/:modelName(indicator|project|input|theme|type|user)/:id', function(
 	});
 });
 
-router.delete('/:modelName(indicator|project|input|theme|type|user)/:id', function(request, response) {
+router.delete('/:modelName(indicator|project|input|report|theme|type|user)/:id', function(request, response) {
 	var modelName = request.params.modelName;
 
 	checkEditPermissions(request.user, modelName, request.params.id, function(error) {

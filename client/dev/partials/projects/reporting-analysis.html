@@ -1,0 +1,66 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li class="active" translate="shared.reporting_analysis"></li>
+	<li class="active" ng-bind="report.date|amDateFormat:'YYYY-MM-DD'"></li>
+	<li class="active" ng-bind="report.name"></li>
+</ol>
+
+<form class="form-horizontal" role="form" name="reportForm" novalidate>
+
+	<div class="form-group" show-errors>
+		<label for="input-name" class="col-sm-1 control-label" translate="shared.name"></label>
+		<div class="col-sm-11" acl-has-project-role="owner" acl-fallback="report.name">
+			<input id="input-name"
+				   type="text"
+				   class="form-control"
+				   name="name"
+				   ng-model="report.name"
+				   placeholder="{{'project.report_name_ph'|translate}}"
+				   required />
+			
+			<p class="help-block" ng-if="reportForm.name.$error.required" translate="form.mandatory"></p>
+		</div>
+	</div>
+
+	<div class="form-group" show-errors>
+		<label for="input-date" class="col-sm-1 control-label" translate="shared.date"></label>
+		<div class="col-sm-11" acl-has-project-role="owner" acl-fallback="report.date">
+
+			<input id="input-date"
+				   type="text" 
+				   datepicker-popup="longDate"
+				   name="date"
+				   ng-model="report.date"
+				   is-open="reportDateOpen"
+				   ng-click = "reportDateOpen = true"
+				   required
+				   class="form-control" />
+
+			<p class="help-block" ng-if="reportForm.begin.$error.required" translate="form.mandatory"></p>
+		</div>
+	</div>
+
+	
+
+	<div text-angular ng-model="element.comment" ta-toolbar="[['h1','h2','h3','h4','p','pre','quote'],['bold','italics','underline','strikeThrough','ul','ol','undo','redo','clear'],['justifyLeft','justifyCenter','justifyRight','indent','outdent']]"></div>
+	
+	<button ng-click="addReportGrid()">Ajouter un tableau</button>
+	<button ng-click="addReportGraph()">Ajouter un graphique</button>
+	<button ng-click="addReportText()">Ajouter une zone de texte</button>
+
+	<div acl-has-project-role="owner">
+		<button ng-disabled="reportForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
+			<i class="fa fa-floppy-o"></i>
+			<span translate="shared.save"></span>
+		</button>
+
+		<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+			<i class="fa fa-undo"></i>
+			<span translate="shared.remove_changes"></span>
+		</button>
+
+	</div>
+</form>
+
+

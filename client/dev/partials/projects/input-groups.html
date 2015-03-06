@@ -10,7 +10,7 @@
 			<tr>
 				<th style="width:300px" translate="project.group_name"></th>
 				<th translate="shared.members"></th>
-				<th style="width: 255px;"></th>
+				<th style="width: 100px;"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -42,11 +42,7 @@
 						{{inputGroup.members | getObjects:project.inputEntities | pluck:'name' | join:', '}}
 					</span>
 				</td>
-				<td>
-					<a class="btn btn-default btn-sm" ui-sref="main.project.input_groups_reporting({id: inputGroup.id})">
-						<i class="fa fa-line-chart"></i>
-						<span translate="shared.view_stats"></span>
-					</a>
+				<td style="text-align: center">
 					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)" acl-has-project-role="owner">
 						<i class="fa fa-remove"></i>
 						<span translate>shared.delete</span>

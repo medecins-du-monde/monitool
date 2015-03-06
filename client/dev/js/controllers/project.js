@@ -597,11 +597,10 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectReportingController', function($scope, $state, $stateParams, mtReporting, mtForms, indicatorsById) {
-		$scope.entity                  = $scope.project.inputEntities.find(function(e) { return e.id === $stateParams.id; });
-		$scope.group                   = $scope.project.inputGroups.find(function(g) { return g.id === $stateParams.id; });
+	.controller('ProjectReportingController', function($scope, $state, mtReporting, mtForms, indicatorsById) {
 		$scope.indicatorsById          = indicatorsById;
 		$scope.unassignedIndicatorsIds = $scope.getUnassignedIndicators();
+		$scope.filter = '';
 
 		// those 2 hashes represent what the user sees.
 		$scope.presentation = {display: 'value', plot: false, colorize: false};
@@ -610,9 +609,22 @@ angular.module('monitool.controllers.project', [])
 			begin:   mtReporting.getDefaultStartDate($scope.project),
 			end:     mtReporting.getDefaultEndDate($scope.project),
 			groupBy: 'month',
-			type:    $state.current.data.type,	// project/entity/group
-			id:      $stateParams.id			// undefined/entityId/groupId
+			type:    'project',	// project/entity/group
+			id:      undefined	// undefined/entityId/groupId
 		};
+
+		$scope.$watch('filter', function(newFilter) {
+			if (!newFilter)
+				$scope.query.type = 'project';
+			else if ($scope.project.inputEntities.find(function(entity) { return entity.id === newFilter; }))
+				$scope.query.type = 'entity';
+			else
+				$scope.query.type = 'group';
+
+			$scope.query.id = newFilter;
+			$scope.entity   = $scope.project.inputEntities.find(function(e) { return e.id === newFilter; });
+			$scope.group    = $scope.project.inputGroups.find(function(g) { return g.id === newFilter; });
+		});
 
 		// h@ck
 		$scope.dates = {begin: new Date($scope.query.begin), end: new Date($scope.query.end)};
@@ -626,7 +638,7 @@ angular.module('monitool.controllers.project', [])
 
 		// Update loaded inputs when query.begin or query.end changes.
 		$scope.inputs = [];
-		$scope.$watch("[query.begin, query.end]", function() {
+		$scope.$watch("[query.begin, query.end, query.type, query.id]", function() {
 			mtReporting.getInputs($scope.query).then(function(inputs) {
 				$scope.inputs = inputs;
 			});
@@ -672,6 +684,107 @@ angular.module('monitool.controllers.project', [])
 		}, true);
 	})
 
-	.controller('ProjectUserListController', function($scope, project, users) {
+
+	.controller('ProjectReportingAnalysisListController', function($scope, reports) {
+		$scope.reports = reports;
+	})
+
+	.controller('ProjectReportingAnalysisController', function($scope, $modal, report, project, indicatorsById) {
+		$scope.report = report;
+
+		$scope.addReportGrid = function() {
+			$modal.open({
+				controller: 'ProjectReportingAnalysisDataSelectionController',
+				templateUrl: 'partials/projects/reporting-analysis-select-data.html',
+				size: 'lg', scope: $scope, resolve: { indicatorsById: function() { return indicatorsById; } }
+			}).result;
+		};
+	})
+
+	.controller('ProjectReportingAnalysisDataSelectionController', function($scope, mtReporting, indicatorsById) {
+		$scope.availableIndicators = Object.keys($scope.project.indicators).map(function(i) { return indicatorsById[i]; });
+		$scope.container = {chosenIndicatorIds: []};
+		$scope.query = {
+			project: mtReporting.getAnnotatedProjectCopy($scope.project, indicatorsById),
+			begin:   mtReporting.getDefaultStartDate($scope.project),
+			end:     mtReporting.getDefaultEndDate($scope.project),
+			groupBy: 'month',
+			type:    'project',	// project/entity/group
+			id:      undefined	// undefined/entityId/groupId
+		};
+
+		// WE NEED TO FACTORIZE THIS INTO A DIRECTIVE.
+		// WE'RE JUST COPY PASTING CODE FROM THE REPORTING CONTROLLER.
+		$scope.$watch('filter', function(newFilter) {
+			if (!newFilter)
+				$scope.query.type = 'project';
+			else if ($scope.project.inputEntities.find(function(entity) { return entity.id === newFilter; }))
+				$scope.query.type = 'entity';
+			else
+				$scope.query.type = 'group';
+
+			$scope.query.id = newFilter;
+			$scope.entity   = $scope.project.inputEntities.find(function(e) { return e.id === newFilter; });
+			$scope.group    = $scope.project.inputGroups.find(function(g) { return g.id === newFilter; });
+		});
+
+		// h@ck
+		$scope.dates = {begin: new Date($scope.query.begin), end: new Date($scope.query.end)};
+		$scope.$watch("dates", function() {
+			$scope.query.begin = moment($scope.dates.begin).format('YYYY-MM-DD');
+			$scope.query.end = moment($scope.dates.end).format('YYYY-MM-DD');
+		}, true);
+
+		// Update loaded inputs when query.begin or query.end changes.
+		$scope.inputs = [];
+		$scope.$watch("[query.begin, query.end, query.type, query.id]", function() {
+			mtReporting.getInputs($scope.query).then(function(inputs) {
+				$scope.inputs = inputs;
+			});
+		}, true);
+
+		// Update cols and data when grouping or inputs changes.
+		$scope.$watch("[query.begin, query.end, query.groupBy, inputs, container.chosenIndicatorIds]", function() {
+			var numIndicators = $scope.container.chosenIndicatorIds.length,
+				cols = mtReporting.getStatsColumns($scope.query),
+				data = mtReporting.regroup($scope.inputs, $scope.query, indicatorsById);
+
+			var result = [[''].concat(cols.map(function(c) { return c.name; }))];
+			for (var i = 0; i < numIndicators; ++i) {
+				var indicator = indicatorsById[$scope.container.chosenIndicatorIds[i]];
+				result.push([indicator.name].concat(cols.map(function(c) {
+					try { return data[c.id][$scope.container.chosenIndicatorIds[i]].value + indicator.unit; }
+					catch (e) { return ''; }
+				})));
+			}
+
+			$scope.result = result;
+		}, true);
+
+
+
+
+	})
+
+	.controller('ProjectUserListController', function($scope, users) {
 		$scope.users = users;
 	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

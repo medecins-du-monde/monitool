@@ -2,10 +2,7 @@
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.logical_frame" ng-bind="project.name"></a></li>
 
-	<li class="active" translate="shared.reporting" ng-if="!group && !entity"></li>
-	<li ng-if="group || entity">
-		<a ui-sref="main.project.reporting" translate="shared.reporting"></a>
-	</li>
+	<li class="active" translate="shared.reporting"></li>
 
 	<li class="active" ng-if="group" ng-bind="group.name"></li>
 	<li class="active" ng-if="entity" ng-bind="entity.name"></li>
@@ -13,7 +10,7 @@
 
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-sm-4">
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label" translate="shared.begin"></label>
 				<div class="col-sm-10">
@@ -31,36 +28,8 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="form-group">
-				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
-				<div class="col-sm-10">
-
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
-						<select class="form-control" id="group-by-input" ng-model="query.groupBy">
-							<option value="day" translate="shared.day"></option>
-							<option value="week" translate="shared.week"></option>
-							<option value="month" translate="shared.month"></option>
-							<option value="year" translate="shared.year"></option>
-							<option value="entity" translate="shared.input_entity"></option>
-							<option value="group" translate="shared.input_group"></option>
-						</select>
-					</div>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
-				<div class="col-sm-10">
-					<p class="form-control-static">
-						<input type="checkbox" id="colorize-input" ng-model="presentation.colorize" />
-					</p>
-				</div>
-			</div>
 		</div>
-		
-		<div class="col-md-6">
+		<div class="col-sm-4">
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
 				<div class="col-sm-10">
@@ -78,7 +47,49 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
 
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
+						<select class="form-control" id="group-by-input" ng-model="query.groupBy">
+							<option value="day" translate="shared.day"></option>
+							<option value="week" translate="shared.week"></option>
+							<option value="month" translate="shared.month"></option>
+							<option value="year" translate="shared.year"></option>
+							<option value="entity" translate="shared.input_entity"></option>
+							<option value="group" translate="shared.input_group"></option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label for="filter-by-input" class="col-sm-2 control-label" translate="shared.filter"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-filter"></i></span>
+						<select class="form-control" id="filter-by-input" ng-model="filter">
+							<option value="">Tout le projet</option>
+							<optgroup label="Lieux d'activité">
+								<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}" ng-bind="entity.name"></option>
+							</optgroup>
+							<optgroup label="Groupes d'activité">
+								<option ng-repeat="group in project.inputGroups" value="{{group.id}}" ng-bind="group.name"></option>
+							</optgroup>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-sm-4">
 			<div class="form-group">
 				<label for="display-input" class="col-sm-2 control-label" translate="shared.display"></label>
 				<div class="col-sm-10">
@@ -91,7 +102,22 @@
 					</div>
 				</div>
 			</div>
-			
+		</div>
+	</div>
+
+<form class="form-horizontal noprint" novalidate>
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="form-group">
+				<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
+				<div class="col-sm-10">
+					<p class="form-control-static">
+						<input type="checkbox" id="colorize-input" ng-model="presentation.colorize" />
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4">
 			<div class="form-group">
 				<label for="plot-input" class="col-sm-2 control-label" translate="shared.plot"></label>
 				<div class="col-sm-10">
@@ -153,7 +179,7 @@
 	<tbody>
 		<tr>
 			<td ng-show="presentation.plot" class="noprint"></td>
-			<td class="section" colspan="{{cols.length + 1}}">
+			<td class="section" colspan="{{cols.length + 3}}">
 				{{'project.goal_short'|translate}}: {{project.logicalFrame.goal}}
 			</td>
 		</tr>
@@ -173,7 +199,7 @@
 	<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
 		<tr>
 			<td ng-show="presentation.plot" class="noprint"></td>
-			<td class="section indent1" colspan="{{cols.length + 1}}">
+			<td class="section indent1" colspan="{{cols.length + 3}}">
 				<a ng-click="purposeOpen=!purposeOpen">
 					<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
 					{{'project.purpose_short'|translate}}.{{purposeId+1}}: {{purpose.description}}
@@ -205,7 +231,7 @@
 	<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
 		<tr>
 			<td ng-show="presentation.plot" class="noprint"></td>
-			<td class="section indent2" colspan="{{cols.length + 1}}">
+			<td class="section indent2" colspan="{{cols.length + 3}}">
 				<a ng-click="outputOpen=!outputOpen">
 					<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
 					{{'project.output_short'|translate}}.{{purposeId+1}}.{{$index+1}}: {{output.description}}

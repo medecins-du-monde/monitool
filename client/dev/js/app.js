@@ -11,7 +11,7 @@ var getPeriods = function(form, project) {
 		var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
 
 		var current = moment(form.useProjectStart ? project.begin : form.begin).startOf(period),
-			end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
+		end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
 
 		if (end.isAfter()) // do not allow to go in the future
 			end = moment();
@@ -53,11 +53,12 @@ var app = angular.module('monitool.app', [
 	'ngCookies',
 	'ngResource',
 	'pascalprecht.translate',
+	'textAngular',
 	'ui.bootstrap',
 	'ui.bootstrap.showErrors',
 	'ui.router',
 	'ui.select',
-]);
+	]);
 
 app.config(function($translateProvider) {
 	$translateProvider.translations('fr', FRENCH_TRANSLATION);
@@ -67,6 +68,43 @@ app.config(function($translateProvider) {
 	$translateProvider.useLocalStorage();
 	$translateProvider.preferredLanguage('fr');
 });
+
+app.run(function(taRegisterTool) {
+
+	taRegisterTool('insertReportGrid', {
+		iconclass: "fa fa-table",
+		action: function(promise) {
+			var html = "<table class=\"report-grid table table-bordered\"><tr><td>coucou</td><td>coucou</td><td>coucou</td><td>coucou</td></tr></table>";
+
+			// FIXME, wtf is the 3rd parameter?
+			// Did textangular invert the last 2 parameters for execCommand?
+			// execCommand(aCommandName, aShowDefaultUI, aValueArgument)
+			this.$editor().wrapSelection('insertHTML', html, true);
+
+			promise.resolve();
+			return false;
+		},
+		onElementSelect: {
+			element: 'table',
+			// onlyWithAttrs: ['report-grid'], // is this supposed to look for class?
+			action: function(event, $element, editorScope) {
+				event.preventDefault();
+
+				console.log('selected')
+			}
+		}
+	});
+
+	taRegisterTool('insertReportChart', {
+		iconclass: "fa fa-line-chart",
+		action: function() {
+		}
+	});
+
+
+});
+
+
 
 app.run(function($translate, $locale) {
 	var langKey = $translate.use();
@@ -109,7 +147,7 @@ app.config(function(datepickerConfig, datepickerPopupConfig) {
  * Remove all properties prefixed by "__" when submitting to server
  * (which allow us to add helper properties on objects, and not submit them).
  */
-app.config(function($httpProvider) {
+ app.config(function($httpProvider) {
 	// $httpProvider.defaults.headers.common['X-NoBasicAuth'] = '1';
 	// if (sessionStorage.Authorization)
 	// 	$httpProvider.defaults.headers.common.Authorization = sessionStorage.Authorization;
@@ -133,10 +171,10 @@ app.config(function($httpProvider) {
 			else if (typeof model === 'object' && model !== null) {
 				for (var key in model)
 					// remove virtual properties
-					if (key.substring(0, 2) === '__')
-						delete model[key];
-					else
-						model[key] = stringifyDates(model[key]);
+				if (key.substring(0, 2) === '__')
+					delete model[key];
+				else
+					model[key] = stringifyDates(model[key]);
 			}
 
 			return model;
@@ -349,21 +387,21 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					for (var formulaId in indicatorsById[indicatorId].formulas)
 						formulasById[formulaId] = indicatorsById[indicatorId].formulas[formulaId];
 
-				return formulasById;
-			},
-			form: function($stateParams, project) {
-				if ($stateParams.formId === 'new')
-					return {
-						id: PouchDB.utils.uuid().toLowerCase(), name: "",
-						periodicity: "month", 
-						useProjectStart: true, useProjectEnd: true, start: project.begin, end: project.end, intermediaryDates: [], active: true,
-						fields: []
-					};
-				else
-					return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
-			}
-		}
-	});
+					return formulasById;
+				},
+				form: function($stateParams, project) {
+					if ($stateParams.formId === 'new')
+						return {
+							id: PouchDB.utils.uuid().toLowerCase(), name: "",
+							periodicity: "month", 
+							useProjectStart: true, useProjectEnd: true, start: project.begin, end: project.end, intermediaryDates: [], active: true,
+							fields: []
+						};
+						else
+							return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
+					}
+				}
+			});
 
 	$stateProvider.state('main.project.input_list', {
 		url: '/inputs',
@@ -416,24 +454,24 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 					return inputs;
 				});
-			}
-		}
-	});
+}
+}
+});
 
-	$stateProvider.state('main.project.input', {
-		url: '/input/:period/:formId/:entityId',
-		templateUrl: 'partials/projects/input.html',
-		controller: 'ProjectInputController',
-		resolve: {
-			inputs: function(mtFetch, $stateParams) {
-				return mtFetch.inputs({
-					mode: "current+last",
-					projectId: $stateParams.projectId,
-					entityId: $stateParams.entityId,
-					formId: $stateParams.formId,
-					period: $stateParams.period
-				}).then(function(result) {
-					var currentInputId = [$stateParams.projectId, $stateParams.entityId, $stateParams.formId, $stateParams.period].join(':');
+$stateProvider.state('main.project.input', {
+	url: '/input/:period/:formId/:entityId',
+	templateUrl: 'partials/projects/input.html',
+	controller: 'ProjectInputController',
+	resolve: {
+		inputs: function(mtFetch, $stateParams) {
+			return mtFetch.inputs({
+				mode: "current+last",
+				projectId: $stateParams.projectId,
+				entityId: $stateParams.entityId,
+				formId: $stateParams.formId,
+				period: $stateParams.period
+			}).then(function(result) {
+				var currentInputId = [$stateParams.projectId, $stateParams.entityId, $stateParams.formId, $stateParams.period].join(':');
 					// both where found
 					if (result.length === 2) 
 						return { current: result[0], previous: result[1], isNew: false };
@@ -444,7 +482,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					
 					// the current one was not found (and we may or not have found the previous one).
 					var previousInput = result.length ? result[0] : null,
-						newInput      = mtFetch.input();
+					newInput      = mtFetch.input();
 
 					newInput._id     = currentInputId;
 					newInput.project = $stateParams.projectId;
@@ -453,32 +491,51 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					newInput.period  = new Date($stateParams.period);
 					return { current: newInput, previous: previousInput, isNew: true };
 				});
-			},
-			form: function($stateParams, project) {
-				return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
-			}
+		},
+		form: function($stateParams, project) {
+			return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
 		}
-	});
+	}
+});
 
-	$stateProvider.state('main.project.reporting', {
-		url: '/reporting',
-		templateUrl: 'partials/projects/reporting.html',
-		controller: 'ProjectReportingController',
-		data: {
-			type: 'project',
-		}
-	});
+$stateProvider.state('main.project.reporting', {
+	url: '/reporting',
+	templateUrl: 'partials/projects/reporting.html',
+	controller: 'ProjectReportingController'
+});
 
-	$stateProvider.state('main.project.user_list', {
-		url: '/users',
-		templateUrl: 'partials/projects/user-list.html',
-		controller: 'ProjectUserListController',
-		resolve: {
-			users: function(mtFetch) {
-				return mtFetch.users();
-			}
+$stateProvider.state('main.project.reporting_analysis_list', {
+	url: '/reporting-analysis-list',
+	templateUrl: 'partials/projects/reporting-analysis-list.html',
+	controller: 'ProjectReportingAnalysisListController',
+	resolve: {
+		reports: function(mtFetch, $stateParams) {
+			return mtFetch.reports({mode: "dates_only", projectId: $stateParams.projectId});
 		}
-	});
+	}
+});
+
+$stateProvider.state('main.project.reporting_analysis', {
+	url: '/reporting-analysis/:reportingId',
+	templateUrl: 'partials/projects/reporting-analysis.html',
+	controller: 'ProjectReportingAnalysisController',
+	resolve: {
+		report: function(mtFetch, $stateParams) {
+			return mtFetch.report($stateParams.reportingId);
+		}
+	}
+});
+
+$stateProvider.state('main.project.user_list', {
+	url: '/users',
+	templateUrl: 'partials/projects/user-list.html',
+	controller: 'ProjectUserListController',
+	resolve: {
+		users: function(mtFetch) {
+			return mtFetch.users();
+		}
+	}
+});
 
 	///////////////////////////
 	// Indicators

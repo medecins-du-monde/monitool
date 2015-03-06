@@ -36,6 +36,7 @@
     "pouchdb-authentication": "~0.3.6",
     "saveSvgAsPng": "https://github.com/exupero/saveSvgAsPng.git#gh-pages",
     "angular-resource": "1.2.25",
-    "PACE": "https://github.com/HubSpot/pace.git#master"
+    "PACE": "https://github.com/HubSpot/pace.git#master",
+    "textAngular": "~1.3.7"
   }
 }

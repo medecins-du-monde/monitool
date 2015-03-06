@@ -9,12 +9,12 @@
 		<thead>
 			<tr>
 				<th translate="project.entity_name"></th>
-				<th style="width: 255px;"></th>
+				<th style="width: 100px;"></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-if="!project.inputEntities.length">
-				<td colspan="2" style="text-align: center" translate>project.no_input_entities</td>
+				<td colspan="2" style="text-align: center" translate="project.no_input_entities"></td>
 			</tr>
 			<tr ng-repeat="inputEntity in project.inputEntities track by inputEntity.id">
 				<td acl-has-project-role="owner" acl-fallback="inputEntity.name">
@@ -29,11 +29,7 @@
 						</div>
 					</ng-form>
 				</td>
-				<td>
-					<a class="btn btn-default btn-sm" ui-sref="main.project.input_entities_reporting({id: inputEntity.id})">
-						<i class="fa fa-line-chart"></i>
-						<span translate="shared.view_stats"></span>
-					</a>
+				<td style="text-align: center">
 					<button class="btn btn-danger btn-sm" ng-click="delete(inputEntity.id)" acl-has-project-role="owner">
 						<i class="fa fa-remove"></i>
 						<span translate>shared.delete</span>

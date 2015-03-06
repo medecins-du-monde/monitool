@@ -101,6 +101,7 @@ var FRENCH_TRANSLATION = {
 		logical_frame: 'Cadre logique',
 		description: 'Description',
 		reporting: 'Statistiques',
+		reporting_analysis: "Analyse descriptive",
 		columns: "Colonnes",
 		colorize: 'Colorer',
 		display: 'Afficher',
@@ -119,6 +120,7 @@ var FRENCH_TRANSLATION = {
 		detach: "Déplacer vers supplémentaires",
 
 		stay_here_check: 'Vous avez realisé des changements. OK pour rester sur cette page, Annuler pour perdre les modifications.',
+		filter: "Filtre"
 	},
 	menu: {
 		toggle_nav: "Voir le menu",

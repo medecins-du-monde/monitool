@@ -42,6 +42,12 @@ module.exports = {
 			}.toString()
 		},
 
+		report_by_project: {
+			map: function(doc) {
+				if (doc.type === 'report')
+					emit([doc.project, doc.date], doc.name);
+			}.toString()
+		},
 
 		// // For project by X stats and inputGroup by X stats
 		// inputs_by_project_year_month_entity: {

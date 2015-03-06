@@ -1,0 +1,39 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li class="active" translate="shared.reporting_analysis"></li>
+</ol>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th translate="shared.date"></th>
+			<th translate="shared.name"></th>
+			<th style="width: 100px;"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-if="!reports.length">
+			<td colspan="2" style="text-align: center" translate="project.no_reports"></td>
+		</tr>
+		<tr ng-repeat="report in reports track by report.id">
+			<td ng-bind="report.date|amDateFormat:'YYYY-MM-DD'"></td>
+			<td>
+				<a ui-sref="main.project.reporting_analysis({reportingId:report._id})" ng-bind="report.name"></a>
+			</td>
+			<td style="text-align: center">
+				<button class="btn btn-danger btn-sm" ng-click="delete(report.id)" acl-has-project-role="owner">
+					<i class="fa fa-remove"></i>
+					<span translate>shared.delete</span>
+				</button>
+			</td>
+		</tr>
+	</tbody>
+	<tfoot acl-has-project-role="owner">
+		<tr>
+			<td colspan="3">
+				<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
+			</td>
+		</tr>
+	</tfoot>
+</table>

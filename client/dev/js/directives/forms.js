@@ -71,4 +71,17 @@ angular.module('monitool.directives.form', [])
 				}
 			});
 		};
+	})
+
+
+	.directive('reportingQuery', function() {
+		return {
+			restrict: 'AE',
+			templateUrl: 'partials/directives/reporting-query.html'
+			link: function(scope, element, attributes, controller) {
+				
+			}
+		}
+
+
 	});

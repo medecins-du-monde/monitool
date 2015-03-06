@@ -1,66 +1,145 @@
 <div class="row">
 	<div class="col-md-2 noprint">
-		<ul class="nav nav-pills nav-stacked" ng-if="project._id">
+
+		<div class="panel-group">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Spécifications</h4>
+				</div>
+
+				<div class="panel-collapse">
+					<div class="list-group">
+						<a ui-sref="main.project.logical_frame({projectId: project._id})" ui-sref-active="active" tooltip="{{'project.logical_frame_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-building-o fa-fw"></i>
+							<span translate="shared.logical_frame"></span>
+						</a>
+
+						<a ui-sref="main.project.input_entities({projectId: project._id})" ui-sref-active="active" tooltip="{{'project.input_entities_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-map-marker fa-fw"></i>
+							<span translate="shared.input_entities"></span>
+						</a>
+
+						<a ui-sref="main.project.input_groups({projectId: project._id})" ui-sref-active="active" tooltip="{{'project.input_groups_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-map-marker fa-fw"></i>
+							<span translate="shared.input_groups"></span>
+						</a>
+
+						<a ui-sref="main.project.user_list" ui-sref-active="active" tooltip="{{'project.user_list_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-users fa-fw"></i>
+							<span translate="project.users"></span>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Suivi des indicateurs</h4>
+				</div>
+
+				<div class="panel-collapse">
+					<div class="list-group">
+						<a ui-sref="main.project.forms({projectId: project._id})" ng-class="{active: $state.is('main.project.forms') || $state.is('main.project.form')}" tooltip="{{'project.input_forms_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-file-text-o fa-fw"></i>
+							<span translate="project.input_forms"></span>
+						</a>
+
+						<a ui-sref="main.project.input_list({projectId: project._id})" ui-sref-active="active" tooltip="{{'project.waiting_inputs_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-clock-o fa-fw"></i>
+							<span translate="project.waiting_inputs"></span>
+						</a>
+
+						<a ui-sref="main.project.reporting({projectId: project._id})" ui-sref-active="active" tooltip="{{'project.reporting_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-line-chart fa-fw"></i>
+							<span translate="shared.reporting"></span>
+						</a>
+
+						<a ui-sref="main.project.reporting_analysis_list({projectId: project._id})" ui-sref-active="active" tooltip="{{'project.reporting_analysis_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-lightbulb-o fa-fw"></i>
+							<span translate="shared.reporting_analysis"></span>
+						</a>
+					</div>
+				</div>
+			</div>
+<!-- 
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Suivi des indicateurs</h4>
+				</div>
+
+				<div class="panel-collapse">
+					<div class="list-group">
+						<a ui-sref="main.project.forms({projectId: project._id})" tooltip="{{'project.input_forms_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-file-text-o fa-fw"></i>
+							<span translate="project.input_forms"></span>
+						</a>
+
+						<a ui-sref="main.project.input_list({projectId: project._id})" tooltip="{{'project.waiting_inputs_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-clock-o fa-fw"></i>
+							<span translate="project.waiting_inputs"></span>
+						</a>
+
+						<a ui-sref="main.project.reporting({projectId: project._id})" tooltip="{{'project.reporting_tooltip'|translate}}" class="list-group-item">
+							<i class="fa fa-line-chart fa-fw"></i>
+							<span translate="shared.reporting"></span>
+						</a>
+					</div>
+				</div>
+			</div> -->
+
+		</div>
+
+
+
+
+
+
+<!--
+ 		<ul class="nav nav-pills nav-stacked" ng-if="project._id">
 			<li ui-sref-active="active">
-				<a ui-sref="main.project.logical_frame({projectId: project._id})"
-				   tooltip="{{'project.logical_frame_tooltip'|translate}}"
-				   tooltip-popup-delay="1000">
+				<a ui-sref="main.project.logical_frame({projectId: project._id})" tooltip="{{'project.logical_frame_tooltip'|translate}}" tooltip-popup-delay="1000">
 				   <i class="fa fa-building-o fa-fw"></i>
 				   <span translate="shared.logical_frame"></span>
 				</a>
 			</li>
 
-			<li ng-class="{disabled: !project._id, active: $state.is('main.project.input_entities') || $state.is('main.project.input_entities_reporting')}">
-				<a ui-sref="main.project.input_entities({projectId: project._id})"
-				   tooltip="{{'project.input_entities_tooltip'|translate}}"
-				   tooltip-popup-delay="1000">
+			<li ng-class="{active: $state.is('main.project.input_entities') || $state.is('main.project.input_entities_reporting')}">
+				<a ui-sref="main.project.input_entities({projectId: project._id})" tooltip="{{'project.input_entities_tooltip'|translate}}" tooltip-popup-delay="1000">
 					<i class="fa fa-map-marker fa-fw"></i>
 					<span translate="shared.input_entities"></span>
 				</a>
 			</li>
 
-			<li ng-class="{disabled: !project._id, active: $state.is('main.project.input_groups') || $state.is('main.project.input_groups_reporting')}">
-				<a ui-sref="main.project.input_groups({projectId: project._id})"
-				   tooltip="{{'project.input_groups_tooltip'|translate}}"
-				   tooltip-popup-delay="1000">
-					
+			<li ng-class="{active: $state.is('main.project.input_groups') || $state.is('main.project.input_groups_reporting')}">
+				<a ui-sref="main.project.input_groups({projectId: project._id})" tooltip="{{'project.input_groups_tooltip'|translate}}" tooltip-popup-delay="1000">
 					<i class="fa fa-map-marker fa-fw"></i>
 					<span translate="shared.input_groups"></span>
 				</a>
 			</li>
 
-			<li ng-class="{disabled: !project._id, active: $state.is('main.project.forms') || $state.is('main.project.form')}">
-				<a ui-sref="main.project.forms({projectId: project._id})"
-				   tooltip="{{'project.input_forms_tooltip'|translate}}"
-				   tooltip-popup-delay="1000">
-
+			<li ng-class="{active: $state.is('main.project.forms') || $state.is('main.project.form')}">
+				<a ui-sref="main.project.forms({projectId: project._id})" tooltip="{{'project.input_forms_tooltip'|translate}}" tooltip-popup-delay="1000">
 					<i class="fa fa-file-text-o fa-fw"></i>
 					<span translate="project.input_forms"></span>
 				</a>
 			</li>
 			
-			<li ui-sref-active="active" ng-class="{disabled: !project._id}">
-				<a ui-sref="main.project.input_list({projectId: project._id})"
-				   tooltip="{{'project.waiting_inputs_tooltip'|translate}}"
-				   tooltip-popup-delay="1000">
+			<li ui-sref-active="active">
+				<a ui-sref="main.project.input_list({projectId: project._id})" tooltip="{{'project.waiting_inputs_tooltip'|translate}}" tooltip-popup-delay="1000">
 					<i class="fa fa-clock-o fa-fw"></i>
 					<span translate="project.waiting_inputs"></span>
 				</a>
 			</li>
 
-			<li ui-sref-active="active" ng-class="{disabled: !project._id}">
-				<a ui-sref="main.project.reporting({projectId: project._id})"
-				   tooltip="{{'project.reporting_tooltip'|translate}}"
-				   tooltip-popup-delay="1000">
+			<li ui-sref-active="active">
+				<a ui-sref="main.project.reporting({projectId: project._id})" tooltip="{{'project.reporting_tooltip'|translate}}" tooltip-popup-delay="1000">
 				   <i class="fa fa-line-chart fa-fw"></i>
 				   <span translate="shared.reporting"></span>
 				</a>
 			</li>
 
-			<li ui-sref-active="active" ng-class="{disabled: !project._id}">
-				<a ui-sref="main.project.user_list"
-				   tooltip="{{'project.user_list_tooltip'|translate}}"
-				   tooltip-popup-delay="1000">
+			<li ui-sref-active="active">
+				<a ui-sref="main.project.user_list" tooltip="{{'project.user_list_tooltip'|translate}}" tooltip-popup-delay="1000">
 				   <i class="fa fa-users fa-fw"></i>
 				   <span translate="project.users"></span>
 				</a>
@@ -117,7 +196,8 @@
 				</a>
 			</li>
 		</ul>
-	</div>
+	-->
+</div>
 
-	<div class="col-md-10 print-full-width" ui-view></div>
+<div class="col-md-10 print-full-width" ui-view></div>
 </div>

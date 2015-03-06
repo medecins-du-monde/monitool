@@ -96,29 +96,6 @@ module.exports = {
 			reduce: "_count"
 		},
 
-		// indicator_partial_tree: {
-		// 	map: function(doc) {
-		// 		if (doc.type === 'indicator' && doc.standard) {
-		// 			var newDoc = {name: doc.name, standard: doc.standard};
-
-		// 			if (doc.themes.length === 0 && doc.types.length === 0)
-		// 				emit(['', ''], newDoc);
-		// 			else if (doc.themes.length === 0 && doc.types.length !== 0)
-		// 				doc.types.forEach(function(type) { emit(['', type], newDoc); });
-		// 			else if (doc.themes.length !== 0 && doc.types.length === 0)
-		// 				doc.themes.forEach(function(theme) { emit([theme, ''], newDoc); });
-		// 			else
-		// 				doc.themes.forEach(function(theme) {
-		// 					doc.types.forEach(function(type) {
-		// 						emit([theme, type], newDoc);
-		// 					});
-		// 				});
-		// 		}
-		// 	}.toString(),
-
-		// 	reduce: "_count"
-		// },
-
 		indicator_usage: {
 			map: function(doc) {
 				var indicatorId;

@@ -19,7 +19,7 @@ Object.keys(ddocs).forEach(function(ddoc) {
 	var url = urlPrefix + appBucket + '/_design/' + ddoc;
 
 	request({method: 'GET', auth: auth, url: url}, function(error, response, doc) {
-		var newDdoc = ddocs[bucket][ddoc];
+		var newDdoc = ddocs[ddoc];
 		newDdoc._rev = JSON.parse(doc)._rev;
 
 		request({method: 'PUT', auth: auth, url: url, json: newDdoc}, function(error, response, doc) {
