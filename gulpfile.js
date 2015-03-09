@@ -63,7 +63,7 @@ var files = {
 			'client/dev/js/controllers/project.js',
 			'client/dev/js/controllers/indicator.js',
 			'client/dev/js/directives/acls.js',
-			'client/dev/js/directives/file-export.js',
+			'client/dev/js/directives/reporting.js',
 			'client/dev/js/directives/forms.js',
 			'client/dev/js/services/fetch.js',
 			'client/dev/js/services/reporting.js',

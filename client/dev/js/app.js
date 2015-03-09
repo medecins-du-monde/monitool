@@ -1,8 +1,5 @@
 "use strict";
 
-
-
-
 // this has nothing to do on the root scope.
 // => move it to a service and factorize with the similiar function in mtReporting
 var getPeriods = function(form, project) {
@@ -45,7 +42,7 @@ var app = angular.module('monitool.app', [
 	'monitool.controllers.project',
 	'monitool.directives.acl',
 	'monitool.directives.form',
-	'monitool.directives.fileexport',
+	'monitool.directives.reporting',
 	'monitool.filters',
 	'monitool.services.fetch',
 	'monitool.services.reporting',
@@ -68,43 +65,6 @@ app.config(function($translateProvider) {
 	$translateProvider.useLocalStorage();
 	$translateProvider.preferredLanguage('fr');
 });
-
-app.run(function(taRegisterTool) {
-
-	taRegisterTool('insertReportGrid', {
-		iconclass: "fa fa-table",
-		action: function(promise) {
-			var html = "<table class=\"report-grid table table-bordered\"><tr><td>coucou</td><td>coucou</td><td>coucou</td><td>coucou</td></tr></table>";
-
-			// FIXME, wtf is the 3rd parameter?
-			// Did textangular invert the last 2 parameters for execCommand?
-			// execCommand(aCommandName, aShowDefaultUI, aValueArgument)
-			this.$editor().wrapSelection('insertHTML', html, true);
-
-			promise.resolve();
-			return false;
-		},
-		onElementSelect: {
-			element: 'table',
-			// onlyWithAttrs: ['report-grid'], // is this supposed to look for class?
-			action: function(event, $element, editorScope) {
-				event.preventDefault();
-
-				console.log('selected')
-			}
-		}
-	});
-
-	taRegisterTool('insertReportChart', {
-		iconclass: "fa fa-line-chart",
-		action: function() {
-		}
-	});
-
-
-});
-
-
 
 app.run(function($translate, $locale) {
 	var langKey = $translate.use();
@@ -277,26 +237,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	///////////////////////////
-	// Help
-	///////////////////////////
-
-
-	// $stateProvider.state('main.help', {
-	// 	abstract: true,
-	// 	templateUrl: 'partials/help/menu.html'
-	// });
-
-	// $stateProvider.state('main.help.monitoring', {
-	// 	url: '/help/monitoring',
-	// 	templateUrl: 'partials/help/monitoring.html'
-	// });
-
-	// $stateProvider.state('main.help.documentation', {
-	// 	url: '/help/documentation',
-	// 	templateUrl: 'partials/help/documentation.html'
-	// });
-
-	///////////////////////////
 	// Project
 	///////////////////////////
 
@@ -454,88 +394,88 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 					return inputs;
 				});
-}
-}
-});
-
-$stateProvider.state('main.project.input', {
-	url: '/input/:period/:formId/:entityId',
-	templateUrl: 'partials/projects/input.html',
-	controller: 'ProjectInputController',
-	resolve: {
-		inputs: function(mtFetch, $stateParams) {
-			return mtFetch.inputs({
-				mode: "current+last",
-				projectId: $stateParams.projectId,
-				entityId: $stateParams.entityId,
-				formId: $stateParams.formId,
-				period: $stateParams.period
-			}).then(function(result) {
-				var currentInputId = [$stateParams.projectId, $stateParams.entityId, $stateParams.formId, $stateParams.period].join(':');
-					// both where found
-					if (result.length === 2) 
-						return { current: result[0], previous: result[1], isNew: false };
-
-					// only the current one was found
-					else if (result.length === 1 && result[0]._id === currentInputId) 
-						return { current: result[0], previous: null, isNew: false };
-					
-					// the current one was not found (and we may or not have found the previous one).
-					var previousInput = result.length ? result[0] : null,
-					newInput      = mtFetch.input();
-
-					newInput._id     = currentInputId;
-					newInput.project = $stateParams.projectId;
-					newInput.entity  = $stateParams.entityId;
-					newInput.form    = $stateParams.formId;
-					newInput.period  = new Date($stateParams.period);
-					return { current: newInput, previous: previousInput, isNew: true };
-				});
-		},
-		form: function($stateParams, project) {
-			return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
+			}
 		}
-	}
-});
+	});
 
-$stateProvider.state('main.project.reporting', {
-	url: '/reporting',
-	templateUrl: 'partials/projects/reporting.html',
-	controller: 'ProjectReportingController'
-});
+	$stateProvider.state('main.project.input', {
+		url: '/input/:period/:formId/:entityId',
+		templateUrl: 'partials/projects/input.html',
+		controller: 'ProjectInputController',
+		resolve: {
+			inputs: function(mtFetch, $stateParams) {
+				return mtFetch.inputs({
+					mode: "current+last",
+					projectId: $stateParams.projectId,
+					entityId: $stateParams.entityId,
+					formId: $stateParams.formId,
+					period: $stateParams.period
+				}).then(function(result) {
+					var currentInputId = [$stateParams.projectId, $stateParams.entityId, $stateParams.formId, $stateParams.period].join(':');
+						// both where found
+						if (result.length === 2) 
+							return { current: result[0], previous: result[1], isNew: false };
 
-$stateProvider.state('main.project.reporting_analysis_list', {
-	url: '/reporting-analysis-list',
-	templateUrl: 'partials/projects/reporting-analysis-list.html',
-	controller: 'ProjectReportingAnalysisListController',
-	resolve: {
-		reports: function(mtFetch, $stateParams) {
-			return mtFetch.reports({mode: "dates_only", projectId: $stateParams.projectId});
+						// only the current one was found
+						else if (result.length === 1 && result[0]._id === currentInputId) 
+							return { current: result[0], previous: null, isNew: false };
+						
+						// the current one was not found (and we may or not have found the previous one).
+						var previousInput = result.length ? result[0] : null,
+						newInput      = mtFetch.input();
+
+						newInput._id     = currentInputId;
+						newInput.project = $stateParams.projectId;
+						newInput.entity  = $stateParams.entityId;
+						newInput.form    = $stateParams.formId;
+						newInput.period  = new Date($stateParams.period);
+						return { current: newInput, previous: previousInput, isNew: true };
+					});
+			},
+			form: function($stateParams, project) {
+				return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
+			}
 		}
-	}
-});
+	});
 
-$stateProvider.state('main.project.reporting_analysis', {
-	url: '/reporting-analysis/:reportingId',
-	templateUrl: 'partials/projects/reporting-analysis.html',
-	controller: 'ProjectReportingAnalysisController',
-	resolve: {
-		report: function(mtFetch, $stateParams) {
-			return mtFetch.report($stateParams.reportingId);
-		}
-	}
-});
+	$stateProvider.state('main.project.reporting', {
+		url: '/reporting',
+		templateUrl: 'partials/projects/reporting.html',
+		controller: 'ProjectReportingController'
+	});
 
-$stateProvider.state('main.project.user_list', {
-	url: '/users',
-	templateUrl: 'partials/projects/user-list.html',
-	controller: 'ProjectUserListController',
-	resolve: {
-		users: function(mtFetch) {
-			return mtFetch.users();
+	$stateProvider.state('main.project.reporting_analysis_list', {
+		url: '/reporting-analysis-list',
+		templateUrl: 'partials/projects/reporting-analysis-list.html',
+		controller: 'ProjectReportingAnalysisListController',
+		resolve: {
+			reports: function(mtFetch, $stateParams) {
+				return mtFetch.reports({mode: "dates_only", projectId: $stateParams.projectId});
+			}
 		}
-	}
-});
+	});
+
+	$stateProvider.state('main.project.reporting_analysis', {
+		url: '/reporting-analysis/:reportingId',
+		templateUrl: 'partials/projects/reporting-analysis.html',
+		controller: 'ProjectReportingAnalysisController',
+		resolve: {
+			report: function(mtFetch, $stateParams) {
+				return mtFetch.report($stateParams.reportingId);
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.user_list', {
+		url: '/users',
+		templateUrl: 'partials/projects/user-list.html',
+		controller: 'ProjectUserListController',
+		resolve: {
+			users: function(mtFetch) {
+				return mtFetch.users();
+			}
+		}
+	});
 
 	///////////////////////////
 	// Indicators

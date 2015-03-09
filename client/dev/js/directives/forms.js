@@ -59,11 +59,11 @@ angular.module('monitool.directives.form', [])
 		};
 	})
 
-	.directive('ngEnter', function () {
+	.directive('ngEnter', function() {
 		return function (scope, element, attrs) {
 			element.bind("keydown keypress", function (event) {
 				if (event.which === 13) {
-					scope.$apply(function (){
+					scope.$apply(function(){
 						scope.$eval(attrs.ngEnter);
 					});
 
@@ -71,17 +71,5 @@ angular.module('monitool.directives.form', [])
 				}
 			});
 		};
-	})
-
-
-	.directive('reportingQuery', function() {
-		return {
-			restrict: 'AE',
-			templateUrl: 'partials/directives/reporting-query.html'
-			link: function(scope, element, attributes, controller) {
-				
-			}
-		}
-
-
 	});
+

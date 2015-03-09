@@ -1,7 +1,7 @@
 
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
-		<div class="col-sm-4">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label" translate="shared.begin"></label>
 				<div class="col-sm-10">
@@ -20,7 +20,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-sm-4">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
 				<div class="col-sm-10">
@@ -42,7 +42,7 @@
 	</div>
 
 	<div class="row">
-		<div class="col-sm-4">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
 				<div class="col-sm-10">
@@ -60,7 +60,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-sm-4">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="filter-by-input" class="col-sm-2 control-label" translate="shared.filter"></label>
 				<div class="col-sm-10">
@@ -69,10 +69,10 @@
 						<select class="form-control" id="filter-by-input" ng-model="filter">
 							<option value="">Tout le projet</option>
 							<optgroup label="Lieux d'activité">
-								<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}" ng-bind="entity.name"></option>
+								<option ng-repeat="entity in query.project.inputEntities" value="{{entity.id}}" ng-bind="entity.name"></option>
 							</optgroup>
 							<optgroup label="Groupes d'activité">
-								<option ng-repeat="group in project.inputGroups" value="{{group.id}}" ng-bind="group.name"></option>
+								<option ng-repeat="group in query.project.inputGroups" value="{{group.id}}" ng-bind="group.name"></option>
 							</optgroup>
 						</select>
 					</div>
@@ -80,19 +80,6 @@
 			</div>
 		</div>
 
-		<div class="col-sm-4">
-			<div class="form-group">
-				<label for="display-input" class="col-sm-2 control-label" translate="shared.display"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-eye"></i></span>
-						<select class="form-control" id="display-input" ng-model="presentation.display">
-							<option value="value" translate="shared.values"></option>
-							<option value="progress" translate="shared.target_percentage"></option>
-						</select>
-					</div>
-				</div>
-			</div>
-		</div>
+
 	</div>
 </form>

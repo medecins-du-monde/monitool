@@ -367,65 +367,13 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 			throw new Error('Invalid groupBy: ' + query.groupBy)
 	};
 
-	// // @FIXME Should be a dichotomy, and targets should be sorted all the time (before saving).
-	// var getTargetValue = function(period, planning) {
-	// 	var targets = planning.targets, numTargets = targets.length;
-	// 	if (numTargets == 0)
-	// 		return 0;
-		
-	// 	targets.sort(function(a, b) { return a.period > b.period ? 1 : -1 });
-	// 	var index = 0;
-	// 	while (index < numTargets) {
-	// 		if (targets[index].period > period)
-	// 			return targets[index].value;
-	// 		++index;
-	// 	}
 
-	// 	return targets[numTargets - 1].value;
-	// };
-
-	var retrieveMetadata = function(regrouped, project, indicatorsById) {
-		// add metadata
-		var regroupedWithMetadata = {};
-		for (var key in regrouped) {
-			regroupedWithMetadata[key] = {};
-
-			for (var indicatorId in regrouped[key]) {
-				var planning  = project.indicators[indicatorId],
-					indicator = indicatorsById[indicatorId];
-
-				if (!planning || !indicator)
-					continue;
-
-				var value = regrouped[key][indicatorId];
-				var metadata = {
-					value: Math.round(value),
-					target: planning.target,
-					baseline: planning.baseline,
-				};
-
-				if (planning.baseline !== null && planning.target !== null) {
-					if (indicator.target === 'around_is_better')
-						metadata.progress = 1 - Math.abs(value - metadata.target) / (metadata.target - metadata.baseline);
-					else
-						metadata.progress = (value - metadata.baseline) / (metadata.target - metadata.baseline);
-					metadata.progress = Math.round(100 * metadata.progress);
-
-					if (metadata.progress < planning.showRed)
-						metadata.color = '#F88';
-					else if (metadata.progress < planning.showYellow)
-						metadata.color = '#FC6';
-					else
-						metadata.color = '#AFA';
-				}
-
-				regroupedWithMetadata[key][indicatorId] = metadata;
-			}
-		}
-
-		return regroupedWithMetadata;
-	};
-
+	/**
+	 * Retrieve from server all inputs that match (between 2 dates)
+	 * - a given project
+	 * - a given indicator
+	 * - a group or an entity
+	 */
 	var getInputs = function(query) {
 		// Retrieve all relevant inputs.
 		var options;
@@ -487,7 +435,7 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 	 * This function regroup inputs into a usable 2 level hash. ex: {2014-01: {indicatorId: 455}}
 	 * it could be optimized a bit: an extra copy is done at the end, and when we have nested compute: values, the subtree is evaluated as many times.
 	 */
-	var regroup = function(inputs, query, indicatorById) {
+	var regroup = function(inputs, query, indicatorsById) {
 		var aggregationKey  = ['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation',
 			globalRegrouped = {};
 
@@ -557,8 +505,26 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 				}
 			}
 		});
-		
-		return retrieveMetadata(globalRegrouped, query.project, indicatorById);
+
+		var cols = getStatsColumns(query);
+
+		return {
+			cols: cols,
+			rows: Object.keys(query.project.indicators).map(function(indicatorId) {
+				return {
+					id: indicatorId,
+					name: indicatorsById[indicatorId].name,
+					unit: indicatorsById[indicatorId].unit,
+					baseline: query.project.indicators[indicatorId].baseline,
+					target: query.project.indicators[indicatorId].target,
+					showRed: query.project.indicators[indicatorId].showRed,
+					showYellow: query.project.indicators[indicatorId].showYellow,
+					cols: cols.map(function(col) {
+						return globalRegrouped[col.id] && globalRegrouped[col.id][indicatorId] !== undefined ? globalRegrouped[col.id][indicatorId] : null;
+					})
+				};
+			})
+		};
 	};
 
 	var regroupIndicator = function(inputs, query, indicatorById) {

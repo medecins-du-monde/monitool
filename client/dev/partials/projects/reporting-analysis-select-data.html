@@ -1,73 +1,8 @@
 <div class="modal-body">
 
-	<legend>Paramétrage tableau</legend>
+	<legend>Paramétrage</legend>
 
-	<div class="row">
-		<label for="indicator" class="col-sm-1 control-label" translate="shared.begin"></label>
-		<div class="col-sm-5">
-			<div class="input-group">
-				<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-				<input type="text" 
-					   datepicker-popup="longDate"
-					   name="begin"
-					   ng-model="dates.begin"
-					   is-open="beginDateOpen"
-					   ng-click = "beginDateOpen = true"
-					   required
-					   ng-max="dates.end"
-					   class="form-control" />
-			</div>
-		</div>
-
-		<label for="indicator" class="col-sm-1 control-label" translate="shared.end"></label>
-		<div class="col-sm-5">
-			<div class="input-group">
-				<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-				<input type="text" 
-					   datepicker-popup="longDate"
-					   name="end"
-					   ng-model="dates.end"
-					   is-open="endDateOpen"
-					   ng-click = "endDateOpen = true"
-					   ng-min="dates.begin"
-					   class="form-control"
-					   required />
-			</div>
-		</div>
-	</div>
-
-	<div class="row">
-		<label for="group-by-input" class="col-sm-1 control-label" translate="shared.columns"></label>
-		<div class="col-sm-5">
-			<div class="input-group">
-				<span class="input-group-addon"><i class="fa fa-columns"></i></span>
-				<select class="form-control" id="group-by-input" ng-model="query.groupBy">
-					<option value="day" translate="shared.day"></option>
-					<option value="week" translate="shared.week"></option>
-					<option value="month" translate="shared.month"></option>
-					<option value="year" translate="shared.year"></option>
-					<option value="entity" translate="shared.input_entity"></option>
-					<option value="group" translate="shared.input_group"></option>
-				</select>
-			</div>
-		</div>
-
-		<label for="filter-by-input" class="col-sm-1 control-label" translate="shared.filter"></label>
-		<div class="col-sm-5">
-			<div class="input-group">
-				<span class="input-group-addon"><i class="fa fa-filter"></i></span>
-				<select class="form-control" id="filter-by-input" ng-model="filter">
-					<option value="">Tout le projet</option>
-					<optgroup label="Lieux d'activité">
-						<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}" ng-bind="entity.name"></option>
-					</optgroup>
-					<optgroup label="Groupes d'activité">
-						<option ng-repeat="group in project.inputGroups" value="{{group.id}}" ng-bind="group.name"></option>
-					</optgroup>
-				</select>
-			</div>
-		</div>
-	</div>
+	<reporting-query query="query"></reporting-query>
 
 	<div class="row">
 		<label for="indicators-input" class="col-md-1 control-label" translate="shared.indicators"></label>
@@ -79,19 +14,40 @@
 		</div>
 	</div>
 
+	<div class="row">
+		<label for="indicators-input" class="col-md-1 control-label" translate="shared.table_or_graph"></label>
+		<div class="col-sm-11">
+			<select ng-model="display">
+				<option value="table">table</option>
+				<option value="graph">graph</option>
+				<option value="both">both</option>
+			</select>
+		</div>
+	</div>
 
-	<table class="table table-bordered table-stripped table-condensed">
+	<legend>Visualisation</legend>
+	
+	<div ng-if="display == 'graph' || display == 'both'" reporting-graph></div>
+
+	<table class="table table-bordered table-stripped table-condensed project-reporting" ng-if="display == 'table' || display == 'both'">
 		<thead>
 			<tr>
-				<th ng-repeat="head in result[0]" ng-bind="head"></th>
+				<th></th>
+				<th translate="project.baseline"></th>
+				<th translate="project.target"></th>
+				<th ng-repeat="col in stats.cols track by col.id" ng-bind="col.name"></th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="row in result track by $index" ng-if="$index !== 0">
-				<td ng-repeat="field in row track by $index" ng-bind="field"></td>
+			<tr ng-repeat="row in stats.rows track by $index">
+				<td ng-bind="row.name||('shared.unknown_indicator'|translate)"></td>
+				<td ng-bind="row.baseline + row.unit || ''"></td>
+				<td ng-bind="row.target + row.unit || ''"></td>
+				<td ng-repeat="col in row.cols track by $index" ng-bind="col"></td>
 			</tr>
 		</tbody>
 	</table>
+
 </div>
 
 <div class="modal-footer">

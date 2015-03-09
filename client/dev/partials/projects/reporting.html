@@ -8,88 +8,11 @@
 	<li class="active" ng-if="entity" ng-bind="entity.name"></li>
 </ol>
 
+<reporting-query query="query"></reporting-query>
+
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
-		<div class="col-sm-4">
-			<div class="form-group">
-				<label for="indicator" class="col-sm-2 control-label" translate="shared.begin"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-						<input type="text" 
-							   datepicker-popup="longDate"
-							   name="begin"
-							   ng-model="dates.begin"
-							   is-open="beginDateOpen"
-							   ng-click = "beginDateOpen = true"
-							   required
-							   ng-max="dates.end"
-							   class="form-control" />
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-4">
-			<div class="form-group">
-				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-						<input type="text" 
-							   datepicker-popup="longDate"
-							   name="end"
-							   ng-model="dates.end"
-							   is-open="endDateOpen"
-							   ng-click = "endDateOpen = true"
-							   ng-min="dates.begin"
-							   class="form-control"
-							   required />
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-sm-4">
-			<div class="form-group">
-				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
-						<select class="form-control" id="group-by-input" ng-model="query.groupBy">
-							<option value="day" translate="shared.day"></option>
-							<option value="week" translate="shared.week"></option>
-							<option value="month" translate="shared.month"></option>
-							<option value="year" translate="shared.year"></option>
-							<option value="entity" translate="shared.input_entity"></option>
-							<option value="group" translate="shared.input_group"></option>
-						</select>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-4">
-			<div class="form-group">
-				<label for="filter-by-input" class="col-sm-2 control-label" translate="shared.filter"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-filter"></i></span>
-						<select class="form-control" id="filter-by-input" ng-model="filter">
-							<option value="">Tout le projet</option>
-							<optgroup label="Lieux d'activité">
-								<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}" ng-bind="entity.name"></option>
-							</optgroup>
-							<optgroup label="Groupes d'activité">
-								<option ng-repeat="group in project.inputGroups" value="{{group.id}}" ng-bind="group.name"></option>
-							</optgroup>
-						</select>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-sm-4">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="display-input" class="col-sm-2 control-label" translate="shared.display"></label>
 				<div class="col-sm-10">
@@ -103,21 +26,8 @@
 				</div>
 			</div>
 		</div>
-	</div>
 
-<form class="form-horizontal noprint" novalidate>
-	<div class="row">
-		<div class="col-sm-4">
-			<div class="form-group">
-				<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
-				<div class="col-sm-10">
-					<p class="form-control-static">
-						<input type="checkbox" id="colorize-input" ng-model="presentation.colorize" />
-					</p>
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-4">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="plot-input" class="col-sm-2 control-label" translate="shared.plot"></label>
 				<div class="col-sm-10">
@@ -130,133 +40,52 @@
 	</div>
 </form>
 
-<div class="clearfix">
-	<button class="btn btn-primary btn-xs pull-right noprint" ng-show="presentation.plot" svg-save="imageFilename">
-		<i class="fa fa-download"></i>
-		<span translate="shared.download_plot"></span>
-	</button>
-</div>
 
-<div id="chart" ng-show="presentation.plot" style="overflow: hidden;"></div>
+<button class="btn btn-primary btn-xs pull-right noprint" ng-show="presentation.plot" svg-save>
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_plot"></span>
+</button>
 
-<button class="btn btn-primary btn-xs pull-right noprint"
-		style="margin-bottom: 10px;"
-		project-csv-save indicators-by-id="indicatorsById" query="query" data="data" cols="cols">
+<div ng-if="presentation.plot" reporting-graph style="clear: both"></div>
+
+<button class="btn btn-primary btn-xs pull-right noprint" project-csv-save>
 	<i class="fa fa-download"></i>
 	<span translate="shared.download_table"></span>
 </button>
 
-<table class="table table-bordered table-stripped table-condensed project-reporting" ng-init="purposeOpen=true">
+<table class="table table-bordered table-stripped table-condensed project-reporting">
 	<thead>
 		<tr>
 			<th ng-show="presentation.plot" class="noprint"></th>
 			<th></th>
 			<th translate="project.baseline"></th>
 			<th translate="project.target"></th>
-			<th ng-repeat="col in cols">
-				<span ng-switch="query.groupBy">
-					<a ng-switch-when="entity" ui-sref="main.project.input_entities_reporting({id: col.id})" ng-bind="col.name"></a>
-					<a ng-switch-when="group" ui-sref="main.project.input_groups_reporting({id: col.id})" ng-bind="col.name"></a>
-					<span ng-switch-default ng-bind="col.name"></span>
-				</span>
-			</th>
+			<th ng-repeat="col in stats.cols track by col.id" ng-bind="col.name"></th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="indicatorId in unassignedIndicatorsIds">
-			<td ng-show="presentation.plot" class="noprint"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" /></td>
-			<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
-			<td>{{project.indicators[indicatorId].baseline}}{{indicatorsById[indicatorId].unit}}</td>
-			<td>{{project.indicators[indicatorId].target}}{{indicatorsById[indicatorId].unit}}</td>
-			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (presentation.colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
-					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
-					<span ng-switch-when="progress">{{data[col.id][indicatorId].progress}}%</span>
-				</span>
-			</td>
-		</tr>
-	</tbody>
-	<tbody>
-		<tr>
-			<td ng-show="presentation.plot" class="noprint"></td>
-			<td class="section" colspan="{{cols.length + 3}}">
-				{{'project.goal_short'|translate}}: {{project.logicalFrame.goal}}
-			</td>
-		</tr>
-		<tr ng-repeat="indicatorId in project.logicalFrame.indicators">
-			<td ng-show="presentation.plot" class="noprint"><input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" /></td>
-			<td><label for="plot-{{indicatorId}}">{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}</label></td>
-			<td>{{project.indicators[indicatorId].baseline}}{{indicatorsById[indicatorId].unit}}</td>
-			<td>{{project.indicators[indicatorId].target}}{{indicatorsById[indicatorId].unit}}</td>
-			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (presentation.colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
-					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
-					<span ng-switch-when="progress">{{data[col.id][indicatorId].progress}}%</span>
-				</span>
-			</td>
-		</tr>
-	</tbody>
-	<tbody ng-repeat-start="purpose in project.logicalFrame.purposes" ng-init="purposeId=$index;purposeOpen=true;">
-		<tr>
-			<td ng-show="presentation.plot" class="noprint"></td>
-			<td class="section indent1" colspan="{{cols.length + 3}}">
-				<a ng-click="purposeOpen=!purposeOpen">
-					<i class="fa" ng-class="{'fa-minus-circle': purposeOpen, 'fa-plus-circle': !purposeOpen}"></i>
-					{{'project.purpose_short'|translate}}.{{purposeId+1}}: {{purpose.description}}
-				</a>
-			</td>
-		</tr>
-		<tr ng-repeat="indicatorId in purpose.indicators" ng-if="purposeOpen">
+		<tr ng-repeat="row in (stats|logFrameReport:project) track by $index">
 			<td ng-show="presentation.plot" class="noprint">
-				<input id="plot-{{indicatorId}}"
-					   type="checkbox"
-					   ng-model="plots[indicatorId]"
-					   ng-change="updateGraph(indicatorId)" />
+				<input id="plot-{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type=='data'"/>
 			</td>
-			<td class="indent1">
-				<label for="plot-{{indicatorId}}">
-					{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}
-				</label>
+
+			<td class="section" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" colspan="{{stats.cols.length + 3}}" ng-if="row.type=='header'">
+				{{row.text}}
 			</td>
-			<td>{{project.indicators[indicatorId].baseline}}{{indicatorsById[indicatorId].unit}}</td>
-			<td>{{project.indicators[indicatorId].target}}{{indicatorsById[indicatorId].unit}}</td>
-			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (presentation.colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
-					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
-					<span ng-switch-when="progress">{{data[col.id][indicatorId].progress}}%</span>
-				</span>
+
+			<td ng-if="row.type=='data'" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" >
+				<label for="plot-{{row.id}}">{{row.name||('shared.unknown_indicator'|translate)}}</label>
 			</td>
+
+			<td ng-if="row.type=='data'">
+				{{row.baseline}}{{row.unit}}
+			</td>
+
+			<td ng-if="row.type=='data'">
+				{{row.target}}{{row.unit}}
+			</td>
+			<td ng-if="row.type=='data'" ng-repeat="col in row.cols track by $index" reporting-field ></td>
 		</tr>
 	</tbody>
-	<tbody ng-repeat="output in purpose.outputs" ng-init="outputOpen=true" ng-if="purposeOpen">
-		<tr>
-			<td ng-show="presentation.plot" class="noprint"></td>
-			<td class="section indent2" colspan="{{cols.length + 3}}">
-				<a ng-click="outputOpen=!outputOpen">
-					<i class="fa" ng-class="{'fa-minus-circle': outputOpen, 'fa-plus-circle': !outputOpen}"></i>
-					{{'project.output_short'|translate}}.{{purposeId+1}}.{{$index+1}}: {{output.description}}
-				</a>
-			</td>
-		</tr>
-		<tr ng-repeat="indicatorId in output.indicators" ng-if="outputOpen">
-			<td ng-show="presentation.plot" class="noprint">
-				<input id="plot-{{indicatorId}}" type="checkbox" ng-model="plots[indicatorId]" ng-change="updateGraph(indicatorId)" />
-			</td>
-			<td class="indent2">
-				<label for="plot-{{indicatorId}}">
-					{{(indicatorsById[indicatorId].name || 'shared.unknown_indicator')|translate}}
-				</label>
-			</td>
-			<td>{{project.indicators[indicatorId].baseline}}{{indicatorsById[indicatorId].unit}}</td>
-			<td>{{project.indicators[indicatorId].target}}{{indicatorsById[indicatorId].unit}}</td>
-			<td ng-repeat="col in cols" ng-style="{'background-color': data[col.id][indicatorId] ? (presentation.colorize ? data[col.id][indicatorId].color : 'white') : '#eeeeee'}">
-				<span ng-switch="presentation.display" ng-if="data[col.id][indicatorId]">
-					<span ng-switch-when="value">{{data[col.id][indicatorId].value}}{{indicatorsById[indicatorId].unit}}</span>
-					<span ng-switch-when="progress">{{data[col.id][indicatorId].progress}}%</span>
-				</span>
-			</td>
-		</tr>
-	</tbody>
-	<tbody ng-repeat-end><!-- This may look a bit hackish... but is always better than nesting tables --></tbody>
 </table>
 
