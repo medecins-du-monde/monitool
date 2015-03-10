@@ -1,57 +1,39 @@
 <div class="modal-body">
 
-	<legend>Paramétrage</legend>
-
 	<reporting-query query="query"></reporting-query>
 
-	<div class="row">
-		<label for="indicators-input" class="col-md-1 control-label" translate="shared.indicators"></label>
-		<div class="col-sm-11">
-			<ui-select multiple ng-model="container.chosenIndicatorIds" theme="bootstrap">
-				<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
-				<ui-select-choices repeat="indicator._id as indicator in availableIndicators">{{indicator.name}}</ui-select-choices>
-			</ui-select>
+	<form class="form-horizontal noprint" novalidate>
+
+		<div class="form-group">
+			<label for="indicators-input" class="col-md-1 control-label" translate="shared.indicators"></label>
+			<div class="col-sm-11">
+				<ui-select multiple ng-model="container.chosenIndicatorIds" theme="bootstrap" class="input-sm">
+					<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
+					<ui-select-choices repeat="indicator._id as indicator in availableIndicators">{{indicator.name}}</ui-select-choices>
+				</ui-select>
+			</div>
 		</div>
-	</div>
 
-	<div class="row">
-		<label for="indicators-input" class="col-md-1 control-label" translate="shared.table_or_graph"></label>
-		<div class="col-sm-11">
-			<select ng-model="display">
-				<option value="table">table</option>
-				<option value="graph">graph</option>
-				<option value="both">both</option>
-			</select>
+		<div class="form-group">
+			<label for="indicators-input" class="col-md-1 control-label" translate="project.analysis_data"></label>
+			<div class="col-sm-11">
+				<select ng-model="result.display" class="form-control input-sm">
+					<option value="table" translate="project.analysis_table"></option>
+					<option value="graph" translate="project.analysis_graph"></option>
+					<option value="both" translate="project.analysis_both"></option>
+				</select>
+			</div>
 		</div>
+	</form>
+
+	<hr/>
+	<div style="overflow: scroll; max-height: 300px">
+		<report-preview data="result"></report-preview>
 	</div>
-
-	<legend>Visualisation</legend>
-	
-	<div ng-if="display == 'graph' || display == 'both'" reporting-graph></div>
-
-	<table class="table table-bordered table-stripped table-condensed project-reporting" ng-if="display == 'table' || display == 'both'">
-		<thead>
-			<tr>
-				<th></th>
-				<th translate="project.baseline"></th>
-				<th translate="project.target"></th>
-				<th ng-repeat="col in stats.cols track by col.id" ng-bind="col.name"></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat="row in stats.rows track by $index">
-				<td ng-bind="row.name||('shared.unknown_indicator'|translate)"></td>
-				<td ng-bind="row.baseline + row.unit || ''"></td>
-				<td ng-bind="row.target + row.unit || ''"></td>
-				<td ng-repeat="col in row.cols track by $index" ng-bind="col"></td>
-			</tr>
-		</tbody>
-	</table>
-
 </div>
 
 <div class="modal-footer">
-	<button ng-click="save()" class="btn btn-primary">
+	<button ng-click="choose()" class="btn btn-primary">
 		<i class="fa fa-floppy-o"></i>
 		<span translate="shared.edit"></span>
 	</button>

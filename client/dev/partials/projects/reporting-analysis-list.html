@@ -9,30 +9,23 @@
 		<tr>
 			<th translate="shared.date"></th>
 			<th translate="shared.name"></th>
-			<th style="width: 100px;"></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-if="!reports.length">
 			<td colspan="2" style="text-align: center" translate="project.no_reports"></td>
 		</tr>
-		<tr ng-repeat="report in reports track by report.id">
+		<tr ng-repeat="report in reports track by $index">
 			<td ng-bind="report.date|amDateFormat:'YYYY-MM-DD'"></td>
 			<td>
-				<a ui-sref="main.project.reporting_analysis({reportingId:report._id})" ng-bind="report.name"></a>
-			</td>
-			<td style="text-align: center">
-				<button class="btn btn-danger btn-sm" ng-click="delete(report.id)" acl-has-project-role="owner">
-					<i class="fa fa-remove"></i>
-					<span translate>shared.delete</span>
-				</button>
+				<a ui-sref="main.project.reporting_analysis({reportId:report._id})" ng-bind="report.name"></a>
 			</td>
 		</tr>
 	</tbody>
 	<tfoot acl-has-project-role="owner">
 		<tr>
 			<td colspan="3">
-				<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
+				<a class="btn btn-default btn-xs" style="width: 100%" translate="shared.add" ui-sref="main.project.reporting_analysis({reportId:'new'})" ></a>
 			</td>
 		</tr>
 	</tfoot>

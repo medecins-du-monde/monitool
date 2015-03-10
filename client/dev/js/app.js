@@ -456,12 +456,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	$stateProvider.state('main.project.reporting_analysis', {
-		url: '/reporting-analysis/:reportingId',
+		url: '/reporting-analysis/:reportId',
 		templateUrl: 'partials/projects/reporting-analysis.html',
 		controller: 'ProjectReportingAnalysisController',
 		resolve: {
 			report: function(mtFetch, $stateParams) {
-				return mtFetch.report($stateParams.reportingId);
+				var report = mtFetch.report($stateParams.reportId);
+				if ($stateParams.reportId === 'new')
+					report.project = $stateParams.projectId;
+				return report;
 			}
 		}
 	});

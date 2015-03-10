@@ -112,47 +112,21 @@ angular.module('monitool.directives.reporting', [])
 	})
 
 	.directive('indicatorCsvSave', function() {
-		var exportIndicatorStats = function(cols, projects, indicator, data) {
-			var csvDump = 'type;nom';
-
-			// header
-			cols.forEach(function(col) { csvDump += ';' + col.name; })
-			csvDump += "\n";
-
-			projects.forEach(function(project) {
-				csvDump += 'project;' + project.name;
-				cols.forEach(function(col) {
-					csvDump += ';';
-					try { csvDump += data[project._id][col.id][indicator._id].value }
-					catch (e) {}
-				});
-				csvDump += "\n";
-
-				project.inputEntities.forEach(function(entity) {
-					csvDump += 'entity;' + entity.name;
-					cols.forEach(function(col) {
-						csvDump += ';';
-						try { csvDump += data[entity.id][col.id][indicator._id].value; }
-						catch (e) {}
-					});
-					csvDump += "\n";
-				});
-			});
-
-			return csvDump;
-		};
+		var esc = function(string) { return '"' + string.replace(/"/g, '\\"') + '"'; };
 
 		return {
 			restrict: "A",
-			scope: {
-				cols: '=cols',
-				query: '=query',
-				data: '=data'
-			},
 			link: function(scope, element, attributes) {
 				element.bind('click', function() {
-					var csvDump = exportIndicatorStats(scope.cols, scope.query.projects, scope.query.indicator, scope.data),
-						blob    = new Blob([csvDump], {type: "text/csv;charset=utf-8"}),
+					var csv = 'type,name,baseline,target,' + scope.stats.cols.map(function(c) { return c.name; }).join(',') + "\n";
+
+					scope.stats.rows.forEach(function(row) {
+						var indent = row.type === 'entity' ? '____' : '';
+						csv += [row.type, esc(indent + row.name), row.baseline, row.target].join(',') + ',' + row.cols.join(',');
+						csv += "\n";
+					});
+
+					var blob    = new Blob([csv], {type: "text/csv;charset=utf-8"}),
 						name    = [scope.query.indicator.name, scope.query.begin, scope.query.end].join('_') + '.csv';
 
 					saveAs(blob, name);
@@ -224,7 +198,7 @@ angular.module('monitool.directives.reporting', [])
 
 						// display data in field
 						if (display === 'value')
-							element.html($scope.col + $scope.row.unit);
+							element.html(Math.round($scope.col) + $scope.row.unit);
 						else if (progress !== null)
 							element.html(Math.round(100 * progress) + '%');
 						else
@@ -237,83 +211,109 @@ angular.module('monitool.directives.reporting', [])
 		}
 	})
 
-	// .directive('reportingGraphScope', function() {
-	// 	return {
-	// 		restrict: 'AE',
-	// 		scope: {
-	// 			"stats": "=",
-	// 			"plot": "=",
-	// 			"display": "="
-	// 		},
-	// 		link: function($scope, element, attributes, controller) {
-
-	// 			$scope.$watch('[plots, stats, presentation.display]', function(newValue, oldValue) {
-
-
-	// 			});
-	// 		}
-	// 	};
-	// })
-
-	.directive('reportingGraph', function() {
+	.directive('reportingGraphAdapter', function() {
 		return {
 			restrict: 'AE',
-			template: '<div id="chart" style="overflow: hidden;"></div>',
+			scope: {
+				'originalData': '=data',
+				'plots': '=',
+				'display': '=',
+				'type': '='
+			},
+			template: '<reporting-graph type="type" data="data"></reporting-graph>',
 			link: function($scope, element, attributes, controller) {
+				// there is no need to subscribe to $destroy
+				// $scope will be destroyed with the directive.
 
-				// This helper function allow us to get the data without totals.
-				var getStatsWithoutTotal = function(stats) {
-					var totalIndex = stats.cols.findIndex(function(e) { return e.id === 'total' });
+				$scope.$watch('[plots, originalData, display]', function() {
+					if ($scope.originalData) {
+						$scope.data = angular.copy($scope.originalData);
 
-					if (totalIndex !== -1) {
-						var newStats = angular.copy(stats);
-						newStats.rows.forEach(function(row) { row.cols.splice(totalIndex, 1); });
-						newStats.cols.splice(totalIndex, 1);
-					}
-
-					return newStats || stats;
-				};
-
-
-				// Generate chart one time, when element is created.
-				var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
-
-				// Watch all scope parameters that could make the graph to change
-				var unwatch = $scope.$watch('[plots, stats, presentation.display]', function(newValue, oldValue) {
-					// leave if we are loading and stats is not defined yet.
-					if (!$scope.stats)
-						return;
-
-					// Retrieve stats + list rows that we want, and those that exit the current graph
-					var stats = getStatsWithoutTotal($scope.stats),
-						shownRows = stats.rows.filter(function(row) { return newValue[0][row.id]; }),
-						exitingRows = stats.rows.filter(function(row) { return !newValue[0][row.id] && oldValue[0][row.id]; }),
-						exitingRowNames = exitingRows.map(function(row) { return row.name; });
-
-					// We display bar graph for everything but time series.
-					var graphType = ['year', 'month', 'week', 'day'].indexOf($scope.query.groupBy) !== -1 ? 'line' : 'bar';
-
-					// Create Y series
-					var xSerie = ['x'].concat(stats.cols.map(function(e) { return e.name; }));
-					var ySeries = shownRows.map(function(row) {
-						// if the user want to see progress instead of value, we need to compute it.
-						var data = row.cols.map(function(col) {
-							if ($scope.presentation.display === 'value')
-								return col || 0;
-							else if (row.baseline !== null && row.target !== null) {
-								if (row.target === 'around_is_better')
-									return 100 * (1 - Math.abs(col - row.target) / (row.target - row.baseline));
-								else
-									return 100 * (col - row.baseline) / (row.target - row.baseline);							
-							}
-							else
-								return 0;
+						// remove rows that are not selected.
+						$scope.data.rows = $scope.data.rows.filter(function(row) {
+							return $scope.plots[row.id];
 						});
 
-						return [row.name].concat(data);
-					});
+						// replace value by target if required.
+						if ($scope.display !== 'value')
+							$scope.data.rows.forEach(function(row) {
+								row.cols = row.cols.map(function(col) {
+									if ($scope.display === 'value')
+										return col;
+									else if (row.baseline !== null && row.target !== null && col !== null) {
+										if (row.target === 'around_is_better')
+											return 100 * (1 - Math.abs(col - row.target) / (row.target - row.baseline));
+										else
+											return 100 * (col - row.baseline) / (row.target - row.baseline);							
+									}
+									else
+										return null;
+								});
+							});
+					}
+				}, true);
+			}
+		};
+	})
 
-					chart.load({ type: graphType, unload: exitingRowNames, columns: [xSerie].concat(ySeries) });
+	.directive('reportingGraph', function() {
+		// This helper function allow us to get the data without totals.
+		var getStatsWithoutTotal = function(stats) {
+			var totalIndex = stats.cols.findIndex(function(e) { return e.id === 'total' });
+
+			if (totalIndex !== -1) {
+				var newStats = angular.copy(stats);
+				newStats.rows.forEach(function(row) { row.cols.splice(totalIndex, 1); });
+				newStats.cols.splice(totalIndex, 1);
+			}
+
+			return newStats || stats;
+		};
+
+		return {
+			restrict: 'AE',
+			template: '<div style="overflow: hidden; text-align: center"></div>',
+			scope: {
+				'data': '=',
+				'type': '='
+			},
+			link: function($scope, element, attributes, controller) {
+				var chartId = 'chart_' + Math.random().toString().substring(2);
+
+				element.children().attr('id', chartId);
+
+				// Generate chart one time, when element is created.
+				var chart = c3.generate({
+					size: { height: 200 },
+					bindto: '#' + chartId,
+					data: {x: 'x', columns: []},
+					axis: {
+						x: {type: "category"}
+					}
+				});
+
+				// Watch all scope parameters that could make the graph to change
+				var unwatch = $scope.$watch('data', function(newStats, oldStats) {
+					// leave if we are loading and stats is not defined yet.
+					if (newStats) {
+						// Retrieve stats + list rows that we want, and those that exit the current graph
+						var stats = getStatsWithoutTotal(newStats);
+						
+						// Create Y series
+						var xSerie  = ['x'].concat(stats.cols.map(function(e) { return e.name; })),
+							ySeries = stats.rows.map(function(row) { return [row.name].concat(row.cols); });
+
+						// compute which rows are leaving.
+						var exitingRowNames = [];
+						if (oldStats)
+							exitingRowNames = oldStats.rows.filter(function(oldRow) {
+								return !stats.rows.find(function(newRow) { return newRow.id === oldRow.id; });
+							}).map(function(row) {
+								return row.name;
+							});
+
+						chart.load({ type: $scope.type, unload: exitingRowNames, columns: [xSerie].concat(ySeries) });
+					}
 				}, true);
 
 				// cleanup when done
@@ -323,4 +323,22 @@ angular.module('monitool.directives.reporting', [])
 				});
 			}
 		}
+	})
+
+	.directive('reportPreview', function() {
+		return {
+			restrict: 'AE',
+			templateUrl: 'partials/directives/reporting-preview.html',
+			scope: {
+				"result": "=data"
+			}
+		}
+
+
 	});
+
+
+
+
+;
+

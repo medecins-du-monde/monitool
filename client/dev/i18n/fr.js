@@ -130,6 +130,19 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		analysis: "Analyse",
+		analysis_insert_data: "Insérer des données",
+		analysis_insert_text: "Insérer du texte",
+		analysis_up_next: "Monter",
+		analysis_down_next: "Descendre",
+		analysis_edit_next: "Éditer",
+		analysis_delete_next: "Supprimer",
+		analysis_data: "Affichage",
+		analysis_table: "Tableau",
+		analysis_graph: "Graphique",
+		analysis_both: "Tableau & Graphique",
+		report_name_ph: "ex: Analyse descriptive mensuelle mai 2015",
+
 		source: "Source",
 		source_ph: "Ex: NHIS local",
 		in_charge: "Personne responsable",
@@ -265,6 +278,8 @@ var FRENCH_TRANSLATION = {
 	},
 	indicator: {
 		search: "Rechercher",
+		search_ph: "Rentrez au moins 3 caractères",
+		
 		target: "Relation à la cible",
 		higher_is_better: "Atteinte si la saisie est supérieure à la cible",
 		lower_is_better: "Atteinte si la saisie est inférieure à la cible",

@@ -18,7 +18,7 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-eye"></i></span>
-						<select class="form-control" id="display-input" ng-model="presentation.display">
+						<select class="form-control input-sm" id="display-input" ng-model="presentation.display">
 							<option value="value" translate="shared.values"></option>
 							<option value="progress" translate="shared.target_percentage"></option>
 						</select>
@@ -40,15 +40,19 @@
 	</div>
 </form>
 
-
 <button class="btn btn-primary btn-xs pull-right noprint" ng-show="presentation.plot" svg-save>
 	<i class="fa fa-download"></i>
 	<span translate="shared.download_plot"></span>
 </button>
 
-<div ng-if="presentation.plot" reporting-graph style="clear: both"></div>
+<div style="clear: both" ng-if="presentation.plot">
+	<reporting-graph-adapter
+		type="['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1 ? 'line' : 'bar'"
+		data="stats" plots="plots" display="presentation.display">
+	</reporting-graph-adapter>
+</div>
 
-<button class="btn btn-primary btn-xs pull-right noprint" project-csv-save>
+<button class="btn btn-primary btn-xs pull-right noprint" project-csv-save style="margin-bottom: 10px;">
 	<i class="fa fa-download"></i>
 	<span translate="shared.download_table"></span>
 </button>
@@ -68,22 +72,13 @@
 			<td ng-show="presentation.plot" class="noprint">
 				<input id="plot-{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type=='data'"/>
 			</td>
-
-			<td class="section" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" colspan="{{stats.cols.length + 3}}" ng-if="row.type=='header'">
-				{{row.text}}
-			</td>
+			<td class="section" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" colspan="{{stats.cols.length + 3}}" ng-if="row.type=='header'" ng-bind="row.text"></td>
 
 			<td ng-if="row.type=='data'" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" >
-				<label for="plot-{{row.id}}">{{row.name||('shared.unknown_indicator'|translate)}}</label>
+				<label for="plot-{{row.id}}" ng-bind="row.name||('shared.unknown_indicator'|translate)"></label>
 			</td>
-
-			<td ng-if="row.type=='data'">
-				{{row.baseline}}{{row.unit}}
-			</td>
-
-			<td ng-if="row.type=='data'">
-				{{row.target}}{{row.unit}}
-			</td>
+			<td ng-if="row.type=='data'" ng-bind="row.baseline + row.unit"></td>
+			<td ng-if="row.type=='data'" ng-bind="row.target + row.unit"></td>
 			<td ng-if="row.type=='data'" ng-repeat="col in row.cols track by $index" reporting-field ></td>
 		</tr>
 	</tbody>

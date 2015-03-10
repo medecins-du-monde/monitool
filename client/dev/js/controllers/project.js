@@ -629,19 +629,62 @@ angular.module('monitool.controllers.project', [])
 		$scope.reports = reports;
 	})
 
-	.controller('ProjectReportingAnalysisController', function($scope, $modal, report, project, indicatorsById) {
+	.controller('ProjectReportingAnalysisController', function($scope, $stateParams, $modal, report, project, indicatorsById) {
 		$scope.report = report;
-
-		$scope.addReportGrid = function() {
+		$scope.master = angular.copy(report);
+		
+		$scope.addReportGrid = function(index) {
 			$modal.open({
 				controller: 'ProjectReportingAnalysisDataSelectionController',
 				templateUrl: 'partials/projects/reporting-analysis-select-data.html',
 				size: 'lg', scope: $scope, resolve: { indicatorsById: function() { return indicatorsById; } }
-			}).result;
+			}).result.then(function(result) {
+				result.type = 'data';
+				$scope.report.elements.splice(index, 0, result);
+			});
 		};
+
+		$scope.addReportText = function(index) {
+			$scope.report.elements.splice(index, 0, {
+				type: "text",
+				content: ""
+			});
+		};
+
+		$scope.move = function(index, delta) {
+			var elements = $scope.report.elements.splice(index, 1);
+			$scope.report.elements.splice(index + delta, 0, elements[0]);
+		};
+
+		$scope.remove = function(index) {
+			$scope.report.elements.splice(index, 1);
+		};
+
+		$scope.save = function() {
+			if ($stateParams.reportId === 'new')
+				$scope.report._id = PouchDB.utils.uuid().toLowerCase();
+
+			$scope.report.$save().then(function() {
+				$scope.master = angular.copy($scope.report);
+				
+				if ($stateParams.reportId === 'new')
+					$state.go('main.project.reporting_analysis', {reportId: $scope.report._id});
+			}).catch(function(error) {
+				$scope.error = error;
+			});
+		};
+
+		$scope.reset = function() {
+			$scope.report = angular.copy($scope.master);
+		};
+
+		$scope.isUnchanged = function() {
+			return angular.equals($scope.report, $scope.master);
+		}
 	})
 
-	.controller('ProjectReportingAnalysisDataSelectionController', function($scope, mtReporting, indicatorsById) {
+	// FIXME this needs a rewriting. The code is way too kludgy
+	.controller('ProjectReportingAnalysisDataSelectionController', function($scope, $modalInstance, mtReporting, indicatorsById) {
 		$scope.query = {
 			project: mtReporting.getAnnotatedProjectCopy($scope.project, indicatorsById),
 			begin:   mtReporting.getDefaultStartDate($scope.project),
@@ -652,14 +695,22 @@ angular.module('monitool.controllers.project', [])
 		$scope.container = {chosenIndicatorIds: []};
 
 		var stats = {cols: [], rows: []};
+		$scope.result = {display: "both"};
+
 		var update = function() {
-			$scope.stats = angular.copy(stats);
-			$scope.stats.rows = $scope.stats.rows.filter(function(row) {
+			$scope.result.stats = angular.copy(stats);
+			$scope.result.stats.rows = $scope.result.stats.rows.filter(function(row) {
 				return $scope.container.chosenIndicatorIds.indexOf(row.id) !== -1;
 			});
+			$scope.result.query = {
+				begin: $scope.query.begin,
+				end: $scope.query.end,
+				groupBy: $scope.query.groupBy,
+				type: $scope.query.type,
+				id: $scope.query.id
+			};
 		};
 
-		// Update loaded inputs when query.begin or query.end changes.
 		// Update loaded inputs when query.begin or query.end changes.
 		var inputsPromise = null;
 		$scope.$watch('query', function(newQuery, oldQuery) {
@@ -676,27 +727,16 @@ angular.module('monitool.controllers.project', [])
 		}, true)
 
 		$scope.$watch('container.chosenIndicatorIds', update, true)
+
+		$scope.choose = function(indicatorId) {
+			$modalInstance.close($scope.result);
+		};
+
+		$scope.cancel = function() {
+			$modalInstance.dismiss()
+		};
 	})
 
 	.controller('ProjectUserListController', function($scope, users) {
 		$scope.users = users;
 	});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

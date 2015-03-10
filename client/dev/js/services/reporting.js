@@ -528,24 +528,35 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 	};
 
 	var regroupIndicator = function(inputs, query, indicatorById) {
-		var result = {},
-			begin = moment(query.begin, 'YYYY-MM-DD')
+		var rows = [];
 
 		query.projects.forEach(function(project) {
-			var projectInputs = inputs.filter(function(input) { return input.project === project._id; }),
-				projectQuery  = {begin: query.begin, project: project, groupBy: query.groupBy};
+			var projectInputs     = inputs.filter(function(input) { return input.project === project._id; }),
+				projectQuery      = {begin: query.begin, end: query.end, project: project, groupBy: query.groupBy},
+				projectResult     = regroup(projectInputs, projectQuery, indicatorById);
 
-			result[project._id] = regroup(projectInputs, projectQuery, indicatorById);
+			// override id and name
+			var row = projectResult.rows.find(function(row) { return row.id === query.indicator._id; });
+			row.id = project._id;
+			row.name = project.name;
+			row.type = 'project'; // presentation hack, should not be here.
+			rows.push(row);
 
 			project.inputEntities.forEach(function(entity) {
 				var entityInputs = projectInputs.filter(function(input) { return input.entity === entity.id; }),
-					entityQuery  = {begin: query.begin, project: project, groupBy: query.groupBy, type: 'entity', id: entity.id};
+					entityQuery  = {begin: query.begin, end: query.end, project: project, groupBy: query.groupBy, type: 'entity', id: entity.id},
+					entityResult = regroup(entityInputs, entityQuery, indicatorById);
 
-				result[entity.id] = regroup(entityInputs, entityQuery, indicatorById);
+				// override id and name
+				var row = entityResult.rows.find(function(row) { return row.id === query.indicator._id; });
+				row.id = entity.id;
+				row.name = entity.name;
+				row.type = 'entity'; // presentation hack, should not be here.
+				rows.push(row);
 			});
 		});
 
-		return result;
+		return { cols: getStatsColumns(query), rows: rows };
 	};
 
 	var getDefaultStartDate = function(project) {

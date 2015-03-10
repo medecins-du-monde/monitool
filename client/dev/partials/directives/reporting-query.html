@@ -15,7 +15,7 @@
 							   ng-click = "beginDateOpen = true"
 							   required
 							   ng-max="dates.end"
-							   class="form-control" />
+							   class="form-control input-sm" />
 					</div>
 				</div>
 			</div>
@@ -33,7 +33,7 @@
 							   is-open="endDateOpen"
 							   ng-click = "endDateOpen = true"
 							   ng-min="dates.begin"
-							   class="form-control"
+							   class="form-control input-sm"
 							   required />
 					</div>
 				</div>
@@ -48,7 +48,7 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
-						<select class="form-control" id="group-by-input" ng-model="query.groupBy">
+						<select class="form-control input-sm" id="group-by-input" ng-model="query.groupBy">
 							<option value="day" translate="shared.day"></option>
 							<option value="week" translate="shared.week"></option>
 							<option value="month" translate="shared.month"></option>
@@ -66,7 +66,7 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-filter"></i></span>
-						<select class="form-control" id="filter-by-input" ng-model="filter">
+						<select class="form-control input-sm" id="filter-by-input" ng-model="filter">
 							<option value="">Tout le projet</option>
 							<optgroup label="Lieux d'activité">
 								<option ng-repeat="entity in query.project.inputEntities" value="{{entity.id}}" ng-bind="entity.name"></option>

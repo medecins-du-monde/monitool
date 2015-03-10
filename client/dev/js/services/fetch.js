@@ -51,7 +51,12 @@ angular.module('monitool.services.fetch', [])
 			},
 
 			report: function(id) {
-				return id && id !== 'new' ? Report.get({id: id}).$promise : new Report({type: "report"});
+				return id && id !== 'new' ? Report.get({id: id}).$promise : new Report({
+					type: "report",
+					name: "",
+					date: moment().format('YYYY-MM-DD'),
+					elements: []
+				});
 			},
 
 			theme: function(id) {

@@ -146,13 +146,14 @@ angular.module('monitool.controllers.indicator', [])
 	
 	.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, indicatorsById) {
 		$scope.indicator = indicator;
-		$scope.projects  = projects;
+		// $scope.projects  = projects;
+		$scope.plots = {};
 
 		$scope.presentation = {display: 'value', plot: false, colorize: false};
 		$scope.query = {
 			type: "indicator",
-			indicator: $scope.indicator,
-			projects: $scope.projects.map(function(p) { return mtReporting.getAnnotatedProjectCopy(p, indicatorsById); }),
+			indicator: indicator,
+			projects: projects.map(function(p) { return mtReporting.getAnnotatedProjectCopy(p, indicatorsById); }),
 			begin: mtReporting.getDefaultStartDate(),
 			end: mtReporting.getDefaultEndDate(),
 			groupBy: 'month',
@@ -169,57 +170,17 @@ angular.module('monitool.controllers.indicator', [])
 			$scope.dates = angular.copy($scope.dates);
 		})
 
-		$scope.inputs = [];
-		$scope.$watch("[query.begin, query.end]", function() {
-			mtReporting.getInputs($scope.query).then(function(inputs) {
-				$scope.inputs = inputs;
+		var inputsPromise = null;
+		$scope.$watch('query', function(newQuery, oldQuery) {
+			// if anything besides groupBy changes, we need to refetch.
+			// FIXME: we could widely optimize this.
+			if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end)
+				inputsPromise = mtReporting.getInputs(newQuery);
+
+			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
+			inputsPromise.then(function(inputs) {
+				$scope.stats = mtReporting.regroupIndicator(inputs, newQuery, indicatorsById);
 			});
-		}, true);
-
-		// Update cols and data when grouping or inputs changes.
-		$scope.$watch("[query.begin, query.end, query.groupBy, inputs]", function() {
-			$scope.cols = mtReporting.getStatsColumns($scope.query);
-			$scope.data = mtReporting.regroupIndicator($scope.inputs, $scope.query, indicatorsById);
-		}, true);
-
-		var chart = c3.generate({bindto: '#chart', data: {x: 'x', columns: []}, axis: {x: {type: "category"}}});
-		$scope.plots = {};
-		$scope.$watch('[plots, query.begin, query.end, query.groupBy, inputs, presentation.display]', function(newValue, oldValue) {
-			var allEntityIds = [], removedEntityIds = [], idToName = {};
-			$scope.query.projects.forEach(function(project) {
-				newValue[0][project._id] && allEntityIds.push(project._id);
-				!newValue[0][project._id] && oldValue[0][project._id] && removedEntityIds.push(project._id);
-				idToName[project._id] = project.name;
-				
-				project.inputEntities.forEach(function(entity) {
-					newValue[0][entity.id] && allEntityIds.push(entity.id);
-					!newValue[0][entity.id] && oldValue[0][entity.id] && removedEntityIds.push(entity.id);
-					idToName[entity.id] = entity.name;
-				});
-			});
-
-			chart.load({
-				type: 'line',
-				unload: removedEntityIds.map(function(entityId) { return idToName[entityId]; }),
-				columns: [
-						['x'].concat($scope.cols.filter(function(e) { return e.id != 'total' }).map(function(e) { return e.name; }))
-					]
-					.concat(allEntityIds.map(function(entityId) {
-						var column = [idToName[entityId]];
-						$scope.cols.forEach(function(col) {
-							if (col.id !== 'total') {
-								if ($scope.data[entityId] && $scope.data[entityId][col.id] && $scope.data[entityId][col.id][indicator._id])
-									column.push($scope.data[entityId][col.id][indicator._id][$scope.presentation.display] || 0);
-								else
-									column.push(0);
-							}
-						});
-						return column;
-					}))
-			});
-
-			$scope.imageFilename = [$scope.query.indicator.name, $scope.query.begin, $scope.query.end].join('_') + '.png';
-
-		}, true);
+		}, true)
 	})
 	

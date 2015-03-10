@@ -109,9 +109,47 @@ textarea {
       .panel-collapse .list-group-item li.list-group-item {border-top: 1px solid #DDD !important;}
 
 
+.ta-toolbar {
+  display: none;
+}
+
+.ta-toolbar.focussed {
+  display: block;
+}
+
+.ta-editor.ta-html, .ta-scroll-window.form-control {
+  min-height: 0;
+  
+}
+.ta-scroll-window > .ta-bind {
+  min-height: 0;
+}
 
 
+.show-on-hover {
+  height: 10px;
+  /*text-align: center;*/
+  overflow: hidden;
+  transition: height .5s;
+}
 
+.show-on-hover button {
+  margin: 10px 5px;
+  opacity: 0;
+  display: inline;
+  transition: opacity .25s;
+}
+
+.show-on-hover:hover {
+  height: 50px;
+  transition: height .5s;
+}
+
+.show-on-hover:hover button {
+  opacity: 1;
+  transition: opacity .25s;
+  transition-delay: .25s
+}
 
 
 .print { display: none;}
