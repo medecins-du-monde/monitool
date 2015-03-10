@@ -56,6 +56,8 @@ var FRENCH_LOCALE = {
 };
 
 
+
+
 var FRENCH_TRANSLATION = {
 	shared: {
 		date: "Date",
@@ -135,13 +137,13 @@ var FRENCH_TRANSLATION = {
 		analysis_insert_text: "Insérer du texte",
 		analysis_up_next: "Monter",
 		analysis_down_next: "Descendre",
-		analysis_edit_next: "Éditer",
 		analysis_delete_next: "Supprimer",
 		analysis_data: "Affichage",
 		analysis_table: "Tableau",
 		analysis_graph: "Graphique",
 		analysis_both: "Tableau & Graphique",
 		report_name_ph: "ex: Analyse descriptive mensuelle mai 2015",
+		no_reports: "Aucune analyse descriptive n'a encore été créé!",
 
 		source: "Source",
 		source_ph: "Ex: NHIS local",

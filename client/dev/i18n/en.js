@@ -1,3 +1,4 @@
+"use strict";
 
 var ENGLISH_LOCALE = {
 	DATETIME_FORMATS: {
@@ -57,8 +58,6 @@ var ENGLISH_LOCALE = {
 	}
 };
 
-
-
 var ENGLISH_TRANSLATION = {
 	shared: {
 		date: "Date",
@@ -104,6 +103,7 @@ var ENGLISH_TRANSLATION = {
 		logical_frame: 'Logical Frame',
 		description: 'Description',
 		reporting: 'Reporting',
+		reporting_analysis: 'Descriptive Analysis',
 		columns: "Columns",
 		colorize: 'Colorize',
 		display: 'Display',
@@ -122,6 +122,7 @@ var ENGLISH_TRANSLATION = {
 		detach: "Detach",
 
 		stay_here_check: 'You made changes. Click OK to stay on this page, Cancel to leave.',
+		filter: "Filter"
 	},
 	menu: {
 		toggle_nav: "Toggle navigation",
@@ -131,6 +132,19 @@ var ENGLISH_TRANSLATION = {
 		english: "English",
 	},
 	project: {
+		analysis: "Analysis",
+		analysis_insert_data: "Insert data",
+		analysis_insert_text: "Insert text",
+		analysis_up_next: "Up",
+		analysis_down_next: "Down",
+		analysis_delete_next: "Remove",
+		analysis_data: "Display",
+		analysis_table: "Table",
+		analysis_graph: "Plot",
+		analysis_both: "Table & Plot",
+		report_name_ph: "ex: Monthly descriptive analysis for may 2015",
+		no_reports: "No descriptive analysis has be created yet!",
+
 		source: "Source",
 		source_ph: "Ej: NHIS",
 		in_charge: "Person in charge",
@@ -266,6 +280,8 @@ var ENGLISH_TRANSLATION = {
 	},
 	indicator: {
 		search: "Search",
+		search_ph: "Enter at least 3 characters",
+
 		target: "Relation with target",
 		higher_is_better: "Reached if input is higher than target",
 		lower_is_better: "Reached if input is lower than target",
@@ -367,3 +383,4 @@ var ENGLISH_TRANSLATION = {
 		end_greater_than_begin: 'End date must be greater than begin date'
 	}
 };
+

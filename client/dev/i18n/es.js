@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var SPANISH_LOCALE = {
 	id: "es-es",
@@ -53,6 +53,11 @@ var SPANISH_LOCALE = {
 	}
 };
 
+
+
+
+
+
 var SPANISH_TRANSLATION = {
 	shared: {
 		date: "Fecha",
@@ -98,6 +103,7 @@ var SPANISH_TRANSLATION = {
 		logical_frame: 'Marco lógico',
 		description: 'Descripción',
 		reporting: 'Estadísticas',
+		reporting_analysis: "Análisis descriptivo",
 		columns: "Columnas",
 		colorize: 'Colorear',
 		display: 'Mostrar',
@@ -116,6 +122,7 @@ var SPANISH_TRANSLATION = {
 		detach: "Desconectar",
 
 		stay_here_check: 'Ha realizado cambios. Selectione acceptar para quedarse en esta página, cancelar para perder los cambios.',
+		filter: "Filtro"
 	},
 	menu: {
 		toggle_nav: "Ver el menu",
@@ -125,6 +132,19 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 	project: {
+		analysis: "Análisis",
+		analysis_insert_data: "Insertar datos",
+		analysis_insert_text: "Insertar texto",
+		analysis_up_next: "Subir",
+		analysis_down_next: "Bajar",
+		analysis_delete_next: "Suprimir",
+		analysis_data: "Mostrar",
+		analysis_table: "Tabla",
+		analysis_graph: "Gráfico",
+		analysis_both: "Tabla & Gráfico",
+		report_name_ph: "ex: Análisis descriptivo mensual de mayo 2015",
+		no_reports: "Ningún analisis descriptivo ha sido creado!",
+
 		source: "Origen",
 		source_ph: "Ej: NHIS local",
 		in_charge: "Persona responsable",
@@ -260,6 +280,8 @@ var SPANISH_TRANSLATION = {
 	},
 	indicator: {
 		search: "Buscar",
+		search_ph: "Entre por lo menos 3 caracteres",
+
 		target: "Relación con el objetivo",
 		higher_is_better: "Alcanzado si la entrada es superior al objetivo",
 		lower_is_better: "Alcanzado si la entrada es inferior al objetivo",
