@@ -11,6 +11,7 @@ var addCors       = require('add-cors-to-couchdb'),
 	rename        = require('gulp-rename'),
 	replace       = require('gulp-replace'),
 	uglify        = require('gulp-uglify'),
+	es = require('event-stream'),
 	request       = require('request'),
 	rimraf        = require('rimraf'),
 	Queue         = require('streamqueue'),
@@ -22,7 +23,8 @@ var files = {
 			'client/dev/bower_components/fontawesome/css/font-awesome.min.css',
 			'client/dev/bower_components/bootstrap/dist/css/bootstrap.min.css',
 			'client/dev/bower_components/angular-ui-select/dist/select.min.css',
-			'client/dev/bower_components/c3/c3.min.css'
+			'client/dev/bower_components/c3/c3.min.css',
+			'client/dev/bower_components/textAngular/src/textAngular.css'
 		],
 		common: [
 			'client/dev/css/app.css'
@@ -30,9 +32,12 @@ var files = {
 	},
 	js: {
 		min: [
+			// 'client/dev/bower_components/javascript-state-machine/state-machine.min.js',
+			// 'client/dev/bower_components/pouchdb/dist/pouchdb.min.js',
+			// 'client/dev/bower_components/pouchdb-authentication/dist/pouchdb.authentication.min.js',
+			// 'client/dev/bower_components/mathjs/dist/math.min.js',
+			
 			'client/dev/bower_components/moment/min/moment.min.js',
-			'client/dev/bower_components/mathjs/dist/math.min.js',
-			'client/dev/bower_components/javascript-state-machine/state-machine.min.js',
 			'client/dev/bower_components/FileSaver.js/FileSaver.min.js',
 			'client/dev/bower_components/angular/angular.min.js',
 			'client/dev/bower_components/angular-ui-router/release/angular-ui-router.min.js',
@@ -46,15 +51,17 @@ var files = {
 			'client/dev/bower_components/angular-translate/angular-translate.min.js',
 			'client/dev/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js',
 			'client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js',
-			'client/dev/bower_components/pouchdb/dist/pouchdb.min.js',
-			'client/dev/bower_components/pouchdb-authentication/dist/pouchdb.authentication.min.js',
 			'client/dev/bower_components/d3/d3.min.js',
-			'client/dev/bower_components/c3/c3.min.js'
+			'client/dev/bower_components/c3/c3.min.js',
+			'client/dev/bower_components/textAngular/dist/textAngular-rangy.min.js',
+			'client/dev/bower_components/textAngular/dist/textAngular-sanitize.min.js',
+			'client/dev/bower_components/textAngular/dist/textAngular.min.js',
 		],
 		common: [
+			// 'client/dev/bower_components/angular-pouchdb/angular-pouchdb.js',
+			
 			'client/dev/bower_components/Blob.js/Blob.js',
 			'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
-			'client/dev/bower_components/angular-pouchdb/angular-pouchdb.js',
 			'client/dev/i18n/fr.js',
 			'client/dev/i18n/es.js',
 			'client/dev/i18n/en.js',
@@ -63,8 +70,8 @@ var files = {
 			'client/dev/js/controllers/project.js',
 			'client/dev/js/controllers/indicator.js',
 			'client/dev/js/directives/acls.js',
-			'client/dev/js/directives/reporting.js',
 			'client/dev/js/directives/forms.js',
+			'client/dev/js/directives/reporting.js',
 			'client/dev/js/services/fetch.js',
 			'client/dev/js/services/reporting.js',
 			'client/dev/js/services/string.js',
@@ -81,6 +88,15 @@ var files = {
 //////////////////////////////////////////////////////////
 
 gulp.task('deploy', ['copy-files-to-s3']);
+
+
+gulp.task('size-report', function() {
+	gulp.src(files.js.min)
+		.pipe(awspublish.gzip())
+		.pipe(es.map(function(toto) {
+			console.log(toto.contents.length, toto.path.substring(toto.path.lastIndexOf('/') + 1))
+		}))
+})
 
 gulp.task('copy-files-to-s3', ['build'], function() {
 	var publisher = awspublish.create(config.aws),

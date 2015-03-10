@@ -216,8 +216,14 @@ reportingServices.factory('mtForms', function() {
 				localScope[key] = scope[formElement.parameters[key].model];
 			}
 
-			try { scope[formElement.model] = math.eval(formElement.expression, localScope); }
-			catch (e) { scope[formElement.model] = undefined; }
+			try {
+				scope[formElement.model] = Parser.evaluate(formElement.expression, localScope);
+				console.log(scope[formElement.model], formElement.expression, localScope)
+				// scope[formElement.model] = math.eval(formElement.expression, localScope);
+			}
+			catch (e) {
+				scope[formElement.model] = undefined;
+			}
 		}
 		else if (type === 'link') {
 			var path = id.split('.');
@@ -258,23 +264,25 @@ reportingServices.factory('mtFormula', function($q) {
 		 */
 		annotate: function(formula) {
 			// Helper function to recursively retrieve symbols from abstract syntax tree.
-			var getSymbolsRec = function(root, symbols) {
-				if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
-					root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
-				else if (root.type === 'SymbolNode')
-					symbols[root.name] = true;
+			// var getSymbolsRec = function(root, symbols) {
+			// 	if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
+			// 		root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
+			// 	else if (root.type === 'SymbolNode')
+			// 		symbols[root.name] = true;
 
-				return Object.keys(symbols);
-			};
+			// 	return Object.keys(symbols);
+			// };
 			
 			formula.__isValid = true;
 			try {
-				var expression = math.parse(formula.expression);
-				// do not allow empty formula
-				if (expression.type === 'ConstantNode' && expression.value === 'undefined')
-					throw new Error();
+				// var expression = math.parse(formula.expression);
+				// // do not allow empty formula
+				// if (expression.type === 'ConstantNode' && expression.value === 'undefined')
+				// 	throw new Error();
 				
-				formula.__symbols = getSymbolsRec(expression, {});
+				// formula.__symbols = getSymbolsRec(expression, {});
+				var ast = Parser.parse(formula.expression);
+				formula.__symbols = ast.variables();
 			}
 			catch (e) { 
 				formula.__symbols = [];

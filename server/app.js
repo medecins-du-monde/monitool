@@ -16,7 +16,7 @@ express()
 	.use(session({ secret: 'cd818da5bcd0d3d9ba5a9a44e49148d2', resave: false, saveUninitialized: false }))
 	.use(passport.initialize())
 	.use(passport.session())
-
+	
 	.get('/login', passport.authenticate('oauth2'))
 
 	.get('/logout', function(request, response) {
@@ -42,8 +42,9 @@ express()
 	.use(compression())
 	.use(cacheControl)
 
-	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? '../client/dev' : '../client/build'))
 	.use(require('./controllers/public'))
 	.use(require('./controllers/restricted'))
 	.use(require('./controllers/reporting'))
+
+	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? '../client/dev' : '../client/build'))
 	.listen(8000);
