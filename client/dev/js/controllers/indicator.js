@@ -67,7 +67,7 @@ angular.module('monitool.controllers.indicator', [])
 	.controller('IndicatorEditController', function($state, $scope, $stateParams, $modal, mtFormula, mtFetch, indicator, indicatorsById, types, themes) {
 		// Formula handlers
 		$scope.addFormula = function() {
-			var uuid  = PouchDB.utils.uuid().toLowerCase(),
+			var uuid  = makeUUID(),
 				value = {name: '', expression: '', parameters: {}};
 
 			$scope.indicator.formulas[uuid] = value;
@@ -119,7 +119,7 @@ angular.module('monitool.controllers.indicator', [])
 
 			// create random id if new indicator
 			if ($stateParams.indicatorId === 'new')
-				$scope.indicator._id = PouchDB.utils.uuid().toLowerCase();
+				$scope.indicator._id = makeUUID();
 
 			// persist
 			$scope.indicator.$save(function() {

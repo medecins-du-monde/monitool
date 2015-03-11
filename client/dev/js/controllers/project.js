@@ -26,7 +26,7 @@ angular.module('monitool.controllers.project', [])
 		// save, reset and isUnchanged are all defined here, because those are shared between all project views.
 		$scope.save = function() {
 			if ($stateParams.projectId === 'new')
-				$scope.project._id = PouchDB.utils.uuid().toLowerCase();
+				$scope.project._id = makeUUID();
 
 			$scope.project.$save().then(function() {
 				$scope.master = angular.copy($scope.project);
@@ -277,7 +277,7 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectInputEntitiesController', function($scope, project) {
 		$scope.create = function() {
-			$scope.project.inputEntities.push({id: PouchDB.utils.uuid().toLowerCase(), name: ''});
+			$scope.project.inputEntities.push({id: makeUUID(), name: ''});
 		};
 
 		$scope.delete = function(inputEntityId) {
@@ -292,7 +292,7 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectInputGroupsController', function($scope, project) {
 		$scope.create = function() {
-			$scope.project.inputGroups.push({id: PouchDB.utils.uuid().toLowerCase(), name: '', members: []});
+			$scope.project.inputGroups.push({id: makeUUID(), name: '', members: []});
 		};
 
 		$scope.delete = function(inputEntityId) {
@@ -662,7 +662,7 @@ angular.module('monitool.controllers.project', [])
 
 		$scope.save = function() {
 			if ($stateParams.reportId === 'new')
-				$scope.report._id = PouchDB.utils.uuid().toLowerCase();
+				$scope.report._id = makeUUID();
 
 			$scope.report.$save().then(function() {
 				$scope.master = angular.copy($scope.report);

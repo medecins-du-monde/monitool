@@ -61,7 +61,7 @@ angular.module('monitool.controllers.admin', [])
 		$scope.create = function() {
 			var newEntity = mtFetch[$scope.entityType]();
 			newEntity.__isNew = true; // this will be removed on save.
-			newEntity._id = PouchDB.utils.uuid().toLowerCase()
+			newEntity._id = makeUUID()
 
 			$scope.entities.push(newEntity);
 			$scope.master.push(angular.copy(newEntity));
