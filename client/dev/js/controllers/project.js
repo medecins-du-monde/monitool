@@ -64,12 +64,10 @@ angular.module('monitool.controllers.project', [])
 		};
 
 		$scope.getUnassignedIndicators = function() {
-			var otherIndicators = Object.keys($scope.project.indicators);
-			$scope.getAssignedIndicators().forEach(function(indicatorId) {
-				if (otherIndicators.indexOf(indicatorId) !== -1)
-					otherIndicators.splice(otherIndicators.indexOf(indicatorId), 1);
+			var assignedIndicators = $scope.getAssignedIndicators();
+			return Object.keys($scope.project.indicators).filter(function(indicatorId) {
+				return assignedIndicators.indexOf(indicatorId) === -1;
 			});
-			return otherIndicators;
 		};
 
 		// We restore $scope.master on $scope.project to avoid unsaved changes from a given tab to pollute changes to another one.
