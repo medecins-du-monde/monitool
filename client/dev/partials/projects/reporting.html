@@ -77,8 +77,8 @@
 			<td ng-if="row.type=='data'" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" >
 				<label for="plot-{{row.id}}" ng-bind="row.name||('shared.unknown_indicator'|translate)"></label>
 			</td>
-			<td ng-if="row.type=='data'" ng-bind="row.baseline + row.unit"></td>
-			<td ng-if="row.type=='data'" ng-bind="row.target + row.unit"></td>
+			<td ng-if="row.type=='data'">{{row.baseline}}{{row.unit}}</td>
+			<td ng-if="row.type=='data'">{{row.target}}{{row.unit}}</td>
 			<td ng-if="row.type=='data'" ng-repeat="col in row.cols track by $index" reporting-field ></td>
 		</tr>
 	</tbody>

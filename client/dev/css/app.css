@@ -16,15 +16,18 @@ textarea {
 
 .indicator-header {
 	margin-bottom: 5px;
+  margin-right: 10px;
 }
 
 .indicator-level-1 {
 	margin-left: 0px;
+  margin-right: 10px;
 	background-color: white;
 }
 
 .indicator-level-2 {
 	margin-left: 40px;
+  margin-right: 10px;
 	background-color: #f8f8f8;
 
 }

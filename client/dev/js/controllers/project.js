@@ -175,7 +175,8 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectLogicalFrameIndicatorSelectionController', function($scope, $modalInstance, mtRemoveDiacritics, forbiddenIds, hierarchy) {
 		$scope.forbidden = forbiddenIds;
-		// $scope.hierarchy = hierarchy;
+		$scope.hierarchy = hierarchy;
+		$scope.searchField = '';
 
 		$scope.missingIndicators = {};
 		hierarchy.forEach(function(theme) {
@@ -188,31 +189,6 @@ angular.module('monitool.controllers.project', [])
 				});
 		});
 		$scope.missingIndicators = Object.keys($scope.missingIndicators).map(function(id) { return $scope.missingIndicators[id]; });
-
-		$scope.searchField = '';
-
-		// FIXME move this to a directive/service....
-		$scope.$watch('searchField', function(newValue, oldValue) {
-			if (newValue.length < 3) {
-				$scope.filter = false;
-				$scope.hierarchy = hierarchy;
-			}
-			else {
-				var filter = mtRemoveDiacritics(newValue).toLowerCase();
-				$scope.filter = true;
-				$scope.hierarchy = angular.copy(hierarchy).filter(function(theme) {
-					theme.children = theme.children.filter(function(type) {
-						type.children = type.children.filter(function(indicator) {
-							var name = mtRemoveDiacritics(indicator.name).toLowerCase();
-							return name.indexOf(filter) !== -1;
-						});
-						return type.children.length;
-					});
-					return theme.children.length;
-				});
-			}
-		});
-
 
 		$scope.choose = function(indicatorId) {
 			$modalInstance.close(indicatorId);

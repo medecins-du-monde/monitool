@@ -2,58 +2,15 @@
 
 angular.module('monitool.controllers.indicator', [])
 
-	.controller('IndicatorListController', function($scope, mtRemoveDiacritics, hierarchy) {
-		$scope.orderField = 'name';
+	.controller('IndicatorListController', function($scope, hierarchy) {
+		$scope.hierarchy = hierarchy;
 		$scope.searchField = '';
-
-		// FIXME move this to a directive/service....
-		$scope.$watch('searchField', function(newValue, oldValue) {
-			if (newValue.length < 3) {
-				$scope.filter = false;
-				$scope.hierarchy = hierarchy;
-			}
-			else {
-				var filter = mtRemoveDiacritics(newValue).toLowerCase();
-				$scope.filter = true;
-				$scope.hierarchy = angular.copy(hierarchy).filter(function(theme) {
-					theme.children = theme.children.filter(function(type) {
-						type.children = type.children.filter(function(indicator) {
-							var name = mtRemoveDiacritics(indicator.name).toLowerCase();
-							return name.indexOf(filter) !== -1;
-						});
-						return type.children.length;
-					});
-					return theme.children.length;
-				});
-			}
-		});
 	})
 	
 	.controller('IndicatorChooseController', function($scope, $modalInstance, mtRemoveDiacritics, forbiddenIds, hierarchy) {
 		$scope.forbidden = forbiddenIds;
 		$scope.searchField = '';
-
-		// FIXME move this to a directive/service....
-		$scope.$watch('searchField', function(newValue, oldValue) {
-			if (newValue.length < 3) {
-				$scope.filter = false;
-				$scope.hierarchy = hierarchy;
-			}
-			else {
-				var filter = mtRemoveDiacritics(newValue).toLowerCase();
-				$scope.filter = true;
-				$scope.hierarchy = angular.copy(hierarchy).filter(function(theme) {
-					theme.children = theme.children.filter(function(type) {
-						type.children = type.children.filter(function(indicator) {
-							var name = mtRemoveDiacritics(indicator.name).toLowerCase();
-							return name.indexOf(filter) !== -1;
-						});
-						return type.children.length;
-					});
-					return theme.children.length;
-				});
-			}
-		});
+		$scope.hierarchy = hierarchy;
 
 		$scope.choose = function(indicatorId) {
 			$modalInstance.close(indicatorId);
