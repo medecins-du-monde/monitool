@@ -534,32 +534,8 @@ angular.module('monitool.controllers.project', [])
 		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
 		mtForms.annotateAllFormElements($scope.form.fields, indicatorsById);
-
-		$scope.status = {};
 		$scope.$watch('currentInput.values', function() {
 			mtForms.evaluateAll($scope.form.fields, $scope.currentInput.values);
-			$scope.form.fields.forEach(function(field) {
-				var planning  = $scope.project.indicators[field.id],
-					indicator = indicatorsById[field.id],
-					value = $scope.currentInput.values[field.model];
-
-				if (planning.target === null || planning.baseline === null || value === undefined || value === null)
-					$scope.status[field.id] = 'unknown';
-				else {
-					var progress;
-					if (indicator.target === 'around_is_better')
-						progress = 100 * (1 - Math.abs(value - planning.target) / (planning.target - planning.baseline));
-					else
-						progress = 100 * (value - planning.baseline) / (planning.target - planning.baseline);
-
-					if (progress < planning.showRed)
-						$scope.status[field.id] = 'red';
-					else if (progress < planning.showYellow)
-						$scope.status[field.id] = 'orange';
-					else
-						$scope.status[field.id] = 'green';
-				}
-			});
 		}, true);
 
 		$scope.save = function() {
