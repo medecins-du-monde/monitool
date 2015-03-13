@@ -4,8 +4,53 @@
 	<li class="active" translate>project.input_forms</li>
 </ol>
 
+<h4 translate="project.input_form_list"></h4>
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th></th>
+			<th translate="shared.name"></th>
+			<th translate="shared.begin"></th>
+			<th translate="shared.end"></th>
+			<th translate="shared.active"></th>
+			<th translate="project.periodicity"></th>
+			<th translate="project.collect"></th>
+			<th style="width:100px"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-if="project.dataCollection.length == 0">
+			<td colspan="5" style="text-align: center" translate="project.no_forms"></td>
+		</tr>
+		<tr ng-repeat="form in project.dataCollection">
+			<td ng-style="{'background-color': colors[$index]}"></td>
+			<td>{{form.name}}</td>
+			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
+			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>
+			<td><i ng-class="{fa:true,'fa-check':form.active,'fa-times':!form.active}" ng-style="{color:form.active?'green':'red'}"></i></td>
+			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
+			<td>{{'project.collects.' + form.collect|translate}}</td>
+			<td>
+				<a class="btn btn-default btn-xs" ui-sref="main.project.form({formId: form.id})">
+					<i class="fa fa-pencil"></i>
+					<span translate="shared.edit" acl-has-project-role="owner"></span>
+					<span translate="shared.display" acl-lacks-project-role="owner"></span>
+				</a>
+			</td>
+		</tr>
+	</tbody>
+	<tfoot acl-has-project-role="owner">
+		<tr>
+			<td colspan="8">
+				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.form({formId: 'new'})" translate>shared.add</button>
+			</td>
+		</tr>
+	</tfoot>
+</table>
 
+<hr/>
 
+<h4 translate="project.indicator_distribution"></h4>
 <table class="table table-bordered table-condensed" ng-if="project.dataCollection.length != 0">
 	<thead>
 		<tr>
@@ -19,46 +64,4 @@
 			<td ng-repeat="usage in usage.usage" ng-style="{'background-color': usage.color, color: 'white'}" colspan="{{usage.length}}">{{usage.name}}</td>
 		</tr>
 	</tbody>
-</table>
-
-
-
-<!-- 
-<h2>Formulaires de saisie</h2> -->
-
-<table class="table table-bordered table-stripped table-condensed">
-	<thead>
-		<tr>
-			<th></th>
-			<th translate="shared.name"></th>
-			<th translate="shared.begin"></th>
-			<th translate="shared.end"></th>
-			<th style="width:250px"></th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-if="project.dataCollection.length == 0">
-			<td colspan="5" style="text-align: center" translate="project.no_forms"></td>
-		</tr>
-		<tr ng-repeat="form in project.dataCollection">
-			<td ng-style="{'background-color': colors[$index]}"></td>
-			<td>{{form.name}}</td>
-			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
-			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>
-			<td>
-				<a class="btn btn-default btn-xs" ui-sref="main.project.form({formId: form.id})">
-					<i class="fa fa-pencil"></i>
-					<span translate="shared.edit" acl-has-project-role="owner"></span>
-					<span translate="shared.display" acl-lacks-project-role="owner"></span>
-				</a>
-			</td>
-		</tr>
-	</tbody>
-	<tfoot acl-has-project-role="owner">
-		<tr>
-			<td colspan="5">
-				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.form({formId: 'new'})" translate>shared.add</button>
-			</td>
-		</tr>
-	</tfoot>
 </table>

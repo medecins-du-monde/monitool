@@ -410,7 +410,7 @@ angular.module('monitool.controllers.project', [])
 
 			// We just add an annotated manual input.
 			added.forEach(function(indicatorId) {
-				var formElement = {id: indicatorId, type: 'input', source: ''};
+				var formElement = {id: indicatorId, type: 'input'};
 				mtForms.annotateFormElement(formElement, indicatorId, indicatorId, indicatorsById);
 
 				// we need to test if the field is already there because of resets that triggers the watches...
@@ -482,7 +482,7 @@ angular.module('monitool.controllers.project', [])
 				var formula = formulasById[indicator.type.substring('compute:'.length)];
 				indicator.parameters = {};
 				for (var key in formula.parameters)
-					indicator.parameters[key] = {type: "input", source: ''};
+					indicator.parameters[key] = {type: "input"};
 				mtForms.annotateFormElement(indicator, indicator.keyPath, indicator.indicatorPath, indicatorsById);
 			}
 
@@ -571,6 +571,7 @@ angular.module('monitool.controllers.project', [])
 			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
 			inputsPromise.then(function(inputs) {
 				$scope.stats = mtReporting.regroup(inputs, newQuery, indicatorsById);
+				console.log($scope.stats)
 			});
 		}, true)
 	})
@@ -579,7 +580,7 @@ angular.module('monitool.controllers.project', [])
 		$scope.reports = reports;
 	})
 
-	.controller('ProjectReportingAnalysisController', function($scope, $stateParams, $modal, report, project, indicatorsById) {
+	.controller('ProjectReportingAnalysisController', function($scope, $state, $stateParams, $modal, report, project, indicatorsById) {
 		$scope.report = report;
 		$scope.master = angular.copy(report);
 		

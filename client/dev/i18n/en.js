@@ -66,6 +66,7 @@ var ENGLISH_TRANSLATION = {
 		back_to_intranet: "Go back to intranet",
 		settings: "Settings",
 		projects: 'Projects',
+		project: 'Project',
 		users: "Users",
 		indicator: 'Indicator',
 		indicators: 'Indicators',
@@ -132,6 +133,13 @@ var ENGLISH_TRANSLATION = {
 		english: "English",
 	},
 	project: {
+		input_form_list: "Input form list",
+		indicator_distribution: "Indicators repartition by form and period",
+		add_new_indicator_to_form: "Add a new indicator to the form",
+
+		collect: "Collect on",
+		form_name_ph: "For instance: Monthly collection on health centers",
+
 		analysis: "Analysis",
 		analysis_insert_data: "Insert data",
 		analysis_insert_text: "Insert text",
@@ -181,12 +189,19 @@ var ENGLISH_TRANSLATION = {
 		input_mode: 'Input mode',
 		manual_input: 'Manual input',
 
-		daily: "Every day",
-		weekly: "Every week",
-		monthly: 'Every month',
-		quarterly: 'Every quarter',
-		yearly: "Every year",
-		planned: 'Planned',
+		periodicities: {
+			day: "Every day",
+			week: "Every week",
+			month: 'Every month',
+			quarter: 'Every quarter',
+			year: "Every year",
+			planned: 'Planned'
+		},
+		collects: {
+			entity: "Input entity",
+			project: "Project"
+		},
+		
 		add_intermediary: "Add a date",
 		intermediary_periods: "Extra dates",
 
@@ -209,7 +224,7 @@ var ENGLISH_TRANSLATION = {
 		baseline: 'Baseline',
 		baseline_ph: 'Reference value',
 		target_value_ph: 'value',
-		targets: 'Targets',
+		target: 'Targets',
 		add_target: 'Add a target',
 		general_data: 'General data',
 

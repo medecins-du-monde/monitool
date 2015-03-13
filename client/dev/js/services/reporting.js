@@ -218,8 +218,6 @@ reportingServices.factory('mtForms', function() {
 
 			try {
 				scope[formElement.model] = Parser.evaluate(formElement.expression, localScope);
-				console.log(scope[formElement.model], formElement.expression, localScope)
-				// scope[formElement.model] = math.eval(formElement.expression, localScope);
 			}
 			catch (e) {
 				scope[formElement.model] = undefined;
@@ -263,24 +261,8 @@ reportingServices.factory('mtFormula', function($q) {
 		 * Out {expression: "a + b", parameters: {a: 42}, symbols: ['a', 'b'], isValid: false}
 		 */
 		annotate: function(formula) {
-			// Helper function to recursively retrieve symbols from abstract syntax tree.
-			// var getSymbolsRec = function(root, symbols) {
-			// 	if (root.type === 'OperatorNode' || root.type === 'FunctionNode')
-			// 		root.params.forEach(function(p) { getSymbolsRec(p, symbols); });
-			// 	else if (root.type === 'SymbolNode')
-			// 		symbols[root.name] = true;
-
-			// 	return Object.keys(symbols);
-			// };
-			
 			formula.__isValid = true;
 			try {
-				// var expression = math.parse(formula.expression);
-				// // do not allow empty formula
-				// if (expression.type === 'ConstantNode' && expression.value === 'undefined')
-				// 	throw new Error();
-				
-				// formula.__symbols = getSymbolsRec(expression, {});
 				var ast = Parser.parse(formula.expression);
 				formula.__symbols = ast.variables();
 			}
@@ -417,18 +399,27 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 			inputs.forEach(function(input) {
 				var period = moment(input.period);
 				var project = query.project || query.projects.find(function(p) { return p._id === input.project; });
-				var groupIds = project.inputGroups.filter(function(group) {
-					return group.members.indexOf(input.entity) !== -1;
-				}).map(function(group) {
-					return group.id;
-				});
 
 				input.yearAgg   = ['total', period.format('YYYY')];
 				input.monthAgg  = ['total', period.format('YYYY-MM')];
 				input.weekAgg   = ['total', period.format('YYYY-[W]WW')];
 				input.dayAgg    = ['total', period.format('YYYY-MM-DD')];
-				input.entityAgg = ['total', input.entity];
-				input.groupAgg  = groupIds; // no total here, groups don't sum
+
+				// some inputs are linked to the projet => they don't have any entity field.
+				if (input.entity !== 'none') {
+					input.entityAgg = ['total', input.entity];
+
+					// no total here, groups may have a non-empty intersection.
+					input.groupAgg  = project.inputGroups.filter(function(group) {
+						return group.members.indexOf(input.entity) !== -1;
+					}).map(function(group) {
+						return group.id;
+					});
+				}
+				else {
+					input.entityAgg = ['total'];
+					input.groupAgg = [];
+				}
 			});
 
 			// discard all inputs that are not relevant...
@@ -461,6 +452,8 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 				formRawRegrouped   = sumBy(formInputs, query.groupBy + 'Agg'),
 				formFinalRegrouped = {};
 
+			console.log('formRawRegrouped', form.id, JSON.stringify(formRawRegrouped, null, "\t"));
+
 			// "for each month" "for each year" "for each inputEntity", etc...
 			for (var groupkey in formRawRegrouped) {
 				// First pass: compute everythink we can, only with averages and sums, and delete values that are wrong.
@@ -471,19 +464,20 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 					var formElement = formElementsByModel[indicatorModel];
 
 					// if no aggregation was done (count === 1), then "none" values are not to be deleted!
-					if (formElement[aggregationKey] === 'none' && formRawRegrouped[groupkey].count !== 1)
-						delete formRawRegrouped[groupkey][indicatorModel];
+					if (formRawRegrouped[groupkey].count !== 1) {
+						if (formElement[aggregationKey] === 'none')
+							delete formRawRegrouped[groupkey][indicatorModel];
 
-					// looping the input fields instead of formElements ensures that we won't divide twice the same element.
-					else if (formElement[aggregationKey] === 'average')
-						formRawRegrouped[groupkey][indicatorModel] /= formRawRegrouped[groupkey].count;
+						// looping the input fields instead of formElements ensures that we won't divide twice the same element.
+						else if (formElement[aggregationKey] === 'average')
+							formRawRegrouped[groupkey][indicatorModel] /= formRawRegrouped[groupkey].count;
+					}
 				}
 
 				// Now that all values are either gone or right in the scope, compute missing values.
 				// This may not succeed, but that's OK: the user was warned when the form was created.
 				formFinalRegrouped[groupkey] = {};
 				form.fields.forEach(function(formElement) {
-
 					// if the value was computed by simple sum or average, take it.
 					if (formRawRegrouped[groupkey][formElement.model] !== undefined)
 						formFinalRegrouped[groupkey][formElement.id] = formRawRegrouped[groupkey][formElement.model];
@@ -499,6 +493,9 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 				});
 			}
 
+			console.log('formRawRegrouped', form.id, JSON.stringify(formRawRegrouped, null, "\t"));
+			console.log('formFinalRegrouped', form.id, JSON.stringify(formFinalRegrouped, null, "\t"));
+
 			// copy values in the final hash and replace conflicted values by a marker
 			// the only way to have conflicted values is to aggregate over a time range where 2 different forms where used.
 			for (var groupkey in formFinalRegrouped) {
@@ -512,13 +509,21 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 						globalRegrouped[groupkey][indicatorId] = formFinalRegrouped[groupkey][indicatorId]
 				}
 			}
+
 		});
 
 		var cols = getStatsColumns(query);
 
+		console.log('globalRegrouped', JSON.stringify(globalRegrouped, null, "\t"))
+		// console.log(cols.map(function(col) {
+		// 	return globalRegrouped[col.id] && globalRegrouped[col.id][indicatorId] !== undefined ? globalRegrouped[col.id][indicatorId] : null;
+		// }))
+		// console.log()
+
 		return {
 			cols: cols,
 			rows: Object.keys(query.project.indicators).map(function(indicatorId) {
+				console.log('INDICATORID', indicatorId)
 				return {
 					id: indicatorId,
 					name: indicatorsById[indicatorId].name,

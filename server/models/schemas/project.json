@@ -68,6 +68,11 @@
 						"enum": ["day", "week", "month", "quarter", "year", "planned"]
 					},
 
+					"collect": {
+						"type": "string",
+						"enum": ["project", "entity"]
+					},
+
 					"intermediaryDates": {
 						"type": "array",
 						"items": { "type": "string", "format": "date" }
@@ -83,7 +88,7 @@
 								"id": { "$ref": "#/definitions/uuid" },
 								"type": {
 									"type": "string",
-									"pattern": "^input|(link:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(\\.[a-z0-9A-Z]+)+)|(compute:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$"
+									"pattern": "^input|(link:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}(\\.[a-z0-9A-Z]+)+)|(compute:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12})$"
 								},
 								"parameters": {
 									"type": "object",
@@ -147,7 +152,6 @@
 												"type": "object",
 												"additionalProperties": false,
 												"required": ["description"],
-
 												"properties": {
 													"description": { "type": "string", "minLength": 1 }
 												}

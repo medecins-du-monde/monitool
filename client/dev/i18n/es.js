@@ -66,6 +66,7 @@ var SPANISH_TRANSLATION = {
 		back_to_intranet: "Volver a la intranet",
 		settings: "Configuración",
 		projects: 'Proyectos',
+		project: 'Proyecto',
 		users: "Usuarios",
 		indicator: 'Indicador',
 		indicators: 'Indicadores',
@@ -132,6 +133,13 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 	project: {
+		input_form_list: "Lista de los formularios",
+		indicator_distribution: "Distribución de los indicadores por formulario y periodo",
+		add_new_indicator_to_form: "Añadir un nuevo indicator al formulario",
+
+		form_name_ph: "ej: Recuperación mensual en los centros de salud",
+		collect: "Recuperar por",
+
 		analysis: "Análisis",
 		analysis_insert_data: "Insertar datos",
 		analysis_insert_text: "Insertar texto",
@@ -181,11 +189,18 @@ var SPANISH_TRANSLATION = {
 		input_mode: 'Modo de entrada',
 		manual_input: 'Entrada manual',
 
-		daily: 'Diario',
-		weekly: 'Cada semana',
-		monthly: 'Cada mes',
-		quarterly: 'Cada trimestre',
-		yearly: 'Cada año',
+		periodicities: {
+			day: 'Diario',
+			week: 'Cada semana',
+			month: 'Cada mes',
+			quarter: 'Cada trimestre',
+			year: 'Cada año',
+		},
+		collects: {
+			entity: "Lugar de actividad",
+			project: "Proyecto"
+		},
+		
 		planned: 'Planificado',
 		add_intermediary: "Añadir una fecha",
 		intermediary_periods: "Fechas adicionales",
@@ -209,7 +224,7 @@ var SPANISH_TRANSLATION = {
 		baseline: 'Valor de base',
 		baseline_ph: 'Valor de referencia',
 		target_value_ph: 'valor',
-		targets: 'Objectivo',
+		target: 'Objectivo',
 		add_target: 'Añadir un objetivo',
 		general_data: 'Datos generales',
 

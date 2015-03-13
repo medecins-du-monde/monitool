@@ -328,72 +328,85 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					for (var formulaId in indicatorsById[indicatorId].formulas)
 						formulasById[formulaId] = indicatorsById[indicatorId].formulas[formulaId];
 
-					return formulasById;
-				},
-				form: function($stateParams, project) {
-					if ($stateParams.formId === 'new')
-						return {
-							id: makeUUID(), name: "",
-							periodicity: "month", 
-							useProjectStart: true, useProjectEnd: true, start: project.begin, end: project.end, intermediaryDates: [], active: true,
-							fields: []
-						};
-						else
-							return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
-					}
-				}
-			});
+				return formulasById;
+			},
+			form: function($stateParams, project) {
+				if ($stateParams.formId === 'new')
+					return {
+						id: makeUUID(),
+						name: '',
+						periodicity: 'month', 
+						collect: 'entity',
+						useProjectStart: true,
+						useProjectEnd: true,
+						start: project.begin,
+						end: project.end,
+						intermediaryDates: [],
+						active: true,
+						fields: []
+					};
+				else
+					return project.dataCollection.find(function(form) {
+						return form.id == $stateParams.formId;
+					});
+			}
+		}
+	});
 
 	$stateProvider.state('main.project.input_list', {
 		url: '/inputs',
 		templateUrl: 'partials/projects/input-list.html',
 		controller: 'ProjectInputListController',
 		resolve: {
+			// FIXME rewrite or move this. It is way to much code for a controller resolve function.
 			inputs: function($stateParams, mtFetch, project) {
 				return mtFetch.inputs({mode: 'project_input_ids', projectId: project._id}).then(function(result) {
-					var inputExists = {}, inputs = [];
-					result.forEach(function(id) { inputExists[id] = true; });
+					// create hash with all existing inputs
+					var existingInputs = {};
+					result.forEach(function(id) { existingInputs[id] = true; });
 					
-					project.inputEntities.forEach(function(inputEntity) {
-						project.dataCollection.forEach(function(form) {
-							getPeriods(form, project).forEach(function(period) {
+					var displayedInputs = []
+
+					// iterate on all inputs that should exist according to the project forms (and current date).
+					project.dataCollection.forEach(function(form) {
+						getPeriods(form, project).forEach(function(period) {
+							var inputEntities;
+							if (form.collect === 'entity')
+								inputEntities = project.inputEntities;
+							else if (form.collect === 'project')
+								inputEntities = [{id: "none"}];
+							else
+								throw new Error('Invalid form.collect value.');
+
+							inputEntities.forEach(function(inputEntity) {
 								var inputId = [project._id, inputEntity.id, form.id, period.format('YYYY-MM-DD')].join(':');
-								if (form.active || inputExists[inputId])
-									inputs.push({
-										filled: inputExists[inputId] ? 'yes' : 'no',
+								if (form.active || existingInputs[inputId])
+									displayedInputs.push({
+										filled: existingInputs[inputId] ? 'yes' : 'no',
 										period: period,
 										formId: form.id, formName: form.name,
 										inputEntityId: inputEntity.id,
 										inputEntityName: inputEntity.name
 									});
 
-								delete inputExists[inputId];
+								delete existingInputs[inputId];
 							});
 						});
 					});
-					
-					Object.keys(inputExists).forEach(function(inputId) {
+
+					Object.keys(existingInputs).forEach(function(inputId) {
 						var parts = inputId.split(':');
-						inputs.push({
+						displayedInputs.push({
 							filled: 'invalid',
 							period: moment(parts[3], 'YYYY-MM-DD'),
 							formId: parts[2],
 							formName: project.dataCollection.find(function(form) { return form.id === parts[2]; }).name,
 							inputEntityId: parts[1],
-							inputEntityName: project.inputEntities.find(function(entity) { return entity.id === parts[1]; }).name
+							inputEntityName: parts[1] == 'none' ? undefined : project.inputEntities.find(function(entity) { return entity.id === parts[1]; }).name
 						});
 					});
 
-					inputs.sort(function(a, b) {
-						if (a.period.isSame(b.period)) {
-							var nameCmp = a.inputEntityName.localeCompare(b.inputEntityName);
-							return nameCmp !== 0 ? nameCmp : a.formName.localeCompare(b.formName);
-						}
-						else
-							return a.period.isBefore(b.period) ? -1 : 1;
-					});
-
-					return inputs;
+					return displayedInputs;
 				});
 			}
 		}
@@ -413,25 +426,26 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					period: $stateParams.period
 				}).then(function(result) {
 					var currentInputId = [$stateParams.projectId, $stateParams.entityId, $stateParams.formId, $stateParams.period].join(':');
-						// both where found
-						if (result.length === 2) 
-							return { current: result[0], previous: result[1], isNew: false };
 
-						// only the current one was found
-						else if (result.length === 1 && result[0]._id === currentInputId) 
-							return { current: result[0], previous: null, isNew: false };
-						
-						// the current one was not found (and we may or not have found the previous one).
-						var previousInput = result.length ? result[0] : null,
-						newInput      = mtFetch.input();
+					// both where found
+					if (result.length === 2) 
+						return { current: result[0], previous: result[1], isNew: false };
 
-						newInput._id     = currentInputId;
-						newInput.project = $stateParams.projectId;
-						newInput.entity  = $stateParams.entityId;
-						newInput.form    = $stateParams.formId;
-						newInput.period  = new Date($stateParams.period);
-						return { current: newInput, previous: previousInput, isNew: true };
-					});
+					// only the current one was found
+					else if (result.length === 1 && result[0]._id === currentInputId) 
+						return { current: result[0], previous: null, isNew: false };
+
+					// the current one was not found (and we may or not have found the previous one).
+					var previousInput = result.length ? result[0] : null,
+					newInput          = mtFetch.input();
+					newInput._id      = currentInputId;
+					newInput.project  = $stateParams.projectId;
+					newInput.form     = $stateParams.formId;
+					newInput.period   = new Date($stateParams.period);
+					newInput.entity  = $stateParams.entityId;
+
+					return { current: newInput, previous: previousInput, isNew: true };
+				});
 			},
 			form: function($stateParams, project) {
 				return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });

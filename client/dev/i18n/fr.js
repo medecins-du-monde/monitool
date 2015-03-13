@@ -66,6 +66,7 @@ var FRENCH_TRANSLATION = {
 		back_to_intranet: "Retourner sur l'intranet",
 		settings: "Paramètres",
 		projects: 'Projets',
+		project: 'Projet',
 		users: "Utilisateurs",
 		indicator: 'Indicateur',
 		indicators: 'Indicateurs',
@@ -132,6 +133,13 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		input_form_list: "Liste des plannings de saisie",
+		indicator_distribution: "Distribution des indicateurs par planning de saisie et période",
+		add_new_indicator_to_form: "Ajouter un nouvel indicateur au formulaire",
+
+		form_name_ph: "ex: Collecte mensuelle pour les centres de santé",
+		collect: "Collecter sur",
+
 		analysis: "Analyse",
 		analysis_insert_data: "Insérer des données",
 		analysis_insert_text: "Insérer du texte",
@@ -181,12 +189,19 @@ var FRENCH_TRANSLATION = {
 		input_mode: 'Mode de saisie',
 		manual_input: 'Saisie manuelle',
 
-		daily: 'Tous les jours',
-		weekly: 'Toutes les semaines',
-		monthly: 'Tous les mois',
-		quarterly: 'Tous les trimestres',
-		yearly: 'Tous les ans',
-		planned: 'Planifiée',
+		periodicities: {
+			day: 'Tous les jours',
+			week: 'Toutes les semaines',
+			month: 'Tous les mois',
+			quarter: 'Tous les trimestres',
+			year: 'Tous les ans',
+			planned: 'Planifiée'
+		},
+		collects: {
+			entity: "Lieux d'activité",
+			project: "Projet"
+		},
+
 		add_intermediary: "Ajouter une saisie",
 		intermediary_periods: "Dates supplémentaires",
 

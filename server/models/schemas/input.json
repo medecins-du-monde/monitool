@@ -9,7 +9,7 @@
 	"properties": {
 		"_id":     {
 			"type": "string",
-			"pattern": "^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:\\d{4}-\\d{2}-\\d{2}$"
+			"pattern": "^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:(([a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12})|none):[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:\\d{4}-\\d{2}-\\d{2}$"
 		},
 		"_rev":    { "$ref": "#/definitions/couchdb-revision" },
 		
@@ -17,7 +17,10 @@
 		"period":  { "type": "string", "format": "date" },
 
 		"project": { "$ref": "#/definitions/uuid" },
-		"entity":  { "$ref": "#/definitions/uuid" },
+		"entity":  {
+			"type": "string",
+			"pattern": "^([a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12})|none$"
+		},
 		"form":    { "$ref": "#/definitions/uuid" },
 		
 		"values": {

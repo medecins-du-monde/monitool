@@ -143,7 +143,9 @@ angular.module('monitool.directives.reporting', [])
 				query: "=query"
 			},
 			link: function($scope, element, attributes, controller) {
+				// FIXME
 				// For legacy reason, dates on this part of the code are strings.
+				// Hence the hacks in this directive.
 				$scope.filter = '';
 				$scope.dates = {begin: new Date($scope.query.begin), end: new Date($scope.query.end)};
 				
@@ -197,9 +199,10 @@ angular.module('monitool.directives.reporting', [])
 							else
 								element.css('background-color', '#AFA');
 						}
+						else
+							element.css('background-color', '');
 
 						// display data in field
-						element.css('background-color', '');
 						if (display === 'value')
 							element.html(Math.round($scope.col) + $scope.row.unit);
 						else if (display === 'progress')

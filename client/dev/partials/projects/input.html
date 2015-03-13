@@ -1,10 +1,10 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
-	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
-	<li><a ui-sref="main.project.input_list({projectId: project._id})" translate>project.waiting_inputs</a></li>
-	<li class="active">{{form.name}}</li>
-	<li class="active">{{inputEntity.name}}</li>
-	<li class="active">{{currentInput.period|amDateFormat:'YYYY-MM-DD'}}</li>
+	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.input_list({projectId: project._id})" translate="project.waiting_inputs"></a></li>
+	<li class="active" ng-bind="form.name"></li>
+	<li class="active" ng-bind="inputEntity.name" ng-if="inputEntity"></li>
+	<li class="active" ng-bind="currentInput.period|amDateFormat:'YYYY-MM-DD'"></li>
 </ol>
 
 <script type="text/ng-template" id="form-sub-3.html">
@@ -59,6 +59,6 @@
 
 	<button class="btn btn-danger" ng-click="delete()" ng-if="!isNew">
 		<i class="fa fa-remove"></i>
-		<span translate>shared.delete</span>
+		<span translate="shared.delete"></span>
 	</button>
 </div>

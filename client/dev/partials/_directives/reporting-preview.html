@@ -19,8 +19,8 @@
 	<tbody>
 		<tr ng-repeat="row in result.stats.rows track by $index">
 			<td ng-bind="row.name||('shared.unknown_indicator'|translate)"></td>
-			<td ng-bind="row.baseline + row.unit || ''"></td>
-			<td ng-bind="row.target + row.unit || ''"></td>
+			<td>{{row.baseline}}{{row.unit}}</td>
+			<td>{{row.target}}{{row.unit}}</td>
 			<td ng-repeat="col in row.cols track by $index" ng-bind="col"></td>
 		</tr>
 	</tbody>

@@ -154,6 +154,10 @@ textarea {
   transition-delay: .25s
 }
 
+report-preview .table {
+  margin-bottom: 0;
+}
+
 
 .print { display: none;}
 .main-content { padding-top: 70px; }

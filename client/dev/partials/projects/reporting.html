@@ -79,7 +79,7 @@
 			</td>
 			<td ng-if="row.type=='data'">{{row.baseline}}{{row.unit}}</td>
 			<td ng-if="row.type=='data'">{{row.target}}{{row.unit}}</td>
-			<td ng-if="row.type=='data'" ng-repeat="col in row.cols track by $index" reporting-field ></td>
+			<td ng-if="row.type=='data'" ng-repeat="col in row.cols track by $index" reporting-field></td>
 		</tr>
 	</tbody>
 </table>
