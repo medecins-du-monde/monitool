@@ -137,7 +137,7 @@
 						"additionalProperties": false,
 						"properties": {
 							"description": { "type": "string", "minLength": 1 },
-							"assumptions": { "type": "string", "minLength": 1 },
+							"assumptions": { "type": "string" },
 							"outputs": {
 								"type": "array",
 								"items": {

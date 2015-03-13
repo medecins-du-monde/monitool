@@ -224,6 +224,7 @@ var ENGLISH_TRANSLATION = {
 		no_input_entities: 'No input entity was created yet!',
 		no_input_groups: 'No input group was created yet!',
 		no_forms: 'No form was created yet!',
+		no_indicators: 'This project does not follow any indicator',
 
 		waiting_inputs: 'Late inputs',
 		no_waiting_inputs: 'No late inputs.',
@@ -239,7 +240,7 @@ var ENGLISH_TRANSLATION = {
 		green_zone: 'Green Zone',
 		baseline: 'Baseline',
 		baseline_ph: 'Reference value',
-		target_value_ph: 'value',
+		target_ph: 'Target value',
 		target: 'Targets',
 		add_target: 'Add a target',
 		general_data: 'General data',

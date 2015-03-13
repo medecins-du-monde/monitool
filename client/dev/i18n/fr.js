@@ -224,6 +224,7 @@ var FRENCH_TRANSLATION = {
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',
 		no_input_groups: 'Aucun groupe d\'activité n\'a encore été créé!',
 		no_forms: 'Aucun formulaire n\'a encore été créé',
+		no_indicators: 'Aucun indicateur n\'est défini sur ce projet',
 
 		waiting_inputs: 'Saisies en attente',
 		no_waiting_inputs: 'Aucune saisie en attente.',

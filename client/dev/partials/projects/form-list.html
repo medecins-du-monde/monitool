@@ -20,7 +20,7 @@
 	</thead>
 	<tbody>
 		<tr ng-if="project.dataCollection.length == 0">
-			<td colspan="5" style="text-align: center" translate="project.no_forms"></td>
+			<td colspan="8" style="text-align: center" translate="project.no_forms"></td>
 		</tr>
 		<tr ng-repeat="form in project.dataCollection">
 			<td ng-style="{'background-color': colors[$index]}"></td>
@@ -51,7 +51,7 @@
 <hr/>
 
 <h4 translate="project.indicator_distribution"></h4>
-<table class="table table-bordered table-condensed" ng-if="project.dataCollection.length != 0">
+<table class="table table-bordered table-condensed">
 	<thead>
 		<tr>
 			<th translate="shared.indicator"></th>
@@ -59,6 +59,9 @@
 		</tr>
 	</thead>
 	<tbody>
+		<tr ng-if="usages.length === 0">
+			<td colspan="2" translate="project.no_indicators" style="text-align: center"></td>
+		</tr>
 		<tr ng-repeat="usage in usages">
 			<td>{{indicatorsById[usage.id].name}}</td>
 			<td ng-repeat="usage in usage.usage" ng-style="{'background-color': usage.color, color: 'white'}" colspan="{{usage.length}}">{{usage.name}}</td>

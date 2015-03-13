@@ -224,6 +224,7 @@ var SPANISH_TRANSLATION = {
 		no_input_entities: '¡Ningún lugar de actividad ha sido creado!',
 		no_input_groups: '¡Ningún grupo de actividad ha sido creado!',
 		no_forms: '¡Ningún formulario ha sido creado!',
+		no_indicators: 'Ningún indicador ha sido definido en este proyecto',
 
 		waiting_inputs: 'Entradas en espera',
 		no_waiting_inputs: 'Ninguna entrada en espera.',
@@ -239,7 +240,7 @@ var SPANISH_TRANSLATION = {
 		green_zone: 'Zona Verde',
 		baseline: 'Valor de base',
 		baseline_ph: 'Valor de referencia',
-		target_value_ph: 'valor',
+		target_ph: 'Valor del objetivo',
 		target: 'Objectivo',
 		add_target: 'Añadir un objetivo',
 		general_data: 'Datos generales',
