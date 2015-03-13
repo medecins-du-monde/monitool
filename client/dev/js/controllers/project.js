@@ -571,7 +571,6 @@ angular.module('monitool.controllers.project', [])
 			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
 			inputsPromise.then(function(inputs) {
 				$scope.stats = mtReporting.regroup(inputs, newQuery, indicatorsById);
-				console.log($scope.stats)
 			});
 		}, true)
 	})

@@ -3,16 +3,16 @@
 
 	<div class="panel-heading">
 		<span class="pull-right" style="font-size: 18px;" acl-has-project-role="owner">
-			<i class="fa fa-caret-square-o-up" ng-if="!key && !$first" ng-click="move($index, -1)" tooltip="{{'project.move_up'|translate}}"></i>
-			<i class="fa fa-caret-square-o-down" ng-if="!key && !$last" ng-click="move($index, 1)" tooltip="{{'project.move_down'|translate}}"></i>
-			<i class="fa fa-times" style="color:red" ng-if="!key" ng-click="remove($index)" tooltip="{{'shared.delete'|translate}}"></i>
+			<i class="fa fa-caret-square-o-up" ng-if="!key && !$first" ng-click="move($index, -1)" tooltip-append-to-body="1" tooltip="{{'project.move_up'|translate}}"></i>
+			<i class="fa fa-caret-square-o-down" ng-if="!key && !$last" ng-click="move($index, 1)" tooltip-append-to-body="1" tooltip="{{'project.move_down'|translate}}"></i>
+			<i class="fa fa-times" style="color:red" ng-if="!key" ng-click="remove($index)" tooltip-append-to-body="1" tooltip="{{'shared.delete'|translate}}"></i>
 		</span>
 
 		<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>
 		<i class="fa fa-calculator" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'"></i>
 		<i class="fa fa-link" ng-if="indicator.type.substring(0, 'link'.length) === 'link'"></i>
-		<i class="fa fa-compass" ng-style="{color: indicator.geoAggregationRec != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.geo_aggregation'|translate}}"></i>
-		<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregationRec != 'none' ? 'green' : 'red'}" tooltip="{{'indicator.time_aggregation'|translate}}"></i>
+		<i class="fa fa-compass" ng-style="{color: indicator.geoAggregationRec != 'none' ? 'green' : 'red'}" tooltip-append-to-body="1" tooltip="{{'indicator.geo_aggregation'|translate}}"></i>
+		<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregationRec != 'none' ? 'green' : 'red'}" tooltip-append-to-body="1" tooltip="{{'indicator.time_aggregation'|translate}}"></i>
 
 		<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
 		{{indicator.name}}
@@ -73,7 +73,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="'project.periodicity.'+form.periodicity|translate">
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.periodicities.'+form.periodicity)|translate">
 				<select class="form-control" name="periodicity" id="periodicity-input" ng-model="form.periodicity">
 					<option value="day" translate="project.periodicities.day"></option>
 					<option value="week" translate="project.periodicities.week"></option>
@@ -87,7 +87,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="collect-input" class="col-sm-2 control-label" translate="project.collect"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="'project.'+form.collect|translate">
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.collects.'+form.collect)|translate">
 				<select class="form-control" name="collect" id="collect-input" ng-model="form.collect">
 					<option value="entity" translate="project.collects.entity"></option>
 					<option value="project" translate="project.collects.project"></option>

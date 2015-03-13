@@ -10,7 +10,7 @@
 
 	<div class="form-group" show-errors>
 		<label for="input-name" class="col-sm-1 control-label" translate="shared.name"></label>
-		<div class="col-sm-11" acl-has-project-role="owner" acl-fallback="report.name">
+		<div class="col-sm-11" acl-has-project-role="input" acl-fallback="report.name">
 			<input id="input-name"
 				   type="text"
 				   class="form-control input-sm"
@@ -25,7 +25,7 @@
 
 	<div class="form-group" show-errors>
 		<label for="input-date" class="col-sm-1 control-label" translate="shared.date"></label>
-		<div class="col-sm-11" acl-has-project-role="owner" acl-fallback="report.date">
+		<div class="col-sm-11" acl-has-project-role="input" acl-fallback="report.date">
 
 			<input id="input-date"
 				   type="text" 
@@ -43,9 +43,9 @@
 
 	<div class="form-group">
 		<label for="input-analysis" class="col-sm-1 control-label" translate="project.analysis"></label>
-		<div class="col-sm-11" acl-has-project-role="owner">
+		<div class="col-sm-11">
 			<div ng-repeat="element in report.elements">
-				<div class="show-on-hover">
+				<div class="show-on-hover" acl-has-project-role="input">
 					<button class="btn btn-primary btn-sm" ng-click="addReportGrid($index)">
 						<i class="fa fa-table"></i>
 						<span translate="project.analysis_insert_data"></span>
@@ -77,11 +77,12 @@
 					<report-preview data="element"></report-preview>
 				</div>
 				<div ng-if="element.type === 'text'">
-					<text-angular ng-model="element.content" ta-toolbar="[['h1','h2','h3','h4','p','pre','quote'],['bold','italics','underline','strikeThrough','ul','ol','undo','redo','clear'],['justifyLeft','justifyCenter','justifyRight','indent','outdent']]"></text-angular>
+					<text-angular acl-has-project-role="input" ng-model="element.content" ta-toolbar="[['h1','h2','h3','h4','p','pre','quote'],['bold','italics','underline','strikeThrough','ul','ol','undo','redo','clear'],['justifyLeft','justifyCenter','justifyRight','indent','outdent']]"></text-angular>
+					<div acl-lacks-project-role="input" ng-bind-html="element.content" style="margin: 10px 0; border: 1px solid #ddd; padding: 5px"></div>
 				</div>
 			</div>
 
-			<div style="margin: 10px 0">
+			<div style="margin: 10px 0" acl-has-project-role="input">
 				<button class="btn btn-primary btn-sm" ng-click="addReportGrid(report.elements.length)">
 					<i class="fa fa-table"></i>
 					<span translate="project.analysis_insert_data"></span>
@@ -94,7 +95,7 @@
 		</div>
 	</div>
 
-	<div acl-has-project-role="owner">
+	<div acl-has-project-role="input">
 		<button ng-disabled="reportForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>

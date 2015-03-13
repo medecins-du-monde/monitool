@@ -19,7 +19,7 @@
 						  placeholder="{{'project.relevance_ph'|translate}}"
 						  required></textarea>
 
-				<p class="help-block" ng-if="planningForm.source.$error.required" translate="form.mandatory"></p>
+				<p class="help-block" ng-if="planningForm.relevance.$error.required" translate="form.mandatory"></p>
 			</div>
 		</div>
 
@@ -45,7 +45,7 @@
 				<div class="input-group">
 					<span class="input-group-addon">
 						<input type="checkbox" ng-model="planning.__baselineUnknown" id="baseline_unknown_input" ng-change="planning.__baselineUnknown&&(planning.baseline=null);">
-						<label for="baseline_unknown_input" style="font-weight: normal">Inconnu</label>
+						<label for="baseline_unknown_input" style="font-weight: normal" translate="project.unknown"></label>
 					</span>
 
 					<input class="form-control"
@@ -66,7 +66,7 @@
 				<div class="input-group">
 					<span class="input-group-addon">
 						<input type="checkbox" ng-model="planning.__targetUnknown" id="target_unknown_input" ng-change="planning.__targetUnknown&&(planning.target=null);">
-						<label for="target_unknown_input" style="font-weight: normal">Inconnu</label>
+						<label for="target_unknown_input" style="font-weight: normal" translate="project.unknown"></label>
 					</span>
 
 					<input id="target-input"
@@ -81,16 +81,12 @@
 			</div>
 		</div>
 
-		<div class="row" style="margin-bottom: 15px;" ng-if="!planning.__baselineUnknown && !planning.__targetUnknown">
-			<label for="show_red-input" class="col-sm-2 control-label">
-				Couleur
-			</label>
-			<div class="col-sm-10" acl-has-project-role="owner">
+		<div class="row" style="margin-bottom: 15px;" ng-if="!planning.__baselineUnknown && !planning.__targetUnknown" acl-has-project-role="owner">
+			<label for="show_red-input" class="col-sm-2 control-label" translate="project.color"></label>
+			<div class="col-sm-10">
 				<div class="form-group" show-errors style="margin: 0">
 					<div class="input-group" style="margin-bottom: 10px">
-						<span class="input-group-addon alert-danger" style="width: 280px;">
-							Rouge pour cible atteinte à moins de 
-						</span>
+						<span class="input-group-addon alert-danger" style="width: 280px;" translate="project.red_for_target"></span>
 						<input id="show_red-input"
 							   class="form-control"
 							   type="number"
@@ -104,7 +100,7 @@
 				<div class="form-group" show-errors style="margin: 0">
 					<div class="input-group" style="margin-bottom: 10px">
 						<span class="input-group-addon alert-warning" style="width: 280px;">
-							Orange pour cible atteinte entre {{planning.showRed || '?'}}% et
+							{{'project.orange_for_target'|translate:{value:planning.showRed} }}
 						</span>
 						<input id="show_yellow-input"
 							   class="form-control"
@@ -119,17 +115,14 @@
 					</div>
 				</div>
 				<div class="alert alert-success" style="padding: 6px 12px; text-align: center">
-					Vert pour cible atteinte à {{planning.showYellow}}%
+					{{'project.green_for_target'|translate:{value:planning.showYellow} }}
 				</div>
 
 				<a class="pull-right" ng-click="show_more=!show_more">
 					<i class="fa fa-info"></i>
-					Qu'appelle-t'on une "cible atteinte à 34%"?
+					{{'project.what_is_progress'|translate}}
 				</a>
-				<div ng-show="show_more" style="clear: both">
-					On ne peut colorer que les indicateurs qui renseignent leur baseline <strong>et</strong> leur cible.<br/>
-					On calcule où se situe chaque saisie entre la baseline et la cible à l'aide d'une règle de trois.
-				</div>
+				<div ng-show="show_more" style="clear: both" ng-bind-html="'project.what_is_progress_detail'|translate"></div>
 			</div>
 		</div>
 	</form>

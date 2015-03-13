@@ -452,7 +452,7 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 				formRawRegrouped   = sumBy(formInputs, query.groupBy + 'Agg'),
 				formFinalRegrouped = {};
 
-			console.log('formRawRegrouped', form.id, JSON.stringify(formRawRegrouped, null, "\t"));
+			// console.log('formRawRegrouped', form.id, JSON.stringify(formRawRegrouped, null, "\t"));
 
 			// "for each month" "for each year" "for each inputEntity", etc...
 			for (var groupkey in formRawRegrouped) {
@@ -493,8 +493,8 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 				});
 			}
 
-			console.log('formRawRegrouped', form.id, JSON.stringify(formRawRegrouped, null, "\t"));
-			console.log('formFinalRegrouped', form.id, JSON.stringify(formFinalRegrouped, null, "\t"));
+			// console.log('formRawRegrouped', form.id, JSON.stringify(formRawRegrouped, null, "\t"));
+			// console.log('formFinalRegrouped', form.id, JSON.stringify(formFinalRegrouped, null, "\t"));
 
 			// copy values in the final hash and replace conflicted values by a marker
 			// the only way to have conflicted values is to aggregate over a time range where 2 different forms where used.
@@ -514,16 +514,12 @@ reportingServices.factory('mtReporting', function($q, mtForms, mtFetch) {
 
 		var cols = getStatsColumns(query);
 
-		console.log('globalRegrouped', JSON.stringify(globalRegrouped, null, "\t"))
-		// console.log(cols.map(function(col) {
-		// 	return globalRegrouped[col.id] && globalRegrouped[col.id][indicatorId] !== undefined ? globalRegrouped[col.id][indicatorId] : null;
-		// }))
-		// console.log()
+		// console.log('globalRegrouped', JSON.stringify(globalRegrouped, null, "\t"))
 
 		return {
 			cols: cols,
 			rows: Object.keys(query.project.indicators).map(function(indicatorId) {
-				console.log('INDICATORID', indicatorId)
+				// console.log('INDICATORID', indicatorId)
 				return {
 					id: indicatorId,
 					name: indicatorsById[indicatorId].name,

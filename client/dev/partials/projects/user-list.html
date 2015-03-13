@@ -14,9 +14,9 @@
 				<ui-select-choices repeat="user._id as user in users">{{user.name}}</ui-select-choices>
 			</ui-select>
 
-			<span acl-lacks-project-role="owner">
+			<p acl-lacks-project-role="owner" class="form-control-static">
 				{{project.owners | getObjects:users | pluck:'name' | join:', '}}
-			</span>
+			</p>
 		</div>
 	</div>
 
@@ -28,9 +28,9 @@
 				<ui-select-choices repeat="user._id as user in users">{{user.name}}</ui-select-choices>
 			</ui-select>
 
-			<span acl-lacks-project-role="owner">
+			<p acl-lacks-project-role="owner" class="form-control-static">
 				{{project.dataEntryOperators | getObjects:users | pluck:'name' | join:', '}}
-			</span>
+			</p>
 		</div>
 	</div>
 

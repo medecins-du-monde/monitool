@@ -133,8 +133,24 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 	project: {
+		unknown: "Desconocido",
+		color: "Color",
+		red_for_target: "Rojo si el objetivo esta alcanzado a",
+		orange_for_target: "Naranja para objetivo entre {{value}}% y ",
+		green_for_target: "Verde para objetivo alcanzado a {{value}}%",
+		what_is_progress: "¿Qué es un \"objetivo alcanzado a 34%\"?",
+		what_is_progress_detail:
+			"Se pueden colorear unicamente los indicadores que informan su valor de base <strong>y</strong> objetivo.<br/>" + 
+			"Luego se compara proporcionalmente cada entrada entre esos dos valores.",
+
+		specs: "Especificaciones",
+		indicators_management: "Seguimiento de indicadores",
+		additional_indicators: "Indicadores adicionales",
+		no_additional_indicators: "Ningun indicador adicional ha sido definido",
+		no_purposes: "Ningun objetivo específico ha sido definido",
+
 		input_form_list: "Lista de los formularios",
-		indicator_distribution: "Distribución de los indicadores por formulario y periodo",
+		indicator_distribution: "Distribución de los indicadores por formulario y período",
 		add_new_indicator_to_form: "Añadir un nuevo indicator al formulario",
 
 		form_name_ph: "ej: Recuperación mensual en los centros de salud",

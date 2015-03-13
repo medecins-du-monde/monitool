@@ -133,6 +133,22 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		unknown: "Inconnu",
+		color: "Couleur",
+		red_for_target: "Rouge pour cible atteinte à moins de",
+		orange_for_target: "Orange pour cible atteinte entre {{value}}% et ",
+		green_for_target: "Vert pour cible atteinte à {{value}}%",
+		what_is_progress: "Qu'appelle-t'on une \"cible atteinte à 34%\"?",
+		what_is_progress_detail:
+			"On ne peut colorer que les indicateurs qui renseignent leur baseline <strong>et</strong> leur cible.<br/>" + 
+			"On calcule où se situe chaque saisie entre la baseline et la cible à l'aide d'une règle de trois.",
+
+		specs: "Spécifications",
+		indicators_management: "Suivi des indicateurs",
+		additional_indicators: "Indicateurs supplémentaires",
+		no_additional_indicators: "Aucun indicateur supplémentaire n'a été défini",
+		no_purposes: "Aucun objectif spécifique n'a été défini",
+
 		input_form_list: "Liste des plannings de saisie",
 		indicator_distribution: "Distribution des indicateurs par planning de saisie et période",
 		add_new_indicator_to_form: "Ajouter un nouvel indicateur au formulaire",

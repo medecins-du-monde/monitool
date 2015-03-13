@@ -1,4 +1,4 @@
-<!-- <table class="table table-bordered table-stripped print-only">
+<!-- <table class="table table-bordered print-only">
 	<thead>
 		<tr>
 			<th>What</th>
@@ -160,6 +160,8 @@
 	<fieldset>
 		<legend translate="project.purposes"></legend>
 		
+		<p ng-if="project.logicalFrame.purposes.length == 0" translate="project.no_purposes"></p>
+
 		<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes" ng-init="tabOpen=false">
 
 			<div class="panel-heading">
@@ -365,7 +367,9 @@
 	<br/>
 
 	<fieldset>
-		<legend>Indicateurs supplémentaires</legend>
+		<legend translate="project.additional_indicators"></legend>
+
+		<p ng-if="otherIndicators.length == 0" translate="project.no_additional_indicators"></p>
 
 		<p ng-repeat="indicatorId in otherIndicators">
 			<i class="fa fa-external-link fa-fw"

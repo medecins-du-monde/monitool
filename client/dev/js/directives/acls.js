@@ -7,27 +7,30 @@
 // acl-fallback
 
 function _makeReadOnly(scope, element, attributes) {
+
 	// replace by raw text
 	if (attributes.aclFallback) {
 		var fallback = scope.$eval(attributes.aclFallback) || '';
-		
-		// handle boolean case.
+
+		// handle boolean and dates case.
 		if (fallback === true)
 			fallback = '<i class="fa fa-check" style="color: green"></i>';
+		
 		else if (fallback === false)
 			fallback = '<i class="fa fa-times" style="color: red"></i>';
-
-		// handle dates
-		if (Object.prototype.toString.call(fallback) === '[object Date]')
+		
+		else if (Object.prototype.toString.call(fallback) === '[object Date]')
 			fallback = moment(fallback).format('YYYY-MM-DD');
 
+		// Nest in a form-control-static if needed.
 		if (element.parent().hasClass('form-group'))
 			fallback = '<p class="form-control-static">' + fallback + '</p>';
 
 		element.html(fallback.toString());
 	}
-	else
+	else {
 		element.remove();
+	}
 };
 
 angular.module('monitool.directives.acl', [])
@@ -49,6 +52,7 @@ angular.module('monitool.directives.acl', [])
 					project = scope.$eval(attributes.project) || scope.project,
 					owners;
 
+
 				if (attributes.aclHasProjectRole === 'owner')
 					owners = project.owners || [];
 				else if (attributes.aclHasProjectRole === 'input')
@@ -59,7 +63,7 @@ angular.module('monitool.directives.acl', [])
 				// if (!project._id)
 				// 	return roles.indexOf('project_create') !== -1 || roles.indexOf('_admin') !== -1;
 				// else {
-					var isAllowed = owners.indexOf(scope.userCtx.name) !== -1 || roles.indexOf('_admin') !== -1;
+					var isAllowed = owners.indexOf(scope.userCtx._id) !== -1 || roles.indexOf('_admin') !== -1;
 					if (!isAllowed)
 						_makeReadOnly(scope, element, attributes);
 				// }
@@ -97,7 +101,7 @@ angular.module('monitool.directives.acl', [])
 				// if (!scope.project._id)
 				// 	return roles.indexOf('project_create') === -1 && roles.indexOf('_admin') === -1;
 				// else {
-					var isForbidden = owners.indexOf(scope.userCtx.name) === -1 && roles.indexOf('_admin') === -1;
+					var isForbidden = owners.indexOf(scope.userCtx._id) === -1 && roles.indexOf('_admin') === -1;
 					if (!isForbidden)
 						_makeReadOnly(scope, element, attributes);
 				// }

@@ -1,7 +1,7 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
-	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
-	<li class="active" translate>shared.input_groups</li>
+	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})" ng-bind="project.name"></a></li>
+	<li class="active" translate="shared.input_groups"></li>
 </ol>
 
 <form name="projectForm" novalidate>
@@ -10,12 +10,12 @@
 			<tr>
 				<th style="width:300px" translate="project.group_name"></th>
 				<th translate="shared.members"></th>
-				<th style="width: 100px;"></th>
+				<th style="width: 100px;" acl-has-project-role="owner"></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-if="!project.inputGroups.length">
-				<td colspan="3" style="text-align: center" translate>project.no_input_groups</td>
+				<td colspan="3" style="text-align: center" translate="project.no_input_groups"></td>
 			</tr>
 			<tr ng-repeat="inputGroup in project.inputGroups track by inputGroup.id">
 				<td acl-has-project-role="owner" acl-fallback="inputGroup.name">
@@ -42,10 +42,10 @@
 						{{inputGroup.members | getObjects:project.inputEntities | pluck:'name' | join:', '}}
 					</span>
 				</td>
-				<td style="text-align: center">
-					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)" acl-has-project-role="owner">
+				<td style="text-align: center" acl-has-project-role="owner">
+					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)">
 						<i class="fa fa-remove"></i>
-						<span translate>shared.delete</span>
+						<span translate="shared.delete"></span>
 					</button>
 				</td>
 			</tr>
@@ -53,7 +53,7 @@
 		<tfoot acl-has-project-role="owner">
 			<tr>
 				<td colspan="3">
-					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate>shared.add</button>
+					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate="shared.add"></button>
 				</td>
 			</tr>
 		</tfoot>

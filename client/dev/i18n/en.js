@@ -133,6 +133,22 @@ var ENGLISH_TRANSLATION = {
 		english: "English",
 	},
 	project: {
+		unknown: "Unknown",
+		color: "Color",
+		red_for_target: "Red if target is reached at",
+		orange_for_target: "Orange if target is reacher between {{value}}% and ",
+		green_for_target: "Green for a target reached over {{value}}%",
+		what_is_progress: "What does \"target reached at 34%\" means?",
+		what_is_progress_detail:
+			"We can compute progress only when both baseline and target are defined.<br/>" + 
+			"The progress simply is computed situating each input between those two values.",
+
+		specs: "Specifications",
+		indicators_management: "Indicators management",
+		additional_indicators: "Additional indicators",
+		no_additional_indicators: "No additional indicators were defined",
+		no_purposes: "No purposes were defined yet",
+
 		input_form_list: "Input form list",
 		indicator_distribution: "Indicators repartition by form and period",
 		add_new_indicator_to_form: "Add a new indicator to the form",
