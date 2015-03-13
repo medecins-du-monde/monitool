@@ -175,7 +175,9 @@ angular.module('monitool.directives.reporting', [])
 	.directive('reportingField', function() {
 		return {
 			link: function($scope, element, attributes, controller) {
-				$scope.$watch('presentation.display', function(display) {
+				$scope.$watch('[presentation.display, row]', function(newValue) {
+					var display = newValue[0];
+
 					if ($scope.col !== null) {
 						var progress = null;
 
@@ -197,16 +199,19 @@ angular.module('monitool.directives.reporting', [])
 						}
 
 						// display data in field
+						element.css('background-color', '');
 						if (display === 'value')
 							element.html(Math.round($scope.col) + $scope.row.unit);
-						else if (progress !== null)
-							element.html(Math.round(100 * progress) + '%');
+						else if (display === 'progress')
+							element.html(progress !== null ? Math.round(100 * progress) + '%' : '');
 						else
-							element.html('')
+							throw new Error('Invalid display value.');
 					}
-					else
+					else {
+						element.html('');
 						element.css('background-color', '#eee');
-				});
+					}
+				}, true);
 			}
 		}
 	})
