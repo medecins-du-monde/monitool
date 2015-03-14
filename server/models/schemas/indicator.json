@@ -4,7 +4,7 @@
 	"type": "object",
 	"additionalProperties": false,
 	"required": [
-		"_id", "type", "name", "description", "history",
+		"_id", "type", "name", "description",
 		"geoAggregation", "timeAggregation", "unit", "types", "themes", "formulas"
 	],
 	"properties": {
@@ -13,9 +13,8 @@
 		"operation":       { "type": "string", "enum": ["parameter", "common", "recommended", "mandatory"] },
 		"target": 		   { "type": "string", "enum": ["lower_is_better", "higher_is_better", "around_is_better", "non_relevant"] },
 		"type":            { "type": "string", "pattern": "^indicator$" },
-		"name":            { "type": "string", "minLength": 3 },
-		"description":     { "type": "string", "minLength": 3 },
-		"history":         { "type": "string" },
+		"name":            { "type": "string", "minLength": 1 },
+		"description":     { "type": "string", "minLength": 1 },
 		"geoAggregation":  { "type": "string", "enum": ["none", "sum", "average"] },
 		"timeAggregation": { "type": "string", "enum": ["none", "sum", "average"] },
 		"unit":            { "type": "string", "enum": ["‰", "%", ""] },

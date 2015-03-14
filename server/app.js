@@ -44,7 +44,6 @@ express()
 
 	.use(require('./controllers/public'))
 	.use(require('./controllers/restricted'))
-	.use(require('./controllers/reporting'))
 
 	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? '../client/dev' : '../client/build'))
 	.listen(8000);

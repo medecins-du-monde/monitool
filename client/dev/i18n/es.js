@@ -327,10 +327,8 @@ var SPANISH_TRANSLATION = {
 
 		name_ph: 'Por ejemplo: Porcentaje de fichas de paciente completas',
 		description_ph: 'Por ejemplo: Medir el nivel de formación del personal medical que completa las fichas de pacientes. Medir este indicador es facil en proyectos pequeños, evitar usarlo en otras circunstancias.',
-		history_ph: 'Por ejemplo: Creado en 2007 en el cuadro de un proyecto de UNICEF ... este indicador permitio seguir los objetivos de ...',
 		definition: 'Definición',
 		core: 'Recomendado',
-		history: 'Historico',
 		unit: 'Unidad',
 		other: 'Otro',
 		percent: 'Porcentaje (%)',
@@ -368,6 +366,7 @@ var SPANISH_TRANSLATION = {
 		is_parameter: "Este indicador se puede usar solo para calcular a otros",
 		is_external: "Este indicator viene de otra temática",
 
+		what_is_aggregation: "¿Como llenar estos campos?",
 		time_aggregation: "Agregación en el tiempo",
 		time_aggregation_sum: "Suma (por ejemplo: número de consultaciones, de nacimientos, ...)",
 		time_aggregation_average: "Promedia no ponderada (por ejemplo: poblaciones, número de medicos, de vehiculos...)",

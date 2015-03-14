@@ -325,12 +325,10 @@ var ENGLISH_TRANSLATION = {
 
 		operation: "Operation mode",
 
-		name_ph: 'For instance: Percentage of correclty filled medical records',
-		description_ph: '',		// Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
-		history_ph: '',			// Exemple: Défini en 2007 par l\'OMS et utilisé sur les projets de UNICEF ... cet indicateur a permi de suivre les objectifs ...
+		name_ph: 'For instance: Percentage of correctly filled medical records',
+		description_ph: 'For instance: Mesure the staff formation level. This indicator is mesurable only on small projects and should be avoided otherwise',
 		definition: 'Definition',
 		core: 'Core',
-		history: 'History',
 		unit: 'Unit',
 		other: 'Other',
 		percent: 'Percentage (%)',
@@ -368,6 +366,7 @@ var ENGLISH_TRANSLATION = {
 		is_parameter: "This indicator can only be used to compute another one",
 		is_external: "This indicator is from another thematic",
 
+		what_is_aggregation: "How to fill those fields?",
 		time_aggregation: "Time aggregation",
 		time_aggregation_sum: "Sum (for instance: number of consultations, births, ...)",
 		time_aggregation_average: "Average (for instance: population, number of doctors, cars, ...)",

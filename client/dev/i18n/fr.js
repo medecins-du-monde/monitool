@@ -327,10 +327,8 @@ var FRENCH_TRANSLATION = {
 
 		name_ph: 'Exemple: Part des dossiers patient bien remplis',
 		description_ph: 'Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
-		history_ph: 'Exemple: Défini en 2007 par l\'OMS et utilisé sur les projets de UNICEF ... cet indicateur a permi de suivre les objectifs ...',
 		definition: 'Définition',
 		core: 'Recommandé',
-		history: 'Historique',
 		unit: 'Unité',
 		other: 'Autre',
 		percent: 'Pour cent (%)',
@@ -372,6 +370,8 @@ var FRENCH_TRANSLATION = {
 		time_aggregation_sum: "Somme (ex: nombre de consultations, de naissances, ...)",
 		time_aggregation_average: "Moyenne non pondérée (ex: population, nombre de médecins, de véhicules, ...)",
 		time_aggregation_none: "Pas d'aggrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
+
+		what_is_aggregation: "Comment remplir ces champs?",
 		time_aggregation_help: [
 			"<strong>Aide à la saisie</strong>",
 			"<ul>",
