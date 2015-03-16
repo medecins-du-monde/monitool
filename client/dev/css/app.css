@@ -162,6 +162,14 @@ report-preview .table {
 .print { display: none;}
 .main-content { padding-top: 70px; }
 
+
+ul>.onrollover {
+  display: none;
+}
+ul:hover>.onrollover {
+  display: list-item;
+}
+
 @media print {
   .noprint { display: none; }
   .print-only { display: block !important; }
