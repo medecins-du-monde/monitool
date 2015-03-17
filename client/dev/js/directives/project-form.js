@@ -39,28 +39,47 @@ angular
 			},
 
 			fields: {
-				getFlat: function(fields) {
-					var getFieldsRec = function(field, path, indent) {
-						var result = [];
-
-						for (var key in field.parameters) {
-							var subField = field.parameters[key];
-							result.push({indent: indent, path: path + '.' + key, field: subField});
-
-							Array.prototype.push.apply(result, getFieldsRec(subField, path + '.' + key, indent + 1));
-						}
-
-						return result;
-					};
-
+				getFlat: function(fields, indicatorsById) {
 					var flatFields = [];
-
 					fields.forEach(function(field) {
-						flatFields.push({indent: 0, path: field.indicatorId, field: field});
-						Array.prototype.push.apply(flatFields, getFieldsRec(field, field.indicatorId, 1))
+						flatFields.push({
+							indent: 0,
+							indicator: indicatorsById[field.indicatorId],
+							field: field
+						});
+
+						if (field.type === 'formula')
+							for (var key in field.parameters)
+								flatFields.push({
+									indent: 1,
+									indicator: indicatorsById[field.indicatorId].formulas[field.formulaId].parameters[key],
+									field: field.parameters[key]
+								});
 					});
 
 					return flatFields;
+
+					// var getFieldsRec = function(field, path, indent) {
+					// 	var result = [];
+
+					// 	for (var key in field.parameters) {
+					// 		var subField = field.parameters[key];
+					// 		result.push({indent: indent, path: path + '.' + key, field: subField});
+
+					// 		Array.prototype.push.apply(result, getFieldsRec(subField, path + '.' + key, indent + 1));
+					// 	}
+
+					// 	return result;
+					// };
+
+					// var flatFields = [];
+
+					// fields.forEach(function(field) {
+					// 	flatFields.push({indent: 0, path: field.indicatorId, field: field});
+					// 	Array.prototype.push.apply(flatFields, getFieldsRec(field, field.indicatorId, 1))
+					// });
+
+					// return flatFields;
 				}
 			},
 
@@ -277,7 +296,7 @@ angular
 				// watch fields in the form. When those change, recompute the flatFields list
 				// so that we can render the html table.
 				$scope.$watch('form.fields', function(fields) {
-					$scope.flatFields = formEditUtils.fields.getFlat(fields);
+					$scope.flatFields = formEditUtils.fields.getFlat(fields, $scope.indicatorsById);
 				}, true);
 
 				// watch begin and end date.
@@ -382,9 +401,7 @@ angular
 						$scope.field.formulaId = source.meta.id;
 						$scope.field.parameters = {};
 						for (var key in $scope.indicator.formulas[source.meta.id].parameters)
-							$scope.field.parameters[key] = {
-								indicatorId: $scope.indicator.formulas[source.meta.id].parameters[key]
-							};
+							$scope.field.parameters[key] = {};
 					}
 				}, true);
 			}

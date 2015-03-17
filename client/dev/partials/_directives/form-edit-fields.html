@@ -7,12 +7,11 @@
 		<th>Provenance</th>
 	</thead>
 	<tbody form-edit-field-list fields="form.fields">
-		<tr
-			ng-repeat="fw in flatFields track by fw.path"
+		<tr ng-repeat="fw in flatFields track by $index"
 			class="{{'indent' + fw.indent}}"
 			form-edit-field
 				field="fw.field"
-				indicator="indicatorsById[fw.field.indicatorId]"
+				indicator="fw.indicator"
 				raw-data="form.rawData">
 		</tr>
 	</tbody>

@@ -62,16 +62,18 @@ var Indicator = module.exports = {
 		// FIXME Here we should parse and execute the MathJS formulas to check if they're valid!
 
 
-		// Check dependencies
-		var ids = {type: item.types, theme: item.themes, indicator: []};
-		for (var formulaId in item.formulas)
-			for (var key in item.formulas[formulaId].parameters)
-				if (ids.indicator.indexOf(item.formulas[formulaId].parameters[key]) === -1)
-					ids.indicator.push(item.formulas[formulaId].parameters[key]);
+		return callback(null);
 
-		Abstract._checkIds(ids, function(errors) {
-			return callback(errors.length ? errors : null)
-		});
+		// Check dependencies
+		// var ids = {type: item.types, theme: item.themes, indicator: []};
+		// for (var formulaId in item.formulas)
+		// 	for (var key in item.formulas[formulaId].parameters)
+		// 		if (ids.indicator.indexOf(item.formulas[formulaId].parameters[key]) === -1)
+		// 			ids.indicator.push(item.formulas[formulaId].parameters[key]);
+
+		// Abstract._checkIds(ids, function(errors) {
+		// 	return callback(errors.length ? errors : null)
+		// });
 	},
 
 	/**

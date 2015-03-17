@@ -37,6 +37,7 @@ reportingServices.factory('mtRegroup', function() {
 
 	/**
 	 * Inputs must always come from the same form!!!!
+	 * FIXME => this is wrong. We need tests!
 	 */
 	var regroupInputs = function(inputs, form, groupBy, indicatorsById) {
 		var result  = {},
@@ -52,33 +53,20 @@ reportingServices.factory('mtRegroup', function() {
 					memo[key] = angular.copy(obj[key]);
 		};
 
-		var processField = function(field, computed, count, indicatorsById) {
-			if (field.type === 'formula') {
-				var result = {}
-				for (var key in field.parameters)
-					result[key] = processField(field.parameters[key], computed[key], count, indicatorsById)
-				return result;
-			}
-			else if (field.type === 'raw') {
-				var indicatorAggregation = indicatorsById[field.indicatorId][aggType];
-
-				// if there was only one input, we don't care how to avg/sum etc, and just return the value
-				if (count > 1) {
-					if (indicatorAggregation === 'average')
-						return computed / count;
-					else if (indicatorAggregation === 'sum')
-						return computed;
-					else if (indicatorAggregation === 'none')
-						return 'AGG_CONFLICT';
-					else
-						throw new Error('Invalid aggregation type');
-				}
+		var processRaw = function(value, count, indicatorAggregation) {
+			// if there was only one input, we don't care how to avg/sum etc, and just return the value
+			if (count > 1) {
+				if (indicatorAggregation === 'average')
+					return value / count;
+				else if (indicatorAggregation === 'sum')
+					return value;
+				else if (indicatorAggregation === 'none')
+					return 'AGG_CONFLICT';
 				else
-					return computed;
+					throw new Error('Invalid aggregation type');
 			}
-			else {
-				throw new Error('Invalid field type: ' + field.type)
-			}
+			else
+				return value;
 		};
 
 		// start by dummy summing all inputs by their groupBy key
@@ -95,8 +83,24 @@ reportingServices.factory('mtRegroup', function() {
 		// - If we summed indicators that are not summable, we need to delete them from the final result.
 		for (var groupKey in result) {
 			var computed = result[groupKey];
+
 			form.fields.forEach(function(field) {
-				computed[field.indicatorId] = processField(field, computed[field.indicatorId], computed.count, indicatorsById);
+				var indicator = indicatorsById[field.indicatorId];
+
+				if (field.type === 'formula') {
+					var formula = indicator.formulas[field.formulaId];
+
+					// we could iterate on either formula.parameters, field.parameters or result[groupKey][indicatorId].
+					for (var key in formula.parameters) { 
+						computed[field.indicatorId][key] = processRaw(
+							computed[field.indicatorId][key],	// value.
+							computed.count,						// number of inputs that were aggregated to do this.
+							formula.parameters[key][aggType]	// geoAggregation/timeAggregation
+						);
+					}
+				}
+				else if (field.type === 'raw')
+					computed[field.indicatorId] = processRaw(computed[field.indicatorId], computed.count, indicator[aggType])
 			});
 		}
 

@@ -10,20 +10,31 @@ reportingServices.factory('mtFormula', function($q) {
 		 * Out {expression: "a + b", parameters: {a: 42}, symbols: ['a', 'b'], isValid: false}
 		 */
 		annotate: function(formula) {
+			var symbols;
+
 			formula.__isValid = true;
 			try {
-				var ast = Parser.parse(formula.expression);
-				formula.__symbols = ast.variables();
+				formula.__symbols = Parser.parse(formula.expression).variables();
 			}
 			catch (e) { 
 				formula.__symbols = [];
 				formula.__isValid = false;
 			}
 
-			var numSymbols = formula.__symbols.length;
-			for (var i = 0; i < numSymbols; ++i)
-				if (!formula.parameters[formula.__symbols[i]])
+			formula.__symbols.forEach(function(symbol) {
+				if (!formula.parameters[symbol])
+					formula.parameters[symbol] = {name: "", geoAggregation: "sum", timeAggregation: "sum"};
+
+				if (!formula.parameters[symbol].name.length)
 					formula.__isValid = false;
+			})
+
+			// var numSymbols = symbols.length;
+			// for (var i = 0; i < numSymbols; ++i)
+			// 	if (!formula.parameters[symbols[i]]) {
+			// 		formula.__isValid = false;
+			// 		formula.parameters[symbols[i]] = []
+			// 	}
 
 			if (!formula.name)
 				formula.__isValid = false;
