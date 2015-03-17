@@ -110,7 +110,7 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.query = {
 			type: "indicator",
 			indicator: indicator,
-			projects: projects.map(function(p) { return mtReporting.getAnnotatedProjectCopy(p, indicatorsById); }),
+			projects: projects,
 			begin: mtReporting.getDefaultStartDate(),
 			end: mtReporting.getDefaultEndDate(),
 			groupBy: 'month',
@@ -123,6 +123,7 @@ angular.module('monitool.controllers.indicator', [])
 			$scope.query.end = moment($scope.dates.end).format('YYYY-MM-DD');
 		}, true);
 
+		// h@ck2 (for translation)
 		$scope.$on('languageChange', function(e) {
 			$scope.dates = angular.copy($scope.dates);
 		})
@@ -132,11 +133,11 @@ angular.module('monitool.controllers.indicator', [])
 			// if anything besides groupBy changes, we need to refetch.
 			// FIXME: we could widely optimize this.
 			if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end)
-				inputsPromise = mtReporting.getInputs(newQuery);
+				inputsPromise = mtReporting.getPreprocessedInputs(newQuery);
 
 			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
 			inputsPromise.then(function(inputs) {
-				$scope.stats = mtReporting.regroupIndicator(inputs, newQuery, indicatorsById);
+				$scope.stats = mtReporting.getIndicatorReporting(inputs, newQuery, indicatorsById);
 			});
 		}, true)
 	})

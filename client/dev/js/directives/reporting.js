@@ -1,5 +1,7 @@
+"use strict";
 
 angular.module('monitool.directives.reporting', [])
+
 	.directive('svgSave', function() {
 		var doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
@@ -13,20 +15,11 @@ angular.module('monitool.directives.reporting', [])
 		var svgAsDataUri = function(el, scaleFactor, cb) {
 			scaleFactor = scaleFactor || 1;
 
-			var outer = document.createElement("div");
-			var clone = el.cloneNode(true);
-			var width = parseInt(
-				clone.getAttribute('width')
-					|| clone.style.width
-					|| out$.getComputedStyle(el).getPropertyValue('width')
-			);
-			var height = parseInt(
-				clone.getAttribute('height')
-					|| clone.style.height
-					|| out$.getComputedStyle(el).getPropertyValue('height')
-			);
-
-			var xmlns = "http://www.w3.org/2000/xmlns/";
+			var outer  = document.createElement("div"),
+				clone  = el.cloneNode(true),
+				width  = parseInt(clone.getAttribute('width') || clone.style.width || out$.getComputedStyle(el).getPropertyValue('width')),
+				height = parseInt(clone.getAttribute('height') || clone.style.height || out$.getComputedStyle(el).getPropertyValue('height')),
+				xmlns  = "http://www.w3.org/2000/xmlns/";
 
 			clone.setAttribute("version", "1.1");
 			clone.setAttributeNS(xmlns, "xmlns", "http://www.w3.org/2000/svg");
@@ -180,7 +173,7 @@ angular.module('monitool.directives.reporting', [])
 				$scope.$watch('[presentation.display, row]', function(newValue) {
 					var display = newValue[0];
 
-					if ($scope.col !== null) {
+					if (typeof $scope.col === "number") {
 						var progress = null;
 
 						// if baseline and target are available.
@@ -209,6 +202,10 @@ angular.module('monitool.directives.reporting', [])
 							element.html(progress !== null ? Math.round(100 * progress) + '%' : '');
 						else
 							throw new Error('Invalid display value.');
+					}
+					else if (typeof $scope.col === "string") {
+						element.html('<i class="fa fa-ban"></i>');
+						element.css('background-color', '');
 					}
 					else {
 						element.html('');
@@ -246,6 +243,10 @@ angular.module('monitool.directives.reporting', [])
 						if ($scope.display !== 'value')
 							$scope.data.rows.forEach(function(row) {
 								row.cols = row.cols.map(function(col) {
+									// deal with form or aggregation conflicts.
+									if (typeof col !== 'number')
+										return null;
+
 									if ($scope.display === 'value')
 										return col;
 									else if (row.baseline !== null && row.target !== null && col !== null) {
@@ -341,12 +342,5 @@ angular.module('monitool.directives.reporting', [])
 				"result": "=data"
 			}
 		}
-
-
 	});
-
-
-
-
-;
 

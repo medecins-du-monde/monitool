@@ -1,39 +1,3 @@
-<!-- FIXME move this to another file... -->
-<script type="text/ng-template" id="form-field.html">
-
-	<div class="panel-heading">
-		<span class="pull-right" style="font-size: 18px;" acl-has-project-role="owner">
-			<i class="fa fa-caret-square-o-up" ng-if="!key && !$first" ng-click="move($index, -1)" tooltip-append-to-body="1" tooltip="{{'project.move_up'|translate}}"></i>
-			<i class="fa fa-caret-square-o-down" ng-if="!key && !$last" ng-click="move($index, 1)" tooltip-append-to-body="1" tooltip="{{'project.move_down'|translate}}"></i>
-			<i class="fa fa-times" style="color:red" ng-if="!key" ng-click="remove($index)" tooltip-append-to-body="1" tooltip="{{'shared.delete'|translate}}"></i>
-		</span>
-
-		<i class="fa fa-pencil" ng-if="indicator.type === 'input'"></i>
-		<i class="fa fa-calculator" ng-if="indicator.type.substring(0, 'compute'.length) === 'compute'"></i>
-		<i class="fa fa-link" ng-if="indicator.type.substring(0, 'link'.length) === 'link'"></i>
-		<i class="fa fa-compass" ng-style="{color: indicator.geoAggregationRec != 'none' ? 'green' : 'red'}" tooltip-append-to-body="1" tooltip="{{'indicator.geo_aggregation'|translate}}"></i>
-		<i class="fa fa-clock-o" ng-style="{color: indicator.timeAggregationRec != 'none' ? 'green' : 'red'}" tooltip-append-to-body="1" tooltip="{{'indicator.time_aggregation'|translate}}"></i>
-
-		<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
-		{{indicator.name}}
-
-		<select class="form-control"
-				acl-has-project-role="owner"
-				ng-model="indicator.type"
-				ng-change="sourceChanged(indicator)"
-				ng-options="i.value as i.label|translate:i group by i.group|translate for i in indicator.availableTypes">
-		</select>
-
-		<p acl-lacks-project-role="owner" ng-repeat="i in indicator.availableTypes" ng-if="i.value === indicator.type">
-			{{i.label|translate:i}}
-		</p>
-	</div>
-
-	<div class="panel-body" ng-if="indicator.parameters">
-		<div class="panel panel-info" ng-repeat="(key, indicator) in indicator.parameters" ng-include="'form-field.html'"></div>
-	</div>
-</script>
-
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.logical_frame({projectId: project._id})" ng-bind="project.name"></a></li>
@@ -42,207 +6,158 @@
 </ol>
 
 <form class="form-horizontal" role="form" name="formForm" novalidate>
-	<div class="alert alert-danger" ng-if="!isNew" acl-has-project-role="owner" translate="project.form_warning"></div>
+	<!-- <div class="alert alert-danger" ng-if="!isNew" acl-has-project-role="owner" translate="project.form_warning"></div> -->
 
-	<fieldset>
-		<legend translate="project.data_collection"></legend>
 
-		<div class="form-group" show-errors>
-			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="form.name">
-				<input type="text"
-					   class="form-control"
-					   id="input-name"
-					   name="name"
-					   ng-model="form.name"
-					   placeholder="{{'project.form_name_ph'|translate}}"
-					   required />
-				
-				<p class="help-block" ng-if="formForm.name.$error.required" translate="form.mandatory"></p>
-			</div>
-		</div>
+	<tabset>
+		<tab heading="Planning">
 
-		<div class="form-group" show-errors>
-			<label for="active-input" class="col-sm-2 control-label" translate="shared.active"></label>
-			<div class="col-sm-10">
-				<p class="form-control-static" acl-has-project-role="owner" acl-fallback="form.active">
-					<input type="checkbox" id="active-input" ng-model="form.active" />
-				</p>
-			</div>
-		</div>
-
-		<div class="form-group" show-errors>
-			<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.periodicities.'+form.periodicity)|translate">
-				<select class="form-control" name="periodicity" id="periodicity-input" ng-model="form.periodicity">
-					<option value="day" translate="project.periodicities.day"></option>
-					<option value="week" translate="project.periodicities.week"></option>
-					<option value="month" translate="project.periodicities.month"></option>
-					<option value="quarter" translate="project.periodicities.quarter"></option>
-					<option value="year" translate="project.periodicities.year"></option>
-					<option value="planned" translate="project.periodicities.planned"></option>
-				</select>
-			</div>
-		</div>
-
-		<div class="form-group" show-errors>
-			<label for="collect-input" class="col-sm-2 control-label" translate="project.collect"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.collects.'+form.collect)|translate">
-				<select class="form-control" name="collect" id="collect-input" ng-model="form.collect">
-					<option value="entity" translate="project.collects.entity"></option>
-					<option value="project" translate="project.collects.project"></option>
-				</select>
-			</div>
-		</div>		
-
-		<div class="form-group" show-errors>
-			<label for="periodicity" class="col-sm-2 control-label" translate="shared.begin"></label>
-			<div class="col-sm-10">
-				<div class="input-group" acl-has-project-role="owner">
-					<div class="input-group-addon">
-						<input type="checkbox" ng-model="form.useProjectStart" />
-						{{'project.begin'|translate}}
-					</div>
-
-					<input type="text" 
-						   datepicker-popup="longDate"
-						   name="start"
-						   ng-model="form.start"
-						   is-open="startDateOpen"
-						   ng-click = "startDateOpen = true"
-						   ng-disabled="form.useProjectStart"
-						   ng-required="!form.useProjectStart"
-						   ng-max="form.end"
-						   class="form-control" />
+			<br/>
+			<div class="form-group" show-errors>
+				<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="form.name">
+					<input type="text"
+						   class="form-control"
+						   id="input-name"
+						   name="name"
+						   ng-model="form.name"
+						   placeholder="{{'project.form_name_ph'|translate}}"
+						   required />
+					
+					<p class="help-block" ng-if="formForm.name.$error.required" translate="form.mandatory"></p>
 				</div>
-
-				<p class="form-control-static" acl-lacks-project-role="owner">
-					<span ng-if="form.useProjectStart" translate="project.begin"></span>
-					<span ng-if="!form.useProjectStart" ng-bind="form.start | amDateFormat: 'D MMMM YYYY'"></span>
-				</p>
 			</div>
-		</div>
 
-		<div class="form-group" ng-if="form.periodicity === 'planned'">
-			<label class="col-sm-2 control-label" translate="project.intermediary_periods"></label>
-			<div class="col-sm-10">
-				<div ng-repeat="(index, period) in form.intermediaryDates" class="row" style="padding-bottom: 10px">
-					<ng-form name="intermediaryForm">
-						<div class="col-sm-10 form-group" show-errors style="margin: 0">
-							<input type="text" 
-								   datepicker-popup="longDate"
-								   name="period"
-								   ng-model="form.intermediaryDates[index]"
-								   is-open="periodDateOpen"
-								   ng-click="periodDateOpen=true"
-								   required
-								   ng-min="form.start"
-								   ng-max="form.end"
-								   class="form-control" />
+			<div class="form-group" show-errors>
+				<label for="active-input" class="col-sm-2 control-label" translate="shared.active"></label>
+				<div class="col-sm-10">
+					<p class="form-control-static" acl-has-project-role="owner" acl-fallback="form.active">
+						<input type="checkbox" id="active-input" ng-model="form.active" />
+					</p>
+				</div>
+			</div>
+
+			<div class="form-group" show-errors>
+				<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.periodicities.'+form.periodicity)|translate">
+					<select class="form-control" name="periodicity" id="periodicity-input" ng-model="form.periodicity">
+						<option value="day" translate="project.periodicities.day"></option>
+						<option value="week" translate="project.periodicities.week"></option>
+						<option value="month" translate="project.periodicities.month"></option>
+						<option value="quarter" translate="project.periodicities.quarter"></option>
+						<option value="year" translate="project.periodicities.year"></option>
+						<option value="planned" translate="project.periodicities.planned"></option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group" show-errors>
+				<label for="collect-input" class="col-sm-2 control-label" translate="project.collect"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.collects.'+form.collect)|translate">
+					<select class="form-control" name="collect" id="collect-input" ng-model="form.collect">
+						<option value="entity" translate="project.collects.entity"></option>
+						<option value="project" translate="project.collects.project"></option>
+					</select>
+				</div>
+			</div>		
+
+			<div class="form-group" show-errors>
+				<label for="periodicity" class="col-sm-2 control-label" translate="shared.begin"></label>
+				<div class="col-sm-10">
+					<div class="input-group" acl-has-project-role="owner">
+						<div class="input-group-addon">
+							<input type="checkbox" ng-model="form.useProjectStart" />
+							{{'project.begin'|translate}}
 						</div>
-						<div class="col-sm-2">
-							<button class="btn btn-danger" ng-click="removeIntermediary(index)" translate="shared.delete"></button>
+
+						<input type="text" 
+							   datepicker-popup="longDate"
+							   name="start"
+							   ng-model="form.start"
+							   is-open="startDateOpen"
+							   ng-click = "startDateOpen = true"
+							   ng-disabled="form.useProjectStart"
+							   ng-required="!form.useProjectStart"
+							   ng-max="form.end"
+							   class="form-control" />
+					</div>
+
+					<p class="form-control-static" acl-lacks-project-role="owner">
+						<span ng-if="form.useProjectStart" translate="project.begin"></span>
+						<span ng-if="!form.useProjectStart" ng-bind="form.start | amDateFormat: 'D MMMM YYYY'"></span>
+					</p>
+				</div>
+			</div>
+
+			<div class="form-group" ng-if="form.periodicity === 'planned'">
+				<label class="col-sm-2 control-label" translate="project.intermediary_periods"></label>
+				<div class="col-sm-10">
+					<div ng-repeat="(index, period) in form.intermediaryDates" class="row" style="padding-bottom: 10px">
+						<ng-form name="intermediaryForm">
+							<div class="col-sm-10 form-group" show-errors style="margin: 0">
+								<input type="text" 
+									   datepicker-popup="longDate"
+									   name="period"
+									   ng-model="form.intermediaryDates[index]"
+									   is-open="periodDateOpen"
+									   ng-click="periodDateOpen=true"
+									   required
+									   ng-min="form.start"
+									   ng-max="form.end"
+									   class="form-control" />
+							</div>
+							<div class="col-sm-2">
+								<button class="btn btn-danger" ng-click="removeIntermediary(index)" translate="shared.delete"></button>
+							</div>
+						</ng-form>
+					</div>
+
+					<div class="row" acl-has-project-role="owner">
+						<div class="col-sm-12">
+							<button class="btn btn-default" ng-click="addIntermediary()" translate="project.add_intermediary"></button>
 						</div>
-					</ng-form>
-				</div>
-
-				<div class="row" acl-has-project-role="owner">
-					<div class="col-sm-12">
-						<button class="btn btn-default" ng-click="addIntermediary()" translate="project.add_intermediary"></button>
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<div class="form-group" show-errors>
-			<label for="periodicity" class="col-sm-2 control-label" translate="shared.end"></label>
-			<div class="col-sm-10">
-				<div class="input-group" acl-has-project-role="owner">
-					<div class="input-group-addon">
-						<input type="checkbox" ng-model="form.useProjectEnd" />
-						{{'project.end'|translate}}
+			<div class="form-group" show-errors>
+				<label for="periodicity" class="col-sm-2 control-label" translate="shared.end"></label>
+				<div class="col-sm-10">
+					<div class="input-group" acl-has-project-role="owner">
+						<div class="input-group-addon">
+							<input type="checkbox" ng-model="form.useProjectEnd" />
+							{{'project.end'|translate}}
+						</div>
+
+						<input type="text" 
+							   datepicker-popup="longDate"
+							   name="end"
+							   ng-model="form.end"
+							   is-open="endDateOpen"
+							   ng-click="endDateOpen=true"
+							   ng-disabled="form.useProjectEnd"
+							   ng-required="!form.useProjectEnd"
+							   ng-min="form.start"
+							   class="form-control" />
 					</div>
 
-					<input type="text" 
-						   datepicker-popup="longDate"
-						   name="end"
-						   ng-model="form.end"
-						   is-open="endDateOpen"
-						   ng-click="endDateOpen=true"
-						   ng-disabled="form.useProjectEnd"
-						   ng-required="!form.useProjectEnd"
-						   ng-min="form.start"
-						   class="form-control" />
+					<p class="form-control-static" acl-lacks-project-role="owner">
+						<span ng-if="form.useProjectEnd" translate="project.end"></span>
+						<span ng-if="!form.useProjectEnd" ng-bind="form.end | amDateFormat: 'D MMMM YYYY'"></span>
+					</p>
 				</div>
-
-				<p class="form-control-static" acl-lacks-project-role="owner">
-					<span ng-if="form.useProjectEnd" translate="project.end"></span>
-					<span ng-if="!form.useProjectEnd" ng-bind="form.end | amDateFormat: 'D MMMM YYYY'"></span>
-				</p>
 			</div>
-		</div>
+		</tab>
+		<tab heading="Données brutes">
+			<br/>
+			<form-edit-raw-data raw-data="form.rawData"></form-edit-raw-data>
+		</tab>
+		<tab heading="Calcul des indicateurs">
+			<br/>
+			<form-edit-fields fields="form.fields"></form-edit-fields>
+ 		</tab>
+	</tabset>
 
-	</fieldset>
-
-	<!-- raw data here -->
-	<fieldset>
-		<legend translate="project.raw_data"></legend>
-
-		<table class="table table-bordered table-stripped">
-			<thead>
-				<tr>
-					<th>Section</th>
-					<th>Variable</th>
-					<th>Partition</th>
-					<th>Partition supplémentaire</th>
-				</tr>
-			</thead>
-			<tbody ng-repeat="section in form.rawData">
-				<tr ng-repeat="element in section.elements">
-					<td rowspan="{{section.elements.length + 1}}" ng-if="$first" contenteditable="true" ng-model="section.name"></td>
-					<td contenteditable="true" ng-model="element.name"></td>
-					<td>
-						<ul>
-							<li ng-repeat="p in element.partition1" contenteditable>{{p}}</li>
-							<li><a href="#">Ajouter une partition</a></li>
-						</ul>
-					</td>
-					<td>
-						<ul>
-							<li ng-repeat="p in element.partition2" contenteditable>{{p}}</li>
-							<li><a href="#">Ajouter une partition</a></li>
-						</ul>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3" style="text-align: center"><a href="#" class="btn btn-xs btn-default" style="width: 100%">Ajouter une variable</a></td>
-				</tr>
-			</tbody>
-			<tbody>
-				<tr>
-					<td colspan="4" style="text-align: center"><a href="#" class="btn btn-xs btn-default" style="width: 100%">Ajouter une section</a></td>
-				</tr>
-			</tbody>
-		</table>
-	</fieldset>
-
-	<!-- fields here -->
-	<fieldset>
-		<legend translate="project.indicator_computation"></legend>
-
-		<div class="panel panel-info" ng-repeat="indicator in form.fields" ng-include="'form-field.html'"></div>
-
-		<div class="input-group">
-			<select class="form-control"
-					acl-has-project-role="owner"
-					ng-model="newIndicatorId"
-					ng-options="i._id as i.name for i in addableIndicators">
-			</select>
-			<span class="input-group-btn">
-				<button class="btn btn-default" ng-click="add()" translate="project.add_new_indicator_to_form"></button>
-			</span>
-		</div>
-	</fieldset>
 
 	<!-- form actions -->
 	<div acl-has-project-role="owner">
@@ -258,164 +173,3 @@
 		</button>
 	</div>
 </form>
-
-
-
-{
-	"id": "60bd1ff6-f26f-435a-af43-07fc31abd41b",
-	"name": "54546",
-	"periodicity": "month",
-	"collect": "entity",
-	"useProjectStart": true,
-	"useProjectEnd": true,
-	"start": "2015-01-01",
-	"end": "2016-01-01",
-	"intermediaryDates": [],
-	"active": true,
-	
-	"rawData": [
-		{
-			"name": "Consultations",
-			"elements": [
-				{
-					"id": "5084685a-6bce-4f97-b0d4-b8cff40bc3b0",
-					"name": "Number of consultations",
-					"partitions": [
-						[
-							{"id": "52b36cf5-d45c-4684-9d45-c853c13a4ee0", "name": "Male"},
-							{"id": "5c254a0b-1446-4619-80b3-b9aa11c7b060", "name": "Female"}
-						],
-						[
-							{"id": "7743651e-0a2c-4139-a1aa-f54baf15b9bc", "name": "Under 5"},
-							{"id": "be686097-e233-4d98-8b3d-80dfab794060", "name": "Over 5"}
-						]
-					]
-				}
-			]
-		},
-		{
-			"name": "Health awareness sessions",
-			"elements": [
-				{
-					"id": "8925032e-7a75-4509-9797-884fe0e36c11",
-					"name": "Number of health awareness sessions",
-					"partition1": [
-						{"id": "f048be43-f1c6-4c19-becb-f83ff78e427d","name": "Health facility"},
-						{"id": "4b020652-fa7e-4d77-a8ce-66b8bc3fe493","name": "Community (social mobilization)"}
-					],
-					"partition2": [
-						{"id": "0a17b526-6faf-43b9-a096-f09c1e0995d5","name": "Acute respiratory infection"},
-						{"id": "0907860f-1d7d-42fe-be1f-db718b553cf8","name": "Breast Feeding"},
-						{"id": "50d184b8-db37-45a0-a5c7-ac05f0581b29","name": "Diarrhea - Prevention of Diahrroea"},
-						{"id": "1bab91b3-7173-4908-ba92-b1b90a8cb8c8","name": "Diarrhea - Signs of dehydration"},
-						{"id": "26d43f43-a65a-44ee-b48e-fde9139b680e","name": "Diarrhea - ORS preparation"},
-						{"id": "6df93d50-94ea-4c94-9f74-d0aa0ac17d33","name": "Family Planning - Family Planning awareness"},
-						{"id": "e6038585-8468-4073-b539-f802375f38ca","name": "Family Planning - Traditional Conceptive Measures"},
-						{"id": "23a7ebb5-0544-4a2c-ab2d-a6e292ae7bb4","name": "Family Planning - Modern contraceptive measures"},
-						{"id": "a4619ad8-0816-49ca-a31a-9f355af3c984","name": "Fever"},
-						{"id": "28020c0e-085d-4391-9dff-2f1ce8344ca0","name": "First Aid"},
-						{"id": "c37107ac-9ae5-4d15-a53d-a33b43fd16ed","name": "Immunization for children - Awareness about Immunization schedule for children"},
-						{"id": "a2730a49-55ef-4850-929e-5b796fd90d41","name": "Immunization for children - General information about EPI"},
-						{"id": "949116ed-0730-4354-a5b0-13ee672042d7","name": "Nutrition and balanced diet - Awareness about balanced diet"},
-						{"id": "45289d0d-b089-4a23-921d-e89e5853e07b","name": "Nutrition and balanced diet - Complication of malnutrition"},
-						{"id": "9167e20c-312c-4445-9536-af23edcd60e6","name": "Nutrition and balanced diet - Weaning diet"},
-						{"id": "7ab00a88-0f99-4a08-a7c2-f04f7e62210e","name": "Nutrition and balanced diet - Nutrition in pregnancy"},
-						{"id": "ab072a8f-dc53-4893-b999-d8097aa669c4","name": "Nutrition and balanced diet - Awareness about dietry needs for children"},
-						{"id": "b9618b8f-454c-4510-9a19-20c0d8c5dea8","name": "Nutrition and balanced diet - Complementry Feeding"},
-						{"id": "af3bd503-b7a1-4ee1-9265-59f268ba29e9","name": "Personal Hygiene"},
-						{"id": "fa18dad7-f665-46ed-95f5-56b3f5952e09","name": "Reproductive health/at risk pregnancies - Main signs of pregnancy"},
-						{"id": "fd6f8c7b-e6a2-4033-950a-cdc2cd8d0fd0","name": "Reproductive health/at risk pregnancies - Awareness about risk factors of pregnancy"},
-						{"id": "96154b96-57bb-43d2-951d-4f97064a6da9","name": "Reproductive health/at risk pregnancies - ANC awareness"},
-						{"id": "299f64a2-b866-4386-850d-c0688f0958a9","name": "Reproductive health/at risk pregnancies - Personal hygiene during pregnancy"},
-						{"id": "d1565182-bdf9-48d1-829d-e297f5604750","name": "Reproductive health/at risk pregnancies - Neonatal care"},
-						{"id": "95ca6e08-2b47-4e5c-b9c5-89ae5ee94cc8","name": "Reproductive health/at risk pregnancies - PNC awareness"},
-						{"id": "ca01b463-83c1-4836-ac87-f61b48e984e0","name": "Reproductive health/at risk pregnancies - Awareness of Immunization during pregnancy"},
-						{"id": "2dccd853-b5b2-42aa-ac83-4e85a5fc5275","name": "Skin Diseases"},
-						{"id": "60039017-6629-4f82-b86a-8af0f2a260a7","name": "Use of latrines"},
-						{"id": "eef12518-1e7d-48c8-8a6e-ff20877557e3","name": "Waste management"},
-						{"id": "c7e24af1-1f02-474e-b927-6a2046baccf5","name": "Water and sanitation"},
-						{"id": "0fc27c15-de73-4c68-a01c-f7ae96646c8d","name": "Other - Role of CHWs"},
-						{"id": "36e4cf25-7308-446c-931b-d0c356558ae4","name": "Other - Prevention of cholera"},
-						{"id": "e56e68db-4b69-47c4-bc10-1f4ab2788620","name": "Other - Dengue Fever"},
-						{"id": "8359956a-11a4-4223-997f-e83f0dba61be","name": "Other - Prevention of Hepatitis"},
-						{"id": "3dfbd8e7-216b-4476-a513-a6990b8c7cef","name": "Other - Other"},
-						{"id": "01fe3574-551d-431f-84f5-ff109425004e","name": "Other - Very basic General signs of measles"},
-						{"id": "71e6559a-4c7f-4305-890c-06cfd9350dd0","name": "Other - Prevention of Malaria"},
-						{"id": "8dba52b5-d111-42c0-aa1c-b940a52a52a7","name": "Total Participants"},
-						{"id": "bf03ea41-7b00-499b-84cf-16b9499a3545","name": "Participants Males"},
-						{"id": "64f199ae-a456-470a-9f51-a80e16505d51","name": "Participants Females"},
-						{"id": "412274b6-c365-4d62-aab8-6a7ac24aae65","name": "Number of mini Hygiene Kits Distributed"}
-					]
-				},
-				{
-					"id": "669e45c4-8985-462f-8ba2-2dcdb5c19ad2",
-					"name": "Total Participants in health awareness sessions",
-					"partition1": [
-						{"id": "6ddcbc6f-fe80-4988-a4d6-c07a56be7d13","name": "Health facility"},
-						{"id": "080587d8-3fed-4538-9dcb-773b8128c7dd","name": "Community (social mobilization)"}
-					],
-					"partition2": [
-						{"id": "b2837f00-9536-4e43-8d8f-f0944cb3e8fc", "name": "Male"},
-						{"id": "9325e610-4a36-4ba7-9fc0-c366d4d7bf67", "name": "Female"}
-					]
-				},
-				{
-					"id": "94bd3fe1-2808-402c-bb03-4b4f8b95e82c",
-					"name": "Number of mini Hygiene Kits Distributed",
-					"partition1": [
-						{"id": "9313ffbe-60f8-4117-ab9d-f9c99104811b","name": "Health facility"},
-						{"id": "fb5f5dda-8489-4518-98f0-624332fd7557","name": "Community (social mobilization)"}
-					],
-					"partition2": []
-				}
-			]
-		},
-		{
-			"name": "Clinic opening days",
-			"elements": [
-				{
-					"id": "8cc81188-7e3c-46ea-ae48-02d9bab479ad",
-					"name": "Number of days clinic remained operational",
-					"partition1": [],
-					"partition2": []
-				},
-				{
-					"id": "7da8fdfd-e334-465f-a408-b984918634ce",
-					"name": "Number of days clinic remained closed",
-					"partition1": [],
-					"partition2": []
-				}
-			]
-		},
-		{
-			"name": "Other",
-			"elements": [
-				{
-					"id": "609f2f83-4066-4a1d-8bd6-5c1e6387ac28",
-					"name": "Number of Dews report submitted",
-					"partition1": [],
-					"partition2": []
-				}
-			]
-		}
-	],
-
-	"fields": [
-		{
-			"id": "4abf8ebe-80f3-4c57-8f6d-57ee4660b1bb",
-			"type": "compute:e8339f03-eaba-447d-be2b-91f4aa17ab85",
-			"parameters": {
-				"as": {
-					"type": "input",
-					"id": "8925032e-7a75-4509-9797-884fe0e36c11",
-					"partitions": [
-					]
-				}
-			}
-		}
-	]
-}
-
-
-
-

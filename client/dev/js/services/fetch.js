@@ -97,9 +97,6 @@ angular.module('monitool.services.fetch', [])
 
 		// Add custom methods for special needs.
 		methods.currentUser = methods.user.bind(null, 'me');
-		methods.changePassword = function(newPassword) {
-			return $http({ method: 'PATCH', url: '/user/me', data: angular.toJson({newPassword: newPassword})});
-		};
 
 		return methods;
 	});

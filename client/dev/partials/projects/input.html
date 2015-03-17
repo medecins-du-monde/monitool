@@ -7,49 +7,166 @@
 	<li class="active" ng-bind="currentInput.period|amDateFormat:'YYYY-MM-DD'"></li>
 </ol>
 
-<script type="text/ng-template" id="form-sub-3.html">
-	<div class="panel-heading">
-		<div class="row">
-			<div class="col-sm-4">
-				<i class="fa fa-pencil" ng-if="field.type === 'input'"></i>
-				<i class="fa fa-calculator" ng-if="field.type.substring(0, 'compute'.length) === 'compute'" tooltip="{{field.expression}}"></i>
-				<i class="fa fa-link" ng-if="field.type.substring(0, 'link'.length) === 'link'"></i>
+<tabset>
+	<tab heading="Données brutes">
+		<br/>
+		<div class="panel panel-primary" ng-repeat="section in form.rawData">
+			<div class="panel-heading" ng-bind="section.name"></div>
+			<div class="panel-body">
+				<form class="form-horizontal">
 
-				<span ng-if="!key"><span translate="shared.indicator"></span>: </span>
-				<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
-				{{field.name}}
-			</div>
+					<div class="form-group" ng-repeat="variable in section.elements">
+						<label for="raw-{{variable.id}}" class="col-sm-2 control-label" ng-bind="variable.name"></label>
+						<div class="col-sm-10">
+							<input ng-if="variable.partition1.length == 0 && variable.partition2.length == 0"
+								   class="form-control"
+								   ng-model="currentInput.values[variable.id]"
+								   type="number" />
 
-			<div class="col-sm-8" acl-has-project-role="input" acl-fallback="currentInput.values[field.model]">
-				<div class="input-group" ng-if="!key">
-					<div class="input-group-addon">
-						<i class="fa fa-circle" input-status></i>
+							<table ng-if="variable.partition1.length != 0 && variable.partition2.length == 0"
+								   class="table table-bordered table-condensed">
+								<thead>
+									<tr>
+										<th style="width: 20%">Partition</th>
+										<th>Valeur</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="p in variable.partition1">
+										<td ng-bind="p.name"></td>
+										<td>
+											<input type="number" class="form-control input-sm" ng-model="currentInput.values[variable.id][p.id]" />
+										</td>
+									</tr>
+									<tr>
+										<td>Total</td>
+										<td sum
+											sum-type="simple"
+											sum-data="currentInput.values[variable.id]"></td>
+									</tr>
+								</tbody>
+							</table>
+
+							<table ng-if="variable.partition1.length != 0 && variable.partition2.length != 0"
+								   class="table table-bordered table-condensed">
+								<thead>
+									<tr>
+										<th style="width: 20%"></th>
+										<th ng-repeat="p2 in variable.partition2" ng-bind="p2.name"></th>
+										<th>Total</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="p1 in variable.partition1">
+										<th ng-bind="p1.name"></th>
+										<td ng-repeat="p2 in variable.partition2">
+											<input type="number"
+												   class="form-control input-sm"
+												   ng-model="currentInput.values[variable.id][p1.id][p2.id]" />
+										</td>
+										<td sum
+											sum-type="simple"
+											sum-data="currentInput.values[variable.id][p1.id]"></td>
+									</tr>
+									<tr>
+										<th>Total</th>
+										<td ng-repeat="p2 in variable.partition2"
+											sum
+											sum-type="deep"
+											sum-id="p2.id"
+											sum-data="currentInput.values[variable.id]"></td>
+
+										<td sum
+											sum-type="deep"
+											sum-data="currentInput.values[variable.id]"></td>
+									</tr>
+								</tbody>
+							</table>
+
+						</div>
 					</div>
-					<input type="number"
-						   class="form-control input-sm"
-						   ng-model="currentInput.values[field.model]"
-						   placeholder="Saisie précédente: {{previousInput.values[field.model] || '?'}}"
-						   ng-disabled="field.type !== 'input'" />
-				</div>
-
-				<input type="number"
-					   class="form-control input-sm"
-					   ng-disabled="field.type !== 'input'"
-					   ng-if="key"
-					   ng-model="currentInput.values[field.model]"
-					   placeholder="Saisie précédente: {{previousInput.values[field.model] || '?'}}" />
-
+				</form>
 			</div>
 		</div>
-	</div>
-	<div class="panel-body" ng-if="field.type.substring(0, 'compute'.length) === 'compute'">
-		<div class="panel panel-info"
-			 ng-repeat="(key, field) in field.parameters"
-			 ng-include="'form-sub-3.html'"></div>
-	</div>
-</script>
 
-<div class="panel panel-primary" ng-repeat="field in form.fields" ng-include="'form-sub-3.html'"></div>
+	</tab>
+	<tab heading="Indicateurs">
+		<br/>
+
+		<table class="table table-bordered table-stripped table-condensed project-reporting">
+			<thead>
+				<tr>
+					<th></th>
+					<th translate="project.baseline"></th>
+					<th translate="project.target"></th>
+					<th ng-repeat="col in stats.cols track by col.id" ng-bind="col.name"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in (stats|logFrameReport:project) track by $index">
+					<td class="section" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" colspan="{{stats.cols.length + 3}}" ng-if="row.type=='header'" ng-bind="row.text"></td>
+
+					<td ng-if="row.type=='data'" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" >
+						<label for="plot-{{row.id}}" ng-bind="row.name||('shared.unknown_indicator'|translate)"></label>
+					</td>
+					<td ng-if="row.type=='data'">{{row.baseline}}{{row.unit}}</td>
+					<td ng-if="row.type=='data'">{{row.target}}{{row.unit}}</td>
+					<td ng-if="row.type=='data'" ng-repeat="col in row.cols track by $index" reporting-field></td>
+				</tr>
+			</tbody>
+		</table>
+
+
+
+		<!-- 
+		<script type="text/ng-template" id="form-sub-3.html">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-sm-4">
+						<i class="fa fa-pencil" ng-if="field.type === 'input'"></i>
+						<i class="fa fa-calculator" ng-if="field.type.substring(0, 'compute'.length) === 'compute'" tooltip="{{field.expression}}"></i>
+						<i class="fa fa-link" ng-if="field.type.substring(0, 'link'.length) === 'link'"></i>
+
+						<span ng-if="!key"><span translate="shared.indicator"></span>: </span>
+						<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
+						{{field.name}}
+					</div>
+
+					<div class="col-sm-8" acl-has-project-role="input" acl-fallback="currentInput.values[field.model]">
+						<div class="input-group" ng-if="!key">
+							<div class="input-group-addon">
+								<i class="fa fa-circle" input-status></i>
+							</div>
+							<input type="number"
+								   class="form-control input-sm"
+								   ng-model="currentInput.values[field.model]"
+								   placeholder="Saisie précédente: {{previousInput.values[field.model] || '?'}}"
+								   ng-disabled="field.type !== 'input'" />
+						</div>
+
+						<input type="number"
+							   class="form-control input-sm"
+							   ng-disabled="field.type !== 'input'"
+							   ng-if="key"
+							   ng-model="currentInput.values[field.model]"
+							   placeholder="Saisie précédente: {{previousInput.values[field.model] || '?'}}" />
+
+					</div>
+				</div>
+			</div>
+			<div class="panel-body" ng-if="field.type.substring(0, 'compute'.length) === 'compute'">
+				<div class="panel panel-info"
+					 ng-repeat="(key, field) in field.parameters"
+					 ng-include="'form-sub-3.html'"></div>
+			</div>
+		</script>
+
+		<div class="panel panel-primary" ng-repeat="field in form.fields" ng-include="'form-sub-3.html'"></div>
+		-->
+
+
+	</tab>
+</tabset>
 
 <div acl-has-project-role="input">
 	<button class="btn btn-default" ng-click="save()">

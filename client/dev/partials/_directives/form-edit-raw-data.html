@@ -1,0 +1,85 @@
+
+<style>
+	
+	.table-raw-data th {
+		width: 25%;
+	}
+
+	.table-raw-data .remove-action {
+		display: none;
+	}
+
+	.table-raw-data li:hover > .remove-action, .table-raw-data td:hover > .remove-action {
+		display: inline;
+		cursor: hand;
+	}
+
+	.table-raw-data span[contenteditable] {
+		display: inline-block;
+		min-width: 100px;
+	}
+
+	.table-raw-data td:hover span[contenteditable] {
+		border: 1px dashed #ccc;
+		margin: 3px;
+	}
+
+</style>
+
+
+<table class="table table-bordered table-condensed table-raw-data">
+	<thead>
+		<tr>
+			<th translate="project.section"></th>
+			<th translate="project.variable"></th>
+			<th translate="project.partition"></th>
+			<th translate="project.additional_partition"></th>
+		</tr>
+	</thead>
+	<tbody ng-repeat="section in rawData track by section.id">
+		<tr ng-repeat="element in section.elements track by element.id">
+			<td rowspan="{{section.elements.length + 1}}" ng-if="$first">
+				<a ng-click="remove(section, rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+				<span contenteditable="true" ng-model="section.name"></span>
+			</td>
+			<td>
+				<a ng-click="remove(element, section.elements)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+				<span contenteditable="true" ng-model="element.name"></span>
+			</td>
+			<td>
+				<ul>
+					<li ng-repeat="p in element.partition1 track by p.id">
+						<a ng-click="remove(p, element.partition1)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+						<span contenteditable ng-model="p.name"></span>
+					</li>
+					<li><a ng-click="newPartition(element.partition1)" translate="project.new_partition"></a></li>
+				</ul>
+			</td>
+			<td>
+				<ul ng-if="element.partition1.length >= 2">
+					<li ng-repeat="p in element.partition2 track by p.id">
+						<a ng-click="remove(p, element.partition2)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+						<span contenteditable ng-model="p.name"></span>
+					</li>
+					<li><a ng-click="newPartition(element.partition2)" translate="project.new_partition"></a></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td ng-if="section.elements.length === 0">
+				<a ng-click="remove(section, rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+				<span contenteditable="true" ng-model="section.name"></span>
+			</td>
+			<td colspan="3" style="text-align: center">
+				<a ng-click="newVariable(section.elements)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_variable"></a>
+			</td>
+		</tr>
+	</tbody>
+	<tbody>
+		<tr>
+			<td colspan="4" style="text-align: center">
+				<a ng-click="newSection(rawData)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_section"></a>
+			</td>
+		</tr>
+	</tbody>
+</table>

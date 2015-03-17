@@ -28,7 +28,7 @@ angular.module('monitool.controllers.project', [])
 			if ($stateParams.projectId === 'new')
 				$scope.project._id = makeUUID();
 
-			$scope.project.$save().then(function() {
+			return $scope.project.$save().then(function() {
 				$scope.master = angular.copy($scope.project);
 				
 				if ($stateParams.projectId === 'new')
@@ -217,7 +217,7 @@ angular.module('monitool.controllers.project', [])
 
 		// if this indicator is already used in a form, we can't delete it from the logical frame.
 		$scope.isDeletable = $scope.project.dataCollection.every(function(form) {
-			return form.fields.every(function(field) { return field.id !== indicatorId; });
+			return form.fields.every(function(field) { return field.indicatorId !== indicatorId; });
 		});
 
 		$scope.isUnchanged = function() {
@@ -304,8 +304,8 @@ angular.module('monitool.controllers.project', [])
 		var indicators = {};
 		$scope.project.dataCollection.forEach(function(form, index) {
 			form.fields.forEach(function(field) {
-				if (!indicators[field.id])
-					indicators[field.id] = [];
+				if (!indicators[field.indicatorId])
+					indicators[field.indicatorId] = [];
 
 				var id     = form.id,
 					color  = $scope.colors[index],
@@ -313,7 +313,7 @@ angular.module('monitool.controllers.project', [])
 					end    = moment(form.end).format('YYYY-MM-DD'),
 					length = relevantDates.indexOf(end) - relevantDates.indexOf(begin);
 
-				indicators[field.id].push({id: id, name: form.name, color: color, begin: begin, end: end, length: length});
+				indicators[field.indicatorId].push({id: id, name: form.name, color: color, begin: begin, end: end, length: length});
 			});
 		});
 
@@ -348,111 +348,10 @@ angular.module('monitool.controllers.project', [])
 		$scope.usages = result;
 	})
 
-	.controller('ProjectFormEditionController', function($scope, $stateParams, mtForms, form, indicatorsById, formulasById) {
-		var projectIndicators = Object.keys($scope.project.indicators).map(function(id) { return indicatorsById[id]; });
-
-		$scope.availableIndicators = [];
-		$scope.container = { chosenIndicators: [] }; // we wrap chosenIndicators in a container for ui-select...
-
-		// the db version it DRY, and a lot of information is missing for use to display it properly.
-		// We make a copy and annotate it: the GUI will work with the copy.
-		$scope.form = angular.copy(form);
-		mtForms.annotateAllFormElements($scope.form.fields, indicatorsById);
-		mtForms.buildLinks($scope.form.fields, indicatorsById);
-		mtForms.buildSumability($scope.form.fields);
-
+	.controller('ProjectFormEditionController', function($scope, $stateParams, form, indicatorsById) {
 		$scope.master = angular.copy($scope.form);
-		$scope.isNew = $stateParams.formId === 'new';
-		$scope.container.chosenIndicatorIds = $scope.form.fields.map(function(field) { return field.id; });
-
-		$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue, oldValue) {
-			// Assign start / end dates.
-			$scope.form.useProjectStart && ($scope.form.start = $scope.project.begin);
-			$scope.form.useProjectEnd   && ($scope.form.end   = $scope.project.end);
-
-			// When begin and end change, we need to update the list of indicators we can keep and add.
-			// the user cannot choose an indicator which is already collected in the same period.
-			var concurrentForms = $scope.project.dataCollection.filter(function(otherForm) {
-				var otherIsAfter  = $scope.form.end.getTime() <= otherForm.start.getTime(),
-					otherIsBefore = $scope.form.start.getTime() >= otherForm.end.getTime();
-				return $scope.form.id !== otherForm.id && !(otherIsBefore || otherIsAfter);
-			});
-
-			var keepableIndicatorIds = $scope.container.chosenIndicatorIds.filter(function(indicatorId) {
-				return concurrentForms.every(function(form) {
-					return form.fields.every(function(field) { return field.id !== indicatorId; });
-				});
-			});
-
-			if (keepableIndicatorIds.length !== $scope.container.chosenIndicatorIds.length) {
-				if (confirm('Indicators will be removed because of collision. Are you sure?'))
-					$scope.container.chosenIndicatorIds = keepableIndicatorIds;
-				else {
-					$scope.form.useProjectStart = oldValue[0];
-					$scope.form.start = oldValue[1];
-					$scope.form.useProjectEnd = oldValue[2];
-					$scope.form.end = oldValue[3];
-				}
-			}
-
-			$scope.addableIndicators = projectIndicators.filter(function(indicator) {
-				return concurrentForms.concat([$scope.form]).every(function(form) {
-					return form.fields.every(function(field) { return field.id !== indicator._id; });
-				});
-			});
-		}, true);
-
-
-		// when chosenIndicators changes, we need to udate the form's fields
-		$scope.$watchCollection('container.chosenIndicatorIds', function(newValue, oldValue) {
-			var added   = newValue.filter(function(i) { return oldValue.indexOf(i) === -1; }),
-				removed = oldValue.filter(function(i) { return newValue.indexOf(i) === -1; });
-
-			// We just add an annotated manual input.
-			added.forEach(function(indicatorId) {
-				var formElement = {id: indicatorId, type: 'input'};
-				mtForms.annotateFormElement(formElement, indicatorId, indicatorId, indicatorsById);
-
-				// we need to test if the field is already there because of resets that triggers the watches...
-				if (!$scope.form.fields.find(function(field) { return field.id === indicatorId; }))
-					$scope.form.fields.push(formElement);
-			});
-
-			// Smart delete (by reparenting nodes if needed)
-			removed.forEach(function(indicatorId) {
-				var field = $scope.form.fields.find(function(element) { return element.id === indicatorId; });
-				if (field)
-				mtForms.deleteFormElement($scope.form.fields, field);
-			});
-
-			// available links are broken because we added/removed elements => rebuild them
-			mtForms.buildLinks($scope.form.fields, indicatorsById);
-			mtForms.buildSumability($scope.form.fields);
-
-			// FIXME: duplicating code is wrong
-			var concurrentForms = $scope.project.dataCollection.filter(function(otherForm) {
-				var otherIsAfter  = $scope.form.end.getTime() <= otherForm.start.getTime(),
-					otherIsBefore = $scope.form.start.getTime() >= otherForm.end.getTime();
-				return $scope.form.id !== otherForm.id && !(otherIsBefore || otherIsAfter);
-			});
-
-			$scope.addableIndicators = projectIndicators.filter(function(indicator) {
-				return concurrentForms.concat([$scope.form]).every(function(form) {
-					return form.fields.every(function(field) { return field.id !== indicator._id; });
-				});
-			});
-		});
-
-		$scope.add = function() {
-			if ($scope.newIndicatorId) {
-				$scope.container.chosenIndicatorIds.push($scope.newIndicatorId);
-				delete $scope.newIndicatorId;
-			}
-		};
-
-		$scope.remove = function(index) {
-			$scope.container.chosenIndicatorIds.splice(index, 1);
-		};
+		$scope.form = angular.copy(form);
+		$scope.indicatorsById = indicatorsById;
 
 		$scope.addIntermediary = function() {
 			if (-1 === $scope.form.intermediaryDates.findIndex(function(key) { return !key; }))
@@ -463,48 +362,18 @@ angular.module('monitool.controllers.project', [])
 			$scope.form.intermediaryDates.splice(index, 1);
 		};
 
-		$scope.move = function(index, direction) {
-			var element = $scope.form.fields.splice(index, 1);
-			// if (direction === 1)
-				$scope.form.fields.splice(index + direction, 0, element[0]);
-		};
-
-		// now that's done, we only need to monitor changes on the types selects.
-		$scope.sourceChanged = function(indicator) {
-			if (indicator.type === 'input' || indicator.type.substring(0, 'link:'.length) === 'link:') {
-				// FIXME we have to fix broken links if indicator type is a link
-
-				for (var key in indicator.parameters)
-					mtForms.deleteFormElement($scope.form.fields, indicator.parameters[key]);
-				delete indicator.parameters; // must be an empty now.
-			}
-			else {
-				var formula = formulasById[indicator.type.substring('compute:'.length)];
-				indicator.parameters = {};
-				for (var key in formula.parameters)
-					indicator.parameters[key] = {type: "input"};
-				mtForms.annotateFormElement(indicator, indicator.keyPath, indicator.indicatorPath, indicatorsById);
-			}
-
-			mtForms.buildLinks($scope.form.fields, indicatorsById);
-			mtForms.buildSumability($scope.form.fields);
-		};
-
 		$scope.save = function() {
-			$scope.master = angular.copy($scope.form);
-
-			var formCopy = angular.copy($scope.form);
-			mtForms.deAnnotateAllFormElements(formCopy.fields);
-
 			// replace or add the form in the project.
-			var index = $scope.project.dataCollection.findIndex(function(form) { return form.id === formCopy.id; });
+			var index = $scope.project.dataCollection.findIndex(function(form) { return form.id === $scope.form.id; });
 			if (index === -1)
-				$scope.project.dataCollection.push(formCopy);
+				$scope.project.dataCollection.push(angular.copy($scope.form));
 			else
-				$scope.project.dataCollection[index] = formCopy;
+				$scope.project.dataCollection[index] = angular.copy($scope.form);
 
 			// call ProjectMenuController save method.
-			return $scope.$parent.save();
+			return $scope.$parent.save().then(function() {
+				$scope.master = angular.copy($scope.form);
+			});
 		};
 
 		$scope.isUnchanged = function() {
@@ -513,7 +382,6 @@ angular.module('monitool.controllers.project', [])
 
 		$scope.reset = function() {
 			$scope.form = angular.copy($scope.master);
-			$scope.container.chosenIndicatorIds = $scope.master.fields.map(function(field) { return field.id; });
 		};
 	})
 
@@ -526,16 +394,44 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectInputController', function($scope, $state, mtForms, form, indicatorsById, inputs) {
-		$scope.form          = angular.copy(form);
+	.controller('ProjectInputController', function($scope, $state, mtReporting, mtCompute, mtRegroup, form, inputs, indicatorsById) {
+		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
 		$scope.previousInput = inputs.previous;
 		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
-		mtForms.annotateAllFormElements($scope.form.fields, indicatorsById);
+		// insure that model is properly initialised, but don't remove existing data
+		$scope.form.rawData.forEach(function(section) {
+			section.elements.forEach(function(element) {
+				if (element.partition1.length != 0 && element.partition2.length == 0)
+					inputs.current.values[element.id] = inputs.current.values[element.id] || {};
+				else if (element.partition1.length != 0 && element.partition2.length != 0) {
+					inputs.current.values[element.id] = inputs.current.values[element.id] || {};
+					element.partition1.forEach(function(p1) {
+						inputs.current.values[element.id][p1.id] = inputs.current.values[element.id][p1.id] || {};
+					})
+				}
+			});
+		});
+
+		// this should not be here, and we seriouly have to make those work on focusout to save cpu cycles.
 		$scope.$watch('currentInput.values', function() {
-			mtForms.evaluateAll($scope.form.fields, $scope.currentInput.values);
+			var input = angular.copy($scope.currentInput),
+				query = {
+					project: $scope.project,
+					begin: moment(input.period).format('YYYY-MM-DD'),
+					end: moment(input.period).format('YYYY-MM-DD'),
+					groupBy: 'month',
+					type: "entity",
+					id: input.entity
+				};
+
+			input.compute = mtCompute.computeIndicatorsLeafsFromRaw(input.values, form);
+			input.aggregation = mtRegroup.computeAggregationFields(input, $scope.project);
+
+			$scope.presentation = {display: 'value'};
+			$scope.stats = mtReporting.getProjectReporting([input], query, indicatorsById);
 		}, true);
 
 		$scope.save = function() {
@@ -547,14 +443,14 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectReportingController', function($scope, $state, mtReporting, mtForms, indicatorsById) {
+	.controller('ProjectReportingController', function($scope, $state, mtReporting, indicatorsById) {
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
 		
 		// those 2 hashes represent what the user sees.
 		$scope.presentation = {plot: false, display: 'value'};
 		$scope.query = {
-			project: mtReporting.getAnnotatedProjectCopy($scope.project, indicatorsById),
+			project: $scope.project,
 			begin:   mtReporting.getDefaultStartDate($scope.project),
 			end:     mtReporting.getDefaultEndDate($scope.project),
 			groupBy: 'month', type: 'project', id: ''
@@ -566,11 +462,11 @@ angular.module('monitool.controllers.project', [])
 			// if anything besides groupBy changes, we need to refetch.
 			// FIXME: we could widely optimize this.
 			if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end || oldQuery.id !== newQuery.id)
-				inputsPromise = mtReporting.getInputs(newQuery);
+				inputsPromise = mtReporting.getPreprocessedInputs(newQuery);
 
 			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
 			inputsPromise.then(function(inputs) {
-				$scope.stats = mtReporting.regroup(inputs, newQuery, indicatorsById);
+				$scope.stats = mtReporting.getProjectReporting(inputs, newQuery, indicatorsById);
 			});
 		}, true)
 	})

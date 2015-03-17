@@ -78,29 +78,8 @@
 						"items": { "type": "string", "format": "date" }
 					},
 					
-					"fields": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"required": ["id", "type"],
-							"additionalProperties": false,
-							"properties": {
-								"id": { "$ref": "#/definitions/uuid" },
-								"type": {
-									"type": "string",
-									"pattern": "^input|(link:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}(\\.[a-z0-9A-Z]+)+)|(compute:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12})$"
-								},
-								"parameters": {
-									"type": "object",
-									"additionalProperties": {
-										"^[a-z0-9A-Z]+$": {
-											"$ref": "#/properties/dataCollection/items/properties/inputEntities"
-										}
-									}
-								}
-							}
-						}
-					}
+					"fields": {},
+					"rawData": {}
 				}
 			}
 		},

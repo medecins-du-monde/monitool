@@ -1,0 +1,52 @@
+
+<a ng-click="show_more=!show_more" class="pull-right">
+	<i class="fa fa-table"></i>
+	Voir les partitions
+</a>
+<div style="clear: both"></div>
+
+<div ng-if="show_more">
+
+	<table class="table table-condensed table-bordered" ng-if="element.partition1.length && element.partition2.length">
+		<tr>
+			<td></td>
+			<td ng-repeat="p1 in element.partition1" ng-bind="p1.name"></td>
+			<td></td>
+		</tr>
+		<tr ng-repeat="p2 in element.partition2">
+			<td ng-bind="p2.name"></td>
+			<td ng-repeat="p1 in element.partition1">
+				<input type="checkbox" ng-model="filter[p1.id][p2.id]" />
+			</td>
+			<td>
+				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="togglePartition2(1, p2.id)">Toggle</button>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td ng-repeat="p1 in element.partition1">
+				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="togglePartition2(0, p1.id)">Toggle</button>
+			</td>
+			<td>
+				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="toggleAll2()">Toggle All</button>
+			</td>
+		</tr>
+	</table>
+
+	<table class="table table-condensed table-bordered" ng-if="element.partition1.length && !element.partition2.length">
+		<tr>
+			<th>Partition</th>
+			<th>Inclure</th>
+		</tr>
+		<tr ng-repeat="p1 in element.partition1">
+			<td ng-bind="p1.name"></td>
+			<td><input type="checkbox" ng-model="filter[p1.id]" /></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="toggleAll1()">Toggle All</button>
+			</td>
+		</tr>
+	</table>
+</div>

@@ -182,3 +182,11 @@ ul:hover>.onrollover {
 
 
 }
+
+
+tr.indent1 > td:first-child { padding-left: 50px; }
+tr.indent2 > td:first-child { padding-left: 100px; }
+tr.indent3 > td:first-child { padding-left: 150px; }
+
+
+

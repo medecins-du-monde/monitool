@@ -74,39 +74,7 @@ angular.module('monitool.directives.form', [])
 	})
 
 
-	/**
-	 * This directive allows coloring bullet points on the indicator input form
-	 * to tell the user if the data that is being entered is out of bounds
-	 */
-	.directive('inputStatus', function() {
-		return {
-			restrict: 'A',
-			link: function($scope, element) {
-				$scope.$watch('currentInput.values[field.model]', function() {
-					var planning  = $scope.project.indicators[$scope.field.id],
-						value     = $scope.currentInput.values[$scope.field.model];
 
-					if (planning.target === null || planning.baseline === null || value === undefined || value === null || Number.isNaN(value))
-						element.css('color', '');
-					
-					else {
-						var progress;
-						if (planning.target === 'around_is_better')
-							progress = 100 * (1 - Math.abs(value - planning.target) / (planning.target - planning.baseline));
-						else
-							progress = 100 * (value - planning.baseline) / (planning.target - planning.baseline);
-
-						if (progress < planning.showRed)
-							element.css('color', 'red');
-						else if (progress < planning.showYellow)
-							element.css('color', 'orange');
-						else
-							element.css('color', 'green');
-					}
-				});
-			}
-		}
-	})
 
 // From https://docs.angularjs.org/guide/forms
 	.directive('contenteditable', function() {
@@ -129,4 +97,27 @@ angular.module('monitool.directives.form', [])
       // ctrl.$setViewValue(elm.html());
     }
   };
-});
+})
+
+	.directive('faBoolean', function() {
+		return {
+			restrict: 'AE',
+			scope: { v: "=faBoolean" },
+			link: function($scope, element) {
+				element.addClass('fa');
+
+				$scope.$watch('v', function(newValue) {
+					element.removeClass();
+
+					if (newValue) {
+						element.css('color', 'green');
+						element.addClass('fa-check');
+					}
+					else {
+						element.css('color', 'red');
+						element.addClass('fa-times');
+					}
+				});
+			}
+		}
+	})

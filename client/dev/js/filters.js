@@ -45,6 +45,7 @@ angular.module('monitool.filters', [])
 		}
 	})
 
+	// FIXME this should be a directive. It is getting called by angular a ridiculous amount of times.
 	.filter('logFrameReport', function() {
 
 		var getAssignedIndicatorIds = function(project) {

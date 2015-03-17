@@ -27,7 +27,7 @@
 			<td>{{form.name}}</td>
 			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
 			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>
-			<td><i ng-class="{fa:true,'fa-check':form.active,'fa-times':!form.active}" ng-style="{color:form.active?'green':'red'}"></i></td>
+			<td><i fa-boolean="form.active"></i></td>
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>{{'project.collects.' + form.collect|translate}}</td>
 			<td>

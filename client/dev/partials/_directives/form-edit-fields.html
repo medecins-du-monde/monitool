@@ -1,0 +1,31 @@
+
+<table class="table table-bordered table-condensed">
+	<thead>
+		<th>Indicator</th>
+		<th>Somme Geo</th>
+		<th>Somme temps</th>
+		<th>Provenance</th>
+	</thead>
+	<tbody form-edit-field-list fields="form.fields">
+		<tr
+			ng-repeat="fw in flatFields track by fw.path"
+			class="{{'indent' + fw.indent}}"
+			form-edit-field
+				field="fw.field"
+				indicator="indicatorsById[fw.field.indicatorId]"
+				raw-data="form.rawData">
+		</tr>
+	</tbody>
+</table>
+
+<div class="input-group">
+	<select class="form-control"
+			acl-has-project-role="owner"
+			ng-model="newIndicatorId"
+			ng-options="i._id as i.name for i in addableIndicators">
+	</select>
+	
+	<span class="input-group-btn">
+		<button class="btn btn-default" ng-click="add()" translate="project.add_new_indicator_to_form"></button>
+	</span>
+</div>

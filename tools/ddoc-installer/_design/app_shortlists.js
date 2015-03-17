@@ -98,16 +98,9 @@ module.exports = {
 
 		indicator_usage: {
 			map: function(doc) {
-				var indicatorId;
-
 				if (doc.type === 'project')
-					for (indicatorId in doc.indicators)
+					for (var indicatorId in doc.indicators)
 						emit('main:' + indicatorId);
-				
-				if (doc.type === 'input')
-					for (indicatorId in doc.values)
-						if (indicatorId.match(/^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}$/))
-							emit('input:' + indicatorId);
 			}.toString(),
 
 			reduce: "_count"

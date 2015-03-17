@@ -121,8 +121,8 @@
 			<td ng-class="{indent1: row.type=='entity'}">
 				<label for="plot-{{row.id}}" ng-bind="row.name"></label>
 			</td>
-			<td ng-bind="row.baseline + row.unit"></td>
-			<td ng-bind="row.target + row.unit"></td>
+			<td>{{row.baseline}}{{row.unit}}</td>
+			<td>{{row.target}}{{row.unit}}</td>
 			<td ng-repeat="col in row.cols track by $index" reporting-field></td>
 		</tr>
 	</tbody>
