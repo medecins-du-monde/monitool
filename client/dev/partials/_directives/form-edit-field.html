@@ -1,16 +1,13 @@
 <td ng-bind="indicator.name"></td>
-<td>
-	<i fa-boolean="indicator.geoAggregationRec"></i>
-</td>
-<td>
-	<i fa-boolean="indicator.timeAggregationRec"></i>
-</td>
+<td form-edit-field-summable type="geo" field="field" indicator="indicator"></td>
+<td form-edit-field-summable type="time" field="field" indicator="indicator"></td>
 <td>
 	<select
 		class="form-control input-sm"
 		ng-model="source"
 		ng-options="f.name group by f.group for f in sources">
 	</select>
+
 	<div ng-if="source.meta.element && source.meta.element.partition1.length">
 		<form-edit-filter element="source.meta.element" value="field.filter"></form-edit-filter>
 	</div>

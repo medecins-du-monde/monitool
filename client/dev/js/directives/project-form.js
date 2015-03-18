@@ -38,55 +38,11 @@ angular
 				},
 			},
 
-			fields: {
-				getFlat: function(fields, indicatorsById) {
-					var flatFields = [];
-					fields.forEach(function(field) {
-						flatFields.push({
-							indent: 0,
-							indicator: indicatorsById[field.indicatorId],
-							field: field
-						});
-
-						if (field.type === 'formula')
-							for (var key in field.parameters)
-								flatFields.push({
-									indent: 1,
-									indicator: indicatorsById[field.indicatorId].formulas[field.formulaId].parameters[key],
-									field: field.parameters[key]
-								});
-					});
-
-					return flatFields;
-
-					// var getFieldsRec = function(field, path, indent) {
-					// 	var result = [];
-
-					// 	for (var key in field.parameters) {
-					// 		var subField = field.parameters[key];
-					// 		result.push({indent: indent, path: path + '.' + key, field: subField});
-
-					// 		Array.prototype.push.apply(result, getFieldsRec(subField, path + '.' + key, indent + 1));
-					// 	}
-
-					// 	return result;
-					// };
-
-					// var flatFields = [];
-
-					// fields.forEach(function(field) {
-					// 	flatFields.push({indent: 0, path: field.indicatorId, field: field});
-					// 	Array.prototype.push.apply(flatFields, getFieldsRec(field, field.indicatorId, 1))
-					// });
-
-					// return flatFields;
-				}
-			},
-
 			sources: {
 				createList: function(indicator, rawData) {
 					var typeOptions = [];
 
+					// indicator.formulas may be undefined if indicator is a parameter.
 					for (var formulaId in indicator.formulas)
 						typeOptions.push({
 							name: indicator.formulas[formulaId].name,
@@ -293,12 +249,6 @@ angular
 			scope: true,
 			templateUrl: 'partials/_directives/form-edit-fields.html',
 			link: function($scope) {
-				// watch fields in the form. When those change, recompute the flatFields list
-				// so that we can render the html table.
-				$scope.$watch('form.fields', function(fields) {
-					$scope.flatFields = formEditUtils.fields.getFlat(fields, $scope.indicatorsById);
-				}, true);
-
 				// watch begin and end date.
 				// When they change, we update the list of
 				// - indicators in form.fields (some of them may become forbidden to compute)
@@ -406,6 +356,41 @@ angular
 				}, true);
 			}
 		}
+	})
+
+	.directive('formEditFieldSummable', function() {
+		return {
+			restrict: 'A',
+			template: '<i fa-boolean="summable"></i>',
+			scope: {
+				type: "@",
+				field: "=",
+				indicator: "="
+			},
+			link: function($scope, element) {
+				$scope.$watch('field.formulaId', function() {
+					var agg = $scope.type + 'Aggregation';
+
+					// if the indicator is summable, that's ok
+					if ($scope.indicator[agg] !== 'none')
+						$scope.summable = true;
+
+					// if it's a formula, and all parameters are summable, that's ok
+					else if ($scope.field.type === 'formula') {
+						$scope.summable = true;
+						for (var key in $scope.indicator.formulas[$scope.field.formulaId].parameters)
+							if ($scope.indicator.formulas[$scope.field.formulaId].parameters[agg] === 'none') {
+								$scope.summable = false;
+								break;
+							}
+					}
+
+					// on all other cases, the field cannot be summed.
+					else
+						$scope.summable = false;
+				})
+			}
+		};
 	})
 
 	/**

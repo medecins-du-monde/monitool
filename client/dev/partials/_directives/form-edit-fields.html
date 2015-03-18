@@ -6,12 +6,17 @@
 		<th>Somme temps</th>
 		<th>Provenance</th>
 	</thead>
-	<tbody form-edit-field-list fields="form.fields">
-		<tr ng-repeat="fw in flatFields track by $index"
-			class="{{'indent' + fw.indent}}"
+	<tbody ng-repeat="field in form.fields">
+		<tr form-edit-field
+				field="field"
+				indicator="indicatorsById[field.indicatorId]"
+				raw-data="form.rawData">
+		</tr>
+		<tr ng-repeat="(key, subField) in field.parameters"
+			class="indent1"
 			form-edit-field
-				field="fw.field"
-				indicator="fw.indicator"
+				field="subField"
+				indicator="indicatorsById[field.indicatorId].formulas[field.formulaId].parameters[key]"
 				raw-data="form.rawData">
 		</tr>
 	</tbody>

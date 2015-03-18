@@ -107,13 +107,14 @@ angular.module('monitool.directives.form', [])
 				element.addClass('fa');
 
 				$scope.$watch('v', function(newValue) {
-					element.removeClass();
 
 					if (newValue) {
+						element.removeClass('fa-times');
 						element.css('color', 'green');
 						element.addClass('fa-check');
 					}
 					else {
+						element.removeClass('fa-check');
 						element.css('color', 'red');
 						element.addClass('fa-times');
 					}
