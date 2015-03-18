@@ -47,7 +47,7 @@
 								</tbody>
 							</table>
 
-							<table ng-if="variable.partition1.length != 0 && variable.partition2.length != 0"
+							<table ng-if="variable.partition1.length != 0 && variable.partition2.length != 0 && variable.partition1.length >= variable.partition2.length"
 								   class="table table-bordered table-condensed">
 								<thead>
 									<tr>
@@ -75,6 +75,42 @@
 											sum-type="deep"
 											sum-id="p2.id"
 											sum-data="currentInput.values[variable.id]"></td>
+
+										<td sum
+											sum-type="deep"
+											sum-data="currentInput.values[variable.id]"></td>
+									</tr>
+								</tbody>
+							</table>
+
+							<table ng-if="variable.partition1.length != 0 && variable.partition2.length != 0 && variable.partition1.length < variable.partition2.length"
+								   class="table table-bordered table-condensed">
+								<thead>
+									<tr>
+										<th style="width: 20%"></th>
+										<th ng-repeat="p1 in variable.partition1" ng-bind="p1.name"></th>
+										<th translate="shared.sum"></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="p2 in variable.partition2">
+										<th ng-bind="p2.name"></th>
+										<td ng-repeat="p1 in variable.partition1">
+											<input type="number"
+												   class="form-control input-sm"
+												   ng-model="currentInput.values[variable.id][p1.id][p2.id]" />
+										</td>
+										<td sum
+											sum-type="deep"
+											sum-id="p2.id"
+											sum-data="currentInput.values[variable.id]"></td>
+									</tr>
+									<tr>
+										<th translate="shared.sum"></th>
+										<td ng-repeat="p1 in variable.partition1"
+											sum
+											sum-type="simple"
+											sum-data="currentInput.values[variable.id][p1.id]"></td>
 
 										<td sum
 											sum-type="deep"
