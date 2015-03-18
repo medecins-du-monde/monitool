@@ -247,6 +247,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/list.html',
 		controller: 'ProjectListController',
 		resolve: {
+			// FIXME => bandwidth burner
 			projects: function(mtFetch) { return mtFetch.projects(); },
 			themes: function(mtFetch) { return mtFetch.themes({mode: 'indicators'}); }
 		}
@@ -263,7 +264,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			},
 			indicatorsById: function(mtFetch, $stateParams) {
 				if ($stateParams.projectId !== 'new')
-					return mtFetch.indicators({mode: 'project_reporting', projectId: $stateParams.projectId}, true);
+					return mtFetch.indicators({mode: 'project', projectId: $stateParams.projectId}, true);
 				else 
 					return {};
 			}
@@ -323,14 +324,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/form-edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
-			formulasById: function(indicatorsById) {
-				var formulasById = {};
-				for (var indicatorId in indicatorsById)
-					for (var formulaId in indicatorsById[indicatorId].formulas)
-						formulasById[formulaId] = indicatorsById[indicatorId].formulas[formulaId];
-
-				return formulasById;
-			},
 			form: function($stateParams, project) {
 				if ($stateParams.formId === 'new')
 					return {
@@ -354,6 +347,23 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			}
 		}
 	});
+
+	$stateProvider.state('main.project.form_reporting', {
+		url: '/forms/:formId/reporting',
+		templateUrl: 'partials/projects/form-reporting.html',
+		controller: 'ProjectFormReportingController',
+		resolve: {
+			form: function($stateParams, project) {
+				return project.dataCollection.find(function(form) {
+					return form.id == $stateParams.formId;
+				});
+			},
+			inputs: function(mtFetch, $stateParams) {
+				return mtFetch.inputs({mode: "form_inputs", formId: $stateParams.formId});
+			}
+		}
+	});
+
 
 	$stateProvider.state('main.project.input_list', {
 		url: '/inputs',
@@ -519,11 +529,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/indicator/:indicatorId',
 		template: '<div ui-view></div>',
 		resolve: {
-			indicatorsById: function(mtFetch, $stateParams) {
-				return mtFetch.indicators({mode: "indicator_edition", indicatorId: $stateParams.indicatorId}, true);
-			},
-			indicator: function(mtFetch, $stateParams, indicatorsById) {
-				return indicatorsById[$stateParams.indicatorId] || mtFetch.indicator();
+			indicator: function(mtFetch, $stateParams) {
+				return mtFetch.indicator($stateParams.indicatorId);
 			}
 		}
 	});

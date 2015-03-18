@@ -6,11 +6,10 @@
 </ol>
 
 <form class="form-horizontal" role="form" name="formForm" novalidate>
-	<!-- <div class="alert alert-danger" ng-if="!isNew" acl-has-project-role="owner" translate="project.form_warning"></div> -->
-
+	<div class="alert alert-danger" ng-if="!isNew" acl-has-project-role="owner" translate="project.form_warning"></div>
 
 	<tabset>
-		<tab heading="Planning">
+		<tab heading="{{'project.planning'|translate}}">
 
 			<br/>
 			<div class="form-group" show-errors>
@@ -148,11 +147,11 @@
 				</div>
 			</div>
 		</tab>
-		<tab heading="Données brutes">
+		<tab heading="{{'project.raw_data'|translate}}">
 			<br/>
 			<form-edit-raw-data raw-data="form.rawData"></form-edit-raw-data>
 		</tab>
-		<tab heading="Calcul des indicateurs">
+		<tab heading="{{'project.indicators_computation'|translate}}">
 			<br/>
 			<form-edit-fields fields="form.fields"></form-edit-fields>
  		</tab>

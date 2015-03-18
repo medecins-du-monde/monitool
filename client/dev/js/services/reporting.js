@@ -2,7 +2,7 @@
 
 var reportingServices = angular.module('monitool.services.reporting', []);
 
-
+// FIXME this should be in a directive and should not touch the model.
 reportingServices.factory('mtFormula', function($q) {
 	return {
 		/**

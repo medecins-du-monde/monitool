@@ -1,7 +1,7 @@
 
 <a ng-click="show_more=!show_more" class="pull-right">
 	<i class="fa fa-table"></i>
-	Voir les partitions
+	{{'project.see_partitions'|translate}}
 </a>
 <div style="clear: both"></div>
 
@@ -19,24 +19,24 @@
 				<input type="checkbox" ng-model="filter[p1.id][p2.id]" />
 			</td>
 			<td>
-				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="togglePartition2(1, p2.id)">Toggle</button>
+				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="togglePartition2(1, p2.id)" translate="shared.toggle"></button>
 			</td>
 		</tr>
 		<tr>
 			<td></td>
 			<td ng-repeat="p1 in element.partition1">
-				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="togglePartition2(0, p1.id)">Toggle</button>
+				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="togglePartition2(0, p1.id)" translate="shared.toggle"></button>
 			</td>
 			<td>
-				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="toggleAll2()">Toggle All</button>
+				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="toggleAll2()" translate="shared.toggle_all"></button>
 			</td>
 		</tr>
 	</table>
 
 	<table class="table table-condensed table-bordered" ng-if="element.partition1.length && !element.partition2.length">
 		<tr>
-			<th>Partition</th>
-			<th>Inclure</th>
+			<th translate="project.partition"></th>
+			<th translate="shared.include"></th>
 		</tr>
 		<tr ng-repeat="p1 in element.partition1">
 			<td ng-bind="p1.name"></td>
@@ -45,7 +45,7 @@
 		<tr>
 			<td></td>
 			<td>
-				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="toggleAll1()">Toggle All</button>
+				<button class="btn btn-xs btn-default" style="width: 100%" ng-click="toggleAll1()" translate="shared.toggle_all"></button>
 			</td>
 		</tr>
 	</table>

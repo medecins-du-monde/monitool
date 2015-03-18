@@ -190,3 +190,27 @@ tr.indent3 > td:first-child { padding-left: 150px; }
 
 
 
+
+
+  .table-raw-data th {
+    width: 25%;
+  }
+
+  .table-raw-data .remove-action {
+    display: none;
+  }
+
+  .table-raw-data li:hover > .remove-action, .table-raw-data td:hover > .remove-action {
+    display: inline;
+    cursor: hand;
+  }
+
+  .table-raw-data span[contenteditable] {
+    display: inline-block;
+    min-width: 100px;
+  }
+
+  .table-raw-data td:hover span[contenteditable] {
+    border: 1px dashed #ccc;
+    margin: 3px;
+  }

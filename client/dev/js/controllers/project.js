@@ -385,6 +385,24 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
+	.controller('ProjectFormReportingController', function($scope, mtRaw, form, inputs) {
+		$scope.form = form;
+		$scope.entity = $scope.project.inputEntities.length ? $scope.project.inputEntities[0] : null;
+
+		$scope.$watch('entity', function() {
+			if ($scope.entity) {
+				if (form.collect === 'project')
+					$scope.stats = mtRaw(form, inputs, 'none');
+				else
+					$scope.stats = mtRaw(form, inputs, $scope.entity.id);
+				$scope.open = {};
+			}
+			else {
+				delete $scope.stats;
+			}
+		});
+	})
+
 	.controller('ProjectInputListController', function($scope, project, inputs) {
 		$scope.inputs = inputs;
 		$scope.pred = 'period';

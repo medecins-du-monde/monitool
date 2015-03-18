@@ -7,21 +7,7 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.searchField = '';
 	})
 	
-	// .controller('IndicatorChooseController', function($scope, $modalInstance, mtRemoveDiacritics, forbiddenIds, hierarchy) {
-	// 	$scope.forbidden = forbiddenIds;
-	// 	$scope.searchField = '';
-	// 	$scope.hierarchy = hierarchy;
-
-	// 	$scope.choose = function(indicatorId) {
-	// 		$modalInstance.close(indicatorId);
-	// 	};
-
-	// 	$scope.cancel = function() {
-	// 		$modalInstance.dismiss()
-	// 	};
-	// })
-
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, $modal, mtFormula, mtFetch, indicator, indicatorsById, types, themes) {
+	.controller('IndicatorEditController', function($state, $scope, $stateParams, mtFormula, indicator, types, themes) {
 		// Formula handlers
 		$scope.addFormula = function() {
 			var uuid  = makeUUID(),
@@ -33,30 +19,6 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.deleteFormula = function(formulaId) {
 			delete $scope.indicator.formulas[formulaId];
 		};
-
-		// $scope.chooseIndicator = function(formulaId, symbol) {
-		// 	var usedIndicators = $scope.indicator.formulas[formulaId].__symbols.map(function(s) {
-		// 		return $scope.indicator.formulas[formulaId].parameters[s];
-		// 	}).filter(function(e) { return !!e; });
-		// 	usedIndicators.push(indicator._id);
-
-		// 	var indicatorId = $modal.open({
-		// 		templateUrl: 'partials/indicators/selector-popup.html',
-		// 		controller: 'IndicatorChooseController',
-		// 		size: 'lg',
-		// 		resolve: {
-		// 			forbiddenIds: function() { return usedIndicators; },
-		// 			hierarchy: function() { return mtFetch.themes({mode: "tree"}); }
-		// 		}
-		// 	}).result;
-
-		// 	indicatorId.then(function(indicatorId) {
-		// 		mtFetch.indicator(indicatorId).then(function(indicator) {
-		// 			$scope.indicatorsById[indicatorId] = indicator;
-		// 			$scope.indicator.formulas[formulaId].parameters[symbol] = indicatorId;
-		// 		});
-		// 	});
-		// };
 
 		$scope.formulasAreValid = true;
 		$scope.$watch('indicator.formulas', function() {
@@ -94,7 +56,6 @@ angular.module('monitool.controllers.indicator', [])
 		};
 
 		// init scope
-		$scope.indicatorsById = indicatorsById;
 		$scope.indicator = indicator;
 		$scope.master = angular.copy(indicator);
 		$scope.types = types;
