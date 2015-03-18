@@ -532,7 +532,7 @@ angular.module('monitool.controllers.project', [])
 	// FIXME this needs a rewriting. The code is way too kludgy
 	.controller('ProjectReportingAnalysisDataSelectionController', function($scope, $modalInstance, mtReporting, indicatorsById) {
 		$scope.query = {
-			project: mtReporting.getAnnotatedProjectCopy($scope.project, indicatorsById),
+			project: $scope.project,
 			begin:   mtReporting.getDefaultStartDate($scope.project),
 			end:     mtReporting.getDefaultEndDate($scope.project),
 			groupBy: 'month', type: 'project', id: ''
@@ -563,11 +563,11 @@ angular.module('monitool.controllers.project', [])
 			// if anything besides groupBy changes, we need to refetch.
 			// FIXME: we could widely optimize this.
 			if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end || oldQuery.id !== newQuery.id)
-				inputsPromise = mtReporting.getInputs(newQuery);
+				inputsPromise = mtReporting.getPreprocessedInputs(newQuery);
 
 			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
 			inputsPromise.then(function(inputs) {
-				stats = mtReporting.regroup(inputs, newQuery, indicatorsById);
+				stats = mtReporting.getProjectReporting(inputs, newQuery, indicatorsById);
 				update();
 			});
 		}, true)
