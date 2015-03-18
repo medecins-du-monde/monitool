@@ -73,31 +73,27 @@ angular.module('monitool.directives.form', [])
 		};
 	})
 
-
-
-
-// From https://docs.angularjs.org/guide/forms
+	// From https://docs.angularjs.org/guide/forms
 	.directive('contenteditable', function() {
-  return {
-    require: 'ngModel',
-    link: function(scope, elm, attrs, ctrl) {
-      // view -> model
-      elm.on('blur', function() {
-        scope.$apply(function() {
-          ctrl.$setViewValue(elm.html());
-        });
-      });
+		return {
+			require: 'ngModel',
+			link: function(scope, elm, attrs, ctrl) {
+				// view -> model
+				elm.on('blur', function() {
+					scope.$apply(function() {
+						var text = elm.text().replace(/\s+/g, " ");
+						elm.html(text);
+						ctrl.$setViewValue(text);
+					});
+				});
 
-      // model -> view
-      ctrl.$render = function() {
-        elm.html(ctrl.$viewValue);
-      };
-
-      // load init value from DOM
-      // ctrl.$setViewValue(elm.html());
-    }
-  };
-})
+				// model -> view
+				ctrl.$render = function() {
+					elm.html(ctrl.$viewValue);
+				};
+			}
+		};
+	})
 
 	.directive('faBoolean', function() {
 		return {
@@ -121,4 +117,5 @@ angular.module('monitool.directives.form', [])
 				});
 			}
 		}
-	})
+	});
+
