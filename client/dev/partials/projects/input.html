@@ -8,7 +8,7 @@
 </ol>
 
 <tabset>
-	<tab heading="Données brutes">
+	<tab heading="{{'project.raw_data'|translate}}">
 		<br/>
 		<div class="panel panel-primary" ng-repeat="section in form.rawData">
 			<div class="panel-heading" ng-bind="section.name"></div>
@@ -27,8 +27,8 @@
 								   class="table table-bordered table-condensed">
 								<thead>
 									<tr>
-										<th style="width: 20%">Partition</th>
-										<th>Valeur</th>
+										<th style="width: 20%" translate="project.partition"></th>
+										<th translate="project.value"></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -39,7 +39,7 @@
 										</td>
 									</tr>
 									<tr>
-										<td>Total</td>
+										<td translate="shared.sum"></td>
 										<td sum
 											sum-type="simple"
 											sum-data="currentInput.values[variable.id]"></td>
@@ -53,7 +53,7 @@
 									<tr>
 										<th style="width: 20%"></th>
 										<th ng-repeat="p2 in variable.partition2" ng-bind="p2.name"></th>
-										<th>Total</th>
+										<th translate="shared.sum"></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -69,7 +69,7 @@
 											sum-data="currentInput.values[variable.id][p1.id]"></td>
 									</tr>
 									<tr>
-										<th>Total</th>
+										<th translate="shared.sum"></th>
 										<td ng-repeat="p2 in variable.partition2"
 											sum
 											sum-type="deep"
@@ -126,7 +126,7 @@
 		</div>
 
 	</tab>
-	<tab heading="Indicateurs">
+	<tab heading="{{'shared.indicators'|translate}}">
 		<br/>
 
 		<table class="table table-bordered table-stripped table-condensed project-reporting">
@@ -151,56 +151,6 @@
 				</tr>
 			</tbody>
 		</table>
-
-
-
-		<!-- 
-		<script type="text/ng-template" id="form-sub-3.html">
-			<div class="panel-heading">
-				<div class="row">
-					<div class="col-sm-4">
-						<i class="fa fa-pencil" ng-if="field.type === 'input'"></i>
-						<i class="fa fa-calculator" ng-if="field.type.substring(0, 'compute'.length) === 'compute'" tooltip="{{field.expression}}"></i>
-						<i class="fa fa-link" ng-if="field.type.substring(0, 'link'.length) === 'link'"></i>
-
-						<span ng-if="!key"><span translate="shared.indicator"></span>: </span>
-						<span ng-if="key"><span translate="indicator.parameter"></span> <strong>"{{key}}"</strong>: </span>
-						{{field.name}}
-					</div>
-
-					<div class="col-sm-8" acl-has-project-role="input" acl-fallback="currentInput.values[field.model]">
-						<div class="input-group" ng-if="!key">
-							<div class="input-group-addon">
-								<i class="fa fa-circle" input-status></i>
-							</div>
-							<input type="number"
-								   class="form-control input-sm"
-								   ng-model="currentInput.values[field.model]"
-								   placeholder="Saisie précédente: {{previousInput.values[field.model] || '?'}}"
-								   ng-disabled="field.type !== 'input'" />
-						</div>
-
-						<input type="number"
-							   class="form-control input-sm"
-							   ng-disabled="field.type !== 'input'"
-							   ng-if="key"
-							   ng-model="currentInput.values[field.model]"
-							   placeholder="Saisie précédente: {{previousInput.values[field.model] || '?'}}" />
-
-					</div>
-				</div>
-			</div>
-			<div class="panel-body" ng-if="field.type.substring(0, 'compute'.length) === 'compute'">
-				<div class="panel panel-info"
-					 ng-repeat="(key, field) in field.parameters"
-					 ng-include="'form-sub-3.html'"></div>
-			</div>
-		</script>
-
-		<div class="panel panel-primary" ng-repeat="field in form.fields" ng-include="'form-sub-3.html'"></div>
-		-->
-
-
 	</tab>
 </tabset>
 

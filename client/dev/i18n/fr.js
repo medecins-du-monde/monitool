@@ -60,6 +60,11 @@ var FRENCH_LOCALE = {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		sum: "Total",
+		include: "Inclure",
+		toggle: "Changer",
+		toggle_all: "Changer tous",
+
 		date: "Date",
 		administrator: "Administrateur",
 
@@ -133,6 +138,19 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		value: "Valeur",
+		raw_data: "Données brutes",
+		planning: "Planning",
+		indicators_computation: "Calcul des indicateurs",
+		partition: "Partition",
+		additional_partition: "Partition supplémentaires",
+		new_partition: "Ajouter une partition",
+		variable: "Variable",
+		new_variable: "Ajouter une variable",
+		section: "Section",
+		new_section: "Ajouter une section",
+		see_partitions: "Voir les partition selectionnées",
+
 		unknown: "Inconnu",
 		color: "Couleur",
 		red_for_target: "Rouge pour cible atteinte à moins de",

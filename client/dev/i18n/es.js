@@ -60,6 +60,11 @@ var SPANISH_LOCALE = {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		sum: "Suma",
+		include: "Incluir",
+		toggle: "Cambiar",
+		toggle_all: "Cambiar todos",
+
 		date: "Fecha",
 		administrator: "Administrador",
 
@@ -133,6 +138,19 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 	project: {
+		value: "Valor",
+		raw_data: "Datos en bruto",
+		planning: "Planificación",
+		indicators_computation: "Cálculo de los indicadores",
+		partition: "Partición",
+		additional_partition: "Partición adicional",
+		new_partition: "Añadir una partición",
+		variable: "Variable",
+		new_variable: "Añadir una variable",
+		section: "Apartado",
+		new_section: "Añadir un apartado",
+		see_partitions: "Ver las particiones selectionadas",
+
 		unknown: "Desconocido",
 		color: "Color",
 		red_for_target: "Rojo si el objetivo esta alcanzado a",

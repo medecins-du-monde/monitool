@@ -60,6 +60,11 @@ var ENGLISH_LOCALE = {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		sum: "Sum",
+		include: "Include",
+		toggle: "Toggle",
+		toggle_all: "Toggle all",
+
 		date: "Date",
 		administrator: "Administrator",
 
@@ -133,6 +138,19 @@ var ENGLISH_TRANSLATION = {
 		english: "English",
 	},
 	project: {
+		value: "Value",
+		raw_data: "Raw data",
+		planning: "Planning",
+		indicators_computation: "Indicadors computation",
+		partition: "Partition",
+		additional_partition: "Additional partition",
+		new_partition: "Add a partition",
+		variable: "Variable",
+		new_variable: "Add a variable",
+		section: "Section",
+		new_section: "Add a section",
+		see_partitions: "View selected sections",
+
 		unknown: "Unknown",
 		color: "Color",
 		red_for_target: "Red if target is reached at",
