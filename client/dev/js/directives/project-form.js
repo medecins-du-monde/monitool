@@ -45,17 +45,26 @@ angular
 					// indicator.formulas may be undefined if indicator is a parameter.
 					for (var formulaId in indicator.formulas)
 						typeOptions.push({
+							// to fill the html select
 							name: indicator.formulas[formulaId].name,
 							group: "Formulas",
-							meta: { type: "formula", id: formulaId, formula: indicator.formulas[formulaId] }
+
+							// to fill the field from this objet
+							type: "formula",
+							formulaId: formulaId,
+							formula: indicator.formulas[formulaId]
 						});
 
 					rawData.forEach(function(section) {
 						section.elements.forEach(function(element) {
 							typeOptions.push({
+								// to fill the html select
 								name: element.name,
 								group: section.name,
-								meta: { type: "raw", id: element.id, element: element, filter: {} }
+
+								// to fill the field from this objet
+								type: "raw",
+								element: element
 							});
 						});
 					});
@@ -321,36 +330,39 @@ angular
 				$scope.$watch('rawData', function() {
 					$scope.sources = formEditUtils.sources.createList($scope.indicator, $scope.rawData);
 					$scope.source = $scope.sources.find(function(potentialSource) {
-						return potentialSource.meta.id === $scope.field.rawId
-							|| potentialSource.meta.id === $scope.field.formulaId;
+						if (potentialSource.type === 'raw')
+							return potentialSource.element.id === $scope.field.rawId;
+						else
+							return potentialSource.formulaId === $scope.field.formulaId;
 					});
 				}, true);
 
 				// On user input
 				$scope.$watch('source', function(source, oldSource) {
 					// When no source is selected, there is no point in continuing
-					if (!source)
+					// OR => if first call do nothing!!!
+					if (!source || angular.equals(source, oldSource))
 						return;
 
 					// Configure the field object depending on what was selected.
-					$scope.field.type = source.meta.type;
+					$scope.field.type = source.type;
 					
 					if ($scope.field.type === 'raw') {
 						// delete formula params on raws
 						delete $scope.field.formulaId;
 						delete $scope.field.parameters;
 						
-						$scope.field.rawId = source.meta.id;
-						$scope.field.filter = formEditUtils.filters.createFullArray(source.meta.element);
+						$scope.field.rawId = source.element.id;
+						$scope.field.filter = formEditUtils.filters.createFullArray(source.element);
 					}
 					else if ($scope.field.type === 'formula') {
 						// delete raw params on formulas
 						delete $scope.field.rawId;
 						delete $scope.field.filter;
 
-						$scope.field.formulaId = source.meta.id;
+						$scope.field.formulaId = source.formulaId;
 						$scope.field.parameters = {};
-						for (var key in $scope.indicator.formulas[source.meta.id].parameters)
+						for (var key in $scope.indicator.formulas[source.formulaId].parameters)
 							$scope.field.parameters[key] = {};
 					}
 				}, true);

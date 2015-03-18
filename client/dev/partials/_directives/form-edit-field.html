@@ -8,7 +8,7 @@
 		ng-options="f.name group by f.group for f in sources">
 	</select>
 
-	<div ng-if="source.meta.element && source.meta.element.partition1.length">
-		<form-edit-filter element="source.meta.element" value="field.filter"></form-edit-filter>
+	<div ng-if="field.type === 'raw' && source.element.partition1.length">
+		<form-edit-filter element="source.element" value="field.filter"></form-edit-filter>
 	</div>
 </td>
