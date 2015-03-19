@@ -381,7 +381,7 @@ var ENGLISH_TRANSLATION = {
 
 		is_mandatory: "This indicator is mandatory in this thematic",
 		is_common: "This indicator is optional",
-		is_parameter: "This indicator can only be used to compute another one",
+		is_forbidden: "This is a legacy indicator, it cannot be used on new projects",
 		is_external: "This indicator is from another thematic",
 
 		what_is_aggregation: "How to fill those fields?",

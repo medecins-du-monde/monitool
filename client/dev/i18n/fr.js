@@ -381,7 +381,7 @@ var FRENCH_TRANSLATION = {
 
 		is_mandatory: "Cet indicateur est obligatoire pour les projets de même thématique",
 		is_common: "Cet indicateur est optionnel",
-		is_parameter: "Cet indicateur ne peut être utilisé que pour en calculer un autre",
+		is_forbidden: "Cet indicateur est historique est ne peut pas être utilisé sur un nouveau projet",
 		is_external: "Cet indicateur provient d'une autre thématique",
 
 		time_aggregation: "Aggrégation par rapport au temps",

@@ -381,7 +381,7 @@ var SPANISH_TRANSLATION = {
 
 		is_mandatory: "Este indicador es obligatorio para esta temática",
 		is_common: "Este indicador es opcional",
-		is_parameter: "Este indicador se puede usar solo para calcular a otros",
+		is_forbidden: "Este indicador es histórico y esta prohibido de uso para nuevos proyectos",
 		is_external: "Este indicator viene de otra temática",
 
 		what_is_aggregation: "¿Como llenar estos campos?",
