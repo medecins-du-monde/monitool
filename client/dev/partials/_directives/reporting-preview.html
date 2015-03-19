@@ -21,7 +21,7 @@
 			<td ng-bind="row.name||('shared.unknown_indicator'|translate)"></td>
 			<td>{{row.baseline}}{{row.unit}}</td>
 			<td>{{row.target}}{{row.unit}}</td>
-			<td ng-repeat="col in row.cols track by $index" ng-bind="col"></td>
+			<td ng-repeat="col in row.cols track by $index">{{col|number:0}}{{row.unit}}</td>
 		</tr>
 	</tbody>
 </table>
