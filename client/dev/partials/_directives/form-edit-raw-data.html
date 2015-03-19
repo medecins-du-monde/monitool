@@ -11,17 +11,17 @@
 		<tr ng-repeat="element in section.elements track by element.id">
 			<td rowspan="{{section.elements.length + 1}}" ng-if="$first">
 				<a ng-click="remove(section, rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-				<span contenteditable="true" ng-model="section.name"></span>
+				<span mt-content-editable ng-model="section.name"></span>
 			</td>
 			<td>
 				<a ng-click="remove(element, section.elements)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-				<span contenteditable="true" ng-model="element.name"></span>
+				<span mt-content-editable ng-model="element.name"></span>
 			</td>
 			<td>
 				<ul>
 					<li ng-repeat="p in element.partition1 track by p.id">
 						<a ng-click="remove(p, element.partition1)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-						<span contenteditable ng-model="p.name"></span>
+						<span mt-content-editable ng-model="p.name"></span>
 					</li>
 					<li><a ng-click="newPartition(element.partition1)" translate="project.new_partition"></a></li>
 				</ul>
@@ -30,7 +30,7 @@
 				<ul ng-if="element.partition1.length >= 2">
 					<li ng-repeat="p in element.partition2 track by p.id">
 						<a ng-click="remove(p, element.partition2)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-						<span contenteditable ng-model="p.name"></span>
+						<span mt-content-editable ng-model="p.name"></span>
 					</li>
 					<li><a ng-click="newPartition(element.partition2)" translate="project.new_partition"></a></li>
 				</ul>
@@ -39,7 +39,7 @@
 		<tr>
 			<td ng-if="section.elements.length === 0">
 				<a ng-click="remove(section, rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-				<span contenteditable="true" ng-model="section.name"></span>
+				<span mt-content-editable ng-model="section.name"></span>
 			</td>
 			<td colspan="3" style="text-align: center">
 				<a ng-click="newVariable(section.elements)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_variable"></a>

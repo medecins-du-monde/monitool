@@ -74,10 +74,12 @@ angular.module('monitool.directives.form', [])
 	})
 
 	// From https://docs.angularjs.org/guide/forms
-	.directive('contenteditable', function() {
+	.directive('mtContentEditable', function() {
 		return {
 			require: 'ngModel',
 			link: function(scope, elm, attrs, ctrl) {
+				elm.attr('contenteditable', true);
+
 				// view -> model
 				elm.on('blur', function() {
 					scope.$apply(function() {
