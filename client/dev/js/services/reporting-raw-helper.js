@@ -20,7 +20,7 @@ reportingServices.factory('mtRaw', function() {
 			sorted[moment(input.period).format('YYYY-MM-DD')] = input.values;
 		});
 
-		return sorted;			
+		return sorted;
 	};
 
 	var makeCols = function(inputs) {
@@ -88,5 +88,5 @@ reportingServices.factory('mtRaw', function() {
 			});
 		});
 		return { cols: cols, rows: rows };
-	}
+	};
 });

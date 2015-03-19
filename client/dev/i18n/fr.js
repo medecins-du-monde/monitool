@@ -99,6 +99,7 @@ var FRENCH_TRANSLATION = {
 		day: 'Jour',
 		week: 'Semaine',
 		month: 'Mois',
+		quarter: "Trimestre",
 		year: "Année",
 		
 		done: 'Fait',

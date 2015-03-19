@@ -57,11 +57,11 @@ reportingServices.factory('mtFormula', function($q) {
 reportingServices.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegroup) {
 
 	var getColumns = function(query) {
-		if (['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1) {
+		if (['year', 'quarter', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1) {
 			var begin      = moment(query.begin, 'YYYY-MM-DD').startOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
 				end        = moment(query.end, 'YYYY-MM-DD').endOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
-				dispFormat = {'year': 'YYYY', 'month': 'YYYY-MM', 'week': 'YYYY-MM-DD', 'day': 'YYYY-MM-DD'}[query.groupBy],
-				idFormat   = {'year': 'YYYY', 'month': 'YYYY-MM', 'week': 'YYYY-[W]WW', 'day': 'YYYY-MM-DD'}[query.groupBy],
+				dispFormat = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-MM-DD', 'day': 'YYYY-MM-DD'}[query.groupBy],
+				idFormat   = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-[W]WW', 'day': 'YYYY-MM-DD'}[query.groupBy],
 				current    = begin.clone(),
 				cols       = [];
 

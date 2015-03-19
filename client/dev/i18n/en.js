@@ -99,6 +99,7 @@ var ENGLISH_TRANSLATION = {
 		day: 'Day',
 		week: 'Week',
 		month: 'Month',
+		quarter: "Quarter",
 		year: "Year",
 		
 		done: 'Done',

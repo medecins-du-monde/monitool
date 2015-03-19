@@ -47,7 +47,7 @@
 
 <div style="clear: both" ng-if="presentation.plot">
 	<reporting-graph-adapter
-		type="['year', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1 ? 'line' : 'bar'"
+		type="['year', 'quarter', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1 ? 'line' : 'bar'"
 		data="stats" plots="plots" display="presentation.display">
 	</reporting-graph-adapter>
 </div>

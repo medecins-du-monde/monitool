@@ -10,10 +10,11 @@ reportingServices.factory('mtRegroup', function() {
 		var period = moment(input.period);
 
 		var result = {
-			year:  ['total', period.format('YYYY')],
-			month: ['total', period.format('YYYY-MM')],
-			week:  ['total', period.format('YYYY-[W]WW')],
-			day:   ['total', period.format('YYYY-MM-DD')]
+			year:    ['total', period.format('YYYY')],
+			quarter: ['total', period.format('YYYY-[Q]Q')],
+			month:   ['total', period.format('YYYY-MM')],
+			week:    ['total', period.format('YYYY-[W]WW')],
+			day:     ['total', period.format('YYYY-MM-DD')]
 		};
 
 		// some inputs are linked to the projet => they don't have any entity field.
@@ -41,7 +42,7 @@ reportingServices.factory('mtRegroup', function() {
 	 */
 	var regroupInputs = function(inputs, form, groupBy, indicatorsById) {
 		var result  = {},
-			aggType = ['year', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation';
+			aggType = ['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation';
 
 		var dummySum = function(memo, obj) {
 			for (var key in obj)

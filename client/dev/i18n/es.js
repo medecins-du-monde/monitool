@@ -99,6 +99,7 @@ var SPANISH_TRANSLATION = {
 		day: 'Dia',
 		week: 'Semana',
 		month: 'Mes',
+		quarter: "Trimestre",
 		year: "Año",
 
 		done: 'Hecho',
