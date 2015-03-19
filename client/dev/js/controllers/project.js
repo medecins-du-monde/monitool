@@ -349,8 +349,8 @@ angular.module('monitool.controllers.project', [])
 	})
 
 	.controller('ProjectFormEditionController', function($scope, $stateParams, form, indicatorsById) {
-		$scope.master = angular.copy($scope.form);
-		$scope.form = angular.copy(form);
+		$scope.master = angular.copy(form);
+		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.indicatorsById = indicatorsById;
 
 		$scope.addIntermediary = function() {
