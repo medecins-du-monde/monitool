@@ -42,6 +42,15 @@ angular
 				createList: function(indicator, rawData) {
 					var typeOptions = [];
 
+					typeOptions.push({
+						// to fill the html select
+						name: "Zero",
+						group: null,
+
+						// to fill the field from this objet
+						type: "zero"
+					});
+
 					// indicator.formulas may be undefined if indicator is a parameter.
 					for (var formulaId in indicator.formulas)
 						typeOptions.push({
@@ -296,7 +305,7 @@ angular
 
 				$scope.add = function() {
 					if ($scope.newIndicatorId) {
-						$scope.form.fields.push({indicatorId: $scope.newIndicatorId});
+						$scope.form.fields.push({indicatorId: $scope.newIndicatorId, type: "zero"});
 						delete $scope.newIndicatorId; // reset html select value.
 					}
 
@@ -332,8 +341,12 @@ angular
 					$scope.source = $scope.sources.find(function(potentialSource) {
 						if (potentialSource.type === 'raw')
 							return potentialSource.element.id === $scope.field.rawId;
-						else
+						else if (potentialSource.type === 'formula')
 							return potentialSource.formulaId === $scope.field.formulaId;
+						else if (potentialSource.type === 'zero')
+							return $scope.field.type === 'zero';
+						else
+							throw new Error('Invalid source type.');
 					});
 				}, true);
 
@@ -363,8 +376,16 @@ angular
 						$scope.field.formulaId = source.formulaId;
 						$scope.field.parameters = {};
 						for (var key in $scope.indicator.formulas[source.formulaId].parameters)
-							$scope.field.parameters[key] = {};
+							$scope.field.parameters[key] = {type: "zero"};
 					}
+					else if ($scope.field.type === 'zero') {
+						delete $scope.field.formulaId;
+						delete $scope.field.parameters;
+						delete $scope.field.rawId;
+						delete $scope.field.filter;
+					}
+					else
+						throw new Error('Invalid source type.');
 				}, true);
 			}
 		}
@@ -384,7 +405,7 @@ angular
 					var agg = $scope.type + 'Aggregation';
 
 					// if the indicator is summable, that's ok
-					if ($scope.indicator[agg] !== 'none')
+					if ($scope.indicator[agg] !== 'none' || $scope.field.type === 'zero')
 						$scope.summable = true;
 
 					// if it's a formula, and all parameters are summable, that's ok

@@ -45,6 +45,8 @@ reportingServices.factory('mtCompute', function() {
 				for (var key in field.parameters)
 					result[key] = processField(field.parameters[key], raw);
 			}
+			else if (field.type === 'zero')
+				result = 0;
 			else
 				throw new Error('Invalid field type.');
 
@@ -63,7 +65,7 @@ reportingServices.factory('mtCompute', function() {
 	var computeIndicatorsFromLeafs = function(computed, form, indicatorsById) {
 		var processField = function(field, raw) {
 			// A raw field is already computed, by nature.
-			if (field.type === 'raw')
+			if (field.type === 'raw' || field.type === 'zero')
 				return raw;
 			
 			// We need to compute formulas.
