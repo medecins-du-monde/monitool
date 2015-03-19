@@ -74,25 +74,6 @@ module.exports = {
 			});
 		}
 
-		else if (options.mode === 'indicators')
-			database.view('shortlists', 'by_type', {include_docs: true, key: 'theme'}, function(error, data) {
-				var themes = {"": {indicatorIds: []}};
-				data.rows.forEach(function(row) {
-					row.doc.indicatorIds = [];
-					themes[row.id] = row.doc;
-				});
-
-				database.view('shortlists', 'indicator_tree', {reduce: false}, function(error, indicators) {
-					indicators.rows.forEach(function(row) {
-						themes[row.key[0]].indicatorIds.push(row.id);
-					});
-
-					themes = Object.keys(themes).map(function(t) { return themes[t]; });
-
-					return callback(null, themes);
-				});
-			});
-
 		else
 			database.view('shortlists', 'by_type', {include_docs: true, key: 'theme'}, function(error, data) {
 				var themes = data.rows.map(function(row) { return row.doc; });

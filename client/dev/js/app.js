@@ -249,7 +249,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			// FIXME => bandwidth burner
 			projects: function(mtFetch) { return mtFetch.projects(); },
-			themes: function(mtFetch) { return mtFetch.themes({mode: 'indicators'}); }
+			themes: function(mtFetch) { return mtFetch.themes({}); }
 		}
 	});
 
