@@ -9,7 +9,7 @@
 		"_id":  { "$ref": "#/definitions/uuid" },
 		"_rev": { "$ref": "#/definitions/couchdb-revision" },
 		"type": { "type": "string", "pattern": "^theme$" },
-		"name": { "type": "string", "minLength": 3 }
+		"name": { "type": "string", "minLength": 1 }
 	},
 	"definitions": {
 		"uuid": {
