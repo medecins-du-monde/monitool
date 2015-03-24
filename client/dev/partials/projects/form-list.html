@@ -60,12 +60,12 @@
 	<thead>
 		<tr>
 			<th translate="shared.indicator"></th>
-			<th ng-repeat="interval in intervals">{{interval}}</th>
+			<th ng-repeat="interval in intervals" ng-bind="interval"></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-if="usages.length === 0">
-			<td colspan="2" translate="project.no_indicators" style="text-align: center"></td>
+			<td colspan="{{1 + intervals.length}}" translate="project.no_indicators" style="text-align: center"></td>
 		</tr>
 		<tr ng-repeat="usage in usages">
 			<td>{{indicatorsById[usage.id].name}}</td>
