@@ -420,6 +420,8 @@ angular.module('monitool.controllers.project', [])
 		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
 		// insure that model is properly initialised, but don't remove existing data
+		mtCompute.sanitizeRawData(inputs.current.values, form);
+
 		$scope.form.rawData.forEach(function(section) {
 			section.elements.forEach(function(element) {
 				if (element.partition1.length != 0 && element.partition2.length == 0)

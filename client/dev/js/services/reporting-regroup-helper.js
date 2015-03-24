@@ -1,6 +1,33 @@
 
 reportingServices.factory('mtRegroup', function() {
 
+	var _dummySum = function(memo, obj) {
+		for (var key in obj)
+			if (typeof memo[key] === 'number')
+				memo[key] += obj[key];
+			else if (memo[key])
+				dummySum(memo[key], obj[key]);
+			else
+				memo[key] = angular.copy(obj[key]);
+	};
+
+	var _processRaw = function(value, count, indicatorAggregation) {
+		// if there was only one input, we don't care how to avg/sum etc, and just return the value
+		if (count > 1) {
+			if (indicatorAggregation === 'average')
+				return value / count;
+			else if (indicatorAggregation === 'sum')
+				return value;
+			else if (indicatorAggregation === 'none')
+				return 'AGG_CONFLICT';
+			else
+				throw new Error('Invalid aggregation type');
+		}
+		else
+			return value;
+	};
+
+
 	/**
 	 * This methods adds yearAgg, monthAgg, weekAgg, dayAgg, entityAgg and groupAgg fields for all inputs.
 	 * Each field is an array that will tell us which columns this input belongs to (each input can belong to multiple columns)
@@ -44,38 +71,12 @@ reportingServices.factory('mtRegroup', function() {
 		var result  = {},
 			aggType = ['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation';
 
-		var dummySum = function(memo, obj) {
-			for (var key in obj)
-				if (typeof memo[key] === 'number')
-					memo[key] += obj[key];
-				else if (memo[key])
-					dummySum(memo[key], obj[key]);
-				else
-					memo[key] = angular.copy(obj[key]);
-		};
-
-		var processRaw = function(value, count, indicatorAggregation) {
-			// if there was only one input, we don't care how to avg/sum etc, and just return the value
-			if (count > 1) {
-				if (indicatorAggregation === 'average')
-					return value / count;
-				else if (indicatorAggregation === 'sum')
-					return value;
-				else if (indicatorAggregation === 'none')
-					return 'AGG_CONFLICT';
-				else
-					throw new Error('Invalid aggregation type');
-			}
-			else
-				return value;
-		};
-
 		// start by dummy summing all inputs by their groupBy key
 		inputs.forEach(function(input) {
 			input.aggregation[groupBy].forEach(function(key) {
 				if (!result[key])
 					result[key] = {};
-				dummySum(result[key], input.compute);
+				_dummySum(result[key], input.compute);
 			});
 		});
 
@@ -92,8 +93,9 @@ reportingServices.factory('mtRegroup', function() {
 					var formula = indicator.formulas[field.formulaId];
 
 					// we could iterate on either formula.parameters, field.parameters or result[groupKey][indicatorId].
+					// field.parameter may be wrong though (if the form changed since the input was made).
 					for (var key in formula.parameters) { 
-						computed[field.indicatorId][key] = processRaw(
+						computed[field.indicatorId][key] = _processRaw(
 							computed[field.indicatorId][key],	// value.
 							computed.count,						// number of inputs that were aggregated to do this.
 							formula.parameters[key][aggType]	// geoAggregation/timeAggregation
@@ -101,7 +103,7 @@ reportingServices.factory('mtRegroup', function() {
 					}
 				}
 				else if (field.type === 'raw')
-					computed[field.indicatorId] = processRaw(computed[field.indicatorId], computed.count, indicator[aggType])
+					computed[field.indicatorId] = _processRaw(computed[field.indicatorId], computed.count, indicator[aggType])
 			});
 		}
 

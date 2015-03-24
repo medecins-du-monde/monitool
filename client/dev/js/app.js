@@ -358,8 +358,12 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					return form.id == $stateParams.formId;
 				});
 			},
-			inputs: function(mtFetch, $stateParams) {
-				return mtFetch.inputs({mode: "form_inputs", formId: $stateParams.formId});
+			inputs: function(mtFetch, form, mtCompute, $stateParams) {
+				return mtFetch.inputs({mode: "form_inputs", formId: $stateParams.formId}).then(function(inputs) {
+					for (var i = 0, numInputs = inputs.length; i < numInputs; ++i)
+						mtCompute.sanitizeRawData(inputs[i].values, form);
+					return inputs;
+				});
 			}
 		}
 	});

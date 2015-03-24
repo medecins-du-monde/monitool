@@ -29,13 +29,6 @@ reportingServices.factory('mtFormula', function($q) {
 					formula.__isValid = false;
 			})
 
-			// var numSymbols = symbols.length;
-			// for (var i = 0; i < numSymbols; ++i)
-			// 	if (!formula.parameters[symbols[i]]) {
-			// 		formula.__isValid = false;
-			// 		formula.parameters[symbols[i]] = []
-			// 	}
-
 			if (!formula.name)
 				formula.__isValid = false;
 		},
@@ -157,7 +150,8 @@ reportingServices.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegr
 				var input   = inputs[i],
 					project = query.project || query.projects.find(function(p) { return p._id === input.project; }),
 					form    = project.dataCollection.find(function(f) { return f.id === input.form; });
-					
+				
+				mtCompute.sanitizeRawData(input.values, form);
 				input.compute = mtCompute.computeIndicatorsLeafsFromRaw(input.values, form);
 				input.aggregation = mtRegroup.computeAggregationFields(input, project);
 			}
