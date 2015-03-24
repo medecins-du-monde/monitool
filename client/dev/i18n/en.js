@@ -139,6 +139,8 @@ var ENGLISH_TRANSLATION = {
 		english: "English",
 	},
 	project: {
+		last_input: "Last input: ",
+
 		value: "Value",
 		raw_data: "Raw data",
 		planning: "Planning",

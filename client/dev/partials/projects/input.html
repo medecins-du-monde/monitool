@@ -21,6 +21,7 @@
 							<input ng-if="variable.partition1.length == 0 && variable.partition2.length == 0"
 								   class="form-control"
 								   ng-model="currentInput.values[variable.id]"
+								   placeholder="{{'project.last_input'|translate}}{{previousInput.values[variable.id] || '?'}}"
 								   type="number" />
 
 							<table ng-if="variable.partition1.length != 0 && variable.partition2.length == 0"
@@ -35,7 +36,10 @@
 									<tr ng-repeat="p in variable.partition1">
 										<td ng-bind="p.name"></td>
 										<td>
-											<input type="number" class="form-control input-sm" ng-model="currentInput.values[variable.id][p.id]" />
+											<input type="number"
+												   class="form-control input-sm"
+												   ng-model="currentInput.values[variable.id][p.id]"
+												   placeholder="{{'project.last_input'|translate}}{{previousInput.values[variable.id][p.id] || '?'}}" />
 										</td>
 									</tr>
 									<tr>
@@ -62,7 +66,8 @@
 										<td ng-repeat="p2 in variable.partition2">
 											<input type="number"
 												   class="form-control input-sm"
-												   ng-model="currentInput.values[variable.id][p1.id][p2.id]" />
+												   ng-model="currentInput.values[variable.id][p1.id][p2.id]"
+												   placeholder="{{'project.last_input'|translate}}{{previousInput.values[variable.id][p1.id][p2.id] || '?'}}" />
 										</td>
 										<td sum
 											sum-type="simple"
@@ -98,7 +103,8 @@
 										<td ng-repeat="p1 in variable.partition1">
 											<input type="number"
 												   class="form-control input-sm"
-												   ng-model="currentInput.values[variable.id][p1.id][p2.id]" />
+												   ng-model="currentInput.values[variable.id][p1.id][p2.id]"
+												   placeholder="{{'project.last_input'|translate}}{{previousInput.values[variable.id][p1.id][p2.id] || '?'}}" />
 										</td>
 										<td sum
 											sum-type="deep"

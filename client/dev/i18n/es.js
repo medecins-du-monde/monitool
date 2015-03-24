@@ -139,6 +139,8 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 	project: {
+		last_input: "Última entrada: ",
+
 		value: "Valor",
 		raw_data: "Datos en bruto",
 		planning: "Planificación",

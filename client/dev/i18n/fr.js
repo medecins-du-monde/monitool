@@ -139,6 +139,8 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		last_input: "Dernière saisie: ",
+
 		value: "Valeur",
 		raw_data: "Données brutes",
 		planning: "Planning",
