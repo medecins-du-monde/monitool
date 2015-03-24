@@ -79,7 +79,20 @@ angular
 					});
 
 					return typeOptions;
-				}
+				},
+
+				getSourceFromField: function(potentialSources, field) {
+					return potentialSources.find(function(potentialSource) {
+						if (potentialSource.type === 'raw')
+							return potentialSource.element.id === field.rawId;
+						else if (potentialSource.type === 'formula')
+							return potentialSource.formulaId === field.formulaId;
+						else if (potentialSource.type === 'zero')
+							return field.type === 'zero';
+						else
+							throw new Error('Invalid source type.');
+					});
+				},
 			},
 
 			filters: {
@@ -107,6 +120,14 @@ angular
 					else
 						return [];
 				},
+				isValid: function(arrayFilter, element) {
+					if (element.partition1.length && element.partition2.length)
+						return fns.filters.two.isValid(arrayFilter, element);
+					else if (element.partition1.length)
+						return fns.filters.one.isValid(arrayFilter, element);
+					else
+						return arrayFilter.length === 0;
+				},
 
 				one: {
 					createFullArray: function(element) {
@@ -132,6 +153,12 @@ angular
 					},
 					setAll: function(hash, element, value) {
 						element.partition1.forEach(function(p) { hash[p.id] = value; });
+					},
+					isValid: function(arrayFilter, element) {
+						return arrayFilter.every(function(target) {
+							return typeof target === 'string'
+								&& element.partition1.findIndex(function(p) { return p.id === target; }) !== -1;
+						});
 					},
 				},
 
@@ -212,7 +239,14 @@ angular
 							hash[p1.id][colId] = value;
 						});
 					},
-					
+					isValid: function(arrayFilter, element) {
+						return arrayFilter.every(function(target) {
+							return Array.isArray(target)
+								&& target.length === 2
+								&& element.partition1.findIndex(function(p) { return p.id === target[0]; }) !== -1
+								&& element.partition2.findIndex(function(p) { return p.id === target[1]; }) !== -1;
+						});
+					}
 				}
 			}
 		};
@@ -272,9 +306,9 @@ angular
 				// - indicators in form.fields (some of them may become forbidden to compute)
 				// - indicators in addable indicators.
 				$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue, oldValue) {
-					// Retrieve start / end dates.
-					var begin = $scope.form.useProjectStart ? $scope.project.begin : $scope.form.start,
-						end   = $scope.form.useProjectEnd ? $scope.project.end : $scope.form.end;
+					// Fix start / end dates.
+					$scope.form.start = $scope.form.useProjectStart ? $scope.project.begin : $scope.form.start,
+					$scope.form.end   = $scope.form.useProjectEnd ? $scope.project.end : $scope.form.end;
 
 					// When begin and end change, we need to update the list of indicators we can keep and add.
 					// the user cannot choose an indicator which is already collected in the same period.
@@ -317,6 +351,18 @@ angular
 
 					$scope.addableIndicators = addableIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId]; });
 				};
+
+
+				$scope.remove = function(field) {
+					$scope.form.fields.splice($scope.form.fields.indexOf(field), 1);
+
+					var concurrentForms     = formEditUtils.forms.getConcurrents($scope.project.dataCollection, $scope.form),
+						allForms            = concurrentForms.concat([$scope.form]),
+						projectIndicatorIds = Object.keys($scope.project.indicators),
+						addableIndicatorIds = formEditUtils.forms.getAddableIndicatorIds(projectIndicatorIds, allForms);
+
+					$scope.addableIndicators = addableIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId]; });
+				};
 			}
 		}
 	})
@@ -337,18 +383,32 @@ angular
 				// Init
 				// We need a watch because available sources may change if user goes between rawdata and fields tabs
 				$scope.$watch('rawData', function() {
+					// Compute a new source list.
 					$scope.sources = formEditUtils.sources.createList($scope.indicator, $scope.rawData);
-					$scope.source = $scope.sources.find(function(potentialSource) {
-						if (potentialSource.type === 'raw')
-							return potentialSource.element.id === $scope.field.rawId;
-						else if (potentialSource.type === 'formula')
-							return potentialSource.formulaId === $scope.field.formulaId;
-						else if (potentialSource.type === 'zero')
-							return $scope.field.type === 'zero';
+					
+					// Search for the right source in the list.
+					var source = formEditUtils.sources.getSourceFromField($scope.sources, $scope.field);
+
+					if (!source)
+						// The raw data do not longer exist => replace by zero.
+						$scope.source = $scope.sources.find(function(s) { return s.type === 'zero'; });
+					else if (source.type === 'formula' || source.type === 'zero')
+						// It's a formula or a zero. It can't be wrong (those can't be changed here).
+						$scope.source = source;
+					else if (source.type === 'raw') {
+						// It's a link to raw data => check that we did not change the partitions, and make all filters wrong.
+						if (!formEditUtils.filters.isValid($scope.field.filter, source.element))
+							$scope.source = $scope.sources.find(function(s) { return s.type === 'zero'; });
 						else
-							throw new Error('Invalid source type.');
-					});
+							$scope.source = source;
+					}
+					else
+						throw new Error('Invalid source type.');
 				}, true);
+
+				$scope.remove = function() {
+					$scope.$parent.remove($scope.field);
+				};
 
 				// On user input
 				$scope.$watch('source', function(source, oldSource) {

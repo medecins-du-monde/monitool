@@ -7,8 +7,8 @@ var getPeriods = function(form, project) {
 	if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
 		var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
 
-		var current = moment(form.useProjectStart ? project.begin : form.begin).startOf(period),
-		end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
+		var current = moment(form.useProjectStart ? project.begin : form.start).startOf(period),
+			end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
 
 		if (end.isAfter()) // do not allow to go in the future
 			end = moment();

@@ -189,18 +189,15 @@ tr.indent2 > td:first-child { padding-left: 100px; }
 tr.indent3 > td:first-child { padding-left: 150px; }
 
 
-
-
-
   .table-raw-data th {
     width: 25%;
   }
 
-  .table-raw-data .remove-action {
+  .remove-action {
     display: none;
   }
 
-  .table-raw-data li:hover > .remove-action, .table-raw-data td:hover > .remove-action {
+  li:hover > .remove-action, td:hover > .remove-action {
     display: inline;
     cursor: hand;
   }
@@ -208,6 +205,7 @@ tr.indent3 > td:first-child { padding-left: 150px; }
   .table-raw-data span[contenteditable] {
     display: inline-block;
     min-width: 100px;
+    min-height: 12px;
   }
 
   .table-raw-data td:hover span[contenteditable] {
