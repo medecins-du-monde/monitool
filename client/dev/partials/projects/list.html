@@ -4,7 +4,7 @@
 </ol>
 
 <input type="checkbox" ng-model="showFinished" id="filter-finished" />
-<label for="filter-finished" translate>project.show_finished</label>
+<label for="filter-finished" translate="project.show_finished"></label>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
@@ -19,7 +19,6 @@
 	<tbody>
 		<tr ng-repeat="project in projects | filter:isDisplayed | orderBy:pred:rev">
 			<td style="text-align: center">
-
 				<i class="fa fa-file-powerpoint-o"
 				   tooltip="{{'project.you_are_owner'|translate}}"
 				   tooltip-placement="right" acl-has-project-role="owner" acl-project="project"></i>
@@ -35,12 +34,11 @@
 				<i class="fa fa-file-text-o text-danger"
 				   tooltip="{{'project.you_are_not_editor'|translate}}"
 				   tooltip-placement="right" acl-lacks-project-role="input" acl-project="project"></i>
-
 			</td>
-			<td><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></td>
-			<td>{{project.themes | getObjects:themes | pluck:'name' | join:', '}}</td>
-			<td>{{project.begin|amDateFormat:'YYYY-MM-DD'}}</td>
-			<td>{{project.end|amDateFormat:'YYYY-MM-DD'}}</td>
+			<td><a ui-sref="main.project.logical_frame({projectId: project._id})">{{::project.name}}</a></td>
+			<td>{{::project.themes|getObjects:themes|pluck:'name'|join:', '}}</td>
+			<td>{{::project.begin|amDateFormat:'YYYY-MM-DD'}}</td>
+			<td>{{::project.end|amDateFormat:'YYYY-MM-DD'}}</td>
 		</tr>
 	</tbody>
 </table>

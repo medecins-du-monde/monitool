@@ -1,6 +1,6 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li><a ui-sref="main.project.logical_frame({projectId: project._id})" ng-bind="::project.name"></a></li>
 	<li class="active" translate="project.waiting_inputs"></li>
 </ol>
 
@@ -19,28 +19,27 @@
 	</thead>
 	<tbody>
 		<tr ng-if="!inputs.length">
-			<td colspan="5" style="text-align: center" translate>project.no_waiting_inputs</td>
+			<td colspan="5" style="text-align: center" translate="project.no_waiting_inputs"></td>
 		</tr>
-		<tr ng-repeat="input in inputs | filter:isDisplayed | orderBy:pred:rev">
+		<tr ng-repeat="input in inputs|filter:isDisplayed|orderBy:pred:rev">
 			<td>
-				<i ng-init="ok=input.filled"
-				   ng-class="{fa: true, 'fa-check': input.filled=='yes', 'fa-times': input.filled=='no', 'fa-calendar': input.filled=='invalid'}"
-				   ng-style="{color:{yes:'green',no:'red',invalid:'orange'}[input.filled]}"></i>
+				<i ng-class="::{fa: true, 'fa-check': input.filled=='yes', 'fa-times': input.filled=='no', 'fa-calendar': input.filled=='invalid'}"
+				   ng-style="::{color:{yes:'green',no:'red',invalid:'orange'}[input.filled]}"></i>
 			</td>
-			<td>{{input.period | amDateFormat: 'D MMMM YYYY'}}</td>
-			<td>{{input.inputEntityName}}</td>
-			<td>{{input.formName}}</td>
+			<td ng-bind="::input.period|amDateFormat:'D MMMM YYYY'"></td>
+			<td ng-bind="::input.inputEntityName"></td>
+			<td ng-bind="::input.formName"></td>
 			<td>
 				<a class="btn btn-default btn-xs" 
 				   acl-has-project-role="input"
 				   ui-sref="main.project.input({period: input.period.format('YYYY-MM-DD'), formId: input.formId, entityId: input.inputEntityId})">
 					<i class="fa fa-pencil-square-o"></i>
-					<span translate>{{input.filled ? "shared.edit" : "project.input"}}</span>
+					<span translate>{{::input.filled ? "shared.edit" : "project.input"}}</span>
 				</a>
 
 				<a class="btn btn-default btn-xs" 
 				   acl-lacks-project-role="input"
-				   ng-if="input.filled"
+				   ng-if="::input.filled"
 				   ui-sref="main.project.input({period: input.period.format('YYYY-MM-DD'), formId: input.formId, entityId: input.inputEntityId})">
 					<i class="fa fa-pencil-square-o"></i>
 					<span translate="shared.display"></span>
