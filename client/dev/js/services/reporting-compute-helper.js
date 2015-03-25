@@ -86,7 +86,9 @@ reportingServices.factory('mtCompute', function() {
 					});
 			}
 			catch (e) {
-				console.log(e); // leave this for now.
+				// input does not match form structure.
+				// we can skip this whole indicator.
+				return "FORM_CHANGED";
 			}
 		}
 
@@ -116,15 +118,18 @@ reportingServices.factory('mtCompute', function() {
 				localScope[key] = _processFieldComp(field.parameters[key], raw[key], indicatorsById);
 
 				// Early quit if one of the parameters is missing.
-				if (localScope[key] === 'AGG_CONFLICT')
-					return 'AGG_CONFLICT';
+				if (typeof localScope[key] !== 'number')
+					return localScope[key];
 			}
 
 			var formula = indicatorsById[field.indicatorId].formulas[field.formulaId];
 			try {
 				return Parser.evaluate(formula.expression, localScope);
 			}
-			catch (e) { } // the function will return undefined, which is what we want.
+			catch (e) {
+				// the function will return undefined, which is what we want.
+				return 'EVALUATE_ERROR';
+			} 
 		}
 		else
 			throw new Error('Invalid field type.');

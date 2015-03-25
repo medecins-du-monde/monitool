@@ -5,8 +5,10 @@ reportingServices.factory('mtRegroup', function() {
 		for (var key in obj)
 			if (typeof memo[key] === 'number')
 				memo[key] += obj[key];
+			else if (typeof memo[key] === 'string') // AGG_CONFLICT, or other errors.
+				;
 			else if (memo[key])
-				dummySum(memo[key], obj[key]);
+				_dummySum(memo[key], obj[key]);
 			else
 				memo[key] = angular.copy(obj[key]);
 	};

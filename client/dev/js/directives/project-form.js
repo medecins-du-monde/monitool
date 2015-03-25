@@ -261,10 +261,10 @@ angular
 		return {
 			restrict: "AE",
 			templateUrl: "partials/_directives/form-edit-raw-data.html",
-			scope: {
-				'rawData': '='
-			},
+			scope: true,
 			link: function($scope, element) {
+				$scope.rawData = $scope.form.rawData;
+
 				$scope.newSection = function(target) {
 					target.push({id: makeUUID(), name: "", elements: []});
 				};
@@ -377,7 +377,9 @@ angular
 			scope: {
 				'field': '=',
 				'indicator': '=',
-				'rawData': '='
+				'rawData': '=',
+				'userCtx': '=',
+				'project': '=',
 			},
 			link: function($scope) {
 				// Init

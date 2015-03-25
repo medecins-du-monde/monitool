@@ -8,6 +8,8 @@
 	</thead>
 	<tbody ng-repeat="field in form.fields">
 		<tr form-edit-field
+				user-ctx="userCtx"
+				project="project"
 				field="field"
 				indicator="indicatorsById[field.indicatorId]"
 				raw-data="form.rawData">
@@ -15,6 +17,8 @@
 		<tr ng-repeat="(key, subField) in field.parameters"
 			class="indent1"
 			form-edit-field
+				user-ctx="userCtx"
+				project="project"
 				field="subField"
 				indicator="indicatorsById[field.indicatorId].formulas[field.formulaId].parameters[key]"
 				raw-data="form.rawData">
@@ -22,9 +26,8 @@
 	</tbody>
 </table>
 
-<div class="input-group">
+<div class="input-group" acl-has-project-role="owner">
 	<select class="form-control"
-			acl-has-project-role="owner"
 			ng-model="newIndicatorId"
 			ng-options="i._id as i.name for i in addableIndicators">
 	</select>

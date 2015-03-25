@@ -32,27 +32,27 @@
 				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				<li dropdown>
+					<a href="#" dropdown-toggle>
 						<i class="fa fa-fw fa-language"></i>
 						{{'menu.language' | translate}}
 						<span class="caret"></span>
 					</a>
 
-					<ul class="dropdown-menu" role="menu">
+					<ul class="dropdown-menu">
 						<li><a ng-click="changeLanguage('fr')" ng-if="language != 'fr'" translate="menu.french"></a></li>
 						<li><a ng-click="changeLanguage('en')" ng-if="language != 'en'" translate="menu.english"></a></li>
 						<li><a ng-click="changeLanguage('es')" ng-if="language != 'es'" translate="menu.spanish"></a></li>
 					</ul>
 				</li>
-
-				<li class="dropdown" ng-if="userCtx">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				
+				<li dropdown ng-if="userCtx">
+					<a href="#" dropdown-toggle>
 						<i class="fa fa-fw fa-user"></i>
 						{{userCtx.name}}
 						<span class="caret"></span>
 					</a>
-					<ul class="dropdown-menu" role="menu">
+					<ul class="dropdown-menu">
 						<li>
 							<a ng-click="logout()">
 								<i class="fa fa-fw fa-arrow-left"></i>
@@ -60,11 +60,11 @@
 							</a>
 						</li>
 					</ul>
+
 				</li>
 			</ul>
 		</div>
 	</div>
 </nav>
-
 
 <div class="container-fluid main-content" ui-view></div>
