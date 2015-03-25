@@ -15,27 +15,23 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.2.25",
-    "angular-bootstrap": "~0.11.2",
-    "angular-bootstrap-show-errors": "romain-gilliotte/angular-bootstrap-show-errors#master",
-    "angular-cookies": "v1.2.25",
-    "angular-moment": "~0.8.2",
-    "angular-pouchdb": "romain-gilliotte/angular-pouchdb",
-    "angular-translate-storage-local": "~2.4.2",
-    "angular-ui-select": "~0.8.2",
-    "angular-ui-router": "~0.2.13",
     "Blob.js": "https://github.com/eligrey/Blob.js.git",
-    "bootstrap": "~3.2.0",
-    "canvas-toBlob.js": "~0.1.3",
-    "c3": "~0.4.9",
     "FileSaver.js": "https://github.com/eligrey/FileSaver.js.git",
-    "fontawesome": "~4.2.0",
-    "javascript-state-machine": "jakesgordon/javascript-state-machine",
-    "mathjs": "~1.0.1",
-    "pouchdb": "~3.0.6",
-    "pouchdb-authentication": "~0.3.6",
-    "saveSvgAsPng": "https://github.com/exupero/saveSvgAsPng.git#gh-pages",
-    "angular-resource": "1.2.25",
-    "textAngular": "~1.3.7"
+    "canvas-toBlob.js": "x",
+    
+    "angular": null,
+    "angular-bootstrap": null,
+    "angular-bootstrap-show-errors": "romain-gilliotte/angular-bootstrap-show-errors#master",
+    "angular-cookies": null,
+    "angular-moment": null,
+    "angular-resource": null,
+    "angular-translate-storage-local": null,
+    "angular-ui-select": null,
+    "angular-ui-router": null,
+
+    "bootstrap-css-only": null,
+    "c3": null,
+    "fontawesome": null,
+    "textAngular": null
   }
 }

@@ -32,20 +32,16 @@ var files = {
 	},
 	js: {
 		min: [
-			// 'client/dev/bower_components/javascript-state-machine/state-machine.min.js',
-			// 'client/dev/bower_components/pouchdb/dist/pouchdb.min.js',
-			// 'client/dev/bower_components/pouchdb-authentication/dist/pouchdb.authentication.min.js',
-			// 'client/dev/bower_components/mathjs/dist/math.min.js',
-			
 			'client/dev/bower_components/moment/min/moment.min.js',
 			'client/dev/bower_components/FileSaver.js/FileSaver.min.js',
 			'client/dev/bower_components/angular/angular.min.js',
 			'client/dev/bower_components/angular-ui-router/release/angular-ui-router.min.js',
 			'client/dev/bower_components/angular-moment/angular-moment.min.js',
 			'client/dev/bower_components/angular-translate/angular-translate.min.js',
-			'client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-			'client/dev/bower_components/angular-ui-select/dist/select.min.js',
+			// 'client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+			'client/dev/js/ui-bootstrap-tpls-0.13.0-SNAPSHOT.min.js',
 			'client/dev/bower_components/angular-bootstrap-show-errors/src/showErrors.min.js',
+			'client/dev/bower_components/angular-ui-select/dist/select.min.js',
 			'client/dev/bower_components/angular-cookies/angular-cookies.min.js',
 			'client/dev/bower_components/angular-resource/angular-resource.min.js',
 			'client/dev/bower_components/angular-translate/angular-translate.min.js',
@@ -58,8 +54,6 @@ var files = {
 			'client/dev/bower_components/textAngular/dist/textAngular.min.js',
 		],
 		common: [
-			// 'client/dev/bower_components/angular-pouchdb/angular-pouchdb.js',
-			
 			'client/dev/bower_components/Blob.js/Blob.js',
 			'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
 			'client/dev/i18n/fr.js',
