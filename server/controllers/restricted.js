@@ -21,22 +21,25 @@ var checkEditPermissions = function(user, modelName, modelId, callback) {
 		// admins can do what they want
 		callback(null);
 
-	else if (["project", "input"].indexOf(modelName) !== -1)
+	else if (modelName === "project")
 		// project permissions are located on the project itself
 		Project.get(modelId, function(error, project) {
 			if (error === 'not_found')
 				// check if the user is allowed to create projects
 				callback(user.roles.indexOf('project') === -1 ? 'missing_permission' : null);
-			else if (error === 'type') {
+
+			else if (error === 'type')
 				// user is crafting this query to see if it can overwrite a type with a project?
 				callback('uuid_must_be_unique_across_types');
-			}
-			else {
+			
+			else
 				// check if the user is allowed to update this particular project
-				var allowerUsers = modelName === 'project' ? project.owners : project.dataEntryOperators;
-				callback(allowerUsers.indexOf(user._id) === -1 ? 'missing_permission' : null);
-			}
+				callback(project.owners.indexOf(user._id) === -1 ? 'missing_permission' : null);
 		});
+
+	else if (["input", "report"].indexOf(modelName) !== -1) {
+		callback(null)
+	}
 
 	else if (["indicator", "theme", "type"].indexOf(modelName) !== -1)
 		// users need a role for indicators
@@ -86,9 +89,7 @@ router.delete('/:modelName(indicator|project|input|report|theme|type|user)/:id',
 		if (error)
 			return response.status(403).json({error: true, detail: error});
 
-		var ModelClass = ModelsByName[modelName];
-
-		ModelClass.delete(request.params.id, function(error) {
+		ModelsByName[modelName].delete(request.params.id, function(error) {
 			if (error)
 				response.status(400).json({error: true, message: "Can't do."});
 			else
