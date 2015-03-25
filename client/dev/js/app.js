@@ -42,6 +42,7 @@ var app = angular.module('monitool.app', [
 	'monitool.controllers.project',
 	'monitool.directives.acl',
 	'monitool.directives.form',
+	'monitool.directives.projectLogframe',
 	'monitool.directives.projectForm',
 	'monitool.directives.projectInput',
 	'monitool.directives.reporting',

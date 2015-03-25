@@ -73,6 +73,7 @@ var files = {
 			'client/dev/js/directives/forms.js',
 			'client/dev/js/directives/project-form.js',
 			'client/dev/js/directives/project-input.js',
+			'client/dev/js/directives/project-logframe.js',
 			'client/dev/js/directives/reporting.js',
 			'client/dev/js/services/fetch.js',
 			'client/dev/js/services/reporting.js',

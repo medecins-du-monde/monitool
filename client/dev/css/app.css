@@ -171,6 +171,7 @@ ul:hover>.onrollover {
 }
 
 @media print {
+  .print { display: block; }
   .noprint { display: none; }
   .print-only { display: block !important; }
   .print-full-width { width: 100% !important; }
