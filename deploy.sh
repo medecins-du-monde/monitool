@@ -120,7 +120,7 @@ fi
 # 4. Build JS application
 echo Building application
 
-eval $NODE_EXE ./node_modules/gulp/bin/gulp.js build
+eval "\"$NODE_EXE\" ./node_modules/gulp/bin/gulp.js build"
 
 ##################################################################################################################################
 
