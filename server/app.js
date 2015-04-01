@@ -6,7 +6,8 @@ var express        = require('express'),
 	compression    = require('compression'),
 	serveStatic    = require('serve-static'),
 	cacheControl   = require('./middlewares/cache-control'),
-	passport       = require('./passport');
+	passport       = require('./passport'),
+	config         = require('../config');
 
 express()
 	.disable('x-powered-by')
@@ -45,4 +46,4 @@ express()
 	.use(require('./controllers/restricted'))
 
 	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? 'client/dev' : 'client/build'))
-	.listen(80);
+	.listen(config.port);

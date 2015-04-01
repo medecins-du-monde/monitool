@@ -4,6 +4,7 @@ try {
 }
 catch (e) {
 	module.exports = {
+		"port": process.env.PORT,
 		"couchdb": {
 			"url": process.env['couchdb.url'],
 			"bucket": process.env['couchdb.bucket']
