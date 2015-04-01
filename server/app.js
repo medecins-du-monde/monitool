@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 "use strict";
 
 var express        = require('express'),
@@ -45,5 +44,5 @@ express()
 	.use(require('./controllers/public'))
 	.use(require('./controllers/restricted'))
 
-	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? '../client/dev' : '../client/build'))
-	.listen(8000);
+	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? 'client/dev' : 'client/build'))
+	.listen(80);

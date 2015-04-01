@@ -11,6 +11,7 @@
     "gulp": "x",
     "gulp-angular-templatecache": "^1.4.2",
     "gulp-awspublish": "0.0.23",
+    "gulp-bower": "0.0.10",
     "gulp-cloudfront": "0.0.14",
     "gulp-concat": "^2.4.1",
     "gulp-insert": "^0.4.0",

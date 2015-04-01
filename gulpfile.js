@@ -4,6 +4,7 @@ var addCors       = require('add-cors-to-couchdb'),
 	gulp          = require('gulp'),
 	templateCache = require('gulp-angular-templatecache'),
 	awspublish    = require('gulp-awspublish'),
+	bower         = require('gulp-bower'),
 	concat        = require('gulp-concat'),
 	insert        = require('gulp-insert'),
 	minifyCSS     = require('gulp-minify-css'),
@@ -11,7 +12,7 @@ var addCors       = require('add-cors-to-couchdb'),
 	rename        = require('gulp-rename'),
 	replace       = require('gulp-replace'),
 	uglify        = require('gulp-uglify'),
-	es = require('event-stream'),
+	es            = require('event-stream'),
 	request       = require('request'),
 	rimraf        = require('rimraf'),
 	Queue         = require('streamqueue'),
@@ -21,7 +22,7 @@ var files = {
 	css: {
 		min: [
 			'client/dev/bower_components/fontawesome/css/font-awesome.min.css',
-			'client/dev/bower_components/bootstrap/dist/css/bootstrap.min.css',
+			'client/dev/bower_components/bootstrap-css-only/css/bootstrap.min.css',
 			'client/dev/bower_components/angular-ui-select/dist/select.min.css',
 			'client/dev/bower_components/c3/c3.min.css',
 			'client/dev/bower_components/textAngular/src/textAngular.css'
@@ -87,9 +88,6 @@ var files = {
 // Deploy
 //////////////////////////////////////////////////////////
 
-gulp.task('deploy', ['copy-files-to-s3']);
-
-
 gulp.task('size-report', function() {
 	gulp.src(files.js.min)
 		.pipe(awspublish.gzip())
@@ -98,22 +96,11 @@ gulp.task('size-report', function() {
 		}))
 })
 
-gulp.task('copy-files-to-s3', ['build'], function() {
-	var publisher = awspublish.create(config.aws),
-		headers   = {'Cache-Control': 'max-age=315360000, no-transform, public'};
-
-	return gulp.src('build/**/*')
-			   .pipe(awspublish.gzip())
-			   .pipe(publisher.publish(headers))
-			   .pipe(publisher.cache())
-			   .pipe(awspublish.reporter())
-			   .on('error', function(err) { console.error('failed to publish err code: ', err.statusCode); } );
-});
-
 //////////////////////////////////////////////////////////
 // Build
 //////////////////////////////////////////////////////////
 
+gulp.task('default', ['build']);
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
 
 gulp.task('copy-static', function() {
@@ -123,7 +110,7 @@ gulp.task('copy-static', function() {
 	gulp.src('client/dev/monitool.appcache').pipe(gulp.dest('client/build'));
 });
 
-gulp.task('build-js', function() {
+gulp.task('build-js', ['bower'], function() {
 	var queue = new Queue({ objectMode: true });
 	queue.queue()
 	queue.queue(gulp.src(files.js.min));										// min.js are unchanged
@@ -144,7 +131,7 @@ gulp.task('build-js', function() {
 				.pipe(gulp.dest('client/build'));
 });
 
-gulp.task('build-css', function() {
+gulp.task('build-css', ['bower'], function() {
 	var queue = new Queue({ objectMode: true });
 	queue.queue(gulp.src(files.css.min));
 	queue.queue(gulp.src(files.css.common).pipe(minifyCSS()));
@@ -155,6 +142,10 @@ gulp.task('build-css', function() {
 				.pipe(gulp.dest('client/build'));
 });
 
+gulp.task('bower', function() {
+	return bower({cwd: './client/dev'}).pipe(gulp.dest('lib/'))
+});
+
 //////////////////////////////////////////////////////////
 // Clean
 //////////////////////////////////////////////////////////
@@ -162,44 +153,3 @@ gulp.task('build-css', function() {
 gulp.task('clean', function(callback) {
 	rimraf('client/build', callback);
 });
-
-
-//////////////////////////////////////////////////////////
-// CouchDB
-//////////////////////////////////////////////////////////
-
-gulp.task('prepare-couchdb', function(callback) {
-	var auth         = {user: config.couchdb.username, pass: config.couchdb.password},
-		txtAuth      = config.couchdb.username + ':' + config.couchdb.password,
-		createBucket = {url: config.couchdb.url + '/' + config.couchdb.bucket, auth: auth},
-		getDdoc      = {url: config.couchdb.url + '/' + config.couchdb.bucket + '/_design/monitool', auth: auth},
-		createDdoc   = {url: config.couchdb.url + '/' + config.couchdb.bucket + '/_design/monitool', auth: auth, json: require('./couchdb/_design/monitool.js')};
-
-	// allow cors
-	addCors(config.couchdb.url, txtAuth, function(error) {
-		if (error)
-			console.log('Failed to add cors', error);
-
-		// create bucket
-		request.put(createBucket, function(error, response) {
-			if (error)
-				console.log('failed to create bucket', error);
-
-			// create/update design doc
-			request.get(getDdoc, function(error, response, doc) {
-				if (doc)
-					createDdoc.json._rev = JSON.parse(doc)._rev;
-
-				request.put(createDdoc, function(error, response, doc) {
-					if (error)
-						console.log('failed to create design doc');
-
-					callback();
-				});
-			});
-		});
-	});
-});
-
-
-
