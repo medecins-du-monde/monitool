@@ -13,10 +13,7 @@ var addCors       = require('add-cors-to-couchdb'),
 	replace       = require('gulp-replace'),
 	uglify        = require('gulp-uglify'),
 	es            = require('event-stream'),
-	request       = require('request'),
-	rimraf        = require('rimraf'),
-	Queue         = require('streamqueue'),
-	config        = require('./config.json');
+	Queue         = require('streamqueue');
 
 var files = {
 	css: {
