@@ -118,9 +118,9 @@ if [ -e "$DEPLOYMENT_TARGET/package.json" ]; then
 fi
 
 # 4. Build JS application
+echo Building application
 
-./node_modules/gulp/bin/gulp.js build
-
+eval $NODE_EXE ./node_modules/gulp/bin/gulp.js build
 
 ##################################################################################################################################
 

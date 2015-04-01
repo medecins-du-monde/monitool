@@ -143,13 +143,5 @@ gulp.task('build-css', ['bower'], function() {
 });
 
 gulp.task('bower', function() {
-	return bower({cwd: './client/dev'}).pipe(gulp.dest('lib/'))
-});
-
-//////////////////////////////////////////////////////////
-// Clean
-//////////////////////////////////////////////////////////
-
-gulp.task('clean', function(callback) {
-	rimraf('client/build', callback);
+	return bower({cwd: './client/dev'});
 });
