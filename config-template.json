@@ -1,10 +1,4 @@
 {
-	"aws": {
-		"key": "",
-		"secret": "",
-		"bucket": "",
-		"region": "eu-west-1"
-	},
 	"couchdb": {
 		"url": "http://user:pass@localhost:5984",
 		"bucket": "monitool"
