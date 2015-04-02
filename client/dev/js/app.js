@@ -58,7 +58,7 @@ var app = angular.module('monitool.app', [
 	'ui.bootstrap.showErrors',
 	'ui.router',
 	'ui.select',
-	]);
+]);
 
 app.config(function($translateProvider) {
 	$translateProvider.translations('fr', FRENCH_TRANSLATION);
@@ -132,12 +132,15 @@ app.config(function(datepickerConfig, datepickerPopupConfig) {
 					model[i] = stringifyDates(model[i]);
 			}
 			else if (typeof model === 'object' && model !== null) {
-				for (var key in model)
-					// remove virtual properties
-				if (key.substring(0, 2) === '__')
-					delete model[key];
-				else
-					model[key] = stringifyDates(model[key]);
+				for (var key in model) {
+					if (key.charAt(0) !== '$' && model.hasOwnProperty && model.hasOwnProperty(key)) {
+						// remove virtual properties
+						if (key.substring(0, 2) === '__')
+							delete model[key];
+						else
+							model[key] = stringifyDates(model[key]);
+					}
+				}
 			}
 
 			return model;
