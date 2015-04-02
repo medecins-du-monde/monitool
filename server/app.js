@@ -4,6 +4,7 @@ var express        = require('express'),
 	cookieParser   = require('cookie-parser'),
 	session        = require('express-session'),
 	compression    = require('compression'),
+	request        = require('request'),
 	serveStatic    = require('serve-static'),
 	cacheControl   = require('./middlewares/cache-control'),
 	passport       = require('./passport'),
@@ -11,6 +12,10 @@ var express        = require('express'),
 
 express()
 	.disable('x-powered-by')
+
+	.get('/ping', function(request, response) {
+		response.send('pong');
+	})
 
 	.use(cookieParser())
 	.use(session({ secret: 'cd818da5bcd0d3d9ba5a9a44e49148d2', resave: false, saveUninitialized: false }))
@@ -47,3 +52,12 @@ express()
 
 	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? 'client/dev' : 'client/build'))
 	.listen(config.port);
+
+
+// hack: avoid having iis kill the node process.
+if (config.ping && config.ping.active)
+	setInterval(function() {
+		request.get(config.ping.url, function(error, response, data) {
+			
+		});
+	}, 10000);
