@@ -20,6 +20,7 @@ angular.module('monitool.services.fetch', [])
 						name: "",
 						begin: new Date(),
 						end: new Date(),
+						themes: [],
 						logicalFrame: {goal: "", indicators: [], purposes: []},
 						inputEntities: [],
 						inputGroups: [],
