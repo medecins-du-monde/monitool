@@ -321,7 +321,15 @@ var FRENCH_TRANSLATION = {
 	indicator: {
 		search: "Rechercher",
 		search_ph: "Rentrez au moins 3 caractères",
-		
+
+		standard: "Norme internationale",
+		sources: "Sources",
+		comments: "Commentaires",
+		standard_ph: "À quelle norme appartient cet indicateur?",
+		sources_ph: "Quelles sont les sources possibles pour cet indicateur?",
+		comments_ph: "Dans quel cas est-il pertinent d'utiliser cet indicateur, et avec quelles limites?",
+		metadata: "Metadonnées",
+
 		target: "Relation à la cible",
 		higher_is_better: "Atteinte si la saisie est supérieure à la cible",
 		lower_is_better: "Atteinte si la saisie est inférieure à la cible",
@@ -332,10 +340,10 @@ var FRENCH_TRANSLATION = {
 		no_type: 'Sans type',
 
 		operation: "Mode d'opération",
-
+		
 		name_ph: 'Exemple: Part des dossiers patient bien remplis',
-		description_ph: 'Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
 		definition: 'Définition',
+		definition_ph: 'Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
 		core: 'Recommandé',
 		unit: 'Unité',
 		other: 'Autre',

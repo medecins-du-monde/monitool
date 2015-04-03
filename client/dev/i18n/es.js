@@ -322,6 +322,14 @@ var SPANISH_TRANSLATION = {
 		search: "Buscar",
 		search_ph: "Entre por lo menos 3 caracteres",
 
+		standard: "Norma international",
+		sources: "Origen",
+		comments: "Comentarios",
+		standard_ph: "¿A que norma pertenece este indicador?",
+		sources_ph: "¿Dónde se puede colectar este indicador?",
+		comments_ph: "¿En qué casos es pertinente usar este indicador, y con qué limites?",
+		metadata: "Metadatos",
+
 		target: "Relación con el objetivo",
 		higher_is_better: "Alcanzado si la entrada es superior al objetivo",
 		lower_is_better: "Alcanzado si la entrada es inferior al objetivo",
@@ -334,7 +342,7 @@ var SPANISH_TRANSLATION = {
 		operation: "Modo de operación",
 
 		name_ph: 'Por ejemplo: Porcentaje de fichas de paciente completas',
-		description_ph: 'Por ejemplo: Medir el nivel de formación del personal medical que completa las fichas de pacientes. Medir este indicador es facil en proyectos pequeños, evitar usarlo en otras circunstancias.',
+		definition_ph: 'Por ejemplo: Medir el nivel de formación del personal medical que completa las fichas de pacientes. Medir este indicador es facil en proyectos pequeños, evitar usarlo en otras circunstancias.',
 		definition: 'Definición',
 		core: 'Recomendado',
 		unit: 'Unidad',

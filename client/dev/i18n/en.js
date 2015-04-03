@@ -322,6 +322,14 @@ var ENGLISH_TRANSLATION = {
 		search: "Search",
 		search_ph: "Enter at least 3 characters",
 
+		standard: "International Standard",
+		sources: "Sources",
+		comments: "Comments",
+		standard_ph: "Which standard is this indicator from?",
+		sources_ph: "Which sources are more common for this indicator?",
+		comments_ph: "When is it relevant to collect this indicator, and what are its limits?",
+		metadata: "Metadata",
+
 		target: "Relation with target",
 		higher_is_better: "Reached if input is higher than target",
 		lower_is_better: "Reached if input is lower than target",
@@ -334,7 +342,7 @@ var ENGLISH_TRANSLATION = {
 		operation: "Operation mode",
 
 		name_ph: 'For instance: Percentage of correctly filled medical records',
-		description_ph: 'For instance: Mesure the staff formation level. This indicator is mesurable only on small projects and should be avoided otherwise',
+		definition_ph: 'For instance: Mesure the staff formation level. This indicator is mesurable only on small projects and should be avoided otherwise',
 		definition: 'Definition',
 		core: 'Core',
 		unit: 'Unit',
