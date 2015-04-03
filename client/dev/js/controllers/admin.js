@@ -3,19 +3,21 @@
 angular.module('monitool.controllers.admin', [])
 
 	.controller('UsersController', function($scope, users) {
-		$scope.users = users.filter(function(user) {
-			return user._id !== $scope.userCtx._id;
-		});
+		$scope.$watch('userCtx', function(userCtx) {
+			if (userCtx) {
+				$scope.users = users.filter(function(user) { return user._id !== userCtx._id; });
+				
+				$scope.users.forEach(function(user) {
+					user.__choices = {
+						_admin: user.roles.indexOf('_admin') !== -1,
+						project: user.roles.indexOf('project') !== -1,
+						indicator: user.roles.indexOf('indicator') !== -1
+					};
+				});
 
-		$scope.users.forEach(function(user) {
-			user.__choices = {
-				_admin: user.roles.indexOf('_admin') !== -1,
-				project: user.roles.indexOf('project') !== -1,
-				indicator: user.roles.indexOf('indicator') !== -1
-			};
+				$scope.masters = angular.copy($scope.users);
+			}
 		});
-
-		$scope.masters = angular.copy($scope.users);
 
 		$scope.save = function(index) {
 			var user = $scope.users[index];
