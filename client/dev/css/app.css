@@ -202,14 +202,13 @@ tr.indent3 > td:first-child { padding-left: 150px; }
     display: inline;
     cursor: hand;
   }
-
   .table-raw-data span[contenteditable] {
     display: inline-block;
     min-width: 100px;
     min-height: 12px;
   }
 
-  .table-raw-data td:hover span[contenteditable] {
+/*  .table-raw-data td:hover span[contenteditable] {
     border: 1px dashed #ccc;
     margin: 3px;
-  }
+  }*/
