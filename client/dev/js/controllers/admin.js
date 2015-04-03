@@ -15,7 +15,7 @@ angular.module('monitool.controllers.admin', [])
 			};
 		});
 
-		$scope.masters = angular.copy(users);
+		$scope.masters = angular.copy($scope.users);
 
 		$scope.save = function(index) {
 			var user = $scope.users[index];
