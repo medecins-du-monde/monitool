@@ -119,5 +119,21 @@ angular.module('monitool.directives.form', [])
 				});
 			}
 		}
+	})
+
+	.directive('textarea', function($timeout) {
+		return {
+			restrict: 'E',
+			link: function($scope, element) {
+				var resize = function() {
+					element[0].style.height = '1px';
+					var newHeight = Math.max(36, element[0].scrollHeight + 5);
+
+					return element[0].style.height = newHeight + "px";
+				};
+				element.on("blur keyup change", resize);
+				$timeout(resize, 0);
+			}
+		};
 	});
 
