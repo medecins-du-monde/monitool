@@ -378,6 +378,7 @@ var ENGLISH_TRANSLATION = {
 		only_core: "Only display core indicators",
 
 		is_mandatory: "This indicator is mandatory in this thematic",
+		is_recommended: "This indicator is from the thematic's catalog",
 		is_common: "This indicator is optional",
 		is_forbidden: "This is a legacy indicator, it cannot be used on new projects",
 		is_external: "This indicator is from another thematic",

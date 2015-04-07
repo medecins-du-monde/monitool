@@ -378,6 +378,7 @@ var SPANISH_TRANSLATION = {
 		only_core: "Ver unicamente los indicadores recomendados",
 
 		is_mandatory: "Este indicador es obligatorio para esta temática",
+		is_recommended: "Este indicador proviene del catálogo temático",
 		is_common: "Este indicador es opcional",
 		is_forbidden: "Este indicador es histórico y esta prohibido de uso para nuevos proyectos",
 		is_external: "Este indicator viene de otra temática",

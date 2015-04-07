@@ -111,6 +111,11 @@
 							tooltip="{{'indicator.is_common'|translate}}"
 							tooltip-placement="right"></i>
 
+						<i class="fa fa-book fa-fw"
+							ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'recommended'"
+							tooltip="{{'indicator.is_recommended'|translate}}"
+							tooltip-placement="right"></i>
+
 						<i class="fa fa-asterisk fa-fw"
 							ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
 							tooltip="{{'indicator.is_mandatory'|translate}}"
@@ -193,6 +198,11 @@
 										tooltip="{{'indicator.is_common'|translate}}"
 										tooltip-placement="right"></i>
 
+									<i class="fa fa-book fa-fw"
+										ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'recommended'"
+										tooltip="{{'indicator.is_recommended'|translate}}"
+										tooltip-placement="right"></i>
+
 									<i class="fa fa-asterisk fa-fw"
 										ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
 										tooltip="{{'indicator.is_mandatory'|translate}}"
@@ -265,6 +275,11 @@
 												<i class="fa fa-question fa-fw"
 													ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
 													tooltip="{{'indicator.is_common'|translate}}"
+													tooltip-placement="right"></i>
+
+												<i class="fa fa-book fa-fw"
+													ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'recommended'"
+													tooltip="{{'indicator.is_recommended'|translate}}"
 													tooltip-placement="right"></i>
 
 												<i class="fa fa-asterisk fa-fw"
@@ -344,6 +359,11 @@
 			<i class="fa fa-question fa-fw"
 				ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
 				tooltip="{{'indicator.is_common'|translate}}"
+				tooltip-placement="right"></i>
+				
+			<i class="fa fa-book fa-fw"
+				ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'recommended'"
+				tooltip="{{'indicator.is_recommended'|translate}}"
 				tooltip-placement="right"></i>
 
 			<i class="fa fa-asterisk fa-fw"

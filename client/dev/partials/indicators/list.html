@@ -56,6 +56,11 @@
 				tooltip="{{'indicator.is_common'|translate}}"
 				tooltip-placement="right"></i>
 
+			<i class="fa fa-book fa-fw"
+				ng-if="indicator.operation == 'recommended'"
+				tooltip="{{'indicator.is_recommended'|translate}}"
+				tooltip-placement="right"></i>
+
 			<i class="fa fa-asterisk fa-fw"
 				ng-if="indicator.operation == 'mandatory'"
 				tooltip="{{'indicator.is_mandatory'|translate}}"

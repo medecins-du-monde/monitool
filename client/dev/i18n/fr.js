@@ -378,6 +378,7 @@ var FRENCH_TRANSLATION = {
 		only_core: "Ne voir que les indicateurs recommandés",
 
 		is_mandatory: "Cet indicateur est obligatoire pour les projets de même thématique",
+		is_recommended: "Cet indicateur provient du catalogue thématique.",
 		is_common: "Cet indicateur est optionnel",
 		is_forbidden: "Cet indicateur est historique est ne peut pas être utilisé sur un nouveau projet",
 		is_external: "Cet indicateur provient d'une autre thématique",
