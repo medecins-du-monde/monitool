@@ -116,10 +116,12 @@
 							tooltip="{{'indicator.is_mandatory'|translate}}"
 							tooltip-placement="right"></i>
 
-						{{indicatorsById[indicatorId].name}}
-						<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)" translate="shared.edit"></a> |
-							<a ng-click="detachIndicator(indicatorId, project.logicalFrame.indicators)" translate="shared.detach"></a>)</span>
-						<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)" translate="shared.display"></a>)</span>
+						<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)">{{indicatorsById[indicatorId].name}}</a>
+						
+						<a ng-click="detachIndicator(indicatorId, project.logicalFrame.indicators)"
+						   translate="shared.detach"
+						   class="btn btn-default btn-xs"
+						   acl-has-project-role="owner"></a>
 					</p>
 					<p acl-has-project-role="owner">
 						<a ng-click="editIndicator('new', project.logicalFrame.indicators)" translate="project.add_indicator"></a>
@@ -196,10 +198,12 @@
 										tooltip="{{'indicator.is_mandatory'|translate}}"
 										tooltip-placement="right"></i>
 
-									{{indicatorsById[indicatorId].name}}
-									<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, purpose.indicators)" translate="shared.edit"></a> |
-										<a ng-click="detachIndicator(indicatorId, purpose.indicators)" translate="shared.detach"></a>)</span>
-									<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, purpose.indicators)" translate="shared.display"></a>)</span>
+									<a ng-click="editIndicator(indicatorId, purpose.indicators)">{{indicatorsById[indicatorId].name}}</a>
+
+									<a ng-click="detachIndicator(indicatorId, purpose.indicators)"
+									   translate="shared.detach"
+									   class="btn btn-default btn-xs"
+									   acl-has-project-role="owner"></a>
 								</p>
 								<p acl-has-project-role="owner">
 									<a ng-click="editIndicator('new', purpose.indicators)" translate="project.add_indicator"></a>
@@ -268,10 +272,12 @@
 													tooltip="{{'indicator.is_mandatory'|translate}}"
 													tooltip-placement="right"></i>
 
-												{{indicatorsById[indicatorId].name}}
-												<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, output.indicators)" translate="shared.edit"></a> |
-													<a ng-click="detachIndicator(indicatorId, output.indicators)" translate="shared.detach"></a>)</span>
-												<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, output.indicators)" translate="shared.display"></a>)</span>
+												<a ng-click="editIndicator(indicatorId, output.indicators)">{{indicatorsById[indicatorId].name}}</a>
+												
+												<a ng-click="detachIndicator(indicatorId, output.indicators)"
+												   translate="shared.detach"
+												   class="btn btn-default btn-xs"
+												   acl-has-project-role="owner"></a>
 											</p>
 											<p acl-has-project-role="owner">
 												<a ng-click="editIndicator('new', output.indicators)" translate="project.add_indicator"></a>
@@ -345,9 +351,8 @@
 				tooltip="{{'indicator.is_mandatory'|translate}}"
 				tooltip-placement="right"></i>
 
-			{{indicatorsById[indicatorId].name}}
-			<span acl-has-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.edit"></a>)</span>
-			<span acl-lacks-project-role="owner">(<a ng-click="editIndicator(indicatorId, null)" translate="shared.display"></a>)</span>
+
+			<a ng-click="editIndicator(indicatorId, null)">{{indicatorsById[indicatorId].name}}</a>
 		</p>
 		<p acl-has-project-role="owner">
 			<a ng-click="editIndicator('new', null)" translate="project.add_indicator"></a>
