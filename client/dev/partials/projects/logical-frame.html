@@ -121,12 +121,8 @@
 							tooltip="{{'indicator.is_mandatory'|translate}}"
 							tooltip-placement="right"></i>
 
-						<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)">{{indicatorsById[indicatorId].name}}</a>
-						
-						<a ng-click="detachIndicator(indicatorId, project.logicalFrame.indicators)"
-						   translate="shared.detach"
-						   class="btn btn-default btn-xs"
-						   acl-has-project-role="owner"></a>
+						<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)"
+						   ng-bind="indicatorsById[indicatorId].name"></a>
 					</p>
 					<p acl-has-project-role="owner">
 						<a ng-click="editIndicator('new', project.logicalFrame.indicators)" translate="project.add_indicator"></a>
@@ -208,12 +204,8 @@
 										tooltip="{{'indicator.is_mandatory'|translate}}"
 										tooltip-placement="right"></i>
 
-									<a ng-click="editIndicator(indicatorId, purpose.indicators)">{{indicatorsById[indicatorId].name}}</a>
-
-									<a ng-click="detachIndicator(indicatorId, purpose.indicators)"
-									   translate="shared.detach"
-									   class="btn btn-default btn-xs"
-									   acl-has-project-role="owner"></a>
+									<a ng-click="editIndicator(indicatorId, purpose.indicators)"
+									   ng-bind="indicatorsById[indicatorId].name"></a>
 								</p>
 								<p acl-has-project-role="owner">
 									<a ng-click="editIndicator('new', purpose.indicators)" translate="project.add_indicator"></a>
@@ -287,12 +279,8 @@
 													tooltip="{{'indicator.is_mandatory'|translate}}"
 													tooltip-placement="right"></i>
 
-												<a ng-click="editIndicator(indicatorId, output.indicators)">{{indicatorsById[indicatorId].name}}</a>
-												
-												<a ng-click="detachIndicator(indicatorId, output.indicators)"
-												   translate="shared.detach"
-												   class="btn btn-default btn-xs"
-												   acl-has-project-role="owner"></a>
+												<a ng-click="editIndicator(indicatorId, output.indicators)"
+												   ng-bind="indicatorsById[indicatorId].name"></a>
 											</p>
 											<p acl-has-project-role="owner">
 												<a ng-click="editIndicator('new', output.indicators)" translate="project.add_indicator"></a>
@@ -321,8 +309,8 @@
 											</div>
 										</ng-form>
 
-										<p acl-has-project-role="owner">
-											<a ng-click="addActivity(output)" translate="project.add_indicator"></a>
+										<p acl-has-project-role="owner" class="form-control-static">
+											<a ng-click="addActivity(output)" translate="project.add_activity"></a>
 										</p>
 									</div>
 								</div>

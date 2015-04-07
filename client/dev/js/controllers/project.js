@@ -124,10 +124,6 @@ angular.module('monitool.controllers.project', [])
 			});
 		};
 
-		$scope.detachIndicator = function(indicatorId, target) {
-			target.splice(target.indexOf(indicatorId), 1);
-		};
-
 		// handle purpose add and remove
 		$scope.addPurpose = function() {
 			$scope.project.logicalFrame.purposes.push({
@@ -216,6 +212,7 @@ angular.module('monitool.controllers.project', [])
 			});
 
 		// if this indicator is already used in a form, we can't delete it from the logical frame.
+		$scope.isDetachable = !!target;
 		$scope.isDeletable = $scope.project.dataCollection.every(function(form) {
 			return form.fields.every(function(field) { return field.indicatorId !== indicatorId; });
 		});
@@ -235,6 +232,11 @@ angular.module('monitool.controllers.project', [])
 
 			// we need to change the project now, because we've been working on a copy of the indicator's planning
 			$scope.project.indicators[indicatorId] = $scope.planning;
+			$modalInstance.close();
+		};
+
+		$scope.detach = function() {
+			target && target.splice(target.indexOf(indicatorId), 1);
 			$modalInstance.close();
 		};
 

@@ -139,7 +139,12 @@
 		<span translate="shared.edit"></span>
 	</button>
 
-	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew" acl-has-project-role="owner" ng-disabled="!isDeletable">
+	<button ng-click="detach()" class="btn btn-default" ng-if="!isNew && isDetachable" acl-has-project-role="owner">
+		<i class="fa fa-arrow-down"></i>
+		<span translate="shared.detach"></span>
+	</button>
+
+	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew && isDeletable" acl-has-project-role="owner">
 		<i class="fa fa-remove"></i>
 		<span translate="shared.delete"></span>
 	</button>
