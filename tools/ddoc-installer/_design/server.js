@@ -44,24 +44,14 @@ module.exports = {
 					// indicator deps
 					Object.keys(indicators).forEach(function(id) { emit(id); });
 
-					// formula deps (we need to recurse)
-					var traverse = function(field) {
-						if (field.type.substring(0, 'compute:'.length) === 'compute:') {
-							emit(field.type.substring('compute:'.length));
-
-							for (var key in field.parameters)
-								traverse(field.parameters[key]);
-						}
-					};
-
 					doc.dataCollection.forEach(function(form) {
-						form.fields.forEach(traverse);
+						form.fields.forEach(function(field) {
+							if (field.type === 'formula')
+								emit(field.formulaId);
+						});
 					});
 				}
-				else if (doc.type === 'input') {
-
-				}
-
+				
 			}.toString(),
 			reduce: '_count'
 		}
