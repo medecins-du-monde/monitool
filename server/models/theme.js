@@ -30,13 +30,12 @@ module.exports = {
 					indicators.rows = indicators.rows.filter(function(row) { return row.value.operation !== 'parameter'; });
 
 				indicators.rows.forEach(function(row) {
-					row.value.__mainUsage = row.value.__inputUsage = 0;
+					row.value.__usage = 0;
 					indicatorsById[row.id] = row.value;
 				});
 				
 				usage.rows.forEach(function(row) {
-					var parts = row.key.split(':');
-					indicatorsById[parts[1]]['__' + parts[0] + "Usage"] = row.value;
+					indicatorsById[row.key].__usage = row.value;
 				});
 
 				themes.rows.forEach(function(row) {

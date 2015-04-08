@@ -100,7 +100,7 @@ module.exports = {
 			map: function(doc) {
 				if (doc.type === 'project')
 					for (var indicatorId in doc.indicators)
-						emit('main:' + indicatorId);
+						emit(indicatorId);
 			}.toString(),
 
 			reduce: "_count"
