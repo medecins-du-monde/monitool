@@ -80,9 +80,13 @@ module.exports = {
 					return callback(null, themes);
 
 				database.view('server', 'themes_usage', {group: true}, function(error, data) {
-					var countByTheme = {};
-					data.rows.forEach(function(row) { countByTheme[row.key] = row.value; });
-					themes.forEach(function(theme) { theme.__indicatorUsage = countByTheme[theme._id] || 0; });
+					themes.forEach(function(theme) {
+						var projectUsage = data.rows.filter(function(row) { return row.key[0] === theme._id && row.key[1] === 'project'; }),
+							indicatorUsage = data.rows.filter(function(row) { return row.key[0] === theme._id && row.key[1] === 'indicator'; });
+
+						theme.__projectUsage   = projectUsage.length ? projectUsage[0].value : 0;
+						theme.__indicatorUsage = indicatorUsage.length ? indicatorUsage[0].value : 0;
+					});
 
 					return callback(null, themes);
 				});

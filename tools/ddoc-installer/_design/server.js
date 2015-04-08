@@ -16,8 +16,8 @@ module.exports = {
 
 		themes_usage: {
 			map: function(doc) {
-				if (doc.type === 'indicator')
-					doc.themes.forEach(function(typeId) { emit(typeId); });
+				if (doc.type === 'indicator' || doc.type === 'project')
+					doc.themes.forEach(function(themeId) { emit([themeId, doc.type]); });
 
 			}.toString(),
 			reduce: '_count'
