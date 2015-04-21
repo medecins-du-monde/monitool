@@ -146,8 +146,10 @@
 						<span translate="shared.delete"></span>
 					</button>
 
-					<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-					<a ng-click="tabOpen = !tabOpen">{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}</a>
+					<a ng-click="tabOpen = !tabOpen">
+						<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
+						{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}
+					</a>
 				</div>
 			</div>
 
@@ -222,8 +224,10 @@
 									<span translate="shared.delete"></span>
 								</button>
 
-								<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-								<a ng-click="tabOpen = !tabOpen"> {{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}</a>
+								<a ng-click="tabOpen = !tabOpen">
+									<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
+									{{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
+								</a>
 							</div>
 						</div>
 
