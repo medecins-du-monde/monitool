@@ -13,7 +13,9 @@ var addCors       = require('add-cors-to-couchdb'),
 	replace       = require('gulp-replace'),
 	uglify        = require('gulp-uglify'),
 	es            = require('event-stream'),
-	Queue         = require('streamqueue');
+	request       = require('request'),
+	Queue         = require('streamqueue'),
+	config        = require('./config');
 
 var files = {
 	css: {
@@ -70,7 +72,6 @@ var files = {
 			'client/dev/js/services/fetch.js',
 			'client/dev/js/services/reporting.js',
 			'client/dev/js/services/reporting-compute-helper.js',
-			'client/dev/js/services/reporting-raw-helper.js',
 			'client/dev/js/services/reporting-regroup-helper.js',
 			'client/dev/js/services/string.js',
 			'client/dev/js/app.js',
@@ -97,7 +98,7 @@ gulp.task('size-report', function() {
 // Build
 //////////////////////////////////////////////////////////
 
-gulp.task('default', ['build']);
+gulp.task('default', ['build', 'design-docs']);
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
 
 gulp.task('copy-static', function() {
@@ -142,3 +143,31 @@ gulp.task('build-css', ['bower'], function() {
 gulp.task('bower', function() {
 	return bower({cwd: './client/dev'});
 });
+
+gulp.task('design-docs', function(callback) {
+	var urlPrefix = config.couchdb.url + '/' + config.couchdb.bucket;
+	var ddocs = {
+		reporting: require('./server/designdocs/app_reporting'),
+		shortlists: require('./server/designdocs/app_shortlists'),
+		server: require('./server/designdocs/server'),
+	};
+
+	var numDocs = 3;
+	Object.keys(ddocs).forEach(function(ddoc) {
+		var url = urlPrefix + '/_design/' + ddoc;
+
+		request({method: 'GET', url: url}, function(error, response, doc) {
+			var newDdoc = ddocs[ddoc];
+			newDdoc._rev = JSON.parse(doc)._rev;
+
+			request({method: 'PUT', url: url, json: newDdoc}, function(error, response, doc) {
+				console.log(JSON.stringify(doc));
+				numDocs--;
+				if (numDocs == 0)
+					callback();
+			});
+		});
+	});
+});
+
+

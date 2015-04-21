@@ -51,7 +51,7 @@ function makeProjectSummary(project, indicatorsById) {
 }
 
 Project.get('69e6f6b9-87ff-969f-8029-ab5782538623', function(error, project) {
-	Indicator.list({mode: "project_reporting", projectId: project._id}, function(error, indicators) {
+	Indicator.list({mode: "project", projectId: project._id}, function(error, indicators) {
 		var indicatorsById = {};
 		indicators.forEach(function(i) { indicatorsById[i._id] = i; });
 
