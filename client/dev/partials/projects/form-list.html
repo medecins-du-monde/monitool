@@ -31,11 +31,6 @@
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>{{'project.collects.' + form.collect|translate}}</td>
 			<td>
-				<a class="btn btn-default btn-xs" ui-sref="main.project.form_reporting({formId: form.id})">
-					<i class="fa fa-line-chart"></i>
-					<span translate="shared.reporting"></span>
-				</a>
-
 				<a class="btn btn-default btn-xs" ui-sref="main.project.form({formId: form.id})">
 					<i class="fa fa-pencil"></i>
 					<span translate="shared.edit" acl-has-project-role="owner"></span>

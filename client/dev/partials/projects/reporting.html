@@ -21,6 +21,7 @@
 						<select class="form-control input-sm" id="display-input" ng-model="presentation.display">
 							<option value="value" translate="shared.values"></option>
 							<option value="progress" translate="shared.target_percentage"></option>
+							<option value="raw_data" translate="project.raw_data"></option>
 						</select>
 					</div>
 				</div>
@@ -62,23 +63,40 @@
 		<tr>
 			<th ng-show="presentation.plot" class="noprint"></th>
 			<th></th>
-			<th translate="project.baseline"></th>
-			<th translate="project.target"></th>
+			<th translate="project.baseline" ng-if="presentation.display!='raw_data'"></th>
+			<th translate="project.target" ng-if="presentation.display!='raw_data'"></th>
 			<th ng-repeat="col in stats.cols track by col.id" ng-bind="::col.name"></th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in (stats|logFrameReport:project) track by $index">
-			<td ng-show="presentation.plot" class="noprint">
-				<input id="plot-{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type=='data'"/>
-			</td>
-			<td class="section" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" colspan="{{stats.cols.length + 3}}" ng-if="row.type=='header'" ng-bind="row.text"></td>
+		<tr ng-repeat="row in stats[presentation.display=='raw_data'?'rawDataRows':'indicatorRows'] track by $index"
+			ng-if="!row.parentId || open[row.parentId]">
 
-			<td ng-if="row.type=='data'" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" >
-				<label for="plot-{{row.id}}" ng-bind="row.name||('shared.unknown_indicator'|translate)"></label>
+			<!-- Graph columns always here -->
+			<td ng-show="presentation.plot" class="noprint">
+				<input id="plot-{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type=='data'" />
 			</td>
-			<td ng-if="row.type=='data'">{{row.baseline}}{{row.unit}}</td>
-			<td ng-if="row.type=='data'">{{row.target}}{{row.unit}}</td>
+
+			<!-- Section row -->
+			<td ng-if="row.type=='header'"
+				ng-class="{section:true,indent1:row.indent==1,indent2:row.indent==2,indent3:row.indent==3}"
+				colspan="{{stats.cols.length + 3}}">{{row.text}}</td>
+
+			<!-- Common row -->
+			<td ng-if="row.type=='data'"
+				ng-class="{indent1:row.indent==1,indent2:row.indent==2,indent3:row.indent==3}"
+				ng-click="open[row.id] = !open[row.id]">
+				
+				<label for="plot-{{row.id}}" ng-if="!row.hasChildren">{{row.name||('shared.unknown_indicator'|translate)}}</label>
+
+				<span ng-if="row.hasChildren">
+					<i class="fa" ng-class="{'fa-plus-circle':!open[row.id],'fa-minus-circle':open[row.id]}"></i>
+					{{row.name||('shared.unknown_indicator'|translate)}}
+				</span>
+			</td>
+
+			<td ng-if="row.type=='data'&&presentation.display!='raw_data'">{{row.baseline}}{{row.unit}}</td>
+			<td ng-if="row.type=='data'&&presentation.display!='raw_data'">{{row.target}}{{row.unit}}</td>
 			<td ng-if="row.type=='data'" ng-repeat="col in row.cols track by $index" reporting-field></td>
 		</tr>
 	</tbody>

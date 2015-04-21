@@ -387,24 +387,6 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectFormReportingController', function($scope, mtRaw, form, inputs) {
-		$scope.form = form;
-		$scope.entity = $scope.project.inputEntities.length ? $scope.project.inputEntities[0] : null;
-
-		$scope.$watch('entity', function() {
-			if ($scope.entity) {
-				if (form.collect === 'project')
-					$scope.stats = mtRaw(form, inputs, 'none');
-				else
-					$scope.stats = mtRaw(form, inputs, $scope.entity.id);
-				$scope.open = {};
-			}
-			else {
-				delete $scope.stats;
-			}
-		});
-	})
-
 	.controller('ProjectInputListController', function($scope, project, inputs) {
 		$scope.inputs = inputs;
 		$scope.pred = 'period';
@@ -468,7 +450,10 @@ angular.module('monitool.controllers.project', [])
 	.controller('ProjectReportingController', function($scope, $state, mtReporting, indicatorsById) {
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
-		
+
+		// This hash allow opening and closing raw datas.
+		$scope.open = {};
+
 		// those 2 hashes represent what the user sees.
 		$scope.presentation = {plot: false, display: 'value'};
 		$scope.query = {

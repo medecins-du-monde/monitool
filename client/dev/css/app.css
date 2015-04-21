@@ -93,6 +93,9 @@ textarea {
   table.project-reporting .indent2 {
     padding-left: 50px !important;
   }
+  table.project-reporting .indent3 {
+    padding-left: 75px !important;
+  }
 
 
 

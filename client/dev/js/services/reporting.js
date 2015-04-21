@@ -160,6 +160,127 @@ reportingServices.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegr
 		});
 	};
 
+	var getIndicatorsRowsFromReporting = function(project, result, cols, indicatorsById) {
+
+		var getUnassignedIndicatorIds = function(project) {
+			var assigned = {};
+			project.logicalFrame.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
+			project.logicalFrame.purposes.forEach(function(purpose) {
+				purpose.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
+				purpose.outputs.forEach(function(output) {
+					output.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
+				});
+			});
+
+			return Object.keys(project.indicators).filter(function(indicatorId) {
+				return !assigned[indicatorId];
+			});
+		};
+
+		var getStats = function(indent, indicatorId) {
+			return {
+				id: indicatorId,
+				name: indicatorsById[indicatorId].name,
+				unit: indicatorsById[indicatorId].unit,
+				baseline: project.indicators[indicatorId].baseline,
+				target: project.indicators[indicatorId].target,
+				showRed: project.indicators[indicatorId].showRed,
+				showYellow: project.indicators[indicatorId].showYellow,
+				cols: cols.map(function(col) {
+					return result[col.id] && result[col.id].compute[indicatorId] !== undefined ? result[col.id].compute[indicatorId] : null;
+				}),
+				type:'data',
+				dataType: "indicator",
+				indent: indent
+			};
+		};
+
+		var logFrameReport = [];
+		logFrameReport.push({type: 'header', text: project.logicalFrame.goal, indent: 0});
+		Array.prototype.push.apply(logFrameReport, project.logicalFrame.indicators.map(getStats.bind(null, 0)));
+		project.logicalFrame.purposes.forEach(function(purpose) {
+			logFrameReport.push({type: 'header', text: purpose.description, indent: 1});
+			Array.prototype.push.apply(logFrameReport, purpose.indicators.map(getStats.bind(null, 1)));
+			purpose.outputs.forEach(function(output) {
+				logFrameReport.push({type: 'header', text: output.description, indent: 2});
+				Array.prototype.push.apply(logFrameReport, output.indicators.map(getStats.bind(null, 2)));
+			});
+		});
+		Array.prototype.push.apply(logFrameReport, getUnassignedIndicatorIds(project).map(getStats.bind(null, 0)));
+
+		return logFrameReport;
+	};
+
+	var getRawDataRowsFromReporting = function(project, result, cols) {
+		var sum = function(hash) {
+			if (typeof hash === 'number')
+				return hash;
+			
+			var result = 0;
+			for (var key in hash)
+				result += sum(hash[key])
+			return result;
+		};
+
+		var rows = [];
+
+		project.dataCollection.forEach(function(form) {
+			rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
+
+			form.rawData.forEach(function(section) {
+				rows.push({ id: section.id, type: "header", text: section.name, indent: 1 });
+
+				section.elements.forEach(function(variable) {
+					var subRow = { id: variable.id, name: variable.name, indent: 1, type: "data", baseline: null, target: null };
+					subRow.cols = cols.map(function(col) {
+						if (result[col.id] !== undefined
+							&& result[col.id].values[variable.id] !== undefined)
+							return sum(result[col.id].values[variable.id]);
+						else
+							return null;
+					});
+
+					rows.push(subRow);
+
+					variable.partition1.forEach(function(p1) {
+						subRow.hasChildren = true;
+
+						var subSubRow = { id: makeUUID(), parentId: variable.id, name: p1.name, indent: 2, type: "data", baseline: null, target: null };
+						subSubRow.cols = cols.map(function(col) {
+							if (result[col.id] !== undefined
+								&& result[col.id].values[variable.id] !== undefined
+								&& result[col.id].values[variable.id][p1.id] !== undefined)
+								return sum(result[col.id].values[variable.id][p1.id]);
+							else
+								return null;
+						});
+
+						rows.push(subSubRow);
+
+						variable.partition2.forEach(function(p2) {
+							subSubRow.hasChildren = true;
+							
+							rows.push({
+								id: makeUUID(), parentId: subSubRow.id, name: p2.name, indent: 3, type: "data", baseline: null, target: null,
+								cols: cols.map(function(col) {
+									if (result[col.id] !== undefined
+										&& result[col.id].values[variable.id] !== undefined
+										&& result[col.id].values[variable.id][p1.id] !== undefined
+										&& result[col.id].values[variable.id][p1.id][p2.id] !== undefined)
+										return sum(result[col.id].values[variable.id][p1.id][p2.id]);
+									else
+										return null;
+								})
+							});
+						});
+					});
+				});
+			});
+		});
+
+		return rows;
+	};
+
 	var getProjectReporting = function(preprocessedInputs, query, indicatorsById) {
 		var cols = getColumns(query), result = {};
 
@@ -172,38 +293,33 @@ reportingServices.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegr
 
 			// For each regrouped result, compute the indicators values.
 			for (var regroupKey in regrouped) {
-				var indicators = mtCompute.computeIndicatorsFromLeafs(regrouped[regroupKey], form, indicatorsById);
 
-				// we could just union the hashes, there should be no conflict...
+				regrouped[regroupKey].compute = mtCompute.computeIndicatorsFromLeafs(regrouped[regroupKey].compute, form, indicatorsById);
+
+				// we now have {values: {rawId: 45, rawId: {partId: 45}, ... }, compute: {indId: 45}}
 				if (!result[regroupKey])
-					result[regroupKey] = indicators;
-				else {
-					for (var indicatorId in indicators) {
-						if (!result[regroupKey][indicatorId])
-							result[regroupKey][indicatorId] = indicators[indicatorId];
-						else
-							result[regroupKey][indicatorId] = 'FORM_CONFLICT';
-					}
+					result[regroupKey] = {values: {}, compute: {}};
+
+				// we must take care when computing the union of all forms,
+				// => because after aggregating over time, we may have conflicts on indicators.
+				// (if 1 indicator gets computed by two different forms.
+				for (var indicatorId in regrouped[regroupKey].compute) {
+					result[regroupKey].compute[indicatorId] =
+						result[regroupKey].compute[indicatorId] ?
+						'FORM_CONFLICT' :
+						regrouped[regroupKey].compute[indicatorId];
 				}
+
+				// variables are different: we use guids across forms so there should be no problems at all
+				for (var rawId in regrouped[regroupKey].values)
+					result[regroupKey].values[rawId] = regrouped[regroupKey].values[rawId];
 			}
 		});
 
 		return {
 			cols: cols,
-			rows: Object.keys(query.project.indicators).map(function(indicatorId) {
-				return {
-					id: indicatorId,
-					name: indicatorsById[indicatorId].name,
-					unit: indicatorsById[indicatorId].unit,
-					baseline: query.project.indicators[indicatorId].baseline,
-					target: query.project.indicators[indicatorId].target,
-					showRed: query.project.indicators[indicatorId].showRed,
-					showYellow: query.project.indicators[indicatorId].showYellow,
-					cols: cols.map(function(col) {
-						return result[col.id] && result[col.id][indicatorId] !== undefined ? result[col.id][indicatorId] : null;
-					})
-				};
-			})
+			indicatorRows: getIndicatorsRowsFromReporting(query.project, result, cols, indicatorsById),
+			rawDataRows: getRawDataRowsFromReporting(query.project, result, cols)
 		};
 	};
 
@@ -250,7 +366,6 @@ reportingServices.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegr
 	var getDefaultEndDate = function(project) {
 		return moment().format('YYYY-MM-DD');
 	};
-
 
 	return {
 		getColumns: getColumns,

@@ -81,7 +81,7 @@ angular.module('monitool.directives.reporting', [])
 				var esc = function(string) { return '"' + string.replace(/"/g, '\\"') + '"'; };
 
 				element.bind('click', function() {
-					var statistics = $scope.$eval('stats|logFrameReport:project'),
+					var statistics = $scope.stats.indicatorRows.concat([{type: 'header', text: '', indent: 0}]).concat($scope.stats.rawDataRows),
 						csv = 'name,baseline,target,' + $scope.stats.cols.map(function(c) { return c.name; }).join(',') + "\n";
 
 					statistics.forEach(function(row) {
@@ -202,6 +202,8 @@ angular.module('monitool.directives.reporting', [])
 							element.html(Math.round($scope.col) + $scope.row.unit);
 						else if (display === 'progress')
 							element.html(progress !== null ? Math.round(100 * progress) + '%' : '');
+						else if (display === 'raw_data')
+							element.html($scope.col);
 						else
 							throw new Error('Invalid display value.');
 					}
@@ -237,29 +239,30 @@ angular.module('monitool.directives.reporting', [])
 						$scope.data = angular.copy($scope.originalData);
 
 						// remove rows that are not selected.
-						$scope.data.rows = $scope.data.rows.filter(function(row) {
+						$scope.data.rows = $scope.data.rawDataRows.concat($scope.data.indicatorRows).filter(function(row) {
 							return $scope.plots[row.id];
 						});
 
 						// replace value by target if required.
-						if ($scope.display !== 'value')
+						if ($scope.display === 'progress')
 							$scope.data.rows.forEach(function(row) {
-								row.cols = row.cols.map(function(col) {
-									// deal with form or aggregation conflicts.
-									if (typeof col !== 'number')
-										return null;
+								if (row.dataType == 'indicator')
+									row.cols = row.cols.map(function(col) {
+										// deal with form or aggregation conflicts.
+										if (typeof col !== 'number')
+											return null;
 
-									if ($scope.display === 'value')
-										return col;
-									else if (row.baseline !== null && row.target !== null && col !== null) {
-										if (row.target === 'around_is_better')
-											return 100 * (1 - Math.abs(col - row.target) / (row.target - row.baseline));
+										if ($scope.display === 'value')
+											return col;
+										else if (row.baseline !== null && row.target !== null && col !== null) {
+											if (row.target === 'around_is_better')
+												return 100 * (1 - Math.abs(col - row.target) / (row.target - row.baseline));
+											else
+												return 100 * (col - row.baseline) / (row.target - row.baseline);							
+										}
 										else
-											return 100 * (col - row.baseline) / (row.target - row.baseline);							
-									}
-									else
-										return null;
-								});
+											return null;
+									});
 							});
 					}
 				}, true);

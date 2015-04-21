@@ -77,8 +77,10 @@ reportingServices.factory('mtRegroup', function() {
 		inputs.forEach(function(input) {
 			input.aggregation[groupBy].forEach(function(key) {
 				if (!result[key])
-					result[key] = {};
-				_dummySum(result[key], input.compute);
+					result[key] = {compute: {}, values: {}};
+
+				_dummySum(result[key].compute, input.compute);
+				_dummySum(result[key].values, input.values);
 			});
 		});
 
@@ -86,7 +88,7 @@ reportingServices.factory('mtRegroup', function() {
 		// - If we summed indicators that needed to be averaged we should correct it.
 		// - If we summed indicators that are not summable, we need to delete them from the final result.
 		for (var groupKey in result) {
-			var computed = result[groupKey];
+			var computed = result[groupKey].compute;
 
 			form.fields.forEach(function(field) {
 				var indicator = indicatorsById[field.indicatorId];

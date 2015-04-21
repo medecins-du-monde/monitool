@@ -352,27 +352,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.form_reporting', {
-		url: '/forms/:formId/reporting',
-		templateUrl: 'partials/projects/form-reporting.html',
-		controller: 'ProjectFormReportingController',
-		resolve: {
-			form: function($stateParams, project) {
-				return project.dataCollection.find(function(form) {
-					return form.id == $stateParams.formId;
-				});
-			},
-			inputs: function(mtFetch, form, mtCompute, $stateParams) {
-				return mtFetch.inputs({mode: "form_inputs", formId: $stateParams.formId}).then(function(inputs) {
-					for (var i = 0, numInputs = inputs.length; i < numInputs; ++i)
-						mtCompute.sanitizeRawData(inputs[i].values, form);
-					return inputs;
-				});
-			}
-		}
-	});
-
-
 	$stateProvider.state('main.project.input_list', {
 		url: '/inputs',
 		templateUrl: 'partials/projects/input-list.html',
