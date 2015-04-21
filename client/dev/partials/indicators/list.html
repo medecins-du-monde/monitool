@@ -15,20 +15,20 @@
 <div class="indicator-level-1" ng-repeat="theme in hierarchy|hierarchyFilter:searchField">
 	<div class="indicator-header" ng-click="theme.open=!theme.open">
 		<i class="fa" ng-class="{'fa-plus-circle':!theme.open,'fa-minus-circle':theme.open}"></i>
-		{{theme.name || ('indicator.no_theme'|translate)}}
+		{{theme.name[language] || ('indicator.no_theme'|translate)}}
 		<span class="badge pull-right" ng-bind="theme.children.length"></span>
 	</div>
 
 	<div class="indicator-level-2" ng-repeat="type in theme.children" ng-if="theme.open">
 		<div class="indicator-header" ng-click="type.open=!type.open">
 			<i class="fa" ng-class="{'fa-plus-circle':!type.open,'fa-minus-circle':type.open}"></i>
-			{{type.name || ('indicator.no_type'|translate)}}
+			{{type.name[language] || ('indicator.no_type'|translate)}}
 			<span class="badge pull-right" ng-bind="type.children.length"></span>
 		</div>
 
 		<div class="indicator-level-3" ng-repeat="indicator in type.children" ng-if="type.open">
 			<span class="pull-right">
-				{{::indicator.__usage}} <i class="fa fa-building-o"></i>
+				{{indicator.__usage}} <i class="fa fa-building-o"></i>
 
 				<a class="btn btn-xs btn-default"
 				   ui-sref="main.indicator.reporting({indicatorId: indicator._id})"
@@ -66,7 +66,7 @@
 				tooltip="{{'indicator.is_mandatory'|translate}}"
 				tooltip-placement="right"></i>
 			
-			{{::indicator.name}}
+			{{indicator.name[language]}}
 		</div>
 	</div>
 </div>

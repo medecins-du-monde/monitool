@@ -63,7 +63,7 @@
 			<td colspan="{{1 + intervals.length}}" translate="project.no_indicators" style="text-align: center"></td>
 		</tr>
 		<tr ng-repeat="usage in usages">
-			<td>{{indicatorsById[usage.id].name}}</td>
+			<td>{{indicatorsById[usage.id].name[language]}}</td>
 			<td ng-repeat="usage in usage.usage" ng-style="{'background-color': usage.color, color: 'white'}" colspan="{{usage.length}}">{{usage.name}}</td>
 		</tr>
 	</tbody>

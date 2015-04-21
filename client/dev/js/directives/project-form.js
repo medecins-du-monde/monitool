@@ -380,6 +380,7 @@ angular
 				'rawData': '=',
 				'userCtx': '=',
 				'project': '=',
+				'language': '=language'
 			},
 			link: function($scope) {
 				// Init

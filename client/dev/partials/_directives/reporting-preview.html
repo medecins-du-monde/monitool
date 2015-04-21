@@ -1,13 +1,18 @@
 
 <div ng-if="result.display == 'graph' || result.display == 'both'"
 	 style="background-color: white; border: 1px solid #ddd; margin-bottom: 10px">
+
 	<reporting-graph
 		type="['year', 'month', 'week', 'day'].indexOf(result.query.groupBy) !== -1 ? 'line' : 'bar'"
 		data="result.stats"></reporting-graph>
+
 </div>
 
 
-<table class="table table-bordered table-stripped table-condensed project-reporting" ng-if="result.display == 'table' || result.display == 'both'" style="background-color: white">
+<table class="table table-bordered table-stripped table-condensed project-reporting"
+	   ng-if="result.display == 'table' || result.display == 'both'"
+	   style="background-color: white">
+
 	<thead>
 		<tr>
 			<th></th>
@@ -25,3 +30,4 @@
 		</tr>
 	</tbody>
 </table>
+

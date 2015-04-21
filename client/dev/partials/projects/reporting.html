@@ -65,7 +65,7 @@
 			<th></th>
 			<th translate="project.baseline" ng-if="presentation.display!='raw_data'"></th>
 			<th translate="project.target" ng-if="presentation.display!='raw_data'"></th>
-			<th ng-repeat="col in stats.cols track by col.id" ng-bind="::col.name"></th>
+			<th ng-repeat="col in stats.cols track by col.id" ng-bind="col.name"></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -87,7 +87,7 @@
 				ng-class="{indent1:row.indent==1,indent2:row.indent==2,indent3:row.indent==3}"
 				ng-click="open[row.id] = !open[row.id]">
 				
-				<label for="plot-{{row.id}}" ng-if="!row.hasChildren">{{row.name||('shared.unknown_indicator'|translate)}}</label>
+				<label for="plot-{{row.id}}" ng-if="!row.hasChildren">{{row.name[language]||row.name||('shared.unknown_indicator'|translate)}}</label>
 
 				<span ng-if="row.hasChildren">
 					<i class="fa" ng-class="{'fa-plus-circle':!open[row.id],'fa-minus-circle':open[row.id]}"></i>

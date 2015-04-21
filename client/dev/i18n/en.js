@@ -322,9 +322,9 @@ var ENGLISH_TRANSLATION = {
 		search: "Search",
 		search_ph: "Enter at least 3 characters",
 
-		standard: "International Standard",
+		standard: "Standard",
 		sources: "Sources",
-		comments: "Comments",
+		comments: "Notes",
 		standard_ph: "Which standard is this indicator from?",
 		sources_ph: "Which sources are more common for this indicator?",
 		comments_ph: "When is it relevant to collect this indicator, and what are its limits?",

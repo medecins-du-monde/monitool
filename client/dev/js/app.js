@@ -60,25 +60,6 @@ var app = angular.module('monitool.app', [
 	'ui.select',
 ]);
 
-app.config(function($translateProvider) {
-	$translateProvider.translations('fr', FRENCH_TRANSLATION);
-	$translateProvider.translations('en', ENGLISH_TRANSLATION);
-	$translateProvider.translations('es', SPANISH_TRANSLATION);
-
-	$translateProvider.useLocalStorage();
-	$translateProvider.preferredLanguage('fr');
-});
-
-app.run(function($translate, $locale) {
-	var langKey = $translate.use();
-	if (langKey == 'fr')
-		angular.copy(FRENCH_LOCALE, $locale);
-	else if (langKey == 'es')
-		angular.copy(SPANISH_LOCALE, $locale);
-	else
-		angular.copy(ENGLISH_LOCALE, $locale);
-});
-
 // Uncomment to add 1 second of latency to every query
 // http://blog.brillskills.com/2013/05/simulating-latency-for-angularjs-http-calls-with-response-interceptors/
 // 
@@ -97,6 +78,29 @@ app.run(function($translate, $locale) {
 // 	});
 // });
 
+app.config(function($translateProvider) {
+	$translateProvider.translations('fr', FRENCH_TRANSLATION);
+	$translateProvider.translations('en', ENGLISH_TRANSLATION);
+	$translateProvider.translations('es', SPANISH_TRANSLATION);
+
+	$translateProvider.useLocalStorage();
+	$translateProvider.preferredLanguage('fr');
+});
+
+app.run(function($translate, $locale, $rootScope) {
+	var langKey = $translate.use();
+	
+	$rootScope.languages = {fr: "french", en: "english", es: 'spanish'};
+	$rootScope.language = langKey;
+	
+	if (langKey == 'fr')
+		angular.copy(FRENCH_LOCALE, $locale);
+	else if (langKey == 'es')
+		angular.copy(SPANISH_LOCALE, $locale);
+	else
+		angular.copy(ENGLISH_LOCALE, $locale);
+});
+
 app.config(function(datepickerConfig, datepickerPopupConfig) {
 	datepickerConfig.showWeeks = false;
 	datepickerConfig.startingDay = 1;
@@ -111,10 +115,6 @@ app.config(function(datepickerConfig, datepickerPopupConfig) {
  * (which allow us to add helper properties on objects, and not submit them).
  */
  app.config(function($httpProvider) {
-	// $httpProvider.defaults.headers.common['X-NoBasicAuth'] = '1';
-	// if (sessionStorage.Authorization)
-	// 	$httpProvider.defaults.headers.common.Authorization = sessionStorage.Authorization;
-
 	$httpProvider.defaults.transformRequest.unshift(function(data) {
 		if (!data)
 			return data;

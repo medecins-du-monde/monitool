@@ -9,7 +9,15 @@
 		"_id":  { "$ref": "#/definitions/uuid" },
 		"_rev": { "$ref": "#/definitions/couchdb-revision" },
 		"type": { "type": "string", "pattern": "^theme$" },
-		"name": { "type": "string", "minLength": 1 }
+		"name": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"en": { "type": "string", "minLength": 1 },
+				"fr": { "type": "string", "minLength": 1 },
+				"es": { "type": "string", "minLength": 1 }
+			}
+		}
 	},
 	"definitions": {
 		"uuid": {

@@ -36,7 +36,7 @@
 				   tooltip-placement="right" acl-lacks-project-role="input" acl-project="project"></i>
 			</td>
 			<td><a ui-sref="main.project.logical_frame({projectId: project._id})">{{::project.name}}</a></td>
-			<td>{{::project.themes|getObjects:themes|pluck:'name'|join:', '}}</td>
+			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
 			<td>{{::project.begin|amDateFormat:'YYYY-MM-DD'}}</td>
 			<td>{{::project.end|amDateFormat:'YYYY-MM-DD'}}</td>
 		</tr>

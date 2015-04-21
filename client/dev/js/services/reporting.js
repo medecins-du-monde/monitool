@@ -333,7 +333,7 @@ reportingServices.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegr
 				projectResult     = getProjectReporting(projectInputs, projectQuery, indicatorById);
 
 			// override id and name
-			var row = projectResult.rows.find(function(row) { return row.id === query.indicator._id; });
+			var row = projectResult.indicatorRows.find(function(row) { return row.id === query.indicator._id; });
 			row.id = project._id;
 			row.name = project.name;
 			row.type = 'project'; // presentation hack, should not be here.
@@ -345,7 +345,7 @@ reportingServices.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegr
 					entityResult = getProjectReporting(entityInputs, entityQuery, indicatorById);
 
 				// override id and name
-				var row = entityResult.rows.find(function(row) { return row.id === query.indicator._id; });
+				var row = entityResult.indicatorRows.find(function(row) { return row.id === query.indicator._id; });
 				row.id = entity.id;
 				row.name = entity.name;
 				row.type = 'entity'; // presentation hack, should not be here.

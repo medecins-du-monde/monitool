@@ -106,7 +106,7 @@ angular.module('monitool.directives.reporting', [])
 		};
 	})
 
-	.directive('indicatorCsvSave', function() {
+	.directive('indicatorCsvSave', function($rootScope) {
 		var esc = function(string) { return '"' + string.replace(/"/g, '\\"') + '"'; };
 
 		return {
@@ -122,7 +122,7 @@ angular.module('monitool.directives.reporting', [])
 					});
 
 					var blob    = new Blob([csv], {type: "text/csv;charset=utf-8"}),
-						name    = [scope.query.indicator.name, scope.query.begin, scope.query.end].join('_') + '.csv';
+						name    = [scope.query.indicator.name[$rootScope.language], scope.query.begin, scope.query.end].join('_') + '.csv';
 
 					saveAs(blob, name);
 				});
@@ -239,7 +239,10 @@ angular.module('monitool.directives.reporting', [])
 						$scope.data = angular.copy($scope.originalData);
 
 						// remove rows that are not selected.
-						$scope.data.rows = $scope.data.rawDataRows.concat($scope.data.indicatorRows).filter(function(row) {
+						if (!$scope.data.rows)
+							$scope.data.rows = $scope.data.rawDataRows.concat($scope.data.indicatorRows)
+
+						$scope.data.rows = $scope.data.rows.filter(function(row) {
 							return $scope.plots[row.id];
 						});
 

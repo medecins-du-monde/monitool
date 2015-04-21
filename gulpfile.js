@@ -1,6 +1,7 @@
 "use strict";
 
-var addCors       = require('add-cors-to-couchdb'),
+var async         = require('async'),
+	addCors       = require('add-cors-to-couchdb'),
 	gulp          = require('gulp'),
 	templateCache = require('gulp-angular-templatecache'),
 	awspublish    = require('gulp-awspublish'),
@@ -170,4 +171,39 @@ gulp.task('design-docs', function(callback) {
 	});
 });
 
+
+gulp.task('update-database', function(callback) {
+	request.get(config.couchdb.url + '/' + config.couchdb.bucket + '/_all_docs?include_docs=true', function(error, response, result) {
+		var updates = [];
+
+		JSON.parse(result).rows.forEach(function(row) {
+			var doc = row.doc, update = false, keys = ["name"];
+
+			if (doc.type !== 'indicator' && doc.type !== 'type' && doc.type !== 'theme')
+				return;
+
+			if (doc.type === 'indicator')
+				keys.push("name", "definition", "standard", "sources", "comments")
+
+			keys.forEach(function(key) {
+				if (typeof doc[key] === 'string') {
+					update = true
+					doc[key] = {en: doc[key], fr: doc[key], es: doc[key]};
+				}
+			});
+
+
+			if (update)
+				updates.push(doc);
+		});
+
+		async.eachSeries(
+			updates,
+			function(doc, cb) {
+				request({method: "PUT", url: config.couchdb.url + '/' + config.couchdb.bucket + '/' + doc._id, json: doc}, cb)
+			},
+			callback
+		);
+	});
+});
 

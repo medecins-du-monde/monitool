@@ -8,8 +8,8 @@
 			<label for="indicators-input" class="col-md-1 control-label" translate="shared.indicators"></label>
 			<div class="col-sm-11">
 				<ui-select multiple ng-model="container.chosenIndicatorIds" theme="bootstrap" class="input-sm">
-					<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
-					<ui-select-choices repeat="indicator._id as indicator in availableIndicators">{{indicator.name}}</ui-select-choices>
+					<ui-select-match placeholder="">{{$item.name[language]}}</ui-select-match>
+					<ui-select-choices repeat="indicator._id as indicator in availableIndicators">{{indicator.name[language]}}</ui-select-choices>
 				</ui-select>
 			</div>
 		</div>

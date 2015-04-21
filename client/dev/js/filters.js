@@ -47,7 +47,7 @@ angular.module('monitool.filters', [])
 
 
 
-	.filter('hierarchyFilter', function(mtRemoveDiacritics) {
+	.filter('hierarchyFilter', function(mtRemoveDiacritics, $rootScope) {
 		var lastHierarchy = null, lastSearchField = null;
 		var lastResult;
 
@@ -59,7 +59,7 @@ angular.module('monitool.filters', [])
 			else if (!i1.name && !i2.name)
 				return 0;
 			else
-				return i1.name.localeCompare(i2.name);
+				return i1.name[$rootScope.language].localeCompare(i2.name[$rootScope.language]);
 		};
 
 		// FIXME i have yet to understand why this piece of code works.
@@ -70,7 +70,8 @@ angular.module('monitool.filters', [])
 			if (searchField === lastSearchField && angular.equals(lastHierarchy, hierarchy))
 				return lastResult;
 
-			var filter = mtRemoveDiacritics(searchField).toLowerCase(),
+			var filter = mtRemoveDiacritics(searchField).toLowerCase().split(/\s+/),
+				numWords = filter.length,
 				result = angular.copy(hierarchy);
 
 			if (searchField.length >= 3)
@@ -79,8 +80,12 @@ angular.module('monitool.filters', [])
 					theme.children = theme.children.filter(function(type) {
 						type.open = true;
 						type.children = type.children.filter(function(indicator) {
-							var name = mtRemoveDiacritics(indicator.name).toLowerCase();
-							return name.indexOf(filter) !== -1;
+							var name = mtRemoveDiacritics(indicator.name[$rootScope.language]).toLowerCase();
+							var matches = 0;
+							for (var i = 0; i < numWords; ++i)
+								if (name.indexOf(filter[i]) !== -1)
+									matches++;
+							return matches == numWords;
 						});
 
 						return type.children.length;

@@ -8,6 +8,7 @@
 	</thead>
 	<tbody ng-repeat="field in form.fields">
 		<tr form-edit-field
+				language="language"
 				user-ctx="userCtx"
 				project="project"
 				field="field"
@@ -17,6 +18,7 @@
 		<tr ng-repeat="(key, subField) in field.parameters"
 			class="indent1"
 			form-edit-field
+				language="language"
 				user-ctx="userCtx"
 				project="project"
 				field="subField"

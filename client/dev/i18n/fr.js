@@ -322,9 +322,9 @@ var FRENCH_TRANSLATION = {
 		search: "Rechercher",
 		search_ph: "Rentrez au moins 3 caractères",
 
-		standard: "Norme internationale",
+		standard: "Norme",
 		sources: "Sources",
-		comments: "Commentaires",
+		comments: "Notes",
 		standard_ph: "À quelle norme appartient cet indicateur?",
 		sources_ph: "Quelles sont les sources possibles pour cet indicateur?",
 		comments_ph: "Dans quel cas est-il pertinent d'utiliser cet indicateur, et avec quelles limites?",

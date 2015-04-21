@@ -149,11 +149,16 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="row in (stats|logFrameReport:project) track by $index">
-					<td class="section" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" colspan="{{stats.cols.length + 3}}" ng-if="row.type=='header'" ng-bind="row.text"></td>
+				<tr ng-repeat="row in stats.indicatorRows track by $index">
 
-					<td ng-if="row.type=='data'" ng-class="{indent1:row.indent==1,indent2:row.indent==2}" >
-						<label for="plot-{{row.id}}" ng-bind="row.name||('shared.unknown_indicator'|translate)"></label>
+					<td class="section" ng-class="{indent1:row.indent==1,indent2:row.indent==2}"
+						colspan="{{stats.cols.length + 3}}"
+						ng-if="row.type=='header'"
+						ng-bind="row.text"></td>
+
+					<td ng-if="row.type=='data'"
+						ng-class="{indent1:row.indent==1,indent2:row.indent==2}">
+						<label for="plot-{{row.id}}" ng-bind="row.name[language]||('shared.unknown_indicator'|translate)"></label>
 					</td>
 					<td ng-if="row.type=='data'">{{row.baseline}}{{row.unit}}</td>
 					<td ng-if="row.type=='data'">{{row.target}}{{row.unit}}</td>

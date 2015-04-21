@@ -3,9 +3,8 @@
 angular
 	.module('monitool.controllers.helper', [])
 
-	.controller('MainMenuController', function($state, $scope, $translate, $locale) {
+	.controller('MainMenuController', function($state, $scope, $translate, $locale, $rootScope) {
 		$scope.$state   = $state;
-		$scope.language = $translate.use();
 		
 		$scope.changeLanguage = function(langKey) {
 			$translate.use(langKey);
@@ -17,7 +16,7 @@ angular
 			else
 				angular.copy(ENGLISH_LOCALE, $locale);
 
-			$scope.language = langKey;
+			$rootScope.language = langKey;
 			$scope.$broadcast('languageChange');
 		};
 

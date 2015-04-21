@@ -30,11 +30,11 @@
 			<label for="input-themes" class="col-sm-2 control-label" translate="indicator.themes"></label>
 			<div class="col-sm-10">
 				<ui-select id="input-themes" multiple ng-model="project.themes" name="themes" theme="bootstrap" required acl-has-project-role="owner">
-					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name}}</ui-select-match>
-					<ui-select-choices repeat="theme._id as theme in themes | filter: {name: $select.search}">{{theme.name}}</ui-select-choices>
+					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name[language]}}</ui-select-match>
+					<ui-select-choices repeat="theme._id as theme in themes">{{theme.name[language]}}</ui-select-choices>
 				</ui-select>
 
-				<p class="form-control-static" acl-lacks-project-role="owner">{{project.themes | getObjects:themes | pluck:'name' | join:', '}}</p>
+				<p class="form-control-static" acl-lacks-project-role="owner">{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</p>
 			</div>
 		</div>
 
@@ -122,7 +122,7 @@
 							tooltip-placement="right"></i>
 
 						<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)"
-						   ng-bind="indicatorsById[indicatorId].name"></a>
+						   ng-bind="indicatorsById[indicatorId].name[language]"></a>
 					</p>
 					<p acl-has-project-role="owner">
 						<a ng-click="editIndicator('new', project.logicalFrame.indicators)" translate="project.add_indicator"></a>
@@ -207,7 +207,7 @@
 										tooltip-placement="right"></i>
 
 									<a ng-click="editIndicator(indicatorId, purpose.indicators)"
-									   ng-bind="indicatorsById[indicatorId].name"></a>
+									   ng-bind="indicatorsById[indicatorId].name[language]"></a>
 								</p>
 								<p acl-has-project-role="owner">
 									<a ng-click="editIndicator('new', purpose.indicators)" translate="project.add_indicator"></a>
@@ -284,7 +284,7 @@
 													tooltip-placement="right"></i>
 
 												<a ng-click="editIndicator(indicatorId, output.indicators)"
-												   ng-bind="indicatorsById[indicatorId].name"></a>
+												   ng-bind="indicatorsById[indicatorId].name[language]"></a>
 											</p>
 											<p acl-has-project-role="owner">
 												<a ng-click="editIndicator('new', output.indicators)" translate="project.add_indicator"></a>
@@ -364,7 +364,7 @@
 				tooltip-placement="right"></i>
 
 
-			<a ng-click="editIndicator(indicatorId, null)">{{indicatorsById[indicatorId].name}}</a>
+			<a ng-click="editIndicator(indicatorId, null)">{{indicatorsById[indicatorId].name[language]}}</a>
 		</p>
 		<p acl-has-project-role="owner">
 			<a ng-click="editIndicator('new', null)" translate="project.add_indicator"></a>

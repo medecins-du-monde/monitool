@@ -1,7 +1,7 @@
 "use strict";
 
 angular.module('monitool.services.fetch', [])
-	.factory('mtFetch', function($http, $resource, $q) {
+	.factory('mtFetch', function($http, $resource, $q, $rootScope) {
 		var Project   = $resource('/project/:id', { id: "@_id" }, { save: { method: "PUT" }}),
 			Indicator = $resource('/indicator/:id', { id: "@_id" }, { save: { method: "PUT" }}),
 			Input     = $resource('/input/:id', { id: "@_id" }, { save: { method: "PUT" }}),
@@ -34,14 +34,18 @@ angular.module('monitool.services.fetch', [])
 			},
 
 			indicator: function(id) {
+				var tran = {};
+				for (var key in $rootScope.languages)
+					tran[key] = "";
+
 				if (!id || id === 'new')
 					return new Indicator({
 						type: 'indicator',
-						name: "",
-						definition: "",
-						standard: "",
-						sources: "",
-						comments: "",
+						name: angular.copy(tran),
+						definition: angular.copy(tran),
+						standard: angular.copy(tran),
+						sources: angular.copy(tran),
+						comments: angular.copy(tran),
 
 						operation: "common", target: "higher_is_better",
 						unit: "%", geoAggregation: 'none', timeAggregation: 'none',

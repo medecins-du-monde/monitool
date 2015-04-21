@@ -322,9 +322,9 @@ var SPANISH_TRANSLATION = {
 		search: "Buscar",
 		search_ph: "Entre por lo menos 3 caracteres",
 
-		standard: "Norma international",
+		standard: "Norma",
 		sources: "Origen",
-		comments: "Comentarios",
+		comments: "Notas",
 		standard_ph: "¿A que norma pertenece este indicador?",
 		sources_ph: "¿Dónde se puede colectar este indicador?",
 		comments_ph: "¿En qué casos es pertinente usar este indicador, y con qué limites?",
