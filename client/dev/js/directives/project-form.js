@@ -55,7 +55,7 @@ angular
 					for (var formulaId in indicator.formulas)
 						typeOptions.push({
 							// to fill the html select
-							name: indicator.formulas[formulaId].name,
+							name: indicator.formulas[formulaId].expression,
 							group: "Formulas",
 
 							// to fill the field from this objet
