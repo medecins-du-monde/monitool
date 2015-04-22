@@ -28,9 +28,6 @@ reportingServices.factory('mtFormula', function($q) {
 				if (!formula.parameters[symbol].name.length)
 					formula.__isValid = false;
 			})
-
-			if (!formula.name)
-				formula.__isValid = false;
 		},
 
 		/**
@@ -41,7 +38,6 @@ reportingServices.factory('mtFormula', function($q) {
 				if (formula.__symbols.indexOf(key) === -1)
 					delete formula.parameters[key];
 		},
-		
 	}
 });
 

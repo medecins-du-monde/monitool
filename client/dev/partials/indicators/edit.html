@@ -180,27 +180,18 @@
 					   ng-repeat="(formulaId, formula) in indicator.formulas"
 					   style="border-width: 0 0 0 5px; border-color: {{indicator.formulas[formulaId].__isValid ? '#ddd' : 'darkred'}}">
 					<tr>
-						<td style="width: 250px" translate="shared.name"></td>
-						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].name">
+						<td style="width: 250px" translate="indicator.formula"></td>
+						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].expression">
 							<div class="input-group">
 								<input type="text"
 									   class="form-control"
-									   placeholder="{{'indicator.formula_name_ph'|translate}}"
-									   ng-model="indicator.formulas[formulaId].name" />
+									   ng-model="indicator.formulas[formulaId].expression"
+									   placeholder="{{'indicator.formula_expression_ph'|translate}}" />
 
 								<span class="input-group-btn">
 									<button class="btn btn-danger" ng-click="deleteFormula(formulaId)" translate="shared.remove"></button>
 								</span>
 							</div>
-						</td>
-					</tr>
-					<tr>
-						<td translate="indicator.formula"></td>
-						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].expression">
-							<input type="text"
-								   class="form-control"
-								   ng-model="indicator.formulas[formulaId].expression"
-								   placeholder="{{'indicator.formula_expression_ph'|translate}}" />
 						</td>
 					</tr>
 					<tr ng-repeat="symbol in indicator.formulas[formulaId].__symbols">
@@ -238,7 +229,6 @@
 									</select>									
 								</div>
 							</div>
-
  						</td>
 					</tr>
 				</table>

@@ -45,7 +45,6 @@
 					"additionalProperties": false,
 
 					"properties": {
-						"name":       { "type": "string", "minLength": 3 },
 						"expression": { "type": "string", "minLength": 1 },
 						"parameters": {
 						}

@@ -11,7 +11,7 @@ angular.module('monitool.controllers.indicator', [])
 		// Formula handlers
 		$scope.addFormula = function() {
 			var uuid  = makeUUID(),
-				value = {name: '', expression: '', parameters: {}};
+				value = {expression: '', parameters: {}};
 
 			$scope.indicator.formulas[uuid] = value;
 		};
