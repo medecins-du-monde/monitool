@@ -47,8 +47,8 @@
 			</span>
 
 			<i class="fa fa-ban fa-fw"
-				ng-if="indicator.operation == 'parameter'"
-				tooltip="{{'indicator.is_parameter'|translate}}"
+				ng-if="indicator.operation == 'forbidden'"
+				tooltip="{{'indicator.is_forbidden'|translate}}"
 				tooltip-placement="right"></i>
 
 			<i class="fa fa-question fa-fw"
@@ -65,7 +65,7 @@
 				ng-if="indicator.operation == 'mandatory'"
 				tooltip="{{'indicator.is_mandatory'|translate}}"
 				tooltip-placement="right"></i>
-			
+
 			{{indicator.name[language]}}
 		</div>
 	</div>

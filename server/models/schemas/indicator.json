@@ -18,7 +18,7 @@
 		"sources":    { "$ref": "#/definitions/translated" },
 		"comments":   { "$ref": "#/definitions/translated" },
 
-		"operation":       { "type": "string", "enum": ["parameter", "common", "recommended", "mandatory"] },
+		"operation":       { "type": "string", "enum": ["forbidden", "common", "recommended", "mandatory"] },
 		"target": 		   { "type": "string", "enum": ["lower_is_better", "higher_is_better", "around_is_better", "non_relevant"] },
 		"unit":            { "type": "string", "enum": ["‰", "%", ""] },
 

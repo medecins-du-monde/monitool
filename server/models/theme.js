@@ -27,7 +27,7 @@ module.exports = {
 				var indicatorsById = {}, themesById = {'': {children: {}}}, typesById = {'': {children: {}}};
 
 				if (options.partial)
-					indicators.rows = indicators.rows.filter(function(row) { return row.value.operation !== 'parameter'; });
+					indicators.rows = indicators.rows.filter(function(row) { return row.value.operation !== 'forbidden'; });
 
 				indicators.rows.forEach(function(row) {
 					row.value.__usage = 0;
@@ -35,7 +35,8 @@ module.exports = {
 				});
 				
 				usage.rows.forEach(function(row) {
-					indicatorsById[row.key].__usage = row.value;
+					if (indicatorsById[row.key])
+						indicatorsById[row.key].__usage = row.value;
 				});
 
 				themes.rows.forEach(function(row) {
