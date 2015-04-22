@@ -2,7 +2,7 @@
 	<div class="indicator-level-2" ng-repeat="type in theme.children" ng-if="theme.open">
 		<div class="indicator-header" ng-click="type.open=!type.open">
 			<i class="fa" ng-class="{'fa-plus-circle':!type.open,'fa-minus-circle':type.open}"></i>
-			{{(type.name || 'indicator.no_type')|translate}}
+			{{type.name[language] || ('indicator.no_type'|translate)}}
 			<span class="badge pull-right" ng-bind="type.children.length"></span>
 		</div>
 
@@ -36,7 +36,7 @@
 				tooltip="{{'indicator.is_external'|translate}}"
 				tooltip-placement="right"></i>
 
-			{{indicator.name}}
+			{{indicator.name[language]}}
 		</div>
 	</div>
 </script>
@@ -46,7 +46,7 @@
 		<legend translate="project.missing_mandatory_indicators"></legend>
 		<ul>
 			<li ng-repeat="indicator in missingIndicators">
-				<a ng-click="choose(indicator._id)">{{indicator.name}}</a>
+				<a ng-click="choose(indicator._id)">{{indicator.name[language]}}</a>
 			</li>
 		</ul>
 		<legend translate="project.other_indicators"></legend>
@@ -67,7 +67,7 @@
 		<div class="indicator-level-1" ng-repeat="theme in hierarchy|hierarchyFilter:searchField">
 			<div class="indicator-header" ng-click="theme.open=!theme.open">
 				<i class="fa" ng-class="{'fa-plus-circle': !theme.open,'fa-minus-circle':theme.open}"></i>
-				{{(theme.name || 'indicator.no_theme')|translate}}
+				{{theme.name[language]||('indicator.no_theme'|translate)}}
 				<span class="badge pull-right" ng-bind="theme.children.length"></span>
 			</div>
 
@@ -88,7 +88,7 @@
 			<div class="indicator-level-1" ng-repeat="theme in hierarchy|hierarchyFilter:searchField" ng-if="project.themes.indexOf(theme._id) !== -1">
 				<div class="indicator-header" ng-click="theme.open=!theme.open">
 					<i class="fa" ng-class="{'fa-plus-circle':!theme.open,'fa-minus-circle':theme.open}"></i>
-					{{(theme.name || 'indicator.no_theme')|translate}}
+					{{theme.name[language]||('indicator.no_theme'|translate)}}
 					<span class="badge pull-right" ng-bind="theme.children.length"></span>
 				</div>
 
