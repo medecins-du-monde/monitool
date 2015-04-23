@@ -5,6 +5,7 @@ function isEmpty(value) {
 };
 
 angular.module('monitool.directives.form', [])
+
 	.directive('ngMin', function() {
 		return {
 			restrict: 'A',
@@ -121,18 +122,33 @@ angular.module('monitool.directives.form', [])
 		}
 	})
 
-	.directive('textarea', function($timeout) {
+	.directive('textarea', function() {
 		return {
 			restrict: 'E',
 			link: function($scope, element) {
-				var resize = function() {
-					element[0].style.height = '1px';
-					var newHeight = Math.max(36, element[0].scrollHeight + 5);
+				var currentTimeout;
 
-					return element[0].style.height = newHeight + "px";
+				var resize = function() {
+					if (element[0].scrollHeight !== 0) {
+						element[0].style.height = '1px';
+						var newHeight = Math.max(24, element[0].scrollHeight + 3);
+
+						element[0].style.height = newHeight + "px";
+					}
+					else {
+						// This is a bit of a hack, but there seems to be no DOM event i can listen for
+						// to know when the element becomes visible
+						currentTimeout = setTimeout(resize, 250);
+					}
 				};
+
+				setTimeout(resize, 0);
 				element.on("blur keyup change", resize);
-				$timeout(resize, 0);
+
+				$scope.$on("$destroy", function() {
+					if (currentTimeout)
+						clearTimeout(currentTimeout);
+				});
 			}
 		};
 	});
