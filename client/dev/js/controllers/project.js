@@ -210,9 +210,6 @@ angular.module('monitool.controllers.project', [])
 
 		// if this indicator is already used in a form, we can't delete it from the logical frame.
 		$scope.isDetachable = !!target;
-		$scope.isDeletable = $scope.project.dataCollection.every(function(form) {
-			return form.fields.every(function(field) { return field.indicatorId !== indicatorId; });
-		});
 
 		$scope.isUnchanged = function() {
 			return angular.equals($scope.planning, $scope.project.indicators[indicatorId]);
@@ -238,8 +235,23 @@ angular.module('monitool.controllers.project', [])
 		};
 
 		$scope.delete = function() {
+			// Remove from logframe.
 			target && target.splice(target.indexOf(indicatorId), 1);
+
+			// Remove from plannings.
 			delete $scope.project.indicators[indicatorId];
+
+			// Remove from all forms that have a reference to it.
+			$scope.project.dataCollection.forEach(function(form) {
+				var numFields = form.fields.length;
+				for (var i = 0; i < numFields; ++i)
+					if (form.fields[i].indicatorId == indicatorId) {
+						form.fields.splice(i, 1);
+						return;
+					}
+
+			});
+
 			$modalInstance.close();
 		};
 
