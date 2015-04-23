@@ -70,7 +70,7 @@
 	</thead>
 	<tbody>
 		<tr ng-repeat="row in stats[presentation.display=='raw_data'?'rawDataRows':'indicatorRows'] track by $index"
-			ng-if="!row.parentId || open[row.parentId]">
+			ng-if="(!row.parentId && !row.gParentId) || (row.parentId && !row.gParentId && open[row.parentId]) || (row.parentId && row.gParentId && open[row.parentId] && open[row.gParentId])">
 
 			<!-- Graph columns always here -->
 			<td ng-show="presentation.plot" class="noprint">

@@ -257,7 +257,7 @@ reportingServices.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegr
 							subSubRow.hasChildren = true;
 							
 							rows.push({
-								id: makeUUID(), parentId: subSubRow.id, name: p2.name, indent: 3, type: "data", baseline: null, target: null,
+								id: makeUUID(), parentId: subSubRow.id, gParentId: subRow.id, name: p2.name, indent: 3, type: "data", baseline: null, target: null,
 								cols: cols.map(function(col) {
 									if (result[col.id] !== undefined
 										&& result[col.id].values[variable.id] !== undefined
