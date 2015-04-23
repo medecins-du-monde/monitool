@@ -139,6 +139,11 @@ var ENGLISH_TRANSLATION = {
 		english: "English",
 	},
 	project: {
+		running: "Running projects",
+		finished: "Finished projects",
+		noproject: "No projects match this criteria",
+		inputs: "Inputs",
+
 		last_input: "Last input: ",
 
 		value: "Value",
@@ -211,7 +216,6 @@ var ENGLISH_TRANSLATION = {
 		waiting_inputs_tooltip: '',
 		reporting_tooltip: '',
 
-		show_finished: 'Show finished projects',
 		create: "Create a new project",
 		input_forms: 'Input forms',
 		input_form: 'Input form',
@@ -248,9 +252,11 @@ var ENGLISH_TRANSLATION = {
 		no_indicators: 'This project does not follow any indicator',
 
 		waiting_inputs: 'Late inputs',
-		no_waiting_inputs: 'No late inputs.',
+		finished_inputs: 'Done inputs',
+		invalid_inputs: 'Out of calendar inputs',
+
+		no_inputs: 'No inputs match this criteria.',
 		input: 'Input now',
-		see_all_inputs: 'Show all inputs',
 
 		relevance: 'Relevance',
 		relevance_ph: 'Why are you collecting this indicator?',
@@ -383,11 +389,12 @@ var ENGLISH_TRANSLATION = {
 		is_forbidden: "This is a legacy indicator, it cannot be used on new projects",
 		is_external: "This indicator is from another thematic",
 
-		what_is_aggregation: "How to fill those fields?",
 		time_aggregation: "Time aggregation",
 		time_aggregation_sum: "Sum (for instance: number of consultations, births, ...)",
 		time_aggregation_average: "Average (for instance: population, number of doctors, cars, ...)",
 		time_aggregation_none: "None (all percentages and computed indicators)",
+
+		what_is_aggregation: "How to fill those fields?",
 		time_aggregation_help: [
 			"<strong>Tip</strong>",
 			"<ul>",

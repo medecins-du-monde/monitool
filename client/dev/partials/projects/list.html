@@ -3,8 +3,16 @@
 	<li class="active" translate="shared.list"></li>
 </ol>
 
-<input type="checkbox" ng-model="showFinished" id="filter-finished" />
-<label for="filter-finished" translate="project.show_finished"></label>
+<ul class="nav nav-tabs" role="tablist">
+	<li ng-class="{active:projects==runningProjects}">
+		<a ng-click="projects=runningProjects">{{'project.running'|translate}}</a>
+	</li>
+	<li ng-class="{active:projects==finishedProjects}">
+		<a ng-click="projects=finishedProjects">{{'project.finished'|translate}}</a>
+	</li>
+</ul>
+
+<br/>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
@@ -17,7 +25,10 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="project in projects | filter:isDisplayed | orderBy:pred:rev">
+		<tr ng-if="projects.length == 0">
+			<td colspan="5" style="text-align: center" translate="project.noproject">
+		</tr>
+		<tr ng-repeat="project in projects|orderBy:pred:rev">
 			<td style="text-align: center">
 				<i class="fa fa-file-powerpoint-o"
 				   tooltip="{{'project.you_are_owner'|translate}}"
@@ -35,10 +46,10 @@
 				   tooltip="{{'project.you_are_not_editor'|translate}}"
 				   tooltip-placement="right" acl-lacks-project-role="input" acl-project="project"></i>
 			</td>
-			<td><a ui-sref="main.project.logical_frame({projectId: project._id})">{{::project.name}}</a></td>
+			<td><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></td>
 			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
-			<td>{{::project.begin|amDateFormat:'YYYY-MM-DD'}}</td>
-			<td>{{::project.end|amDateFormat:'YYYY-MM-DD'}}</td>
+			<td>{{project.begin|amDateFormat:'YYYY-MM-DD'}}</td>
+			<td>{{project.end|amDateFormat:'YYYY-MM-DD'}}</td>
 		</tr>
 	</tbody>
 </table>

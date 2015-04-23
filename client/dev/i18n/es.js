@@ -139,6 +139,11 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 	project: {
+		running: "Proyectos en progreso",
+		finished: "Proyectos terminados",
+		noproject: "Ningún proyecto corresponde a este criterio",
+		inputs: "Entradas",
+
 		last_input: "Última entrada: ",
 
 		value: "Valor",
@@ -211,7 +216,6 @@ var SPANISH_TRANSLATION = {
 		waiting_inputs_tooltip: '',
 		reporting_tooltip: '',
 
-		show_finished: 'Mostrar todos los proyectos',
 		create: "Crear un nuevo proyecto",
 		input_forms: 'Formularios',
 		input_form: 'Formulario',
@@ -248,9 +252,11 @@ var SPANISH_TRANSLATION = {
 		no_indicators: 'Ningún indicador ha sido definido en este proyecto',
 
 		waiting_inputs: 'Entradas en espera',
-		no_waiting_inputs: 'Ninguna entrada en espera.',
+		finished_inputs: 'Entradas realizadas',
+		invalid_inputs: 'Entradas fuera de calendario',
+
+		no_inputs: 'Ninguna entrada corresponder a este criterio.',
 		input: 'Entrar datos',
-		see_all_inputs: 'Ver todos los formularios',
 
 		relevance: 'Pertinencia',
 		relevance_ph: '¿Porqué quiere colectar este indicador?',
@@ -383,11 +389,12 @@ var SPANISH_TRANSLATION = {
 		is_forbidden: "Este indicador es histórico y esta prohibido de uso para nuevos proyectos",
 		is_external: "Este indicator viene de otra temática",
 
-		what_is_aggregation: "¿Como llenar estos campos?",
 		time_aggregation: "Agregación en el tiempo",
 		time_aggregation_sum: "Suma (por ejemplo: número de consultaciones, de nacimientos, ...)",
 		time_aggregation_average: "Promedia no ponderada (por ejemplo: poblaciones, número de medicos, de vehiculos...)",
 		time_aggregation_none: "No agregación directa posible (todas las tasas, porcentajes, indicadores calculados, ...)",
+
+		what_is_aggregation: "¿Como llenar estos campos?",
 		time_aggregation_help: [
 			"<strong>Ayuda a la entrada</strong>",
 			"<ul>",

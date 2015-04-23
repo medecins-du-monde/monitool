@@ -3,15 +3,12 @@
 angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectListController', function($scope, projects, themes) {
-		$scope.projects       = projects;
 		$scope.themes         = themes;
-		$scope.filterFinished = true;
-		$scope.now            = new Date();
 		$scope.pred           = 'name'; // default sorting predicate
-
-		$scope.isDisplayed = function(project) {
-			return $scope.showFinished || project.end > $scope.now;
-		};
+		
+		$scope.runningProjects  = projects.filter(function(p) { return p.end >= new Date() });
+		$scope.finishedProjects = projects.filter(function(p) { return p.end < new Date() });
+		$scope.projects         = $scope.runningProjects;
 	})
 
 	.controller('ProjectMenuController', function($scope, $state, $stateParams, $filter, project, mtFetch) {
@@ -388,12 +385,13 @@ angular.module('monitool.controllers.project', [])
 	})
 
 	.controller('ProjectInputListController', function($scope, project, inputs) {
-		$scope.inputs = inputs;
+		// $scope.inputs = inputs;
 		$scope.pred = 'period';
 
-		$scope.isDisplayed = function(input) {
-			return input.filled == 'no' || input.filled == 'invalid' || $scope.showFinished;
-		};
+		$scope.finishedInputs = inputs.filter(function(i) { return i.filled == 'yes'; });
+		$scope.waitingInputs = inputs.filter(function(i) { return i.filled == 'no'; });
+		$scope.invalidInputs = inputs.filter(function(i) { return i.filled == 'invalid'; });
+		$scope.inputs = $scope.waitingInputs;
 	})
 
 	.controller('ProjectInputController', function($scope, $state, mtReporting, mtCompute, mtRegroup, form, inputs, indicatorsById) {

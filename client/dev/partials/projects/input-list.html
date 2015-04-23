@@ -4,13 +4,27 @@
 	<li class="active" translate="project.waiting_inputs"></li>
 </ol>
 
-<input type="checkbox" id="see-all-input" ng-model="showFinished" />
+<!-- <input type="checkbox" id="see-all-input" ng-model="showFinished" />
 <label for="see-all-input" translate="project.see_all_inputs"></label>
+ -->
+
+<ul class="nav nav-tabs" role="tablist">
+	<li ng-class="{active:inputs==waitingInputs}">
+		<a ng-click="inputs=waitingInputs">{{'project.waiting_inputs'|translate}}</a>
+	</li>
+	<li ng-class="{active:inputs==finishedInputs}">
+		<a ng-click="inputs=finishedInputs">{{'project.finished_inputs'|translate}}</a>
+	</li>
+	<li ng-class="{active:inputs==invalidInputs}">
+		<a ng-click="inputs=invalidInputs">{{'project.invalid_inputs'|translate}}</a>
+	</li>
+</ul>
+
+<br/>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th><a ng-click="pred='filled';rev=!rev">{{'shared.done'|translate}}</a></th>
 			<th><a ng-click="pred='period';rev=!rev">{{'shared.date'|translate}}</a></th>
 			<th><a ng-click="pred='inputEntityName';rev=!rev">{{'shared.input_entities'|translate}}</a></th>
 			<th><a ng-click="pred='formName';rev=!rev">{{'project.input_forms'|translate}}</a></th>
@@ -19,14 +33,10 @@
 	</thead>
 	<tbody>
 		<tr ng-if="!inputs.length">
-			<td colspan="5" style="text-align: center" translate="project.no_waiting_inputs"></td>
+			<td colspan="4" style="text-align: center" translate="project.no_inputs"></td>
 		</tr>
-		<tr ng-repeat="input in inputs|filter:isDisplayed|orderBy:pred:rev">
-			<td>
-				<i ng-class="::{fa: true, 'fa-check': input.filled=='yes', 'fa-times': input.filled=='no', 'fa-calendar': input.filled=='invalid'}"
-				   ng-style="::{color:{yes:'green',no:'red',invalid:'orange'}[input.filled]}"></i>
-			</td>
-			<td ng-bind="::input.period|amDateFormat:'D MMMM YYYY'"></td>
+		<tr ng-repeat="input in inputs|orderBy:pred:rev">
+			<td ng-bind="input.period|amDateFormat:'D MMMM YYYY'"></td>
 			<td ng-bind="::input.inputEntityName"></td>
 			<td ng-bind="::input.formName"></td>
 			<td>

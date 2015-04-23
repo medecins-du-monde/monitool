@@ -139,6 +139,11 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 	project: {
+		running: "Projets en cours",
+		finished: "Projets terminés",
+		noproject: "Aucun projet ne correspond à ce critère",
+		inputs: "Saisies",
+
 		last_input: "Dernière saisie: ",
 
 		value: "Valeur",
@@ -211,7 +216,6 @@ var FRENCH_TRANSLATION = {
 		waiting_inputs_tooltip: '',
 		reporting_tooltip: '',
 
-		show_finished: 'Montrer les projets finis',
 		create: "Créer un nouveau projet",
 		input_forms: 'Plannings de saisie',
 		input_form: 'Planning de saisie',
@@ -248,9 +252,11 @@ var FRENCH_TRANSLATION = {
 		no_indicators: 'Aucun indicateur n\'est défini sur ce projet',
 
 		waiting_inputs: 'Saisies en attente',
-		no_waiting_inputs: 'Aucune saisie en attente.',
+		finished_inputs: 'Saisies réalisées',
+		invalid_inputs: 'Saisies hors planning',
+
+		no_inputs: 'Aucune saisie ne correspond à ce critère.',
 		input: 'Saisir',
-		see_all_inputs: 'Voir toutes les saisies',
 
 		relevance: 'Pertinence',
 		relevance_ph: 'Pourquoi collectez-vous cet indicateur?',
@@ -380,7 +386,7 @@ var FRENCH_TRANSLATION = {
 		is_mandatory: "Cet indicateur est obligatoire pour les projets de même thématique",
 		is_recommended: "Cet indicateur provient du catalogue thématique.",
 		is_common: "Cet indicateur est optionnel",
-		is_forbidden: "Cet indicateur est historique est ne peut pas être utilisé sur un nouveau projet",
+		is_forbidden: "Cet indicateur est historique et ne peut pas être utilisé sur un nouveau projet",
 		is_external: "Cet indicateur provient d'une autre thématique",
 
 		time_aggregation: "Aggrégation par rapport au temps",
