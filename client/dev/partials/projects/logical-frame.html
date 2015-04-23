@@ -141,10 +141,10 @@
 
 			<div class="panel-heading">
 				<div class="panel-title">
-					<button class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)" acl-has-project-role="owner">
+					<a class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)" acl-has-project-role="owner">
 						<i class="fa fa-remove"></i>
 						<span translate="shared.delete"></span>
-					</button>
+					</a>
 
 					<a ng-click="tabOpen = !tabOpen">
 						<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
@@ -158,13 +158,12 @@
 					<div class="form-group" show-errors>
 						<label for="purpose-desc-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.purpose"></label>
 						<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.description">
-							<input type="text"
-								   class="form-control"
-								   name="description"
-								   id="purpose-desc-{{purposeId}}-input"
-								   placeholder="{{'project.intervention_logic_purpose_ph'|translate}}"
-								   ng-model="purpose.description"
-								   required />
+							<textarea class="form-control"
+									  name="description"
+									  id="purpose-desc-{{purposeId}}-input"
+									  placeholder="{{'project.intervention_logic_purpose_ph'|translate}}"
+									  ng-model="purpose.description"
+									  required></textarea>
 
 							<p class="help-block" ng-if="purposeForm.description.$error.required" translate="form.mandatory"></p>
 						</div>
@@ -219,10 +218,12 @@
 					<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs" ng-init="tabOpen=false">
 						<div class="panel-heading">
 							<div class="panel-title">
-								<button class="btn btn-danger btn-xs pull-right" ng-click="removeOutput(output, purpose)" acl-has-project-role="owner">
-									<i class="fa fa-remove"></i>
-									<span translate="shared.delete"></span>
-								</button>
+								<span class="pull-right">
+									<a class="btn btn-danger btn-xs" ng-click="removeOutput(output, purpose)" acl-has-project-role="owner">
+										<i class="fa fa-remove"></i>
+										<span translate="shared.delete"></span>
+									</a>
+								</span>
 
 								<a ng-click="tabOpen = !tabOpen">
 									<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
