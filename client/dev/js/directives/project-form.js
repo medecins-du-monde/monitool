@@ -468,7 +468,7 @@ angular
 					var agg = $scope.type + 'Aggregation';
 
 					// if the indicator is summable, that's ok
-					if ($scope.indicator[agg] !== 'none' || $scope.field.type === 'zero')
+					if ($scope.indicator[agg] !== 'none')
 						$scope.summable = true;
 
 					// if it's a formula, and all parameters are summable, that's ok
