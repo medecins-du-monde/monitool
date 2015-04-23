@@ -1,9 +1,129 @@
+/* make bootstrap smaller */
+
+body {
+  font-size: 12px;
+}
+
+.form-control {
+  font-size: 12px;
+  padding: 3px 6px;
+  height: 24px;
+}
+
+.form-group {
+  margin-bottom: 8px;
+}
+
+.form-horizontal .control-label {
+  padding-top: 3px;
+}
+
+p {
+  margin: 0 0 5px;
+}
+
+.panel {
+  margin-bottom: 10px;
+}
+.panel-title {
+  font-size: 13px;
+}
+
+.btn {
+  padding: 3px 6px;
+  font-size: 12px;
+}
+
+.btn-sm {
+  padding: 2px 5px;
+}
+
+.btn-xs {
+  padding: 0px 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+legend {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.input-group-addon {
+  padding: 3px 6px;
+  font-size: 12px;
+}
+
+label {
+  margin-bottom: 0;
+}
+
+.nav>li>a {
+  padding: 5px 10px;
+}
+.navbar {
+  min-height: 30px;
+}
+
+.panel-heading {
+  padding: 5px 8px;
+}
+
+.form-control-static {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.breadcrumb {
+  padding: 5px 10px;
+  margin-bottom: 10px
+}
+
+.list-group-item {
+  padding: 5px 10px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+.dropdown-menu {
+  min-width: 100px;
+  font-size: 12px;
+  padding: 2px 0;
+}
+
+.dropdown-menu>li>a {
+  padding: 3px 10px;
+}
+
+.table {
+  margin-bottom: 10px;
+}
+.table-condensed>tbody>tr>td {
+  padding: 3px;
+}
+
+.input-sm {
+  height: 24px;
+  padding: 3px 5px;
+  font-size: 12px;
+}
+
+select.input-sm {
+  height: 24px;
+  line-height: 24px;
+}
 
 
-/*https://www.gv.com/portfolio/*/
+/* we autosize textareas with a directive */
+
 textarea {
 	resize: none;
 }
+
+
 
 .indicator-level-1, .indicator-level-2, .indicator-level-3 {
 	border: solid #ccc;
@@ -163,7 +283,7 @@ report-preview .table {
 
 
 .print { display: none;}
-.main-content { padding-top: 70px; }
+.main-content { padding-top: 45px; }
 
 
 ul>.onrollover {
