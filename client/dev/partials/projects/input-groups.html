@@ -4,6 +4,8 @@
 	<li class="active" translate="shared.input_groups"></li>
 </ol>
 
+<doc-reminder pages="project.presentation_project,project.entities_groups"></doc-reminder>
+
 <form name="projectForm" novalidate>
 	<table class="table table-bordered table-stripped table-condensed">
 		<thead>
@@ -59,7 +61,7 @@
 		</tfoot>
 	</table>
 
-	<div acl-has-project-role="owner">
+	<div acl-has-project-role="owner" class="noprint">
 		<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>

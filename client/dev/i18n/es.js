@@ -138,6 +138,44 @@ var SPANISH_TRANSLATION = {
 		spanish: "Español",
 		english: "Inglés",
 	},
+
+	help: {
+		block: {
+			general: "General",
+			indicators: "Catálogo de indicadores",
+			project: "Proyectos",
+		},
+		page: {
+			presentation_general: "Presentación",
+			presentation_project: "Presentación",
+			presentation_indicator: "Presentación",
+
+			offline_access: "Uso desconectado",
+			acls: "Derechos de acceso",
+			translation: "Traducción",
+
+			completeness: "Integridad y limitaciones",
+			operation_modes: "Modos de operación",
+			computation: "Formulas y agregación",
+			collection_history: "Historial de colecta",
+
+			logical_frame: "Marco lógico",
+			entities_groups: "Lugares de actividad y grupos",
+			input_forms: "Formularios",
+			users: "Derechos de acceso",
+
+			inputs: "Entradas",
+			statistics: "Estadísticas",
+			descriptive_analysis: "Análisis descriptivo",
+			change_definition: "Modicaciones",
+		},
+		reminder: {
+			have_you_read_single_pre: "¿Ha leido la sección ",
+			have_you_read_single_post: "de la documentación?",
+			have_you_read_multiple: "Ha leido las secciones siguientes en la documentación?",
+		}
+	},
+
 	project: {
 		running: "Proyectos en progreso",
 		finished: "Proyectos terminados",

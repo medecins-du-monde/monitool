@@ -30,6 +30,13 @@
 						<span translate="shared.settings"></span>
 					</a>
 				</li>
+
+				<li ng-class="{active: $state.includes('main.help')}">
+					<a ui-sref="main.help.presentation_general">
+						<i class="fa fa-fw fa-question"></i>
+						<span translate="shared.help"></span>
+					</a>
+				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li dropdown>

@@ -1,0 +1,42 @@
+<ol class="breadcrumb">
+	<li class="active" translate="shared.help"></li>
+	<li class="active" translate="help.block.indicators"></li>
+	<li class="active" translate="help.page.computation"></li>
+</ol>
+
+<div ng-switch="language">
+	<div ng-switch-when="fr">
+
+		<p>
+			Lors de la définition d’un indicateur, il est nécessaire de préciser la manière dont celui-ci peut être agrégé dans le temps et l’espace.
+		</p>
+		<p>
+			Par agréger dans le temps, on entend « déduire la valeur d’un indicateur sur une année à partir de ses valeurs par mois ». De la même façon, par agréger dans l’espace on entend « déduire la valeur d’un indicateur sur un projet à partir de ses valeurs sur les lieux d’activité qui le composent ».
+		</p>
+		<p>
+			Seul deux types d’agrégations possible sont disponibles à ce jour, mais devraient couvrir tous les besoins rencontrés : la somme et la moyenne arithmétique.
+		</p>
+		<p>
+			Dans la pratique, pour la majorité des indicateurs (à commencer par tous les taux), il est impossible de les agréger automatiquement si on ne dispose que de leur valeur.
+		</p>
+		<p>
+			En effet, savoir que le taux de mortalité opératoire d’un bloc chirurgical est de 3% au premier semestre et de 10% au deuxième semestre ne permet en aucun cas de déduire la valeur de ce même taux sur l’année.
+		</p>
+		<p>
+			Pour pallier à cette limitation, il est possible d’exprimer chaque indicateur du catalogue à partir de ses composantes de calcul et d’une formule. Pour chaque composante utilisée l’utilisateur spécifiera de la même manière que pour l’indicateur la manière dont le système doit les agréger.
+		</p>
+		<p>
+			Dans notre exemple, la solution au problème consiste simplement à exprimer le taux de mortalité opératoire comme le nombre de décès opératoires divisé par le nombre d’opérations chirurgicales. Puis de spécifier que les deux composantes peuvent être sommées dans le temps et l’espace.
+		</p>
+		<p>
+			Lors la décomposition d’un indicateur en composantes, il est capital de prendre garde à la méthode d’agrégation des dites composantes. Cette remarque s’applique tout particulièrement avec tous les indicateurs qui contiennent comme composante la population de la zone, ou un dérivé de celle-ci : une population de 10’000 habitants sur les trois premier mois de l’année ne fait pas une population de 30'000 habitants sur le premier trimestre.
+		</p>
+
+	</div>
+	<div ng-switch-when="es">
+		La documentación solo esta traducida en francès por ahora.
+	</div>
+	<div ng-switch-when="en">
+		The documentation is only available in french for now.
+	</div>
+</div>

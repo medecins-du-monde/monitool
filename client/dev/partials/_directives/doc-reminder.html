@@ -1,0 +1,20 @@
+
+<div class="alert alert-info noprint" ng-if="unreadPages.length">
+	
+	<div ng-if="unreadPages.length == 1">
+		<i class="fa fa-info-circle"></i>
+		{{'help.reminder.have_you_read_single_pre'|translate}}
+		"<a ui-sref="{{'main.help.' + unreadPages[0].page}}">{{('help.block.' + unreadPages[0].block)|translate}} &gt; {{('help.page.'+unreadPages[0].page)|translate}}</a>"
+		{{'help.reminder.have_you_read_single_post'|translate}}
+	</div>
+
+	<div ng-if="unreadPages.length > 1">
+		<i class="fa fa-info-circle"></i>
+		{{'help.reminder.have_you_read_multiple'|translate}}
+		<ul>
+			<li ng-repeat="page in unreadPages">
+				<a ui-sref="{{'main.help.' + page.page}}">{{('help.block.' + page.block)|translate}} &gt; {{('help.page.'+page.page)|translate}}</a>
+			</li>
+		</ul>
+	</div>
+</div>

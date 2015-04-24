@@ -138,6 +138,44 @@ var ENGLISH_TRANSLATION = {
 		spanish: "Spanish",
 		english: "English",
 	},
+
+	help: {
+		block: {
+			general: "Overall",
+			indicators: "Indicators catalog",
+			project: "Projects",
+		},
+		page: {
+			presentation_general: "Introduction",
+			presentation_project: "Introduction",
+			presentation_indicator: "Introduction",
+
+			offline_access: "Offline access",
+			acls: "Authorization",
+			translation: "Translation",
+
+			completeness: "Completeness and limitations",
+			operation_modes: "Operation modes",
+			computation: "Computation and aggregation",
+			collection_history: "Collection history",
+
+			logical_frame: "Logical frame",
+			entities_groups: "Input entities and groups",
+			input_forms: "Input forms",
+			users: "Authorization",
+
+			inputs: "Inputs",
+			statistics: "Statistics",
+			descriptive_analysis: "Descriptive analysis",
+			change_definition: "Modifying projects",
+		},
+		reminder: {
+			have_you_read_single_pre: "Did you read the ",
+			have_you_read_single_post: "chapter from the manual?",
+			have_you_read_multiple: "Did you read the following chapters in the manual?",
+		}
+	},
+
 	project: {
 		running: "Running projects",
 		finished: "Finished projects",

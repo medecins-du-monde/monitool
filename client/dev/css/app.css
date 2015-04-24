@@ -116,6 +116,14 @@ select.input-sm {
   line-height: 24px;
 }
 
+.alert {
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+ol, ul {
+  margin-bottom: 5px;
+}
 
 /* we autosize textareas with a directive */
 
@@ -146,14 +154,14 @@ textarea {
 }
 
 .indicator-level-2 {
-	margin-left: 40px;
+	margin-left: 20px;
   margin-right: 10px;
 	background-color: #f8f8f8;
 
 }
 
 .indicator-level-3 {
-	margin-left: 40px;
+	margin-left: 20px;
 	background-color: #f0f0f0;
 }
 
@@ -308,9 +316,9 @@ ul:hover>.onrollover {
 }
 
 
-tr.indent1 > td:first-child { padding-left: 50px; }
-tr.indent2 > td:first-child { padding-left: 100px; }
-tr.indent3 > td:first-child { padding-left: 150px; }
+tr.indent1 > td:first-child { padding-left: 25px; }
+tr.indent2 > td:first-child { padding-left: 50px; }
+tr.indent3 > td:first-child { padding-left: 75px; }
 
 
   .table-raw-data th {

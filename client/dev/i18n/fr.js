@@ -138,6 +138,44 @@ var FRENCH_TRANSLATION = {
 		spanish: "Espagnol",
 		english: "Anglais",
 	},
+
+	help: {
+		block: {
+			general: "Général",
+			indicators: "Catalogue d'indicateurs",
+			project: "Projets",
+		},
+		page: {
+			presentation_general: "Présentation",
+			presentation_project: "Présentation",
+			presentation_indicator: "Présentation",
+
+			offline_access: "Utilisation offline",
+			acls: "Droits d'accès",
+			translation: "Traduction",
+
+			completeness: "Exhaustivité et contraintes",
+			operation_modes: "Mode d'opérations",
+			computation: "Formules et agrégation",
+			collection_history: "Historique de collecte",
+
+			logical_frame: "Cadre logique",
+			entities_groups: "Lieux d'activité et groupes",
+			input_forms: "Plannings de saisie",
+			users: "Droits d'accès",
+
+			inputs: "Saisies",
+			statistics: "Statistiques",
+			descriptive_analysis: "Analyse Descriptives",
+			change_definition: "Re-spécification",
+		},
+		reminder: {
+			have_you_read_single_pre: "Avez-vous lu la section",
+			have_you_read_single_post: "dans la documentation?",
+			have_you_read_multiple: "Avez-vous lu les sections suivantes dans la documentation?",
+		}
+	},
+
 	project: {
 		running: "Projets en cours",
 		finished: "Projets terminés",
@@ -389,10 +427,10 @@ var FRENCH_TRANSLATION = {
 		is_forbidden: "Cet indicateur est historique et ne peut pas être utilisé sur un nouveau projet",
 		is_external: "Cet indicateur provient d'une autre thématique",
 
-		time_aggregation: "Aggrégation par rapport au temps",
+		time_aggregation: "Agrégation par rapport au temps",
 		time_aggregation_sum: "Somme (ex: nombre de consultations, de naissances, ...)",
 		time_aggregation_average: "Moyenne non pondérée (ex: population, nombre de médecins, de véhicules, ...)",
-		time_aggregation_none: "Pas d'aggrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
+		time_aggregation_none: "Pas d'agrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
 
 		what_is_aggregation: "Comment remplir ces champs?",
 		time_aggregation_help: [
@@ -400,26 +438,26 @@ var FRENCH_TRANSLATION = {
 			"<ul>",
 				"<li>",
 					"Si un hôpital réalise 100 consultations en janvier, en février et en mars, il en aura réalisé 300 au",
-					"cours du premier trimestre de l'année. Le mode d'aggrégation de l'indicateur <strong>\"Nombre de consultations\"</strong>",
+					"cours du premier trimestre de l'année. Le mode d'agrégation de l'indicateur <strong>\"Nombre de consultations\"</strong>",
 					"vaut donc <strong>\"Somme\"</strong>",
 				"</li>",
 				"<li>",
 					"Si un bloc chirurgical a un taux de mortalité de 5% en janvier, 7% en février et 10% en mars, on ne peut pas calculer",
 					"son taux de mortalité sur le premier trimestre de l'année sans connaître le nombre d'opérations sur chaque mois.",
-					"Le mode d'aggrégation de l'indicateur <strong>\"Taux de mortalité opératoire\"</strong> vaut donc <strong>\"Pas d'aggrégation directe possible\"</strong>",
+					"Le mode d'agrégation de l'indicateur <strong>\"Taux de mortalité opératoire\"</strong> vaut donc <strong>\"Pas d'agrégation directe possible\"</strong>",
 				"</li>",
 				"<li>",
 					"Si un village a une population de 510 habitants en janvier, 600 en février et 550 en mars, on peut dire que sa population",
-					"au premier trimestre de l'année vaut 553. Le mode d'aggrégation de l'indicateur <strong>\"Population\"</strong>à choisir est",
+					"au premier trimestre de l'année vaut 553. Le mode d'agrégation de l'indicateur <strong>\"Population\"</strong>à choisir est",
 					"donc <strong>\"Moyenne non pondérée\"</strong>",
 				"</li>",
 			"</ul>"
 		].join(' '),
 
-		geo_aggregation: "Aggrégation géographique",
+		geo_aggregation: "Agrégation géographique",
 		geo_aggregation_sum: "Somme (ex: population, nombre de médecins, de véhicules disponibles, de consultations, de naissances, ...)",
 		geo_aggregation_average: "Moyenne non pondérée (à n'utiliser uniquement que pour des indicateurs qui sont déjà des moyennes par centre: \"nombre de médecins par centre\")",
-		geo_aggregation_none: "Pas d'aggrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
+		geo_aggregation_none: "Pas d'agrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
 	},
 	login: {
 		error: "Identifiant ou mot de passe invalide",

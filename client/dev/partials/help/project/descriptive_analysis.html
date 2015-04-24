@@ -1,0 +1,26 @@
+<ol class="breadcrumb">
+	<li class="active" translate="shared.help"></li>
+	<li class="active" translate="help.block.project"></li>
+	<li class="active" translate="help.page.descriptive_analysis"></li>
+</ol>
+
+<div ng-switch="language">
+	<div ng-switch-when="fr">
+
+		<p>L’analyse quantitative d’indicateurs n’étant jamais suffisante pour obtenir une vision globale sur un projet, il est possible de rédiger au sein même de l’outil des analyses descriptives de statistiques choisies par l’utilisateur générées avec le même mécanisme que celles présentées dans la section précédente.</p>
+		<p>Une différence importante doit cependant être notée : les tableaux et graphiques de statistiques placés dans une analyse descriptive étant accompagnés de texte qui les analyse, ceux-ci sont figés à la date à laquelle ils ont été générés.</p>
+		<p>La raison est double :</p>
+
+		<ul>
+			<li>Si des données brutes ont été corrigées ou modifiés après l’analyse, celle-ci montrera encore l’ancienne version, gardant ainsi son sens.</li>
+			<li>Si le cadre logique du projet a été remanié, et des indicateurs supprimés, les analyses passés sur ces indicateurs est archivée.</li>
+			<li>Dans le cas, où le comportement désiré est de répercuter les modifications d’une correction d’erreur de saisie dans une analyse passée, il est simple de supprimer le tableau ou graphique concerné et de le recréer, cette fois avec les données les plus à jour possible.</li>
+		</ul>
+	</div>
+	<div ng-switch-when="es">
+		La documentación solo esta traducida en francès por ahora.
+	</div>
+	<div ng-switch-when="en">
+		The documentation is only available in french for now.
+	</div>
+</div>

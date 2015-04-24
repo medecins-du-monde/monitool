@@ -78,6 +78,10 @@ var app = angular.module('monitool.app', [
 // 	});
 // });
 
+
+/**
+ * Init translation modules
+ */
 app.config(function($translateProvider) {
 	$translateProvider.translations('fr', FRENCH_TRANSLATION);
 	$translateProvider.translations('en', ENGLISH_TRANSLATION);
@@ -101,13 +105,14 @@ app.run(function($translate, $locale, $rootScope) {
 		angular.copy(ENGLISH_LOCALE, $locale);
 });
 
+/**
+ * Init datepicker modules
+ */
 app.config(function(datepickerConfig, datepickerPopupConfig) {
 	datepickerConfig.showWeeks = false;
 	datepickerConfig.startingDay = 1;
-
 	datepickerPopupConfig.showButtonBar = false;
 });
-
 
 /**
  * Transform all dates that come from the server to date objects, and back
@@ -552,6 +557,126 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
+
+	///////////////////////////
+	// Help
+	///////////////////////////
+
+	$stateProvider.state('main.help', {
+		abstract: true,
+		controller: 'HelpMenuController',
+		url: '/help',
+		templateUrl: 'partials/help/menu.html',
+	});
+
+	$stateProvider.state('main.help.presentation_general', {
+		controller: 'HelpController',
+		url: "/presentation_general",
+		templateUrl: 'partials/help/general/presentation_general.html'
+	});
+
+	$stateProvider.state('main.help.offline_access', {
+		controller: 'HelpController',
+		url: "/offline_access",
+		templateUrl: 'partials/help/general/offline_access.html'
+	});
+
+	$stateProvider.state('main.help.acls', {
+		controller: 'HelpController',
+		url: "/acls",
+		templateUrl: 'partials/help/general/acls.html'
+	});
+
+	$stateProvider.state('main.help.translation', {
+		controller: 'HelpController',
+		url: "/translation",
+		templateUrl: 'partials/help/general/translation.html'
+	});
+
+	$stateProvider.state('main.help.presentation_indicator', {
+		controller: 'HelpController',
+		url: "/presentation_indicator",
+		templateUrl: 'partials/help/indicators/presentation_indicator.html'
+	});
+
+	$stateProvider.state('main.help.completeness', {
+		controller: 'HelpController',
+		url: "/completeness",
+		templateUrl: 'partials/help/indicators/completeness.html'
+	});
+
+	$stateProvider.state('main.help.operation_modes', {
+		controller: 'HelpController',
+		url: "/operation_modes",
+		templateUrl: 'partials/help/indicators/operation_modes.html'
+	});
+
+	$stateProvider.state('main.help.computation', {
+		controller: 'HelpController',
+		url: "/computation",
+		templateUrl: 'partials/help/indicators/computation.html'
+	});
+
+	$stateProvider.state('main.help.collection_history', {
+		controller: 'HelpController',
+		url: "/collection_history",
+		templateUrl: 'partials/help/indicators/collection_history.html'
+	});
+
+	$stateProvider.state('main.help.presentation_project', {
+		controller: 'HelpController',
+		url: "/presentation_project",
+		templateUrl: 'partials/help/project/presentation_project.html'
+	});
+
+	$stateProvider.state('main.help.logical_frame', {
+		controller: 'HelpController',
+		url: "/logical_frame",
+		templateUrl: 'partials/help/project/logical_frame.html'
+	});
+
+	$stateProvider.state('main.help.entities_groups', {
+		controller: 'HelpController',
+		url: "/entities_groups",
+		templateUrl: 'partials/help/project/entities_groups.html'
+	});
+
+	$stateProvider.state('main.help.input_forms', {
+		controller: 'HelpController',
+		url: "/input_forms",
+		templateUrl: 'partials/help/project/input_forms.html'
+	});
+
+	$stateProvider.state('main.help.users', {
+		controller: 'HelpController',
+		url: "/users",
+		templateUrl: 'partials/help/project/users.html'
+	});
+
+	$stateProvider.state('main.help.inputs', {
+		controller: 'HelpController',
+		url: "/inputs",
+		templateUrl: 'partials/help/project/inputs.html'
+	});
+
+	$stateProvider.state('main.help.statistics', {
+		controller: 'HelpController',
+		url: "/statistics",
+		templateUrl: 'partials/help/project/statistics.html'
+	});
+
+	$stateProvider.state('main.help.descriptive_analysis', {
+		controller: 'HelpController',
+		url: "/descriptive_analysis",
+		templateUrl: 'partials/help/project/descriptive_analysis.html'
+	});
+
+	$stateProvider.state('main.help.change_definition', {
+		controller: 'HelpController',
+		url: "/change_definition",
+		templateUrl: 'partials/help/project/change_definition.html'
+	});
+
 });
 
 
@@ -571,3 +696,4 @@ app.run(function($rootScope, $state, mtFetch) {
 angular.element(document).ready(function() {
 	angular.bootstrap(document, ['monitool.app']);
 });
+

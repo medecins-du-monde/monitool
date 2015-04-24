@@ -1,0 +1,34 @@
+<ol class="breadcrumb">
+	<li class="active" translate="shared.help"></li>
+	<li class="active" translate="help.block.project"></li>
+	<li class="active" translate="help.page.presentation_project"></li>
+</ol>
+
+<div ng-switch="language">
+	<div ng-switch-when="fr">
+
+		<p>Le Monitool a pour objectif de permettre le suivi quantitatif des résultats et de l’impact sur le terrain des projets. Il ne prend donc en compte aucune considération de planning, de budget, de logistique ou de stock, de ressources humaines : ceux-ci sont hors du périmètre du projet et sont déjà traités dans d’autres outils.</p>
+
+		<div ng-include="'partials/help/project/project.svg'" style="width: 500px; display: block; margin: auto"></div>
+
+		<p>On peut considérer que les projets sont donc entièrement caractérisés par</p>
+		<ul>
+			<li>Leur cadre logique (objectifs, résultats, activités et indicateurs).</li>
+			<li>La liste des lieux d’activité sur lesquelles ils opèrent (centres de santé, hôpitaux, …).</li>
+			<li>Les groupes qui caractérisent leurs lieux d’activité (par région, type de structure de santé, …).</li>
+			<li>La liste des utilisateurs de l’outil qui peuvent les modifier à différent degrés.</li>
+			<li>Des plannings de saisie qui explicitent les variables collectées sur le terrain, leur périodicité, et granularité et leur lien avec les indicateurs du cadre logique.</li>
+			<li>À cela s’ajoute au cours de la vie du projet :</li>
+			<li>Des saisies de données brutes.</li>
+			<li>Des statistiques sur les données brutes et les indicateurs (générés à partir des saisies).</li>
+			<li>Des analyses descriptives des statistiques.</li>
+		</ul>
+
+	</div>
+	<div ng-switch-when="es">
+		La documentación solo esta traducida en francès por ahora.
+	</div>
+	<div ng-switch-when="en">
+		The documentation is only available in french for now.
+	</div>
+</div>
