@@ -24,10 +24,10 @@ var files = {
 			'client/dev/bower_components/fontawesome/css/font-awesome.min.css',
 			'client/dev/bower_components/bootstrap-css-only/css/bootstrap.min.css',
 			'client/dev/bower_components/angular-ui-select/dist/select.min.css',
-			'client/dev/bower_components/c3/c3.min.css',
-			'client/dev/bower_components/textAngular/src/textAngular.css'
+			'client/dev/bower_components/c3/c3.min.css'
 		],
 		common: [
+			'client/dev/bower_components/textAngular/src/textAngular.css',
 			'client/dev/css/app.css'
 		]
 	},
