@@ -121,7 +121,7 @@ fi
 echo 4. Build JS application
 if [ -e "$DEPLOYMENT_TARGET/gulpfile.js" ]; then
   cd "$DEPLOYMENT_TARGET"
-  eval "\"$NODE_EXE\" \"$DEPLOYMENT_TARGET/node_modules/gulp/bin/gulp.js\" build"
+  eval "\"$NODE_EXE\" \"$DEPLOYMENT_TARGET/node_modules/gulp/bin/gulp.js\" "
   exitWithMessageOnError "gulp failed"
   cd - > /dev/null
 fi
