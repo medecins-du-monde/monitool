@@ -31,7 +31,7 @@
 <div class="input-group" acl-has-project-role="owner">
 	<select class="form-control"
 			ng-model="newIndicatorId"
-			ng-options="i._id as i.name for i in addableIndicators">
+			ng-options="i._id as i.name[language] for i in addableIndicators">
 	</select>
 	
 	<span class="input-group-btn">

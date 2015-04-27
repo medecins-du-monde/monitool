@@ -18,7 +18,7 @@
 				<div class="panel-body">
 					<div class="form-group" show-errors>
 						<label for="input-name-{{code}}" class="col-sm-2 control-label" translate="shared.name"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.name">
+						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.name[code]">
 							<textarea id="input-name-{{code}}"
 									  class="form-control"
 									  type="text"
@@ -33,7 +33,7 @@
 
 					<div class="form-group">
 						<label for="input-standard-{{code}}" class="col-sm-2 control-label" translate="indicator.standard"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.standard">
+						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.standard[code]">
 							<textarea id="input-standard-{{code}}"
 									  class="form-control"
 									  ng-model="indicator.standard[code]"
@@ -43,7 +43,7 @@
 
 					<div class="form-group">
 						<label for="input-sources-{{code}}" class="col-sm-2 control-label" translate="indicator.sources"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sources">
+						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sources[code]">
 							<textarea id="input-sources-{{code}}"
 									  class="form-control"
 									  ng-model="indicator.sources[code]"
@@ -53,7 +53,7 @@
 
 					<div class="form-group">
 						<label for="input-comments-{{code}}" class="col-sm-2 control-label" translate="indicator.comments"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.comments">
+						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.comments[code]">
 							<textarea id="input-comments-{{code}}"
 									  class="form-control"
 									  ng-model="indicator.comments[code]"
@@ -95,7 +95,7 @@
 
 		<div class="form-group">
 			<label for="input-operation" class="col-sm-2 control-label" translate="indicator.operation"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.operation">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.operation)|translate">
 				<select id="input-operation" class="form-control" ng-model="indicator.operation">
 					<option value="mandatory" translate="indicator.is_mandatory"></option>
 					<option value="recommended" translate="indicator.is_recommended"></option>
@@ -107,7 +107,7 @@
 
 		<div class="form-group" ng-if="indicator.operation != 'parameter'">
 			<label for="input-target" class="col-sm-2 control-label" translate="indicator.target"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.target">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="('indicator.' + indicator.target)|translate">
 				<select id="input-target" class="form-control" ng-model="indicator.target">
 					<option value="lower_is_better" translate="indicator.lower_is_better"></option>
 					<option value="higher_is_better" translate="indicator.higher_is_better"></option>
@@ -134,7 +134,7 @@
 
 		<div class="form-group">
 			<label for="input-sum-allowed" class="col-sm-2 control-label" translate="indicator.time_aggregation"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sumAllowed">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="('indicator.time_aggregation_'+indicator.timeAggregation)|translate">
 				<select class="form-control" ng-model="indicator.timeAggregation">
 					<option value="sum" translate="indicator.time_aggregation_sum"></option>
 					<option value="average" translate="indicator.time_aggregation_average"></option>
@@ -145,7 +145,7 @@
 
 		<div class="form-group">
 			<label for="input-sum-allowed" class="col-sm-2 control-label" translate="indicator.geo_aggregation"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sumAllowed">
+			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="('indicator.geo_aggregation_'+indicator.geoAggregation)|translate">
 				<select class="form-control" ng-model="indicator.geoAggregation">
 					<option value="sum" translate="indicator.geo_aggregation_sum"></option>
 					<option value="average" translate="indicator.geo_aggregation_average"></option>
@@ -203,7 +203,7 @@
 										<option value="sum" translate="indicator.geo_aggregation_sum"></option>
 										<option value="average" translate="indicator.geo_aggregation_average"></option>
 										<option value="none" translate="indicator.geo_aggregation_none"></option>
-									</select>										
+									</select>
 								</div>
 							</div>
 

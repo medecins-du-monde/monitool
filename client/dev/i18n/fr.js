@@ -427,7 +427,7 @@ var FRENCH_TRANSLATION = {
 		is_forbidden: "Cet indicateur est historique et ne peut pas être utilisé sur un nouveau projet",
 		is_external: "Cet indicateur provient d'une autre thématique",
 
-		time_aggregation: "Agrégation par rapport au temps",
+		time_aggregation: "Agrégation temps",
 		time_aggregation_sum: "Somme (ex: nombre de consultations, de naissances, ...)",
 		time_aggregation_average: "Moyenne non pondérée (ex: population, nombre de médecins, de véhicules, ...)",
 		time_aggregation_none: "Pas d'agrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
@@ -454,7 +454,7 @@ var FRENCH_TRANSLATION = {
 			"</ul>"
 		].join(' '),
 
-		geo_aggregation: "Agrégation géographique",
+		geo_aggregation: "Agrégation lieux",
 		geo_aggregation_sum: "Somme (ex: population, nombre de médecins, de véhicules disponibles, de consultations, de naissances, ...)",
 		geo_aggregation_average: "Moyenne non pondérée (à n'utiliser uniquement que pour des indicateurs qui sont déjà des moyennes par centre: \"nombre de médecins par centre\")",
 		geo_aggregation_none: "Pas d'agrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
