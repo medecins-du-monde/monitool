@@ -256,8 +256,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/list.html',
 		controller: 'ProjectListController',
 		resolve: {
-			// FIXME => bandwidth burner
-			projects: function(mtFetch) { return mtFetch.projects(); },
+			projects: function(mtFetch) { return mtFetch.projects({mode: 'list'}); },
 			themes: function(mtFetch) { return mtFetch.themes({}); }
 		}
 	});

@@ -18,7 +18,12 @@ module.exports = {
 			database.view('shortlists', 'projects_by_indicator', {key: options.indicatorId, include_docs: true}, function(error, result) {
 				callback(null, result.rows.map(function(row) { return row.doc; }));
 			});
-		
+
+		else if (options.mode === 'list')
+			database.view('shortlists', 'projects_short', {}, function(error, result) {
+				callback(null, result.rows.map(function(row) { return row.value; }));
+			});
+
 		else
 			Abstract.list('project', options, callback);
 	},
