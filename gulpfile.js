@@ -99,7 +99,7 @@ gulp.task('size-report', function() {
 // Build
 //////////////////////////////////////////////////////////
 
-gulp.task('default', ['build', 'design-docs']);
+gulp.task('default', ['build', 'design-docs', 'update-database']);
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
 
 gulp.task('copy-static', function() {
@@ -183,7 +183,7 @@ gulp.task('update-database', function(callback) {
 				return;
 
 			if (doc.type === 'indicator')
-				keys.push("name", "definition", "standard", "sources", "comments")
+				keys.push("name", "standard", "sources", "comments")
 
 			keys.forEach(function(key) {
 				if (typeof doc[key] === 'string') {
@@ -191,6 +191,9 @@ gulp.task('update-database', function(callback) {
 					doc[key] = {en: doc[key], fr: doc[key], es: doc[key]};
 				}
 			});
+
+			if (doc.type === 'indicator' && doc.definition !== undefined)
+				delete doc.definition;
 
 
 			if (update)

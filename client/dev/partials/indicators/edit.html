@@ -9,7 +9,7 @@
 	<fieldset>
 		<legend translate="indicator.definition"></legend>
 
-		<div class="col-sm-4" ng-repeat="(code, language) in languages">
+		<div ng-repeat="(code, language) in languages">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<div class="panel-title" translate="{{'menu.' + language}}"></div>
@@ -28,20 +28,6 @@
 									  required></textarea>
 
 							<p class="help-block" ng-if="indicatorForm['name-' + code].$error.required" translate="form.mandatory"></p>
-						</div>
-					</div>
-
-					<div class="form-group" show-errors>
-						<label for="input-definition-{{code}}" class="col-sm-2 control-label" translate="indicator.definition"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.definition">
-							<textarea id="input-definition-{{code}}"
-									  name="definition-{{code}}"
-									  class="form-control"
-									  ng-model="indicator.definition[code]"
-									  required
-									  placeholder="{{'indicator.definition_ph'|translate}}"></textarea>
-
-							<p class="help-block" ng-if="indicatorForm['definition-' + code].$error.required" translate="form.mandatory"></p>
 						</div>
 					</div>
 

@@ -4,7 +4,7 @@
 	"type": "object",
 	"additionalProperties": false,
 	"required": [
-		"_id", "type", "name", "definition",
+		"_id", "type", "name",
 		"geoAggregation", "timeAggregation", "unit", "types", "themes", "formulas"
 	],
 	"properties": {
@@ -13,7 +13,6 @@
 		"type": { "type": "string", "pattern": "^indicator$" },
 
 		"name":       { "$ref": "#/definitions/translated_req" },
-		"definition": { "$ref": "#/definitions/translated_req" },
 		"standard":   { "$ref": "#/definitions/translated" },
 		"sources":    { "$ref": "#/definitions/translated" },
 		"comments":   { "$ref": "#/definitions/translated" },
