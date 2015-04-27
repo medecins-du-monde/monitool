@@ -42,7 +42,6 @@ angular.module('monitool.services.fetch', [])
 					return new Indicator({
 						type: 'indicator',
 						name: angular.copy(tran),
-						definition: angular.copy(tran),
 						standard: angular.copy(tran),
 						sources: angular.copy(tran),
 						comments: angular.copy(tran),
