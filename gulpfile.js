@@ -126,7 +126,7 @@ gulp.task('build-js', ['bower'], function() {
 
 	// concat it all.
 	return queue.done()
-				.pipe(concat('monitool.js'))
+				.pipe(concat('monitool2.js'))
 				.pipe(gulp.dest('client/build'));
 });
 
@@ -136,7 +136,7 @@ gulp.task('build-css', ['bower'], function() {
 	queue.queue(gulp.src(files.css.common).pipe(minifyCSS()));
 
 	return queue.done()
-				.pipe(concat('monitool.css'))
+				.pipe(concat('monitool2.css'))
 				.pipe(replace(/\.\.\/fonts\//g, ''))
 				.pipe(gulp.dest('client/build'));
 });
@@ -192,13 +192,25 @@ gulp.task('update-database', function(callback) {
 				}
 			});
 
-			if (doc.type === 'indicator' && doc.definition !== undefined)
+			if (doc.type === 'indicator' && doc.definition !== undefined) {
 				delete doc.definition;
+				update = true
+			}
 
+			if (doc.type === 'indicator') {
+				for (var id in doc.formulas) {
+					if (doc.formulas[id].name !== undefined) {
+						delete doc.formulas[id].name;
+						update=true
+					}
+				}
+			}
 
 			if (update)
 				updates.push(doc);
 		});
+
+		console.log("Updated documents", updates.length);
 
 		async.eachSeries(
 			updates,
