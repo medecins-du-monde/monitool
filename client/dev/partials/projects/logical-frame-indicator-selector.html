@@ -77,7 +77,7 @@
 
 	<div ng-if="!showAllIndicators">
 		<div ng-if="project.themes.length == 1">
-			<div style="margin-left: -40px"
+			<div style="margin-left: -20px"
 				ng-include="'indicator_tree.html'"
 				ng-repeat="theme in hierarchy|hierarchyFilter:searchField"
 				ng-if="theme._id === project.themes[0]"
