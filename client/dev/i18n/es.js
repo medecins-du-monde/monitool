@@ -177,6 +177,12 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		delete_form_easy: "¿Esta seguro que quiere suprimir este formulario de entrada?",
+		delete_form_hard: "Si suprime este formulario, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
+		delete_form_hard_answer: "Suprimir las {{num_inputs}} entradas",
+		delete_entity: "Si suprime este lugar de actividad, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
+		delete_entity_answer: "Suprimir las {{num_inputs}} entradas",
+
 		running: "Proyectos en progreso",
 		finished: "Proyectos terminados",
 		noproject: "Ningún proyecto corresponde a este criterio",

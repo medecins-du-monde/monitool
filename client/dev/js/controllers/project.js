@@ -260,18 +260,29 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectInputEntitiesController', function($scope, project) {
+	.controller('ProjectInputEntitiesController', function($scope, $filter, mtFetch, project) {
 		$scope.create = function() {
 			$scope.project.inputEntities.push({id: makeUUID(), name: ''});
 		};
 
-		$scope.delete = function(inputEntityId) {
-			var message = 'Si vous supprimez un lieu d\'activité vous perdrez toutes les saisies associées. Tapez "supprimer" pour confirmer';
+		$scope.delete = function(entityId) {
+			// Fetch this forms inputs.
+			mtFetch.inputs({mode: "ids_by_entity", entityId: entityId}).then(function(inputIds) {
+				var question = $filter('translate')('project.delete_entity', {num_inputs: inputIds.length}),
+					answer = $filter('translate')('project.delete_entity_answer', {num_inputs: inputIds.length});
 
-			if (prompt(message) == 'supprimer') {
-				$scope.project.inputEntities = 
-					$scope.project.inputEntities.filter(function(entity) { return entity.id !== inputEntityId; });
-			}
+				var really = inputIds.length == 0 || (inputIds.length && window.prompt(question) == answer);
+
+				// If there are none, just confirm that the user wants to do this for real.
+				if (really) {
+					$scope.project.inputEntities = $scope.project.inputEntities.filter(function(e) { return e.id !== entityId; });
+					$scope.project.inputGroups.forEach(function(group) {
+						var index = group.members.indexOf(entityId);
+						if (index !== -1)
+							group.members.splice(index, 1);
+					});
+				}
+			});
 		};
 	})
 
@@ -359,10 +370,13 @@ angular.module('monitool.controllers.project', [])
 		$scope.usages = result;
 	})
 
-	.controller('ProjectFormEditionController', function($scope, $stateParams, form, indicatorsById) {
+	.controller('ProjectFormEditionController', function($scope, $state, $filter, mtFetch, form, indicatorsById) {
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.indicatorsById = indicatorsById;
+		$scope.formIndex = $scope.project.dataCollection.findIndex(function(f) {
+			return f.id === form.id;
+		});
 
 		$scope.addIntermediary = function() {
 			if (-1 === $scope.form.intermediaryDates.findIndex(function(key) { return !key; }))
@@ -373,13 +387,35 @@ angular.module('monitool.controllers.project', [])
 			$scope.form.intermediaryDates.splice(index, 1);
 		};
 
+		$scope.delete = function() {
+			// Fetch this forms inputs.
+			mtFetch.inputs({mode: "ids_by_form", formId: $scope.form.id}).then(function(inputIds) {
+				var easy_question = $filter('translate')('project.delete_form_easy'),
+					hard_question = $filter('translate')('project.delete_form_hard', {num_inputs: inputIds.length}),
+					answer = $filter('translate')('project.delete_form_hard_answer', {num_inputs: inputIds.length});
+
+				var really = (inputIds.length == 0 && window.confirm(easy_question))
+					|| (inputIds.length && window.prompt(hard_question) == answer);
+
+				// If there are none, just confirm that the user wants to do this for real.
+				if (really) {
+					$scope.project.dataCollection.splice($scope.formIndex, 1);
+					$scope.formIndex = -1;
+					$scope.$parent.save().then(function() {
+						$state.go('main.project.forms');
+					});
+				}
+			});
+		};
+
 		$scope.save = function() {
 			// replace or add the form in the project.
-			var index = $scope.project.dataCollection.findIndex(function(form) { return form.id === $scope.form.id; });
-			if (index === -1)
+			if ($scope.formIndex === -1) {
+				$scope.formIndex = $scope.project.dataCollection.length
 				$scope.project.dataCollection.push(angular.copy($scope.form));
+			}
 			else
-				$scope.project.dataCollection[index] = angular.copy($scope.form);
+				$scope.project.dataCollection[$scope.formIndex] = angular.copy($scope.form);
 
 			// call ProjectMenuController save method.
 			return $scope.$parent.save().then(function() {

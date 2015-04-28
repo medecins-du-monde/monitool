@@ -177,6 +177,12 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		delete_form_easy: "Are you sure to delete this input form?",
+		delete_form_hard: "If you delete this input form, all linked entries will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
+		delete_form_hard_answer: "Delete the {{num_inputs}} inputs",
+		delete_entity: "If you delete this input entity, all linked entries will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
+		delete_entity_answer: "Delete the {{num_inputs}} inputs",
+
 		running: "Running projects",
 		finished: "Finished projects",
 		noproject: "No projects match this criteria",

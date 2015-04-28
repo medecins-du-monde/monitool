@@ -25,6 +25,18 @@ var Input = module.exports = {
 				callback(null, result.rows.map(function(item) { return item.id; }));
 			});
 		}
+		else if (options.mode === 'ids_by_form') {
+			opt = {startkey: [options.formId], endkey: [options.formId, {}]};
+			database.view('reporting', 'inputs_by_form_date', opt, function(error, result) {
+				callback(null, result.rows.map(function(item) { return item.id; }));
+			});
+		}
+		else if (options.mode === 'ids_by_entity') {
+			opt = {startkey: [options.entityId], endkey: [options.entityId, {}]};
+			database.view('reporting', 'inputs_by_entity_date', opt, function(error, result) {
+				callback(null, result.rows.map(function(item) { return item.id; }));
+			});
+		}
 		else if (['project_inputs', 'entity_inputs', 'form_inputs'].indexOf(options.mode) !== -1) {
 			var filter   = options.mode.replace(/_inputs$/, ''),
 				viewName = 'inputs_by_' + filter + '_date',

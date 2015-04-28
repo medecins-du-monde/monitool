@@ -177,6 +177,12 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		delete_form_easy: "Voulez-vous vraiment supprimer ce planning de saisie?",
+		delete_form_hard: "Si vous supprimez ce planning, toutes les saisies associées seront supprimés. Tapez \"Supprimer les {{num_inputs}} saisies\" pour confirmer",
+		delete_form_hard_answer: "Supprimer les {{num_inputs}} saisies",
+		delete_entity: "Si vous supprimez ce lieu d'activité, toutes les saisies associées seront supprimés. Tapez \"Supprimer les {{num_inputs}} saisies\" pour confirmer",
+		delete_entity_answer: "Supprimer les {{num_inputs}} saisies",
+
 		running: "Projets en cours",
 		finished: "Projets terminés",
 		noproject: "Aucun projet ne correspond à ce critère",

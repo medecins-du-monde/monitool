@@ -170,5 +170,10 @@
 			<i class="fa fa-undo"></i>
 			<span translate="shared.remove_changes"></span>
 		</button>
+
+		<button ng-click="delete()" ng-if="formIndex !== -1" class="btn btn-danger">
+			<i class="fa fa-times"></i>
+			<span translate="shared.delete"></span>
+		</button>
 	</div>
 </form>
