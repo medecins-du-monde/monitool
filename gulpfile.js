@@ -41,6 +41,7 @@ var files = {
 			'client/dev/bower_components/angular-translate/angular-translate.min.js',
 			// 'client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
 			'client/dev/js/ui-bootstrap-tpls-0.13.0-SNAPSHOT.min.js',
+			'client/dev/js/ui-bootstrap-override.min.js',
 			'client/dev/bower_components/angular-bootstrap-show-errors/src/showErrors.min.js',
 			'client/dev/bower_components/angular-ui-select/dist/select.min.js',
 			'client/dev/bower_components/angular-cookies/angular-cookies.min.js',
