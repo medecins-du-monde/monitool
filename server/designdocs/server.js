@@ -23,37 +23,41 @@ module.exports = {
 			reduce: '_count'
 		},
 
-		// query(indicator) => returns the list of all indicators and project that use it.
 		reverse_dependencies: {
 			map: function(doc) {
 				if (doc.type === 'indicator') {
-					// theme & type dependencies
-					doc.themes.forEach(function(id) { emit(id); });
-					doc.types.forEach(function(id) { emit(id); });
-
-					// indicator dependencies
-					for (var formulaId in doc.formulas)
-						for (var key in doc.formulas[formulaId].parameters)
-							emit(doc.formulas[formulaId].parameters[key]);
+					doc.themes.forEach(function(id) { emit(id, "indicator_on_theme"); });
+					doc.types.forEach(function(id) { emit(id, "indicator_on_type"); });
 				}
 				else if (doc.type === 'project') {
-					// user deps
-					doc.owners.forEach(function(name) { emit(name); });
-					doc.dataEntryOperators.forEach(function(name) { emit(name); });
+					var users = doc.owners.concat(doc.dataEntryOperators).sort(),
+						numUsers = users.length;
 
-					// indicator deps
-					Object.keys(indicators).forEach(function(id) { emit(id); });
+					for (var i = 1; i < numUsers; ++i) {
+						if (users[i - 1] == users[i]) {
+							users.splice(i, 1);
+							i--;
+							numUsers--;
+						}
+					}
+					users.forEach(function(name) { emit(name, "project_on_user"); });
 
+					for (var indicatorId in doc.indicators)
+						emit(indicatorId, "project_on_indicator");
+					
 					doc.dataCollection.forEach(function(form) {
 						form.fields.forEach(function(field) {
-							if (field.type === 'formula')
-								emit(field.formulaId);
+							if (field.type === 'formula') {
+								emit(field.formulaId, "project_on_formula");
+							}
 						});
 					});
 				}
-				
+
 			}.toString(),
 			reduce: '_count'
 		}
 	}
 };
+
+
