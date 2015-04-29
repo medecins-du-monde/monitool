@@ -193,7 +193,7 @@ var ENGLISH_TRANSLATION = {
 		value: "Value",
 		raw_data: "Raw data",
 		planning: "Planning",
-		indicators_computation: "Indicadors computation",
+		indicators_computation: "Indicators computation",
 		partition: "Partition",
 		additional_partition: "Additional partition",
 		new_partition: "Add a partition",
