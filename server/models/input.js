@@ -22,19 +22,28 @@ var Input = module.exports = {
 			// used for late inputs
 			opt = {startkey: [options.projectId], endkey: [options.projectId, {}]};
 			database.view('reporting', 'inputs_by_project_date', opt, function(error, result) {
-				callback(null, result.rows.map(function(item) { return item.id; }));
+				if (result && result.rows)
+					callback(null, result.rows.map(function(item) { return item.id; }));
+				else
+					callback(null, []);
 			});
 		}
 		else if (options.mode === 'ids_by_form') {
 			opt = {startkey: [options.formId], endkey: [options.formId, {}]};
 			database.view('reporting', 'inputs_by_form_date', opt, function(error, result) {
-				callback(null, result.rows.map(function(item) { return item.id; }));
+				if (result && result.rows)
+					callback(null, result.rows.map(function(item) { return item.id; }));
+				else
+					callback(null, []);
 			});
 		}
 		else if (options.mode === 'ids_by_entity') {
 			opt = {startkey: [options.entityId], endkey: [options.entityId, {}]};
 			database.view('reporting', 'inputs_by_entity_date', opt, function(error, result) {
-				callback(null, result.rows.map(function(item) { return item.id; }));
+				if (result && result.rows)
+					callback(null, result.rows.map(function(item) { return item.id; }));
+				else
+					callback(null, []);
 			});
 		}
 		else if (['project_inputs', 'entity_inputs', 'form_inputs'].indexOf(options.mode) !== -1) {
@@ -49,8 +58,12 @@ var Input = module.exports = {
 				options[param],
 				function(curParamId, callback) {
 					var opt = {startkey: [curParamId, options.begin || null], endkey: [curParamId, options.end || {}], include_docs: true};
+
 					database.view('reporting', viewName, opt, function(error, result) {
-						callback(null, result.rows.map(function(item) { return item.doc; }));
+						if (result && result.rows)
+							callback(null, result.rows.map(function(item) { return item.doc; }));
+						else
+							callback(null, []);
 					});
 				},
 				function(error, results) {
