@@ -2,45 +2,6 @@
 
 angular.module('monitool.services.reporting', [])
 
-	// FIXME this should be in a directive and should not touch the model.
-	.factory('mtFormula', function($q) {
-		return {
-			/**
-			 * In: {expression: "a + b", parameters: {a: 42}}
-			 * Out {expression: "a + b", parameters: {a: 42}, symbols: ['a', 'b'], isValid: false}
-			 */
-			annotate: function(formula) {
-				var symbols;
-
-				formula.__isValid = true;
-				try {
-					formula.__symbols = Parser.parse(formula.expression).variables();
-				}
-				catch (e) { 
-					formula.__symbols = [];
-					formula.__isValid = false;
-				}
-
-				formula.__symbols.forEach(function(symbol) {
-					if (!formula.parameters[symbol])
-						formula.parameters[symbol] = {name: "", geoAggregation: "sum", timeAggregation: "sum"};
-
-					if (!formula.parameters[symbol].name.length)
-						formula.__isValid = false;
-				})
-			},
-
-			/**
-			 * Clean up
-			 */
-			clean: function(formula) {
-				for (var key in formula.parameters)
-					if (formula.__symbols.indexOf(key) === -1)
-						delete formula.parameters[key];
-			},
-		}
-	})
-
 	// TODO profiling this piece of code for perfs could not hurt.
 	// we will see how bad if performs on the wild.
 	.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegroup) {

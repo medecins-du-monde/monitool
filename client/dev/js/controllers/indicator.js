@@ -7,35 +7,23 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.searchField = '';
 	})
 	
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, mtFormula, indicator, types, themes) {
+	.controller('IndicatorEditController', function($state, $scope, $stateParams, indicator, types, themes) {
+		$scope.indicator = indicator;
+		$scope.master = angular.copy(indicator);
+		$scope.types = types;
+		$scope.themes = themes;
+
 		// Formula handlers
 		$scope.addFormula = function() {
-			var uuid  = makeUUID(),
-				value = {expression: '', parameters: {}};
-
-			$scope.indicator.formulas[uuid] = value;
+			$scope.indicator.formulas[makeUUID()] = {expression: '', parameters: {}};
 		};
 
 		$scope.deleteFormula = function(formulaId) {
 			delete $scope.indicator.formulas[formulaId];
 		};
 
-		$scope.formulasAreValid = true;
-		$scope.$watch('indicator.formulas', function() {
-			$scope.formulasAreValid = true;
-			for (var formulaId in $scope.indicator.formulas) {
-				mtFormula.annotate($scope.indicator.formulas[formulaId]);
-				if (!$scope.indicator.formulas[formulaId].__isValid)
-					$scope.formulasAreValid = false;
-			}
-		}, true);
-
 		// Form actions
 		$scope.save = function() {
-			// remove unused parameters
-			for (var formulaId in $scope.indicator.formulas)
-				mtFormula.clean($scope.indicator.formulas[formulaId]);
-
 			// create random id if new indicator
 			if ($stateParams.indicatorId === 'new')
 				$scope.indicator._id = makeUUID();
@@ -54,12 +42,6 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.reset = function() {
 			$scope.indicator = angular.copy($scope.master);
 		};
-
-		// init scope
-		$scope.indicator = indicator;
-		$scope.master = angular.copy(indicator);
-		$scope.types = types;
-		$scope.themes = themes;
 	})
 	
 	.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, indicatorsById) {

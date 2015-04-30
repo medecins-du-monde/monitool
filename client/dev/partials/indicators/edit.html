@@ -164,8 +164,7 @@
 		<div class="form-group">
 			<label for="name" class="col-sm-2 control-label" translate="indicator.formulas"></label>
 			<div class="col-sm-10">
-
-				<div formula="formula" ng-repeat="formula in indicator.formulas"></div>
+				<div formula="formula" id="formulaId" ng-repeat="(formulaId, formula) in indicator.formulas"></div>
 
 				<button class="btn btn-default" ng-click="addFormula()" acl-has-role="indicator">
 					<i class="fa fa-plus"></i>
@@ -176,7 +175,7 @@
 	</fieldset>
 
 	<div class="pull-right" acl-has-role="indicator">
-		<button class="btn btn-primary" ng-disabled="indicatorForm.$invalid || isUnchanged() || !formulasAreValid" ng-click="save()">
+		<button class="btn btn-primary" ng-disabled="indicatorForm.$invalid || isUnchanged()" ng-click="save()">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>
 		</button>
