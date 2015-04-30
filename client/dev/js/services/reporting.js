@@ -516,37 +516,39 @@ angular.module('monitool.services.reporting', [])
 					if (!element)
 						delete values[elementId];
 
-					var numPartitions1 = element.partition1.length,
-						numPartitions2 = element.partition2.length,
-						p1, p2;
-					
-					if (numPartitions1 && numPartitions2) {
-						if (typeof value !== 'object')
-							delete values[elementId];
-
-						else for (p1 in value) {
-							// if the partition does not exists or is not a hashmap
-							if (!element.partition1.find(function(p) { return p.id === p1; }) || typeof value[p1] !== 'object')
-								delete value[p1];
-
-							else for (p2 in value[p1])
-								// if the partition does not exists or is not a number
-								if (!element.partition2.find(function(p) { return p.id === p2; }) || typeof value[p1][p2] !== 'number')
-									delete value[p1][p2];
-						}
-					}
-					else if (numPartitions1) {
-						if (typeof value !== 'object')
-							delete values[elementId];
-
-						else for (p1 in value)
-							// if the partition does not exists or is not a number
-							if (!element.partition1.find(function(p) { return p.id === p1; }) || typeof value[p1] !== 'number')
-								delete value[p1];
-					}
 					else {
-						if (typeof value !== "number")
-							delete values[elementId];
+						var numPartitions1 = element.partition1.length,
+							numPartitions2 = element.partition2.length,
+							p1, p2;
+						
+						if (numPartitions1 && numPartitions2) {
+							if (typeof value !== 'object')
+								delete values[elementId];
+
+							else for (p1 in value) {
+								// if the partition does not exists or is not a hashmap
+								if (!element.partition1.find(function(p) { return p.id === p1; }) || typeof value[p1] !== 'object')
+									delete value[p1];
+
+								else for (p2 in value[p1])
+									// if the partition does not exists or is not a number
+									if (!element.partition2.find(function(p) { return p.id === p2; }) || typeof value[p1][p2] !== 'number')
+										delete value[p1][p2];
+							}
+						}
+						else if (numPartitions1) {
+							if (typeof value !== 'object')
+								delete values[elementId];
+
+							else for (p1 in value)
+								// if the partition does not exists or is not a number
+								if (!element.partition1.find(function(p) { return p.id === p1; }) || typeof value[p1] !== 'number')
+									delete value[p1];
+						}
+						else {
+							if (typeof value !== "number")
+								delete values[elementId];
+						}
 					}
 				}
 			}
