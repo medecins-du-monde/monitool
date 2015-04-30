@@ -260,7 +260,7 @@ angular
 	.directive('formEditRawData', function() {
 		return {
 			restrict: "AE",
-			templateUrl: "partials/project/planning/edit-raw-data.html",
+			templateUrl: "partials/projects/planning/edit-raw-data.html",
 			scope: true,
 			link: function($scope, element) {
 				$scope.rawData = $scope.form.rawData;
@@ -495,7 +495,7 @@ angular
 	 .directive('formEditFilter', function(formEditUtils) {
 		return {
 			restrict: "AE",
-			templateUrl: "partials/projects/planing/edit-filter.html",
+			templateUrl: "partials/projects/planning/edit-filter.html",
 			scope: {
 				'element': '=',
 				'arrayFilter': '=value'
