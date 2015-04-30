@@ -93,7 +93,7 @@ angular.module('monitool.controllers.project', [])
 			if (indicatorId === 'new')
 				indicatorIdPromise = $modal.open({
 					controller: 'ProjectLogicalFrameIndicatorSelectionController',
-					templateUrl: 'partials/projects/logical-frame-indicator-selector.html',
+					templateUrl: 'partials/projects/logframe/indicator-select.html',
 					size: 'lg',
 					scope: $scope,
 					resolve: {
@@ -113,7 +113,7 @@ angular.module('monitool.controllers.project', [])
 					// edit.
 					$modal.open({
 						controller: 'ProjectLogicalFrameIndicatorEditionController',
-						templateUrl: 'partials/projects/logical-frame-indicator-edition.html',
+						templateUrl: 'partials/projects/logframe/indicator-edit.html',
 						size: 'lg',
 						scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
 						resolve: {indicatorId: function() { return chosenIndicatorId; }, target: function() { return target; }}
@@ -535,7 +535,7 @@ angular.module('monitool.controllers.project', [])
 		$scope.addReportGrid = function(index) {
 			$modal.open({
 				controller: 'ProjectReportingAnalysisDataSelectionController',
-				templateUrl: 'partials/projects/reporting-analysis-select-data.html',
+				templateUrl: 'partials/projects/reporting/analysis-select-data.html',
 				size: 'lg', scope: $scope, resolve: { indicatorsById: function() { return indicatorsById; } }
 			}).result.then(function(result) {
 				result.type = 'data';

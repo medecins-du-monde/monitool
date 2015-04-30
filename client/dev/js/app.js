@@ -36,20 +36,29 @@ var getPeriods = function(form, project) {
 
 var app = angular.module('monitool.app', [
 	'angularMoment',
+
 	'monitool.controllers.admin',
 	'monitool.controllers.helper',
 	'monitool.controllers.indicator',
 	'monitool.controllers.project',
+
 	'monitool.directives.acl',
 	'monitool.directives.form',
+	'monitool.directives.shared',
+	
+	'monitool.directives.indicatorForm',
+	'monitool.directives.projectInput',
 	'monitool.directives.projectLogframe',
 	'monitool.directives.projectForm',
-	'monitool.directives.projectInput',
 	'monitool.directives.reporting',
-	'monitool.filters',
+
+	'monitool.filters.shared',
+	'monitool.filters.indicator',
+
 	'monitool.services.fetch',
 	'monitool.services.reporting',
 	'monitool.services.string',
+	
 	'ngCookies',
 	'ngResource',
 	'pascalprecht.translate',
@@ -281,7 +290,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.logical_frame', {
 		url: '/logical-frame',
-		templateUrl: 'partials/projects/logical-frame.html',
+		templateUrl: 'partials/projects/logframe/edit.html',
 		controller: 'ProjectLogicalFrameController',
 		resolve: {
 			themes: function(mtFetch) {
@@ -292,44 +301,25 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.input_entities', {
 		url: '/input-entities',
-		templateUrl: 'partials/projects/input-entities.html',
+		templateUrl: 'partials/projects/entities/input-entities.html',
 		controller: 'ProjectInputEntitiesController'
-	});
-
-	$stateProvider.state('main.project.input_entities_reporting', {
-		url: '/input-entities/:id',
-		templateUrl: 'partials/projects/reporting.html',
-		controller: 'ProjectReportingController',
-		data: {
-			type: 'entity',
-		}
-
 	});
 
 	$stateProvider.state('main.project.input_groups', {
 		url: '/input-groups',
-		templateUrl: 'partials/projects/input-groups.html',
+		templateUrl: 'partials/projects/entities/input-groups.html',
 		controller: 'ProjectInputGroupsController'
-	});
-
-	$stateProvider.state('main.project.input_groups_reporting', {
-		url: '/input-groups/:id',
-		templateUrl: 'partials/projects/reporting.html',
-		controller: 'ProjectReportingController',
-		data: {
-			type: 'group',
-		}
 	});
 
 	$stateProvider.state('main.project.forms', {
 		url: '/forms',
-		templateUrl: 'partials/projects/form-list.html',
+		templateUrl: 'partials/projects/planning/list.html',
 		controller: 'ProjectFormsController'
 	});
 
 	$stateProvider.state('main.project.form', {
 		url: '/forms/:formId',
-		templateUrl: 'partials/projects/form-edit.html',
+		templateUrl: 'partials/projects/planning/edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
 			form: function($stateParams, project) {
@@ -358,7 +348,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.input_list', {
 		url: '/inputs',
-		templateUrl: 'partials/projects/input-list.html',
+		templateUrl: 'partials/projects/input/list.html',
 		controller: 'ProjectInputListController',
 		resolve: {
 			// FIXME rewrite or move this. It is way to much code for a controller resolve function.
@@ -417,7 +407,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.input', {
 		url: '/input/:period/:formId/:entityId',
-		templateUrl: 'partials/projects/input.html',
+		templateUrl: 'partials/projects/input/edit.html',
 		controller: 'ProjectInputController',
 		resolve: {
 			inputs: function(mtFetch, $stateParams) {
@@ -458,13 +448,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.reporting', {
 		url: '/reporting',
-		templateUrl: 'partials/projects/reporting.html',
+		templateUrl: 'partials/projects/reporting/display.html',
 		controller: 'ProjectReportingController'
 	});
 
 	$stateProvider.state('main.project.reporting_analysis_list', {
 		url: '/reporting-analysis-list',
-		templateUrl: 'partials/projects/reporting-analysis-list.html',
+		templateUrl: 'partials/projects/reporting/analysis-list.html',
 		controller: 'ProjectReportingAnalysisListController',
 		resolve: {
 			reports: function(mtFetch, $stateParams) {
@@ -475,7 +465,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.reporting_analysis', {
 		url: '/reporting-analysis/:reportId',
-		templateUrl: 'partials/projects/reporting-analysis.html',
+		templateUrl: 'partials/projects/reporting/analysis.html',
 		controller: 'ProjectReportingAnalysisController',
 		resolve: {
 			report: function(mtFetch, $stateParams) {
@@ -489,7 +479,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.user_list', {
 		url: '/users',
-		templateUrl: 'partials/projects/user-list.html',
+		templateUrl: 'partials/projects/user/list.html',
 		controller: 'ProjectUserListController',
 		resolve: {
 			users: function(mtFetch) {

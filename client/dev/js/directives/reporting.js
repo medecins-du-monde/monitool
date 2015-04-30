@@ -133,7 +133,7 @@ angular.module('monitool.directives.reporting', [])
 	.directive('reportingQuery', function() {
 		return {
 			restrict: 'AE',
-			templateUrl: 'partials/_directives/reporting-query.html',
+			templateUrl: 'partials/projects/reporting/query.html',
 			scope: {
 				query: "=query"
 			},
@@ -345,7 +345,7 @@ angular.module('monitool.directives.reporting', [])
 	.directive('reportPreview', function() {
 		return {
 			restrict: 'AE',
-			templateUrl: 'partials/_directives/reporting-preview.html',
+			templateUrl: 'partials/projects/reporting/preview.html',
 			scope: {
 				"result": "=data"
 			}

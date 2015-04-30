@@ -260,7 +260,7 @@ angular
 	.directive('formEditRawData', function() {
 		return {
 			restrict: "AE",
-			templateUrl: "partials/_directives/form-edit-raw-data.html",
+			templateUrl: "partials/project/planning/edit-raw-data.html",
 			scope: true,
 			link: function($scope, element) {
 				$scope.rawData = $scope.form.rawData;
@@ -299,7 +299,7 @@ angular
 		return {
 			restrict: "AE",
 			scope: true,
-			templateUrl: 'partials/_directives/form-edit-fields.html',
+			templateUrl: 'partials/projects/planning/edit-fields.html',
 			link: function($scope) {
 				// watch begin and end date.
 				// When they change, we update the list of
@@ -373,7 +373,7 @@ angular
 	 .directive('formEditField', function(formEditUtils) {
 		return {
 			restrict: "AE",
-			templateUrl: "partials/_directives/form-edit-field.html",
+			templateUrl: "partials/projects/planning/edit-field.html",
 			scope: {
 				'field': '=',
 				'indicator': '=',
@@ -495,7 +495,7 @@ angular
 	 .directive('formEditFilter', function(formEditUtils) {
 		return {
 			restrict: "AE",
-			templateUrl: "partials/_directives/form-edit-filter.html",
+			templateUrl: "partials/projects/planing/edit-filter.html",
 			scope: {
 				'element': '=',
 				'arrayFilter': '=value'

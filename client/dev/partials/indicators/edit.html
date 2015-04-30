@@ -164,62 +164,8 @@
 		<div class="form-group">
 			<label for="name" class="col-sm-2 control-label" translate="indicator.formulas"></label>
 			<div class="col-sm-10">
-				<table class="table table-bordered table-condensed"
-					   ng-repeat="(formulaId, formula) in indicator.formulas"
-					   style="border-width: 0 0 0 5px; border-color: {{indicator.formulas[formulaId].__isValid ? '#ddd' : 'darkred'}}">
-					<tr>
-						<td style="width: 250px" translate="indicator.formula"></td>
-						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].expression">
-							<div class="input-group">
-								<input type="text"
-									   class="form-control"
-									   ng-model="indicator.formulas[formulaId].expression"
-									   placeholder="{{'indicator.formula_expression_ph'|translate}}" />
 
-								<span class="input-group-btn">
-									<button class="btn btn-danger" ng-click="deleteFormula(formulaId)" translate="shared.remove"></button>
-								</span>
-							</div>
-						</td>
-					</tr>
-					<tr ng-repeat="symbol in indicator.formulas[formulaId].__symbols">
-						<td>{{'indicator.parameter'|translate}} <strong>"{{symbol}}"</strong></td>
-						<td acl-has-role="indicator" acl-fallback="indicator.formulas[formulaId].parameters[symbol].name">
-
-							<div class="form-group">
-								<label class="col-sm-2 control-label" translate="shared.name"></label>
-								<div class="col-sm-10">
-									<input type="text"
-										   class="form-control"
-										   ng-model="indicator.formulas[formulaId].parameters[symbol].name"
-										   placeholder="" />
-								</div>
-							</div>
-
-							<div class="form-group">
-								<label class="col-sm-2 control-label" translate="indicator.geo_aggregation"></label>
-								<div class="col-sm-10">
-									<select class="form-control" ng-model="indicator.formulas[formulaId].parameters[symbol].geoAggregation">
-										<option value="sum" translate="indicator.geo_aggregation_sum"></option>
-										<option value="average" translate="indicator.geo_aggregation_average"></option>
-										<option value="none" translate="indicator.geo_aggregation_none"></option>
-									</select>
-								</div>
-							</div>
-
-							<div class="form-group">
-								<label class="col-sm-2 control-label" translate="indicator.time_aggregation"></label>
-								<div class="col-sm-10">
-									<select class="form-control" ng-model="indicator.formulas[formulaId].parameters[symbol].timeAggregation">
-										<option value="sum" translate="indicator.time_aggregation_sum"></option>
-										<option value="average" translate="indicator.time_aggregation_average"></option>
-										<option value="none" translate="indicator.time_aggregation_none"></option>
-									</select>									
-								</div>
-							</div>
- 						</td>
-					</tr>
-				</table>
+				<div formula="formula" ng-repeat="formula in indicator.formulas"></div>
 
 				<button class="btn btn-default" ng-click="addFormula()" acl-has-role="indicator">
 					<i class="fa fa-plus"></i>
