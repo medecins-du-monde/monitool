@@ -92,7 +92,7 @@
 				<label for="plot-{{row.id}}" ng-if="!row.hasChildren">{{row.name[language]||row.name||('shared.unknown_indicator'|translate)}}</label>
 
 				<span ng-if="row.hasChildren">
-					<i class="fa" ng-class="{'fa-plus-circle':!open[row.id],'fa-minus-circle':open[row.id]}"></i>
+					<i fa-open="open[row.id]"></i>
 					{{row.name||('shared.unknown_indicator'|translate)}}
 				</span>
 			</td>

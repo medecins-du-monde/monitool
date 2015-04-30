@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="indicator_tree.html">
 	<div class="indicator-level-2" ng-repeat="type in theme.children" ng-if="theme.open">
 		<div class="indicator-header" ng-click="type.open=!type.open">
-			<i class="fa" ng-class="{'fa-plus-circle':!type.open,'fa-minus-circle':type.open}"></i>
+			<i fa-open="type.open"></i>
 			{{type.name[language] || ('indicator.no_type'|translate)}}
 			<span class="badge pull-right" ng-bind="type.children.length"></span>
 		</div>
@@ -53,7 +53,7 @@
 	<div ng-if="showAllIndicators || project.themes.length == 0">
 		<div class="indicator-level-1" ng-repeat="theme in hierarchy|hierarchyFilter:searchField">
 			<div class="indicator-header" ng-click="theme.open=!theme.open">
-				<i class="fa" ng-class="{'fa-plus-circle': !theme.open,'fa-minus-circle':theme.open}"></i>
+				<i fa-open="theme.open"></i>
 				{{theme.name[language]||('indicator.no_theme'|translate)}}
 				<span class="badge pull-right" ng-bind="theme.children.length"></span>
 			</div>
@@ -74,7 +74,7 @@
 		<div ng-if="project.themes.length != 1">
 			<div class="indicator-level-1" ng-repeat="theme in hierarchy|hierarchyFilter:searchField" ng-if="project.themes.indexOf(theme._id) !== -1">
 				<div class="indicator-header" ng-click="theme.open=!theme.open">
-					<i class="fa" ng-class="{'fa-plus-circle':!theme.open,'fa-minus-circle':theme.open}"></i>
+					<i fa-open="theme.open"></i>
 					{{theme.name[language]||('indicator.no_theme'|translate)}}
 					<span class="badge pull-right" ng-bind="theme.children.length"></span>
 				</div>

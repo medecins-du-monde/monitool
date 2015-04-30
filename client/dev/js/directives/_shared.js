@@ -26,6 +26,27 @@ angular.module('monitool.directives.shared', [])
 		}
 	})
 
+	.directive('faOpen', function() {
+		return {
+			restrict: 'AE',
+			scope: { v: "=faOpen" },
+			link: function($scope, element) {
+				element.addClass('fa');
+
+				$scope.$watch('v', function(newValue) {
+					if (newValue) {
+						element.removeClass('fa-plus-circle');
+						element.addClass('fa-minus-circle');
+					}
+					else {
+						element.removeClass('fa-minus-circle');
+						element.addClass('fa-plus-circle');
+					}
+				});
+			}
+		}
+	})
+
 	.directive('docReminder', function() {
 		return {
 			restrict: 'E',
