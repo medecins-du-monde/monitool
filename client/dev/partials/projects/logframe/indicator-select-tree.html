@@ -1,0 +1,28 @@
+
+<div class="indicator-level-2" ng-repeat="type in theme.children" ng-if="theme.open">
+	<div class="indicator-header" ng-click="type.open=!type.open">
+		<i fa-open="type.open"></i>
+		{{type.name[language] || ('indicator.no_type'|translate)}}
+		<span class="badge pull-right" ng-bind="type.children.length"></span>
+	</div>
+
+	<div class="indicator-level-3" ng-repeat="indicator in type.children" ng-if="type.open">
+		<span class="pull-right">
+			{{indicator.__usage}} <i class="fa fa-building-o"></i>
+
+			<a class="btn btn-xs btn-default"
+				ng-click="choose(indicator._id)"
+				ng-disabled="forbidden.indexOf(indicator._id) !== -1"
+				translate="shared.choose"></a>
+		</span>
+
+		<indicator-icon ng-if="project.themes.indexOf(theme._id) !== -1" operation="indicator.operation"></indicator-icon>
+
+		<i class="fa fa-external-link fa-fw"
+			ng-if="project.themes.indexOf(theme._id) === -1"
+			tooltip="{{'indicator.is_external'|translate}}"
+			tooltip-placement="right"></i>
+
+		{{indicator.name[language]}}
+	</div>
+</div>
