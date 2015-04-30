@@ -59,4 +59,18 @@ angular
 				console.log(controller)
 			}
 		}
+	})
+
+	.directive('indicatorIcon', function() {
+		return {
+			restrict: 'E',
+			replace: true,
+			scope: true,
+			template: '<i class="fa fa-fw" ng-class="iconClass" tooltip="{{translationKey|translate}}" tooltip-placement="right"></i>',
+			link: function($scope, element, attributes) {
+				var v = $scope.$eval(attributes.operation);
+				$scope.translationKey = 'indicator.is_' + v;
+				$scope.iconClass = {forbidden: 'fa-ban', common: 'fa-question', recommended: 'fa-book', mandatory: 'fa-asterisk'}[v];
+			}
+		}
 	});

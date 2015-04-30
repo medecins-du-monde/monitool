@@ -103,25 +103,13 @@
 			<div class="col-sm-10">
 				<div class="form-control-static">
 					<p ng-repeat="indicatorId in project.logicalFrame.indicators">
+
 						<i class="fa fa-external-link fa-fw"
 							ng-if="isExternal(indicatorId)"
 							tooltip="{{'indicator.is_external'|translate}}"
 							tooltip-placement="right"></i>
 
-						<i class="fa fa-question fa-fw"
-							ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
-							tooltip="{{'indicator.is_common'|translate}}"
-							tooltip-placement="right"></i>
-
-						<i class="fa fa-book fa-fw"
-							ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'recommended'"
-							tooltip="{{'indicator.is_recommended'|translate}}"
-							tooltip-placement="right"></i>
-
-						<i class="fa fa-asterisk fa-fw"
-							ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
-							tooltip="{{'indicator.is_mandatory'|translate}}"
-							tooltip-placement="right"></i>
+						<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
 
 						<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)"
 						   ng-bind="indicatorsById[indicatorId].name[language]"></a>
@@ -192,20 +180,7 @@
 										tooltip="{{'indicator.is_external'|translate}}"
 										tooltip-placement="right"></i>
 
-									<i class="fa fa-question fa-fw"
-										ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
-										tooltip="{{'indicator.is_common'|translate}}"
-										tooltip-placement="right"></i>
-
-									<i class="fa fa-book fa-fw"
-										ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'recommended'"
-										tooltip="{{'indicator.is_recommended'|translate}}"
-										tooltip-placement="right"></i>
-
-									<i class="fa fa-asterisk fa-fw"
-										ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
-										tooltip="{{'indicator.is_mandatory'|translate}}"
-										tooltip-placement="right"></i>
+									<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
 
 									<a ng-click="editIndicator(indicatorId, purpose.indicators)"
 									   ng-bind="indicatorsById[indicatorId].name[language]"></a>
@@ -271,20 +246,7 @@
 													tooltip="{{'indicator.is_external'|translate}}"
 													tooltip-placement="right"></i>
 
-												<i class="fa fa-question fa-fw"
-													ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
-													tooltip="{{'indicator.is_common'|translate}}"
-													tooltip-placement="right"></i>
-
-												<i class="fa fa-book fa-fw"
-													ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'recommended'"
-													tooltip="{{'indicator.is_recommended'|translate}}"
-													tooltip-placement="right"></i>
-
-												<i class="fa fa-asterisk fa-fw"
-													ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
-													tooltip="{{'indicator.is_mandatory'|translate}}"
-													tooltip-placement="right"></i>
+												<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
 
 												<a ng-click="editIndicator(indicatorId, output.indicators)"
 												   ng-bind="indicatorsById[indicatorId].name[language]"></a>
@@ -351,24 +313,11 @@
 				tooltip="{{'indicator.is_external'|translate}}"
 				tooltip-placement="right"></i>
 
-			<i class="fa fa-question fa-fw"
-				ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'common'"
-				tooltip="{{'indicator.is_common'|translate}}"
-				tooltip-placement="right"></i>
-				
-			<i class="fa fa-book fa-fw"
-				ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'recommended'"
-				tooltip="{{'indicator.is_recommended'|translate}}"
-				tooltip-placement="right"></i>
-
-			<i class="fa fa-asterisk fa-fw"
-				ng-if="!isExternal(indicatorId) && indicatorsById[indicatorId].operation == 'mandatory'"
-				tooltip="{{'indicator.is_mandatory'|translate}}"
-				tooltip-placement="right"></i>
-
+			<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
 
 			<a ng-click="editIndicator(indicatorId, null)">{{indicatorsById[indicatorId].name[language]}}</a>
 		</p>
+
 		<p acl-has-project-role="owner">
 			<a ng-click="editIndicator('new', null)" translate="project.add_indicator"></a>
 		</p>
