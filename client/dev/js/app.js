@@ -58,6 +58,7 @@ var app = angular.module('monitool.app', [
 	'monitool.services.fetch',
 	'monitool.services.reporting',
 	'monitool.services.string',
+	'monitool.services.models.input',
 	
 	'ngCookies',
 	'ngResource',

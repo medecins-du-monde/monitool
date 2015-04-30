@@ -5,6 +5,7 @@
 			<th translate="project.variable"></th>
 			<th translate="project.partition"></th>
 			<th translate="project.additional_partition"></th>
+			<th>Agrégation</th>
 		</tr>
 	</thead>
 	<tbody ng-repeat="section in rawData track by section.id">
@@ -35,13 +36,34 @@
 					<li acl-has-project-role="owner"><a ng-click="newPartition(element.partition2)" translate="project.new_partition"></a></li>
 				</ul>
 			</td>
+			<td>
+				Sur des lieux différents<br/>
+				<select ng-model="element.geoAgg">
+					<option value="none">Ne pas agréger</option>
+					<option value="sum">Somme</option>
+					<option value="average">Moyenne</option>
+					<option value="highest">Plus grand valeure</option>
+					<option value="lowest">Plus petite valeure</option>
+					<option value="last">Dernière valeur</option>
+				</select><br/>
+
+				Sur un même lieu<br/>
+				<select ng-model="element.timeAgg">
+					<option value="none">Ne pas agréger</option>
+					<option value="sum">Somme</option>
+					<option value="average">Moyenne</option>
+					<option value="highest">Plus grand valeure</option>
+					<option value="lowest">Plus petite valeure</option>
+					<option value="last">Dernière valeur</option>
+				</select><br/>
+			</td>
 		</tr>
 		<tr acl-has-project-role="owner">
 			<td ng-if="section.elements.length === 0">
 				<a ng-click="remove(section, rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
 				<span mt-content-editable ng-model="section.name"></span>
 			</td>
-			<td colspan="3" style="text-align: center">
+			<td colspan="4" style="text-align: center">
 				<a ng-click="newVariable(section.elements)"
 				   class="btn btn-xs btn-default" 
 				   style="width: 100%"
@@ -51,7 +73,7 @@
 	</tbody>
 	<tbody acl-has-project-role="owner">
 		<tr>
-			<td colspan="4" style="text-align: center">
+			<td colspan="5" style="text-align: center">
 				<a ng-click="newSection(rawData)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_section"></a>
 			</td>
 		</tr>

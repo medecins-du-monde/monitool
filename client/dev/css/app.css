@@ -322,7 +322,7 @@ tr.indent3 > td:first-child { padding-left: 75px; }
 
 
   .table-raw-data th {
-    width: 25%;
+    width: 20%;
   }
 
   .remove-action {
@@ -343,3 +343,11 @@ tr.indent3 > td:first-child { padding-left: 75px; }
     border: 1px dashed #ccc;
     margin: 3px;
   }*/
+
+
+table.formula {
+  border-width: 0 0 0 5px;
+}
+table.formula.error {
+  border-color: darkred;
+}

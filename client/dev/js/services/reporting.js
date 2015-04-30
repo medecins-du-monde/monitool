@@ -4,7 +4,7 @@ angular.module('monitool.services.reporting', [])
 
 	// TODO profiling this piece of code for perfs could not hurt.
 	// we will see how bad if performs on the wild.
-	.factory('mtReporting', function($q, mtFetch, mtCompute, mtRegroup) {
+	.factory('mtReporting', function($q, Input) {
 
 		var getColumns = function(query) {
 			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1) {
@@ -48,76 +48,7 @@ angular.module('monitool.services.reporting', [])
 				throw new Error('Invalid groupBy: ' + query.groupBy)
 		};
 
-		/**
-		 * Retrieve from server all inputs that match (between 2 dates)
-		 * - a given project
-		 * - a given indicator
-		 * - a group or an entity
-		 */
-		var getInputs = function(query) {
-			// Retrieve all relevant inputs.
-			var options;
-			if (query.type === 'project' || query.type === 'group')
-				options = {mode: 'project_inputs', begin: query.begin, end: query.end, projectId: query.project._id};
-
-			else if (query.type === 'entity')
-				options = {mode: 'entity_inputs', begin: query.begin, end: query.end, entityId: query.id};
-
-			else if (query.type === 'indicator')
-				// we want all inputs from a form with the relevant formId
-				options = {
-					mode: 'form_inputs',
-					begin: query.begin, end: query.end,
-					formId: query.projects.map(function(p) {
-						var form = p.dataCollection.find(function(f) {
-							return !!f.fields.find(function(field) { return query.indicator._id === field.indicatorId });
-						});
-						return form ? form.id : null;
-					}).filter(function(form) { return form; })
-				};
-			else
-				throw new Error('query.type must be indicator, project, group or entity');
-
-			return mtFetch.inputs(options).then(function(inputs) {
-				// Discard all inputs that are not relevant.
-				if (query.type === 'project')
-					inputs = inputs.filter(function(input) { return input.project === query.project._id; });
-
-				else if (query.type === 'entity')
-					inputs = inputs.filter(function(input) { return input.entity === query.id; });
-
-				else if (query.type === 'group')
-					inputs = inputs.filter(function(input) {
-						var project = query.project || query.projects.find(function(p) { return p._id === input.project; }),
-							group   = project.inputGroups.find(function(g) { return g.id === query.id; });
-
-						return group.members.indexOf(input.entity) !== -1;
-					});
-
-				return inputs;
-			});
-		};
-
-		var getPreprocessedInputs = function(query) {
-			return getInputs(query).then(function(inputs) {
-				var numInputs = inputs.length;
-
-				// For all of them, compute indicators leafs.
-				for (var i = 0; i < numInputs; ++i) {
-					var input   = inputs[i],
-						project = query.project || query.projects.find(function(p) { return p._id === input.project; }),
-						form    = project.dataCollection.find(function(f) { return f.id === input.form; });
-					
-					mtCompute.sanitizeRawData(input.values, form);
-					input.compute = mtCompute.computeIndicatorsLeafsFromRaw(input.values, form);
-					input.aggregation = mtRegroup.computeAggregationFields(input, project);
-				}
-
-				return inputs;
-			});
-		};
-
-		var getIndicatorsRowsFromReporting = function(project, result, cols, indicatorsById) {
+		var formatLogFrameReporting = function(project, result, cols, indicatorsById) {
 
 			var getUnassignedIndicatorIds = function(project) {
 				var assigned = {};
@@ -168,7 +99,7 @@ angular.module('monitool.services.reporting', [])
 			return logFrameReport;
 		};
 
-		var getRawDataRowsFromReporting = function(project, result, cols) {
+		var formatRawDataReporting = function(project, result, cols) {
 			var sum = function(hash) {
 				if (typeof hash === 'number')
 					return hash;
@@ -238,38 +169,64 @@ angular.module('monitool.services.reporting', [])
 			return rows;
 		};
 
-		var getProjectReporting = function(preprocessedInputs, query, indicatorsById) {
+		var computeProjectReporting = function(allInputs, query, indicatorsById) {
 			var cols = getColumns(query), result = {};
 
 			query.project.dataCollection.forEach(function(form) {
 				// Take all inputs that match our form.
-				var inputs = preprocessedInputs.filter(function(input) { return input.form === form.id; });
+				var inputs = allInputs.filter(function(input) { return input.form === form.id; });
 
 				// Regroup them by the requested groupBy
-				var regrouped = mtRegroup.regroupInputs(inputs, form, query.groupBy, indicatorsById);
+				var regrouped = Input.aggregate(inputs, form, query.groupBy, query.project.inputsGroups);
 
-				// For each regrouped result, compute the indicators values.
+				// For each regrouped input, compute the indicators values.
 				for (var regroupKey in regrouped) {
-
-					regrouped[regroupKey].compute = mtCompute.computeIndicatorsFromLeafs(regrouped[regroupKey].compute, form, indicatorsById);
-
-					// we now have {values: {rawId: 45, rawId: {partId: 45}, ... }, compute: {indId: 45}}
+					// Create a hash to receive the final results if it's not done yet.
 					if (!result[regroupKey])
 						result[regroupKey] = {values: {}, compute: {}};
 
-					// we must take care when computing the union of all forms,
-					// => because after aggregating over time, we may have conflicts on indicators.
-					// (if 1 indicator gets computed by two different forms.
-					for (var indicatorId in regrouped[regroupKey].compute) {
-						result[regroupKey].compute[indicatorId] =
-							result[regroupKey].compute[indicatorId] ?
-							'FORM_CONFLICT' :
-							regrouped[regroupKey].compute[indicatorId];
-					}
+					var input = regrouped[regroupKey];
 
-					// variables are different: we use guids across forms so there should be no problems at all
-					for (var rawId in regrouped[regroupKey].values)
-						result[regroupKey].values[rawId] = regrouped[regroupKey].values[rawId];
+					// Copy raw data into final result.
+					// we use guids across forms so no collision check is needed.
+					for (var rawId in input.values)
+						result[regroupKey].values[rawId] = input.values[rawId];
+
+					// Compute indicators and write them in the final result.
+					form.fields.forEach(function(field) {
+						// check if this indicator was already computed by another form.
+						if (result[regroupKey].compute[field.indicatorId])
+							result[regroupKey].compute[field.indicatorId] = 'FORM_CONFLICT';
+
+						else {
+							var indicatorValue;
+
+							if (field.type === 'zero')
+								indicatorValue = 0;
+							else if (field.type === 'raw')
+								indicatorValue = input.extractRawValue(field.rawId, field.filter);
+							else if (field.type === 'formula') {
+								var formula = indicatorsById[field.indicatorId].formulas[field.formulaId],
+									localScope = {};
+
+								for (var key in field.parameters) {
+									if (field.parameters[key].type === 'zero')
+										localScope[key] = 0;
+									else if (field.parameters[key].type === 'raw')
+										localScope[key] = input.extractRawValue(field.parameters[key].rawId, field.parameters[key].filter);
+									else
+										throw new Error('Invalid subfield type.');
+
+									try { indicatorValue = Parser.evaluate(formula.expression, localScope); }
+									catch (e) { console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope)); }
+								}
+							}
+							else
+								throw new Error('Invalid field type.');
+
+							result[regroupKey].compute[field.indicatorId]
+						}
+					});
 				}
 			});
 
@@ -280,8 +237,7 @@ angular.module('monitool.services.reporting', [])
 			};
 		};
 
-
-		var getIndicatorReporting = function(inputs, query, indicatorById) {
+		var computeIndicatorReporting = function(inputs, query, indicatorById) {
 			var rows = [];
 
 			query.projects.forEach(function(project) {
@@ -313,6 +269,12 @@ angular.module('monitool.services.reporting', [])
 			return { cols: getColumns(query), rows: rows };
 		};
 
+		/**
+		 * Given a project, find a default start date that makes sense to compute statistics
+		 * - project is older than one year => one year ago
+		 * - project started less than a year ago => project start
+		 * - project starts in the future => now
+		 */
 		var getDefaultStartDate = function(project) {
 			var result = moment().subtract(1, 'year');
 			if (project && result.isBefore(project.begin))
@@ -320,6 +282,10 @@ angular.module('monitool.services.reporting', [])
 			return result.format('YYYY-MM-DD');
 		};
 
+		/**
+		 * Given a project, find a default end date that makes sense to compute statistics
+		 * In fact, this always return the current date.
+		 */
 		var getDefaultEndDate = function(project) {
 			return moment().format('YYYY-MM-DD');
 		};
@@ -329,303 +295,9 @@ angular.module('monitool.services.reporting', [])
 			getDefaultStartDate: getDefaultStartDate,
 			getDefaultEndDate: getDefaultEndDate,
 
-			getPreprocessedInputs: getPreprocessedInputs,
-			getProjectReporting: getProjectReporting,
-			getIndicatorReporting: getIndicatorReporting,
+			computeProjectReporting: computeProjectReporting,
+			computeIndicatorReporting: computeIndicatorReporting,
 		};
 	})
 
 	
-	.factory('mtRegroup', function() {
-
-		var _dummySum = function(memo, obj) {
-			for (var key in obj)
-				if (typeof memo[key] === 'number')
-					memo[key] += obj[key];
-				else if (typeof memo[key] === 'string') // AGG_CONFLICT, or other errors.
-					;
-				else if (memo[key])
-					_dummySum(memo[key], obj[key]);
-				else
-					memo[key] = angular.copy(obj[key]);
-		};
-
-		var _processRaw = function(value, count, indicatorAggregation) {
-			// if there was only one input, we don't care how to avg/sum etc, and just return the value
-			if (count > 1) {
-				if (indicatorAggregation === 'average')
-					return value / count;
-				else if (indicatorAggregation === 'sum')
-					return value;
-				else if (indicatorAggregation === 'none')
-					return 'AGG_CONFLICT';
-				else
-					throw new Error('Invalid aggregation type');
-			}
-			else
-				return value;
-		};
-
-
-		/**
-		 * This methods adds yearAgg, monthAgg, weekAgg, dayAgg, entityAgg and groupAgg fields for all inputs.
-		 * Each field is an array that will tell us which columns this input belongs to (each input can belong to multiple columns)
-		 */
-		var computeAggregationFields = function(input, project) {
-			// annotate each input with keys that will later tell the sumBy function how to aggregate the data.
-			var period = moment(input.period);
-
-			var result = {
-				year:    ['total', period.format('YYYY')],
-				quarter: ['total', period.format('YYYY-[Q]Q')],
-				month:   ['total', period.format('YYYY-MM')],
-				week:    ['total', period.format('YYYY-[W]WW')],
-				day:     ['total', period.format('YYYY-MM-DD')]
-			};
-
-			// some inputs are linked to the projet => they don't have any entity field.
-			if (input.entity !== 'none') {
-				result.entity = ['total', input.entity];
-
-				// no total here, groups may have a non-empty intersection.
-				result.group = project.inputGroups.filter(function(group) {
-					return group.members.indexOf(input.entity) !== -1;
-				}).map(function(group) {
-					return group.id;
-				});
-			}
-			else {
-				result.entity = ['total'];
-				result.group = [];
-			}
-
-			return result;
-		};
-
-		/**
-		 * Inputs must always come from the same form!!!!
-		 * FIXME => this is wrong. We need tests!
-		 */
-		var regroupInputs = function(inputs, form, groupBy, indicatorsById) {
-			var result  = {},
-				aggType = ['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'timeAggregation' : 'geoAggregation';
-
-			// start by dummy summing all inputs by their groupBy key
-			inputs.forEach(function(input) {
-				input.aggregation[groupBy].forEach(function(key) {
-					if (!result[key])
-						result[key] = {compute: {}, values: {}};
-
-					_dummySum(result[key].compute, input.compute);
-					_dummySum(result[key].values, input.values);
-				});
-			});
-
-			// Then we need to check the definition of the indicators!
-			// - If we summed indicators that needed to be averaged we should correct it.
-			// - If we summed indicators that are not summable, we need to delete them from the final result.
-			for (var groupKey in result) {
-				var computed = result[groupKey].compute;
-
-				form.fields.forEach(function(field) {
-					var indicator = indicatorsById[field.indicatorId];
-
-					if (field.type === 'formula') {
-						var formula = indicator.formulas[field.formulaId];
-
-						// we could iterate on either formula.parameters, field.parameters or result[groupKey][indicatorId].
-						// field.parameter may be wrong though (if the form changed since the input was made).
-						for (var key in formula.parameters) { 
-							computed[field.indicatorId][key] = _processRaw(
-								computed[field.indicatorId][key],	// value.
-								computed.count,						// number of inputs that were aggregated to do this.
-								formula.parameters[key][aggType]	// geoAggregation/timeAggregation
-							);
-						}
-					}
-					else if (field.type === 'raw')
-						computed[field.indicatorId] = _processRaw(computed[field.indicatorId], computed.count, indicator[aggType])
-				});
-			}
-
-			return result;
-		};
-
-		return {
-			computeAggregationFields: computeAggregationFields,
-			regroupInputs: regroupInputs,
-		}
-	})
-
-	.factory('mtCompute', function() {
-
-		/**
-		 * This method will ensure that an input has a valid format against
-		 * a given form by removing all entries that are not explicitely defined in the form.
-		 */
-		var sanitizeRawData = function(values, form) {
-			var elementsById = {};
-			for (var i = 0, numSections = form.rawData.length; i < numSections; ++i)
-				for (var j = 0, numElements = form.rawData[i].elements.length; j < numElements; ++j)
-					elementsById[form.rawData[i].elements[j].id] = form.rawData[i].elements[j];
-
-			for (var elementId in values) {
-				if (elementId !== 'count') {
-					var element = elementsById[elementId],
-						value   = values[elementId];
-
-					if (!element)
-						delete values[elementId];
-
-					else {
-						var numPartitions1 = element.partition1.length,
-							numPartitions2 = element.partition2.length,
-							p1, p2;
-						
-						if (numPartitions1 && numPartitions2) {
-							if (typeof value !== 'object')
-								delete values[elementId];
-
-							else for (p1 in value) {
-								// if the partition does not exists or is not a hashmap
-								if (!element.partition1.find(function(p) { return p.id === p1; }) || typeof value[p1] !== 'object')
-									delete value[p1];
-
-								else for (p2 in value[p1])
-									// if the partition does not exists or is not a number
-									if (!element.partition2.find(function(p) { return p.id === p2; }) || typeof value[p1][p2] !== 'number')
-										delete value[p1][p2];
-							}
-						}
-						else if (numPartitions1) {
-							if (typeof value !== 'object')
-								delete values[elementId];
-
-							else for (p1 in value)
-								// if the partition does not exists or is not a number
-								if (!element.partition1.find(function(p) { return p.id === p1; }) || typeof value[p1] !== 'number')
-									delete value[p1];
-						}
-						else {
-							if (typeof value !== "number")
-								delete values[elementId];
-						}
-					}
-				}
-			}
-		};
-
-
-		var _processFieldLeafs = function(field, raw) {
-			var result;
-
-			// We need to sum filters.
-			if (field.type === 'raw') {
-				result = 0;
-
-				try {
-					// we support not defining any filter for simple fields.
-					if (!field.filter || !Array.isArray(field.filter) || field.filter.length == 0)
-						result = raw[field.rawId];
-					else
-						field.filter.forEach(function(filterInstance) {
-							var v = raw[field.rawId];
-							if (Array.isArray(filterInstance))
-								// filters can be as long as they want, which is not the case IRL
-								filterInstance.forEach(function(f) { v = v[f]; });
-							else
-								// is the filter is not an array we assume that we can just get the data.
-								v = v[filterInstance];
-
-							// v may be undefined or null if the field was not filled.
-							// we just ignore it in that case.
-							if (typeof v == 'number')
-								result += v;
-						});
-				}
-				catch (e) {
-					// input does not match form structure.
-					// we can skip this whole indicator.
-					return "FORM_CHANGED";
-				}
-			}
-
-			// We just create a branch recurse
-			else if (field.type === 'formula') {
-				result = {};
-				for (var key in field.parameters)
-					result[key] = _processFieldLeafs(field.parameters[key], raw);
-			}
-			else if (field.type === 'zero')
-				result = 0;
-			else
-				throw new Error('Invalid field type.');
-
-			return result;
-		};
-
-		var _processFieldComp = function(field, raw, indicatorsById) {
-			// A raw field is already computed, by nature.
-			if (field.type === 'raw' || field.type === 'zero')
-				return raw;
-			
-			// We need to compute formulas.
-			else if (field.type === 'formula') {
-				var localScope = {};
-				for (var key in field.parameters) {
-					localScope[key] = _processFieldComp(field.parameters[key], raw[key], indicatorsById);
-
-					// Early quit if one of the parameters is missing.
-					if (typeof localScope[key] !== 'number')
-						return localScope[key];
-				}
-
-				var formula = indicatorsById[field.indicatorId].formulas[field.formulaId];
-				try {
-					return Parser.evaluate(formula.expression, localScope);
-				}
-				catch (e) {
-					// the function will return undefined, which is what we want.
-					return 'EVALUATE_ERROR';
-				} 
-			}
-			else
-				throw new Error('Invalid field type.');
-		};
-
-		/**
-		 * This method computes the leafs on the tree used to compute indicators from the raw data.
-		 * This is computed by input, before grouping
-		 */
-		var computeIndicatorsLeafsFromRaw = function(rawData, form) {
-			var computed = {count: 1};
-			
-			form.fields.forEach(function(field) {
-				computed[field.indicatorId] = _processFieldLeafs(field, rawData);
-			});
-
-			return computed;
-		};
-
-		/**
-		 * This method computes the indicators from the leafs.
-		 * This may be called on inputs directly, but is usually used with regrouped results.
-		 */
-		var computeIndicatorsFromLeafs = function(computed, form, indicatorsById) {
-			var result = {};
-
-			form.fields.forEach(function(field) {
-				result[field.indicatorId] = _processFieldComp(field, computed[field.indicatorId], indicatorsById);
-			});
-
-			return result;
-		};
-
-		return {
-			sanitizeRawData: sanitizeRawData,
-			computeIndicatorsFromLeafs: computeIndicatorsFromLeafs,
-			computeIndicatorsLeafsFromRaw: computeIndicatorsLeafsFromRaw,
-		};
-	})
-
-

@@ -493,7 +493,7 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectReportingController', function($scope, $state, mtReporting, indicatorsById) {
+	.controller('ProjectReportingController', function($scope, $state, Input, mtReporting, indicatorsById) {
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
 
@@ -515,11 +515,11 @@ angular.module('monitool.controllers.project', [])
 			// if anything besides groupBy changes, we need to refetch.
 			// FIXME: we could widely optimize this.
 			if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end || oldQuery.id !== newQuery.id)
-				inputsPromise = mtReporting.getPreprocessedInputs(newQuery);
+				inputsPromise = Input.fetchFromQuery(newQuery);
 
 			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
 			inputsPromise.then(function(inputs) {
-				$scope.stats = mtReporting.getProjectReporting(inputs, newQuery, indicatorsById);
+				$scope.stats = mtReporting.computeProjectReporting(inputs, newQuery, indicatorsById);
 			});
 		}, true)
 	})

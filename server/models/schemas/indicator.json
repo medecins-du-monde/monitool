@@ -21,9 +21,6 @@
 		"target": 		   { "type": "string", "enum": ["lower_is_better", "higher_is_better", "around_is_better", "non_relevant"] },
 		"unit":            { "type": "string", "enum": ["‰", "%", ""] },
 
-		"geoAggregation":  { "type": "string", "enum": ["none", "sum", "average"] },
-		"timeAggregation": { "type": "string", "enum": ["none", "sum", "average"] },
-
 		"types": {
 			"type": "array",
 			"uniqueItems": true,

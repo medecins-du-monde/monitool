@@ -54,12 +54,12 @@ angular.module('monitool.services.fetch', [])
 					return Indicator.get({id: id}).$promise;
 			},
 
-			input: function(id) {
-				return id && id !== 'new' ? Input.get({id: id}).$promise : new Input({
-					type: "input",
-					values: {count: 1}
-				});
-			},
+			// input: function(id) {
+			// 	return id && id !== 'new' ? Input.get({id: id}).$promise : new Input({
+			// 		type: "input",
+			// 		values: {count: 1}
+			// 	});
+			// },
 
 			report: function(id) {
 				return id && id !== 'new' ? Report.get({id: id}).$promise : new Report({
