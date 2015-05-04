@@ -3,11 +3,14 @@
 angular
 	.module('monitool.directives.indicatorForm', [])
 
-	.directive('formula', function() {
+	.directive('formula', function($rootScope) {
 		return {
 			templateUrl: 'partials/indicators/edit-formula.html',
 			scope: {formula: '=', id: '='},
 			link: function($scope, $element, attributes, controller) {
+				$scope.translations = {fr: FRENCH_TRANSLATION, es: SPANISH_TRANSLATION, en: ENGLISH_TRANSLATION};
+				$scope.languages = $rootScope.languages;
+
 				var parameters = {};
 
 				$scope.delete = function() {
@@ -28,7 +31,7 @@ angular
 
 						// Add new symbols to formula
 						newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; }).forEach(function(s) {
-							$scope.formula.parameters[s] = parameters[s] || {name: "", geoAggregation: "sum", timeAggregation: "sum"};
+							$scope.formula.parameters[s] = parameters[s] || {fr: "", es: "", en: ""};
 						});
 					}
 				});

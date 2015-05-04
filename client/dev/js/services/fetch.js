@@ -46,19 +46,12 @@ angular.module('monitool.services.fetch', [])
 						comments: angular.copy(tran),
 
 						operation: "common", target: "higher_is_better",
-						unit: "%", geoAggregation: 'none', timeAggregation: 'none',
+						unit: "%",
 						types: [], themes: [], formulas: {}
 					});
 				else
 					return Indicator.get({id: id}).$promise;
 			},
-
-			// input: function(id) {
-			// 	return id && id !== 'new' ? Input.get({id: id}).$promise : new Input({
-			// 		type: "input",
-			// 		values: {count: 1}
-			// 	});
-			// },
 
 			report: function(id) {
 				return id && id !== 'new' ? Report.get({id: id}).$promise : new Report({

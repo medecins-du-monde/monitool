@@ -410,6 +410,7 @@ var SPANISH_TRANSLATION = {
 		formulas: 'Formulas',
 		formula_name_ph: 'Por ejemplo: Porcentaje entre fichas completas y total',
 		formula_expression_ph: 'Por ejemplo: 100 * a / b',
+		param_name_ph: "Por ejemplo: Número de consultaciones prenatales",
 		add_formula: "Añadir una formula",
 		parameter: 'Parametro',
 

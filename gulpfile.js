@@ -173,9 +173,18 @@ gulp.task('update-database', function(callback) {
 						if (doc.formulas[formulaId].parameters[key].timeAggregation) {
 							delete doc.formulas[formulaId].parameters[key].timeAggregation;
 							update = true;
-						} 
+						}
+
 						if (doc.formulas[formulaId].parameters[key].geoAggregation) {
 							delete doc.formulas[formulaId].parameters[key].geoAggregation;
+							update = true;
+						}
+
+						if (doc.formulas[formulaId].parameters[key].name) {
+							doc.formulas[formulaId].parameters[key].fr = doc.formulas[formulaId].parameters[key].name;
+							doc.formulas[formulaId].parameters[key].es = doc.formulas[formulaId].parameters[key].name;
+							doc.formulas[formulaId].parameters[key].en = doc.formulas[formulaId].parameters[key].name;
+							delete doc.formulas[formulaId].parameters[key].name;
 							update = true;
 						}
 					}

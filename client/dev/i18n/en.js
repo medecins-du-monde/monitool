@@ -410,6 +410,7 @@ var ENGLISH_TRANSLATION = {
 		formulas: 'Formulas',
 		formula_name_ph: 'For instance: Percentage between correctly filled forms and total',
 		formula_expression_ph: 'For instance: 100 * a / b',
+		param_name_ph: "For instance: Number of prenatal consultations",
 		add_formula: "Add formula",
 		parameter: 'Parameter',
 

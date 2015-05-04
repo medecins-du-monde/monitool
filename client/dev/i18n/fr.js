@@ -410,6 +410,7 @@ var FRENCH_TRANSLATION = {
 		formulas: 'Formules',
 		formula_name_ph: 'Exemple: Pourcentage entre dossiers patient bien remplis et total',
 		formula_expression_ph: 'Exemple: 100 * a / b',
+		param_name_ph: "Exemple: Nombre de consultations prénatales",
 		add_formula: "Ajouter une formule",
 		parameter: 'Paramètre',
 

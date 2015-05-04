@@ -4,8 +4,7 @@
 	"type": "object",
 	"additionalProperties": false,
 	"required": [
-		"_id", "type", "name",
-		"geoAggregation", "timeAggregation", "unit", "types", "themes", "formulas"
+		"_id", "type", "name", "unit", "types", "themes", "formulas"
 	],
 	"properties": {
 		"_id":  { "$ref": "#/definitions/uuid" },

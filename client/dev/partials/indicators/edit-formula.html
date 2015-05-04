@@ -1,28 +1,31 @@
 
-<ng-form name="formulaForm">
-	<table class="table table-bordered table-condensed formula" ng-class="{error: formulaForm.$invalid}">
-		<tr>
-			<td style="width: 250px" translate="indicator.formula"></td>
-			<td acl-has-role="indicator" acl-fallback="formula.expression">
-				<div class="input-group">
-					<input type="text" class="form-control" ng-model="formula.expression" expression placeholder="{{'indicator.formula_expression_ph'|translate}}" />
+<div ng-form name="formulaForm" class="formula" ng-class="{error: formulaForm.$invalid}">
+	<table class="table table-bordered table-condensed">
+		<thead>
+			<td></td>
+			<th ng-repeat="(code, language) in languages" translate="{{'menu.' + language}}" style="width: 30%"></th>
+		</thead>
 
-					<span class="input-group-btn">
-						<button class="btn btn-danger" ng-click="delete()" translate="shared.remove"></button>
-					</span>
-				</div>
-			</td>
-		</tr>
-		<tr ng-repeat="(symbol, parameter) in formula.parameters">
-			<td>{{'indicator.parameter'|translate}} <strong>"{{symbol}}"</strong></td>
-			<td acl-has-role="indicator" acl-fallback="parameter.name">
-				<div class="form-group">
-					<label class="col-sm-2 control-label" translate="shared.name"></label>
-					<div class="col-sm-10">
-						<input type="text" class="form-control" ng-model="parameter.name" required placeholder="" />
+		<tbody>
+			<tr>
+				<td translate="indicator.formula"></td>
+				<td acl-has-role="indicator" acl-fallback="formula.expression" colspan="3">
+
+					<div class="input-group" style="width: 100%">
+						<input type="text" class="form-control" ng-model="formula.expression" expression placeholder="{{'indicator.formula_expression_ph'|translate}}" />
+
+						<span class="input-group-btn">
+							<a class="btn btn-danger" ng-click="delete()" translate="shared.remove"></a>
+						</span>
 					</div>
-				</div>
-			</td>
-		</tr>
+				</td>
+			</tr>
+			<tr ng-repeat="(symbol, parameter) in formula.parameters">
+				<td>{{'indicator.parameter'|translate}} <strong>"{{symbol}}"</strong></td>
+				<td acl-has-role="indicator" acl-fallback="parameter[code]" ng-repeat="(code, language) in languages">
+					<textarea type="text" class="form-control" ng-model="parameter[code]" required placeholder="{{translations[code].indicator.param_name_ph}}"></textarea>
+				</td>
+			</tr>
+		</tbody>
 	</table>
-</ng-form>
+</div>

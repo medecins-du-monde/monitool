@@ -345,9 +345,13 @@ tr.indent3 > td:first-child { padding-left: 75px; }
   }*/
 
 
-table.formula {
+.formula {
+  border-style: solid;
   border-width: 0 0 0 5px;
+  border-color: #CCC;
+
 }
-table.formula.error {
+
+.formula.error {
   border-color: darkred;
 }
