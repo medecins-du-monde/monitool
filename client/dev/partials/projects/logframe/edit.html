@@ -272,7 +272,7 @@
 														   required/>
 
 													<span class="input-group-btn">
-														<button class="btn btn-danger ng-scope" ng-click="removeActivity(activity, output)" translate="shared.remove">Retirer</button>
+														<a class="btn btn-danger ng-scope" ng-click="removeActivity(activity, output)" translate="shared.remove">Retirer</a>
 													</span>
 												</div>
 											</div>
@@ -287,18 +287,18 @@
 						</div>
 					</div>
 					
-					<button class="btn btn-default" ng-click="addOutput(purpose)" acl-has-project-role="owner">
+					<a class="btn btn-default" ng-click="addOutput(purpose)" acl-has-project-role="owner">
 						<i class="fa fa-plus"></i>
 						<span translate="project.add_output"></span>
-					</button>
+					</a>
 				</ng-form>
 			</div>
 		</div>
 
-		<button class="btn btn-default" ng-click="addPurpose()" acl-has-project-role="owner">
+		<a class="btn btn-default" ng-click="addPurpose()" acl-has-project-role="owner">
 			<i class="fa fa-plus"></i>
 			<span translate="project.add_purpose"></span>
-		</button>
+		</a>
 	</fieldset>
 	<br/>
 
@@ -326,14 +326,14 @@
 	<div acl-has-project-role="owner">
 		<br/><br/>
 
-		<button ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
+		<a ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>
-		</button>
+		</a>
 
-		<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+		<a ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
 			<i class="fa fa-undo"></i>
 			<span translate="shared.remove_changes"></span>
-		</button>
+		</a>
 	</div>
 </form>

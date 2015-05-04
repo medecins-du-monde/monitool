@@ -56,7 +56,6 @@ angular
 				};
 
 				controller.$validate();		
-				console.log(controller)
 			}
 		}
 	})

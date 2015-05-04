@@ -7,65 +7,6 @@
 
 <form class="form-horizontal" role="form" name="indicatorForm" novalidate>
 	<fieldset>
-		<legend translate="indicator.definition"></legend>
-
-		<div ng-repeat="(code, language) in languages">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="panel-title" translate="{{'menu.' + language}}"></div>
-				</div>
-
-				<div class="panel-body">
-					<div class="form-group" show-errors>
-						<label for="input-name-{{code}}" class="col-sm-2 control-label" translate="shared.name"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.name[code]">
-							<textarea id="input-name-{{code}}"
-									  class="form-control"
-									  type="text"
-									  ng-model="indicator.name[code]"
-									  name="name-{{code}}"
-									  placeholder="{{'indicator.name_ph'|translate}}"
-									  required></textarea>
-
-							<p class="help-block" ng-if="indicatorForm['name-' + code].$error.required" translate="form.mandatory"></p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-standard-{{code}}" class="col-sm-2 control-label" translate="indicator.standard"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.standard[code]">
-							<textarea id="input-standard-{{code}}"
-									  class="form-control"
-									  ng-model="indicator.standard[code]"
-									  placeholder="{{'indicator.standard_ph'|translate}}"></textarea>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-sources-{{code}}" class="col-sm-2 control-label" translate="indicator.sources"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.sources[code]">
-							<textarea id="input-sources-{{code}}"
-									  class="form-control"
-									  ng-model="indicator.sources[code]"
-									  placeholder="{{'indicator.sources_ph'|translate}}"></textarea>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="input-comments-{{code}}" class="col-sm-2 control-label" translate="indicator.comments"></label>
-						<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.comments[code]">
-							<textarea id="input-comments-{{code}}"
-									  class="form-control"
-									  ng-model="indicator.comments[code]"
-									  placeholder="{{'indicator.comments_ph'|translate}}"></textarea>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</fieldset>
-
-	<fieldset>
 		<legend translate="indicator.metadata"></legend>
 
 		<div class="form-group">
@@ -128,38 +69,60 @@
 			</div>
 		</div>
 	</fieldset>
+	<fieldset>
+		<legend translate="indicator.definition"></legend>
+
+		<table class="table table-stripped table-condensed table-bordered">
+			<thead>
+				<tr>
+					<th style="width: 10%"></th>
+					<th ng-repeat="(code, language) in languages" translate="{{'menu.' + language}}" style="width: 30%"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<i class="fa fa-question-circle" tooltip-placement="right" tooltip="{{'indicator.name_ph'|translate}}">
+						{{'shared.name'|translate}}
+					</td>
+					<td ng-repeat="(code, language) in languages">
+						<textarea style="display: block; width: 100%; height: 100%" ng-model="indicator.name[code]"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i class="fa fa-question-circle" tooltip-placement="right" tooltip="{{'indicator.standard_ph'|translate}}">
+						{{'indicator.standard'|translate}}
+					</td>
+					<td ng-repeat="(code, language) in languages">
+						<textarea style="display: block; width: 100%; height: 100%" ng-model="indicator.standard[code]"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i class="fa fa-question-circle" tooltip-placement="right" tooltip="{{'indicator.sources_ph'|translate}}">
+						{{'indicator.sources'|translate}}
+					</td>
+					<td ng-repeat="(code, language) in languages">
+						<textarea style="display: block; width: 100%; height: 100%" ng-model="indicator.sources[code]"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i class="fa fa-question-circle" tooltip-placement="right" tooltip="{{'indicator.comments_ph'|translate}}">
+						{{'indicator.comments'|translate}}
+					</td>
+					<td ng-repeat="(code, language) in languages">
+						<textarea style="display: block; width: 100%; height: 100%" ng-model="indicator.comments[code]"></textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</fieldset>
 
 	<fieldset>
 		<legend translate="indicator.computation"></legend>
-
-		<div class="form-group">
-			<label for="input-sum-allowed" class="col-sm-2 control-label" translate="indicator.time_aggregation"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="('indicator.time_aggregation_'+indicator.timeAggregation)|translate">
-				<select class="form-control" ng-model="indicator.timeAggregation">
-					<option value="sum" translate="indicator.time_aggregation_sum"></option>
-					<option value="average" translate="indicator.time_aggregation_average"></option>
-					<option value="none" translate="indicator.time_aggregation_none"></option>
-				</select>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="input-sum-allowed" class="col-sm-2 control-label" translate="indicator.geo_aggregation"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="('indicator.geo_aggregation_'+indicator.geoAggregation)|translate">
-				<select class="form-control" ng-model="indicator.geoAggregation">
-					<option value="sum" translate="indicator.geo_aggregation_sum"></option>
-					<option value="average" translate="indicator.geo_aggregation_average"></option>
-					<option value="none" translate="indicator.geo_aggregation_none"></option>
-				</select>
-
-				<a class="pull-right" ng-click="show_more=!show_more">
-					<i class="fa fa-info"></i>
-					{{'indicator.what_is_aggregation'|translate}}
-				</a>
-
-				<div ng-show="show_more" style="clear: both" ng-bind-html="'indicator.time_aggregation_help'|translate"></div>
-			</div>
-		</div>
 
 		<div class="form-group">
 			<label for="name" class="col-sm-2 control-label" translate="indicator.formulas"></label>

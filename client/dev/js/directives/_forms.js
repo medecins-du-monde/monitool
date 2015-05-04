@@ -10,25 +10,25 @@ angular.module('monitool.directives.form', [])
 		return {
 			restrict: 'A',
 			require: 'ngModel',
-			link: function(scope, elem, attr, ctrl) {
-				scope.$watch(attr.ngMin, function(){
-					ctrl.$setViewValue(ctrl.$viewValue);
+			link: function($scope, elem, attributes, controller) {
+				$scope.$watch(attributes.ngMin, function(){
+					controller.$setViewValue(controller.$viewValue);
 				});
 
 				var minValidator = function(value) {
-					var min = scope.$eval(attr.ngMin) || 0;
+					var min = $scope.$eval(attributes.ngMin) || 0;
 					if (!isEmpty(value) && value < min) {
-						ctrl.$setValidity('ngMin', false);
+						controller.$setValidity('ngMin', false);
 						return undefined;
 					}
 					else {
-						ctrl.$setValidity('ngMin', true);
+						controller.$setValidity('ngMin', true);
 						return value;
 					}
 				};
 
-				ctrl.$parsers.push(minValidator);
-				ctrl.$formatters.push(minValidator);
+				controller.$parsers.push(minValidator);
+				controller.$formatters.push(minValidator);
 			}
 		};
 	})
@@ -37,35 +37,35 @@ angular.module('monitool.directives.form', [])
 		return {
 			restrict: 'A',
 			require: 'ngModel',
-			link: function(scope, elem, attr, ctrl) {
-				scope.$watch(attr.ngMax, function(){
-					ctrl.$setViewValue(ctrl.$viewValue);
+			link: function($scope, elem, attributes, controller) {
+				$scope.$watch(attributes.ngMax, function(){
+					controller.$setViewValue(controller.$viewValue);
 				});
 
 				var maxValidator = function(value) {
-					var max = scope.$eval(attr.ngMax) || Infinity;
+					var max = $scope.$eval(attributes.ngMax) || Infinity;
 					if (!isEmpty(value) && value > max) {
-						ctrl.$setValidity('ngMax', false);
+						controller.$setValidity('ngMax', false);
 						return undefined;
 					}
 					else {
-						ctrl.$setValidity('ngMax', true);
+						controller.$setValidity('ngMax', true);
 						return value;
 					}
 				};
 
-				ctrl.$parsers.push(maxValidator);
-				ctrl.$formatters.push(maxValidator);
+				controller.$parsers.push(maxValidator);
+				controller.$formatters.push(maxValidator);
 			}
 		};
 	})
 
 	.directive('ngEnter', function() {
-		return function (scope, element, attrs) {
+		return function ($scope, element, attributes) {
 			element.bind("keydown keypress", function (event) {
 				if (event.which === 13) {
-					scope.$apply(function(){
-						scope.$eval(attrs.ngEnter);
+					$scope.$apply(function(){
+						$scope.$eval(attributes.ngEnter);
 					});
 
 					event.preventDefault();
@@ -78,21 +78,26 @@ angular.module('monitool.directives.form', [])
 	.directive('mtContentEditable', function() {
 		return {
 			require: 'ngModel',
-			link: function(scope, elm, attrs, ctrl) {
-				elm.attr('contenteditable', true);
+			link: function($scope, element, attributes, controller) {
+				element.attr('contenteditable', true);
 
 				// view -> model
-				elm.on('blur', function() {
-					scope.$apply(function() {
-						var text = elm.text().replace(/\s+/g, " ");
-						elm.html(text);
-						ctrl.$setViewValue(text);
+				element.on('blur', function() {
+					$scope.$apply(function() {
+						var text = element.text()
+
+						console.log(attributes.allowWhitespace)
+						if (!attributes.allowWhitespace)
+							text = text.replace(/\s+/g, " ")
+
+						element.html(text);
+						controller.$setViewValue(text);
 					});
 				});
 
 				// model -> view
-				ctrl.$render = function() {
-					elm.html(ctrl.$viewValue);
+				controller.$render = function() {
+					element.html(controller.$viewValue);
 				};
 			}
 		};

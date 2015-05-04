@@ -45,31 +45,31 @@
 					</span>
 				</td>
 				<td style="text-align: center" acl-has-project-role="owner">
-					<button class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)">
+					<a class="btn btn-danger btn-sm" ng-click="delete(inputGroup.id)">
 						<i class="fa fa-remove"></i>
 						<span translate="shared.delete"></span>
-					</button>
+					</a>
 				</td>
 			</tr>
 		</tbody>
 		<tfoot acl-has-project-role="owner">
 			<tr>
 				<td colspan="3">
-					<button class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate="shared.add"></button>
+					<a class="btn btn-default btn-xs" ng-click="create()" style="width: 100%" translate="shared.add"></a>
 				</td>
 			</tr>
 		</tfoot>
 	</table>
 
 	<div acl-has-project-role="owner" class="noprint">
-		<button ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">
+		<a ng-click="save()" ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>
-		</button>
+		</a>
 
-		<button ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">
+		<a ng-click="reset()" ng-disabled="isUnchanged()"class="btn btn-default">
 			<i class="fa fa-undo"></i>
 			<span translate="shared.remove_changes"></span>
-		</button>
+		</a>
 	</div>
 </form>

@@ -209,6 +209,8 @@ angular.module('monitool.services.models.input', [])
 				formId: form.id,
 				period: period
 			}).$promise.then(function(result) {
+				result.forEach(function(input) { input.sanitize(form); });
+
 				var currentInputId = [projectId, entityId, form.id, period].join(':');
 
 				// both where found
@@ -220,15 +222,11 @@ angular.module('monitool.services.models.input', [])
 					return { current: result[0], previous: null, isNew: false };
 
 				// the current one was not found (and we may or not have found the previous one).
-				var previousInput = result.length ? result[0] : null,
-				newInput          = Input.makeNew(projectId, form, period, entityId)
-				// newInput._id      = currentInputId;
-				// newInput.project  = projectId;
-				// newInput.form     = formId;
-				// newInput.period   = new Date(period);
-				// newInput.entity   = entityId;
-
-				return { current: newInput, previous: previousInput, isNew: true };
+				return {
+					current: Input.makeNew(projectId, form, period, entityId),
+					previous: result.length ? result[0] : null,
+					isNew: true
+				};
 			});
 		};
 

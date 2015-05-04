@@ -270,7 +270,7 @@ angular
 				};
 
 				$scope.newVariable = function(target) {
-					target.push({id: makeUUID(), name: "", partition1: [], partition2: []});
+					target.push({id: makeUUID(), name: "", partition1: [], partition2: [], geoAgg: 'sum', timeAgg: 'sum'});
 				};
 
 				$scope.newPartition = function(target) {
