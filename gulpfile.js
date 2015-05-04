@@ -156,34 +156,46 @@ gulp.task('update-database', function(callback) {
 		var updates = [];
 
 		JSON.parse(result).rows.forEach(function(row) {
-			var doc = row.doc, update = false, keys = ["name"];
-
-			if (doc.type !== 'indicator' && doc.type !== 'type' && doc.type !== 'theme')
-				return;
-
-			if (doc.type === 'indicator')
-				keys.push("name", "standard", "sources", "comments")
-
-			keys.forEach(function(key) {
-				if (typeof doc[key] === 'string') {
-					update = true
-					doc[key] = {en: doc[key], fr: doc[key], es: doc[key]};
-				}
-			});
-
-			if (doc.type === 'indicator' && doc.definition !== undefined) {
-				delete doc.definition;
-				update = true
-			}
+			var doc = row.doc, update = false;
 
 			if (doc.type === 'indicator') {
-				for (var id in doc.formulas) {
-					if (doc.formulas[id].name !== undefined) {
-						delete doc.formulas[id].name;
-						update=true
-					}
+				if (doc.geoAggregation) {
+					delete doc.geoAggregation;
+					update = true;
 				}
+				if (doc.timeAggregation) {
+					delete doc.timeAggregation;
+					update = true;
+				}
+
+				for (var formulaId in doc.formulas)
+					for (var key in doc.formulas[formulaId].parameters) {
+						if (doc.formulas[formulaId].parameters[key].timeAggregation) {
+							delete doc.formulas[formulaId].parameters[key].timeAggregation;
+							update = true;
+						} 
+						if (doc.formulas[formulaId].parameters[key].geoAggregation) {
+							delete doc.formulas[formulaId].parameters[key].geoAggregation;
+							update = true;
+						}
+					}
 			}
+			else if (doc.type == 'project')
+				doc.dataCollection.forEach(function(form) {
+					form.rawData.forEach(function(section) {
+						section.elements.forEach(function(element) {
+							if (!element.timeAgg) {
+								element.timeAgg = 'sum';
+								update = true;
+							}
+
+							if (!element.geoAgg) {
+								element.geoAgg = 'sum';
+								update = true;
+							}
+						});
+					});
+				});
 
 			if (update)
 				updates.push(doc);

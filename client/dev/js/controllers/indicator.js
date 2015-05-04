@@ -44,7 +44,7 @@ angular.module('monitool.controllers.indicator', [])
 		};
 	})
 	
-	.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, indicatorsById) {
+	.controller('IndicatorReportingController', function($scope, Input, mtReporting, indicator, projects, indicatorsById) {
 		$scope.indicator = indicator;
 		// $scope.projects  = projects;
 		$scope.plots = {};
@@ -76,11 +76,11 @@ angular.module('monitool.controllers.indicator', [])
 			// if anything besides groupBy changes, we need to refetch.
 			// FIXME: we could widely optimize this.
 			if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end)
-				inputsPromise = mtReporting.getPreprocessedInputs(newQuery);
+				inputsPromise = Input.fetchFromQuery(newQuery);
 
 			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
 			inputsPromise.then(function(inputs) {
-				$scope.stats = mtReporting.getIndicatorReporting(inputs, newQuery, indicatorsById);
+				$scope.stats = mtReporting.computeIndicatorReporting(inputs, newQuery, indicatorsById);
 			});
 		}, true)
 	})

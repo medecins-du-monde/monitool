@@ -442,28 +442,12 @@ angular.module('monitool.controllers.project', [])
 		$scope.inputs = $scope.waitingInputs;
 	})
 
-	.controller('ProjectInputController', function($scope, $state, mtReporting, mtCompute, mtRegroup, form, inputs, indicatorsById) {
+	.controller('ProjectInputController', function($scope, $state, mtReporting, form, inputs, indicatorsById) {
 		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
 		$scope.previousInput = inputs.previous;
 		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
-
-		// insure that model is properly initialised, but don't remove existing data
-		mtCompute.sanitizeRawData(inputs.current.values, form);
-
-		$scope.form.rawData.forEach(function(section) {
-			section.elements.forEach(function(element) {
-				if (element.partition1.length != 0 && element.partition2.length == 0)
-					inputs.current.values[element.id] = inputs.current.values[element.id] || {};
-				else if (element.partition1.length != 0 && element.partition2.length != 0) {
-					inputs.current.values[element.id] = inputs.current.values[element.id] || {};
-					element.partition1.forEach(function(p1) {
-						inputs.current.values[element.id][p1.id] = inputs.current.values[element.id][p1.id] || {};
-					})
-				}
-			});
-		});
 
 		// this should not be here, and we seriouly have to make those work on focusout to save cpu cycles.
 		$scope.$watch('currentInput.values', function() {
@@ -477,11 +461,8 @@ angular.module('monitool.controllers.project', [])
 					id: input.entity
 				};
 
-			input.compute = mtCompute.computeIndicatorsLeafsFromRaw(input.values, form);
-			input.aggregation = mtRegroup.computeAggregationFields(input, $scope.project);
-
 			$scope.presentation = {display: 'value'};
-			$scope.stats = mtReporting.getProjectReporting([input], query, indicatorsById);
+			$scope.stats = mtReporting.computeProjectReporting([input], query, indicatorsById);
 		}, true);
 
 		$scope.save = function() {

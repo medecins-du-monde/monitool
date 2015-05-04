@@ -3,6 +3,38 @@
 angular.module('monitool.services.models.input', [])
 	.factory('Input', function($resource) {
 
+		// this has nothing to do on the root scope.
+		// => move it to a service and factorize with the similiar function in mtReporting
+		var _getPeriods = function(form, project) {
+			var periods;
+			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
+				var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
+
+				var current = moment(form.useProjectStart ? project.begin : form.start).startOf(period),
+					end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
+
+				if (end.isAfter()) // do not allow to go in the future
+					end = moment();
+
+				periods = [];
+				while (current.isBefore(end)) {
+					periods.push(current.clone());
+					current.add(1, form.periodicity);
+				}
+			}
+			else if (form.periodicity === 'planned') {
+				periods = form.intermediaryDates.map(function(period) {
+					return moment(period);
+				});
+				periods.unshift(moment(form.start));
+				periods.push(moment(form.end));
+			}
+			else
+				throw new Error(form.periodicity + ' is not a valid periodicity');
+
+			return periods;
+		};
+
 		/**
 		 * This takes a mode and an array of values.
 		 * mode is none, sum, average, highest, lowest, last
@@ -15,7 +47,7 @@ angular.module('monitool.services.models.input', [])
 			if (values.length == 0)
 				return undefined;
 
-			switch (element[mode]) {
+			switch (mode) {
 				case "none":
 					return values.length == 1 ? values[0] : undefined;
 
@@ -23,7 +55,7 @@ angular.module('monitool.services.models.input', [])
 					return values.reduce(function(a, b) { return a + b; });
 
 				case "average":
-					return values.reduce(function(a, b, index, arr) { return a + b / arr.length; }, 0)
+					return values.reduce(function(a, b, index, arr) { return a + b / arr.length; }, 0);
 
 				case "highest":
 					return values.reduce(function(a, b) { return a > b ? a : b; });
@@ -41,47 +73,43 @@ angular.module('monitool.services.models.input', [])
 		 * mode is geoAgg or timeAgg
 		 */
 		var _groupInputs = function(mode, inputs, form) {
-			var newInput = Input.makeNew();
+			var newInput = Input.makeFake(form);
 
 			form.rawData.forEach(function(section) {
 				section.elements.forEach(function(element) {
-					var mode = element[mode], values;
+					var elementMode = element[mode], values;
 
 					// simple elements.
 					if (!element.partition1.length && !element.partition2.length) {
 						values = inputs.map(function(input) { return input.values[element.id]; });
-						newInput.values[element.id] = _aggregateValues(mode, values);
+						newInput.values[element.id] = _aggregateValues(elementMode, values);
 					}
 					// one partition.
 					else if (element.partition1.length && !element.partition2.length) {
-						newInput.values[element.id] = {}
-
 						// aggregate sums
 						values = inputs.map(function(input) { return input.values[element.id].sum; });
-						newInput.values[element.id].sum = _aggregateValues(mode, values);
+						newInput.values[element.id].sum = _aggregateValues(elementMode, values);
 
 						// aggregate partitions
 						element.partition1.forEach(function(p1) {
 							values = inputs.map(function(input) { return input.values[element.id][p1.id]; });
-							newInput.values[element.id][p1.id] = _aggregateValues(mode, values);
+							newInput.values[element.id][p1.id] = _aggregateValues(elementMode, values);
 						})
 					}
 					// two partitions.
 					else if (element.partition1.length && element.partition2.length) {
-						newInput.values[element.id] = {}
-
 						// aggregate sums
 						values = inputs.map(function(input) { return input.values[element.id].sum; });
-						newInput.values[element.id].sum = _aggregateValues(mode, values);
+						newInput.values[element.id].sum = _aggregateValues(elementMode, values);
 
 						// aggregate partitions
 						element.partition1.forEach(function(p1) {
 							values = inputs.map(function(input) { return input.values[element.id][p1.id].sum; });
-							newInput.values[element.id][p1.id].sum = _aggregateValues(mode, values);
+							newInput.values[element.id][p1.id].sum = _aggregateValues(elementMode, values);
 
 							element.partition2.forEach(function(p2) {
 								values = inputs.map(function(input) { return input.values[element.id][p1.id][p2.id]; });
-								newInput.values[element.id][p1.id][p2.id] = _aggregateValues(mode, values);
+								newInput.values[element.id][p1.id][p2.id] = _aggregateValues(elementMode, values);
 							});
 						});
 					}
@@ -92,22 +120,118 @@ angular.module('monitool.services.models.input', [])
 		};
 
 
-
-
-
-
 		// Create $resource
-		var Input = $resource( '/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
+		var Input = $resource('/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
 		/**
 		 * Factory with default value
 		 */
-		Input.makeNew = function() {
-			return new Input({
+		Input.makeNew = function(projectId, form, period, entityId) {
+			var input = new Input({
+				_id: [projectId, entityId, form.id, period].join(':'),
 				type: "input",
-				values: {}
+				project: projectId,
+				form: form.id,
+				period: period,
+				entity: entityId,
+				values: {},
+			});
+
+			input.sanitize(form);
+			return input;
+		};
+
+		/**
+		 * Factory with default value
+		 */
+		Input.makeFake = function(form) {
+			var input = new Input({form: form.id, values: {}});
+			input.sanitize(form);
+			return input;
+		};
+
+		Input.fetchProjectStatus = function(project) {
+			return Input.query({mode: 'project_input_ids', projectId: project._id}).$promise.then(function(result) {
+				// create hash with all existing inputs
+				var existingInputs = {};
+				result.forEach(function(id) { existingInputs[id] = true; });
+				
+				var displayedInputs = []
+
+				// iterate on all inputs that should exist according to the project forms (and current date).
+				project.dataCollection.forEach(function(form) {
+					_getPeriods(form, project).forEach(function(period) {
+						var inputEntities;
+						if (form.collect === 'entity')
+							inputEntities = project.inputEntities;
+						else if (form.collect === 'project')
+							inputEntities = [{id: "none"}];
+						else
+							throw new Error('Invalid form.collect value.');
+
+						inputEntities.forEach(function(inputEntity) {
+							var inputId = [project._id, inputEntity.id, form.id, period.format('YYYY-MM-DD')].join(':');
+							if (form.active || existingInputs[inputId])
+								displayedInputs.push({
+									filled: existingInputs[inputId] ? 'yes' : 'no',
+									period: period,
+									formId: form.id, formName: form.name,
+									inputEntityId: inputEntity.id,
+									inputEntityName: inputEntity.name
+								});
+
+							delete existingInputs[inputId];
+						});
+					});
+				});
+
+				Object.keys(existingInputs).forEach(function(inputId) {
+					var parts = inputId.split(':');
+					displayedInputs.push({
+						filled: 'invalid',
+						period: moment(parts[3], 'YYYY-MM-DD'),
+						formId: parts[2],
+						formName: project.dataCollection.find(function(form) { return form.id === parts[2]; }).name,
+						inputEntityId: parts[1],
+						inputEntityName: parts[1] == 'none' ? undefined : project.inputEntities.find(function(entity) { return entity.id === parts[1]; }).name
+					});
+				});
+
+				return displayedInputs;
 			});
 		};
+
+		Input.fetchLasts = function(projectId, entityId, form, period) {
+			return Input.query({
+				mode: "current+last",
+				projectId: projectId,
+				entityId: entityId,
+				formId: form.id,
+				period: period
+			}).$promise.then(function(result) {
+				var currentInputId = [projectId, entityId, form.id, period].join(':');
+
+				// both where found
+				if (result.length === 2) 
+					return { current: result[0], previous: result[1], isNew: false };
+
+				// only the current one was found
+				else if (result.length === 1 && result[0]._id === currentInputId) 
+					return { current: result[0], previous: null, isNew: false };
+
+				// the current one was not found (and we may or not have found the previous one).
+				var previousInput = result.length ? result[0] : null,
+				newInput          = Input.makeNew(projectId, form, period, entityId)
+				// newInput._id      = currentInputId;
+				// newInput.project  = projectId;
+				// newInput.form     = formId;
+				// newInput.period   = new Date(period);
+				// newInput.entity   = entityId;
+
+				return { current: newInput, previous: previousInput, isNew: true };
+			});
+		};
+
 
 		/**
 		 * Retrieve from server all inputs that match (between 2 dates)
@@ -155,6 +279,17 @@ angular.module('monitool.services.models.input', [])
 						return group.members.indexOf(input.entity) !== -1;
 					});
 
+				// Sanitize all inputs.
+				var formsById = {};
+				if (query.project)
+					query.project.dataCollection.forEach(function(form) { formsById[form.id] = form; });
+				if (query.projects)
+					query.projects.forEach(function(p) { p.dataCollection.forEach(function(form) { formsById[form.id] = form; }); });
+
+				inputs.forEach(function(input) {
+					input.sanitize(formsById[input.form]);
+				});
+
 				return inputs;
 			});
 		};
@@ -162,10 +297,7 @@ angular.module('monitool.services.models.input', [])
 		Input.aggregate = function(inputs, form, groupBy, projectGroups) {
 			var groupedInputs = {};
 
-			// Transform input list to 
-			//	 {
-			//	 	"2010-Q1": { "someEntityId": [Input('2010-02'), Input('2010-01'), ...], ... }
-			//	 }
+			// Transform input list to {"2010-Q1": { "someEntityId": [Input('2010-02'), Input('2010-01'), ...], ... }}
 			inputs.forEach(function(input) {
 				input.getAggregationKeys(groupBy, projectGroups).forEach(function(key) {
 					!groupedInputs[key] && (groupedInputs[key] = {});
@@ -174,30 +306,23 @@ angular.module('monitool.services.models.input', [])
 				});
 			});
 
-
-			// Transform to 
-			//	 {
-			//	 	"2010-Q1": [[Input('2010-01'), Input('2010-02'), ...], ...]
-			//	 }
+			// Transform to {"2010-Q1": [[Input('2010-01'), Input('2010-02'), ...], ...]}
 			for (var groupKey in groupedInputs) {
 				for (var entityId in groupedInputs[groupKey]) {
-					console.log(groupedInputs[groupKey][entityId])
 					// sort by date so that "last" aggregation mode works
 					groupedInputs[groupKey][entityId].sort(function(a, b) { return a < b ? -1 : 1; });
 				}
+
 				// transform into array
 				groupedInputs[groupKey] = Object.keys(groupedInputs[groupKey]).map(function(k) { return groupedInputs[groupKey][k]; });
 			}
 
-
-			// Now we need to aggregate by levels. We will obtain
-			// 	{
-			// 		"2010-Q1": Input()
-			// 	}
+			// Now we need to aggregate by levels. We will obtain {"2010-Q1": Input()}
 			for (var key in groupedInputs) {
 				// aggregate by time first.
-				for (var entityId in groupedInputs[key])
-					groupedInputs[key][entityId] = _groupInputs('timeAgg', groupedInputs[key][entityId], form);
+				groupedInputs[key].forEach(function(sameEntityInputs, index) {
+					groupedInputs[key][index] = _groupInputs('timeAgg', sameEntityInputs, form);
+				});
 
 				// and then by location
 				groupedInputs[key] = _groupInputs('geoAgg', groupedInputs[key], form);
@@ -214,53 +339,42 @@ angular.module('monitool.services.models.input', [])
 			if (this.form !== form.id)
 				throw new Error('Invalid form');
 
-			var elementsById = {};
-			for (var i = 0, numSections = form.rawData.length; i < numSections; ++i)
-				for (var j = 0, numElements = form.rawData[i].elements.length; j < numElements; ++j)
-					elementsById[form.rawData[i].elements[j].id] = form.rawData[i].elements[j];
+			var newValues = {};
 
-			for (var elementId in values) {
-				if (elementId !== 'count') {
-					var element = elementsById[elementId],
-						value   = values[elementId];
+			form.rawData.forEach(function(section) {
+				section.elements.forEach(function(element) {
 
-					if (!element)
-						delete values[elementId];
+					if (!element.partition1.length && !element.partition2.length)
+						newValues[element.id] = this.values[element.id]
 
-					var numPartitions1 = element.partition1.length,
-						numPartitions2 = element.partition2.length,
-						p1, p2;
-					
-					if (numPartitions1 && numPartitions2) {
-						if (typeof value !== 'object')
-							delete values[elementId];
-
-						else for (p1 in value) {
-							// if the partition does not exists or is not a hashmap
-							if (!element.partition1.find(function(p) { return p.id === p1; }) || typeof value[p1] !== 'object')
-								delete value[p1];
-
-							else for (p2 in value[p1])
-								// if the partition does not exists or is not a number
-								if (!element.partition2.find(function(p) { return p.id === p2; }) || typeof value[p1][p2] !== 'number')
-									delete value[p1][p2];
-						}
+					else if (element.partition1.length && !element.partition2.length) {
+						newValues[element.id] = {sum: 0};
+						element.partition1.forEach(function(p1) {
+							if (this.values[element.id] && this.values[element.id][p1.id] !== undefined) {
+								newValues[element.id].sum += this.values[element.id][p1.id]
+								newValues[element.id][p1.id] = this.values[element.id][p1.id];
+							}
+						}, this);
 					}
-					else if (numPartitions1) {
-						if (typeof value !== 'object')
-							delete values[elementId];
+					else if (element.partition1.length && element.partition2.length) {
+						newValues[element.id] = {sum: 0};
+						element.partition1.forEach(function(p1) {
+							newValues[element.id][p1.id] = {sum: 0};
+							element.partition2.forEach(function(p2) {
+								if (this.values[element.id] && this.values[element.id][p1.id] && this.values[element.id][p1.id][p2.id] !== undefined) {
+									newValues[element.id].sum += this.values[element.id][p1.id][p2.id];
+									newValues[element.id][p1.id].sum += this.values[element.id][p1.id][p2.id];
+									newValues[element.id][p1.id][p2.id] = this.values[element.id][p1.id][p2.id];
+								}
+							}, this);
+						}, this);
+					}
+					else
+						throw new Error();
+				}, this);
+			}, this);
 
-						else for (p1 in value)
-							// if the partition does not exists or is not a number
-							if (!element.partition1.find(function(p) { return p.id === p1; }) || typeof value[p1] !== 'number')
-								delete value[p1];
-					}
-					else {
-						if (typeof value !== "number")
-							delete values[elementId];
-					}
-				}
-			}
+			this.values = newValues;
 		};
 
 
@@ -269,35 +383,32 @@ angular.module('monitool.services.models.input', [])
 		 * If no filter is provided, assume the user want all partitions.
 		 */
 		Input.prototype.extractRawValue = function(rawId, filter) {
-			result = 0;
+			// we support not defining any filter for simple fields.
+			if (!filter || !Array.isArray(filter) || filter.length == 0)
+				return this.values[rawId];
+			else {
+				var result = 0, numFound = 0;
 
-			try {
-				// we support not defining any filter for simple fields.
-				if (!field.filter || !Array.isArray(field.filter) || field.filter.length == 0)
-					result = raw[field.rawId];
-				else
-					field.filter.forEach(function(filterInstance) {
-						var v = raw[field.rawId];
-						if (Array.isArray(filterInstance))
-							// filters can be as long as they want, which is not the case IRL
-							filterInstance.forEach(function(f) { v = v[f]; });
-						else
-							// is the filter is not an array we assume that we can just get the data.
-							v = v[filterInstance];
+				filter.forEach(function(filterInstance) {
+					var v = this.values[rawId];
+					if (Array.isArray(filterInstance))
+						// filters can be as long as they want, which is not the case IRL
+						filterInstance.forEach(function(f) { v = v[f]; });
+					else
+						// is the filter is not an array we assume that we can just get the data.
+						v = v[filterInstance];
 
-						// v may be undefined or null if the field was not filled.
-						// we just ignore it in that case.
-						if (typeof v == 'number')
-							result += v;
-					});
-			}
-			catch (e) {
-				// input does not match form structure.
-				// we can skip this whole indicator.
-				return "FORM_CHANGED";
+					// v may be undefined or null if the field was not filled.
+					// we just ignore it in that case.
+					if (typeof v == 'number') {
+						result += v;
+						numFound++;
+					}
+				}, this);
+
+				return numFound ? result : undefined;
 			}
 		};
-
 
 
 		/**

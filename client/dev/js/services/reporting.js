@@ -100,18 +100,9 @@ angular.module('monitool.services.reporting', [])
 		};
 
 		var formatRawDataReporting = function(project, result, cols) {
-			var sum = function(hash) {
-				if (typeof hash === 'number')
-					return hash;
-				
-				var result = 0;
-				for (var key in hash)
-					result += sum(hash[key])
-				return result;
-			};
+			var getValue = function(v) { return typeof v == 'number' ? v : v.sum; };
 
 			var rows = [];
-
 			project.dataCollection.forEach(function(form) {
 				rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
 
@@ -121,11 +112,8 @@ angular.module('monitool.services.reporting', [])
 					section.elements.forEach(function(variable) {
 						var subRow = { id: variable.id, name: variable.name, indent: 1, type: "data", baseline: null, target: null };
 						subRow.cols = cols.map(function(col) {
-							if (result[col.id] !== undefined
-								&& result[col.id].values[variable.id] !== undefined)
-								return sum(result[col.id].values[variable.id]);
-							else
-								return null;
+							try { return getValue(result[col.id].values[variable.id]); }
+							catch (e) {}
 						});
 
 						rows.push(subRow);
@@ -135,12 +123,8 @@ angular.module('monitool.services.reporting', [])
 
 							var subSubRow = { id: makeUUID(), parentId: variable.id, name: p1.name, indent: 2, type: "data", baseline: null, target: null };
 							subSubRow.cols = cols.map(function(col) {
-								if (result[col.id] !== undefined
-									&& result[col.id].values[variable.id] !== undefined
-									&& result[col.id].values[variable.id][p1.id] !== undefined)
-									return sum(result[col.id].values[variable.id][p1.id]);
-								else
-									return null;
+								try { return getValue(result[col.id].values[variable.id][p1.id]); }
+								catch (e) {}
 							});
 
 							rows.push(subSubRow);
@@ -151,13 +135,8 @@ angular.module('monitool.services.reporting', [])
 								rows.push({
 									id: makeUUID(), parentId: subSubRow.id, gParentId: subRow.id, name: p2.name, indent: 3, type: "data", baseline: null, target: null,
 									cols: cols.map(function(col) {
-										if (result[col.id] !== undefined
-											&& result[col.id].values[variable.id] !== undefined
-											&& result[col.id].values[variable.id][p1.id] !== undefined
-											&& result[col.id].values[variable.id][p1.id][p2.id] !== undefined)
-											return sum(result[col.id].values[variable.id][p1.id][p2.id]);
-										else
-											return null;
+										try { return getValue(result[col.id].values[variable.id][p1.id][p2.id]); }
+										catch (e) {}
 									})
 								});
 							});
@@ -194,6 +173,7 @@ angular.module('monitool.services.reporting', [])
 
 					// Compute indicators and write them in the final result.
 					form.fields.forEach(function(field) {
+						
 						// check if this indicator was already computed by another form.
 						if (result[regroupKey].compute[field.indicatorId])
 							result[regroupKey].compute[field.indicatorId] = 'FORM_CONFLICT';
@@ -216,15 +196,15 @@ angular.module('monitool.services.reporting', [])
 										localScope[key] = input.extractRawValue(field.parameters[key].rawId, field.parameters[key].filter);
 									else
 										throw new Error('Invalid subfield type.');
-
-									try { indicatorValue = Parser.evaluate(formula.expression, localScope); }
-									catch (e) { console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope)); }
 								}
+
+								try { indicatorValue = Parser.evaluate(formula.expression, localScope); }
+								catch (e) { console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope)); }
 							}
 							else
 								throw new Error('Invalid field type.');
 
-							result[regroupKey].compute[field.indicatorId]
+							result[regroupKey].compute[field.indicatorId] = indicatorValue;
 						}
 					});
 				}
@@ -232,8 +212,8 @@ angular.module('monitool.services.reporting', [])
 
 			return {
 				cols: cols,
-				indicatorRows: getIndicatorsRowsFromReporting(query.project, result, cols, indicatorsById),
-				rawDataRows: getRawDataRowsFromReporting(query.project, result, cols)
+				indicatorRows: formatLogFrameReporting(query.project, result, cols, indicatorsById),
+				rawDataRows: formatRawDataReporting(query.project, result, cols)
 			};
 		};
 
@@ -243,7 +223,7 @@ angular.module('monitool.services.reporting', [])
 			query.projects.forEach(function(project) {
 				var projectInputs     = inputs.filter(function(input) { return input.project === project._id; }),
 					projectQuery      = {begin: query.begin, end: query.end, project: project, groupBy: query.groupBy},
-					projectResult     = getProjectReporting(projectInputs, projectQuery, indicatorById);
+					projectResult     = computeProjectReporting(projectInputs, projectQuery, indicatorById);
 
 				// override id and name
 				var row = projectResult.indicatorRows.find(function(row) { return row.id === query.indicator._id; });
@@ -255,7 +235,7 @@ angular.module('monitool.services.reporting', [])
 				project.inputEntities.forEach(function(entity) {
 					var entityInputs = projectInputs.filter(function(input) { return input.entity === entity.id; }),
 						entityQuery  = {begin: query.begin, end: query.end, project: project, groupBy: query.groupBy, type: 'entity', id: entity.id},
-						entityResult = getProjectReporting(entityInputs, entityQuery, indicatorById);
+						entityResult = computeProjectReporting(entityInputs, entityQuery, indicatorById);
 
 					// override id and name
 					var row = entityResult.indicatorRows.find(function(row) { return row.id === query.indicator._id; });
