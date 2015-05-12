@@ -80,7 +80,6 @@ gulp.task('copy-static', function() {
 	gulp.src('client/dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/bower_components/fontawesome/fonts/*').pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/bower_components/bootstrap/fonts/*').pipe(gulp.dest('client/build'));
-	gulp.src('client/dev/monitool.appcache').pipe(gulp.dest('client/build'));
 });
 
 gulp.task('build-js', ['bower'], function() {
