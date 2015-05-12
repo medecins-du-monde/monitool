@@ -1,13 +1,11 @@
 "use strict";
 
 var async         = require('async'),
-	addCors       = require('add-cors-to-couchdb'),
+	del           = require('del'),
 	gulp          = require('gulp'),
 	templateCache = require('gulp-angular-templatecache'),
-	awspublish    = require('gulp-awspublish'),
 	bower         = require('gulp-bower'),
 	concat        = require('gulp-concat'),
-	insert        = require('gulp-insert'),
 	minifyCSS     = require('gulp-minify-css'),
 	ngAnnotate    = require('gulp-ng-annotate'),
 	rename        = require('gulp-rename'),
@@ -73,6 +71,10 @@ gulp.task('size-report', function() {
 
 gulp.task('default', ['build', 'design-docs', 'update-database']);
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
+
+gulp.task('clean', function(cb) {
+	del(['client/build/**/*'], cb);
+});
 
 gulp.task('copy-static', function() {
 	gulp.src('client/dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('client/build'));
