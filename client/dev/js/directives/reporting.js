@@ -74,7 +74,7 @@ angular.module('monitool.directives.reporting', [])
 		}
 	})
 
-	.directive('projectCsvSave', function() {
+	.directive('projectCsvSave', function($rootScope) {
 		return {
 			restrict: "A",
 			link: function($scope, element, attributes) {
@@ -92,7 +92,7 @@ angular.module('monitool.directives.reporting', [])
 						if (row.type === 'header')
 							csv += esc(indent + row.text);
 						else
-							csv += [esc(indent + row.name), row.baseline, row.target].join(',') + ',' + row.cols.join(',');
+							csv += [esc(indent + (row.name[$rootScope.language] || row.name)), row.baseline, row.target].join(',') + ',' + row.cols.join(',');
 
 						csv += "\n";
 					});
