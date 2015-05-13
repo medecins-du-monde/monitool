@@ -273,7 +273,7 @@ angular.module('monitool.directives.reporting', [])
 		};
 	})
 
-	.directive('reportingGraph', function() {
+	.directive('reportingGraph', function($rootScope) {
 		// This helper function allow us to get the data without totals.
 		var getStatsWithoutTotal = function(stats) {
 			var totalIndex = stats.cols.findIndex(function(e) { return e.id === 'total' });
@@ -318,7 +318,11 @@ angular.module('monitool.directives.reporting', [])
 						
 						// Create Y series
 						var xSerie  = ['x'].concat(stats.cols.map(function(e) { return e.name; })),
-							ySeries = stats.rows.map(function(row) { return [row.name].concat(row.cols); });
+							ySeries = stats.rows.map(function(row) {
+								var name = row.name[$rootScope.language] || row.name,
+									values = row.cols.map(function(v) { return v === undefined ? null : v; });
+								return [name].concat(values);
+							});
 
 						// compute which rows are leaving.
 						var exitingRowNames = [];
@@ -326,7 +330,7 @@ angular.module('monitool.directives.reporting', [])
 							exitingRowNames = oldStats.rows.filter(function(oldRow) {
 								return !stats.rows.find(function(newRow) { return newRow.id === oldRow.id; });
 							}).map(function(row) {
-								return row.name;
+								return row.name[$rootScope.language] || row.name;
 							});
 
 						chart.load({ type: $scope.type, unload: exitingRowNames, columns: [xSerie].concat(ySeries) });
