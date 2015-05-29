@@ -28,28 +28,33 @@ var strategy = new OAuth2Strategy({
     // this method is invoked upon auth sequence completion
     //  its your hook to cache the access/refresh tokens, post-process the Azure profile, etc.
     function (accessToken, refreshToken, profile, done) {
-        var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
-            domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
+        try {
+            var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
+                domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
-        if (domain !== 'medecinsdumonde.net')
-            done("You must use an account from medecinsdumonde.net (not " + domain + ").\nTry closing and reopening your browser to log in again.");
-
-        User.get(userId, function(error, user) {
-            if (error) {
-                user = {_id: userId, type: 'user', name: profile.name, roles: []};
-                User.set(user, function(error, result) {
+            if (domain !== 'medecinsdumonde.net')
+                done("You must use an account from medecinsdumonde.net (not " + domain + ").\nTry closing and reopening your browser to log in again.");
+        
+            User.get(userId, function(error, user) {
+                if (error) {
+                    user = {_id: userId, type: 'user', name: profile.name, roles: []};
+                    User.set(user, function(error, result) {
+                        done(null, user);
+                    });
+                }
+                else if (user.name !== profile.name) {
+                    user.name = profile.name;
+                    User.set(user, function(error, result) {
+                        done(null, user);
+                    });
+                }
+                else
                     done(null, user);
-                });
-            }
-            else if (user.name !== profile.name) {
-                user.name = profile.name;
-                User.set(user, function(error, result) {
-                    done(null, user);
-                });
-            }
-            else
-                done(null, user);
-        });
+            });
+        }
+        catch (e) {
+            done("An error has occured while loggin you in. Are you using a medecinsdumonde.net account?");
+        }
     });
 
 // Azure AD requires an additional 'resource' parameter for the token request
