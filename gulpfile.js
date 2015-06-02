@@ -152,73 +152,73 @@ gulp.task('design-docs', function(callback) {
 
 
 gulp.task('update-database', function(callback) {
-	request.get(config.couchdb.url + '/' + config.couchdb.bucket + '/_all_docs?include_docs=true', function(error, response, result) {
-		var updates = [];
+	// request.get(config.couchdb.url + '/' + config.couchdb.bucket + '/_all_docs?include_docs=true', function(error, response, result) {
+	// 	var updates = [];
 
-		JSON.parse(result).rows.forEach(function(row) {
-			var doc = row.doc, update = false;
+	// 	JSON.parse(result).rows.forEach(function(row) {
+	// 		var doc = row.doc, update = false;
 
-			if (doc.type === 'indicator') {
-				if (doc.geoAggregation) {
-					delete doc.geoAggregation;
-					update = true;
-				}
-				if (doc.timeAggregation) {
-					delete doc.timeAggregation;
-					update = true;
-				}
+	// 		if (doc.type === 'indicator') {
+	// 			if (doc.geoAggregation) {
+	// 				delete doc.geoAggregation;
+	// 				update = true;
+	// 			}
+	// 			if (doc.timeAggregation) {
+	// 				delete doc.timeAggregation;
+	// 				update = true;
+	// 			}
 
-				for (var formulaId in doc.formulas)
-					for (var key in doc.formulas[formulaId].parameters) {
-						if (doc.formulas[formulaId].parameters[key].timeAggregation) {
-							delete doc.formulas[formulaId].parameters[key].timeAggregation;
-							update = true;
-						}
+	// 			for (var formulaId in doc.formulas)
+	// 				for (var key in doc.formulas[formulaId].parameters) {
+	// 					if (doc.formulas[formulaId].parameters[key].timeAggregation) {
+	// 						delete doc.formulas[formulaId].parameters[key].timeAggregation;
+	// 						update = true;
+	// 					}
 
-						if (doc.formulas[formulaId].parameters[key].geoAggregation) {
-							delete doc.formulas[formulaId].parameters[key].geoAggregation;
-							update = true;
-						}
+	// 					if (doc.formulas[formulaId].parameters[key].geoAggregation) {
+	// 						delete doc.formulas[formulaId].parameters[key].geoAggregation;
+	// 						update = true;
+	// 					}
 
-						if (doc.formulas[formulaId].parameters[key].name) {
-							doc.formulas[formulaId].parameters[key].fr = doc.formulas[formulaId].parameters[key].name;
-							doc.formulas[formulaId].parameters[key].es = doc.formulas[formulaId].parameters[key].name;
-							doc.formulas[formulaId].parameters[key].en = doc.formulas[formulaId].parameters[key].name;
-							delete doc.formulas[formulaId].parameters[key].name;
-							update = true;
-						}
-					}
-			}
-			else if (doc.type == 'project')
-				doc.dataCollection.forEach(function(form) {
-					form.rawData.forEach(function(section) {
-						section.elements.forEach(function(element) {
-							if (!element.timeAgg) {
-								element.timeAgg = 'sum';
-								update = true;
-							}
+	// 					if (doc.formulas[formulaId].parameters[key].name) {
+	// 						doc.formulas[formulaId].parameters[key].fr = doc.formulas[formulaId].parameters[key].name;
+	// 						doc.formulas[formulaId].parameters[key].es = doc.formulas[formulaId].parameters[key].name;
+	// 						doc.formulas[formulaId].parameters[key].en = doc.formulas[formulaId].parameters[key].name;
+	// 						delete doc.formulas[formulaId].parameters[key].name;
+	// 						update = true;
+	// 					}
+	// 				}
+	// 		}
+	// 		else if (doc.type == 'project')
+	// 			doc.dataCollection.forEach(function(form) {
+	// 				form.rawData.forEach(function(section) {
+	// 					section.elements.forEach(function(element) {
+	// 						if (!element.timeAgg) {
+	// 							element.timeAgg = 'sum';
+	// 							update = true;
+	// 						}
 
-							if (!element.geoAgg) {
-								element.geoAgg = 'sum';
-								update = true;
-							}
-						});
-					});
-				});
+	// 						if (!element.geoAgg) {
+	// 							element.geoAgg = 'sum';
+	// 							update = true;
+	// 						}
+	// 					});
+	// 				});
+	// 			});
 
-			if (update)
-				updates.push(doc);
-		});
+	// 		if (update)
+	// 			updates.push(doc);
+	// 	});
 
-		console.log("Updated documents", updates.length);
+	// 	console.log("Updated documents", updates.length);
 
-		async.eachSeries(
-			updates,
-			function(doc, cb) {
-				request({method: "PUT", url: config.couchdb.url + '/' + config.couchdb.bucket + '/' + doc._id, json: doc}, cb)
-			},
-			callback
-		);
-	});
+	// 	async.eachSeries(
+	// 		updates,
+	// 		function(doc, cb) {
+	// 			request({method: "PUT", url: config.couchdb.url + '/' + config.couchdb.bucket + '/' + doc._id, json: doc}, cb)
+	// 		},
+	// 		callback
+	// 	);
+	// });
 });
 
