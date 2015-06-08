@@ -1,16 +1,14 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
-	<li><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></li>
+	<li><a ui-sref="main.project.logical_frame">{{project.name}}</a></li>
 	<li class="active" translate>project.input_forms</li>
 </ol>
 
 <doc-reminder pages="project.presentation_project,project.input_forms,project.change_definition"></doc-reminder>
 
-<h4 translate="project.input_form_list"></h4>
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th></th>
 			<th translate="shared.name"></th>
 			<th translate="shared.begin"></th>
 			<th translate="shared.end"></th>
@@ -22,10 +20,9 @@
 	</thead>
 	<tbody>
 		<tr ng-if="project.dataCollection.length == 0">
-			<td colspan="8" style="text-align: center" translate="project.no_forms"></td>
+			<td colspan="7" style="text-align: center" translate="project.no_forms"></td>
 		</tr>
 		<tr ng-repeat="form in project.dataCollection">
-			<td ng-style="{'background-color': colors[$index]}"></td>
 			<td>{{form.name}}</td>
 			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
 			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>
@@ -44,29 +41,8 @@
 	<tfoot acl-has-project-role="owner">
 		<tr>
 			<td colspan="8">
-				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.form({formId: 'new'})" translate>shared.add</button>
+				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.form({formId: 'new'})" translate="shared.add"></button>
 			</td>
 		</tr>
 	</tfoot>
-</table>
-
-<hr/>
-
-<h4 translate="project.indicator_distribution"></h4>
-<table class="table table-bordered table-condensed">
-	<thead>
-		<tr>
-			<th translate="shared.indicator"></th>
-			<th ng-repeat="interval in intervals" ng-bind="interval"></th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-if="usages.length === 0">
-			<td colspan="{{1 + intervals.length}}" translate="project.no_indicators" style="text-align: center"></td>
-		</tr>
-		<tr ng-repeat="usage in usages">
-			<td>{{indicatorsById[usage.id].name[language]}}</td>
-			<td ng-repeat="usage in usage.usage" ng-style="{'background-color': usage.color, color: 'white'}" colspan="{{usage.length}}">{{usage.name}}</td>
-		</tr>
-	</tbody>
 </table>

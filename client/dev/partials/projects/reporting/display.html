@@ -1,11 +1,7 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.logical_frame" ng-bind="project.name"></a></li>
-
 	<li class="active" translate="shared.reporting"></li>
-
-	<li class="active" ng-if="group" ng-bind="group.name"></li>
-	<li class="active" ng-if="entity" ng-bind="entity.name"></li>
 </ol>
 
 <doc-reminder pages="project.presentation_project,project.statistics"></doc-reminder>
@@ -14,7 +10,7 @@
 
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-6" ng-if="presentation.display !== 'raw_data'">
 			<div class="form-group">
 				<label for="display-input" class="col-sm-2 control-label" translate="shared.display"></label>
 				<div class="col-sm-10">
@@ -23,7 +19,6 @@
 						<select class="form-control input-sm" id="display-input" ng-model="presentation.display">
 							<option value="value" translate="shared.values"></option>
 							<option value="progress" translate="shared.target_percentage"></option>
-							<option value="raw_data" translate="project.raw_data"></option>
 						</select>
 					</div>
 				</div>

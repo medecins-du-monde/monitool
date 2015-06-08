@@ -82,44 +82,9 @@ angular.module('monitool.controllers.project', [])
 		});
 	})
 
-	.controller('ProjectLogicalFrameController', function($scope, $state, $q, $modal, indicatorsById, themes) {
+	.controller('ProjectLogicalFrameController', function($scope, themes) {
 		// contains description of indicators for the loaded project.
-		$scope.indicatorsById = indicatorsById;
 		$scope.themes = themes;
-
-		// handle indicator add, edit and remove are handled in a modal window.
-		$scope.editIndicator = function(indicatorId, target) {
-			var indicatorIdPromise;
-			if (indicatorId === 'new')
-				indicatorIdPromise = $modal.open({
-					controller: 'ProjectLogicalFrameIndicatorSelectionController',
-					templateUrl: 'partials/projects/logframe/indicator-select.html',
-					size: 'lg',
-					scope: $scope,
-					resolve: {
-						forbiddenIds: function() { return target ? $scope.getAssignedIndicators() : Object.keys($scope.project.indicators); },
-						hierarchy: function(mtFetch) { return mtFetch.themes({mode: 'tree', partial: '1'}); }
-					}
-				}).result;
-			else
-				indicatorIdPromise = $q.when(indicatorId);
-
-			indicatorIdPromise.then(function(chosenIndicatorId) {
-				// are we only reparenting an indicator?
-				if (indicatorId === 'new' && $scope.project.indicators[chosenIndicatorId])
-					// put it into new target
-					target.push(chosenIndicatorId);
-				else
-					// edit.
-					$modal.open({
-						controller: 'ProjectLogicalFrameIndicatorEditionController',
-						templateUrl: 'partials/projects/logframe/indicator-edit.html',
-						size: 'lg',
-						scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
-						resolve: {indicatorId: function() { return chosenIndicatorId; }, target: function() { return target; }}
-					});
-			});
-		};
 
 		// handle purpose add and remove
 		$scope.addPurpose = function() {
@@ -151,123 +116,17 @@ angular.module('monitool.controllers.project', [])
 		$scope.removeActivity = function(activity, output) {
 			output.activities.splice(output.activities.indexOf(activity), 1);
 		};
-
-		$scope.isExternal = function(indicatorId) {
-			// FIXME: Use !$scope.project.themes.some(is internal)
-			return $scope.project.themes.filter(function(theme) {
-				return $scope.indicatorsById[indicatorId].themes.indexOf(theme) !== -1
-			}).length === 0;
-		};
-
-		$scope.$watch('project', function(project) {
-			$scope.otherIndicators = $scope.getUnassignedIndicators();
-		}, true);
 	})
 
-	.controller('ProjectLogicalFrameIndicatorSelectionController', function($scope, $modalInstance, mtRemoveDiacritics, forbiddenIds, hierarchy) {
-		$scope.forbidden = forbiddenIds;
-		$scope.hierarchy = hierarchy;
-		$scope.searchField = '';
 
-		$scope.missingIndicators = {};
-		hierarchy.forEach(function(theme) {
-			if ($scope.project.themes.indexOf(theme._id) !== -1)
-				theme.children.forEach(function(type) {
-					type.children.forEach(function(indicator) {
-						if (!$scope.project.indicators[indicator._id] && indicator.operation === 'mandatory')
-							$scope.missingIndicators[indicator._id] = indicator;
-					});
-				});
-		});
-		$scope.missingIndicators = Object.keys($scope.missingIndicators).map(function(id) { return $scope.missingIndicators[id]; });
-
-		$scope.choose = function(indicatorId) {
-			$modalInstance.close(indicatorId);
-		};
-
-		$scope.cancel = function() {
-			$modalInstance.dismiss()
-		};
-	})
-
-	.controller('ProjectLogicalFrameIndicatorEditionController', function($scope, $modalInstance, mtFetch, indicatorId, target) {
-		// Retrieve indicator array where we need to add or remove indicator ids.
-		$scope.isNew = !$scope.project.indicators[indicatorId];
-		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
-			relevance: '', baseline: null, target: null, showRed: 33, showYellow: 66
-		};
-		$scope.planning.__baselineUnknown = $scope.planning.baseline === null;
-		$scope.planning.__targetUnknown = $scope.planning.target === null;
-
-		// Load the indicator if it's a new one. Take is from the hash if not.
-		if ($scope.indicatorsById[indicatorId])
-			$scope.indicator = $scope.indicatorsById[indicatorId];
-		else
-			mtFetch.indicator(indicatorId).then(function(indicator) {
-				// we also store it in the hash for future usage in ProjectLogicalFrameController
-				$scope.indicatorsById[indicatorId] = $scope.indicator = indicator;
-			});
-
-		// if this indicator is already used in a form, we can't delete it from the logical frame.
-		$scope.isDetachable = !!target;
-
-		$scope.isUnchanged = function() {
-			return angular.equals($scope.planning, $scope.project.indicators[indicatorId]);
-		};
-
-		$scope.save = function() {
-			// This should be done on the ProjectLogicalFrameController?
-			if ($scope.isNew)
-				target && target.push(indicatorId);
-
-			// we delete this to avoid changing the $scope.isUnchanged() value if we did nothing with the indicator.
-			delete $scope.planning.__baselineUnknown;
-			delete $scope.planning.__targetUnknown;
-
-			// we need to change the project now, because we've been working on a copy of the indicator's planning
-			$scope.project.indicators[indicatorId] = $scope.planning;
-			$modalInstance.close();
-		};
-
-		$scope.detach = function() {
-			target && target.splice(target.indexOf(indicatorId), 1);
-			$modalInstance.close();
-		};
-
-		$scope.delete = function() {
-			// Remove from logframe.
-			target && target.splice(target.indexOf(indicatorId), 1);
-
-			// Remove from plannings.
-			delete $scope.project.indicators[indicatorId];
-
-			// Remove from all forms that have a reference to it.
-			$scope.project.dataCollection.forEach(function(form) {
-				var numFields = form.fields.length;
-				for (var i = 0; i < numFields; ++i)
-					if (form.fields[i].indicatorId == indicatorId) {
-						form.fields.splice(i, 1);
-						return;
-					}
-
-			});
-
-			$modalInstance.close();
-		};
-
-		$scope.cancel = function() {
-			$modalInstance.close();
-		};
-	})
-
-	.controller('ProjectInputEntitiesController', function($scope, $filter, mtFetch, project) {
-		$scope.create = function() {
+	.controller('ProjectInputEntitiesController', function($scope, $filter, Input, project) {
+		$scope.createEntity = function() {
 			$scope.project.inputEntities.push({id: makeUUID(), name: ''});
 		};
 
-		$scope.delete = function(entityId) {
+		$scope.deleteEntity = function(entityId) {
 			// Fetch this forms inputs.
-			mtFetch.inputs({mode: "ids_by_entity", entityId: entityId}).then(function(inputIds) {
+			Input.query({mode: "ids_by_entity", entityId: entityId}).$promise.then(function(inputIds) {
 				var question = $filter('translate')('project.delete_entity', {num_inputs: inputIds.length}),
 					answer = $filter('translate')('project.delete_entity_answer', {num_inputs: inputIds.length});
 
@@ -284,91 +143,17 @@ angular.module('monitool.controllers.project', [])
 				}
 			});
 		};
-	})
 
-	.controller('ProjectInputGroupsController', function($scope, project) {
-		$scope.create = function() {
+		$scope.createGroup = function() {
 			$scope.project.inputGroups.push({id: makeUUID(), name: '', members: []});
 		};
 
-		$scope.delete = function(inputEntityId) {
+		$scope.deleteGroup = function(inputEntityId) {
 			$scope.project.inputGroups = 
 				$scope.project.inputGroups.filter(function(entity) { return entity.id !== inputEntityId; });
 		};
 	})
 
-	.controller('ProjectFormsController', function($scope, indicatorsById) {
-		$scope.colors = ['#FBB735', '#E98931', '#EB403B', '#B32E37', '#6C2A6A', '#5C4399', '#274389', '#1F5EA8', '#227FB0', '#2AB0C5', '#39C0B3'];
-		$scope.colors = ["#F2B701", "#E57D04", "#DC0030", "#B10058", "#7C378A", "#3465AA", "#09A275", "#7CB854"].reverse();
-		$scope.indicatorsById = indicatorsById;
-
-		// we retrieve all relevant dates.
-		var relevantDates = [
-			moment($scope.project.begin).format('YYYY-MM-DD'),
-			moment($scope.project.end).format('YYYY-MM-DD')
-		];
-
-		$scope.project.dataCollection.forEach(function(form) {
-			[form.start, form.end].concat(form.intermediaryDates).forEach(function(jsDate) {
-				if (jsDate) {
-					var date = moment(jsDate).format('YYYY-MM-DD');
-					relevantDates.indexOf(date) === -1 && relevantDates.push(date);
-				}
-			});
-		});
-		relevantDates.sort();
-
-		// Then retrieve all intervals.
-		var intervals = [];
-		for (var i = 0; i < relevantDates.length - 1; ++i)
-			intervals.push(relevantDates[i] + ' ' + relevantDates[i + 1]);
-
-		var indicators = {};
-		$scope.project.dataCollection.forEach(function(form, index) {
-			form.fields.forEach(function(field) {
-				if (!indicators[field.indicatorId])
-					indicators[field.indicatorId] = [];
-
-				var id     = form.id,
-					color  = $scope.colors[index],
-					begin  = moment(form.start).format('YYYY-MM-DD'),
-					end    = moment(form.end).format('YYYY-MM-DD'),
-					length = relevantDates.indexOf(end) - relevantDates.indexOf(begin);
-
-				indicators[field.indicatorId].push({id: id, name: form.name, color: color, begin: begin, end: end, length: length});
-			});
-		});
-
-		var result = [];
-		for (var indicatorId in $scope.project.indicators) {
-			var rowResult = [], lastIndex = 0;
-			var h = indicators[indicatorId] || [];
-
-			h.sort(function(a, b) { return a.begin.localeCompare(b.begin); });
-			h.forEach(function(usage) {
-				// push empty slot.
-				if (relevantDates.indexOf(usage.begin) !== lastIndex) {
-					rowResult.push({length: relevantDates.indexOf(usage.begin) - lastIndex });
-					lastIndex = relevantDates.indexOf(usage.begin);
-				}
-
-				// push filled slot.
-				rowResult.push(usage);
-				lastIndex = relevantDates.indexOf(usage.end);
-			});
-
-			if (lastIndex < intervals.length)
-				rowResult.push({length: intervals.length - lastIndex });
-
-			result.push({
-				id: indicatorId,
-				usage: rowResult
-			});
-		}
-
-		$scope.intervals = intervals;
-		$scope.usages = result;
-	})
 
 	.controller('ProjectFormEditionController', function($scope, $state, $filter, mtFetch, form, indicatorsById) {
 		$scope.master = angular.copy(form);
@@ -482,7 +267,7 @@ angular.module('monitool.controllers.project', [])
 		$scope.open = {};
 
 		// those 2 hashes represent what the user sees.
-		$scope.presentation = {plot: false, display: 'value'};
+		$scope.presentation = {plot: false, display: $state.current.data.display || 'value' };
 		$scope.query = {
 			project: $scope.project,
 			begin:   mtReporting.getDefaultStartDate($scope.project),
@@ -619,4 +404,154 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectUserListController', function($scope, users) {
 		$scope.users = users;
+	})
+
+	.controller('ProjectIndicatorSelectionController', function($scope, $q, $modal, indicatorsById) {
+		$scope.indicatorsById = indicatorsById;
+		// handle indicator add, edit and remove are handled in a modal window.
+		$scope.editIndicator = function(indicatorId, target) {
+			var indicatorIdPromise;
+			if (indicatorId === 'new')
+				indicatorIdPromise = $modal.open({
+					controller: 'ProjectIndicatorSelectionModalController',
+					templateUrl: 'partials/projects/indicators/selection-modal.html',
+					size: 'lg',
+					scope: $scope,
+					resolve: {
+						forbiddenIds: function() { return target ? $scope.getAssignedIndicators() : Object.keys($scope.project.indicators); },
+						hierarchy: function(mtFetch) { return mtFetch.themes({mode: 'tree', partial: '1'}); }
+					}
+				}).result;
+			else
+				indicatorIdPromise = $q.when(indicatorId);
+
+			indicatorIdPromise.then(function(chosenIndicatorId) {
+				// are we only reparenting an indicator?
+				if (indicatorId === 'new' && $scope.project.indicators[chosenIndicatorId])
+					// put it into new target
+					target.push(chosenIndicatorId);
+				else
+					// edit.
+					$modal.open({
+						controller: 'ProjectIndicatorEditionModalController',
+						templateUrl: 'partials/projects/indicators/edition-modal.html',
+						size: 'lg',
+						scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
+						resolve: {indicatorId: function() { return chosenIndicatorId; }, target: function() { return target; }}
+					});
+			});
+		};
+
+		$scope.isExternal = function(indicatorId) {
+			// FIXME: Use !$scope.project.themes.some(is internal)
+			return $scope.project.themes.filter(function(theme) {
+				return $scope.indicatorsById[indicatorId].themes.indexOf(theme) !== -1
+			}).length === 0;
+		};
+
+		$scope.$watch('project', function(project) {
+			$scope.otherIndicators = $scope.getUnassignedIndicators();
+		}, true);
+	})
+
+
+	.controller('ProjectIndicatorSelectionModalController', function($scope, $modalInstance, mtRemoveDiacritics, forbiddenIds, hierarchy) {
+		$scope.forbidden = forbiddenIds;
+		$scope.hierarchy = hierarchy;
+		$scope.searchField = '';
+
+		$scope.missingIndicators = {};
+		hierarchy.forEach(function(theme) {
+			if ($scope.project.themes.indexOf(theme._id) !== -1)
+				theme.children.forEach(function(type) {
+					type.children.forEach(function(indicator) {
+						if (!$scope.project.indicators[indicator._id] && indicator.operation === 'mandatory')
+							$scope.missingIndicators[indicator._id] = indicator;
+					});
+				});
+		});
+		$scope.missingIndicators = Object.keys($scope.missingIndicators).map(function(id) { return $scope.missingIndicators[id]; });
+
+		$scope.choose = function(indicatorId) {
+			$modalInstance.close(indicatorId);
+		};
+
+		$scope.cancel = function() {
+			$modalInstance.dismiss()
+		};
+	})
+
+	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, mtFetch, indicatorId, target) {
+		// Retrieve indicator array where we need to add or remove indicator ids.
+		$scope.isNew = !$scope.project.indicators[indicatorId];
+		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
+			relevance: '', baseline: null, target: null, showRed: 33, showYellow: 66
+		};
+		$scope.planning.__baselineUnknown = $scope.planning.baseline === null;
+		$scope.planning.__targetUnknown = $scope.planning.target === null;
+
+		// Load the indicator if it's a new one. Take is from the hash if not.
+		if ($scope.indicatorsById[indicatorId])
+			$scope.indicator = $scope.indicatorsById[indicatorId];
+		else
+			mtFetch.indicator(indicatorId).then(function(indicator) {
+				// we also store it in the hash for future usage in ProjectLogicalFrameController
+				$scope.indicatorsById[indicatorId] = $scope.indicator = indicator;
+			});
+
+		// if this indicator is already used in a form, we can't delete it from the logical frame.
+		$scope.isDetachable = !!target;
+
+		$scope.isUnchanged = function() {
+			return angular.equals($scope.planning, $scope.project.indicators[indicatorId]);
+		};
+
+		$scope.save = function() {
+			// This should be done on the ProjectLogicalFrameController?
+			if ($scope.isNew)
+				target && target.push(indicatorId);
+
+			// we delete this to avoid changing the $scope.isUnchanged() value if we did nothing with the indicator.
+			delete $scope.planning.__baselineUnknown;
+			delete $scope.planning.__targetUnknown;
+
+			// we need to change the project now, because we've been working on a copy of the indicator's planning
+			$scope.project.indicators[indicatorId] = $scope.planning;
+			$modalInstance.close();
+		};
+
+		$scope.detach = function() {
+			target && target.splice(target.indexOf(indicatorId), 1);
+			$modalInstance.close();
+		};
+
+		$scope.delete = function() {
+			// Remove from logframe.
+			target && target.splice(target.indexOf(indicatorId), 1);
+
+			// Remove from plannings.
+			delete $scope.project.indicators[indicatorId];
+
+			// Remove from all forms that have a reference to it.
+			$scope.project.dataCollection.forEach(function(form) {
+				var numFields = form.fields.length;
+				for (var i = 0; i < numFields; ++i)
+					if (form.fields[i].indicatorId == indicatorId) {
+						form.fields.splice(i, 1);
+						return;
+					}
+
+			});
+
+			$modalInstance.close();
+		};
+
+		$scope.cancel = function() {
+			$modalInstance.close();
+		};
+	})
+
+	.controller('ProjectExportController', function($scope) {
+		
 	});
+

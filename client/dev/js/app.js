@@ -277,12 +277,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectInputEntitiesController'
 	});
 
-	$stateProvider.state('main.project.input_groups', {
-		url: '/input-groups',
-		templateUrl: 'partials/projects/specification/input-groups.html',
-		controller: 'ProjectInputGroupsController'
-	});
-
 	$stateProvider.state('main.project.user_list', {
 		url: '/users',
 		templateUrl: 'partials/projects/specification/user-list.html',
@@ -300,8 +294,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.forms', {
 		url: '/forms',
-		templateUrl: 'partials/projects/raw-data/planning-list.html',
-		controller: 'ProjectFormsController'
+		templateUrl: 'partials/projects/raw-data/planning-list.html'
 	});
 
 	$stateProvider.state('main.project.form', {
@@ -363,7 +356,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/raw-data-reporting',
 		templateUrl: 'partials/projects/reporting/display.html',
 		controller: 'ProjectReportingController',
-		data: {type: "raw-data"}
+		data: {display: "raw_data"}
 	});
 
 
@@ -375,19 +368,19 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.project.indicator_selection', {
 		url: '/indicator-selection',
 		templateUrl: 'partials/projects/indicators/selection.html',
-		controller: 'ProjectIndicatorsSelectionController'
+		controller: 'ProjectIndicatorSelectionController'
 	});
 
 	$stateProvider.state('main.project.indicators_reporting', {
 		url: '/raw-data-reporting',
 		templateUrl: 'partials/projects/reporting/display.html',
 		controller: 'ProjectReportingController',
-		data: {type: "indicators"}
+		data: {display: "value"}
 	});
 
 	$stateProvider.state('main.project.reporting_analysis_list', {
 		url: '/reporting-analysis-list',
-		templateUrl: 'partials/projects/reporting/analysis-list.html',
+		templateUrl: 'partials/projects/indicators/analysis-list.html',
 		controller: 'ProjectReportingAnalysisListController',
 		resolve: {
 			reports: function(mtFetch, $stateParams) {
@@ -398,7 +391,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.reporting_analysis', {
 		url: '/reporting-analysis/:reportId',
-		templateUrl: 'partials/projects/reporting/analysis.html',
+		templateUrl: 'partials/projects/indicators/analysis.html',
 		controller: 'ProjectReportingAnalysisController',
 		resolve: {
 			report: function(mtFetch, $stateParams) {
@@ -410,6 +403,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
+	$stateProvider.state('main.project.export', {
+		url: '/export',
+		templateUrl: 'partials/projects/export.html',
+		controller: 'ProjectExportController'
+	});
 
 	///////////////////////////
 	// Indicators

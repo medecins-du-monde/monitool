@@ -28,14 +28,14 @@
 				<span class="badge pull-right" ng-bind="theme.children.length"></span>
 			</div>
 
-			<div ng-include="'partials/projects/logframe/indicator-select-tree.html'"></div>
+			<div ng-include="'partials/projects/indicators/selection-modal-tree.html'"></div>
 		</div>
 	</div>
 
 	<div ng-if="!showAllIndicators">
 		<div ng-if="project.themes.length == 1">
 			<div style="margin-left: -20px"
-				ng-include="'partials/projects/logframe/indicator-select-tree.html'"
+				ng-include="'partials/projects/indicators/selection-modal-tree.html'"
 				ng-repeat="theme in hierarchy|hierarchyFilter:searchField"
 				ng-if="theme._id === project.themes[0]"
  				ng-init="theme.open = true"></div>
@@ -49,7 +49,7 @@
 					<span class="badge pull-right" ng-bind="theme.children.length"></span>
 				</div>
 
-				<div ng-include="'partials/projects/logframe/indicator-select-tree.html'"></div>
+				<div ng-include="'partials/projects/indicators/selection-modal-tree.html'"></div>
 			</div>
 		</div>
 	</div>

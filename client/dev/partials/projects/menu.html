@@ -19,11 +19,6 @@
 							<span translate="shared.input_entities"></span>
 						</a>
 
-						<a ui-sref="main.project.input_groups" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-map-marker fa-fw"></i>
-							<span translate="shared.input_groups"></span>
-						</a>
-
 						<a ui-sref="main.project.user_list" ui-sref-active="active" class="list-group-item">
 							<i class="fa fa-users fa-fw"></i>
 							<span translate="project.users"></span>
@@ -105,26 +100,26 @@
 				</div>
 			</div>
 
-
 			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title" translate="project.security"></h4>
-				</div>
-
 				<div class="panel-collapse">
-					<div class="list-group" ng-if="project._id">
+					<div class="list-group">
+						<a class="list-group-item" ng-if="project._id" ui-sref="main.project.export" ui-sref-active="active">
+							<i class="fa fa-fw fa-file-excel-o"></i>
+							Export
+						</a>
+						<a class="list-group-item" ng-if="!project._id">
+							<i class="fa fa-fw fa-file-excel-o"></i>
+							Export
+						</a>
 
-
-					</div>
-
-					<div class="list-group" ng-if="!project._id">
 					</div>
 				</div>
 			</div>
 
-
 		</div>
 	</div>
+
+
 
 	<div class="col-md-10 print-full-width" ui-view></div>
 </div>

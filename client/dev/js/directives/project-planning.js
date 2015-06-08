@@ -260,7 +260,7 @@ angular
 	.directive('formEditRawData', function() {
 		return {
 			restrict: "AE",
-			templateUrl: "partials/projects/planning/edit-raw-data.html",
+			templateUrl: "partials/projects/raw-data/planning-edit-raw-data.html",
 			scope: true,
 			link: function($scope, element) {
 				$scope.rawData = $scope.form.rawData;
