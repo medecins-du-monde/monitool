@@ -255,9 +255,14 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
+
+	///////////////////////////
+	// Project Specification
+	///////////////////////////
+
 	$stateProvider.state('main.project.logical_frame', {
 		url: '/logical-frame',
-		templateUrl: 'partials/projects/logframe/edit.html',
+		templateUrl: 'partials/projects/specification/logframe-edit.html',
 		controller: 'ProjectLogicalFrameController',
 		resolve: {
 			themes: function(mtFetch) {
@@ -268,25 +273,40 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.input_entities', {
 		url: '/input-entities',
-		templateUrl: 'partials/projects/entities/input-entities.html',
+		templateUrl: 'partials/projects/specification/input-entities.html',
 		controller: 'ProjectInputEntitiesController'
 	});
 
 	$stateProvider.state('main.project.input_groups', {
 		url: '/input-groups',
-		templateUrl: 'partials/projects/entities/input-groups.html',
+		templateUrl: 'partials/projects/specification/input-groups.html',
 		controller: 'ProjectInputGroupsController'
 	});
 
+	$stateProvider.state('main.project.user_list', {
+		url: '/users',
+		templateUrl: 'partials/projects/specification/user-list.html',
+		controller: 'ProjectUserListController',
+		resolve: {
+			users: function(mtFetch) {
+				return mtFetch.users();
+			}
+		}
+	});
+
+	///////////////////////////
+	// Project Raw data
+	///////////////////////////
+
 	$stateProvider.state('main.project.forms', {
 		url: '/forms',
-		templateUrl: 'partials/projects/planning/list.html',
+		templateUrl: 'partials/projects/raw-data/planning-list.html',
 		controller: 'ProjectFormsController'
 	});
 
 	$stateProvider.state('main.project.form', {
 		url: '/forms/:formId',
-		templateUrl: 'partials/projects/planning/edit.html',
+		templateUrl: 'partials/projects/raw-data/planning-edit.html',
 		controller: 'ProjectFormEditionController',
 		resolve: {
 			form: function($stateParams, project) {
@@ -315,7 +335,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.input_list', {
 		url: '/inputs',
-		templateUrl: 'partials/projects/input/list.html',
+		templateUrl: 'partials/projects/raw-data/input-list.html',
 		controller: 'ProjectInputListController',
 		resolve: {
 			inputs: function(Input, project) {
@@ -326,7 +346,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.input', {
 		url: '/input/:period/:formId/:entityId',
-		templateUrl: 'partials/projects/input/edit.html',
+		templateUrl: 'partials/projects/raw-data/input-edit.html',
 		controller: 'ProjectInputController',
 		resolve: {
 			inputs: function(Input, $stateParams, project) {
@@ -339,10 +359,30 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.reporting', {
-		url: '/reporting',
+	$stateProvider.state('main.project.raw_data_reporting', {
+		url: '/raw-data-reporting',
 		templateUrl: 'partials/projects/reporting/display.html',
-		controller: 'ProjectReportingController'
+		controller: 'ProjectReportingController',
+		data: {type: "raw-data"}
+	});
+
+
+
+	///////////////////////////
+	// Project Indicators
+	///////////////////////////
+
+	$stateProvider.state('main.project.indicator_selection', {
+		url: '/indicator-selection',
+		templateUrl: 'partials/projects/indicators/selection.html',
+		controller: 'ProjectIndicatorsSelectionController'
+	});
+
+	$stateProvider.state('main.project.indicators_reporting', {
+		url: '/raw-data-reporting',
+		templateUrl: 'partials/projects/reporting/display.html',
+		controller: 'ProjectReportingController',
+		data: {type: "indicators"}
 	});
 
 	$stateProvider.state('main.project.reporting_analysis_list', {
@@ -370,16 +410,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.user_list', {
-		url: '/users',
-		templateUrl: 'partials/projects/user/list.html',
-		controller: 'ProjectUserListController',
-		resolve: {
-			users: function(mtFetch) {
-				return mtFetch.users();
-			}
-		}
-	});
 
 	///////////////////////////
 	// Indicators

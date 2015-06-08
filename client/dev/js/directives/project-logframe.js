@@ -5,7 +5,7 @@ angular.module('monitool.directives.projectLogframe', [])
 	.directive('printLogframe', function() {
 		return {
 			restrict: "AE",
-			templateUrl: 'partials/projects/logframe/print.html',
+			templateUrl: 'partials/projects/specification/logframe-print.html',
 			scope: true,
 			link: function($scope, element) {
 				var name = function(indicatorId) {
