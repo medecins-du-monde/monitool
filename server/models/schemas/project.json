@@ -41,7 +41,13 @@
 						"baseline": { "type": ["number", "null"] },
 						"target": { "type": ["number", "null"] },
 						"showRed": { "type": "number" },
-						"showYellow": { "type": "number" }
+						"showYellow": { "type": "number" },
+
+						"formula": {},
+						"variable": {},
+						"filter": {},
+						"parameters": {}
+
 					}
 				}
 			}
@@ -51,7 +57,7 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": ["id", "name", "start", "end", "active", "useProjectStart", "useProjectEnd", "periodicity", "intermediaryDates", "fields"],
+				"required": ["id", "name", "start", "end", "active", "useProjectStart", "useProjectEnd", "periodicity", "intermediaryDates"],
 				"additionalProperties": false,
 				"properties": {
 					"id":    { "$ref": "#/definitions/uuid" },
@@ -78,7 +84,6 @@
 						"items": { "type": "string", "format": "date" }
 					},
 					
-					"fields": {},
 					"rawData": {}
 				}
 			}

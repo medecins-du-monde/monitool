@@ -155,13 +155,25 @@ angular.module('monitool.controllers.project', [])
 	})
 
 
-	.controller('ProjectFormEditionController', function($scope, $state, $filter, mtFetch, form, indicatorsById) {
+	.controller('ProjectManualInputListController', function($scope, project, inputs) {
+		// $scope.inputs = inputs;
+		$scope.pred = 'period';
+
+		$scope.finishedInputs = inputs.filter(function(i) { return i.filled == 'yes'; });
+		$scope.waitingInputs = inputs.filter(function(i) { return i.filled == 'no'; });
+		$scope.invalidInputs = inputs.filter(function(i) { return i.filled == 'invalid'; });
+		$scope.inputs = $scope.waitingInputs;
+	})
+
+	.controller('ProjectManualInputStructureController', function($scope, $state, $filter, Input, form, indicatorsById) {
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.indicatorsById = indicatorsById;
 		$scope.formIndex = $scope.project.dataCollection.findIndex(function(f) {
 			return f.id === form.id;
 		});
+
+		console.log($scope.form)
 
 		$scope.addIntermediary = function() {
 			if (-1 === $scope.form.intermediaryDates.findIndex(function(key) { return !key; }))
@@ -174,7 +186,8 @@ angular.module('monitool.controllers.project', [])
 
 		$scope.delete = function() {
 			// Fetch this forms inputs.
-			mtFetch.inputs({mode: "ids_by_form", formId: $scope.form.id}).then(function(inputIds) {
+			Input.query({mode: "ids_by_form", formId: $scope.form.id}).$promise.then(function(inputIds) {
+				console.log(inputIds)
 				var easy_question = $filter('translate')('project.delete_form_easy'),
 					hard_question = $filter('translate')('project.delete_form_hard', {num_inputs: inputIds.length}),
 					answer = $filter('translate')('project.delete_form_hard_answer', {num_inputs: inputIds.length});
@@ -187,10 +200,31 @@ angular.module('monitool.controllers.project', [])
 					$scope.project.dataCollection.splice($scope.formIndex, 1);
 					$scope.formIndex = -1;
 					$scope.$parent.save().then(function() {
-						$state.go('main.project.forms');
+						$state.go('main.project.manual_input_list');
 					});
 				}
 			});
+		};
+
+		$scope.newSection = function(target) {
+			target.push({id: makeUUID(), name: "", elements: []});
+		};
+
+		$scope.newVariable = function(target) {
+			target.push({id: makeUUID(), name: "", partition1: [], partition2: [], geoAgg: 'sum', timeAgg: 'sum'});
+		};
+
+		$scope.newPartition = function(target) {
+			target.push({id: makeUUID(), name: ""});
+		};
+
+		$scope.remove = function(item, target) {
+			var index = target.findIndex(function(arrItem) {
+				return item.id === arrItem.id;
+			});
+
+			if (index !== -1)
+				target.splice(index, 1)
 		};
 
 		$scope.save = function() {
@@ -217,17 +251,7 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectInputListController', function($scope, project, inputs) {
-		// $scope.inputs = inputs;
-		$scope.pred = 'period';
-
-		$scope.finishedInputs = inputs.filter(function(i) { return i.filled == 'yes'; });
-		$scope.waitingInputs = inputs.filter(function(i) { return i.filled == 'no'; });
-		$scope.invalidInputs = inputs.filter(function(i) { return i.filled == 'invalid'; });
-		$scope.inputs = $scope.waitingInputs;
-	})
-
-	.controller('ProjectInputController', function($scope, $state, mtReporting, form, inputs, indicatorsById) {
+	.controller('ProjectManualInputDataController', function($scope, $state, mtReporting, form, inputs, indicatorsById) {
 		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
@@ -251,11 +275,11 @@ angular.module('monitool.controllers.project', [])
 		}, true);
 
 		$scope.save = function() {
-			$scope.currentInput.$save(function() { $state.go('main.project.input_list'); });
+			$scope.currentInput.$save(function() { $state.go('main.project.manual_input_list'); });
 		};
 
 		$scope.delete = function() {
-			$scope.currentInput.$delete(function() { $state.go('main.project.input_list'); });
+			$scope.currentInput.$delete(function() { $state.go('main.project.manual_input_list'); });
 		};
 	})
 
@@ -483,24 +507,84 @@ angular.module('monitool.controllers.project', [])
 
 	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, mtFetch, indicatorId, target) {
 		// Retrieve indicator array where we need to add or remove indicator ids.
-		$scope.isNew = !$scope.project.indicators[indicatorId];
 		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
-			relevance: '', baseline: null, target: null, showRed: 33, showYellow: 66
+			relevance: '',
+			baseline: null,
+			target: null,
+			showRed: 33,
+			showYellow: 66,
+			
+			formula: null,
+			variable: null,
+			filter: []
 		};
-		$scope.planning.__baselineUnknown = $scope.planning.baseline === null;
-		$scope.planning.__targetUnknown = $scope.planning.target === null;
+
+		// Init display helper variable
+		$scope.isNew = !$scope.project.indicators[indicatorId];
+		$scope.isDetachable = !!target;
+		$scope.baselineUnknown = $scope.planning.baseline === null;
+		$scope.targetUnknown = $scope.planning.target === null;
+
+		// Create list of data sources
+		$scope.sources = [{id: null, name: "---", group: null}];
+		$scope.project.dataCollection.forEach(function(form) {
+			form.rawData.forEach(function(section) {
+				section.elements.forEach(function(element) {
+					$scope.sources.push({id: element.id, name: element.name, group: section.name, element: element});
+				});
+			});
+		});
 
 		// Load the indicator if it's a new one. Take is from the hash if not.
 		if ($scope.indicatorsById[indicatorId])
 			$scope.indicator = $scope.indicatorsById[indicatorId];
-		else
+		else // we also store it in the hash for future usage in ProjectLogicalFrameController
 			mtFetch.indicator(indicatorId).then(function(indicator) {
-				// we also store it in the hash for future usage in ProjectLogicalFrameController
 				$scope.indicatorsById[indicatorId] = $scope.indicator = indicator;
 			});
 
-		// if this indicator is already used in a form, we can't delete it from the logical frame.
-		$scope.isDetachable = !!target;
+		// Gui interaction
+		$scope.$watch('baselineUnknown', function(value) {
+			$scope.planning.baseline = value ? null : 33;
+		});
+
+		$scope.$watch('targetUnknown', function(value) {
+			$scope.planning.target = value ? null : 66;
+		});
+
+		$scope.$watch('planning.formula', function(formulaId) {
+			if (formulaId == null) {
+				delete $scope.planning.parameters;
+
+				$scope.planning.variable = null;
+				$scope.planning.filter = [];
+			}
+			else if (!$scope.planning.parameters) {
+				delete $scope.planning.variable;
+				delete $scope.planning.filter;
+
+				$scope.planning.parameters = {};
+				for (var key in $scope.indicator.formulas[formulaId].parameters)
+					$scope.planning.parameters[key] = {id: null, filter: []}
+			}
+		})
+
+		$scope.getElement = function(id) {
+			var numForms = $scope.project.dataCollection.length;
+			for (var i = 0; i < numForms; ++i) {
+				var form = $scope.project.dataCollection[i],
+					numSections = form.rawData.length;
+
+				for (var j = 0; j < numSections; ++j) {
+					var section = form.rawData[j],
+						numElements = section.elements.length;
+
+					for (var k = 0; k < numElements; ++k)
+						if (section.elements[k].id === id)
+							return section.elements[k];
+				}
+			}
+		};
 
 		$scope.isUnchanged = function() {
 			return angular.equals($scope.planning, $scope.project.indicators[indicatorId]);
@@ -510,10 +594,6 @@ angular.module('monitool.controllers.project', [])
 			// This should be done on the ProjectLogicalFrameController?
 			if ($scope.isNew)
 				target && target.push(indicatorId);
-
-			// we delete this to avoid changing the $scope.isUnchanged() value if we did nothing with the indicator.
-			delete $scope.planning.__baselineUnknown;
-			delete $scope.planning.__targetUnknown;
 
 			// we need to change the project now, because we've been working on a copy of the indicator's planning
 			$scope.project.indicators[indicatorId] = $scope.planning;

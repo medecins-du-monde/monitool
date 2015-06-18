@@ -151,6 +151,7 @@ angular.module('monitool.services.reporting', [])
 		var computeProjectReporting = function(allInputs, query, indicatorsById) {
 			var cols = getColumns(query), result = {};
 
+			// Compute raw data.
 			query.project.dataCollection.forEach(function(form) {
 				// Take all inputs that match our form.
 				var inputs = allInputs.filter(function(input) { return input.form === form.id; });
@@ -170,43 +171,54 @@ angular.module('monitool.services.reporting', [])
 					// we use guids across forms so no collision check is needed.
 					for (var rawId in input.values)
 						result[regroupKey].values[rawId] = input.values[rawId];
+				}
+			});
 
-					// Compute indicators and write them in the final result.
-					form.fields.forEach(function(field) {
-						
-						// check if this indicator was already computed by another form.
-						if (result[regroupKey].compute[field.indicatorId])
-							result[regroupKey].compute[field.indicatorId] = 'FORM_CONFLICT';
+			Object.keys(query.project.indicators).forEach(function(indicatorId) {
+				var indicator = indicatorsById[indicatorId],
+					indicatorMeta = project.indicators[indicatorId];
 
-						else {
-							var indicatorValue;
+				for (var regroupKey in result) {
+					// check if this indicator was already computed by another form.
+					if (result[regroupKey].compute[indicatorId])
+						result[regroupKey].compute[indicatorId] = 'FORM_CONFLICT';
 
-							if (field.type === 'zero')
-								indicatorValue = 0;
-							else if (field.type === 'raw')
-								indicatorValue = input.extractRawValue(field.rawId, field.filter);
-							else if (field.type === 'formula') {
-								var formula = indicatorsById[field.indicatorId].formulas[field.formulaId],
-									localScope = {};
+					else {
+						var indicatorValue;
 
-								for (var key in field.parameters) {
-									if (field.parameters[key].type === 'zero')
-										localScope[key] = 0;
-									else if (field.parameters[key].type === 'raw')
-										localScope[key] = input.extractRawValue(field.parameters[key].rawId, field.parameters[key].filter);
-									else
-										throw new Error('Invalid subfield type.');
-								}
-
-								try { indicatorValue = Parser.evaluate(formula.expression, localScope); }
-								catch (e) { console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope)); }
-							}
-							else
-								throw new Error('Invalid field type.');
-
-							result[regroupKey].compute[field.indicatorId] = indicatorValue;
+						if (indicatorMeta.formula === null) {
+							
 						}
-					});
+						else {
+
+						}
+
+
+						if (field.type === 'zero')
+							indicatorValue = 0;
+						else if (field.type === 'raw')
+							indicatorValue = input.extractRawValue(field.rawId, field.filter);
+						else if (field.type === 'formula') {
+							var formula = indicatorsById[field.indicatorId].formulas[field.formulaId],
+								localScope = {};
+
+							for (var key in field.parameters) {
+								if (field.parameters[key].type === 'zero')
+									localScope[key] = 0;
+								else if (field.parameters[key].type === 'raw')
+									localScope[key] = input.extractRawValue(field.parameters[key].rawId, field.parameters[key].filter);
+								else
+									throw new Error('Invalid subfield type.');
+							}
+
+							try { indicatorValue = Parser.evaluate(formula.expression, localScope); }
+							catch (e) { console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope)); }
+						}
+						else
+							throw new Error('Invalid field type.');
+
+						result[regroupKey].compute[field.indicatorId] = indicatorValue;
+					}
 				}
 			});
 

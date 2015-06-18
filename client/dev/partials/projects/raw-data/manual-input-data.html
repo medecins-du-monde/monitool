@@ -1,7 +1,7 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.logical_frame({projectId: project._id})" ng-bind="project.name"></a></li>
-	<li><a ui-sref="main.project.input_list({projectId: project._id})" translate="project.waiting_inputs"></a></li>
+	<li><a ui-sref="main.project.logical_frame" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.manual_input_list" translate="project.manual_input"></a></li>
 	<li class="active" ng-bind="form.name"></li>
 	<li class="active" ng-bind="inputEntity.name" ng-if="inputEntity"></li>
 	<li class="active" ng-bind="currentInput.period|amDateFormat:'YYYY-MM-DD'"></li>

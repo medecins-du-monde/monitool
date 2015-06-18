@@ -257,237 +257,237 @@ angular
 	/**
 	 * This directive controls the HTML table where the user can describe the raw data that comes from the NHIS, etc...
 	 */
-	.directive('formEditRawData', function() {
-		return {
-			restrict: "AE",
-			templateUrl: "partials/projects/raw-data/planning-edit-raw-data.html",
-			scope: true,
-			link: function($scope, element) {
-				$scope.rawData = $scope.form.rawData;
+	// .directive('formEditRawData', function() {
+	// 	return {
+	// 		restrict: "AE",
+	// 		templateUrl: "partials/projects/raw-data/planning-edit-raw-data.html",
+	// 		scope: true,
+	// 		link: function($scope, element) {
+	// 			$scope.rawData = $scope.form.rawData;
 
-				$scope.newSection = function(target) {
-					target.push({id: makeUUID(), name: "", elements: []});
-				};
+	// 			$scope.newSection = function(target) {
+	// 				target.push({id: makeUUID(), name: "", elements: []});
+	// 			};
 
-				$scope.newVariable = function(target) {
-					target.push({id: makeUUID(), name: "", partition1: [], partition2: [], geoAgg: 'sum', timeAgg: 'sum'});
-				};
+	// 			$scope.newVariable = function(target) {
+	// 				target.push({id: makeUUID(), name: "", partition1: [], partition2: [], geoAgg: 'sum', timeAgg: 'sum'});
+	// 			};
 
-				$scope.newPartition = function(target) {
-					target.push({id: makeUUID(), name: ""});
-				};
+	// 			$scope.newPartition = function(target) {
+	// 				target.push({id: makeUUID(), name: ""});
+	// 			};
 
-				$scope.remove = function(item, target) {
-					var index = target.findIndex(function(arrItem) {
-						return item.id === arrItem.id;
-					});
+	// 			$scope.remove = function(item, target) {
+	// 				var index = target.findIndex(function(arrItem) {
+	// 					return item.id === arrItem.id;
+	// 				});
 
-					if (index !== -1)
-						target.splice(index, 1)
-				};
+	// 				if (index !== -1)
+	// 					target.splice(index, 1)
+	// 			};
 
-			}
-		}
-	})
+	// 		}
+	// 	}
+	// })
 
 
 	/**
 	 * This directive controls the HTML table where the user can describe how to compute the project's indicators from the raw data.
 	 * It's only role is to help formatting the table by flattening the tree structure to an array (so that we can iterate on those and fill the table).
 	 */
-	.directive('formEditFields', function(formEditUtils) {
-		return {
-			restrict: "AE",
-			scope: true,
-			templateUrl: 'partials/projects/planning/edit-fields.html',
-			link: function($scope) {
-				// watch begin and end date.
-				// When they change, we update the list of
-				// - indicators in form.fields (some of them may become forbidden to compute)
-				// - indicators in addable indicators.
-				$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue, oldValue) {
-					// Fix start / end dates.
-					$scope.form.start = $scope.form.useProjectStart ? $scope.project.begin : $scope.form.start,
-					$scope.form.end   = $scope.form.useProjectEnd ? $scope.project.end : $scope.form.end;
+	// .directive('formEditFields', function(formEditUtils) {
+	// 	return {
+	// 		restrict: "AE",
+	// 		scope: true,
+	// 		templateUrl: 'partials/projects/planning/edit-fields.html',
+	// 		link: function($scope) {
+	// 			// watch begin and end date.
+	// 			// When they change, we update the list of
+	// 			// - indicators in form.fields (some of them may become forbidden to compute)
+	// 			// - indicators in addable indicators.
+	// 			$scope.$watch("[form.useProjectStart, form.start, form.useProjectEnd, form.end]", function(newValue, oldValue) {
+	// 				// Fix start / end dates.
+	// 				$scope.form.start = $scope.form.useProjectStart ? $scope.project.begin : $scope.form.start,
+	// 				$scope.form.end   = $scope.form.useProjectEnd ? $scope.project.end : $scope.form.end;
 
-					// When begin and end change, we need to update the list of indicators we can keep and add.
-					// the user cannot choose an indicator which is already collected in the same period.
-					var concurrentForms = formEditUtils.forms.getConcurrents($scope.project.dataCollection, $scope.form),
-						keepableFields  = formEditUtils.forms.getKeepableFields($scope.form, concurrentForms);
+	// 				// When begin and end change, we need to update the list of indicators we can keep and add.
+	// 				// the user cannot choose an indicator which is already collected in the same period.
+	// 				var concurrentForms = formEditUtils.forms.getConcurrents($scope.project.dataCollection, $scope.form),
+	// 					keepableFields  = formEditUtils.forms.getKeepableFields($scope.form, concurrentForms);
 
-					if (keepableFields.length !== $scope.form.fields.length) {
-						if (confirm('Indicators will be removed. Are you sure you want to change this dates?'))
-							// remove the fields that are causing problems
-							$scope.form.fields = keepableFields;
-						else {
-							// restore former dates.
-							$scope.form.useProjectStart = oldValue[0];
-							$scope.form.start = oldValue[1];
-							$scope.form.useProjectEnd = oldValue[2];
-							$scope.form.end = oldValue[3];
-						}
-					}
+	// 				if (keepableFields.length !== $scope.form.fields.length) {
+	// 					if (confirm('Indicators will be removed. Are you sure you want to change this dates?'))
+	// 						// remove the fields that are causing problems
+	// 						$scope.form.fields = keepableFields;
+	// 					else {
+	// 						// restore former dates.
+	// 						$scope.form.useProjectStart = oldValue[0];
+	// 						$scope.form.start = oldValue[1];
+	// 						$scope.form.useProjectEnd = oldValue[2];
+	// 						$scope.form.end = oldValue[3];
+	// 					}
+	// 				}
 
-					// Update addable indicators
-					var allForms            = concurrentForms.concat([$scope.form]),
-						projectIndicatorIds = Object.keys($scope.project.indicators),
-						addableIndicatorIds = formEditUtils.forms.getAddableIndicatorIds(projectIndicatorIds, allForms);
+	// 				// Update addable indicators
+	// 				var allForms            = concurrentForms.concat([$scope.form]),
+	// 					projectIndicatorIds = Object.keys($scope.project.indicators),
+	// 					addableIndicatorIds = formEditUtils.forms.getAddableIndicatorIds(projectIndicatorIds, allForms);
 
-					$scope.addableIndicators = addableIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId]; });
-				}, true);
-
-
-				$scope.add = function() {
-					if ($scope.newIndicatorId) {
-						$scope.form.fields.push({indicatorId: $scope.newIndicatorId, type: "zero"});
-						delete $scope.newIndicatorId; // reset html select value.
-					}
-
-					// Update addable indicators
-					var concurrentForms     = formEditUtils.forms.getConcurrents($scope.project.dataCollection, $scope.form),
-						allForms            = concurrentForms.concat([$scope.form]),
-						projectIndicatorIds = Object.keys($scope.project.indicators),
-						addableIndicatorIds = formEditUtils.forms.getAddableIndicatorIds(projectIndicatorIds, allForms);
-
-					$scope.addableIndicators = addableIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId]; });
-				};
+	// 				$scope.addableIndicators = addableIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId]; });
+	// 			}, true);
 
 
-				$scope.remove = function(field) {
-					$scope.form.fields.splice($scope.form.fields.indexOf(field), 1);
+	// 			$scope.add = function() {
+	// 				if ($scope.newIndicatorId) {
+	// 					$scope.form.fields.push({indicatorId: $scope.newIndicatorId, type: "zero"});
+	// 					delete $scope.newIndicatorId; // reset html select value.
+	// 				}
 
-					var concurrentForms     = formEditUtils.forms.getConcurrents($scope.project.dataCollection, $scope.form),
-						allForms            = concurrentForms.concat([$scope.form]),
-						projectIndicatorIds = Object.keys($scope.project.indicators),
-						addableIndicatorIds = formEditUtils.forms.getAddableIndicatorIds(projectIndicatorIds, allForms);
+	// 				// Update addable indicators
+	// 				var concurrentForms     = formEditUtils.forms.getConcurrents($scope.project.dataCollection, $scope.form),
+	// 					allForms            = concurrentForms.concat([$scope.form]),
+	// 					projectIndicatorIds = Object.keys($scope.project.indicators),
+	// 					addableIndicatorIds = formEditUtils.forms.getAddableIndicatorIds(projectIndicatorIds, allForms);
 
-					$scope.addableIndicators = addableIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId]; });
-				};
-			}
-		}
-	})
+	// 				$scope.addableIndicators = addableIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId]; });
+	// 			};
+
+
+	// 			$scope.remove = function(field) {
+	// 				$scope.form.fields.splice($scope.form.fields.indexOf(field), 1);
+
+	// 				var concurrentForms     = formEditUtils.forms.getConcurrents($scope.project.dataCollection, $scope.form),
+	// 					allForms            = concurrentForms.concat([$scope.form]),
+	// 					projectIndicatorIds = Object.keys($scope.project.indicators),
+	// 					addableIndicatorIds = formEditUtils.forms.getAddableIndicatorIds(projectIndicatorIds, allForms);
+
+	// 				$scope.addableIndicators = addableIndicatorIds.map(function(indicatorId) { return $scope.indicatorsById[indicatorId]; });
+	// 			};
+	// 		}
+	// 	}
+	// })
 
 	/**
 	 * This directive controls one row the HTML table where the user can describe how to compute the project's indicators from the raw data.
 	 */
-	 .directive('formEditField', function(formEditUtils) {
-		return {
-			restrict: "AE",
-			templateUrl: "partials/projects/planning/edit-field.html",
-			scope: {
-				'field': '=',
-				'indicator': '=',
-				'rawData': '=',
-				'userCtx': '=',
-				'project': '=',
-				'language': '=language'
-			},
-			link: function($scope) {
-				// Init
-				// We need a watch because available sources may change if user goes between rawdata and fields tabs
-				$scope.$watch('rawData', function() {
-					// Compute a new source list.
-					$scope.sources = formEditUtils.sources.createList($scope.indicator, $scope.rawData);
+	//  .directive('formEditField', function(formEditUtils) {
+	// 	return {
+	// 		restrict: "AE",
+	// 		templateUrl: "partials/projects/planning/edit-field.html",
+	// 		scope: {
+	// 			'field': '=',
+	// 			'indicator': '=',
+	// 			'rawData': '=',
+	// 			'userCtx': '=',
+	// 			'project': '=',
+	// 			'language': '=language'
+	// 		},
+	// 		link: function($scope) {
+	// 			// Init
+	// 			// We need a watch because available sources may change if user goes between rawdata and fields tabs
+	// 			$scope.$watch('rawData', function() {
+	// 				// Compute a new source list.
+	// 				$scope.sources = formEditUtils.sources.createList($scope.indicator, $scope.rawData);
 					
-					// Search for the right source in the list.
-					var source = formEditUtils.sources.getSourceFromField($scope.sources, $scope.field);
+	// 				// Search for the right source in the list.
+	// 				var source = formEditUtils.sources.getSourceFromField($scope.sources, $scope.field);
 
-					if (!source)
-						// The raw data do not longer exist => replace by zero.
-						$scope.source = $scope.sources.find(function(s) { return s.type === 'zero'; });
-					else if (source.type === 'formula' || source.type === 'zero')
-						// It's a formula or a zero. It can't be wrong (those can't be changed here).
-						$scope.source = source;
-					else if (source.type === 'raw') {
-						// It's a link to raw data => check that we did not change the partitions, and make all filters wrong.
-						if (!formEditUtils.filters.isValid($scope.field.filter, source.element))
-							$scope.source = $scope.sources.find(function(s) { return s.type === 'zero'; });
-						else
-							$scope.source = source;
-					}
-					else
-						throw new Error('Invalid source type.');
-				}, true);
+	// 				if (!source)
+	// 					// The raw data do not longer exist => replace by zero.
+	// 					$scope.source = $scope.sources.find(function(s) { return s.type === 'zero'; });
+	// 				else if (source.type === 'formula' || source.type === 'zero')
+	// 					// It's a formula or a zero. It can't be wrong (those can't be changed here).
+	// 					$scope.source = source;
+	// 				else if (source.type === 'raw') {
+	// 					// It's a link to raw data => check that we did not change the partitions, and make all filters wrong.
+	// 					if (!formEditUtils.filters.isValid($scope.field.filter, source.element))
+	// 						$scope.source = $scope.sources.find(function(s) { return s.type === 'zero'; });
+	// 					else
+	// 						$scope.source = source;
+	// 				}
+	// 				else
+	// 					throw new Error('Invalid source type.');
+	// 			}, true);
 
-				$scope.remove = function() {
-					$scope.$parent.remove($scope.field);
-				};
+	// 			$scope.remove = function() {
+	// 				$scope.$parent.remove($scope.field);
+	// 			};
 
-				// On user input
-				$scope.$watch('source', function(source, oldSource) {
-					// When no source is selected, there is no point in continuing
-					// OR => if first call do nothing!!!
-					if (!source || angular.equals(source, oldSource))
-						return;
+	// 			// On user input
+	// 			$scope.$watch('source', function(source, oldSource) {
+	// 				// When no source is selected, there is no point in continuing
+	// 				// OR => if first call do nothing!!!
+	// 				if (!source || angular.equals(source, oldSource))
+	// 					return;
 
-					// Configure the field object depending on what was selected.
-					$scope.field.type = source.type;
+	// 				// Configure the field object depending on what was selected.
+	// 				$scope.field.type = source.type;
 					
-					if ($scope.field.type === 'raw') {
-						// delete formula params on raws
-						delete $scope.field.formulaId;
-						delete $scope.field.parameters;
+	// 				if ($scope.field.type === 'raw') {
+	// 					// delete formula params on raws
+	// 					delete $scope.field.formulaId;
+	// 					delete $scope.field.parameters;
 						
-						$scope.field.rawId = source.element.id;
-						$scope.field.filter = formEditUtils.filters.createFullArray(source.element);
-					}
-					else if ($scope.field.type === 'formula') {
-						// delete raw params on formulas
-						delete $scope.field.rawId;
-						delete $scope.field.filter;
+	// 					$scope.field.rawId = source.element.id;
+	// 					$scope.field.filter = formEditUtils.filters.createFullArray(source.element);
+	// 				}
+	// 				else if ($scope.field.type === 'formula') {
+	// 					// delete raw params on formulas
+	// 					delete $scope.field.rawId;
+	// 					delete $scope.field.filter;
 
-						$scope.field.formulaId = source.formulaId;
-						$scope.field.parameters = {};
-						for (var key in $scope.indicator.formulas[source.formulaId].parameters)
-							$scope.field.parameters[key] = {type: "zero"};
-					}
-					else if ($scope.field.type === 'zero') {
-						delete $scope.field.formulaId;
-						delete $scope.field.parameters;
-						delete $scope.field.rawId;
-						delete $scope.field.filter;
-					}
-					else
-						throw new Error('Invalid source type.');
-				}, true);
-			}
-		}
-	})
+	// 					$scope.field.formulaId = source.formulaId;
+	// 					$scope.field.parameters = {};
+	// 					for (var key in $scope.indicator.formulas[source.formulaId].parameters)
+	// 						$scope.field.parameters[key] = {type: "zero"};
+	// 				}
+	// 				else if ($scope.field.type === 'zero') {
+	// 					delete $scope.field.formulaId;
+	// 					delete $scope.field.parameters;
+	// 					delete $scope.field.rawId;
+	// 					delete $scope.field.filter;
+	// 				}
+	// 				else
+	// 					throw new Error('Invalid source type.');
+	// 			}, true);
+	// 		}
+	// 	}
+	// })
 
-	.directive('formEditFieldSummable', function() {
-		return {
-			restrict: 'A',
-			template: '<i fa-boolean="summable"></i>',
-			scope: {
-				type: "@",
-				field: "=",
-				indicator: "="
-			},
-			link: function($scope, element) {
-				$scope.$watch('field.formulaId', function() {
-					var agg = $scope.type + 'Aggregation';
+	// .directive('formEditFieldSummable', function() {
+	// 	return {
+	// 		restrict: 'A',
+	// 		template: '<i fa-boolean="summable"></i>',
+	// 		scope: {
+	// 			type: "@",
+	// 			field: "=",
+	// 			indicator: "="
+	// 		},
+	// 		link: function($scope, element) {
+	// 			$scope.$watch('field.formulaId', function() {
+	// 				var agg = $scope.type + 'Aggregation';
 
-					// if the indicator is summable, that's ok
-					if ($scope.indicator[agg] !== 'none')
-						$scope.summable = true;
+	// 				// if the indicator is summable, that's ok
+	// 				if ($scope.indicator[agg] !== 'none')
+	// 					$scope.summable = true;
 
-					// if it's a formula, and all parameters are summable, that's ok
-					else if ($scope.field.type === 'formula') {
-						$scope.summable = true;
-						for (var key in $scope.indicator.formulas[$scope.field.formulaId].parameters)
-							if ($scope.indicator.formulas[$scope.field.formulaId].parameters[agg] === 'none') {
-								$scope.summable = false;
-								break;
-							}
-					}
+	// 				// if it's a formula, and all parameters are summable, that's ok
+	// 				else if ($scope.field.type === 'formula') {
+	// 					$scope.summable = true;
+	// 					for (var key in $scope.indicator.formulas[$scope.field.formulaId].parameters)
+	// 						if ($scope.indicator.formulas[$scope.field.formulaId].parameters[agg] === 'none') {
+	// 							$scope.summable = false;
+	// 							break;
+	// 						}
+	// 				}
 
-					// on all other cases, the field cannot be summed.
-					else
-						$scope.summable = false;
-				})
-			}
-		};
-	})
+	// 				// on all other cases, the field cannot be summed.
+	// 				else
+	// 					$scope.summable = false;
+	// 			})
+	// 		}
+	// 	};
+	// })
 
 	/**
 	 * This directive controls a filter (used to extract a partial sum from a partitioned raw data
@@ -495,7 +495,7 @@ angular
 	 .directive('formEditFilter', function(formEditUtils) {
 		return {
 			restrict: "AE",
-			templateUrl: "partials/projects/planning/edit-filter.html",
+			templateUrl: "partials/projects/indicators/edition-modal-filter.html",
 			scope: {
 				'element': '=',
 				'arrayFilter': '=value'

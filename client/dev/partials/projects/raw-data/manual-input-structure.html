@@ -1,0 +1,251 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.logical_frame" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.manual_input_list" translate="project.manual_input"></a></li>
+	<li class="active">{{form.name}}</li>
+</ol>
+
+<doc-reminder pages="project.presentation_project,project.input_forms,project.change_definition"></doc-reminder>
+
+<form class="form-horizontal" role="form" name="formForm" novalidate>
+
+	<br/>
+	<div class="form-group" show-errors>
+		<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
+		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="form.name">
+			<input type="text"
+				   class="form-control"
+				   id="input-name"
+				   name="name"
+				   ng-model="form.name"
+				   placeholder="{{'project.form_name_ph'|translate}}"
+				   required />
+			
+			<p class="help-block" ng-if="formForm.name.$error.required" translate="form.mandatory"></p>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="active-input" class="col-sm-2 control-label" translate="shared.active"></label>
+		<div class="col-sm-10">
+			<p class="form-control-static" acl-has-project-role="owner" acl-fallback="form.active">
+				<input type="checkbox" id="active-input" ng-model="form.active" />
+			</p>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="collect-input" class="col-sm-2 control-label" translate="project.collect"></label>
+		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.collects.'+form.collect)|translate">
+			<select class="form-control" name="collect" id="collect-input" ng-model="form.collect">
+				<option value="entity" translate="project.collects.entity"></option>
+				<option value="project" translate="project.collects.project"></option>
+			</select>
+		</div>
+	</div>		
+
+	<div class="form-group">
+		<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
+		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.periodicities.'+form.periodicity)|translate">
+			<select class="form-control" name="periodicity" id="periodicity-input" ng-model="form.periodicity">
+				<option value="day" translate="project.periodicities.day"></option>
+				<option value="week" translate="project.periodicities.week"></option>
+				<option value="month" translate="project.periodicities.month"></option>
+				<option value="quarter" translate="project.periodicities.quarter"></option>
+				<option value="year" translate="project.periodicities.year"></option>
+				<option value="planned" translate="project.periodicities.planned"></option>
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group" show-errors>
+		<label for="periodicity" class="col-sm-2 control-label" translate="shared.begin"></label>
+		<div class="col-sm-10">
+			<div class="input-group" acl-has-project-role="owner">
+				<div class="input-group-addon">
+					<input type="checkbox" ng-model="form.useProjectStart" id="use-project-start-input" />
+					<label for="use-project-start-input" style="font-weight: normal; display: inline; ">{{'project.begin'|translate}}</label>
+				</div>
+
+				<input type="text" 
+					   datepicker-popup="longDate"
+					   name="start"
+					   ng-model="form.start"
+					   is-open="startDateOpen"
+					   ng-click = "startDateOpen = true"
+					   ng-disabled="form.useProjectStart"
+					   ng-required="!form.useProjectStart"
+					   ng-max="form.end"
+					   class="form-control" />
+			</div>
+
+			<p class="form-control-static" acl-lacks-project-role="owner">
+				<span ng-if="form.useProjectStart" translate="project.begin"></span>
+				<span ng-if="!form.useProjectStart" ng-bind="form.start | amDateFormat: 'D MMMM YYYY'"></span>
+			</p>
+		</div>
+	</div>
+
+	<div class="form-group" ng-if="form.periodicity === 'planned'">
+		<label class="col-sm-2 control-label" translate="project.intermediary_periods"></label>
+		<div class="col-sm-10">
+			<div ng-repeat="(index, period) in form.intermediaryDates" class="row" style="padding-bottom: 10px">
+				<ng-form name="intermediaryForm">
+					<div class="col-sm-10 form-group" show-errors style="margin: 0">
+						<input type="text" 
+							   datepicker-popup="longDate"
+							   name="period"
+							   ng-model="form.intermediaryDates[index]"
+							   is-open="periodDateOpen"
+							   ng-click="periodDateOpen=true"
+							   required
+							   ng-min="form.start"
+							   ng-max="form.end"
+							   class="form-control" />
+					</div>
+					<div class="col-sm-2">
+						<button class="btn btn-danger" ng-click="removeIntermediary(index)" translate="shared.delete"></button>
+					</div>
+				</ng-form>
+			</div>
+
+			<div class="row" acl-has-project-role="owner">
+				<div class="col-sm-12">
+					<button class="btn btn-default" ng-click="addIntermediary()" translate="project.add_intermediary"></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group" show-errors>
+		<label for="periodicity" class="col-sm-2 control-label" translate="shared.end"></label>
+		<div class="col-sm-10">
+			<div class="input-group" acl-has-project-role="owner">
+				<div class="input-group-addon">
+					<input type="checkbox" ng-model="form.useProjectEnd" id="use-project-end-input" />
+					<label for="use-project-end-input" style="font-weight: normal; display: inline; ">{{'project.end'|translate}}</label>
+				</div>
+
+				<input type="text" 
+					   datepicker-popup="longDate"
+					   name="end"
+					   ng-model="form.end"
+					   is-open="endDateOpen"
+					   ng-click="endDateOpen=true"
+					   ng-disabled="form.useProjectEnd"
+					   ng-required="!form.useProjectEnd"
+					   ng-min="form.start"
+					   class="form-control" />
+			</div>
+
+			<p class="form-control-static" acl-lacks-project-role="owner">
+				<span ng-if="form.useProjectEnd" translate="project.end"></span>
+				<span ng-if="!form.useProjectEnd" ng-bind="form.end | amDateFormat: 'D MMMM YYYY'"></span>
+			</p>
+		</div>
+	</div>
+
+	<br/>
+
+	<table class="table table-bordered table-condensed table-raw-data">
+		<thead>
+			<tr>
+				<th translate="project.section"></th>
+				<th translate="project.variable"></th>
+				<th translate="project.partition"></th>
+				<th translate="project.additional_partition"></th>
+				<th>Agrégation</th>
+			</tr>
+		</thead>
+		<tbody ng-repeat="section in form.rawData track by section.id">
+			<tr ng-repeat="element in section.elements track by element.id">
+				<td rowspan="{{section.elements.length + 1}}" ng-if="$first" acl-has-project-role="owner" acl-fallback="section.name">
+					<a ng-click="remove(section, form.rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+					<span mt-content-editable ng-model="section.name"></span>
+				</td>
+				<td acl-has-project-role="owner" acl-fallback="element.name">
+					<a ng-click="remove(element, section.elements)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+					<span mt-content-editable ng-model="element.name"></span>
+				</td>
+				<td>
+					<ul>
+						<li ng-repeat="p in element.partition1 track by p.id" acl-has-project-role="owner" acl-fallback="p.name">
+							<a ng-click="remove(p, element.partition1)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+							<span mt-content-editable ng-model="p.name"></span>
+						</li>
+						<li acl-has-project-role="owner"><a ng-click="newPartition(element.partition1)" translate="project.new_partition"></a></li>
+					</ul>
+				</td>
+				<td>
+					<ul ng-if="element.partition1.length >= 2">
+						<li ng-repeat="p in element.partition2 track by p.id" acl-has-project-role="owner" acl-fallback="p.name">
+							<a ng-click="remove(p, element.partition2)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+							<span mt-content-editable ng-model="p.name"></span>
+						</li>
+						<li acl-has-project-role="owner"><a ng-click="newPartition(element.partition2)" translate="project.new_partition"></a></li>
+					</ul>
+				</td>
+				<td>
+					Sur des lieux différents<br/>
+					<select ng-model="element.geoAgg">
+						<option value="none">Ne pas agréger</option>
+						<option value="sum">Somme</option>
+						<option value="average">Moyenne</option>
+						<option value="highest">Plus grand valeure</option>
+						<option value="lowest">Plus petite valeure</option>
+						<option value="last">Dernière valeur</option>
+					</select><br/>
+
+					Sur un même lieu<br/>
+					<select ng-model="element.timeAgg">
+						<option value="none">Ne pas agréger</option>
+						<option value="sum">Somme</option>
+						<option value="average">Moyenne</option>
+						<option value="highest">Plus grand valeure</option>
+						<option value="lowest">Plus petite valeure</option>
+						<option value="last">Dernière valeur</option>
+					</select><br/>
+				</td>
+			</tr>
+			<tr acl-has-project-role="owner">
+				<td ng-if="section.elements.length === 0">
+					<a ng-click="remove(section, form.rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+					<span mt-content-editable ng-model="section.name"></span>
+				</td>
+				<td colspan="4" style="text-align: center">
+					<a ng-click="newVariable(section.elements)"
+					   class="btn btn-xs btn-default" 
+					   style="width: 100%"
+					   translate="project.new_variable"></a>
+				</td>
+			</tr>
+		</tbody>
+		<tbody acl-has-project-role="owner">
+			<tr>
+				<td colspan="5" style="text-align: center">
+					<a ng-click="newSection(form.rawData)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_section"></a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+
+	<!-- form actions -->
+	<div acl-has-project-role="owner">
+		<br/>
+		<button ng-click="save()" ng-disabled="formForm.$invalid || isUnchanged()" class="btn btn-primary">
+			<i class="fa fa-floppy-o"></i>
+			<span translate="shared.save"></span>
+		</button>
+
+		<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+			<i class="fa fa-undo"></i>
+			<span translate="shared.remove_changes"></span>
+		</button>
+
+		<button ng-click="delete()" ng-if="formIndex !== -1" class="btn btn-danger">
+			<i class="fa fa-times"></i>
+			<span translate="shared.delete"></span>
+		</button>
+	</div>
+</form>

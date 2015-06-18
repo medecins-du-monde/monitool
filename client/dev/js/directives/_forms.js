@@ -86,7 +86,6 @@ angular.module('monitool.directives.form', [])
 					$scope.$apply(function() {
 						var text = element.text()
 
-						console.log(attributes.allowWhitespace)
 						if (!attributes.allowWhitespace)
 							text = text.replace(/\s+/g, " ")
 

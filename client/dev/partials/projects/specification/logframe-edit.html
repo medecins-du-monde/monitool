@@ -78,7 +78,7 @@
  	</fieldset>
 
 	<fieldset>
-		<legend translate="project.goal"></legend>
+		<legend translate="shared.logical_frame"></legend>
 
 		<div class="form-group" show-errors>
 			<label for="logframe-goal-input" class="col-sm-2 control-label" translate="project.goal"></label>
@@ -94,10 +94,6 @@
 				<p class="help-block" ng-if="projectForm.goalDesc.$error.required" translate="form.mandatory"></p>
 			</div>
 		</div>
-	</fieldset>
-
-	<fieldset>
-		<legend translate="project.purposes"></legend>
 		
 		<p ng-if="project.logicalFrame.purposes.length == 0" translate="project.no_purposes"></p>
 

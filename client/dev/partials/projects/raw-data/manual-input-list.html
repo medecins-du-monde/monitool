@@ -1,0 +1,109 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.logical_frame" ng-bind="::project.name"></a></li>
+	<li class="active" translate="project.manual_input"></li>
+</ol>
+
+<doc-reminder pages="project.presentation_project,project.input_forms,project.change_definition,project.inputs"></doc-reminder>
+
+<legend>Plannings de saisies manuels</legend>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th translate="shared.name"></th>
+			<th translate="shared.begin"></th>
+			<th translate="shared.end"></th>
+			<th translate="shared.active"></th>
+			<th translate="project.periodicity"></th>
+			<th translate="project.collect"></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-if="project.dataCollection.length == 0">
+			<td colspan="7" style="text-align: center" translate="project.no_forms"></td>
+		</tr>
+		<tr ng-repeat="form in project.dataCollection">
+			<td>{{form.name}}</td>
+			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
+			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>
+			<td><i fa-boolean="form.active"></i></td>
+			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
+			<td>{{'project.collects.' + form.collect|translate}}</td>
+			<td>
+				<a class="btn btn-default btn-xs" ui-sref="main.project.manual_input_structure({formId: form.id})">
+					<i class="fa fa-pencil"></i>
+					<span translate="shared.edit" acl-has-project-role="owner"></span>
+					<span translate="shared.display" acl-lacks-project-role="owner"></span>
+				</a>
+			</td>
+		</tr>
+	</tbody>
+	<tfoot acl-has-project-role="owner">
+		<tr>
+			<td colspan="8">
+				<button class="btn btn-default btn-xs" style="width: 100%" ui-sref="main.project.manual_input_structure({formId: 'new'})" translate="shared.add"></button>
+			</td>
+		</tr>
+	</tfoot>
+</table>
+
+
+<legend>Saisies</legend>
+
+<ul class="nav nav-tabs" role="tablist">
+	<li ng-class="{active:inputs==waitingInputs}">
+		<a ng-click="inputs=waitingInputs">{{'project.waiting_inputs'|translate}}</a>
+	</li>
+	<li ng-class="{active:inputs==finishedInputs}">
+		<a ng-click="inputs=finishedInputs">{{'project.finished_inputs'|translate}}</a>
+	</li>
+	<li ng-class="{active:inputs==invalidInputs}">
+		<a ng-click="inputs=invalidInputs">{{'project.invalid_inputs'|translate}}</a>
+	</li>
+</ul>
+
+<br/>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th><a ng-click="pred='period';rev=!rev">{{'shared.date'|translate}}</a></th>
+			<th><a ng-click="pred='inputEntityName';rev=!rev">{{'shared.input_entities'|translate}}</a></th>
+			<th><a ng-click="pred='formName';rev=!rev">{{'project.input_forms'|translate}}</a></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-if="!inputs.length">
+			<td colspan="4" style="text-align: center" translate="project.no_inputs"></td>
+		</tr>
+		<tr ng-repeat="input in inputs|orderBy:pred:rev">
+			<td ng-bind="input.period|amDateFormat:'D MMMM YYYY'"></td>
+			<td ng-bind="::input.inputEntityName"></td>
+			<td ng-bind="::input.formName"></td>
+			<td>
+				<a class="btn btn-default btn-xs" 
+				   acl-has-project-role="input"
+				   ui-sref="main.project.manual_input_data({period: input.period.format('YYYY-MM-DD'), formId: input.formId, entityId: input.inputEntityId})">
+					<i class="fa fa-pencil-square-o"></i>
+					<span translate>{{::input.filled ? "shared.edit" : "project.input"}}</span>
+				</a>
+
+				<a class="btn btn-default btn-xs" 
+				   acl-lacks-project-role="input"
+				   ng-if="::input.filled"
+				   ui-sref="main.project.manual_input_data({period: input.period.format('YYYY-MM-DD'), formId: input.formId, entityId: input.inputEntityId})">
+					<i class="fa fa-pencil-square-o"></i>
+					<span translate="shared.display"></span>
+				</a>
+			</td>
+		</tr>
+	</tbody>
+	<tbody ng-if="allDone && !showFinished">
+		<tr>
+			<td colspan="5" translate="project.no_waiting_inputs"></td>
+		</tr>
+	</tbody>
+</table>

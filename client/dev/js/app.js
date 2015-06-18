@@ -292,15 +292,27 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Project Raw data
 	///////////////////////////
 
-	$stateProvider.state('main.project.forms', {
-		url: '/forms',
-		templateUrl: 'partials/projects/raw-data/planning-list.html'
+	$stateProvider.state('main.project.automatic_input_list', {
+		url: '/automatic-input',
+		templateUrl: 'partials/projects/raw-data/automatic-input-list.html'
 	});
 
-	$stateProvider.state('main.project.form', {
-		url: '/forms/:formId',
-		templateUrl: 'partials/projects/raw-data/planning-edit.html',
-		controller: 'ProjectFormEditionController',
+
+	$stateProvider.state('main.project.manual_input_list', {
+		url: '/manual-input',
+		templateUrl: 'partials/projects/raw-data/manual-input-list.html',
+		controller: 'ProjectManualInputListController',
+		resolve: {
+			inputs: function(Input, project) {
+				return Input.fetchProjectStatus(project);
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.manual_input_structure', {
+		url: '/manual-input/:formId',
+		templateUrl: 'partials/projects/raw-data/manual-input-structure.html',
+		controller: 'ProjectManualInputStructureController',
 		resolve: {
 			form: function($stateParams, project) {
 				if ($stateParams.formId === 'new')
@@ -315,8 +327,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						end: project.end,
 						intermediaryDates: [],
 						active: true,
-						rawData: [],
-						fields: []
+						rawData: []
 					};
 				else
 					return project.dataCollection.find(function(form) {
@@ -326,21 +337,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.input_list', {
-		url: '/inputs',
-		templateUrl: 'partials/projects/raw-data/input-list.html',
-		controller: 'ProjectInputListController',
-		resolve: {
-			inputs: function(Input, project) {
-				return Input.fetchProjectStatus(project);
-			}
-		}
-	});
-
-	$stateProvider.state('main.project.input', {
-		url: '/input/:period/:formId/:entityId',
-		templateUrl: 'partials/projects/raw-data/input-edit.html',
-		controller: 'ProjectInputController',
+	$stateProvider.state('main.project.manual_input_data', {
+		url: '/manual-input/:period/:formId/:entityId',
+		templateUrl: 'partials/projects/raw-data/manual-input-data.html',
+		controller: 'ProjectManualInputDataController',
 		resolve: {
 			inputs: function(Input, $stateParams, project) {
 				var form = project.dataCollection.find(function(f) { return f.id == $stateParams.formId});
@@ -599,7 +599,7 @@ app.run(function($rootScope, $state, mtFetch) {
 	mtFetch.currentUser().then(function(user) {
 		$rootScope.userCtx = user;
 	}).catch(function(error) {
-		$state.go('main.login');
+		
 	});
 })
 

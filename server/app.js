@@ -16,6 +16,7 @@ express()
 	.get('/ping', function(request, response) {
 		response.send('pong');
 	})
+	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? 'client/dev' : 'client/build'))
 
 	.use(cookieParser())
 	.use(session({ secret: 'cd818da5bcd0d3d9ba5a9a44e49148d2', resave: false, saveUninitialized: false }))
@@ -50,7 +51,6 @@ express()
 	.use(require('./controllers/public'))
 	.use(require('./controllers/restricted'))
 
-	.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? 'client/dev' : 'client/build'))
 	.listen(config.port);
 
 

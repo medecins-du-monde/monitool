@@ -129,7 +129,9 @@ var FRENCH_TRANSLATION = {
 		detach: "Déplacer vers supplémentaires",
 
 		stay_here_check: 'Vous avez realisé des changements. OK pour rester sur cette page, Annuler pour perdre les modifications.',
-		filter: "Filtre"
+		filter: "Filtre",
+		'export': "Export",
+		none: "Aucune"
 	},
 	menu: {
 		toggle_nav: "Voir le menu",
@@ -192,6 +194,8 @@ var FRENCH_TRANSLATION = {
 
 		value: "Valeur",
 		raw_data: "Données brutes",
+		raw_data_management: "Suivi des données brutes",
+		indicator_selection: "Selection des indicateurs",
 		planning: "Planning",
 		indicators_computation: "Calcul des indicateurs",
 		partition: "Partition",
@@ -272,7 +276,8 @@ var FRENCH_TRANSLATION = {
 		input_field: 'Champ de saisie',
 		value_source: 'Source de la valeur',
 		input_mode: 'Mode de saisie',
-		manual_input: 'Saisie manuelle',
+		manual_input: 'Saisies manuelles',
+		automatic_input: 'Saisies automatiques',
 
 		periodicities: {
 			day: 'Tous les jours',

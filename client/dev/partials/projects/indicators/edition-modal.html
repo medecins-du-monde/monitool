@@ -1,128 +1,176 @@
 <div class="modal-body">
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
-		<legend translate="shared.edition"></legend>
+		<legend ng-bind="indicator.name[language]"></legend>
 
-		<div class="form-group">
-			<label for="relevance-input" class="col-sm-2 control-label" translate="shared.indicator"></label>
-			<div class="col-sm-10">
-				<input type="text" ng-model="indicator.name[language]" class="form-control" disabled />
+		<div class="well well-sm">
+			<div class="form-group" show-errors>
+				<label for="relevance-input" class="col-sm-2 control-label" translate="project.relevance"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.relevance">
+					<textarea class="form-control"
+							  id="relevance-input"
+							  name="relevance"
+							  ng-model="planning.relevance"
+							  placeholder="{{'project.relevance_ph'|translate}}"
+							  required></textarea>
+
+					<p class="help-block" ng-if="planningForm.relevance.$error.required" translate="form.mandatory"></p>
+				</div>
 			</div>
-		</div>
 
-		<div class="form-group" show-errors>
-			<label for="relevance-input" class="col-sm-2 control-label" translate="project.relevance"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.relevance">
-				<textarea class="form-control"
-						  id="relevance-input"
-						  name="relevance"
-						  ng-model="planning.relevance"
-						  placeholder="{{'project.relevance_ph'|translate}}"
-						  required></textarea>
-
-				<p class="help-block" ng-if="planningForm.relevance.$error.required" translate="form.mandatory"></p>
+			<div class="form-group" show-errors>
+				<label for="source-input" class="col-sm-2 control-label" translate="project.source"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.source">
+					<input class="form-control" id="source-input" name="source" ng-model="planning.source" placeholder="{{'project.source_ph'|translate}}" required />
+					<p class="help-block" ng-if="planningForm.source.$error.required" translate="form.mandatory"></p>
+				</div>
 			</div>
-		</div>
 
-		<div class="form-group" show-errors>
-			<label for="source-input" class="col-sm-2 control-label" translate="project.source"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.source">
-				<input class="form-control" id="source-input" name="source" ng-model="planning.source" placeholder="{{'project.source_ph'|translate}}" required />
-				<p class="help-block" ng-if="planningForm.source.$error.required" translate="form.mandatory"></p>
-			</div>
-		</div>
-
-		<div class="form-group" show-errors>
-			<label for="in-charge-input" class="col-sm-2 control-label" translate="project.in_charge"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.inCharge">
-				<input class="form-control" id="in-charge-input" name="inCharge" ng-model="planning.inCharge" placeholder="{{'project.in_charge_ph'|translate}}" required />
-				<p class="help-block" ng-if="planningForm.inCharge.$error.required" translate="form.mandatory"></p>
-			</div>
-		</div>
-
-		<div class="form-group" show-errors>
-			<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
-				<div class="input-group">
-					<span class="input-group-addon">
-						<input type="checkbox" ng-model="planning.__baselineUnknown" id="baseline_unknown_input" ng-change="planning.__baselineUnknown&&(planning.baseline=null);">
-						<label for="baseline_unknown_input" style="font-weight: normal" translate="project.unknown"></label>
-					</span>
-
-					<input class="form-control"
-						   id="baseline-input"
-						   name="baseline"
-						   type="number"
-						   ng-model="planning.baseline"
-						   ng-disabled="planning.__baselineUnknown"
-						   placeholder="{{'project.baseline_ph'|translate}}"
-						   ng-required="!planning.__baselineUnknown" />
+			<div class="form-group" show-errors>
+				<label for="in-charge-input" class="col-sm-2 control-label" translate="project.in_charge"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.inCharge">
+					<input class="form-control" id="in-charge-input" name="inCharge" ng-model="planning.inCharge" placeholder="{{'project.in_charge_ph'|translate}}" required />
+					<p class="help-block" ng-if="planningForm.inCharge.$error.required" translate="form.mandatory"></p>
 				</div>
 			</div>
 		</div>
 
-		<div class="form-group" show-errors>
-			<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.target">
-				<div class="input-group">
-					<span class="input-group-addon">
-						<input type="checkbox" ng-model="planning.__targetUnknown" id="target_unknown_input" ng-change="planning.__targetUnknown&&(planning.target=null);">
-						<label for="target_unknown_input" style="font-weight: normal" translate="project.unknown"></label>
-					</span>
-
-					<input id="target-input"
-						   class="form-control"
-						   type="number"
-						   name="target"
-						   ng-model="planning.target"
-						   ng-disabled="planning.__targetUnknown"
-						   placeholder="{{'project.target_ph'|translate}}"
-						   ng-required="!planning.__targetUnknown" />
+		<div class="well well-sm">
+			<div class="form-group">
+				<label for="formula-input" class="col-sm-2 control-label" translate="indicator.formula"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.formula">
+					<select class="form-control" name="planning-formula" ng-model="planning.formula" ng-options="id as formula.expression for (id, formula) in indicator.formulas">
+						<option value="" translate="shared.none"></option>
+					</select>
 				</div>
 			</div>
+
+			<div class="form-group" ng-if="!planning.formula">
+				<label for="source2-input" class="col-sm-2 control-label" translate="project.variable"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.variable">
+					<select class="form-control input-sm"
+						ng-model="planning.variable"
+						ng-options="v.id as v.name group by v.group for v in sources"></select>
+				</div>
+			</div>
+
+			<div class="form-group" ng-if="planning.variable">
+				<label for="source2-input" class="col-sm-2 control-label" translate="shared.filter"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.filter">
+					<form-edit-filter element="getElement(planning.variable)" value="planning.filter"></form-edit-filter>
+				</div>
+			</div>
+
+			<table class="table table-bordered table-condensed" ng-if="planning.formula" style="background-color: white">
+				<thead>
+					<tr>
+						<th>Nom</th>
+						<th>Variable</th>
+						<th>Filtre</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="(paramKey, value) in planning.parameters">
+						<td ng-bind="indicator.formulas[planning.formula].parameters[paramKey][language]"></td>
+						<td>
+							<select class="form-control input-sm"
+									ng-model="value.id"
+									ng-options="v.id as v.name group by v.group for v in sources"></select>
+						</td>
+						<td style="padding: 0">
+							<form-edit-filter element="getElement(value.id)" value="value.filter"></form-edit-filter>
+						</td>
+					<tr>
+				</tbody>
+			</table>
 		</div>
 
-		<div class="row" style="margin-bottom: 15px;" ng-if="!planning.__baselineUnknown && !planning.__targetUnknown" acl-has-project-role="owner">
-			<label for="show_red-input" class="col-sm-2 control-label" translate="project.color"></label>
-			<div class="col-sm-10">
-				<div class="form-group" show-errors style="margin: 0">
-					<div class="input-group" style="margin-bottom: 10px">
-						<span class="input-group-addon alert-danger" style="width: 280px;" translate="project.red_for_target"></span>
-						<input id="show_red-input"
-							   class="form-control"
-							   type="number"
-							   name="show_red"
-							   ng-model="planning.showRed"
-							   ng-min="0"
-							   required />
-						<span class="input-group-addon">%</span>
-					</div>
-				</div>
-				<div class="form-group" show-errors style="margin: 0">
-					<div class="input-group" style="margin-bottom: 10px">
-						<span class="input-group-addon alert-warning" style="width: 280px;">
-							{{'project.orange_for_target'|translate:{value:planning.showRed} }}
+		<div class="well well-sm">
+
+			<div class="form-group" show-errors>
+				<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
+					<div class="input-group">
+						<span class="input-group-addon">
+							<input type="checkbox" ng-model="baselineUnknown" id="baseline_unknown_input">
+							<label for="baseline_unknown_input" style="font-weight: normal" translate="project.unknown"></label>
 						</span>
-						<input id="show_yellow-input"
-							   class="form-control"
-							   type="number"
-							   name="show_yellow"
-							   ng-model="planning.showYellow"
-							   ng-min="planning.showRed"
-							   ng-max="100"
-							   required />
 
-						<span class="input-group-addon">%</span>
+						<input class="form-control"
+							   id="baseline-input"
+							   name="baseline"
+							   type="number"
+							   ng-model="planning.baseline"
+							   ng-disabled="baselineUnknown"
+							   placeholder="{{'project.baseline_ph'|translate}}"
+							   ng-required="!baselineUnknown" />
 					</div>
 				</div>
-				<div class="alert alert-success" style="padding: 6px 12px; text-align: center">
-					{{'project.green_for_target'|translate:{value:planning.showYellow} }}
-				</div>
+			</div>
 
-				<a class="pull-right" ng-click="show_more=!show_more">
-					<i class="fa fa-info"></i>
-					{{'project.what_is_progress'|translate}}
-				</a>
-				<div ng-show="show_more" style="clear: both" ng-bind-html="'project.what_is_progress_detail'|translate"></div>
+			<div class="form-group" show-errors>
+				<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
+				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.target">
+					<div class="input-group">
+						<span class="input-group-addon">
+							<input type="checkbox" ng-model="targetUnknown" id="target_unknown_input">
+							<label for="target_unknown_input" style="font-weight: normal" translate="project.unknown"></label>
+						</span>
+
+						<input id="target-input"
+							   class="form-control"
+							   type="number"
+							   name="target"
+							   ng-model="planning.target"
+							   ng-disabled="targetUnknown"
+							   placeholder="{{'project.target_ph'|translate}}"
+							   ng-required="!targetUnknown" />
+					</div>
+				</div>
+			</div>
+
+			<div class="row" style="margin-bottom: 15px;" ng-if="!baselineUnknown && !targetUnknown" acl-has-project-role="owner">
+				<label for="show_red-input" class="col-sm-2 control-label" translate="project.color"></label>
+				<div class="col-sm-10">
+					<div class="form-group" show-errors style="margin: 0">
+						<div class="input-group" style="margin-bottom: 10px">
+							<span class="input-group-addon alert-danger" style="width: 280px;" translate="project.red_for_target"></span>
+							<input id="show_red-input"
+								   class="form-control"
+								   type="number"
+								   name="show_red"
+								   ng-model="planning.showRed"
+								   ng-min="0"
+								   required />
+							<span class="input-group-addon">%</span>
+						</div>
+					</div>
+					<div class="form-group" show-errors style="margin: 0">
+						<div class="input-group" style="margin-bottom: 10px">
+							<span class="input-group-addon alert-warning" style="width: 280px;">
+								{{'project.orange_for_target'|translate:{value:planning.showRed} }}
+							</span>
+							<input id="show_yellow-input"
+								   class="form-control"
+								   type="number"
+								   name="show_yellow"
+								   ng-model="planning.showYellow"
+								   ng-min="planning.showRed"
+								   ng-max="100"
+								   required />
+
+							<span class="input-group-addon">%</span>
+						</div>
+					</div>
+					<div class="alert alert-success" style="padding: 6px 12px; text-align: center">
+						{{'project.green_for_target'|translate:{value:planning.showYellow} }}
+					</div>
+
+					<a class="pull-right" ng-click="show_more=!show_more">
+						<i class="fa fa-info"></i>
+						{{'project.what_is_progress'|translate}}
+					</a>
+					<div ng-show="show_more" style="clear: both" ng-bind-html="'project.what_is_progress_detail'|translate"></div>
+				</div>
 			</div>
 		</div>
 	</form>
