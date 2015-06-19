@@ -1,6 +1,6 @@
 "use strict";
 
-var database = require('../database');
+var database = require('./database');
 
 module.exports = {
 	list: function(type, options, callback) {

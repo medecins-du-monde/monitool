@@ -2,12 +2,54 @@
 
 var async     = require('async'),
 	validator = require('is-my-json-valid'),
-	Abstract  = require('./abstract'),
 	Project   = require('./project'),
-	schema    = require('./schemas/input'),
+	Abstract  = require('../abstract'),
 	database  = require('../database');
 
-var validate = validator(schema);
+var validate = validator({
+	"$schema": "http://json-schema.org/schema#",
+	"title": "Monitool input schema",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["_id", "type", "project", "entity", "form", "period", "values"],
+	
+	"properties": {
+		"_id":     {
+			"type": "string",
+			"pattern": "^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:(([a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12})|none):[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:\\d{4}-\\d{2}-\\d{2}$"
+		},
+		"_rev":    { "$ref": "#/definitions/couchdb-revision" },
+		
+		"type":    { "type": "string", "pattern": "^input$" },
+		"period":  { "type": "string", "format": "date" },
+
+		"project": { "$ref": "#/definitions/uuid" },
+		"entity":  {
+			"type": "string",
+			"pattern": "^([a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12})|none$"
+		},
+		"form":    { "$ref": "#/definitions/uuid" },
+		
+		"values": {
+			"type": "object",
+			"patternProperties": {
+				"^count$": { "type": "number" },
+				"[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}(\\.[a-z0-9A-Z]+)+": {"type": "number"}
+			}
+		}
+	},
+
+	"definitions": {
+		"uuid": {
+			"type": "string",
+			"pattern": "^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}$"
+		},
+		"couchdb-revision": {
+			"type": "string",
+			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
+		}
+	}
+});
 
 var Input = module.exports = {
 	// list: Abstract.list.bind(this, 'input'),

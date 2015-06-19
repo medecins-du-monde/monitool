@@ -95,7 +95,8 @@ app.config(function(datepickerConfig, datepickerPopupConfig) {
  * Remove all properties prefixed by "__" when submitting to server
  * (which allow us to add helper properties on objects, and not submit them).
  */
- app.config(function($httpProvider) {
+app.config(function($httpProvider) {
+
 	$httpProvider.defaults.transformRequest.unshift(function(data) {
 		if (!data)
 			return data;
@@ -599,11 +600,47 @@ app.run(function($rootScope, $state, mtFetch) {
 	mtFetch.currentUser().then(function(user) {
 		$rootScope.userCtx = user;
 	}).catch(function(error) {
-		
+		window.location.href = '/authentication/login';
 	});
-})
+});
+
+
+// Angular is not loaded yet...
+function load(url, callback) {
+	var xhr;
+	
+	if (typeof XMLHttpRequest !== 'undefined')
+		xhr = new XMLHttpRequest();
+	else {
+		var versions = ["MSXML2.XmlHttp.5.0",  "MSXML2.XmlHttp.4.0", "MSXML2.XmlHttp.3.0",  "MSXML2.XmlHttp.2.0", "Microsoft.XmlHttp"];
+
+		for (var i = 0, len = versions.length; i < len; i++) {
+			try {
+				xhr = new ActiveXObject(versions[i]);
+				break;
+			}
+			catch(e) {}
+		}
+	}
+	
+	xhr.onreadystatechange = function() {
+		xhr.readyState === 4 && callback(xhr);
+	};
+	
+	xhr.open('GET', url, true);
+	xhr.send('');
+};
 
 angular.element(document).ready(function() {
-	angular.bootstrap(document, ['monitool.app']);
+	load('/resources/user/me', function(response) {
+		if (response.status === 200)
+			angular.bootstrap(document, ['monitool.app']);
+
+		else if (response.status === 401)
+			window.location.href = '/authentication/login';
+
+		else
+			angular.element('body').html('Server seems to be down.')
+	});
 });
 

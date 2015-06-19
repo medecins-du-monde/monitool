@@ -4,7 +4,7 @@ angular
 	.module('monitool.controllers.helper', [])
 
 	.controller('MainMenuController', function($state, $scope, $translate, $locale, $rootScope) {
-		$scope.$state   = $state;
+		$scope.$state = $state;
 		
 		$scope.changeLanguage = function(langKey) {
 			$translate.use(langKey);

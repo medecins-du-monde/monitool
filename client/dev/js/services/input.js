@@ -121,7 +121,7 @@ angular.module('monitool.services.models.input', [])
 
 
 		// Create $resource
-		var Input = $resource('/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
+		var Input = $resource('/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
 		/**
 		 * Factory with default value

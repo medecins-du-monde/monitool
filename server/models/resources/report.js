@@ -1,11 +1,14 @@
 "use strict";
 
 var validator = require('is-my-json-valid'),
-	Abstract  = require('./abstract'),
-	schema    = require('./schemas/report'),
+	Abstract  = require('../abstract'),
 	database  = require('../database');
 
-var validate = validator(schema);
+var validate = validator({
+	"$schema": "http://json-schema.org/schema#",
+	"title": "Monitool report schema",
+	"type": "object"
+});
 
 var Report = module.exports = {
 	get: Abstract.get.bind(this, 'report'),

@@ -1,0 +1,19 @@
+doctype html
+html(lang="en")
+	head
+		title Allow access
+	body
+		h1 Monitool access
+
+		p
+			| #{client.name} is asking to make changes to the monitool database
+			| on your behalf.
+		
+		p
+			| Do you agree?
+
+		form(action="/authentication/decision", method="post")
+			input(type="hidden", name="transaction_id", value=transactionID)
+			input(type="submit", value="Allow")
+			input(type="submit", value="Deny", name="cancel")
+
