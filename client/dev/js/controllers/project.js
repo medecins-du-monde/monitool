@@ -260,14 +260,14 @@ angular.module('monitool.controllers.project', [])
 		};
 	})
 
-	.controller('ProjectInputEntitiesController', function($scope, $filter, mtFetch, project) {
+	.controller('ProjectInputEntitiesController', function($scope, $filter, Input, project) {
 		$scope.create = function() {
 			$scope.project.inputEntities.push({id: makeUUID(), name: ''});
 		};
 
 		$scope.delete = function(entityId) {
 			// Fetch this forms inputs.
-			mtFetch.inputs({mode: "ids_by_entity", entityId: entityId}).then(function(inputIds) {
+			Input.query({mode: "ids_by_entity", entityId: entityId}).$promise.then(function(inputIds) {
 				var question = $filter('translate')('project.delete_entity', {num_inputs: inputIds.length}),
 					answer = $filter('translate')('project.delete_entity_answer', {num_inputs: inputIds.length});
 
@@ -370,7 +370,7 @@ angular.module('monitool.controllers.project', [])
 		$scope.usages = result;
 	})
 
-	.controller('ProjectFormEditionController', function($scope, $state, $filter, mtFetch, form, indicatorsById) {
+	.controller('ProjectFormEditionController', function($scope, $state, $filter, Input, form, indicatorsById) {
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.indicatorsById = indicatorsById;
@@ -389,7 +389,7 @@ angular.module('monitool.controllers.project', [])
 
 		$scope.delete = function() {
 			// Fetch this forms inputs.
-			mtFetch.inputs({mode: "ids_by_form", formId: $scope.form.id}).then(function(inputIds) {
+			Input.query({mode: "ids_by_form", formId: $scope.form.id}).$promise.then(function(inputIds) {
 				var easy_question = $filter('translate')('project.delete_form_easy'),
 					hard_question = $filter('translate')('project.delete_form_hard', {num_inputs: inputIds.length}),
 					answer = $filter('translate')('project.delete_form_hard_answer', {num_inputs: inputIds.length});
