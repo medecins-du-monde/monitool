@@ -14,19 +14,29 @@ angular.module('monitool.directives.projectInput', [])
 				$scope.$watch('sumData', function(hash) {
 					var sum = 0;
 
-					if ($scope.sumType === 'simple')
-						for (var key in $scope.sumData)
-							sum += $scope.sumData[key] || 0;
-
-					else if ($scope.sumType === 'deep' && $scope.sumId)
-						for (var key in $scope.sumData)
-							sum += $scope.sumData[key][$scope.sumId] || 0;
-
-					else if ($scope.sumType === 'deep')
-						for (var key1 in $scope.sumData)
-							for (var key2 in $scope.sumData[key1])
-								sum += $scope.sumData[key1][key2] || 0;
-
+					if ($scope.sumType === 'simple') {
+						for (var key in $scope.sumData) {
+							if (key !== 'sum') {
+								sum += $scope.sumData[key] || 0;
+							}
+						}
+					}
+					else if ($scope.sumType === 'deep' && $scope.sumId) {
+						for (var key in $scope.sumData) {
+							if (key !== 'sum') {
+								sum += $scope.sumData[key][$scope.sumId] || 0;
+							}
+						}
+					}
+					else if ($scope.sumType === 'deep') {
+						for (var key1 in $scope.sumData) {
+							for (var key2 in $scope.sumData[key1]) {
+								if (key1 !== 'sum' && key2 !== 'sum') {
+									sum += $scope.sumData[key1][key2] || 0;
+								}
+							}
+						}
+					}
 					else
 						throw new Error('Invalid parameters');
 
