@@ -67,6 +67,11 @@ app.config(function($translateProvider) {
 	$translateProvider.preferredLanguage('fr');
 });
 
+
+app.run(function($rootScope) {
+	$rootScope.userCtx = window.user;
+});
+
 app.run(function($translate, $locale, $rootScope) {
 	var langKey = $translate.use();
 	
@@ -174,7 +179,19 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/menu.html'
 	});
 
+	///////////////////////////
+	// User
+	///////////////////////////
 
+	$stateProvider.state('main.access_tokens', {
+		controller: 'AccessTokenListController',
+		templateUrl: 'partials/user/access-tokens.html',
+		resolve: {
+			accessTokens: function(mtFetch) {
+				return mtFetch.accessTokens();
+			}
+		}
+	});
 
 	///////////////////////////
 	// Admin
@@ -221,6 +238,28 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		},
 		data: {
 			entityType: 'type'
+		}
+	});
+
+	$stateProvider.state('main.admin.client_list', {
+		url: '/admin/clients',
+		templateUrl: 'partials/admin/client-list.html',
+		controller: 'ClientListController',
+		resolve: {
+			clients: function(mtFetch) {
+				return mtFetch.clients();
+			}
+		}
+	});
+
+	$stateProvider.state('main.admin.client', {
+		url: '/admin/client/:clientId',
+		templateUrl: 'partials/admin/client-edit.html',
+		controller: 'ClientController',
+		resolve: {
+			client: function(mtFetch, $stateParams) {
+				return mtFetch.client($stateParams.clientId);
+			}
 		}
 	});
 
@@ -596,32 +635,12 @@ app.run(function($rootScope, $state, mtFetch) {
 		console.log(error)
 		console.log(error.stack)
 	});
-
-	mtFetch.currentUser().then(function(user) {
-		$rootScope.userCtx = user;
-	}).catch(function(error) {
-		window.location.href = '/authentication/login';
-	});
 });
 
 
 // Angular is not loaded yet...
 function load(url, callback) {
-	var xhr;
-	
-	if (typeof XMLHttpRequest !== 'undefined')
-		xhr = new XMLHttpRequest();
-	else {
-		var versions = ["MSXML2.XmlHttp.5.0",  "MSXML2.XmlHttp.4.0", "MSXML2.XmlHttp.3.0",  "MSXML2.XmlHttp.2.0", "Microsoft.XmlHttp"];
-
-		for (var i = 0, len = versions.length; i < len; i++) {
-			try {
-				xhr = new ActiveXObject(versions[i]);
-				break;
-			}
-			catch(e) {}
-		}
-	}
+	var xhr = new XMLHttpRequest();
 	
 	xhr.onreadystatechange = function() {
 		xhr.readyState === 4 && callback(xhr);
@@ -633,14 +652,15 @@ function load(url, callback) {
 
 angular.element(document).ready(function() {
 	load('/resources/user/me', function(response) {
-		if (response.status === 200)
+		if (response.status === 200) {
+			window.user = JSON.parse(response.responseText);
 			angular.bootstrap(document, ['monitool.app']);
-
+		}
 		else if (response.status === 401)
 			window.location.href = '/authentication/login';
-
-		else
-			angular.element('body').html('Server seems to be down.')
+		
+		else 
+			angular.element('body').html('Server seems to be down.');
 	});
 });
 

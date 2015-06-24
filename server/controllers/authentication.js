@@ -94,8 +94,15 @@ module.exports = express.Router()
 
 		// Check that user is not already logged in.
 		function(request, response, next) {
-			if (request.isAuthenticated && request.isAuthenticated() && request.user && request.user.type === 'user')
-				response.redirect('/');
+			if (request.isAuthenticated && request.isAuthenticated() && request.user && request.user.type === 'user') {
+				// we need to check for nextUrl because authorize may have sent us here if some dark cookie+302 magic prevented him from knowing who it was speaking to.
+				if (request.session.nextUrl) {
+					response.render('redirect', {url: request.session.nextUrl});
+					delete request.session.nextUrl;
+				}
+				else
+					response.render('redirect', {url: '/'});
+			}
 			else
 				next();
 		},

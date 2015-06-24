@@ -1,14 +1,16 @@
 "use strict";
 
-var express   = require('express'),
-	passport  = require('../authentication/passport'),
-	Indicator = require('../models/resources/indicator'),
-	Input     = require('../models/resources/input'),
-	Report    = require('../models/resources/report'),
-	Project   = require('../models/resources/project'),
-	Theme     = require('../models/resources/theme'),
-	Type      = require('../models/resources/type'),
-	User      = require('../models/authentication/user');
+var express     = require('express'),
+	passport    = require('../authentication/passport'),
+	AccessToken = require('../models/authentication/access-token'),
+	Client      = require('../models/authentication/client'),
+	User        = require('../models/authentication/user'),
+	Indicator   = require('../models/resources/indicator'),
+	Input       = require('../models/resources/input'),
+	Report      = require('../models/resources/report'),
+	Project     = require('../models/resources/project'),
+	Theme       = require('../models/resources/theme'),
+	Type        = require('../models/resources/type');
 
 var ModelsByName = {indicator: Indicator, input: Input, report: Report, project: Project, theme: Theme, type: Type, user: User},
 	bodyParser   = require('body-parser').json();
@@ -98,6 +100,39 @@ module.exports = express.Router()
 			}
 
 			response.json(data);
+		});
+	})
+
+	.get('/client', function(request, response) {
+		Client.list({}, function(error, clients) {
+			AccessToken.list({}, function(error, accessTokens) {
+				// SLOW!
+				
+				clients.forEach(function(c) { c.__numUserTokens = 0; c.__numTokens = 0; });
+				if (request.user.roles.indexOf('_admin') === -1)
+					clients.forEach(function(c) { delete c.secret; });
+
+				accessTokens.forEach(function(accessToken) {
+					clients.forEach(function(c) {
+						if (accessToken.clientId === c._id) {
+							if (accessToken.userId === request.user._id)
+								c.__numUserTokens++;
+							c.__numTokens++;
+						}
+					});
+				});
+
+				response.json(clients);
+			})
+		});
+	})
+
+	.get('/client/:id', function(request, response) {
+		Client.get(request.params.id, function(error, client) {
+			if (request.user.roles.indexOf('_admin') === -1)
+				delete client.secret;
+
+			response.json(client);
 		});
 	})
 

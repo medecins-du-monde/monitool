@@ -1,0 +1,69 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.admin.users" translate="shared.settings"></a></li>
+	<li><a ui-sref="main.admin.client_list" translate="client.clients"></a></li>
+	<li class="active">{{client.name}}</li>
+</ol>
+
+
+<form class="form-horizontal noprint" role="form" name="clientForm" novalidate>
+	<fieldset>
+		<div class="form-group" show-errors>
+			<label for="input-id" class="col-sm-2 control-label" translate="client.id"></label>
+			<div class="col-sm-10" acl-fallback="client._id">
+				<input id="input-id" type="text" class="form-control" name="id" ng-model="client._id" disabled required />
+			</div>
+		</div>
+
+		<div class="form-group" show-errors>
+			<label for="input-secret" class="col-sm-2 control-label" translate="client.secret"></label>
+			<div class="col-sm-10" acl-fallback="client.secret">
+				<input id="input-secret" type="text" class="form-control" name="secret" ng-model="client.secret" disabled required />
+
+				<p class="help-block" ng-if="clientForm.secret.$error.required" translate="form.mandatory"></p>
+			</div>
+		</div>
+
+		<div class="form-group" show-errors>
+			<label for="input-name" class="col-sm-2 control-label" translate="client.name"></label>
+			<div class="col-sm-10" acl-fallback="client.name">
+				<input id="input-name"
+					   type="text"
+					   class="form-control"
+					   name="name"
+					   ng-model="client.name"
+					   placeholder="{{'client.name_ph'|translate}}"
+					   required />
+				
+				<p class="help-block" ng-if="clientForm.name.$error.required" translate="form.mandatory"></p>
+			</div>
+		</div>
+
+		<div class="form-group" show-errors>
+			<label for="input-redirects" class="col-sm-2 control-label" translate="client.allowed_redirects"></label>
+			<div class="col-sm-10" acl-fallback="client.allowedRedirects">
+				<textarea id="input-redirects"
+					   class="form-control"
+					   name="allowed_redirects"
+					   ng-model="client.allowedRedirects"
+					   placeholder="{{'client.allowed_redirects_ph'|translate}}"
+					   required></textarea>
+				
+				<p class="help-block" ng-if="clientForm.allowed_redirects.$error.required" translate="form.mandatory"></p>
+			</div>
+		</div>
+	</fieldset>
+	
+	<div>
+		<br/><br/>
+
+		<a ng-disabled="clientForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
+			<i class="fa fa-floppy-o"></i>
+			<span translate="shared.save"></span>
+		</a>
+
+		<a ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+			<i class="fa fa-undo"></i>
+			<span translate="shared.remove_changes"></span>
+		</a>
+	</div>
+</form>

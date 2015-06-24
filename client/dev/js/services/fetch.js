@@ -8,7 +8,8 @@ angular.module('monitool.services.fetch', [])
 			Theme     = $resource('/resources/theme/:id', { id: "@_id" }, { save: { method: "PUT" }}),
 			Type      = $resource('/resources/type/:id', { id: "@_id" }, { save: { method: "PUT" }}),
 			User      = $resource('/resources/user/:id', { id: "@_id" }, { save: { method: "PUT" }}),
-			ModelById = { project: Project, indicator: Indicator, report: Report, theme: Theme, type: Type, user: User };
+			Client    = $resource('/resources/client/:id', { id: "@_id" }, { save: { method: "PUT" }}),
+			ModelById = { project: Project, indicator: Indicator, report: Report, theme: Theme, type: Type, user: User, client: Client };
 
 		// Add common methods exported by this service (project, projects, projectsById, etc).
 		var methods = {
@@ -78,6 +79,13 @@ angular.module('monitool.services.fetch', [])
 
 			user: function(id) {
 				return id && id !== 'new' ? User.get({id: id}).$promise : new User();
+			},
+
+			client: function(id) {
+				if (!id || id === 'new')
+					return { name: "", type: "client", secret: "", allowedRedirects: [] };
+				else
+					return Client.get({id: id}).$promise;
 			}
 		};
 

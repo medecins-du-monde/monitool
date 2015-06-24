@@ -46,7 +46,6 @@ angular.module('monitool.controllers.admin', [])
 		};
 	})
 
-
 	.controller('ThemeTypeListController', function($scope, $state, mtFetch, entities) {
 		entities.sort(function(entity1, entity2) {
 			return entity1.name[$scope.language].localeCompare(entity2.name[$scope.language]);
@@ -86,4 +85,13 @@ angular.module('monitool.controllers.admin', [])
 			if (!entity.__isNew)
 				entity.$delete();
 		};
+	})
+
+	.controller('ClientListController', function($scope, clients) {
+		$scope.clients = clients;
+	})
+
+	.controller('ClientController', function($scope, client) {
+		$scope.client = client;
 	});
+
