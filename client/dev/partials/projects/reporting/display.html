@@ -10,7 +10,8 @@
 
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
-		<div class="col-sm-6" ng-if="presentation.display !== 'raw_data'">
+<!--
+ 		<div class="col-sm-6" ng-if="presentation.display !== 'aggregated_data'">
 			<div class="form-group">
 				<label for="display-input" class="col-sm-2 control-label" translate="shared.display"></label>
 				<div class="col-sm-10">
@@ -24,7 +25,7 @@
 				</div>
 			</div>
 		</div>
-
+-->
 		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="plot-input" class="col-sm-2 control-label" translate="shared.plot"></label>
@@ -60,13 +61,13 @@
 		<tr>
 			<th ng-show="presentation.plot" class="noprint"></th>
 			<th></th>
-			<th translate="project.baseline" ng-if="presentation.display!='raw_data'"></th>
-			<th translate="project.target" ng-if="presentation.display!='raw_data'"></th>
+			<th translate="project.baseline" ng-if="presentation.display!='aggregated_data'"></th>
+			<th translate="project.target" ng-if="presentation.display!='aggregated_data'"></th>
 			<th ng-repeat="col in stats.cols track by col.id" ng-bind="col.name"></th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in stats[presentation.display=='raw_data'?'rawDataRows':'indicatorRows'] track by $index"
+		<tr ng-repeat="row in stats[presentation.display=='aggregated_data'?'aggregatedDataRows':'indicatorRows'] track by $index"
 			ng-if="(!row.parentId && !row.gParentId) || (row.parentId && !row.gParentId && open[row.parentId]) || (row.parentId && row.gParentId && open[row.parentId] && open[row.gParentId])">
 
 			<!-- Graph columns always here -->
@@ -92,8 +93,8 @@
 				</span>
 			</td>
 
-			<td ng-if="row.type=='data'&&presentation.display!='raw_data'">{{row.baseline}}{{row.unit}}</td>
-			<td ng-if="row.type=='data'&&presentation.display!='raw_data'">{{row.target}}{{row.unit}}</td>
+			<td ng-if="row.type=='data'&&presentation.display!='aggregated_data'">{{row.baseline}}{{row.unit}}</td>
+			<td ng-if="row.type=='data'&&presentation.display!='aggregated_data'">{{row.target}}{{row.unit}}</td>
 			<td ng-if="row.type=='data'" ng-repeat="col in row.cols track by $index" reporting-field></td>
 		</tr>
 	</tbody>

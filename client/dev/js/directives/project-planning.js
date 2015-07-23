@@ -39,7 +39,7 @@ angular
 			},
 
 			sources: {
-				createList: function(indicator, rawData) {
+				createList: function(indicator, aggregatedData) {
 					var typeOptions = [];
 
 					typeOptions.push({
@@ -64,7 +64,7 @@ angular
 							formula: indicator.formulas[formulaId]
 						});
 
-					rawData.forEach(function(section) {
+					aggregatedData.forEach(function(section) {
 						section.elements.forEach(function(element) {
 							typeOptions.push({
 								// to fill the html select
@@ -257,13 +257,13 @@ angular
 	/**
 	 * This directive controls the HTML table where the user can describe the raw data that comes from the NHIS, etc...
 	 */
-	// .directive('formEditRawData', function() {
+	// .directive('formEditAggregatedData', function() {
 	// 	return {
 	// 		restrict: "AE",
-	// 		templateUrl: "partials/projects/raw-data/planning-edit-raw-data.html",
+	// 		templateUrl: "partials/projects/aggregated-data/planning-edit-aggregated-data.html",
 	// 		scope: true,
 	// 		link: function($scope, element) {
-	// 			$scope.rawData = $scope.form.rawData;
+	// 			$scope.aggregatedData = $scope.form.aggregatedData;
 
 	// 			$scope.newSection = function(target) {
 	// 				target.push({id: makeUUID(), name: "", elements: []});
@@ -377,7 +377,7 @@ angular
 	// 		scope: {
 	// 			'field': '=',
 	// 			'indicator': '=',
-	// 			'rawData': '=',
+	// 			'aggregatedData': '=',
 	// 			'userCtx': '=',
 	// 			'project': '=',
 	// 			'language': '=language'
@@ -385,9 +385,9 @@ angular
 	// 		link: function($scope) {
 	// 			// Init
 	// 			// We need a watch because available sources may change if user goes between rawdata and fields tabs
-	// 			$scope.$watch('rawData', function() {
+	// 			$scope.$watch('aggregatedData', function() {
 	// 				// Compute a new source list.
-	// 				$scope.sources = formEditUtils.sources.createList($scope.indicator, $scope.rawData);
+	// 				$scope.sources = formEditUtils.sources.createList($scope.indicator, $scope.aggregatedData);
 					
 	// 				// Search for the right source in the list.
 	// 				var source = formEditUtils.sources.getSourceFromField($scope.sources, $scope.field);

@@ -48,108 +48,108 @@ angular.module('monitool.services.reporting', [])
 				throw new Error('Invalid groupBy: ' + query.groupBy)
 		};
 
-		var formatLogFrameReporting = function(project, result, cols, indicatorsById) {
+		// var formatLogFrameReporting = function(project, result, cols, indicatorsById) {
 
-			var getUnassignedIndicatorIds = function(project) {
-				var assigned = {};
-				project.logicalFrame.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
-				project.logicalFrame.purposes.forEach(function(purpose) {
-					purpose.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
-					purpose.outputs.forEach(function(output) {
-						output.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
-					});
-				});
+		// 	var getUnassignedIndicatorIds = function(project) {
+		// 		var assigned = {};
+		// 		project.logicalFrame.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
+		// 		project.logicalFrame.purposes.forEach(function(purpose) {
+		// 			purpose.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
+		// 			purpose.outputs.forEach(function(output) {
+		// 				output.indicators.forEach(function(indicatorId) { assigned[indicatorId] = true; })
+		// 			});
+		// 		});
 
-				return Object.keys(project.indicators).filter(function(indicatorId) {
-					return !assigned[indicatorId];
-				});
-			};
+		// 		return Object.keys(project.indicators).filter(function(indicatorId) {
+		// 			return !assigned[indicatorId];
+		// 		});
+		// 	};
 
-			var getStats = function(indent, indicatorId) {
-				return {
-					id: indicatorId,
-					name: indicatorsById[indicatorId].name,
-					unit: indicatorsById[indicatorId].unit,
-					baseline: project.indicators[indicatorId].baseline,
-					target: project.indicators[indicatorId].target,
-					showRed: project.indicators[indicatorId].showRed,
-					showYellow: project.indicators[indicatorId].showYellow,
-					cols: cols.map(function(col) {
-						return result[col.id] && result[col.id].compute[indicatorId] !== undefined ? result[col.id].compute[indicatorId] : null;
-					}),
-					type:'data',
-					dataType: "indicator",
-					indent: indent
-				};
-			};
+		// 	var getStats = function(indent, indicatorId) {
+		// 		return {
+		// 			id: indicatorId,
+		// 			name: indicatorsById[indicatorId].name,
+		// 			unit: indicatorsById[indicatorId].unit,
+		// 			baseline: project.indicators[indicatorId].baseline,
+		// 			target: project.indicators[indicatorId].target,
+		// 			showRed: project.indicators[indicatorId].showRed,
+		// 			showYellow: project.indicators[indicatorId].showYellow,
+		// 			cols: cols.map(function(col) {
+		// 				return result[col.id] && result[col.id].compute[indicatorId] !== undefined ? result[col.id].compute[indicatorId] : null;
+		// 			}),
+		// 			type:'data',
+		// 			dataType: "indicator",
+		// 			indent: indent
+		// 		};
+		// 	};
 
-			var logFrameReport = [];
-			logFrameReport.push({type: 'header', text: project.logicalFrame.goal, indent: 0});
-			Array.prototype.push.apply(logFrameReport, project.logicalFrame.indicators.map(getStats.bind(null, 0)));
-			project.logicalFrame.purposes.forEach(function(purpose) {
-				logFrameReport.push({type: 'header', text: purpose.description, indent: 1});
-				Array.prototype.push.apply(logFrameReport, purpose.indicators.map(getStats.bind(null, 1)));
-				purpose.outputs.forEach(function(output) {
-					logFrameReport.push({type: 'header', text: output.description, indent: 2});
-					Array.prototype.push.apply(logFrameReport, output.indicators.map(getStats.bind(null, 2)));
-				});
-			});
-			Array.prototype.push.apply(logFrameReport, getUnassignedIndicatorIds(project).map(getStats.bind(null, 0)));
+		// 	var logFrameReport = [];
+		// 	logFrameReport.push({type: 'header', text: project.logicalFrame.goal, indent: 0});
+		// 	Array.prototype.push.apply(logFrameReport, project.logicalFrame.indicators.map(getStats.bind(null, 0)));
+		// 	project.logicalFrame.purposes.forEach(function(purpose) {
+		// 		logFrameReport.push({type: 'header', text: purpose.description, indent: 1});
+		// 		Array.prototype.push.apply(logFrameReport, purpose.indicators.map(getStats.bind(null, 1)));
+		// 		purpose.outputs.forEach(function(output) {
+		// 			logFrameReport.push({type: 'header', text: output.description, indent: 2});
+		// 			Array.prototype.push.apply(logFrameReport, output.indicators.map(getStats.bind(null, 2)));
+		// 		});
+		// 	});
+		// 	Array.prototype.push.apply(logFrameReport, getUnassignedIndicatorIds(project).map(getStats.bind(null, 0)));
 
-			return logFrameReport;
-		};
+		// 	return logFrameReport;
+		// };
 
-		var formatRawDataReporting = function(project, result, cols) {
-			var getValue = function(v) { return typeof v == 'number' ? v : v.sum; };
+		// var formatAggregatedDataReporting = function(project, result, cols) {
+		// 	var getValue = function(v) { return typeof v == 'number' ? v : v.sum; };
 
-			var rows = [];
-			project.dataCollection.forEach(function(form) {
-				rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
+		// 	var rows = [];
+		// 	project.dataCollection.forEach(function(form) {
+		// 		rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
 
-				form.rawData.forEach(function(section) {
-					rows.push({ id: section.id, type: "header", text: section.name, indent: 1 });
+		// 		form.aggregatedData.forEach(function(section) {
+		// 			rows.push({ id: section.id, type: "header", text: section.name, indent: 1 });
 
-					section.elements.forEach(function(variable) {
-						var subRow = { id: variable.id, name: variable.name, indent: 1, type: "data", baseline: null, target: null };
-						subRow.cols = cols.map(function(col) {
-							try { return getValue(result[col.id].values[variable.id]); }
-							catch (e) {}
-						});
+		// 			section.elements.forEach(function(variable) {
+		// 				var subRow = { id: variable.id, name: variable.name, indent: 1, type: "data", baseline: null, target: null };
+		// 				subRow.cols = cols.map(function(col) {
+		// 					try { return getValue(result[col.id].values[variable.id]); }
+		// 					catch (e) {}
+		// 				});
 
-						rows.push(subRow);
+		// 				rows.push(subRow);
 
-						variable.partition1.forEach(function(p1) {
-							subRow.hasChildren = true;
+		// 				variable.partition1.forEach(function(p1) {
+		// 					subRow.hasChildren = true;
 
-							var subSubRow = { id: makeUUID(), parentId: variable.id, name: p1.name, indent: 2, type: "data", baseline: null, target: null };
-							subSubRow.cols = cols.map(function(col) {
-								try { return getValue(result[col.id].values[variable.id][p1.id]); }
-								catch (e) {}
-							});
+		// 					var subSubRow = { id: makeUUID(), parentId: variable.id, name: p1.name, indent: 2, type: "data", baseline: null, target: null };
+		// 					subSubRow.cols = cols.map(function(col) {
+		// 						try { return getValue(result[col.id].values[variable.id][p1.id]); }
+		// 						catch (e) {}
+		// 					});
 
-							rows.push(subSubRow);
+		// 					rows.push(subSubRow);
 
-							variable.partition2.forEach(function(p2) {
-								subSubRow.hasChildren = true;
+		// 					variable.partition2.forEach(function(p2) {
+		// 						subSubRow.hasChildren = true;
 								
-								rows.push({
-									id: makeUUID(), parentId: subSubRow.id, gParentId: subRow.id, name: p2.name, indent: 3, type: "data", baseline: null, target: null,
-									cols: cols.map(function(col) {
-										try { return getValue(result[col.id].values[variable.id][p1.id][p2.id]); }
-										catch (e) {}
-									})
-								});
-							});
-						});
-					});
-				});
-			});
+		// 						rows.push({
+		// 							id: makeUUID(), parentId: subSubRow.id, gParentId: subRow.id, name: p2.name, indent: 3, type: "data", baseline: null, target: null,
+		// 							cols: cols.map(function(col) {
+		// 								try { return getValue(result[col.id].values[variable.id][p1.id][p2.id]); }
+		// 								catch (e) {}
+		// 							})
+		// 						});
+		// 					});
+		// 				});
+		// 			});
+		// 		});
+		// 	});
 
-			return rows;
-		};
+		// 	return rows;
+		// };
 
-		var computeProjectReporting = function(allInputs, query, indicatorsById) {
-			var cols = getColumns(query), result = {};
+		var computeRawDataReporting = function(allInputs, query) {
+			var result = {};
 
 			// Compute raw data.
 			query.project.dataCollection.forEach(function(form) {
@@ -163,103 +163,135 @@ angular.module('monitool.services.reporting', [])
 				for (var regroupKey in regrouped) {
 					// Create a hash to receive the final results if it's not done yet.
 					if (!result[regroupKey])
-						result[regroupKey] = {values: {}, compute: {}};
+						result[regroupKey] = {};
 
 					var input = regrouped[regroupKey];
 
 					// Copy raw data into final result.
 					// we use guids across forms so no collision check is needed.
-					for (var rawId in input.values)
-						result[regroupKey].values[rawId] = input.values[rawId];
+					var allValues = input.computeSums();
+					for (var rawId in allValues)
+						result[regroupKey][rawId] = allValues[rawId];
 				}
 			});
 
-			Object.keys(query.project.indicators).forEach(function(indicatorId) {
-				var indicator = indicatorsById[indicatorId],
-					indicatorMeta = project.indicators[indicatorId];
+			return result;
+		};
 
-				for (var regroupKey in result) {
-					// check if this indicator was already computed by another form.
-					if (result[regroupKey].compute[indicatorId])
-						result[regroupKey].compute[indicatorId] = 'FORM_CONFLICT';
 
-					else {
-						var indicatorValue;
 
-						if (indicatorMeta.formula === null) {
+		// var computeProjectReporting = function(allInputs, query, indicatorsById) {
+		// 	var cols = getColumns(query), result = {};
+
+		// 	// Compute raw data.
+		// 	query.project.dataCollection.forEach(function(form) {
+		// 		// Take all inputs that match our form.
+		// 		var inputs = allInputs.filter(function(input) { return input.form === form.id; });
+
+		// 		// Regroup them by the requested groupBy
+		// 		var regrouped = Input.aggregate(inputs, form, query.groupBy, query.project.inputsGroups);
+
+		// 		// For each regrouped input, compute the indicators values.
+		// 		for (var regroupKey in regrouped) {
+		// 			// Create a hash to receive the final results if it's not done yet.
+		// 			if (!result[regroupKey])
+		// 				result[regroupKey] = {values: {}, compute: {}};
+
+		// 			var input = regrouped[regroupKey];
+
+		// 			// Copy raw data into final result.
+		// 			// we use guids across forms so no collision check is needed.
+		// 			for (var rawId in input.values)
+		// 				result[regroupKey].values[rawId] = input.values[rawId];
+		// 		}
+		// 	});
+
+		// 	Object.keys(query.project.indicators).forEach(function(indicatorId) {
+		// 		var indicator = indicatorsById[indicatorId],
+		// 			indicatorMeta = project.indicators[indicatorId];
+
+		// 		for (var regroupKey in result) {
+		// 			// check if this indicator was already computed by another form.
+		// 			if (result[regroupKey].compute[indicatorId])
+		// 				result[regroupKey].compute[indicatorId] = 'FORM_CONFLICT';
+
+		// 			else {
+		// 				var indicatorValue;
+
+		// 				if (indicatorMeta.formula === null) {
 							
-						}
-						else {
+		// 				}
+		// 				else {
 
-						}
+		// 				}
 
 
-						if (field.type === 'zero')
-							indicatorValue = 0;
-						else if (field.type === 'raw')
-							indicatorValue = input.extractRawValue(field.rawId, field.filter);
-						else if (field.type === 'formula') {
-							var formula = indicatorsById[field.indicatorId].formulas[field.formulaId],
-								localScope = {};
+		// 				if (field.type === 'zero')
+		// 					indicatorValue = 0;
+		// 				else if (field.type === 'raw')
+		// 					indicatorValue = input.extractRawValue(field.rawId, field.filter);
+		// 				else if (field.type === 'formula') {
+		// 					var formula = indicatorsById[field.indicatorId].formulas[field.formulaId],
+		// 						localScope = {};
 
-							for (var key in field.parameters) {
-								if (field.parameters[key].type === 'zero')
-									localScope[key] = 0;
-								else if (field.parameters[key].type === 'raw')
-									localScope[key] = input.extractRawValue(field.parameters[key].rawId, field.parameters[key].filter);
-								else
-									throw new Error('Invalid subfield type.');
-							}
+		// 					for (var key in field.parameters) {
+		// 						if (field.parameters[key].type === 'zero')
+		// 							localScope[key] = 0;
+		// 						else if (field.parameters[key].type === 'raw')
+		// 							localScope[key] = input.extractRawValue(field.parameters[key].rawId, field.parameters[key].filter);
+		// 						else
+		// 							throw new Error('Invalid subfield type.');
+		// 					}
 
-							try { indicatorValue = Parser.evaluate(formula.expression, localScope); }
-							catch (e) { console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope)); }
-						}
-						else
-							throw new Error('Invalid field type.');
+		// 					try { indicatorValue = Parser.evaluate(formula.expression, localScope); }
+		// 					catch (e) { console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope)); }
+		// 				}
+		// 				else
+		// 					throw new Error('Invalid field type.');
 
-						result[regroupKey].compute[field.indicatorId] = indicatorValue;
-					}
-				}
-			});
+		// 				result[regroupKey].compute[field.indicatorId] = indicatorValue;
+		// 			}
+		// 		}
+		// 	});
 
-			return {
-				cols: cols,
-				indicatorRows: formatLogFrameReporting(query.project, result, cols, indicatorsById),
-				rawDataRows: formatRawDataReporting(query.project, result, cols)
-			};
-		};
+		// 	return {
+		// 		cols: cols,
+		// 		indicatorRows: formatLogFrameReporting(query.project, result, cols, indicatorsById),
+		// 		aggregatedDataRows: formatAggregatedDataReporting(query.project, result, cols)
+		// 	};
+		// };
 
-		var computeIndicatorReporting = function(inputs, query, indicatorById) {
-			var rows = [];
+		// var computeIndicatorReporting = function(inputs, query, indicatorById) {
+		// 	var rows = [];
 
-			query.projects.forEach(function(project) {
-				var projectInputs     = inputs.filter(function(input) { return input.project === project._id; }),
-					projectQuery      = {begin: query.begin, end: query.end, project: project, groupBy: query.groupBy},
-					projectResult     = computeProjectReporting(projectInputs, projectQuery, indicatorById);
+		// 	query.projects.forEach(function(project) {
+		// 		var projectInputs     = inputs.filter(function(input) { return input.project === project._id; }),
+		// 			projectQuery      = {begin: query.begin, end: query.end, project: project, groupBy: query.groupBy},
+		// 			projectResult     = computeProjectReporting(projectInputs, projectQuery, indicatorById);
 
-				// override id and name
-				var row = projectResult.indicatorRows.find(function(row) { return row.id === query.indicator._id; });
-				row.id = project._id;
-				row.name = project.name;
-				row.type = 'project'; // presentation hack, should not be here.
-				rows.push(row);
+		// 		// override id and name
+		// 		var row = projectResult.indicatorRows.find(function(row) { return row.id === query.indicator._id; });
+		// 		row.id = project._id;
+		// 		row.name = project.name;
+		// 		row.type = 'project'; // presentation hack, should not be here.
+		// 		rows.push(row);
 
-				project.inputEntities.forEach(function(entity) {
-					var entityInputs = projectInputs.filter(function(input) { return input.entity === entity.id; }),
-						entityQuery  = {begin: query.begin, end: query.end, project: project, groupBy: query.groupBy, type: 'entity', id: entity.id},
-						entityResult = computeProjectReporting(entityInputs, entityQuery, indicatorById);
+		// 		project.inputEntities.forEach(function(entity) {
+		// 			var entityInputs = projectInputs.filter(function(input) { return input.entity === entity.id; }),
+		// 				entityQuery  = {begin: query.begin, end: query.end, project: project, groupBy: query.groupBy, type: 'entity', id: entity.id},
+		// 				entityResult = computeProjectReporting(entityInputs, entityQuery, indicatorById);
 
-					// override id and name
-					var row = entityResult.indicatorRows.find(function(row) { return row.id === query.indicator._id; });
-					row.id = entity.id;
-					row.name = entity.name;
-					row.type = 'entity'; // presentation hack, should not be here.
-					rows.push(row);
-				});
-			});
+		// 			// override id and name
+		// 			var row = entityResult.indicatorRows.find(function(row) { return row.id === query.indicator._id; });
+		// 			row.id = entity.id;
+		// 			row.name = entity.name;
+		// 			row.type = 'entity'; // presentation hack, should not be here.
+		// 			rows.push(row);
+		// 		});
+		// 	});
 
-			return { cols: getColumns(query), rows: rows };
-		};
+		// 	return { cols: getColumns(query), rows: rows };
+		// };
 
 		/**
 		 * Given a project, find a default start date that makes sense to compute statistics
@@ -287,8 +319,10 @@ angular.module('monitool.services.reporting', [])
 			getDefaultStartDate: getDefaultStartDate,
 			getDefaultEndDate: getDefaultEndDate,
 
-			computeProjectReporting: computeProjectReporting,
-			computeIndicatorReporting: computeIndicatorReporting,
+			computeRawDataReporting: computeRawDataReporting,
+
+			// computeProjectReporting: computeProjectReporting,
+			// computeIndicatorReporting: computeIndicatorReporting,
 		};
 	})
 

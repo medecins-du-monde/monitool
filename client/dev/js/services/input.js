@@ -1,7 +1,7 @@
 "use strict";
 
 angular.module('monitool.services.models.input', [])
-	.factory('Input', function($resource) {
+	.factory('Input', function($resource, itertools) {
 
 		// this has nothing to do on the root scope.
 		// => move it to a service and factorize with the similiar function in mtReporting
@@ -75,42 +75,20 @@ angular.module('monitool.services.models.input', [])
 		var _groupInputs = function(mode, inputs, form) {
 			var newInput = Input.makeFake(form);
 
-			form.rawData.forEach(function(section) {
+			form.aggregatedData.forEach(function(section) {
 				section.elements.forEach(function(element) {
 					var elementMode = element[mode], values;
 
-					// simple elements.
-					if (!element.partition1.length && !element.partition2.length) {
+					if (element.partitions.length === 0) {
 						values = inputs.map(function(input) { return input.values[element.id]; });
 						newInput.values[element.id] = _aggregateValues(elementMode, values);
 					}
-					// one partition.
-					else if (element.partition1.length && !element.partition2.length) {
-						// aggregate sums
-						values = inputs.map(function(input) { return input.values[element.id].sum; });
-						newInput.values[element.id].sum = _aggregateValues(elementMode, values);
-
-						// aggregate partitions
-						element.partition1.forEach(function(p1) {
-							values = inputs.map(function(input) { return input.values[element.id][p1.id]; });
-							newInput.values[element.id][p1.id] = _aggregateValues(elementMode, values);
-						})
-					}
-					// two partitions.
-					else if (element.partition1.length && element.partition2.length) {
-						// aggregate sums
-						values = inputs.map(function(input) { return input.values[element.id].sum; });
-						newInput.values[element.id].sum = _aggregateValues(elementMode, values);
-
-						// aggregate partitions
-						element.partition1.forEach(function(p1) {
-							values = inputs.map(function(input) { return input.values[element.id][p1.id].sum; });
-							newInput.values[element.id][p1.id].sum = _aggregateValues(elementMode, values);
-
-							element.partition2.forEach(function(p2) {
-								values = inputs.map(function(input) { return input.values[element.id][p1.id][p2.id]; });
-								newInput.values[element.id][p1.id][p2.id] = _aggregateValues(elementMode, values);
-							});
+					else {
+						itertools.product(element.partitions).map(function(list) {
+							return list.map(function(p) { return p.id; }).sort().join('.');
+						}).forEach(function(partition) {
+							values = inputs.map(function(input) { return input.values[element.id + '.' + partition]; });
+							newInput.values[element.id + '.' + partition] = _aggregateValues(elementMode, values);
 						});
 					}
 				});
@@ -337,39 +315,34 @@ angular.module('monitool.services.models.input', [])
 			if (this.form !== form.id)
 				throw new Error('Invalid form');
 
-			var newValues = {};
-
-			form.rawData.forEach(function(section) {
+			// Index form elements by id so that we can check everything faster.
+			var elementsById = {};
+			form.aggregatedData.forEach(function(section) {
 				section.elements.forEach(function(element) {
+					elementsById[element.id] = element;
+				});
+			});
 
-					if (!element.partition1.length && !element.partition2.length)
-						newValues[element.id] = this.values[element.id]
+			var newValues = {};
+			
+			Object.keys(this.values).forEach(function(key) {
+				// first index = element.id, all others = partitions.
+				var parts = key.split('.');
 
-					else if (element.partition1.length && !element.partition2.length) {
-						newValues[element.id] = {sum: 0};
-						element.partition1.forEach(function(p1) {
-							if (this.values[element.id] && this.values[element.id][p1.id] !== undefined) {
-								newValues[element.id].sum += this.values[element.id][p1.id]
-								newValues[element.id][p1.id] = this.values[element.id][p1.id];
-							}
-						}, this);
-					}
-					else if (element.partition1.length && element.partition2.length) {
-						newValues[element.id] = {sum: 0};
-						element.partition1.forEach(function(p1) {
-							newValues[element.id][p1.id] = {sum: 0};
-							element.partition2.forEach(function(p2) {
-								if (this.values[element.id] && this.values[element.id][p1.id] && this.values[element.id][p1.id][p2.id] !== undefined) {
-									newValues[element.id].sum += this.values[element.id][p1.id][p2.id];
-									newValues[element.id][p1.id].sum += this.values[element.id][p1.id][p2.id];
-									newValues[element.id][p1.id][p2.id] = this.values[element.id][p1.id][p2.id];
-								}
-							}, this);
-						}, this);
-					}
-					else
-						throw new Error();
-				}, this);
+				// Value is invalid.
+				if (typeof this.values[key] !== 'number')
+					return;
+
+				// Element is undefined or
+				// Number of partitions is unexpected
+				var element = elementsById[parts[0]];
+				if (!element || parts.length !== element.partitions.length + 1)
+					return;
+
+				// now check that all partitions exist
+				// IMPLEMENT ME!
+
+				newValues[key] = this.values[key];
 			}, this);
 
 			this.values = newValues;
@@ -381,31 +354,47 @@ angular.module('monitool.services.models.input', [])
 		 * If no filter is provided, assume the user want all partitions.
 		 */
 		Input.prototype.extractRawValue = function(rawId, filter) {
-			// we support not defining any filter for simple fields.
-			if (!filter || !Array.isArray(filter) || filter.length == 0)
-				return this.values[rawId];
-			else {
-				var result = 0, numFound = 0;
+			var result = 0;
+			var numFilters = filter.length;
 
-				filter.forEach(function(filterInstance) {
-					var v = this.values[rawId];
-					if (Array.isArray(filterInstance))
-						// filters can be as long as they want, which is not the case IRL
-						filterInstance.forEach(function(f) { v = v[f]; });
-					else
-						// is the filter is not an array we assume that we can just get the data.
-						v = v[filterInstance];
+			Object.keys(this.values).forEach(function(key) {
+				// if the filter is not found, skip.
+				for (var i = 0; i < numFilters; ++i)
+					if (key.indexOf(filter[i]) === -1)
+						return;
 
-					// v may be undefined or null if the field was not filled.
-					// we just ignore it in that case.
-					if (typeof v == 'number') {
-						result += v;
-						numFound++;
-					}
-				}, this);
+				result += this.values[key];
+			}, this);
+		};
 
-				return numFound ? result : undefined;
+		/**
+		 * Given a input.value hash, compute all possible sums.
+		 * This is used for the agg data stats.
+		 */
+		Input.prototype.computeSums = function() {
+			var result = {};
+
+			for (var key in this.values) {
+				var parts = key.split('.'),
+					variableId = parts.shift();
+
+				// now we need to create a key for each subset of the partition.
+				var numElements = parts.length,
+					numSubsets = Math.pow(2, parts.length);
+
+				for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
+					// Build subset key
+					var subsetKey = variableId;
+					for (var partitionIndex = 0; partitionIndex < numElements; ++partitionIndex)
+						if (subsetIndex & (1 << partitionIndex))
+							subsetKey += '.' + parts[partitionIndex];
+
+					result[subsetKey] = result[subsetKey] || 0; // initialize if needed
+					result[subsetKey] += this.values[key];
+				}
 			}
+
+			return result;
 		};
 
 

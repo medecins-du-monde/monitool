@@ -1,5 +1,10 @@
 <doc-reminder pages="indicators.presentation_indicator"></doc-reminder>
 
+
+<a class="btn btn-primary pull-right" ui-sref="main.indicator.edit({indicatorId: 'new'})" acl-has-role="indicator">
+	<i class="fa fa-plus"></i>
+	<span translate="indicator.create_new"></span>
+</a>
 <div class="form-horizontal">
 	<div class="form-group">
 		<label for="search-input" class="col-sm-1" translate="indicator.search"></label>
@@ -49,8 +54,3 @@
 		</div>
 	</div>
 </div>
-
-<a class="btn btn-default" ui-sref="main.indicator.edit({indicatorId: 'new'})" acl-has-role="indicator">
-	<i class="fa fa-plus"></i>
-	<span translate="indicator.create_new"></span>
-</a>

@@ -8,8 +8,9 @@
 <doc-reminder pages="project.presentation_project,project.input_forms,project.change_definition"></doc-reminder>
 
 <form class="form-horizontal" role="form" name="formForm" novalidate>
+	
+	<legend translate="project.manual_input_info"></legend>
 
-	<br/>
 	<div class="form-group" show-errors>
 		<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
 		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="form.name">
@@ -145,46 +146,38 @@
 		</div>
 	</div>
 
-	<br/>
+	<legend translate="project.manual_input_structure"></legend>
 
-	<table class="table table-bordered table-condensed table-raw-data">
+	<table class="table table-bordered table-condensed table-aggregated-data">
 		<thead>
 			<tr>
 				<th translate="project.section"></th>
 				<th translate="project.variable"></th>
-				<th translate="project.partition"></th>
-				<th translate="project.additional_partition"></th>
-				<th>Agrégation</th>
+				<th translate="project.aggregation"></th>
+				<th translate="project.partitions" colspan="{{maxPartitions + 1}}"></th>
+				<th colspan="2">Actions</th>
 			</tr>
 		</thead>
-		<tbody ng-repeat="section in form.rawData track by section.id">
+		<tbody ng-repeat="section in form.aggregatedData track by section.id">
+
+
+			<!-- variable row -->
 			<tr ng-repeat="element in section.elements track by element.id">
-				<td rowspan="{{section.elements.length + 1}}" ng-if="$first" acl-has-project-role="owner" acl-fallback="section.name">
-					<a ng-click="remove(section, form.rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-					<span mt-content-editable ng-model="section.name"></span>
-				</td>
-				<td acl-has-project-role="owner" acl-fallback="element.name">
-					<a ng-click="remove(element, section.elements)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-					<span mt-content-editable ng-model="element.name"></span>
-				</td>
-				<td>
-					<ul>
-						<li ng-repeat="p in element.partition1 track by p.id" acl-has-project-role="owner" acl-fallback="p.name">
-							<a ng-click="remove(p, element.partition1)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-							<span mt-content-editable ng-model="p.name"></span>
-						</li>
-						<li acl-has-project-role="owner"><a ng-click="newPartition(element.partition1)" translate="project.new_partition"></a></li>
-					</ul>
-				</td>
-				<td>
-					<ul ng-if="element.partition1.length >= 2">
-						<li ng-repeat="p in element.partition2 track by p.id" acl-has-project-role="owner" acl-fallback="p.name">
-							<a ng-click="remove(p, element.partition2)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-							<span mt-content-editable ng-model="p.name"></span>
-						</li>
-						<li acl-has-project-role="owner"><a ng-click="newPartition(element.partition2)" translate="project.new_partition"></a></li>
-					</ul>
-				</td>
+
+				<!-- section name (only if first variable of section) -->
+				<td rowspan="{{section.elements.length + 1}}"
+					ng-if="$first"
+					acl-has-project-role="owner"
+					acl-fallback="section.name"
+					mt-content-editable ng-model="section.name"></td>
+
+				<!-- variable name -->
+				<td acl-has-project-role="owner"
+					acl-fallback="element.name"
+					mt-content-editable
+					ng-model="element.name"></td>
+				
+				<!-- variable aggregation -->
 				<td>
 					Sur des lieux différents<br/>
 					<select ng-model="element.geoAgg">
@@ -204,26 +197,105 @@
 						<option value="highest">Plus grand valeure</option>
 						<option value="lowest">Plus petite valeure</option>
 						<option value="last">Dernière valeur</option>
-					</select><br/>
+					</select>
 				</td>
-			</tr>
+
+				<!-- variable partitions -->
+				<td ng-repeat="partition in element.partitions">
+					<ul>
+						<li ng-repeat="p in partition track by p.id" acl-has-project-role="owner" acl-fallback="p.name">
+							<a ng-click="remove(p, partition)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
+							<span mt-content-editable ng-model="p.name"></span>
+						</li>
+					</ul>
+					<div acl-has-project-role="owner">
+						<a class="btn btn-xs btn-default" ng-click="newPartitionElement(partition)" translate="project.new_partition_element"></a>
+						<br/>
+						<a class="btn btn-xs btn-danger" ng-click="remPartition(partition)" translate="project.remove_partition"></a>
+					</div>
+				</td>
+				<td>
+					<a ng-click="newPartition(element.partitions)" translate="project.new_partition"></a>
+				</td>
+				<td colspan="{{maxPartitions - element.partitions.length}}"
+					ng-if="maxPartitions - element.partitions.length > 0"></td>
+
+				<!-- /!\  -->
+				<!-- we should check the $parent magic, or use ng-init -->
+				<!-- /!\  -->
+
+				<!-- variable actions -->
+				<td>
+					<a ng-click="upElement($index, $parent.$parent.$index)"
+					   tooltip="Monter d'un cran la variable"
+					   ng-if="!$parent.$first || !$first">
+
+						<i class="fa fa-caret-square-o-up"></i>
+					</a>
+					<a ng-click="downElement($index, $parent.$parent.$index)"
+					   tooltip="Descendre d'un cran la variable"
+					   ng-if="!$parent.$last || !$last">
+
+						<i class="fa fa-caret-square-o-down"></i>
+					</a>
+					<a ng-click="remove(element, section.elements)"
+					   tooltip="Supprimer la variable">
+
+					   <i class="fa fa-times" style="color: red"></i>
+					</a>
+				</td>
+	
+				<!-- section actions (only if first variable) -->
+				<td rowspan="{{section.elements.length + 1}}" ng-if="$first" acl-has-project-role="owner" acl-fallback="section.name">
+					<a ng-click="upSection($parent.$parent.$index)"
+					   tooltip="Monter d'un cran la section"
+					   ng-if="!$parent.$parent.$first">
+
+						<i class="fa fa-caret-square-o-up"></i>
+					</a>
+					<a ng-click="downSection($parent.$parent.$index)"
+					   tooltip="Descendre d'un cran la section"
+					   ng-if="!$parent.$parent.$last">
+
+						<i class="fa fa-caret-square-o-down"></i>
+					</a>
+					<a ng-click="remove(section, form.aggregatedData)"
+					   tooltip="Supprimer la section">
+
+						<i class="fa fa-times" style="color: red"></i>
+					</a>
+				</td>
+
+ 			</tr>
+
+ 			<!-- add new variable row. If section is empty, also contain section form elements --> 
 			<tr acl-has-project-role="owner">
 				<td ng-if="section.elements.length === 0">
-					<a ng-click="remove(section, form.rawData)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
 					<span mt-content-editable ng-model="section.name"></span>
 				</td>
-				<td colspan="4" style="text-align: center">
+				<td colspan="{{maxPartitions + 4}}" style="text-align: center">
 					<a ng-click="newVariable(section.elements)"
 					   class="btn btn-xs btn-default" 
 					   style="width: 100%"
 					   translate="project.new_variable"></a>
 				</td>
+				<td ng-if="section.elements.length === 0">
+					<a ng-click="upSection($index)" tooltip="Monter d'un cran la section" ng-if="!$first">
+						<i class="fa fa-caret-square-o-up"></i>
+					</a>
+					<a ng-click="downSection($index)" tooltip="Descendre d'un cran la section" ng-if="!$last">
+						<i class="fa fa-caret-square-o-down"></i>
+					</a>
+					<a ng-click="remove(section, form.aggregatedData)" tooltip="Supprimer la section">
+						<i class="fa fa-times" style="color: red"></i>
+					</a>
+				</td>
 			</tr>
 		</tbody>
 		<tbody acl-has-project-role="owner">
 			<tr>
-				<td colspan="5" style="text-align: center">
-					<a ng-click="newSection(form.rawData)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_section"></a>
+				<td colspan="{{maxPartitions + 6}}" style="text-align: center">
+					<a ng-click="newSection(form.aggregatedData)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_section"></a>
 				</td>
 			</tr>
 		</tbody>

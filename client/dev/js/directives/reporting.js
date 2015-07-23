@@ -81,7 +81,7 @@ angular.module('monitool.directives.reporting', [])
 				var esc = function(string) { return '"' + string.replace(/"/g, '\\"') + '"'; };
 
 				element.bind('click', function() {
-					var statistics = $scope.stats.indicatorRows.concat([{type: 'header', text: '', indent: 0}]).concat($scope.stats.rawDataRows),
+					var statistics = $scope.stats.indicatorRows.concat([{type: 'header', text: '', indent: 0}]).concat($scope.stats.aggregatedDataRows),
 						csv = 'name,baseline,target,' + $scope.stats.cols.map(function(c) { return c.name; }).join(',') + "\n";
 
 					statistics.forEach(function(row) {
@@ -202,7 +202,7 @@ angular.module('monitool.directives.reporting', [])
 							element.html(Math.round($scope.col) + $scope.row.unit);
 						else if (display === 'progress')
 							element.html(progress !== null ? Math.round(100 * progress) + '%' : '');
-						else if (display === 'raw_data')
+						else if (display === 'aggregated_data')
 							element.html($scope.col);
 						else
 							throw new Error('Invalid display value.');
@@ -240,7 +240,7 @@ angular.module('monitool.directives.reporting', [])
 
 						// remove rows that are not selected.
 						if (!$scope.data.rows)
-							$scope.data.rows = $scope.data.rawDataRows.concat($scope.data.indicatorRows)
+							$scope.data.rows = $scope.data.aggregatedDataRows.concat($scope.data.indicatorRows)
 
 						$scope.data.rows = $scope.data.rows.filter(function(row) {
 							return $scope.plots[row.id];
@@ -354,5 +354,73 @@ angular.module('monitool.directives.reporting', [])
 				"result": "=data"
 			}
 		}
+	})
+
+	.directive('aggregatedDataReporting', function() {
+		return {
+			restrict: 'AE',
+			templateUrl: 'partials/projects/aggregated-data/_display_grid.html',
+			scope: {
+				"cols": "=",
+				"stats": "=",
+				"project": "="
+			},
+
+			link: function($scope) {
+
+				$scope.toggle = function(id) {
+					
+				}
+
+				$scope.$watch('stats', function(stats) {
+					if (!stats)
+						return;
+
+					$scope.rows = [];
+					$scope.project.dataCollection.forEach(function(form) {
+						$scope.rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
+						form.aggregatedData.forEach(function(section) {
+							$scope.rows.push({ id: section.id, type: "header", text: section.name, indent: 1 });
+							section.elements.forEach(function(variable) {
+
+								var row = {};
+								row.id = variable.id;
+								row.type = "data";
+								row.name = variable.name;
+								row.indent = 1;
+								row.splittable = !!variable.partitions.length;
+								row.cols = $scope.cols.map(function(col) {
+									try {
+										return $scope.stats[col.id][row.id];
+									}
+									catch (e) {
+										return undefined;
+									}
+								});
+
+								$scope.rows.push(row);
+							});
+						});
+
+
+
+
+					});
+
+
+
+
+				})
+			}
+		};
 	});
 
+
+
+{
+	variableId: {
+		open: true,
+		partition: 0,
+
+	}
+}

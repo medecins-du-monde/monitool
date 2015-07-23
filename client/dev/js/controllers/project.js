@@ -173,8 +173,6 @@ angular.module('monitool.controllers.project', [])
 			return f.id === form.id;
 		});
 
-		console.log($scope.form)
-
 		$scope.addIntermediary = function() {
 			if (-1 === $scope.form.intermediaryDates.findIndex(function(key) { return !key; }))
 				$scope.form.intermediaryDates.push(null);
@@ -206,16 +204,68 @@ angular.module('monitool.controllers.project', [])
 			});
 		};
 
+		$scope.$watch('form.aggregatedData', function(aggregatedData) {
+			$scope.maxPartitions = 0;
+			aggregatedData.forEach(function(section) {
+				section.elements.forEach(function(element) {
+					$scope.maxPartitions = Math.max(element.partitions.length, $scope.maxPartitions);
+				});
+			});
+		}, true);
+
 		$scope.newSection = function(target) {
 			target.push({id: makeUUID(), name: "", elements: []});
 		};
 
 		$scope.newVariable = function(target) {
-			target.push({id: makeUUID(), name: "", partition1: [], partition2: [], geoAgg: 'sum', timeAgg: 'sum'});
+			target.push({id: makeUUID(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
 		};
 
 		$scope.newPartition = function(target) {
+			target.push([]);
+		};
+
+		$scope.newPartitionElement = function(target) {
 			target.push({id: makeUUID(), name: ""});
+		};
+
+		$scope.upSection = function(index) {
+			if (index == 0)
+				throw new Error();
+
+			var element = $scope.form.aggregatedData[index];
+
+			$scope.form.aggregatedData[index] = $scope.form.aggregatedData[index - 1];
+			$scope.form.aggregatedData[index - 1] = element;
+		};
+
+		$scope.downSection = function(index) {
+			if (index == $scope.form.aggregatedData.length - 1)
+				throw new Error();
+
+			var element = $scope.form.aggregatedData[index];
+			$scope.form.aggregatedData[index] = $scope.form.aggregatedData[index + 1];
+			$scope.form.aggregatedData[index + 1] = element;
+		};
+
+		$scope.upElement = function(index, parentIndex) {
+			var element = $scope.form.aggregatedData[parentIndex].elements[index];
+			$scope.form.aggregatedData[parentIndex].elements.splice(index, 1);
+
+			if (index == 0)
+				$scope.form.aggregatedData[parentIndex - 1].elements.push(element);
+			else
+				$scope.form.aggregatedData[parentIndex].elements.splice(index - 1, 0, element);
+		};
+
+		$scope.downElement = function(index, parentIndex) {
+			var element = $scope.form.aggregatedData[parentIndex].elements[index];
+			$scope.form.aggregatedData[parentIndex].elements.splice(index, 1);
+
+			if ($scope.form.aggregatedData[parentIndex].elements.length == index)
+				$scope.form.aggregatedData[parentIndex + 1].elements.unshift(element);
+			else
+				$scope.form.aggregatedData[parentIndex].elements.splice(index + 1, 0, element);
 		};
 
 		$scope.remove = function(item, target) {
@@ -258,30 +308,52 @@ angular.module('monitool.controllers.project', [])
 		$scope.previousInput = inputs.previous;
 		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
-		// this should not be here, and we seriouly have to make those work on focusout to save cpu cycles.
-		$scope.$watch('currentInput.values', function() {
-			var input = angular.copy($scope.currentInput),
-				query = {
-					project: $scope.project,
-					begin: moment(input.period).format('YYYY-MM-DD'),
-					end: moment(input.period).format('YYYY-MM-DD'),
-					groupBy: 'month',
-					type: "entity",
-					id: input.entity
-				};
-
-			$scope.presentation = {display: 'value'};
-			$scope.stats = mtReporting.computeProjectReporting([input], query, indicatorsById);
-		}, true);
-
 		$scope.save = function() {
 			$scope.currentInput.$save(function() { $state.go('main.project.manual_input_list'); });
 		};
+
+		$scope.$watch('currentInput', function(v) {
+			console.log(v);
+		}, true)
 
 		$scope.delete = function() {
 			$scope.currentInput.$delete(function() { $state.go('main.project.manual_input_list'); });
 		};
 	})
+
+	.controller('ProjectAggregatedDataReportingController', function($scope, $state, Input, mtReporting) {
+
+		// This hash allows to select indicators for plotting. It is used by directives.
+		$scope.plots = {};
+
+		// those 2 hashes represent what the user sees.
+		$scope.presentation = {plot: false};
+		$scope.query = {
+			project: $scope.project,
+			begin:   mtReporting.getDefaultStartDate($scope.project),
+			end:     mtReporting.getDefaultEndDate($scope.project),
+			groupBy: 'month', type: 'project', id: ''
+		};
+
+		// Update loaded inputs when query.begin or query.end changes.
+		var inputsPromise = null;
+		$scope.$watch('query', function(newQuery, oldQuery) {
+			// if anything besides groupBy changes, we need to refetch.
+			// FIXME: we could widely optimize this.
+			if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end || oldQuery.id !== newQuery.id)
+				inputsPromise = Input.fetchFromQuery(newQuery);
+
+			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
+			inputsPromise.then(function(inputs) {
+				$scope.stats = mtReporting.computeRawDataReporting(inputs, newQuery);
+				$scope.cols = mtReporting.getColumns(newQuery);
+
+				// console.log($scope.stats)
+
+			});
+		}, true)
+	})
+	
 
 	.controller('ProjectReportingController', function($scope, $state, Input, mtReporting, indicatorsById) {
 		// This hash allows to select indicators for plotting. It is used by directives.
@@ -528,7 +600,7 @@ angular.module('monitool.controllers.project', [])
 		// Create list of data sources
 		$scope.sources = [{id: null, name: "---", group: null}];
 		$scope.project.dataCollection.forEach(function(form) {
-			form.rawData.forEach(function(section) {
+			form.aggregatedData.forEach(function(section) {
 				section.elements.forEach(function(element) {
 					$scope.sources.push({id: element.id, name: element.name, group: section.name, element: element});
 				});
@@ -573,10 +645,10 @@ angular.module('monitool.controllers.project', [])
 			var numForms = $scope.project.dataCollection.length;
 			for (var i = 0; i < numForms; ++i) {
 				var form = $scope.project.dataCollection[i],
-					numSections = form.rawData.length;
+					numSections = form.aggregatedData.length;
 
 				for (var j = 0; j < numSections; ++j) {
-					var section = form.rawData[j],
+					var section = form.aggregatedData[j],
 						numElements = section.elements.length;
 
 					for (var k = 0; k < numElements; ++k)

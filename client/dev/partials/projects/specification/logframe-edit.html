@@ -97,7 +97,7 @@
 		
 		<p ng-if="project.logicalFrame.purposes.length == 0" translate="project.no_purposes"></p>
 
-		<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes" ng-init="tabOpen=false">
+		<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes">
 
 			<div class="panel-heading">
 				<div class="panel-title">
@@ -106,14 +106,11 @@
 						<span translate="shared.delete"></span>
 					</a>
 
-					<a ng-click="tabOpen = !tabOpen">
-						<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-						{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}
-					</a>
+					{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}
 				</div>
 			</div>
 
-			<div class="panel-body" ng-show="tabOpen">
+			<div class="panel-body">
 				<ng-form name="purposeForm">
 					<div class="form-group" show-errors>
 						<label for="purpose-desc-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.purpose"></label>
@@ -140,7 +137,7 @@
 						</div>
 					</div>
 
-					<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs" ng-init="tabOpen=false">
+					<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs">
 						<div class="panel-heading">
 							<div class="panel-title">
 								<span class="pull-right">
@@ -150,14 +147,11 @@
 									</a>
 								</span>
 
-								<a ng-click="tabOpen = !tabOpen">
-									<i class="fa" ng-class="{'fa-minus-circle': tabOpen, 'fa-plus-circle': !tabOpen}"></i>
-									{{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
-								</a>
+								{{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
 							</div>
 						</div>
 
-						<div class="panel-body" ng-show="tabOpen">
+						<div class="panel-body">
 							<ng-form name="outputForm">
 								<div class="form-group" show-errors>
 									<label for="output-desc-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.output"></label>

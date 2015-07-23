@@ -22,6 +22,7 @@ var app = angular.module('monitool.app', [
 	'monitool.filters.indicator',
 
 	'monitool.services.fetch',
+	'monitool.services.itertools',
 	'monitool.services.reporting',
 	'monitool.services.string',
 	'monitool.services.models.input',
@@ -332,15 +333,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Project Raw data
 	///////////////////////////
 
-	$stateProvider.state('main.project.automatic_input_list', {
-		url: '/automatic-input',
-		templateUrl: 'partials/projects/raw-data/automatic-input-list.html'
+	$stateProvider.state('main.project.external_input_list', {
+		url: '/external-input',
+		templateUrl: 'partials/projects/aggregated-data/external-input-list.html'
 	});
 
 
 	$stateProvider.state('main.project.manual_input_list', {
 		url: '/manual-input',
-		templateUrl: 'partials/projects/raw-data/manual-input-list.html',
+		templateUrl: 'partials/projects/aggregated-data/manual-input-list.html',
 		controller: 'ProjectManualInputListController',
 		resolve: {
 			inputs: function(Input, project) {
@@ -351,7 +352,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.manual_input_structure', {
 		url: '/manual-input/:formId',
-		templateUrl: 'partials/projects/raw-data/manual-input-structure.html',
+		templateUrl: 'partials/projects/aggregated-data/manual-input-structure.html',
 		controller: 'ProjectManualInputStructureController',
 		resolve: {
 			form: function($stateParams, project) {
@@ -367,7 +368,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						end: project.end,
 						intermediaryDates: [],
 						active: true,
-						rawData: []
+						aggregatedData: []
 					};
 				else
 					return project.dataCollection.find(function(form) {
@@ -379,7 +380,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.manual_input_data', {
 		url: '/manual-input/:period/:formId/:entityId',
-		templateUrl: 'partials/projects/raw-data/manual-input-data.html',
+		templateUrl: 'partials/projects/aggregated-data/manual-input-data.html',
 		controller: 'ProjectManualInputDataController',
 		resolve: {
 			inputs: function(Input, $stateParams, project) {
@@ -392,11 +393,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.raw_data_reporting', {
-		url: '/raw-data-reporting',
-		templateUrl: 'partials/projects/reporting/display.html',
-		controller: 'ProjectReportingController',
-		data: {display: "raw_data"}
+	$stateProvider.state('main.project.aggregated_data_reporting', {
+		url: '/aggregated-data-reporting',
+		templateUrl: 'partials/projects/aggregated-data/reporting.html',
+		controller: 'ProjectAggregatedDataReportingController'
 	});
 
 
@@ -412,7 +412,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	$stateProvider.state('main.project.indicators_reporting', {
-		url: '/raw-data-reporting',
+		url: '/aggregated-data-reporting',
 		templateUrl: 'partials/projects/reporting/display.html',
 		controller: 'ProjectReportingController',
 		data: {display: "value"}

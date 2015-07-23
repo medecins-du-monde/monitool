@@ -8,7 +8,6 @@ function makeUUID() {
 }
 
 
-
 // MDN polyfills, i'm not sure about the licence, but it should be OK
 
 if (!Array.prototype.findIndex) {

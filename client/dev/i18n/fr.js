@@ -179,6 +179,10 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		raw_data_management: "Suivi données brutes",
+		form_list: "Formulaires de collecte",
+		aggregation: "Agrégation",
+
 		delete_form_easy: "Voulez-vous vraiment supprimer ce planning de saisie?",
 		delete_form_hard: "Si vous supprimez ce planning, toutes les saisies associées seront supprimés. Tapez \"Supprimer les {{num_inputs}} saisies\" pour confirmer",
 		delete_form_hard_answer: "Supprimer les {{num_inputs}} saisies",
@@ -193,13 +197,13 @@ var FRENCH_TRANSLATION = {
 		last_input: "Dernière saisie: ",
 
 		value: "Valeur",
-		raw_data: "Données brutes",
-		raw_data_management: "Suivi des données brutes",
+		aggregated_data: "Données agrégées",
+		aggregated_data_management: "Suivi des données agrégées",
 		indicator_selection: "Selection des indicateurs",
 		planning: "Planning",
 		indicators_computation: "Calcul des indicateurs",
-		partition: "Partition",
-		additional_partition: "Partition supplémentaires",
+		partitions: "Partitions",
+		new_partition_element: "Ajouter un element",
 		new_partition: "Ajouter une partition",
 		variable: "Variable",
 		new_variable: "Ajouter une variable",
@@ -277,7 +281,7 @@ var FRENCH_TRANSLATION = {
 		value_source: 'Source de la valeur',
 		input_mode: 'Mode de saisie',
 		manual_input: 'Saisies manuelles',
-		automatic_input: 'Saisies automatiques',
+		external_input: 'Applications externes',
 
 		periodicities: {
 			day: 'Tous les jours',
@@ -471,6 +475,16 @@ var FRENCH_TRANSLATION = {
 		geo_aggregation_average: "Moyenne non pondérée (à n'utiliser uniquement que pour des indicateurs qui sont déjà des moyennes par centre: \"nombre de médecins par centre\")",
 		geo_aggregation_none: "Pas d'agrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
 	},
+
+	client: {
+		clients: "Application externes",
+		id: "Identifiant",
+		secret: "Secret",
+		name: "Nom de l'application",
+		num_tokens: "Nombre de délégations",
+		allowed_redirects: "Redirections autorisées"
+	},
+
 	login: {
 		error: "Identifiant ou mot de passe invalide",
 		please_connect: "Connectez-vous",
