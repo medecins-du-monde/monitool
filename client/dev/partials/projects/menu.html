@@ -4,19 +4,14 @@
 		<div class="panel-group">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title" translate="project.specs"></h4>
+					<h4 class="panel-title" translate="project.general"></h4>
 				</div>
 
 				<div class="panel-collapse">
 					<div class="list-group" ng-if="project._id">
-						<a ui-sref="main.project.logical_frame" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-building-o fa-fw"></i>
-							<span translate="shared.logical_frame"></span>
-						</a>
-
-						<a ui-sref="main.project.input_entities" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-map-marker fa-fw"></i>
-							<span translate="shared.input_entities"></span>
+						<a ui-sref="main.project.basics" ui-sref-active="active" class="list-group-item">
+							<i class="fa fa-info fa-fw"></i>
+							<span translate="project.basics"></span>
 						</a>
 
 						<a ui-sref="main.project.user_list" ui-sref-active="active" class="list-group-item">
@@ -27,13 +22,8 @@
 
 					<div class="list-group" ng-if="!project._id">
 						<a class="list-group-item">
-							<i class="fa fa-building-o fa-fw"></i>
-							<span translate="shared.logical_frame"></span>
-						</a>
-
-						<a class="list-group-item">
-							<i class="fa fa-map-marker fa-fw"></i>
-							<span translate="shared.input_entities"></span>
+							<i class="fa fa-info fa-fw"></i>
+							<span translate="project.basics"></span>
 						</a>
 
 						<a class="list-group-item">
@@ -46,18 +36,15 @@
 
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title" translate="project.aggregated_data_management"></h4>
+					<h4 class="panel-title" translate="project.activity_management"></h4>
 				</div>
 
 				<div class="panel-collapse">
 					<div class="list-group" ng-if="project._id">
 
-						<a ui-sref="main.project.external_input_list"
-						   ng-class="{active:$state.is('main.project.external_input_list')}"
-						   class="list-group-item">
-							
-							<i class="fa fa-tablet fa-fw"></i>
-							<span translate="project.external_input"></span>
+						<a ui-sref="main.project.input_entities" ui-sref-active="active" class="list-group-item">
+							<i class="fa fa-map-marker fa-fw"></i>
+							<span translate="shared.input_entities"></span>
 						</a>
 
 						<a ui-sref="main.project.manual_input_list"
@@ -75,9 +62,10 @@
 					</div>
 
 					<div class="list-group" ng-if="!project._id">
+
 						<a class="list-group-item">
-							<i class="fa fa-cloud fa-fw"></i>
-							<span translate="project.external_input"></span>
+							<i class="fa fa-map-marker fa-fw"></i>
+							<span translate="shared.input_entities"></span>
 						</a>
 
 						<a class="list-group-item">
@@ -100,10 +88,12 @@
 
 				<div class="panel-collapse">
 					<div class="list-group" ng-if="project._id">
-						<a ui-sref="main.project.indicator_selection" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-bullseye fa-fw"></i>
-							<span translate="project.indicator_selection"></span>
+
+						<a ui-sref="main.project.logical_frame" ui-sref-active="active" class="list-group-item">
+							<i class="fa fa-building-o fa-fw"></i>
+							<span translate="shared.logical_frame"></span>
 						</a>
+
 
 						<a ui-sref="main.project.indicators_reporting" ui-sref-active="active" class="list-group-item">
 							<i class="fa fa-line-chart fa-fw"></i>
@@ -118,8 +108,8 @@
 
 					<div class="list-group" ng-if="!project._id">
 						<a class="list-group-item">
-							<i class="fa fa-bullseye fa-fw"></i>
-							<span translate="project.indicator_selection"></span>
+							<i class="fa fa-building-o fa-fw"></i>
+							<span translate="shared.logical_frame"></span>
 						</a>
 						<a class="list-group-item">
 							<i class="fa fa-line-chart fa-fw"></i>

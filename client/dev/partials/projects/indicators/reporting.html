@@ -1,3 +1,11 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.logical_frame" ng-bind="project.name"></a></li>
+	<li class="active" translate="shared.reporting"></li>
+</ol>
+
+<doc-reminder pages="project.presentation_project,project.statistics"></doc-reminder>
+
 
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
@@ -44,25 +52,6 @@
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="form-group">
-				<label for="filter-by-input" class="col-sm-2 control-label" translate="shared.filter"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-filter"></i></span>
-						<select class="form-control input-sm" id="filter-by-input" ng-model="filters.entityId">
-							<option value="">Tout le projet</option>
-							<optgroup label="Lieux d'activité">
-								<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}">{{entity.name}}</option>
-							</optgroup>
-							<optgroup label="Groupes d'activité">
-								<option ng-repeat="group in project.inputGroups" value="{{group.id}}">{{group.name}}</option>
-							</optgroup>
-						</select>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-6">
-			<div class="form-group">
 				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
@@ -80,7 +69,53 @@
 				</div>
 			</div>
 		</div>
-
+		<div class="col-sm-6">
+			<div class="form-group">
+				<label for="filter-by-input" class="col-sm-2 control-label" translate="shared.filter"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-filter"></i></span>
+						<select class="form-control input-sm" id="filter-by-input" ng-model="filters.entityId">
+							<option value="">Tout le projet</option>
+							<optgroup label="Lieux d'activité">
+								<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}">{{entity.name}}</option>
+							</optgroup>
+							<optgroup label="Groupes d'activité">
+								<option ng-repeat="group in project.inputGroups" value="{{group.id}}">{{group.name}}</option>
+							</optgroup>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	</div>
 </form>
+
+
+<button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_table"></span>
+</button>
+
+<table id="reporting" class="table table-bordered table-condensed">
+	<thead>
+		<tr>
+			<th>Nom</th>
+			<th>Baseline</th>
+			<th>Target</th>
+			<th ng-repeat="col in cols">{{col.name}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="row in rows" class="indent{{row.indent}}">
+			<th ng-if="row.type === 'header'" colspan="{{3 + cols.length}}">{{row.text}}</th>
+			<td ng-if="row.type === 'data'">{{row.name[language]}}</td>
+			<td ng-if="row.type === 'data'">{{row.baseline}}{{row.unit}}</td>
+			<td ng-if="row.type === 'data'">{{row.target}}{{row.unit}}</td>
+			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" reporting-field></td>
+		</tr>
+	</tbody>
+</table>
+
+

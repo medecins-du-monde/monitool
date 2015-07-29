@@ -1,0 +1,22 @@
+- Comprendre pourquoi taux de CPN n'arrive pas a agreger.
+
+
+- Si possible de trouver une solution pour les trimestre
+=> ou on laisse decaller les trimestres et tant pis pour la comparaison entre projets
+=> ou on nomme les saisies (T1, T2, ...)
+
+- L'export excel pas assez clair.
+Refaire pour pas avoir de panneau intermédiaire dans excel
+que ca s'ouvre direct.
+
+
+- Quand on ajoute un indicateur, permettre de ne colorer que le total, ou rien du tout.
+Ex: RCA => nb consultations
+
+
+- Quand on edite une formule dans un indicateur presenter les parametres dans le meme sens que dans la formule.
+
+
+
+
+

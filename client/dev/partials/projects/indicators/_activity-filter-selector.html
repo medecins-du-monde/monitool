@@ -1,0 +1,15 @@
+
+<div ng-if="filters == null" style="padding: 3px">
+	Selectionnez une variable
+</div>
+
+<div ng-if="filters.length == 0" style="padding: 3px">
+	Pas de partitions disponibles
+</div>
+
+<div ng-if="filters.length > 0">
+	<ui-select multiple ng-model="planning.filter" name="filter" theme="bootstrap" required>
+		<ui-select-match placeholder="{{'project.select_filters'|translate}}">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="filter.id as filter in filters">{{filter.name}}</ui-select-choices>
+	</ui-select>
+</div>

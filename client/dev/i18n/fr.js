@@ -77,7 +77,7 @@ var FRENCH_TRANSLATION = {
 		indicators: 'Indicateurs',
 		indicators_catalog: 'Catalogue Indicateurs',
 		help: 'Aide',
-		input_entities: 'Lieux d\'activité',
+		input_entities: 'Lieux de collecte',
 		input_groups: 'Groupes d\'activité',
 		input_entity: 'Lieu d\'activité',
 		input_group: 'Groupe d\'activité',
@@ -162,7 +162,7 @@ var FRENCH_TRANSLATION = {
 			collection_history: "Historique de collecte",
 
 			logical_frame: "Cadre logique",
-			entities_groups: "Lieux d'activité et groupes",
+			entities_groups: "Lieux de collecte et groupes",
 			input_forms: "Plannings de saisie",
 			users: "Droits d'accès",
 
@@ -179,6 +179,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		basics: "Données de bases",
 		raw_data_management: "Suivi données brutes",
 		form_list: "Formulaires de collecte",
 		aggregation: "Agrégation",
@@ -197,8 +198,8 @@ var FRENCH_TRANSLATION = {
 		last_input: "Dernière saisie: ",
 
 		value: "Valeur",
-		aggregated_data: "Données agrégées",
-		aggregated_data_management: "Suivi des données agrégées",
+		activity: "Activités",
+		activity_management: "Suivi des activités",
 		indicator_selection: "Selection des indicateurs",
 		planning: "Planning",
 		indicators_computation: "Calcul des indicateurs",
@@ -262,8 +263,8 @@ var FRENCH_TRANSLATION = {
 		group_name_placeholder: "ex: Hôpitaux régionaux, parti Nord du pays, ...",
 
 		logical_frame_tooltip: 'Décrit les objectifs, resultats attendus et activitées mises en oeuvre par le projet.',
-		input_entities_tooltip: 'Liste les lieux d\'activité du projet où sont collectés les indicateurs. Par exemple des hopitaux, centre de santé, villages...',
-		input_groups_tooltip: 'Permet de grouper les lieux d\'activité par catégories logiques.',
+		input_entities_tooltip: 'Liste les Lieux de collecte du projet où sont collectés les indicateurs. Par exemple des hopitaux, centre de santé, villages...',
+		input_groups_tooltip: 'Permet de grouper les Lieux de collecte par catégories logiques.',
 		input_forms_tooltip: 'Déclaration des formulaires et du planning de saisie des indicateurs de suivi du projet.',
 		waiting_inputs_tooltip: '',
 		reporting_tooltip: '',
@@ -292,7 +293,7 @@ var FRENCH_TRANSLATION = {
 			planned: 'Planifiée'
 		},
 		collects: {
-			entity: "Lieux d'activité",
+			entity: "Lieux de collecte",
 			project: "Projet"
 		},
 

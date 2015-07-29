@@ -1,3 +1,5 @@
+
+
 <table class="table table-bordered table-condensed">
 	<thead>
 		<tr>
@@ -6,20 +8,18 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in rows">
-			<td ng-if="row.type === 'header'" colspan="{{1 + cols.length}}">{{row.text}}</td>
+		<tr ng-repeat="row in rows" class="indent{{row.indent}}">
+			<th ng-if="row.type === 'header'"
+				colspan="{{1 + cols.length}}">{{row.text}}</th>
 
 			<td ng-if="row.type === 'data'">
 				{{row.name}}
 
 				<div class="button-group pull-right">
-
 					<button class="btn-small">{{$index}}</button>
+				</div>
 			</td>
 			<td ng-repeat="col in row.cols track by $index">{{col}}</td>
-
-
-
 		</tr>
 
 	</tbody>

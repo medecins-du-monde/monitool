@@ -6,7 +6,10 @@ var app = angular.module('monitool.app', [
 	'monitool.controllers.admin',
 	'monitool.controllers.helper',
 	'monitool.controllers.indicator',
-	'monitool.controllers.project',
+	'monitool.controllers.project.shared',
+	'monitool.controllers.project.activity',
+	'monitool.controllers.project.indicators',
+	'monitool.controllers.project.spec',
 
 	'monitool.directives.acl',
 	'monitool.directives.form',
@@ -181,20 +184,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	///////////////////////////
-	// User
-	///////////////////////////
-
-	$stateProvider.state('main.access_tokens', {
-		controller: 'AccessTokenListController',
-		templateUrl: 'partials/user/access-tokens.html',
-		resolve: {
-			accessTokens: function(mtFetch) {
-				return mtFetch.accessTokens();
-			}
-		}
-	});
-
-	///////////////////////////
 	// Admin
 	///////////////////////////
 
@@ -242,27 +231,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.admin.client_list', {
-		url: '/admin/clients',
-		templateUrl: 'partials/admin/client-list.html',
-		controller: 'ClientListController',
-		resolve: {
-			clients: function(mtFetch) {
-				return mtFetch.clients();
-			}
-		}
-	});
-
-	$stateProvider.state('main.admin.client', {
-		url: '/admin/client/:clientId',
-		templateUrl: 'partials/admin/client-edit.html',
-		controller: 'ClientController',
-		resolve: {
-			client: function(mtFetch, $stateParams) {
-				return mtFetch.client($stateParams.clientId);
-			}
-		}
-	});
 
 	///////////////////////////
 	// Project
@@ -301,21 +269,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Project Specification
 	///////////////////////////
 
-	$stateProvider.state('main.project.logical_frame', {
-		url: '/logical-frame',
-		templateUrl: 'partials/projects/specification/logframe-edit.html',
-		controller: 'ProjectLogicalFrameController',
+
+	$stateProvider.state('main.project.basics', {
+		url: '/basics',
+		templateUrl: 'partials/projects/specification/basics.html',
+		controller: 'ProjectBasicsController',
 		resolve: {
 			themes: function(mtFetch) {
 				return mtFetch.themes();
 			}
 		}
-	});
-
-	$stateProvider.state('main.project.input_entities', {
-		url: '/input-entities',
-		templateUrl: 'partials/projects/specification/input-entities.html',
-		controller: 'ProjectInputEntitiesController'
 	});
 
 	$stateProvider.state('main.project.user_list', {
@@ -333,15 +296,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Project Raw data
 	///////////////////////////
 
-	$stateProvider.state('main.project.external_input_list', {
-		url: '/external-input',
-		templateUrl: 'partials/projects/aggregated-data/external-input-list.html'
+	$stateProvider.state('main.project.input_entities', {
+		url: '/input-entities',
+		templateUrl: 'partials/projects/activity/input-entities.html',
+		controller: 'ProjectInputEntitiesController'
 	});
-
 
 	$stateProvider.state('main.project.manual_input_list', {
 		url: '/manual-input',
-		templateUrl: 'partials/projects/aggregated-data/manual-input-list.html',
+		templateUrl: 'partials/projects/activity/manual-input-list.html',
 		controller: 'ProjectManualInputListController',
 		resolve: {
 			inputs: function(Input, project) {
@@ -352,7 +315,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.manual_input_structure', {
 		url: '/manual-input/:formId',
-		templateUrl: 'partials/projects/aggregated-data/manual-input-structure.html',
+		templateUrl: 'partials/projects/activity/manual-input-structure.html',
 		controller: 'ProjectManualInputStructureController',
 		resolve: {
 			form: function($stateParams, project) {
@@ -380,7 +343,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.manual_input_data', {
 		url: '/manual-input/:period/:formId/:entityId',
-		templateUrl: 'partials/projects/aggregated-data/manual-input-data.html',
+		templateUrl: 'partials/projects/activity/manual-input-data.html',
 		controller: 'ProjectManualInputDataController',
 		resolve: {
 			inputs: function(Input, $stateParams, project) {
@@ -394,9 +357,14 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	$stateProvider.state('main.project.aggregated_data_reporting', {
-		url: '/aggregated-data-reporting',
-		templateUrl: 'partials/projects/aggregated-data/reporting.html',
-		controller: 'ProjectAggregatedDataReportingController'
+		url: '/activity-reporting',
+		templateUrl: 'partials/projects/activity/reporting.html',
+		controller: 'ProjectActivityReportingController',
+		resolve: {
+			inputs: function(Input, project) {
+				return Input.fetchForProject(project);
+			}
+		}
 	});
 
 
@@ -405,6 +373,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Project Indicators
 	///////////////////////////
 
+
+	$stateProvider.state('main.project.logical_frame', {
+		url: '/logical-frame',
+		templateUrl: 'partials/projects/indicators/logframe-edit.html',
+		controller: 'ProjectLogicalFrameController'
+	});
+
 	$stateProvider.state('main.project.indicator_selection', {
 		url: '/indicator-selection',
 		templateUrl: 'partials/projects/indicators/selection.html',
@@ -412,10 +387,14 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	$stateProvider.state('main.project.indicators_reporting', {
-		url: '/aggregated-data-reporting',
-		templateUrl: 'partials/projects/reporting/display.html',
+		url: '/indicator-reporting',
+		templateUrl: 'partials/projects/indicators/reporting.html',
 		controller: 'ProjectReportingController',
-		data: {display: "value"}
+		resolve: {
+			inputs: function(Input, project) {
+				return Input.fetchForProject(project);
+			}
+		}
 	});
 
 	$stateProvider.state('main.project.reporting_analysis_list', {

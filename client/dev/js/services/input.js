@@ -215,54 +215,71 @@ angular.module('monitool.services.models.input', [])
 		 * - a given indicator
 		 * - a group or an entity
 		 */
-		Input.fetchFromQuery = function(query) {
-			// Retrieve all relevant inputs.
-			var options;
-			if (query.type === 'project' || query.type === 'group')
-				options = {mode: 'project_inputs', begin: query.begin, end: query.end, projectId: query.project._id};
+		// Input.fetchFromQuery = function(query) {
+		// 	// Retrieve all relevant inputs.
+		// 	var options;
+		// 	if (query.type === 'project' || query.type === 'group')
+		// 		options = {mode: 'project_inputs', begin: query.begin, end: query.end, projectId: query.project._id};
 
-			else if (query.type === 'entity')
-				options = {mode: 'entity_inputs', begin: query.begin, end: query.end, entityId: query.id};
+		// 	else if (query.type === 'entity')
+		// 		options = {mode: 'entity_inputs', begin: query.begin, end: query.end, entityId: query.id};
 
-			else if (query.type === 'indicator')
-				// we want all inputs from a form with the relevant formId
-				options = {
-					mode: 'form_inputs',
-					begin: query.begin, end: query.end,
-					formId: query.projects.map(function(p) {
-						var form = p.dataCollection.find(function(f) {
-							return !!f.fields.find(function(field) { return query.indicator._id === field.indicatorId });
-						});
-						return form ? form.id : null;
-					}).filter(function(form) { return form; })
-				};
-			else
-				throw new Error('query.type must be indicator, project, group or entity');
+		// 	else if (query.type === 'indicator')
+		// 		// we want all inputs from a form with the relevant formId
+		// 		options = {
+		// 			mode: 'form_inputs',
+		// 			begin: query.begin, end: query.end,
+		// 			formId: query.projects.map(function(p) {
+		// 				var form = p.dataCollection.find(function(f) {
+		// 					return !!f.fields.find(function(field) { return query.indicator._id === field.indicatorId });
+		// 				});
+		// 				return form ? form.id : null;
+		// 			}).filter(function(form) { return form; })
+		// 		};
+		// 	else
+		// 		throw new Error('query.type must be indicator, project, group or entity');
 
-			return Input.query(options).$promise.then(function(inputs) {
-				// Discard all inputs that are not relevant.
-				if (query.type === 'project')
-					inputs = inputs.filter(function(input) { return input.project === query.project._id; });
+		// 	return Input.query(options).$promise.then(function(inputs) {
+		// 		// Discard all inputs that are not relevant.
+		// 		if (query.type === 'project')
+		// 			inputs = inputs.filter(function(input) { return input.project === query.project._id; });
 
-				else if (query.type === 'entity')
-					inputs = inputs.filter(function(input) { return input.entity === query.id; });
+		// 		else if (query.type === 'entity')
+		// 			inputs = inputs.filter(function(input) { return input.entity === query.id; });
 
-				else if (query.type === 'group')
-					inputs = inputs.filter(function(input) {
-						var project = query.project || query.projects.find(function(p) { return p._id === input.project; }),
-							group   = project.inputGroups.find(function(g) { return g.id === query.id; });
+		// 		else if (query.type === 'group')
+		// 			inputs = inputs.filter(function(input) {
+		// 				var project = query.project || query.projects.find(function(p) { return p._id === input.project; }),
+		// 					group   = project.inputGroups.find(function(g) { return g.id === query.id; });
 
-						return group.members.indexOf(input.entity) !== -1;
-					});
+		// 				return group.members.indexOf(input.entity) !== -1;
+		// 			});
 
+		// 		// Sanitize all inputs.
+		// 		var formsById = {};
+		// 		if (query.project)
+		// 			query.project.dataCollection.forEach(function(form) { formsById[form.id] = form; });
+		// 		if (query.projects)
+		// 			query.projects.forEach(function(p) { p.dataCollection.forEach(function(form) { formsById[form.id] = form; }); });
+
+		// 		inputs.forEach(function(input) {
+		// 			input.sanitize(formsById[input.form]);
+		// 		});
+
+		// 		return inputs;
+		// 	});
+		// };
+
+		Input.fetchForProject = function(project) {
+			return Input.query({mode: "project_inputs", projectId: project._id}).$promise.then(function(inputs) {
 				// Sanitize all inputs.
-				var formsById = {};
-				if (query.project)
-					query.project.dataCollection.forEach(function(form) { formsById[form.id] = form; });
-				if (query.projects)
-					query.projects.forEach(function(p) { p.dataCollection.forEach(function(form) { formsById[form.id] = form; }); });
 
-				inputs.forEach(function(input) {
+				var formsById = {};	// start by indexings form by id
+				project.dataCollection.forEach(function(form) {
+					formsById[form.id] = form;
+				});
+
+				inputs.forEach(function(input) { // ask each input to sanitize itself with the relevant form.
 					input.sanitize(formsById[input.form]);
 				});
 
@@ -349,23 +366,23 @@ angular.module('monitool.services.models.input', [])
 		};
 
 
-		/**
-		 * Given a rawId, and a filter, returns the appropriate sum
-		 * If no filter is provided, assume the user want all partitions.
-		 */
-		Input.prototype.extractRawValue = function(rawId, filter) {
-			var result = 0;
-			var numFilters = filter.length;
+		// /**
+		//  * Given a rawId, and a filter, returns the appropriate sum
+		//  * If no filter is provided, assume the user want all partitions.
+		//  */
+		// Input.prototype.extractRawValue = function(rawId, filter) {
+		// 	var result = 0;
+		// 	var numFilters = filter.length;
 
-			Object.keys(this.values).forEach(function(key) {
-				// if the filter is not found, skip.
-				for (var i = 0; i < numFilters; ++i)
-					if (key.indexOf(filter[i]) === -1)
-						return;
+		// 	Object.keys(this.values).forEach(function(key) {
+		// 		// if the filter is not found, skip.
+		// 		for (var i = 0; i < numFilters; ++i)
+		// 			if (key.indexOf(filter[i]) === -1)
+		// 				return;
 
-				result += this.values[key];
-			}, this);
-		};
+		// 		result += this.values[key];
+		// 	}, this);
+		// };
 
 		/**
 		 * Given a input.value hash, compute all possible sums.
@@ -425,6 +442,7 @@ angular.module('monitool.services.models.input', [])
 					return this.entity !== 'none' ? ['total', this.entity] : ['total'];
 
 				case 'group':
+					// FIXME this test appears to be always false
 					if (this.entity !== 'none' && projectGroups)
 						return projectGroups.filter(function(group) {
 							return group.members.indexOf(this.entity) !== -1;

@@ -1,3 +1,6 @@
+
+<div print-logframe class="print"></div>
+
 <ol class="breadcrumb noprint">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li class="active">{{project.name}}</li>
@@ -7,78 +10,9 @@
 <doc-reminder pages="project.presentation_project,project.logical_frame,project.change_definition"></doc-reminder>
 
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate>
-	<fieldset>
-		<legend translate="project.general_data"></legend>
-
-		<div class="form-group" show-errors>
-			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.name">
-				<input id="input-name"
-					   type="text"
-					   class="form-control"
-					   name="name"
-					   ng-model="project.name"
-					   placeholder="{{'project.name_ph'|translate}}"
-					   required />
-				
-				<p class="help-block" ng-if="projectForm.name.$error.required" translate="form.mandatory"></p>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="input-themes" class="col-sm-2 control-label" translate="indicator.themes"></label>
-			<div class="col-sm-10">
-				<ui-select id="input-themes" multiple ng-model="project.themes" name="themes" theme="bootstrap" required acl-has-project-role="owner">
-					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name[language]}}</ui-select-match>
-					<ui-select-choices repeat="theme._id as theme in themes">{{theme.name[language]}}</ui-select-choices>
-				</ui-select>
-
-				<p class="form-control-static" acl-lacks-project-role="owner">{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</p>
-			</div>
-		</div>
-
-		<div class="form-group" show-errors>
-			<label for="input-begin" class="col-sm-2 control-label" translate="project.begin_date"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.begin">
-
-				<input type="text" 
-					   datepicker-popup="longDate"
-					   name="begin"
-					   ng-model="project.begin"
-					   is-open="beginDateOpen"
-					   ng-click = "beginDateOpen = true"
-					   required
-					   ng-max="project.end"
-					   class="form-control" />
-
-				<p class="help-block" ng-if="projectForm.begin.$error.required" translate="form.mandatory"></p>
-				<p class="help-block" ng-if="projectForm.begin.$error.lowerThan" translate="form.begin_lower_than_end"></p>
-			</div>
-		</div>
-
-		<div class="form-group" show-errors>
-			<label for="input-end" class="col-sm-2 control-label" translate="project.end_date"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.end">
-
-				<input type="text" 
-					   datepicker-popup="longDate"
-					   name="end"
-					   ng-model="project.end"
-					   is-open="endDateOpen"
-					   ng-click = "endDateOpen = true"
-					   required
-					   ng-min="project.begin"
-					   class="form-control" />
-
-				<p class="help-block" ng-if="projectForm.end.$error.required" translate="form.mandatory"></p>
-				<p class="help-block" ng-if="projectForm.end.$error.greaterThan" translate="form.end_greater_than_begin"></p>
-			</div>
-		</div>
-
- 	</fieldset>
 
 	<fieldset>
-		<legend translate="shared.logical_frame"></legend>
+		<legend translate="project.goal"></legend>
 
 		<div class="form-group" show-errors>
 			<label for="logframe-goal-input" class="col-sm-2 control-label" translate="project.goal"></label>
@@ -94,6 +28,33 @@
 				<p class="help-block" ng-if="projectForm.goalDesc.$error.required" translate="form.mandatory"></p>
 			</div>
 		</div>
+
+		<div class="form-group">
+			<label class="col-sm-2 control-label" translate="shared.indicators"></label>
+			<div class="col-sm-10">
+				<div class="form-control-static">
+					<p ng-repeat="indicatorId in project.logicalFrame.indicators">
+
+						<i class="fa fa-external-link fa-fw"
+							ng-if="isExternal(indicatorId)"
+							tooltip="{{'indicator.is_external'|translate}}"
+							tooltip-placement="right"></i>
+
+						<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
+
+						<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)"
+						   ng-bind="indicatorsById[indicatorId].name[language]"></a>
+					</p>
+					<p acl-has-project-role="owner">
+						<a ng-click="editIndicator('new', project.logicalFrame.indicators)" translate="project.add_indicator"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend translate="project.purposes"></legend>
 		
 		<p ng-if="project.logicalFrame.purposes.length == 0" translate="project.no_purposes"></p>
 
@@ -134,6 +95,28 @@
 									  id="purpose-assum-{{purposeId}}-input"
 									  placeholder="{{'project.assumptions_purpose_ph'|translate}}"
 									  ng-model="purpose.assumptions"></textarea>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" translate="shared.indicators"></label>
+						<div class="col-sm-10">
+							<div class="form-control-static">
+								<p ng-repeat="indicatorId in purpose.indicators">
+									<i class="fa fa-external-link fa-fw"
+										ng-if="isExternal(indicatorId)"
+										tooltip="{{'indicator.is_external'|translate}}"
+										tooltip-placement="right"></i>
+
+									<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
+
+									<a ng-click="editIndicator(indicatorId, purpose.indicators)"
+									   ng-bind="indicatorsById[indicatorId].name[language]"></a>
+								</p>
+								<p acl-has-project-role="owner">
+									<a ng-click="editIndicator('new', purpose.indicators)" translate="project.add_indicator"></a>
+								</p>
+							</div>
 						</div>
 					</div>
 
@@ -179,6 +162,28 @@
 								</div>
 
 								<div class="form-group">
+									<label class="col-sm-2 control-label" translate="shared.indicators"></label>
+									<div class="col-sm-10">
+										<div class="form-control-static">
+											<p ng-repeat="indicatorId in output.indicators">
+												<i class="fa fa-external-link fa-fw"
+													ng-if="isExternal(indicatorId)"
+													tooltip="{{'indicator.is_external'|translate}}"
+													tooltip-placement="right"></i>
+
+												<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
+
+												<a ng-click="editIndicator(indicatorId, output.indicators)"
+												   ng-bind="indicatorsById[indicatorId].name[language]"></a>
+											</p>
+											<p acl-has-project-role="owner">
+												<a ng-click="editIndicator('new', output.indicators)" translate="project.add_indicator"></a>
+											</p>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
 									<label class="col-sm-2 control-label" translate="project.activities"></label>
 									<div class="col-sm-10">
 										<div class="input-group" style="margin-bottom: 5px; " ng-repeat="activity in output.activities">
@@ -215,6 +220,28 @@
 			<i class="fa fa-plus"></i>
 			<span translate="project.add_purpose"></span>
 		</a>
+	</fieldset>
+	<br/>
+
+	<fieldset>
+		<legend translate="project.additional_indicators"></legend>
+
+		<p ng-if="otherIndicators.length == 0" translate="project.no_additional_indicators"></p>
+
+		<p ng-repeat="indicatorId in otherIndicators">
+			<i class="fa fa-external-link fa-fw"
+				ng-if="isExternal(indicatorId)"
+				tooltip="{{'indicator.is_external'|translate}}"
+				tooltip-placement="right"></i>
+
+			<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
+
+			<a ng-click="editIndicator(indicatorId, null)">{{indicatorsById[indicatorId].name[language]}}</a>
+		</p>
+
+		<p acl-has-project-role="owner">
+			<a ng-click="editIndicator('new', null)" translate="project.add_indicator"></a>
+		</p>
 	</fieldset>
 	
 	<div acl-has-project-role="owner">

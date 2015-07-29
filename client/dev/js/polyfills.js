@@ -7,6 +7,21 @@ function makeUUID() {
   });
 }
 
+// pluck function
+if (!Array.prototype.pluck) {
+  Array.prototype.pluck = function(col) {
+    if (this == null)
+     throw new TypeError('Array.prototype.pluck called on null or undefined');
+
+    if (typeof col !== 'string')
+      throw new TypeError('col must be a string');
+
+    return this.map(function(item) {
+      return item[col];
+    });
+  }
+}
+
 
 // MDN polyfills, i'm not sure about the licence, but it should be OK
 

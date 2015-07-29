@@ -9,159 +9,160 @@ var validate = validator({
 	"$schema": "http://json-schema.org/schema#",
 	"title": "Monitool project schema",
 	"type": "object",
-	"additionalProperties": false,
+	// "additionalProperties": false,
+	"additionalProperties": true,
 
 	"required": [
-		"_id", "type", "name", "begin", "end", "indicators", "dataCollection", "themes",
-		"inputEntities", "inputGroups", "logicalFrame", "owners", "dataEntryOperators"
+		// "_id", "type", "name", "begin", "end", "indicators", "dataCollection", "themes",
+		// "inputEntities", "inputGroups", "logicalFrame", "owners", "dataEntryOperators"
 	],
 
 	"properties": {
-		"_id":   { "$ref": "#/definitions/uuid" },
-		"_rev":  { "$ref": "#/definitions/couchdb-revision" },
-		"type":  { "type": "string", "pattern": "^project$" },
-		"name":  { "type": "string", "minLength": 1 },
-		"begin": { "type": "string", "format": "date" },
-		"end":   { "type": "string", "format": "date" },
+		// "_id":   { "$ref": "#/definitions/uuid" },
+		// "_rev":  { "$ref": "#/definitions/couchdb-revision" },
+		// "type":  { "type": "string", "pattern": "^project$" },
+		// "name":  { "type": "string", "minLength": 1 },
+		// "begin": { "type": "string", "format": "date" },
+		// "end":   { "type": "string", "format": "date" },
 		
-		"themes": {
-			"type": "array",
-			"uniqueItems": true,
-			"items": {
-				"$ref": "#/definitions/uuid"
-			}
-		},
+		// "themes": {
+		// 	"type": "array",
+		// 	"uniqueItems": true,
+		// 	"items": {
+		// 		"$ref": "#/definitions/uuid"
+		// 	}
+		// },
 
-		"indicators": {
-			"type": "object",
-			"patternProperties": {
-				"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$": {
-					"type": "object",
-					"additionalProperties": false,
-					"required": [
-						"relevance", "inCharge", "source"
-					],
-					"properties": {
-						"relevance": { "type": "string", "minLength": 1 },
-						"source": { "type": "string", "minLength": 1 },
-						"inCharge": { "type": "string", "minLength": 1 },
-						"baseline": { "type": ["number", "null"] },
-						"target": { "type": ["number", "null"] },
-						"showRed": { "type": "number" },
-						"showYellow": { "type": "number" },
+		// "indicators": {
+		// 	"type": "object",
+		// 	"patternProperties": {
+		// 		"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$": {
+		// 			"type": "object",
+		// 			"additionalProperties": false,
+		// 			"required": [
+		// 				"relevance", "inCharge", "source"
+		// 			],
+		// 			"properties": {
+		// 				"relevance": { "type": "string", "minLength": 1 },
+		// 				"source": { "type": "string", "minLength": 1 },
+		// 				"inCharge": { "type": "string", "minLength": 1 },
+		// 				"baseline": { "type": ["number", "null"] },
+		// 				"target": { "type": ["number", "null"] },
+		// 				"showRed": { "type": "number" },
+		// 				"showYellow": { "type": "number" },
 
-						"formula": {},
-						"variable": {},
-						"filter": {},
-						"parameters": {}
+		// 				"formula": {},
+		// 				"variable": {},
+		// 				"filter": {},
+		// 				"parameters": {}
 
-					}
-				}
-			}
-		},
+		// 			}
+		// 		}
+		// 	}
+		// },
 
-		"dataCollection": {
-			"type": "array",
-			"items": {
-				"type": "object",
-				"required": ["id", "name", "start", "end", "active", "useProjectStart", "useProjectEnd", "periodicity", "intermediaryDates"],
-				"additionalProperties": false,
-				"properties": {
-					"id":    { "$ref": "#/definitions/uuid" },
-					"name":  { "type": "string", "minLength": 1 },
-					"start": { "type": "string", "format": "date" },
-					"end":   { "type": "string", "format": "date" },
+		// "dataCollection": {
+		// 	"type": "array",
+		// 	"items": {
+		// 		"type": "object",
+		// 		"required": ["id", "name", "start", "end", "active", "useProjectStart", "useProjectEnd", "periodicity", "intermediaryDates"],
+		// 		"additionalProperties": false,
+		// 		"properties": {
+		// 			"id":    { "$ref": "#/definitions/uuid" },
+		// 			"name":  { "type": "string", "minLength": 1 },
+		// 			"start": { "type": "string", "format": "date" },
+		// 			"end":   { "type": "string", "format": "date" },
 					
-					"active": { "type": "boolean" },
-					"useProjectStart": { "type": "boolean" },
-					"useProjectEnd": { "type": "boolean" },
+		// 			"active": { "type": "boolean" },
+		// 			"useProjectStart": { "type": "boolean" },
+		// 			"useProjectEnd": { "type": "boolean" },
 
-					"periodicity": {
-						"type": "string",
-						"enum": ["day", "week", "month", "quarter", "year", "planned"]
-					},
+		// 			"periodicity": {
+		// 				"type": "string",
+		// 				"enum": ["day", "week", "month", "quarter", "year", "planned"]
+		// 			},
 
-					"collect": {
-						"type": "string",
-						"enum": ["project", "entity"]
-					},
+		// 			"collect": {
+		// 				"type": "string",
+		// 				"enum": ["project", "entity"]
+		// 			},
 
-					"intermediaryDates": {
-						"type": "array",
-						"items": { "type": "string", "format": "date" }
-					},
+		// 			"intermediaryDates": {
+		// 				"type": "array",
+		// 				"items": { "type": "string", "format": "date" }
+		// 			},
 					
-					"rawData": {}
-				}
-			}
-		},
+		// 			"rawData": {}
+		// 		}
+		// 	}
+		// },
 		
-		"inputEntities": {
-			"type": "array",
-			"items": {
-				"id":   { "$ref": "#/definitions/uuid" },
-				"name": { "type": "string", "minLength": 1 }	
-			}
-		},
+		// "inputEntities": {
+		// 	"type": "array",
+		// 	"items": {
+		// 		"id":   { "$ref": "#/definitions/uuid" },
+		// 		"name": { "type": "string", "minLength": 1 }	
+		// 	}
+		// },
 
-		"inputGroups": {
-			"type": "array",
-			"items": {
-				"type": "object",
-				"properties": {
-					"id":      { "$ref": "#/definitions/uuid" },
-					"name":    { "type": "string", "minLength": 1 },
-					"members": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
-				}
-			}
-		},
+		// "inputGroups": {
+		// 	"type": "array",
+		// 	"items": {
+		// 		"type": "object",
+		// 		"properties": {
+		// 			"id":      { "$ref": "#/definitions/uuid" },
+		// 			"name":    { "type": "string", "minLength": 1 },
+		// 			"members": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
+		// 		}
+		// 	}
+		// },
 
-		"logicalFrame": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"goal": { "type": "string", "minLength": 1 },
-				"purposes": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"additionalProperties": false,
-						"properties": {
-							"description": { "type": "string", "minLength": 1 },
-							"assumptions": { "type": "string" },
-							"outputs": {
-								"type": "array",
-								"items": {
-									"type": "object",
-									"additionalProperties": false,
-									"properties": {
-										"description": { "type": "string", "minLength": 1 },
-										"assumptions": { "type": "string" },
-										"activities": {
-											"type": "array",
-											"items": {
-												"type": "object",
-												"additionalProperties": false,
-												"required": ["description"],
-												"properties": {
-													"description": { "type": "string", "minLength": 1 }
-												}
-											}
-										},
-										"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
-									}
-								}
-							},
-							"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
-						}
-					}
-				},
-				"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
-			}
-		},
+		// "logicalFrame": {
+		// 	"type": "object",
+		// 	"additionalProperties": false,
+		// 	"properties": {
+		// 		"goal": { "type": "string", "minLength": 1 },
+		// 		"purposes": {
+		// 			"type": "array",
+		// 			"items": {
+		// 				"type": "object",
+		// 				"additionalProperties": false,
+		// 				"properties": {
+		// 					"description": { "type": "string", "minLength": 1 },
+		// 					"assumptions": { "type": "string" },
+		// 					"outputs": {
+		// 						"type": "array",
+		// 						"items": {
+		// 							"type": "object",
+		// 							"additionalProperties": false,
+		// 							"properties": {
+		// 								"description": { "type": "string", "minLength": 1 },
+		// 								"assumptions": { "type": "string" },
+		// 								"activities": {
+		// 									"type": "array",
+		// 									"items": {
+		// 										"type": "object",
+		// 										"additionalProperties": false,
+		// 										"required": ["description"],
+		// 										"properties": {
+		// 											"description": { "type": "string", "minLength": 1 }
+		// 										}
+		// 									}
+		// 								},
+		// 								"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
+		// 							}
+		// 						}
+		// 					},
+		// 					"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
+		// 				}
+		// 			}
+		// 		},
+		// 		"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
+		// 	}
+		// },
 
-		"owners":             { "$ref": "#/definitions/user-list" },
-		"dataEntryOperators": { "$ref": "#/definitions/user-list" }
+		// "owners":             { "$ref": "#/definitions/user-list" },
+		// "dataEntryOperators": { "$ref": "#/definitions/user-list" }
 	},
 
 	"definitions": {

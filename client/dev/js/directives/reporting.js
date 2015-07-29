@@ -4,7 +4,6 @@ angular.module('monitool.directives.reporting', [])
 
 	.directive('svgSave', function() {
 		// from "https://github.com/exupero/saveSvgAsPng.git#gh-pages"
-
 		var doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
 		var s = document.createElement('style');
@@ -74,106 +73,48 @@ angular.module('monitool.directives.reporting', [])
 		}
 	})
 
-	.directive('projectCsvSave', function($rootScope) {
+	.directive('csvSave', function() {
+		// From https://gist.github.com/insin/1031969
+		var tableToExcel = (function() {
+			var uri = 'data:application/vnd.ms-excel;base64,', 
+				template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>', 
+				base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }, 
+				format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+
+			return function(table, name) {
+				if (!table.nodeType)
+					table = document.getElementById(table)
+
+				var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML};
+				// window.location.href = uri + base64(format(template, ctx));
+
+				var blob = new Blob([format(template, ctx)], {type: "application/vnd.ms-excel"});
+				saveAs(blob, 'export.xls');
+			};
+		})()
+
 		return {
-			restrict: "A",
+			restrict: 'A',
 			link: function($scope, element, attributes) {
-				var esc = function(string) { return '"' + string.replace(/"/g, '\\"') + '"'; };
-
-				element.bind('click', function() {
-					var statistics = $scope.stats.indicatorRows.concat([{type: 'header', text: '', indent: 0}]).concat($scope.stats.aggregatedDataRows),
-						csv = 'name,baseline,target,' + $scope.stats.cols.map(function(c) { return c.name; }).join(',') + "\n";
-
-					statistics.forEach(function(row) {
-						var indent = '';
-						for (var i = 0; i < row.indent * 4; ++i)
-							indent += '_';
-
-						if (row.type === 'header')
-							csv += esc(indent + row.text);
-						else
-							csv += [esc(indent + (row.name[$rootScope.language] || row.name)), row.baseline, row.target].join(',') + ',' + row.cols.join(',');
-
-						csv += "\n";
-					});
-
-					var blob = new Blob([csv], {type: "text/csv;charset=utf-8"}),
-						name = [$scope.query.project.name, $scope.query.begin, $scope.query.end].join('_') + '.csv';
-
-					saveAs(blob, name);
-				});
-			}
-		};
-	})
-
-	.directive('indicatorCsvSave', function($rootScope) {
-		var esc = function(string) { return '"' + string.replace(/"/g, '\\"') + '"'; };
-
-		return {
-			restrict: "A",
-			link: function(scope, element, attributes) {
-				element.bind('click', function() {
-					var csv = 'type,name,baseline,target,' + scope.stats.cols.map(function(c) { return c.name; }).join(',') + "\n";
-
-					scope.stats.rows.forEach(function(row) {
-						var indent = row.type === 'entity' ? '____' : '';
-						csv += [row.type, esc(indent + row.name), row.baseline, row.target].join(',') + ',' + row.cols.join(',');
-						csv += "\n";
-					});
-
-					var blob    = new Blob([csv], {type: "text/csv;charset=utf-8"}),
-						name    = [scope.query.indicator.name[$rootScope.language], scope.query.begin, scope.query.end].join('_') + '.csv';
-
-					saveAs(blob, name);
-				});
-			}
-		}
-	})
-
-	.directive('reportingQuery', function() {
-		return {
-			restrict: 'AE',
-			templateUrl: 'partials/projects/reporting/query.html',
-			scope: {
-				query: "=query"
-			},
-			link: function($scope, element, attributes, controller) {
-				// FIXME
-				// For legacy reason, dates on this part of the code are strings.
-				// Hence the hacks in this directive.
-				$scope.filter = '';
-				$scope.dates = {begin: new Date($scope.query.begin), end: new Date($scope.query.end)};
-				
-				$scope.$watch('filter', function(newFilter) {
-					if (!newFilter)
-						$scope.query.type = 'project';
-					else if ($scope.query.project.inputEntities.find(function(entity) { return entity.id === newFilter; }))
-						$scope.query.type = 'entity';
-					else
-						$scope.query.type = 'group';
-
-					$scope.query.id = newFilter;
-					$scope.entity   = $scope.query.project.inputEntities.find(function(e) { return e.id === newFilter; });
-					$scope.group    = $scope.query.project.inputGroups.find(function(g) { return g.id === newFilter; });
+				element.on('click', function(e) {
+					tableToExcel('reporting');
+					e.preventDefault();
 				});
 
-				$scope.$watch("dates", function() {
-					$scope.query.begin = moment($scope.dates.begin).format('YYYY-MM-DD');
-					$scope.query.end = moment($scope.dates.end).format('YYYY-MM-DD');
-				}, true);
-				
-				$scope.$on('languageChange', function(e) {
-					$scope.dates = angular.copy($scope.dates);
-				});
+
+				// <-- event handler leak
+				// $scope.on('$destroy', function() {
+				// 	element.off('click');
+				// });
 			}
 		};
 	})
 
 	.directive('reportingField', function() {
 		return {
+			scope: false,
 			link: function($scope, element, attributes, controller) {
-				$scope.$watch('[presentation.display, row]', function(newValue) {
-					var display = newValue[0];
+				$scope.$watch('row', function(newValue) {
 
 					if (typeof $scope.col === "number") {
 						var progress = null;
@@ -197,15 +138,7 @@ angular.module('monitool.directives.reporting', [])
 						else
 							element.css('background-color', '');
 
-						// display data in field
-						if (display === 'value')
-							element.html(Math.round($scope.col) + $scope.row.unit);
-						else if (display === 'progress')
-							element.html(progress !== null ? Math.round(100 * progress) + '%' : '');
-						else if (display === 'aggregated_data')
-							element.html($scope.col);
-						else
-							throw new Error('Invalid display value.');
+						element.html(Math.round($scope.col) + $scope.row.unit);
 					}
 					else if (typeof $scope.col === "string") {
 						element.html('<i class="fa fa-ban"></i>');
@@ -338,6 +271,7 @@ angular.module('monitool.directives.reporting', [])
 				}, true);
 
 				// cleanup when done
+				// FIXME shouldn't this be an event on the scope?
 				element.on('$destroy', function() {
 					chart.destroy();
 					unwatch();
@@ -354,73 +288,4 @@ angular.module('monitool.directives.reporting', [])
 				"result": "=data"
 			}
 		}
-	})
-
-	.directive('aggregatedDataReporting', function() {
-		return {
-			restrict: 'AE',
-			templateUrl: 'partials/projects/aggregated-data/_display_grid.html',
-			scope: {
-				"cols": "=",
-				"stats": "=",
-				"project": "="
-			},
-
-			link: function($scope) {
-
-				$scope.toggle = function(id) {
-					
-				}
-
-				$scope.$watch('stats', function(stats) {
-					if (!stats)
-						return;
-
-					$scope.rows = [];
-					$scope.project.dataCollection.forEach(function(form) {
-						$scope.rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
-						form.aggregatedData.forEach(function(section) {
-							$scope.rows.push({ id: section.id, type: "header", text: section.name, indent: 1 });
-							section.elements.forEach(function(variable) {
-
-								var row = {};
-								row.id = variable.id;
-								row.type = "data";
-								row.name = variable.name;
-								row.indent = 1;
-								row.splittable = !!variable.partitions.length;
-								row.cols = $scope.cols.map(function(col) {
-									try {
-										return $scope.stats[col.id][row.id];
-									}
-									catch (e) {
-										return undefined;
-									}
-								});
-
-								$scope.rows.push(row);
-							});
-						});
-
-
-
-
-					});
-
-
-
-
-				})
-			}
-		};
 	});
-
-
-
-{
-	variableId: {
-		open: true,
-		partition: 0,
-
-	}
-}

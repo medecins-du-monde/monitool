@@ -6,46 +6,54 @@ angular.module('monitool.services.reporting', [])
 	// we will see how bad if performs on the wild.
 	.factory('mtReporting', function($q, Input) {
 
-		var getColumns = function(query) {
-			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1) {
-				var begin      = moment(query.begin, 'YYYY-MM-DD').startOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
-					end        = moment(query.end, 'YYYY-MM-DD').endOf(query.groupBy === 'week' ? 'isoWeek' : query.groupBy),
-					dispFormat = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-MM-DD', 'day': 'YYYY-MM-DD'}[query.groupBy],
-					idFormat   = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-[W]WW', 'day': 'YYYY-MM-DD'}[query.groupBy],
+		var getColumns = function(groupBy, begin, end, entityId, project) {
+			var type;
+			if (!entityId)
+				type = 'project';
+			else if (project.inputGroups.find(function(g) { return g.id === entityId }))
+				type = 'group';
+			else
+				type = 'entity';
+
+			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1) {
+				var begin      = moment(begin).startOf(groupBy === 'week' ? 'isoWeek' : groupBy),
+					end        = moment(end).endOf(groupBy === 'week' ? 'isoWeek' : groupBy),
+					dispFormat = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-MM-DD', 'day': 'YYYY-MM-DD'}[groupBy],
+					idFormat   = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-[W]WW', 'day': 'YYYY-MM-DD'}[groupBy],
 					current    = begin.clone(),
 					cols       = [];
 
 				while (current.isBefore(end) || current.isSame(end)) {
 					cols.push({id: current.format(idFormat), name: current.format(dispFormat)});
-					current.add(1, query.groupBy);
+					current.add(1, groupBy);
 				}
 
 				cols.push({id: 'total', name: 'Total'});
 
 				return cols;
 			}
-			else if (query.groupBy === 'entity') {
-				if (query.type === 'project')
-					return query.project.inputEntities.concat([{id:'total',name:'Total'}]);
-				else if (query.type === 'entity')
-					return query.project.inputEntities.filter(function(e) { return e.id === query.id })
+			else if (groupBy === 'entity') {
+				if (type === 'project')
+					return project.inputEntities.concat([{id:'total',name:'Total'}]);
+				else if (type === 'entity')
+					return project.inputEntities.filter(function(e) { return e.id === entityId })
 												.concat([{id:'total',name:'Total'}]);
-				else  if (query.type === 'group') {
-					var group = query.project.inputGroups.find(function(g) { return g.id === query.id });
-					return query.project.inputEntities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
+				else  if (type === 'group') {
+					var group = project.inputGroups.find(function(g) { return g.id === entityId });
+					return project.inputEntities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
 												.concat([{id:'total',name:'Total'}]);
 				}
 			}
-			else if (query.groupBy === 'group') {
-				if (query.type === 'project')
-					return query.project.inputGroups;
-				else if (query.type === 'entity')
-					return query.project.inputGroups.filter(function(g) { return g.members.indexOf(query.id) !== -1 });
-				else if (query.type === 'group')
-					return query.project.inputGroups.filter(function(g) { return g.id === query.id });
+			else if (groupBy === 'group') {
+				if (type === 'project')
+					return project.inputGroups;
+				else if (type === 'entity')
+					return project.inputGroups.filter(function(g) { return g.members.indexOf(entityId) !== -1 });
+				else if (type === 'group')
+					return project.inputGroups.filter(function(g) { return g.id === entityId });
 			}
 			else
-				throw new Error('Invalid groupBy: ' + query.groupBy)
+				throw new Error('Invalid groupBy: ' + groupBy)
 		};
 
 		// var formatLogFrameReporting = function(project, result, cols, indicatorsById) {
@@ -148,16 +156,21 @@ angular.module('monitool.services.reporting', [])
 		// 	return rows;
 		// };
 
-		var computeRawDataReporting = function(allInputs, query) {
+
+
+
+
+
+		var computeProjectActivityReporting = function(allInputs, project, groupBy) {
 			var result = {};
 
 			// Compute raw data.
-			query.project.dataCollection.forEach(function(form) {
+			project.dataCollection.forEach(function(form) {
 				// Take all inputs that match our form.
 				var inputs = allInputs.filter(function(input) { return input.form === form.id; });
 
 				// Regroup them by the requested groupBy
-				var regrouped = Input.aggregate(inputs, form, query.groupBy, query.project.inputsGroups);
+				var regrouped = Input.aggregate(inputs, form, groupBy, project.inputsGroups);
 
 				// For each regrouped input, compute the indicators values.
 				for (var regroupKey in regrouped) {
@@ -169,7 +182,7 @@ angular.module('monitool.services.reporting', [])
 
 					// Copy raw data into final result.
 					// we use guids across forms so no collision check is needed.
-					var allValues = input.computeSums();
+					var allValues = input.computeSums(); // This line compute all possible sums among partitions in the activity data.
 					for (var rawId in allValues)
 						result[regroupKey][rawId] = allValues[rawId];
 				}
@@ -178,88 +191,60 @@ angular.module('monitool.services.reporting', [])
 			return result;
 		};
 
+		var computeProjectIndicatorReporting = function(allInputs, project, groupBy, indicatorsById) {
+			// Compute activity reporting.
+			var activityReporting = computeProjectActivityReporting(allInputs, project, groupBy),
+				indicatorReporting = {};
+
+			// for each month/entity/year/etc... on the activity reporting.
+			for (var regroupKey in activityReporting) {
+				// create an entry on the indicators reporting.
+				indicatorReporting[regroupKey] = {};
+
+				// iterate on all indicators.
+				Object.keys(project.indicators).forEach(function(indicatorId) {
+					var indicator = indicatorsById[indicatorId],
+						indicatorMeta = project.indicators[indicatorId];
+
+					// if the indicator has to be computed with a formula.
+					if (indicatorMeta.formula) {
+						// Retrieve the formula parameters from activity reporting.
+						var localScope = {};
+
+						for (var key in indicatorMeta.parameters) {
+							var parameter = indicatorMeta.parameters[key],
+								numFilters = parameter.filter.length;
+
+							localScope[key] = 0;
+							for (var filterId = 0; filterId < numFilters; ++filterId)
+								localScope[key] += activityReporting[regroupKey][parameter.variable + '.' + parameter.filter[filterId]];
+						}
+
+						// and compute the result.
+						var formula = indicator.formulas[indicatorMeta.formula];
+						try {
+							indicatorReporting[regroupKey][indicatorId] = Parser.evaluate(formula.expression, localScope);
+						}
+						catch (e) {
+							console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope));
+						}
+					}
+					// if the indicator can be directly taken from the activity report.
+					else {
+						// just extract the value.
+						var numFilters = indicatorMeta.filter.length;
+
+						indicatorReporting[regroupKey][indicatorId] = 0;
+						for (var filterId = 0; filterId < numFilters; ++filterId)
+							indicatorReporting[regroupKey][indicatorId] += activityReporting[regroupKey][indicatorMeta.variable + '.' + indicatorMeta.filter[filterId]];
+					}
+				});
+			}
+
+			return indicatorReporting;
+		};
 
 
-		// var computeProjectReporting = function(allInputs, query, indicatorsById) {
-		// 	var cols = getColumns(query), result = {};
-
-		// 	// Compute raw data.
-		// 	query.project.dataCollection.forEach(function(form) {
-		// 		// Take all inputs that match our form.
-		// 		var inputs = allInputs.filter(function(input) { return input.form === form.id; });
-
-		// 		// Regroup them by the requested groupBy
-		// 		var regrouped = Input.aggregate(inputs, form, query.groupBy, query.project.inputsGroups);
-
-		// 		// For each regrouped input, compute the indicators values.
-		// 		for (var regroupKey in regrouped) {
-		// 			// Create a hash to receive the final results if it's not done yet.
-		// 			if (!result[regroupKey])
-		// 				result[regroupKey] = {values: {}, compute: {}};
-
-		// 			var input = regrouped[regroupKey];
-
-		// 			// Copy raw data into final result.
-		// 			// we use guids across forms so no collision check is needed.
-		// 			for (var rawId in input.values)
-		// 				result[regroupKey].values[rawId] = input.values[rawId];
-		// 		}
-		// 	});
-
-		// 	Object.keys(query.project.indicators).forEach(function(indicatorId) {
-		// 		var indicator = indicatorsById[indicatorId],
-		// 			indicatorMeta = project.indicators[indicatorId];
-
-		// 		for (var regroupKey in result) {
-		// 			// check if this indicator was already computed by another form.
-		// 			if (result[regroupKey].compute[indicatorId])
-		// 				result[regroupKey].compute[indicatorId] = 'FORM_CONFLICT';
-
-		// 			else {
-		// 				var indicatorValue;
-
-		// 				if (indicatorMeta.formula === null) {
-							
-		// 				}
-		// 				else {
-
-		// 				}
-
-
-		// 				if (field.type === 'zero')
-		// 					indicatorValue = 0;
-		// 				else if (field.type === 'raw')
-		// 					indicatorValue = input.extractRawValue(field.rawId, field.filter);
-		// 				else if (field.type === 'formula') {
-		// 					var formula = indicatorsById[field.indicatorId].formulas[field.formulaId],
-		// 						localScope = {};
-
-		// 					for (var key in field.parameters) {
-		// 						if (field.parameters[key].type === 'zero')
-		// 							localScope[key] = 0;
-		// 						else if (field.parameters[key].type === 'raw')
-		// 							localScope[key] = input.extractRawValue(field.parameters[key].rawId, field.parameters[key].filter);
-		// 						else
-		// 							throw new Error('Invalid subfield type.');
-		// 					}
-
-		// 					try { indicatorValue = Parser.evaluate(formula.expression, localScope); }
-		// 					catch (e) { console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope)); }
-		// 				}
-		// 				else
-		// 					throw new Error('Invalid field type.');
-
-		// 				result[regroupKey].compute[field.indicatorId] = indicatorValue;
-		// 			}
-		// 		}
-		// 	});
-
-		// 	return {
-		// 		cols: cols,
-		// 		indicatorRows: formatLogFrameReporting(query.project, result, cols, indicatorsById),
-		// 		aggregatedDataRows: formatAggregatedDataReporting(query.project, result, cols)
-		// 	};
-		// };
 
 		// var computeIndicatorReporting = function(inputs, query, indicatorById) {
 		// 	var rows = [];
@@ -299,27 +284,28 @@ angular.module('monitool.services.reporting', [])
 		 * - project started less than a year ago => project start
 		 * - project starts in the future => now
 		 */
-		var getDefaultStartDate = function(project) {
-			var result = moment().subtract(1, 'year');
-			if (project && result.isBefore(project.begin))
-				result = moment(project.begin)
-			return result.format('YYYY-MM-DD');
-		};
+		// var getDefaultStartDate = function(project) {
+		// 	var result = moment().subtract(1, 'year');
+		// 	if (project && result.isBefore(project.begin))
+		// 		result = moment(project.begin)
+		// 	return result.format('YYYY-MM-DD');
+		// };
 
-		/**
-		 * Given a project, find a default end date that makes sense to compute statistics
-		 * In fact, this always return the current date.
-		 */
-		var getDefaultEndDate = function(project) {
-			return moment().format('YYYY-MM-DD');
-		};
+		// *
+		//  * Given a project, find a default end date that makes sense to compute statistics
+		//  * In fact, this always return the current date.
+		 
+		// var getDefaultEndDate = function(project) {
+		// 	return moment().format('YYYY-MM-DD');
+		// };
 
 		return {
 			getColumns: getColumns,
-			getDefaultStartDate: getDefaultStartDate,
-			getDefaultEndDate: getDefaultEndDate,
+			// getDefaultStartDate: getDefaultStartDate,
+			// getDefaultEndDate: getDefaultEndDate,
 
-			computeRawDataReporting: computeRawDataReporting,
+			computeProjectActivityReporting: computeProjectActivityReporting,
+			computeProjectIndicatorReporting: computeProjectIndicatorReporting,
 
 			// computeProjectReporting: computeProjectReporting,
 			// computeIndicatorReporting: computeIndicatorReporting,
