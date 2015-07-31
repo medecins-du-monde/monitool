@@ -60,6 +60,8 @@ var FRENCH_LOCALE = {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		up: "Monter d'un cran",
+		down: "Descendre d'un cran",
 		sum: "Total",
 		include: "Inclure",
 		toggle: "Changer",
@@ -77,11 +79,6 @@ var FRENCH_TRANSLATION = {
 		indicators: 'Indicateurs',
 		indicators_catalog: 'Catalogue Indicateurs',
 		help: 'Aide',
-		input_entities: 'Lieux de collecte',
-		input_groups: 'Groupes d\'activité',
-		input_entity: 'Lieu d\'activité',
-		input_group: 'Groupe d\'activité',
-
 		name: 'Nom',
 		begin: 'Début',
 		end: 'Fin',
@@ -179,10 +176,24 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
-		basics: "Données de bases",
-		raw_data_management: "Suivi données brutes",
-		form_list: "Formulaires de collecte",
+		groups: "Groupes",
+		basics: "Données de base",
+		general: "Général",
+		full_project: "Tout le projet",
+
+
+		collection_site_list: "Lieux de collecte",
+		collection_form_list: "Formulaires de collecte",
+		collection_input_list: "Saisie",
+
+		collection_site: "Lieu de collecte",
+		collection_form: "Formulaire de collecte",
+
+		collection_form_planning: "Planning de saisie",
+		collection_form_structure: "Structure du formulaire",
 		aggregation: "Agrégation",
+
+		remove_partition: "Supprimer la partition",
 
 		delete_form_easy: "Voulez-vous vraiment supprimer ce planning de saisie?",
 		delete_form_hard: "Si vous supprimez ce planning, toutes les saisies associées seront supprimés. Tapez \"Supprimer les {{num_inputs}} saisies\" pour confirmer",

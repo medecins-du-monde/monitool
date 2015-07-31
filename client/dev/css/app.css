@@ -316,9 +316,11 @@ ul:hover>.onrollover {
 }
 
 
-.indent1 td:first-child,.indent1 th:first-child { padding-left: 25px; }
-.indent2 td:first-child,.indent2 th:first-child { padding-left: 50px; }
-.indent3 td:first-child,.indent3 th:first-child { padding-left: 75px; }
+.indent1 { padding-left: 20px !important; }
+.indent2 { padding-left: 40px !important; }
+.indent3 { padding-left: 60px !important; }
+.indent4 { padding-left: 80px !important; }
+.indent5 { padding-left: 100px !important; }
 
 
   .table-raw-data th {

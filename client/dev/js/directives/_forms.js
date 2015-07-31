@@ -131,5 +131,4 @@ angular.module('monitool.directives.form', [])
 				});
 			}
 		};
-	});
-
+	})

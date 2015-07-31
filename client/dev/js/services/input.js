@@ -446,9 +446,7 @@ angular.module('monitool.services.models.input', [])
 					if (this.entity !== 'none' && projectGroups)
 						return projectGroups.filter(function(group) {
 							return group.members.indexOf(this.entity) !== -1;
-						}).map(function(group) {
-							return group.id;
-						});
+						}, this).pluck('id')
 					else
 						return [];
 

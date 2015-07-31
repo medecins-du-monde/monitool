@@ -1,15 +1,13 @@
 <ol class="breadcrumb noprint">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li class="active">{{project.name}}</li>
-	<li class="active" translate="shared.logical_frame"></li>
+	<li class="active" translate="project.basics"></li>
 </ol>
 
 <doc-reminder pages="project.presentation_project,project.logical_frame,project.change_definition"></doc-reminder>
 
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate>
 	<fieldset>
-		<legend translate="project.general_data"></legend>
-
 		<div class="form-group" show-errors>
 			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.name">

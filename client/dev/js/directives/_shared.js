@@ -61,5 +61,22 @@ angular.module('monitool.directives.shared', [])
 				});
 			}
 		}
-	});
+	})
+
+	.directive('disableIf', function() {
+		return {
+			retrict: 'A',
+			scope: false,
+			link: function($scope, element, attributes) {
+				var disable = $scope.$eval(attributes.disableIf);
+
+				if (disable) {
+					element.removeAttr('ui-sref');
+					element.removeAttr('ui-sref-active');
+					element.removeAttr('href');
+					element.addClass('disabled')
+				}
+			}
+		}
+	})
 

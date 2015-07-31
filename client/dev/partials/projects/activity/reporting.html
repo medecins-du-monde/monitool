@@ -1,6 +1,6 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.logical_frame" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="shared.reporting"></li>
 </ol>
 
@@ -62,8 +62,8 @@
 							<option value="month" translate="shared.month"></option>
 							<option value="quarter" translate="shared.quarter"></option>
 							<option value="year" translate="shared.year"></option>
-							<option value="entity" translate="shared.input_entity"></option>
-							<option value="group" translate="shared.input_group"></option>
+							<option value="entity" translate="project.collection_site_list"></option>
+							<option value="group" translate="project.groups"></option>
 						</select>
 					</div>
 				</div>
@@ -77,11 +77,11 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-filter"></i></span>
 						<select class="form-control input-sm" id="filter-by-input" ng-model="filters.entityId">
-							<option value="">Tout le projet</option>
-							<optgroup label="Lieux d'activité">
+							<option value="">{{'project.full_project'|translate}}</option>
+							<optgroup label="{{'project.collection_site_list'|translate}}">
 								<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}">{{entity.name}}</option>
 							</optgroup>
-							<optgroup label="Groupes d'activité">
+							<optgroup label="{{'project.groups'|translate}}">
 								<option ng-repeat="group in project.inputGroups" value="{{group.id}}">{{group.name}}</option>
 							</optgroup>
 						</select>
@@ -93,6 +93,19 @@
 </form>
 
 
+<button class="btn btn-primary btn-xs pull-right noprint" svg-save>
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_plot"></span>
+</button>
+<div style="clear: both"></div>
+
+<reporting-graph-adapter
+	type="['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
+	rows="rows" cols="cols" plots="plots">
+</reporting-graph-adapter>
+
+<div style="clear: both"></div>
+
 <button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
 	<i class="fa fa-download"></i>
 	<span translate="shared.download_table"></span>
@@ -101,23 +114,31 @@
 <table id="reporting" class="table table-bordered table-condensed">
 	<thead>
 		<tr>
-			<th>Nom</th>
+			<th style="width: 30px"></th>
+			<th translate="shared.name"></th>
 			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in rows" class="indent{{row.indent}}">
+		<tr ng-repeat="row in rows">
+			<td style="text-align: center">
+				<input type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data'" />
+			</td>
+
 			<th ng-if="row.type === 'header'"
+				class="indent{{row.indent}}"
 				colspan="{{1 + cols.length}}">{{row.text}}</th>
 
-			<td ng-if="row.type === 'data'">
+			<td ng-if="row.type === 'data'"
+				class="indent{{row.indent}}">
 				{{row.name}}
 
 				<div class="button-group pull-right">
 					<button class="btn btn-default btn-xs"
 							ng-repeat="p in row.partitions"
 							ng-class="{active:splits[row.id]==p.index}"
-							ng-click="onSplitClick(row.id, p.index)">
+							ng-click="onSplitClick(row.id, p.index)"
+							tooltip="{{p.fullname}}">
 						<i class="fa" ng-class="{'fa-plus-circle': splits[row.id]!=p.index,'fa-minus-circle': splits[row.id]==p.index,}"></i>
 						{{p.name}}
 					</button>
@@ -128,16 +149,3 @@
 
 	</tbody>
 </table>
-
-
-<!-- 
-<button class="btn btn-primary btn-xs pull-right noprint" ng-show="presentation.plot" svg-save>
-	<i class="fa fa-download"></i>
-	<span translate="shared.download_plot"></span>
-</button>
-
-<reporting-graph-adapter
-	type="['year', 'quarter', 'month', 'week', 'day'].indexOf(query.groupBy) !== -1 ? 'line' : 'bar'"
-	data="stats" plots="plots" display="presentation.display">
-</reporting-graph-adapter>
--->

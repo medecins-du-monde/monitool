@@ -1,15 +1,25 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.logical_frame" ng-bind="project.name"></a></li>
-	<li><a ui-sref="main.project.manual_input_list" translate="project.manual_input"></a></li>
+	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.collection_form_list" translate="project.collection_form_list"></a></li>
 	<li class="active">{{form.name}}</li>
 </ol>
 
 <doc-reminder pages="project.presentation_project,project.input_forms,project.change_definition"></doc-reminder>
 
+<div class="alert alert-danger noprint" ng-if="formUsage.length">
+	<strong>Attention, en modifiant cette page vous risquez de perdre des données</strong><br/>
+	{{formUsage.length}} saisies ont déjà été réalisées sur ce formulaire.
+
+	<ul>
+		<li>Toute modification sur le planning (périodicité, dates) causera la suppression des saisies exclues du nouveau planning</li>
+		<li>Toute modification sur la structure des données collectées sera répercutée sur toutes les saisies passées de ce formulaire</li>
+	</ul>
+</div>
+
 <form class="form-horizontal" role="form" name="formForm" novalidate>
 	
-	<legend translate="project.manual_input_info"></legend>
+	<legend translate="project.collection_form_planning"></legend>
 
 	<div class="form-group" show-errors>
 		<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
@@ -146,7 +156,7 @@
 		</div>
 	</div>
 
-	<legend translate="project.manual_input_structure"></legend>
+	<legend translate="project.collection_form_structure"></legend>
 
 	<table class="table table-bordered table-condensed table-aggregated-data">
 		<thead>
@@ -202,16 +212,24 @@
 
 				<!-- variable partitions -->
 				<td ng-repeat="partition in element.partitions">
-					<ul>
-						<li ng-repeat="p in partition track by p.id" acl-has-project-role="owner" acl-fallback="p.name">
-							<a ng-click="remove(p, partition)" class="remove-action"><i class="fa fa-times" style="color: red"></i></a>
-							<span mt-content-editable ng-model="p.name"></span>
-						</li>
-					</ul>
+					<div class="input-group" ng-repeat="p in partition track by p.id">
+
+						<input class="form-control input-xs" ng-model="p.name" required>
+						<span class="input-group-addon">
+							<i ng-click="remove(p, partition)"
+							   class="fa fa-times text-danger"
+							   tooltip="Supprimer l'élément"></i>
+						</span>
+					</div>
+
 					<div acl-has-project-role="owner">
-						<a class="btn btn-xs btn-default" ng-click="newPartitionElement(partition)" translate="project.new_partition_element"></a>
-						<br/>
-						<a class="btn btn-xs btn-danger" ng-click="remPartition(partition)" translate="project.remove_partition"></a>
+						<a class="btn btn-xs btn-default"
+						   ng-click="newPartitionElement(partition)"
+						   translate="project.new_partition_element"></a>
+
+						<a class="btn btn-xs btn-danger"
+						   ng-click="remPartition(partition, element.partitions)"
+						   translate="project.remove_partition"></a>
 					</div>
 				</td>
 				<td>

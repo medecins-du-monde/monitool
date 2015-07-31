@@ -2,7 +2,7 @@
 
 angular.module('monitool.controllers.project.activity', [])
 
-	.controller('ProjectInputEntitiesController', function($scope, $filter, Input, project) {
+	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input, project) {
 		$scope.createEntity = function() {
 			$scope.project.inputEntities.push({id: makeUUID(), name: ''});
 		};
@@ -35,23 +35,26 @@ angular.module('monitool.controllers.project.activity', [])
 			$scope.project.inputGroups = 
 				$scope.project.inputGroups.filter(function(entity) { return entity.id !== inputEntityId; });
 		};
+
+		$scope.up = function(index, array) {
+			var element = array.splice(index, 1);
+			array.splice(index - 1, 0, element[0]);
+		};
+
+		$scope.down = function(index, array) {
+			var element = array.splice(index, 1);
+			array.splice(index + 1, 0, element[0]);
+		};
 	})
 
+	.controller('ProjectCollectionFormListController', function() {
 
-	.controller('ProjectManualInputListController', function($scope, project, inputs) {
-		// $scope.inputs = inputs;
-		$scope.pred = 'period';
-
-		$scope.finishedInputs = inputs.filter(function(i) { return i.filled == 'yes'; });
-		$scope.waitingInputs = inputs.filter(function(i) { return i.filled == 'no'; });
-		$scope.invalidInputs = inputs.filter(function(i) { return i.filled == 'invalid'; });
-		$scope.inputs = $scope.waitingInputs;
 	})
 
-
-	.controller('ProjectManualInputStructureController', function($scope, $state, $filter, Input, form, indicatorsById) {
+	.controller('ProjectCollectionFormEditionController', function($scope, $state, $filter, formUsage, form) {
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
+		$scope.formUsage = formUsage;
 		$scope.formIndex = $scope.project.dataCollection.findIndex(function(f) {
 			return f.id === form.id;
 		});
@@ -67,23 +70,21 @@ angular.module('monitool.controllers.project.activity', [])
 
 		$scope.delete = function() {
 			// Fetch this forms inputs.
-			Input.query({mode: "ids_by_form", formId: $scope.form.id}).$promise.then(function(inputIds) {
-				var easy_question = $filter('translate')('project.delete_form_easy'),
-					hard_question = $filter('translate')('project.delete_form_hard', {num_inputs: inputIds.length}),
-					answer = $filter('translate')('project.delete_form_hard_answer', {num_inputs: inputIds.length});
+			var easy_question = $filter('translate')('project.delete_form_easy'),
+				hard_question = $filter('translate')('project.delete_form_hard', {num_inputs: formUsage.length}),
+				answer = $filter('translate')('project.delete_form_hard_answer', {num_inputs: formUsage.length});
 
-				var really = (inputIds.length == 0 && window.confirm(easy_question))
-					|| (inputIds.length && window.prompt(hard_question) == answer);
+			var really = (formUsage.length == 0 && window.confirm(easy_question))
+				|| (formUsage.length && window.prompt(hard_question) == answer);
 
-				// If there are none, just confirm that the user wants to do this for real.
-				if (really) {
-					$scope.project.dataCollection.splice($scope.formIndex, 1);
-					$scope.formIndex = -1;
-					$scope.$parent.save().then(function() {
-						$state.go('main.project.manual_input_list');
-					});
-				}
-			});
+			// If there are none, just confirm that the user wants to do this for real.
+			if (really) {
+				$scope.project.dataCollection.splice($scope.formIndex, 1);
+				$scope.formIndex = -1;
+				$scope.$parent.save().then(function() {
+					$state.go('main.project.collection_form_list');
+				});
+			}
 		};
 
 		$scope.$watch('form.aggregatedData', function(aggregatedData) {
@@ -109,6 +110,10 @@ angular.module('monitool.controllers.project.activity', [])
 
 		$scope.newPartitionElement = function(target) {
 			target.push({id: makeUUID(), name: ""});
+		};
+
+		$scope.remPartition = function(partition, target) {
+			target.splice(target.indexOf(partition), 1);
 		};
 
 		$scope.upSection = function(index) {
@@ -183,7 +188,16 @@ angular.module('monitool.controllers.project.activity', [])
 		};
 	})
 
-	.controller('ProjectManualInputDataController', function($scope, $state, mtReporting, form, inputs, indicatorsById) {
+	.controller('ProjectCollectionInputListController', function($scope, project, inputs) {
+		$scope.pred = 'period';
+		$scope.finishedInputs = inputs.filter(function(i) { return i.filled == 'yes'; });
+		$scope.waitingInputs = inputs.filter(function(i) { return i.filled == 'no'; });
+		$scope.invalidInputs = inputs.filter(function(i) { return i.filled == 'invalid'; });
+		$scope.inputs = $scope.waitingInputs;
+	})
+
+
+	.controller('ProjectCollectionInputEditionController', function($scope, $state, mtReporting, form, inputs, indicatorsById) {
 		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
@@ -191,11 +205,11 @@ angular.module('monitool.controllers.project.activity', [])
 		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
 		$scope.save = function() {
-			$scope.currentInput.$save(function() { $state.go('main.project.manual_input_list'); });
+			$scope.currentInput.$save(function() { $state.go('main.project.collection_input_list'); });
 		};
 
 		$scope.delete = function() {
-			$scope.currentInput.$delete(function() { $state.go('main.project.manual_input_list'); });
+			$scope.currentInput.$delete(function() { $state.go('main.project.collection_input_list'); });
 		};
 	})
 
@@ -253,7 +267,8 @@ angular.module('monitool.controllers.project.activity', [])
 								index: index,
 								name: p.map(function(p) {
 									return p.name.substring(0, 1).toLocaleUpperCase();
-								}).join('/')
+								}).join('/'),
+								fullname: p.pluck('name').join(' / ')
 							}
 						});
 
@@ -320,11 +335,8 @@ angular.module('monitool.controllers.project.activity', [])
 			$scope.inputs = $scope.inputs.slice(); // don't leave this hack here or kittens will die horribly
 		};
 
-
-
-
-		// // This hash allows to select indicators for plotting. It is used by directives.
-		// $scope.plots = {};
+		// This hash allows to select indicators for plotting. It is used by directives.
+		$scope.plots = {};
 
 		// // those 2 hashes represent what the user sees.
 		// $scope.presentation = {plot: false};

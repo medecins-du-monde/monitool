@@ -30,7 +30,7 @@ angular.module('monitool.controllers.project.shared', [])
 				$scope.master = angular.copy($scope.project);
 				
 				if ($stateParams.projectId === 'new')
-					$state.go('main.project.logical_frame', {projectId: $scope.project._id});
+					$state.go('main.project.basics', {projectId: $scope.project._id});
 			}).catch(function(error) {
 				$scope.error = error;
 			});

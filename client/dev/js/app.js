@@ -296,27 +296,22 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Project Raw data
 	///////////////////////////
 
-	$stateProvider.state('main.project.input_entities', {
-		url: '/input-entities',
-		templateUrl: 'partials/projects/activity/input-entities.html',
-		controller: 'ProjectInputEntitiesController'
+	$stateProvider.state('main.project.collection_site_list', {
+		url: '/collection-site',
+		templateUrl: 'partials/projects/activity/collection-site-list.html',
+		controller: 'ProjectCollectionSiteListController'
 	});
 
-	$stateProvider.state('main.project.manual_input_list', {
-		url: '/manual-input',
-		templateUrl: 'partials/projects/activity/manual-input-list.html',
-		controller: 'ProjectManualInputListController',
-		resolve: {
-			inputs: function(Input, project) {
-				return Input.fetchProjectStatus(project);
-			}
-		}
+	$stateProvider.state('main.project.collection_form_list', {
+		url: '/collection-form',
+		templateUrl: 'partials/projects/activity/collection-form-list.html',
+		controller: 'ProjectCollectionFormListController'
 	});
 
-	$stateProvider.state('main.project.manual_input_structure', {
-		url: '/manual-input/:formId',
-		templateUrl: 'partials/projects/activity/manual-input-structure.html',
-		controller: 'ProjectManualInputStructureController',
+	$stateProvider.state('main.project.collection_form_edition', {
+		url: '/collection-form/:formId',
+		templateUrl: 'partials/projects/activity/collection-form-edition.html',
+		controller: 'ProjectCollectionFormEditionController',
 		resolve: {
 			form: function($stateParams, project) {
 				if ($stateParams.formId === 'new')
@@ -337,14 +332,28 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					return project.dataCollection.find(function(form) {
 						return form.id == $stateParams.formId;
 					});
+			},
+			formUsage: function(form, Input) {
+				return Input.query({mode: "ids_by_form", formId: form.id}).$promise;
 			}
 		}
 	});
 
-	$stateProvider.state('main.project.manual_input_data', {
-		url: '/manual-input/:period/:formId/:entityId',
-		templateUrl: 'partials/projects/activity/manual-input-data.html',
-		controller: 'ProjectManualInputDataController',
+	$stateProvider.state('main.project.collection_input_list', {
+		url: '/collection-input',
+		templateUrl: 'partials/projects/activity/collection-input-list.html',
+		controller: 'ProjectCollectionInputListController',
+		resolve: {
+			inputs: function(Input, project) {
+				return Input.fetchProjectStatus(project);
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.collection_input_edition', {
+		url: '/collection-input/:period/:formId/:entityId',
+		templateUrl: 'partials/projects/activity/collection-input-edition.html',
+		controller: 'ProjectCollectionInputEditionController',
 		resolve: {
 			inputs: function(Input, $stateParams, project) {
 				var form = project.dataCollection.find(function(f) { return f.id == $stateParams.formId});
@@ -356,7 +365,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.aggregated_data_reporting', {
+	$stateProvider.state('main.project.activity_reporting', {
 		url: '/activity-reporting',
 		templateUrl: 'partials/projects/activity/reporting.html',
 		controller: 'ProjectActivityReportingController',

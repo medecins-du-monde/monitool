@@ -3,7 +3,6 @@
 angular
 	.module('monitool.directives.projectForm', [])
 
-
 	/**
 	 * This directive shows a select box with all the raw variables from the given project.
 	 */
@@ -38,7 +37,7 @@ angular
 		/**
 		 * Search a variable in a project.
 		 */
-	 	var findVariable = function(project, variableId) {
+		var findVariable = function(project, variableId) {
 			var numForms = project.dataCollection.length;
 			for (var i = 0; i < numForms; ++i) {
 				var form = project.dataCollection[i],

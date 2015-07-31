@@ -2,7 +2,7 @@
 <doc-reminder pages="project.presentation_project"></doc-reminder>
 
 
-<a class="btn btn-primary pull-right" ui-sref="main.project.logical_frame({projectId: 'new'})" acl-has-role="project">
+<a class="btn btn-primary pull-right" ui-sref="main.project.basics({projectId: 'new'})" acl-has-role="project">
 	<i class="fa fa-plus"></i>
 	<span translate="project.create"></span>
 </a>
@@ -42,7 +42,7 @@
 				   tooltip="{{'project.you_are_editor'|translate}}"
 				   tooltip-placement="right" acl-has-project-role="input" acl-project="project"></i>
 			</td>
-			<td><a ui-sref="main.project.logical_frame({projectId: project._id})">{{project.name}}</a></td>
+			<td><a ui-sref="main.project.basics({projectId: project._id})">{{project.name}}</a></td>
 			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
 			<td>{{project.begin|amDateFormat:'YYYY-MM-DD'}}</td>
 			<td>{{project.end|amDateFormat:'YYYY-MM-DD'}}</td>

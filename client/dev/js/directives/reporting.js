@@ -128,9 +128,9 @@ angular.module('monitool.directives.reporting', [])
 								progress = ($scope.col - $scope.row.baseline) / ($scope.row.target - $scope.row.baseline);
 
 							// and apply color to field
-							if (100 * progress < $scope.row.showRed)
+							if (progress < .333)
 								element.css('background-color', '#F88');
-							else if (100 * progress < $scope.row.showYellow)
+							else if (progress < .667)
 								element.css('background-color', '#FC6');
 							else
 								element.css('background-color', '#AFA');
@@ -157,50 +157,26 @@ angular.module('monitool.directives.reporting', [])
 		return {
 			restrict: 'AE',
 			scope: {
-				'originalData': '=data',
-				'plots': '=',
-				'display': '=',
-				'type': '='
+				cols: '=',
+				originalRows: '=rows',
+				plots: '=',
+				type: '='
 			},
 			template: '<reporting-graph type="type" data="data"></reporting-graph>',
 			link: function($scope, element, attributes, controller) {
 				// there is no need to subscribe to $destroy
 				// $scope will be destroyed with the directive.
 
-				$scope.$watch('[plots, originalData, display]', function() {
-					if ($scope.originalData) {
-						$scope.data = angular.copy($scope.originalData);
+				$scope.$watch('[plots, originalData, cols]', function() {
+					if (!$scope.originalRows)
+						return;
 
-						// remove rows that are not selected.
-						if (!$scope.data.rows)
-							$scope.data.rows = $scope.data.aggregatedDataRows.concat($scope.data.indicatorRows)
-
-						$scope.data.rows = $scope.data.rows.filter(function(row) {
+					$scope.data = {
+						cols: $scope.cols,
+						rows: angular.copy($scope.originalRows).filter(function(row) {
 							return $scope.plots[row.id];
-						});
-
-						// replace value by target if required.
-						if ($scope.display === 'progress')
-							$scope.data.rows.forEach(function(row) {
-								if (row.dataType == 'indicator')
-									row.cols = row.cols.map(function(col) {
-										// deal with form or aggregation conflicts.
-										if (typeof col !== 'number')
-											return null;
-
-										if ($scope.display === 'value')
-											return col;
-										else if (row.baseline !== null && row.target !== null && col !== null) {
-											if (row.target === 'around_is_better')
-												return 100 * (1 - Math.abs(col - row.target) / (row.target - row.baseline));
-											else
-												return 100 * (col - row.baseline) / (row.target - row.baseline);							
-										}
-										else
-											return null;
-									});
-							});
-					}
+						})
+					};
 				}, true);
 			}
 		};
