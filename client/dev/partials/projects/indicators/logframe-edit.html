@@ -25,11 +25,8 @@
 				<textarea class="form-control"
 						  name="goalDesc"
 						  id="logframe-goal-input"
-						  required
 						  placeholder="{{'project.intervention_logic_goal_ph'|translate}}"
 						  ng-model="project.logicalFrame.goal"></textarea>
-
-				<p class="help-block" ng-if="projectForm.goalDesc.$error.required" translate="form.mandatory"></p>
 			</div>
 		</div>
 
@@ -84,10 +81,7 @@
 									  name="description"
 									  id="purpose-desc-{{purposeId}}-input"
 									  placeholder="{{'project.intervention_logic_purpose_ph'|translate}}"
-									  ng-model="purpose.description"
-									  required></textarea>
-
-							<p class="help-block" ng-if="purposeForm.description.$error.required" translate="form.mandatory"></p>
+									  ng-model="purpose.description"></textarea>
 						</div>
 					</div>
 
@@ -144,13 +138,10 @@
 									<label for="output-desc-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.output"></label>
 									<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.description">
 										<textarea class="form-control"
-												  required
 												  id="output-desc-{{purposeId}}-{{outputId}}-input"
 												  name="description"
 												  placeholder="{{'project.output_desc_ph'|translate}}"
 												  ng-model="output.description"></textarea>
-
-										<p class="help-block" ng-if="outputForm.description.$error.required" translate="form.mandatory"></p>
 									</div>
 								</div>
 
@@ -195,8 +186,7 @@
 												   class="form-control"
 												   name="activity"
 												   placeholder="{{'project.activity_desc_ph'|translate}}"
-												   ng-model="activity.description"
-												   required/>
+												   ng-model="activity.description"/>
 
 											<span class="input-group-btn">
 												<a class="btn btn-danger ng-scope" ng-click="removeActivity(activity, output)" translate="shared.remove">Retirer</a>

@@ -82,8 +82,3 @@ angular.module('monitool.controllers.project.shared', [])
 			}
 		});
 	})
-
-	.controller('ProjectExportController', function($scope) {
-		
-	});
-

@@ -9,6 +9,7 @@ angular.module('monitool.controllers.indicator', [])
 	
 	.controller('IndicatorEditController', function($state, $scope, $stateParams, indicator, types, themes) {
 		$scope.translations = {fr: FRENCH_TRANSLATION, es: SPANISH_TRANSLATION, en: ENGLISH_TRANSLATION};
+		$scope.numLanguages = 3;
 		$scope.indicator = indicator;
 		$scope.master = angular.copy(indicator);
 		$scope.types = types;

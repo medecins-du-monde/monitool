@@ -110,9 +110,14 @@ angular.module('monitool.services.reporting', [])
 							var parameter = indicatorMeta.parameters[key],
 								numFilters = parameter.filter.length;
 
-							localScope[key] = 0;
-							for (var filterId = 0; filterId < numFilters; ++filterId)
-								localScope[key] += activityReporting[regroupKey][parameter.variable + '.' + parameter.filter[filterId]];
+							if (numFilters == 0)
+								localScope[key] = activityReporting[regroupKey][parameter.variable];
+							else {
+								localScope[key] = 0;
+								for (var filterId = 0; filterId < numFilters; ++filterId)
+									localScope[key] += activityReporting[regroupKey][parameter.variable + '.' + parameter.filter[filterId]];
+							}
+
 						}
 
 						// and compute the result.
@@ -129,9 +134,13 @@ angular.module('monitool.services.reporting', [])
 						// just extract the value.
 						var numFilters = indicatorMeta.filter.length;
 
-						indicatorReporting[regroupKey][indicatorId] = 0;
-						for (var filterId = 0; filterId < numFilters; ++filterId)
-							indicatorReporting[regroupKey][indicatorId] += activityReporting[regroupKey][indicatorMeta.variable + '.' + indicatorMeta.filter[filterId]];
+						if (numFilters == 0)
+							indicatorReporting[regroupKey][indicatorId] = activityReporting[regroupKey][indicatorMeta.variable];
+						else {
+							indicatorReporting[regroupKey][indicatorId] = 0;
+							for (var filterId = 0; filterId < numFilters; ++filterId)
+								indicatorReporting[regroupKey][indicatorId] += activityReporting[regroupKey][indicatorMeta.variable + '.' + indicatorMeta.filter[filterId]];
+						}
 					}
 				});
 			}

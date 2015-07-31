@@ -34,40 +34,6 @@
 			</div>
 		</div>
 
-		<div class="form-group">
-			<label for="input-operation" class="col-sm-2 control-label" translate="indicator.operation"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.operation)|translate">
-				<select id="input-operation" class="form-control" ng-model="indicator.operation">
-					<option value="mandatory" translate="indicator.is_mandatory"></option>
-					<option value="recommended" translate="indicator.is_recommended"></option>
-					<option value="common" translate="indicator.is_common"></option>
-					<option value="forbidden" translate="indicator.is_forbidden"></option>
-				</select>
-			</div>
-		</div>
-
-		<div class="form-group" ng-if="indicator.operation != 'parameter'">
-			<label for="input-target" class="col-sm-2 control-label" translate="indicator.target"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="('indicator.' + indicator.target)|translate">
-				<select id="input-target" class="form-control" ng-model="indicator.target">
-					<option value="lower_is_better" translate="indicator.lower_is_better"></option>
-					<option value="higher_is_better" translate="indicator.higher_is_better"></option>
-					<option value="around_is_better" translate="indicator.around_is_better"></option>
-					<option value="non_relevant" translate="indicator.non_relevant"></option>
-				</select>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="input-unit" class="col-sm-2 control-label" translate="indicator.unit"></label>
-			<div class="col-sm-10" acl-has-role="indicator" acl-fallback="indicator.unit">
-				<select id="input-unit" name="unit" ng-model="indicator.unit" class="form-control">
-					<option value="" translate="indicator.other"></option>
-					<option value="%" translate="indicator.percent"></option>
-					<option value="‰" translate="indicator.permille"></option>
-				</select>
-			</div>
-		</div>
 	</fieldset>
 	<fieldset>
 		<legend translate="indicator.definition"></legend>
@@ -81,27 +47,79 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td translate="shared.name"></td>
+					<th translate="shared.name"></th>
 					<td ng-repeat="(code, language) in languages">
 						<textarea class="form-control" name="someName" required ng-model="indicator.name[code]" placeholder="{{translations[code].indicator.name_ph}}"></textarea>
 					</td>
 				</tr>
 				<tr>
-					<td translate="indicator.standard"></td>
+					<th translate="indicator.standard"></th>
 					<td ng-repeat="(code, language) in languages">
 						<textarea class="form-control" ng-model="indicator.standard[code]" placeholder="{{translations[code].indicator.standard_ph}}"></textarea>
 					</td>
 				</tr>
 				<tr>
-					<td translate="indicator.sources"></td>
+					<th translate="indicator.sources"></th>
 					<td ng-repeat="(code, language) in languages">
 						<textarea class="form-control" ng-model="indicator.sources[code]" placeholder="{{translations[code].indicator.sources_ph}}"></textarea>
 					</td>
 				</tr>
 				<tr>
-					<td translate="indicator.comments"></td>
+					<th translate="indicator.comments"></th>
 					<td ng-repeat="(code, language) in languages">
 						<textarea class="form-control" ng-model="indicator.comments[code]" placeholder="{{translations[code].indicator.comments_ph}}"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<th translate="indicator.operation"></th>
+					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.operation)|translate">
+						<!--
+							mandatory => Mandatory for all projects in the same thematic.
+							optional  => Can be collected on new projects.
+							forbidden => Forbidden. Cannot be collected on new projects.
+						-->
+						<select id="input-operation" class="form-control" ng-model="indicator.operation">
+							<option value="mandatory" translate="indicator.is_mandatory"></option>
+							<option value="optional" translate="indicator.is_optional"></option>
+							<option value="forbidden" translate="indicator.is_forbidden"></option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th translate="indicator.scope"></th>
+					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.scope)|translate">
+						<!--
+							broad_accredited => Applicable to different projects and accredited by an authority.
+							broad_not_accredited => Applicable to different projects but not accredited.
+							limited => Too narrow to be applicable to many projets.
+							single => Can only be used for a specific project.
+						-->
+						<select id="input-scope" class="form-control" ng-model="indicator.scope">
+							<option value="broad" translate="indicator.is_broad"></option>
+							<option value="limited" translate="indicator.is_limited"></option>
+							<option value="single" translate="indicator.is_single"></option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th translate="indicator.target"></th>
+					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.' + indicator.target)|translate">
+						<select id="input-target" class="form-control" ng-model="indicator.target">
+							<option value="lower_is_better" translate="indicator.lower_is_better"></option>
+							<option value="higher_is_better" translate="indicator.higher_is_better"></option>
+							<option value="around_is_better" translate="indicator.around_is_better"></option>
+							<option value="non_relevant" translate="indicator.non_relevant"></option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th translate="indicator.unit"></th>
+					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="indicator.unit">
+						<select id="input-unit" name="unit" ng-model="indicator.unit" class="form-control">
+							<option value="" translate="indicator.other"></option>
+							<option value="%" translate="indicator.percent"></option>
+							<option value="‰" translate="indicator.permille"></option>
+						</select>
 					</td>
 				</tr>
 			</tbody>

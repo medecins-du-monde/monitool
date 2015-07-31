@@ -45,8 +45,9 @@ angular.module('monitool.services.fetch', [])
 						standard: angular.copy(tran),
 						sources: angular.copy(tran),
 						comments: angular.copy(tran),
-
-						operation: "common", target: "higher_is_better",
+						operation: "optional",
+						scope: "broad",
+						target: "higher_is_better",
 						unit: "%",
 						types: [], themes: [], formulas: {}
 					});

@@ -180,6 +180,7 @@ var FRENCH_TRANSLATION = {
 		basics: "Données de base",
 		general: "Général",
 		full_project: "Tout le projet",
+		select_filters: "Sélectionnez les partitions désirées",
 
 
 		collection_site_list: "Lieux de collecte",
@@ -390,8 +391,27 @@ var FRENCH_TRANSLATION = {
 		links: "Liens"
 	},
 	indicator: {
+
+		// mandatory => Mandatory. Should be collected for all new projects of this thematic.
+		// optional  => Optional. Can be collected on new projects of this thematic.
+		// forbidden => Forbidden. Must not be collected on any new projects.
+
+		// broad_accredited => Applicable to different projects and accredited by an authority.
+		// broad_not_accredited => Applicable to different projects but not accredited.
+		// limited => Too narrow to be applicable to many projets.
+		// single => Can only be used for a specific project.
+
+		is_mandatory: "Obligatoire - Doit être collecté pour tous les projets de même thématique",
+		is_optional: "Optionnel - Peut-être collecté ou non sur les projets de même thématique",
+		is_forbidden: "Interdit - Ne doit plus être collecté sur les nouveaux projets",
+
+		is_broad: "Applicable à des projets différents",
+		is_limited: "Applicable un nombre restreint de projets similaires entre eux",
+		is_single: "Uniquement applicable à un projet en particulier",
+
 		search: "Rechercher",
 		search_ph: "Rentrez au moins 3 caractères",
+		scope: "Portée",
 
 		standard: "Norme",
 		sources: "Sources",
@@ -448,44 +468,7 @@ var FRENCH_TRANSLATION = {
 		new_type_name: "Nom du nouveau type",
 		new_theme_name: "Nom de la nouvelle thématique",
 		only_core: "Ne voir que les indicateurs recommandés",
-
-		is_mandatory: "Cet indicateur est obligatoire pour les projets de même thématique",
-		is_recommended: "Cet indicateur provient du catalogue thématique.",
-		is_common: "Cet indicateur est optionnel",
-		is_forbidden: "Cet indicateur est historique et ne peut pas être utilisé sur un nouveau projet",
 		is_external: "Cet indicateur provient d'une autre thématique",
-
-		time_aggregation: "Agrégation temps",
-		time_aggregation_sum: "Somme (ex: nombre de consultations, de naissances, ...)",
-		time_aggregation_average: "Moyenne non pondérée (ex: population, nombre de médecins, de véhicules, ...)",
-		time_aggregation_none: "Pas d'agrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
-
-		what_is_aggregation: "Comment remplir ces champs?",
-		time_aggregation_help: [
-			"<strong>Aide à la saisie</strong>",
-			"<ul>",
-				"<li>",
-					"Si un hôpital réalise 100 consultations en janvier, en février et en mars, il en aura réalisé 300 au",
-					"cours du premier trimestre de l'année. Le mode d'agrégation de l'indicateur <strong>\"Nombre de consultations\"</strong>",
-					"vaut donc <strong>\"Somme\"</strong>",
-				"</li>",
-				"<li>",
-					"Si un bloc chirurgical a un taux de mortalité de 5% en janvier, 7% en février et 10% en mars, on ne peut pas calculer",
-					"son taux de mortalité sur le premier trimestre de l'année sans connaître le nombre d'opérations sur chaque mois.",
-					"Le mode d'agrégation de l'indicateur <strong>\"Taux de mortalité opératoire\"</strong> vaut donc <strong>\"Pas d'agrégation directe possible\"</strong>",
-				"</li>",
-				"<li>",
-					"Si un village a une population de 510 habitants en janvier, 600 en février et 550 en mars, on peut dire que sa population",
-					"au premier trimestre de l'année vaut 553. Le mode d'agrégation de l'indicateur <strong>\"Population\"</strong>à choisir est",
-					"donc <strong>\"Moyenne non pondérée\"</strong>",
-				"</li>",
-			"</ul>"
-		].join(' '),
-
-		geo_aggregation: "Agrégation lieux",
-		geo_aggregation_sum: "Somme (ex: population, nombre de médecins, de véhicules disponibles, de consultations, de naissances, ...)",
-		geo_aggregation_average: "Moyenne non pondérée (à n'utiliser uniquement que pour des indicateurs qui sont déjà des moyennes par centre: \"nombre de médecins par centre\")",
-		geo_aggregation_none: "Pas d'agrégation directe possible (tous les taux, pourcentages, indicateurs calculés, ...)",
 	},
 
 	client: {

@@ -62,8 +62,8 @@
 							<option value="month" translate="shared.month"></option>
 							<option value="quarter" translate="shared.quarter"></option>
 							<option value="year" translate="shared.year"></option>
-							<option value="entity" translate="shared.input_entity"></option>
-							<option value="group" translate="shared.input_group"></option>
+							<option value="entity" translate="project.collection_site_list"></option>
+							<option value="group" translate="project.groups"></option>
 						</select>
 					</div>
 				</div>
@@ -77,10 +77,10 @@
 						<span class="input-group-addon"><i class="fa fa-filter"></i></span>
 						<select class="form-control input-sm" id="filter-by-input" ng-model="filters.entityId">
 							<option value="">Tout le projet</option>
-							<optgroup label="Lieux d'activité">
+							<optgroup label="{{'project.collection_site_list'|translate}}">
 								<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}">{{entity.name}}</option>
 							</optgroup>
-							<optgroup label="Groupes d'activité">
+							<optgroup label="{{'project.groups'|translate}}">
 								<option ng-repeat="group in project.inputGroups" value="{{group.id}}">{{group.name}}</option>
 							</optgroup>
 						</select>
@@ -92,6 +92,19 @@
 	</div>
 </form>
 
+<button class="btn btn-primary btn-xs pull-right noprint" svg-save>
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_plot"></span>
+</button>
+<div style="clear: both"></div>
+
+<reporting-graph-adapter
+	type="['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
+	rows="rows" cols="cols" plots="plots">
+</reporting-graph-adapter>
+
+<div style="clear: both"></div>
+
 
 <button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
 	<i class="fa fa-download"></i>
@@ -101,16 +114,21 @@
 <table id="reporting" class="table table-bordered table-condensed">
 	<thead>
 		<tr>
-			<th>Nom</th>
-			<th>Baseline</th>
-			<th>Target</th>
+			<th style="width: 30px"></th>
+			<th translate="shared.name"></th>
+			<th translate="project.baseline"></th>
+			<th translate="project.target"></th>
 			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in rows" class="indent{{row.indent}}">
-			<th ng-if="row.type === 'header'" colspan="{{3 + cols.length}}">{{row.text}}</th>
-			<td ng-if="row.type === 'data'">{{row.name[language]}}</td>
+		<tr ng-repeat="row in rows">
+			<td style="text-align: center">
+				<input type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data'" />
+			</td>
+
+			<th ng-if="row.type === 'header'" colspan="{{3 + cols.length}}" class="indent{{row.indent}}">{{row.text}}</th>
+			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">{{row.name[language]}}</td>
 			<td ng-if="row.type === 'data'">{{row.baseline}}{{row.unit}}</td>
 			<td ng-if="row.type === 'data'">{{row.target}}{{row.unit}}</td>
 			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" reporting-field></td>

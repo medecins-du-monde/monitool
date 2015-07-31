@@ -114,18 +114,22 @@ angular.module('monitool.directives.reporting', [])
 		return {
 			scope: false,
 			link: function($scope, element, attributes, controller) {
-				$scope.$watch('row', function(newValue) {
+				$scope.$watch('col', function(value) {
 
-					if (typeof $scope.col === "number") {
-						var progress = null;
-
+					if (typeof value === "string" || Number.isNaN(value)) {
+						element.html('<i class="fa fa-ban"></i>');
+						element.css('background-color', '');
+					}
+					else if (typeof value === "number") {
 						// if baseline and target are available.
 						if ($scope.row.baseline !== null && $scope.row.target !== null) {
+							var progress = null;
+
 							// compute progress 
 							if ($scope.row.target === 'around_is_better')
-								progress = 1 - Math.abs($scope.col - $scope.row.target) / ($scope.row.target - $scope.row.baseline);
+								progress = 1 - Math.abs(value - $scope.row.target) / ($scope.row.target - $scope.row.baseline);
 							else
-								progress = ($scope.col - $scope.row.baseline) / ($scope.row.target - $scope.row.baseline);
+								progress = (value - $scope.row.baseline) / ($scope.row.target - $scope.row.baseline);
 
 							// and apply color to field
 							if (progress < .333)
@@ -138,11 +142,7 @@ angular.module('monitool.directives.reporting', [])
 						else
 							element.css('background-color', '');
 
-						element.html(Math.round($scope.col) + $scope.row.unit);
-					}
-					else if (typeof $scope.col === "string") {
-						element.html('<i class="fa fa-ban"></i>');
-						element.css('background-color', '');
+						element.html(Math.round(value) + $scope.row.unit);
 					}
 					else {
 						element.html('');
@@ -167,7 +167,7 @@ angular.module('monitool.directives.reporting', [])
 				// there is no need to subscribe to $destroy
 				// $scope will be destroyed with the directive.
 
-				$scope.$watch('[plots, originalData, cols]', function() {
+				$scope.$watch('[plots, originalRows]', function() {
 					if (!$scope.originalRows)
 						return;
 

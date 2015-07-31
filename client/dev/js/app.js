@@ -431,12 +431,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.export', {
-		url: '/export',
-		templateUrl: 'partials/projects/export.html',
-		controller: 'ProjectExportController'
-	});
-
 	///////////////////////////
 	// Indicators
 	///////////////////////////

@@ -70,7 +70,7 @@ angular
 						$scope.filters = itertools.product(variable.partitions).map(function(filter) {
 							return {
 								id: filter.pluck('id').sort().join('.'),
-								name: filter.pluck('name').join('/')
+								name: filter.pluck('name').join(' / ')
 							};
 						});
 					else

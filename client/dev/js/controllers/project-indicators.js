@@ -277,7 +277,7 @@ angular.module('monitool.controllers.project.indicators', [])
 
 
 		// This hash allows to select indicators for plotting. It is used by directives.
-		// $scope.plots = {};
+		$scope.plots = {};
 
 		// // This hash allow opening and closing raw datas.
 		// $scope.open = {};
