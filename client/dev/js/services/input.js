@@ -35,69 +35,6 @@ angular.module('monitool.services.models.input', [])
 			return periods;
 		};
 
-		// /**
-		//  * This takes a mode and an array of values.
-		//  * mode is none, sum, average, highest, lowest, last
-		//  */
-		// var _aggregateValues = function(mode, values) {
-		// 	// filter out unanswered questions
-		// 	values = values.filter(function(v) { return v !== undefined && v !== null; });
-
-		// 	// if nothing remains, we can't aggregate.
-		// 	if (values.length == 0)
-		// 		return undefined;
-
-		// 	switch (mode) {
-		// 		case "none":
-		// 			return values.length == 1 ? values[0] : undefined;
-
-		// 		case "sum":
-		// 			return values.reduce(function(a, b) { return a + b; });
-
-		// 		case "average":
-		// 			return values.reduce(function(a, b, index, arr) { return a + b / arr.length; }, 0);
-
-		// 		case "highest":
-		// 			return values.reduce(function(a, b) { return a > b ? a : b; });
-
-		// 		case "lowest":
-		// 			return values.reduce(function(a, b) { return a > b ? b : a; });
-
-		// 		case "last":
-		// 			return values[values.length - 1];
-		// 	}
-		// };
-
-
-		// *
-		//  * mode is geoAgg or timeAgg
-		 
-		// var _groupInputs = function(mode, inputs, form) {
-		// 	var newInput = Input.makeFake(form);
-
-		// 	form.aggregatedData.forEach(function(section) {
-		// 		section.elements.forEach(function(element) {
-		// 			var elementMode = element[mode], values;
-
-		// 			if (element.partitions.length === 0) {
-		// 				values = inputs.map(function(input) { return input.values[element.id]; });
-		// 				newInput.values[element.id] = _aggregateValues(elementMode, values);
-		// 			}
-		// 			else {
-		// 				itertools.product(element.partitions).map(function(list) {
-		// 					return list.map(function(p) { return p.id; }).sort().join('.');
-		// 				}).forEach(function(partition) {
-		// 					values = inputs.map(function(input) { return input.values[element.id + '.' + partition]; });
-		// 					newInput.values[element.id + '.' + partition] = _aggregateValues(elementMode, values);
-		// 				});
-		// 			}
-		// 		});
-		// 	});
-
-		// 	return newInput;
-		// };
-
-
 		// Create $resource
 		var Input = $resource('/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
@@ -209,67 +146,6 @@ angular.module('monitool.services.models.input', [])
 		};
 
 
-		/**
-		 * Retrieve from server all inputs that match (between 2 dates)
-		 * - a given project
-		 * - a given indicator
-		 * - a group or an entity
-		 */
-		// Input.fetchFromQuery = function(query) {
-		// 	// Retrieve all relevant inputs.
-		// 	var options;
-		// 	if (query.type === 'project' || query.type === 'group')
-		// 		options = {mode: 'project_inputs', begin: query.begin, end: query.end, projectId: query.project._id};
-
-		// 	else if (query.type === 'entity')
-		// 		options = {mode: 'entity_inputs', begin: query.begin, end: query.end, entityId: query.id};
-
-		// 	else if (query.type === 'indicator')
-		// 		// we want all inputs from a form with the relevant formId
-		// 		options = {
-		// 			mode: 'form_inputs',
-		// 			begin: query.begin, end: query.end,
-		// 			formId: query.projects.map(function(p) {
-		// 				var form = p.dataCollection.find(function(f) {
-		// 					return !!f.fields.find(function(field) { return query.indicator._id === field.indicatorId });
-		// 				});
-		// 				return form ? form.id : null;
-		// 			}).filter(function(form) { return form; })
-		// 		};
-		// 	else
-		// 		throw new Error('query.type must be indicator, project, group or entity');
-
-		// 	return Input.query(options).$promise.then(function(inputs) {
-		// 		// Discard all inputs that are not relevant.
-		// 		if (query.type === 'project')
-		// 			inputs = inputs.filter(function(input) { return input.project === query.project._id; });
-
-		// 		else if (query.type === 'entity')
-		// 			inputs = inputs.filter(function(input) { return input.entity === query.id; });
-
-		// 		else if (query.type === 'group')
-		// 			inputs = inputs.filter(function(input) {
-		// 				var project = query.project || query.projects.find(function(p) { return p._id === input.project; }),
-		// 					group   = project.inputGroups.find(function(g) { return g.id === query.id; });
-
-		// 				return group.members.indexOf(input.entity) !== -1;
-		// 			});
-
-		// 		// Sanitize all inputs.
-		// 		var formsById = {};
-		// 		if (query.project)
-		// 			query.project.dataCollection.forEach(function(form) { formsById[form.id] = form; });
-		// 		if (query.projects)
-		// 			query.projects.forEach(function(p) { p.dataCollection.forEach(function(form) { formsById[form.id] = form; }); });
-
-		// 		inputs.forEach(function(input) {
-		// 			input.sanitize(formsById[input.form]);
-		// 		});
-
-		// 		return inputs;
-		// 	});
-		// };
-
 		Input.fetchForProject = function(project) {
 			return this.fetchForProjects([project]);
 		};
@@ -379,24 +255,6 @@ angular.module('monitool.services.models.input', [])
 			this.values = newValues;
 		};
 
-
-		// /**
-		//  * Given a rawId, and a filter, returns the appropriate sum
-		//  * If no filter is provided, assume the user want all partitions.
-		//  */
-		// Input.prototype.extractRawValue = function(rawId, filter) {
-		// 	var result = 0;
-		// 	var numFilters = filter.length;
-
-		// 	Object.keys(this.values).forEach(function(key) {
-		// 		// if the filter is not found, skip.
-		// 		for (var i = 0; i < numFilters; ++i)
-		// 			if (key.indexOf(filter[i]) === -1)
-		// 				return;
-
-		// 		result += this.values[key];
-		// 	}, this);
-		// };
 
 		/**
 		 * Given a input.value hash, compute all possible sums.
