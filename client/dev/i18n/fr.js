@@ -107,6 +107,7 @@ var FRENCH_TRANSLATION = {
 		logical_frame: 'Cadre logique',
 		description: 'Description',
 		reporting: 'Statistiques',
+		detailed_reporting: 'Statistiques détaillées',
 		reporting_analysis: "Analyse descriptive",
 		columns: "Colonnes",
 		colorize: 'Colorer',
@@ -182,6 +183,45 @@ var FRENCH_TRANSLATION = {
 		full_project: "Tout le projet",
 		select_filters: "Sélectionnez les partitions désirées",
 
+		collection_form_warning:
+			'<strong>Attention, en modifiant cette page vous risquez de perdre des données</strong><br/>' + 
+			'{{num_inputs}} saisies ont déjà été réalisées sur ce formulaire.' + 
+			'<ul>' + 
+			'	<li>Toute modification sur le planning (périodicité, dates) causera la suppression des saisies exclues du nouveau planning</li>' + 
+			'	<li>Toute modification sur la structure des données collectées sera répercutée sur toutes les saisies passées de ce formulaire</li>' + 
+			'</ul>',
+
+		sections: "Sections",
+		variables: "Variables",
+		partitions: "Partitions",
+
+		add_variable: "Ajouter une variable",
+		remove_variable: "Supprimer la variable",
+		add_partition: "Ajouter une partition",
+		remove_partition: "Supprimer la partition",
+		add_partition_element: "Ajouter un élément",
+		remove_partition_element: "Supprimer l'élément",
+
+		aggregation: 'Agrégation',
+		different_geos: 'Sur des lieux différents',
+		same_geos: 'Sur un même lieu',
+
+		none: "Ne pas agréger",
+		sum: "Somme",
+		average: "Moyenne",
+		highest: "Plus grand valeure",
+		lowest: "Plus petite valeure",
+		last: "Dernière valeur",
+
+		section_up: "Monter la section d'un cran",
+		section_down: "Descendre la section d'un cran",
+		variable_up: "Monter la variable d'un cran",
+		variable_down: "Descendre la variable d'un cran",
+		remove_section: "Supprimer la section",
+
+		please_select_variable: "Selectionnez une variable",
+		no_partitions_available: "Pas de partitions disponibles",
+
 
 		collection_site_list: "Lieux de collecte",
 		collection_form_list: "Formulaires de collecte",
@@ -226,13 +266,6 @@ var FRENCH_TRANSLATION = {
 
 		unknown: "Inconnu",
 		color: "Couleur",
-		red_for_target: "Rouge pour cible atteinte à moins de",
-		orange_for_target: "Orange pour cible atteinte entre {{value}}% et ",
-		green_for_target: "Vert pour cible atteinte à {{value}}%",
-		what_is_progress: "Qu'appelle-t'on une \"cible atteinte à 34%\"?",
-		what_is_progress_detail:
-			"On ne peut colorer que les indicateurs qui renseignent leur baseline <strong>et</strong> leur cible.<br/>" + 
-			"On calcule où se situe chaque saisie entre la baseline et la cible à l'aide d'une règle de trois.",
 
 		specs: "Spécifications",
 		indicators_management: "Suivi des indicateurs",

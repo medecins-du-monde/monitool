@@ -46,44 +46,57 @@ angular.module('monitool.controllers.indicator', [])
 		};
 	})
 	
-	.controller('IndicatorReportingController', function($scope, Input, mtReporting, indicator, projects, indicatorsById) {
+	.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, inputs) {
 		$scope.indicator = indicator;
-		// $scope.projects  = projects;
 		$scope.plots = {};
 
-		$scope.presentation = {display: 'value', plot: false, colorize: false};
-		$scope.query = {
-			type: "indicator",
-			indicator: indicator,
-			projects: projects,
-			begin: mtReporting.getDefaultStartDate(),
-			end: mtReporting.getDefaultEndDate(),
-			groupBy: 'month',
-		};
+		// Create default filter so that all inputs are used.
+		$scope.filters = {};
+		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
+		for (var i = 0; i < inputs.length; ++i) {
+			if (inputs[i].period < $scope.filters.begin)
+				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period > $scope.filters.end)
+				$scope.filters.end = inputs[i].period;
+		}
 
-		// h@ck
-		$scope.dates = {begin: new Date($scope.query.begin), end: new Date($scope.query.end)};
-		$scope.$watch("dates", function() {
-			$scope.query.begin = moment($scope.dates.begin).format('YYYY-MM-DD');
-			$scope.query.end = moment($scope.dates.end).format('YYYY-MM-DD');
+		// default group by
+		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'month';
+		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'quarter';
+		else
+			$scope.groupBy = 'year';
+
+		// When filter changes (or init), build the list of inputs to pass to the scope.
+		$scope.$watch('filters', function() {
+			$scope.inputs = inputs.filter(function(input) {
+				return input.period >= $scope.filters.begin && input.period <= $scope.filters.end;
+			});
 		}, true);
 
-		// h@ck2 (for translation)
-		$scope.$on('languageChange', function(e) {
-			$scope.dates = angular.copy($scope.dates);
-		})
+		// when input list change, or regrouping is needed, compute table rows again.
+		$scope.$watchGroup(['inputs', 'groupBy'], function() {
+			var reporting = mtReporting.computeIndicatorReporting($scope.inputs, projects, indicator, $scope.groupBy);
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end);
+			$scope.rows = [];
 
-		var inputsPromise = null;
-		$scope.$watch('query', function(newQuery, oldQuery) {
-			// if anything besides groupBy changes, we need to refetch.
-			// FIXME: we could widely optimize this.
-			if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end)
-				inputsPromise = Input.fetchFromQuery(newQuery);
-
-			// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
-			inputsPromise.then(function(inputs) {
-				$scope.stats = mtReporting.computeIndicatorReporting(inputs, newQuery, indicatorsById);
+			projects.forEach(function(project) {
+				$scope.rows.push({
+					id: project._id,
+					type: 'data',
+					indent: 0,
+					name: project.name,
+					unit: indicator.unit,
+					baseline: project.indicators[indicator._id].baseline,
+					target: project.indicators[indicator._id].target,
+					cols: $scope.cols.map(function(col) {
+						try { return reporting[project._id][col.id]; }
+						catch (e) { return null; }
+					})
+				});
 			});
-		}, true)
-	})
-	
+		});
+	});
+

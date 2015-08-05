@@ -377,6 +377,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 
+	$stateProvider.state('main.project.detailed_activity_reporting', {
+		url: '/activity-detailed-reporting',
+		templateUrl: 'partials/projects/activity/reporting-detailed.html',
+		controller: 'ProjectActivityDetailedReportingController',
+		resolve: {
+			inputs: function(Input, project) {
+				return Input.fetchForProject(project);
+			}
+		}
+	});
+
 
 	///////////////////////////
 	// Project Indicators
@@ -399,6 +410,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/indicator-reporting',
 		templateUrl: 'partials/projects/indicators/reporting.html',
 		controller: 'ProjectReportingController',
+		resolve: {
+			inputs: function(Input, project) {
+				return Input.fetchForProject(project);
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.detailed_indicators_reporting', {
+		url: '/detailed-indicator-reporting',
+		templateUrl: 'partials/projects/indicators/reporting-detailed.html',
+		controller: 'ProjectDetailedReportingController',
 		resolve: {
 			inputs: function(Input, project) {
 				return Input.fetchForProject(project);
@@ -481,11 +503,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			projects: function($stateParams, mtFetch) {
 				return mtFetch.projects({mode: "indicator_reporting", indicatorId: $stateParams.indicatorId});
 			},
-
-			// FIXME! that patch is the uglyest thing, we are wasting tons of bandwidth
-			indicatorsById: function(mtFetch, $stateParams) {
-				return mtFetch.indicators({}, true);
-			},
+			inputs: function(Input, projects) {
+				return Input.fetchForProjects(projects);
+			}
 		}
 	});
 

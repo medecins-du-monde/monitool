@@ -7,14 +7,9 @@
 
 <doc-reminder pages="project.presentation_project,project.input_forms,project.change_definition"></doc-reminder>
 
-<div class="alert alert-danger noprint" ng-if="formUsage.length">
-	<strong>Attention, en modifiant cette page vous risquez de perdre des données</strong><br/>
-	{{formUsage.length}} saisies ont déjà été réalisées sur ce formulaire.
-
-	<ul>
-		<li>Toute modification sur le planning (périodicité, dates) causera la suppression des saisies exclues du nouveau planning</li>
-		<li>Toute modification sur la structure des données collectées sera répercutée sur toutes les saisies passées de ce formulaire</li>
-	</ul>
+<div class="alert alert-danger noprint"
+	 ng-if="formUsage.length"
+	 ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}">
 </div>
 
 <form class="form-horizontal" role="form" name="formForm" novalidate>
@@ -165,11 +160,10 @@
 				<th translate="project.variable"></th>
 				<th translate="project.aggregation"></th>
 				<th translate="project.partitions" colspan="{{maxPartitions + 1}}"></th>
-				<th colspan="2">Actions</th>
+				<th colspan="2" translate="project.actions"></th>
 			</tr>
 		</thead>
 		<tbody ng-repeat="section in form.aggregatedData track by section.id">
-
 
 			<!-- variable row -->
 			<tr ng-repeat="element in section.elements track by element.id">
@@ -189,51 +183,57 @@
 				
 				<!-- variable aggregation -->
 				<td>
-					Sur des lieux différents<br/>
+					{{'project.different_geos'|translate}}<br/>
 					<select ng-model="element.geoAgg">
-						<option value="none">Ne pas agréger</option>
-						<option value="sum">Somme</option>
-						<option value="average">Moyenne</option>
-						<option value="highest">Plus grand valeure</option>
-						<option value="lowest">Plus petite valeure</option>
-						<option value="last">Dernière valeur</option>
+						<option value="none" translate="project.none"></option>
+						<option value="sum" translate="project.sum"></option>
+						<option value="average" translate="project.average"></option>
+						<option value="highest" translate="project.highest"></option>
+						<option value="lowest" translate="project.lowest"></option>
+						<option value="last" translate="project.last"></option>
 					</select><br/>
 
-					Sur un même lieu<br/>
+					{{'project.same_geos'|translate}}<br/>
 					<select ng-model="element.timeAgg">
-						<option value="none">Ne pas agréger</option>
-						<option value="sum">Somme</option>
-						<option value="average">Moyenne</option>
-						<option value="highest">Plus grand valeure</option>
-						<option value="lowest">Plus petite valeure</option>
-						<option value="last">Dernière valeur</option>
+						<option value="none" translate="project.none"></option>
+						<option value="sum" translate="project.sum"></option>
+						<option value="average" translate="project.average"></option>
+						<option value="highest" translate="project.highest"></option>
+						<option value="lowest" translate="project.lowest"></option>
+						<option value="last" translate="project.last"></option>
 					</select>
 				</td>
 
 				<!-- variable partitions -->
 				<td ng-repeat="partition in element.partitions">
-					<div class="input-group" ng-repeat="p in partition track by p.id">
-
+					<div class="input-group" ng-repeat="p in partition track by p.id" style="margin-bottom: 2px;">
 						<input class="form-control input-xs" ng-model="p.name" required>
 						<span class="input-group-addon">
 							<i ng-click="remove(p, partition)"
-							   class="fa fa-times text-danger"
-							   tooltip="Supprimer l'élément"></i>
+							   class="fa fa-fw fa-times text-danger"
+							   tooltip="{{'project.remove_partition_element'|translate}}"></i>
+						</span>
+					</div>
+
+					<div class="input-group" acl-has-project-role="owner" style="margin-bottom: 2px;">
+						<input class="form-control input-xs" disabled>
+						<span class="input-group-addon">
+							<i ng-click="newPartitionElement(partition)"
+							   class="fa fa-fw fa-plus"
+							   tooltip="{{'project.add_partition_element'|translate}}"></i>
 						</span>
 					</div>
 
 					<div acl-has-project-role="owner">
-						<a class="btn btn-xs btn-default"
-						   ng-click="newPartitionElement(partition)"
-						   translate="project.new_partition_element"></a>
-
-						<a class="btn btn-xs btn-danger"
+						<div class="btn btn-xs btn-danger btn-block"
 						   ng-click="remPartition(partition, element.partitions)"
-						   translate="project.remove_partition"></a>
+						   translate="project.remove_partition"></div>
 					</div>
 				</td>
 				<td>
-					<a ng-click="newPartition(element.partitions)" translate="project.new_partition"></a>
+					<a ng-click="newPartition(element.partitions)"
+					   class="btn btn-xs btn-default btn-block"
+					   translate="project.new_partition"></a>
 				</td>
 				<td colspan="{{maxPartitions - element.partitions.length}}"
 					ng-if="maxPartitions - element.partitions.length > 0"></td>
@@ -245,20 +245,19 @@
 				<!-- variable actions -->
 				<td>
 					<a ng-click="upElement($index, $parent.$parent.$index)"
-					   tooltip="Monter d'un cran la variable"
+					   tooltip="{{'project.variable_up'|translate}}"
 					   ng-if="!$parent.$first || !$first">
 
 						<i class="fa fa-caret-square-o-up"></i>
 					</a>
 					<a ng-click="downElement($index, $parent.$parent.$index)"
-					   tooltip="Descendre d'un cran la variable"
+					   tooltip="{{'project.variable_down'|translate}}"
 					   ng-if="!$parent.$last || !$last">
 
 						<i class="fa fa-caret-square-o-down"></i>
 					</a>
 					<a ng-click="remove(element, section.elements)"
-					   tooltip="Supprimer la variable">
-
+					   tooltip="{{'project.remove_variable'|translate}}">
 					   <i class="fa fa-times" style="color: red"></i>
 					</a>
 				</td>
@@ -266,20 +265,19 @@
 				<!-- section actions (only if first variable) -->
 				<td rowspan="{{section.elements.length + 1}}" ng-if="$first" acl-has-project-role="owner" acl-fallback="section.name">
 					<a ng-click="upSection($parent.$parent.$index)"
-					   tooltip="Monter d'un cran la section"
+					   tooltip="{{'project.section_up'|translate}}"
 					   ng-if="!$parent.$parent.$first">
 
 						<i class="fa fa-caret-square-o-up"></i>
 					</a>
 					<a ng-click="downSection($parent.$parent.$index)"
-					   tooltip="Descendre d'un cran la section"
+					   tooltip="{{'project.section_down'|translate}}"
 					   ng-if="!$parent.$parent.$last">
 
 						<i class="fa fa-caret-square-o-down"></i>
 					</a>
 					<a ng-click="remove(section, form.aggregatedData)"
-					   tooltip="Supprimer la section">
-
+					   tooltip="{{'project.remove_section'|translate}}">
 						<i class="fa fa-times" style="color: red"></i>
 					</a>
 				</td>
@@ -298,13 +296,13 @@
 					   translate="project.new_variable"></a>
 				</td>
 				<td ng-if="section.elements.length === 0">
-					<a ng-click="upSection($index)" tooltip="Monter d'un cran la section" ng-if="!$first">
+					<a ng-click="upSection($index)" tooltip="{{'project.section_up'|translate}}" ng-if="!$first">
 						<i class="fa fa-caret-square-o-up"></i>
 					</a>
-					<a ng-click="downSection($index)" tooltip="Descendre d'un cran la section" ng-if="!$last">
+					<a ng-click="downSection($index)" tooltip="{{'project.section_down'|translate}}" ng-if="!$last">
 						<i class="fa fa-caret-square-o-down"></i>
 					</a>
-					<a ng-click="remove(section, form.aggregatedData)" tooltip="Supprimer la section">
+					<a ng-click="remove(section, form.aggregatedData)" tooltip="{{'project.remove_section'|translate}}">
 						<i class="fa fa-times" style="color: red"></i>
 					</a>
 				</td>

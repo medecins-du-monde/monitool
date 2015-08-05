@@ -64,6 +64,15 @@
 							<i class="fa fa-line-chart fa-fw"></i>
 							<span translate="shared.reporting"></span>
 						</a>
+
+						<a ui-sref="main.project.detailed_activity_reporting"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!project._id">
+
+							<i class="fa fa-bar-chart fa-fw"></i>
+							<span translate="shared.detailed_reporting"></span>
+						</a>
 					</div>
 				</div>
 			</div>
@@ -84,6 +93,11 @@
 						<a ui-sref="main.project.indicators_reporting" ui-sref-active="active" class="list-group-item" disable-if="!project._id">
 							<i class="fa fa-line-chart fa-fw"></i>
 							<span translate="shared.reporting"></span>
+						</a>
+
+						<a ui-sref="main.project.detailed_indicators_reporting" ui-sref-active="active" class="list-group-item" disable-if="!project._id">
+							<i class="fa fa-bar-chart fa-fw"></i>
+							<span translate="shared.detailed_reporting"></span>
 						</a>
 
 						<a ui-sref="main.project.reporting_analysis_list" ui-sref-active="active" class="list-group-item" disable-if="!project._id">

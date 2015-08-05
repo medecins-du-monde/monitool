@@ -1,7 +1,7 @@
 "use strict";
 
 angular.module('monitool.services.models.input', [])
-	.factory('Input', function($resource, itertools) {
+	.factory('Input', function($resource, $q, itertools) {
 
 		// this has nothing to do on the root scope.
 		// => move it to a service and factorize with the similiar function in mtReporting
@@ -35,67 +35,67 @@ angular.module('monitool.services.models.input', [])
 			return periods;
 		};
 
-		/**
-		 * This takes a mode and an array of values.
-		 * mode is none, sum, average, highest, lowest, last
-		 */
-		var _aggregateValues = function(mode, values) {
-			// filter out unanswered questions
-			values = values.filter(function(v) { return v !== undefined && v !== null; });
+		// /**
+		//  * This takes a mode and an array of values.
+		//  * mode is none, sum, average, highest, lowest, last
+		//  */
+		// var _aggregateValues = function(mode, values) {
+		// 	// filter out unanswered questions
+		// 	values = values.filter(function(v) { return v !== undefined && v !== null; });
 
-			// if nothing remains, we can't aggregate.
-			if (values.length == 0)
-				return undefined;
+		// 	// if nothing remains, we can't aggregate.
+		// 	if (values.length == 0)
+		// 		return undefined;
 
-			switch (mode) {
-				case "none":
-					return values.length == 1 ? values[0] : undefined;
+		// 	switch (mode) {
+		// 		case "none":
+		// 			return values.length == 1 ? values[0] : undefined;
 
-				case "sum":
-					return values.reduce(function(a, b) { return a + b; });
+		// 		case "sum":
+		// 			return values.reduce(function(a, b) { return a + b; });
 
-				case "average":
-					return values.reduce(function(a, b, index, arr) { return a + b / arr.length; }, 0);
+		// 		case "average":
+		// 			return values.reduce(function(a, b, index, arr) { return a + b / arr.length; }, 0);
 
-				case "highest":
-					return values.reduce(function(a, b) { return a > b ? a : b; });
+		// 		case "highest":
+		// 			return values.reduce(function(a, b) { return a > b ? a : b; });
 
-				case "lowest":
-					return values.reduce(function(a, b) { return a > b ? b : a; });
+		// 		case "lowest":
+		// 			return values.reduce(function(a, b) { return a > b ? b : a; });
 
-				case "last":
-					return values[values.length - 1];
-			}
-		};
+		// 		case "last":
+		// 			return values[values.length - 1];
+		// 	}
+		// };
 
 
-		/**
-		 * mode is geoAgg or timeAgg
-		 */
-		var _groupInputs = function(mode, inputs, form) {
-			var newInput = Input.makeFake(form);
+		// *
+		//  * mode is geoAgg or timeAgg
+		 
+		// var _groupInputs = function(mode, inputs, form) {
+		// 	var newInput = Input.makeFake(form);
 
-			form.aggregatedData.forEach(function(section) {
-				section.elements.forEach(function(element) {
-					var elementMode = element[mode], values;
+		// 	form.aggregatedData.forEach(function(section) {
+		// 		section.elements.forEach(function(element) {
+		// 			var elementMode = element[mode], values;
 
-					if (element.partitions.length === 0) {
-						values = inputs.map(function(input) { return input.values[element.id]; });
-						newInput.values[element.id] = _aggregateValues(elementMode, values);
-					}
-					else {
-						itertools.product(element.partitions).map(function(list) {
-							return list.map(function(p) { return p.id; }).sort().join('.');
-						}).forEach(function(partition) {
-							values = inputs.map(function(input) { return input.values[element.id + '.' + partition]; });
-							newInput.values[element.id + '.' + partition] = _aggregateValues(elementMode, values);
-						});
-					}
-				});
-			});
+		// 			if (element.partitions.length === 0) {
+		// 				values = inputs.map(function(input) { return input.values[element.id]; });
+		// 				newInput.values[element.id] = _aggregateValues(elementMode, values);
+		// 			}
+		// 			else {
+		// 				itertools.product(element.partitions).map(function(list) {
+		// 					return list.map(function(p) { return p.id; }).sort().join('.');
+		// 				}).forEach(function(partition) {
+		// 					values = inputs.map(function(input) { return input.values[element.id + '.' + partition]; });
+		// 					newInput.values[element.id + '.' + partition] = _aggregateValues(elementMode, values);
+		// 				});
+		// 			}
+		// 		});
+		// 	});
 
-			return newInput;
-		};
+		// 	return newInput;
+		// };
 
 
 		// Create $resource
@@ -271,15 +271,29 @@ angular.module('monitool.services.models.input', [])
 		// };
 
 		Input.fetchForProject = function(project) {
-			return Input.query({mode: "project_inputs", projectId: project._id}).$promise.then(function(inputs) {
-				// Sanitize all inputs.
+			return this.fetchForProjects([project]);
+		};
 
-				var formsById = {};	// start by indexings form by id
+		Input.fetchForProjects = function(projects) {
+			// Index forms by their uuid.
+			var formsById = {};
+			projects.forEach(function(project) {
 				project.dataCollection.forEach(function(form) {
 					formsById[form.id] = form;
 				});
+			});
 
-				inputs.forEach(function(input) { // ask each input to sanitize itself with the relevant form.
+			// Buid promises for each project's inputs.
+			var promises = projects.map(function(project) {
+				return Input.query({mode: "project_inputs", projectId: project._id}).$promise;
+			});
+
+			return $q.all(promises).then(function(inputs) {
+				// Reduce the inputs array.
+				inputs = inputs.reduce(function(m, i) { return m.concat(i); }, []);
+
+				// ask each input to sanitize itself with the relevant form.
+				inputs.forEach(function(input) {
 					input.sanitize(formsById[input.form]);
 				});
 

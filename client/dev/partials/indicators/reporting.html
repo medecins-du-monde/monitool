@@ -8,7 +8,7 @@
 
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="indicator" class="col-sm-2 control-label" translate="shared.begin"></label>
 				<div class="col-sm-10">
@@ -17,22 +17,45 @@
 						<input type="text" 
 							   datepicker-popup="longDate"
 							   name="begin"
-							   ng-model="dates.begin"
+							   ng-model="filters.begin"
 							   is-open="beginDateOpen"
-							   ng-click="beginDateOpen=true"
+							   ng-click = "beginDateOpen = true"
 							   required
-							   ng-max="dates.end"
-							   class="form-control" />
-
+							   ng-max="filters.end"
+							   class="form-control input-sm" />
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						<input type="text" 
+							   datepicker-popup="longDate"
+							   name="end"
+							   ng-model="filters.end"
+							   is-open="endDateOpen"
+							   ng-click = "endDateOpen = true"
+							   ng-min="filters.begin"
+							   class="form-control input-sm"
+							   required />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
-						<select class="form-control" id="group-by-input" ng-model="query.groupBy">
+						<select class="form-control input-sm" id="group-by-input" ng-model="groupBy">
 							<option value="day" translate="shared.day"></option>
 							<option value="week" translate="shared.week"></option>
 							<option value="month" translate="shared.month"></option>
@@ -42,61 +65,39 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="form-group">
-				<label for="plot-input" class="col-sm-2 control-label" translate="shared.plot"></label>
-				<div class="col-sm-10">
-					<p class="form-control-static">
-						<input type="checkbox" id="plot-input" ng-model="presentation.plot" />
-					</p>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-md-6">
-			<div class="form-group">
-				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-						<input type="text" 
-							   datepicker-popup="longDate"
-							   name="end"
-							   ng-model="dates.end"
-							   is-open="endDateOpen"
-							   ng-click="endDateOpen=true"
-							   required
-							   ng-min="dates.begin"
-							   class="form-control" />
-					</div>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label for="display-input" class="col-sm-2 control-label" translate="shared.display"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-eye"></i></span>
-						<select class="form-control" id="display-input" ng-model="presentation.display">
-							<option value="value" translate="shared.values"></option>
-							<option value="progress" translate="shared.target_percentage"></option>
-						</select>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </form>
 
-<div class="clearfix noprint">
-	<button class="btn btn-primary btn-xs pull-right" ng-show="presentation.plot" svg-save="imageFilename">
+
+
+<button class="btn btn-primary btn-xs pull-right noprint" svg-save>
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_plot"></span>
+</button>
+<div style="clear: both"></div>
+
+<reporting-graph-adapter
+	type="['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
+	rows="rows" cols="cols" plots="plots">
+</reporting-graph-adapter>
+
+<div style="clear: both"></div>
+
+<button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_table"></span>
+</button>
+
+<!-- <div class="clearfix noprint">
+	<button class="btn btn-primary btn-xs pull-right" svg-save="imageFilename">
 		<i class="fa fa-download"></i>
 		<span translate="shared.download_plot"></span>
 	</button>
 </div>
 
-<div style="clear: both" ng-if="presentation.plot">
-	<reporting-graph-adapter type="'line'" data="stats" plots="plots" display="presentation.display"></reporting-graph-adapter>
+<div style="clear: both">
+	<reporting-graph-adapter type="'line'" data="stats" plots="plots"></reporting-graph-adapter>
 </div>
 
 <button class="btn btn-primary btn-xs pull-right noprint"
@@ -105,24 +106,24 @@
 	<i class="fa fa-download"></i>
 	<span translate="shared.download_table"></span>
 </button>
-
-<table class="table table-bordered table-stripped table-condensed project-reporting">
+ -->
+<table id="reporting" class="table table-bordered table-condensed">
 	<thead>
 		<tr>
-			<th ng-if="presentation.plot" class="noprint"></th>
+			<th class="noprint"></th>
 			<th></th>
 			<th translate="project.baseline"></th>
 			<th translate="project.target"></th>
-			<th ng-repeat="col in stats.cols track by col.id" ng-bind="col.name"></th>
+			<th ng-repeat="col in cols track by col.id" ng-bind="col.name"></th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in stats.rows track by $index">
-			<td ng-if="presentation.plot" class="noprint">
+		<tr ng-repeat="row in rows track by $index">
+			<td class="noprint" style="text-align: center">
 				<input id="plot-{{row.id}}" type="checkbox" ng-model="plots[row.id]" />
 			</td>
-			<td ng-class="{indent1: row.type=='entity'}">
-				<label for="plot-{{row.id}}" ng-bind="row.name"></label>
+			<td class="indent{{row.indent}}">
+				{{row.name}}
 			</td>
 			<td>{{row.baseline}}{{row.unit}}</td>
 			<td>{{row.target}}{{row.unit}}</td>

@@ -213,10 +213,7 @@ angular.module('monitool.controllers.project.activity', [])
 		};
 	})
 
-	.controller('ProjectActivityReportingController', function($scope, $state, inputs, mtReporting) {
-		// Create default groupby directive
-		$scope.groupBy = 'month';
-
+	.controller('ProjectActivityReportingController', function($scope, inputs, mtReporting) {
 		// Create default filter so that all inputs are used.
 		$scope.filters = {entityId: ""};
 		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
@@ -227,6 +224,14 @@ angular.module('monitool.controllers.project.activity', [])
 			if (inputs[i].period > $scope.filters.end)
 				$scope.filters.end = inputs[i].period;
 		}
+
+		// default group by
+		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'month';
+		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'quarter';
+		else
+			$scope.groupBy = 'year';
 
 		// When filter changes (or init), build the list of inputs to pass to the scope.
 		$scope.$watch('filters', function() {
@@ -247,7 +252,7 @@ angular.module('monitool.controllers.project.activity', [])
 
 		// when input list change, or regrouping is needed, compute table rows again.
 		$scope.$watchGroup(['inputs', 'groupBy'], function() {
-			var reporting = mtReporting.computeProjectActivityReporting($scope.inputs, $scope.project, $scope.groupBy);
+			var reporting = mtReporting.computeProjectReporting($scope.inputs, $scope.project, $scope.groupBy);
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project)
 			$scope.rows = [];
 
@@ -337,29 +342,79 @@ angular.module('monitool.controllers.project.activity', [])
 
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
-
-		// // those 2 hashes represent what the user sees.
-		// $scope.presentation = {plot: false};
-		// $scope.query = {
-		// 	project: $scope.project,
-		// 	begin:   mtReporting.getDefaultStartDate($scope.project),
-		// 	end:     mtReporting.getDefaultEndDate($scope.project),
-		// 	groupBy: 'month', type: 'project', id: ''
-		// };
-
-		// // Update loaded inputs when query.begin or query.end changes.
-		// var inputsPromise = null;
-		// $scope.$watch('query', function(newQuery, oldQuery) {
-		// 	// if anything besides groupBy changes, we need to refetch.
-		// 	// FIXME: we could widely optimize this.
-		// 	if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end || oldQuery.id !== newQuery.id)
-		// 		inputsPromise = Input.fetchFromQuery(newQuery);
-
-		// 	// Once input are ready (which will be immediate if we did not reload them) => refresh the scope
-		// 	inputsPromise.then(function(inputs) {
-		// 		$scope.stats = mtReporting.computeRawDataReporting(inputs, newQuery);
-		// 		$scope.cols = mtReporting.getColumns(newQuery);
-		// 	});
-		// }, true)
 	})
 
+	.controller('ProjectActivityDetailedReportingController', function($scope, inputs, mtReporting) {
+		// Create default filter so that all inputs are used.
+		$scope.filters = {};
+		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
+		for (var i = 0; i < inputs.length; ++i) {
+			if (inputs[i].period < $scope.filters.begin)
+				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period > $scope.filters.end)
+				$scope.filters.end = inputs[i].period;
+		}
+
+		// default group by
+		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'month';
+		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'quarter';
+		else
+			$scope.groupBy = 'year';
+
+		// When filter changes (or init), build the list of inputs to pass to the scope.
+		$scope.$watch('filters', function() {
+			// ...rebuild usedInputs
+			$scope.inputs = inputs.filter(function(input) {
+				return input.period >= $scope.filters.begin && input.period <= $scope.filters.end;
+			});
+		}, true);
+
+		$scope.planning = {variable: $scope.project.dataCollection[0].aggregatedData[0].elements[0].id, filter: []};
+
+		var makeRow = function(rowId, rowName, variableId, filters, reporting, indent) {
+			return {
+				id: rowId,
+				type: "data",
+				name: rowName,
+				indent: indent,
+				cols: $scope.cols.map(function(col) {
+					try {
+						if (filters.length == 0)
+							return reporting[rowId][col.id][variableId];
+						else {
+							var total = 0;
+							filters.forEach(function(filter) {
+								total += reporting[rowId][col.id][variableId + '.' + filter];
+							});
+							return total;
+						}
+					}
+					catch (e) { return undefined; }
+				})
+			};			
+		}
+
+		// when input list change, or regrouping is needed, compute table rows again.
+		$scope.$watchGroup(['inputs', 'groupBy', 'planning.variable', 'planning.filter'], function() {
+			var reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy);
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
+			$scope.rows = [];
+
+			$scope.rows.push(makeRow($scope.project._id, "All", $scope.planning.variable, $scope.planning.filter, reporting, 0));
+			$scope.rows.push({ id: makeUUID(), type: "header", text: 'Entities', indent: 0 });
+			$scope.project.inputEntities.forEach(function(entity) {
+				$scope.rows.push(makeRow(entity.id, entity.name, $scope.planning.variable, $scope.planning.filter, reporting, 1));
+			});
+
+			$scope.rows.push({ id: makeUUID(), type: "header", text: 'Groups', indent: 0 });
+			$scope.project.inputGroups.forEach(function(group) {
+				$scope.rows.push(makeRow(group.id, group.name, $scope.planning.variable, $scope.planning.filter, reporting, 1));
+			});
+		});
+
+		// This hash allows to select indicators for plotting. It is used by directives.
+		$scope.plots = {};
+	});
