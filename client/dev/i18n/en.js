@@ -60,6 +60,8 @@ var ENGLISH_LOCALE = {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		up: "Up",
+		down: "Down",
 		sum: "Sum",
 		include: "Include",
 		toggle: "Toggle",
@@ -77,11 +79,6 @@ var ENGLISH_TRANSLATION = {
 		indicators: 'Indicators',
 		indicators_catalog: 'Indicators Catalog',
 		help: 'Help',
-		input_entities: 'Input entities',
-		input_groups: 'Input groups',
-		input_entity: 'Input entity',
-		input_group: 'Input group',
-
 		name: 'Name',
 		begin: 'Start',
 		end: 'End',
@@ -110,6 +107,7 @@ var ENGLISH_TRANSLATION = {
 		logical_frame: 'Logical Frame',
 		description: 'Description',
 		reporting: 'Reporting',
+		detailed_reporting: 'Detailed reporting',
 		reporting_analysis: 'Descriptive Analysis',
 		columns: "Columns",
 		colorize: 'Colorize',
@@ -129,7 +127,9 @@ var ENGLISH_TRANSLATION = {
 		detach: "Detach",
 
 		stay_here_check: 'You made changes. Click OK to stay on this page, Cancel to leave.',
-		filter: "Filter"
+		filter: "Filter",
+		'export': "Export",
+		none: "None"
 	},
 	menu: {
 		toggle_nav: "Toggle navigation",
@@ -177,6 +177,64 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		actions: "Actions",
+		groups: "Groups",
+		basics: "Basics",
+		general: "General",
+		full_project: "Full project",
+		select_filters: "Select filters",
+
+		collection_form_warning: 
+			'<strong>Take care, if you make changes to this page, you risk losing data</strong><br/>' + 
+			'{{num_inputs}} inputs were made with the form as it is.' + 
+			'<ul>' + 
+			'	<li>All modifications on the planning (periodicity, dates) will cause old inputs to be discarded</li>' + 
+			'	<li>All modifications on the structure will be echoed on former inputs</li>' + 
+			'</ul>',
+
+		sections: "Sections",
+		variables: "Variables",
+		partitions: "Partitions",
+
+		add_variable: "Add a variable",
+		remove_variable: "Remove this variable",
+		add_partition: "Add a partition",
+		remove_partition: "Remove this partition",
+		add_partition_element: "Add an element",
+		remove_partition_element: "Remove this element",
+
+		aggregation: "Aggregation",
+		different_geos: "On different places",
+		same_geos: "On the same place",
+
+		none: "Do not aggregate",
+		sum: "Sum",
+		average: "Average",
+		highest: "Highest",
+		lowest: "Lowest",
+		last: "Last",
+
+		section_up: "Move up",
+		section_down: "Move down",
+		variable_up: "Move up",
+		variable_down: "Move down",
+		remove_section: "Remove this section",
+
+		please_select_variable: "Please select a variable",
+		no_partitions_available: "No partitions available",
+
+		collection_site_list: "Collection sites",
+		collection_form_list: "Collection forms",
+		collection_input_list: "Input",
+
+		collection_site: "Collection site",
+		collection_form: "Collection form",
+
+		collection_form_planning: "Calendar",
+		collection_form_structure: "Structure",
+
+		remove_partition: "Remove this partition",
+
 		delete_form_easy: "Are you sure to delete this input form?",
 		delete_form_hard: "If you delete this input form, all linked entries will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
 		delete_form_hard_answer: "Delete the {{num_inputs}} inputs",
@@ -191,27 +249,14 @@ var ENGLISH_TRANSLATION = {
 		last_input: "Last input: ",
 
 		value: "Value",
-		raw_data: "Raw data",
-		planning: "Planning",
-		indicators_computation: "Indicators computation",
-		partition: "Partition",
-		additional_partition: "Additional partition",
-		new_partition: "Add a partition",
+		activity: "Activity",
+		activity_management: "Activity management",
+		partitions: "Partitions",
 		variable: "Variable",
-		new_variable: "Add a variable",
 		section: "Section",
-		new_section: "Add a section",
-		see_partitions: "View selected sections",
 
 		unknown: "Unknown",
 		color: "Color",
-		red_for_target: "Red if target is reached at",
-		orange_for_target: "Orange if target is reacher between {{value}}% and ",
-		green_for_target: "Green for a target reached over {{value}}%",
-		what_is_progress: "What does \"target reached at 34%\" means?",
-		what_is_progress_detail:
-			"We can compute progress only when both baseline and target are defined.<br/>" + 
-			"The progress simply is computed situating each input between those two values.",
 
 		specs: "Specifications",
 		indicators_management: "Indicators management",
@@ -304,16 +349,10 @@ var ENGLISH_TRANSLATION = {
 
 		relevance: 'Relevance',
 		relevance_ph: 'Why are you collecting this indicator?',
-		limits: 'Limits',
-		minimum_ph: 'minimum',
-		maximum_ph: 'maximum',
-		orange_zone: 'Orange Zone',
-		green_zone: 'Green Zone',
 		baseline: 'Baseline',
 		baseline_ph: 'Reference value',
 		target_ph: 'Target value',
 		target: 'Targets',
-		add_target: 'Add a target',
 		general_data: 'General data',
 
 		goal: 'Main goal',
@@ -359,18 +398,23 @@ var ENGLISH_TRANSLATION = {
 		you_are_not_owner: "You cannot edit this project",
 		you_are_not_editor: "You cannot input on this project",
 	
-		status_green: "This indicator is in its green zone",
-		status_orange: "This indicator is in its orange zone",
-		status_red: "This indicator is in its red zone",
-		status_unknown: "This indicator is out of bounds",
-
 		formula: "Formula: {{name}}",
 		link: "Link: {{name}}",
 		links: "Links"
 	},
 	indicator: {
+
+		is_mandatory: "Mandatory. Should be collected for all new projects of this thematic.",
+		is_optional: "Optional. Can be collected on new projects of this thematic.",
+		is_forbidden: "Forbidden. Must not be collected on any new projects.",
+
+		is_broad: "Applicable to different projects.",
+		is_limited: "Too narrow to be applicable to many projets.",
+		is_single: "Can only be used for a specific project.",
+
 		search: "Search",
 		search_ph: "Enter at least 3 characters",
+		scope: "Scope",
 
 		standard: "Standard",
 		sources: "Sources",
@@ -427,55 +471,7 @@ var ENGLISH_TRANSLATION = {
 		new_type_name: "New type name",
 		new_theme_name: "New theme name",
 		only_core: "Only display core indicators",
-
-		is_mandatory: "This indicator is mandatory in this thematic",
-		is_recommended: "This indicator is from the thematic's catalog",
-		is_common: "This indicator is optional",
-		is_forbidden: "This is a legacy indicator, it cannot be used on new projects",
 		is_external: "This indicator is from another thematic",
-
-		time_aggregation: "Time aggregation",
-		time_aggregation_sum: "Sum (for instance: number of consultations, births, ...)",
-		time_aggregation_average: "Average (for instance: population, number of doctors, cars, ...)",
-		time_aggregation_none: "None (all percentages and computed indicators)",
-
-		what_is_aggregation: "How to fill those fields?",
-		time_aggregation_help: [
-			"<strong>Tip</strong>",
-			"<ul>",
-				"<li>",
-					"If an hospital makes 100 in january, february and march, it has made 300 on the first quarter of the year.",
-					"The aggregation mode of <strong>\"Number of consultations\"</strong> will be <strong>\"Sum\"</strong>",
-					"",
-				"</li>",
-				"<li>",
-					"If a surgical unit has a mortality rate of 5% in january, 7% in february and 10% in march, it is impossible to compute",
-					"its mortality rate over the first quarter of the year without knowing the number of surgeries on each month.",
-					"The aggregation of the indicator <strong>\"operative mortality\"</strong> is <strong>\"None\"</strong>",
-				"</li>",
-				"<li>",
-					"If a town has a population of 512 people in january, 600 in february and 550 in march, we can say that it's population",
-					"over the first quarter is 553. The aggregation mode of the indicator <strong>\"Population\"</strong> is ",
-					"<strong>\"Average\"</strong>",
-				"</li>",
-			"</ul>"
-		].join(' '),
-
-		geo_aggregation: "Geographic aggregation",
-		geo_aggregation_sum: "Sum (for instance: population, number of doctors, cars, consultations, births, ...)",
-		geo_aggregation_average: "Average (only use for indicators that already are averages over input entities)",
-		geo_aggregation_none: "None (all percentages and computed indicators)",
-	},
-	login: {
-		error: "Invalid username or password",
-		please_connect: "Please log in",
-		login: 'Username',
-		password: "Password",
-		connect: "Log in",
-		change_password_please: "Type your new password",
-		new_password: "Password",
-		new_password_again: "Password again",
-		change_password: "Change"
 	},
 	form: {
 		mandatory: "This field is mandatory",

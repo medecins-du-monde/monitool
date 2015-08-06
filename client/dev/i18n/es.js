@@ -60,6 +60,8 @@ var SPANISH_LOCALE = {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		up: "Subir",
+		down: "Bajar",
 		sum: "Suma",
 		include: "Incluir",
 		toggle: "Cambiar",
@@ -77,11 +79,6 @@ var SPANISH_TRANSLATION = {
 		indicators: 'Indicadores',
 		indicators_catalog: 'Catálogo de indicadores',
 		help: 'Ayuda',
-		input_entities: 'Lugares de actividad',
-		input_groups: 'Grupos de actividad',
-		input_entity: 'Lugar de actividad',
-		input_group: 'Grupo de actividad',
-
 		name: 'Nombre',
 		begin: 'Principio',
 		end: 'Fin',
@@ -110,6 +107,7 @@ var SPANISH_TRANSLATION = {
 		logical_frame: 'Marco lógico',
 		description: 'Descripción',
 		reporting: 'Estadísticas',
+		detailed_reporting: 'Estadísticas detalladas',
 		reporting_analysis: "Análisis descriptivo",
 		columns: "Columnas",
 		colorize: 'Colorear',
@@ -129,7 +127,9 @@ var SPANISH_TRANSLATION = {
 		detach: "Desconectar",
 
 		stay_here_check: 'Ha realizado cambios. Selectione acceptar para quedarse en esta página, cancelar para perder los cambios.',
-		filter: "Filtro"
+		filter: "Filtro",
+		'export': "Exportar",
+		none: "Ningúno"
 	},
 	menu: {
 		toggle_nav: "Ver el menu",
@@ -177,6 +177,64 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		actions: "Actions",
+		groups: "Grupos",
+		basics: "Datos de base",
+		general: "General",
+		full_project: "Proyecto completo",
+		select_filters: "Seleccione filtros",
+
+		collection_form_warning: 
+			'<strong>Cuidado, si hace cambios en esta página, perdera datos</strong><br/>' + 
+			'{{num_inputs}} entradas han sido realizadas en este formulario.' + 
+			'<ul>' + 
+			'	<li>Todo cambio sobre el calendario suprimira todas las entradas que no entren en las nuevas fechas</li>' + 
+			'	<li>Todo cambio sobre la estructura de datos sera efectiva en todas las entradas realizadas</li>' + 
+			'</ul>',
+
+		sections: "Apartados",
+		variables: "Variables",
+		partitions: "Particiones",
+
+		add_variable: "Añadir una variable",
+		remove_variable: "Quitar esta variable",
+		add_partition: "Añadir una partición",
+		remove_partition: "Quitar esta partición",
+		add_partition_element: "Añadir un elemento",
+		remove_partition_element: "Quitar este elemento",
+
+		aggregation: "Agregación",
+		different_geos: "Entre lugares diferentes",
+		same_geos: "En un mismo lugar",
+
+		none: "No agregar",
+		sum: "Suma",
+		average: "Promedio",
+		highest: "Mas alto",
+		lowest: "Mas bajo",
+		last: "Último",
+
+		section_up: "Subir el apartado",
+		section_down: "Bajar el apartado",
+		variable_up: "Subir la variable",
+		variable_down: "Bajar la variable",
+		remove_section: "Quitar este apartado",
+
+		please_select_variable: "Seleccione una variable",
+		no_partitions_available: "Ningúna partición disponible",
+
+		collection_site_list: "Lugares de colecta",
+		collection_form_list: "Formularios de colecta",
+		collection_input_list: "Entrada de datos",
+
+		collection_site: "Lugar de colecta",
+		collection_form: "Formulario de colecta",
+
+		collection_form_planning: "Calendario",
+		collection_form_structure: "Estructura",
+
+		remove_partition: "Quitar esta partición",
+
 		delete_form_easy: "¿Esta seguro que quiere suprimir este formulario de entrada?",
 		delete_form_hard: "Si suprime este formulario, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
 		delete_form_hard_answer: "Suprimir las {{num_inputs}} entradas",
@@ -191,27 +249,14 @@ var SPANISH_TRANSLATION = {
 		last_input: "Última entrada: ",
 
 		value: "Valor",
-		raw_data: "Datos en bruto",
-		planning: "Planificación",
-		indicators_computation: "Cálculo de los indicadores",
-		partition: "Partición",
-		additional_partition: "Partición adicional",
-		new_partition: "Añadir una partición",
+		activity: "Actividad",
+		activity_management: "Seguimiento de actividades",
+		partitions: "Particiónes",
 		variable: "Variable",
-		new_variable: "Añadir una variable",
 		section: "Apartado",
-		new_section: "Añadir un apartado",
-		see_partitions: "Ver las particiones selectionadas",
 
 		unknown: "Desconocido",
 		color: "Color",
-		red_for_target: "Rojo si el objetivo esta alcanzado a",
-		orange_for_target: "Naranja para objetivo entre {{value}}% y ",
-		green_for_target: "Verde para objetivo alcanzado a {{value}}%",
-		what_is_progress: "¿Qué es un \"objetivo alcanzado a 34%\"?",
-		what_is_progress_detail:
-			"Se pueden colorear unicamente los indicadores que informan su valor de base <strong>y</strong> objetivo.<br/>" + 
-			"Luego se compara proporcionalmente cada entrada entre esos dos valores.",
 
 		specs: "Especificaciones",
 		indicators_management: "Seguimiento de indicadores",
@@ -280,13 +325,13 @@ var SPANISH_TRANSLATION = {
 			month: 'Cada mes',
 			quarter: 'Cada trimestre',
 			year: 'Cada año',
+			planned: 'Planificado'
 		},
 		collects: {
 			entity: "Lugar de actividad",
 			project: "Proyecto"
 		},
 		
-		planned: 'Planificado',
 		add_intermediary: "Añadir una fecha",
 		intermediary_periods: "Fechas adicionales",
 
@@ -304,16 +349,10 @@ var SPANISH_TRANSLATION = {
 
 		relevance: 'Pertinencia',
 		relevance_ph: '¿Porqué quiere colectar este indicador?',
-		limits: 'Limites',
-		minimum_ph: 'minimo',
-		maximum_ph: 'maximo',
-		orange_zone: 'Zona Naranja',
-		green_zone: 'Zona Verde',
 		baseline: 'Valor de base',
 		baseline_ph: 'Valor de referencia',
 		target_ph: 'Valor del objetivo',
 		target: 'Objectivo',
-		add_target: 'Añadir un objetivo',
 		general_data: 'Datos generales',
 
 		goal: 'Objectivo global',
@@ -359,18 +398,23 @@ var SPANISH_TRANSLATION = {
 		you_are_not_owner: "No puede editar este proyecto",
 		you_are_not_editor: "No puede entrar indicadores en este proyecto",
 		
-		status_green: "Este indicador esta en zona verde",
-		status_orange: "Este indicador esta en zona naranja",
-		status_red: "Este indicador esta en zona roja",
-		status_unknown: "Este indicador esta fuera<br/>de los limites establecidos<br/>en el marco lógico",
-
 		formula: "Formula: {{name}}",
 		link: "Vínculo: {{name}}",
 		links: "Vínculos"
 	},
 	indicator: {
+
+		is_mandatory: "Obligatorio - Debe ser colectado por todos los proyectos de misma tématica",
+		is_optional: "Opcional - Puede o no ser colectado por proyecto de misma tématica",
+		is_forbidden: "Prohibido - Ne debe ser colectado en nuevos proyectos",
+
+		is_broad: "Aplicable en proyectos diferentes",
+		is_limited: "Aplicable sobre pocos proyectos, parecidos entre ellos",
+		is_single: "Aplicable unicamente a un proyecto en particular",
+
 		search: "Buscar",
 		search_ph: "Entre por lo menos 3 caracteres",
+		scope: "Perimetro",
 
 		standard: "Norma",
 		sources: "Origen",
@@ -427,55 +471,7 @@ var SPANISH_TRANSLATION = {
 		new_type_name: "Nombre del nuevo tipo",
 		new_theme_name: "Nombre de la nueva temática",
 		only_core: "Ver unicamente los indicadores recomendados",
-
-		is_mandatory: "Este indicador es obligatorio para esta temática",
-		is_recommended: "Este indicador proviene del catálogo temático",
-		is_common: "Este indicador es opcional",
-		is_forbidden: "Este indicador es histórico y esta prohibido de uso para nuevos proyectos",
 		is_external: "Este indicator viene de otra temática",
-
-		time_aggregation: "Agregación en el tiempo",
-		time_aggregation_sum: "Suma (por ejemplo: número de consultaciones, de nacimientos, ...)",
-		time_aggregation_average: "Promedia no ponderada (por ejemplo: poblaciones, número de medicos, de vehiculos...)",
-		time_aggregation_none: "No agregación directa posible (todas las tasas, porcentajes, indicadores calculados, ...)",
-
-		what_is_aggregation: "¿Como llenar estos campos?",
-		time_aggregation_help: [
-			"<strong>Ayuda a la entrada</strong>",
-			"<ul>",
-				"<li>",
-					"Si un hospital realiza 100 consultaciones en enero, febrero y marzo, habra realizado 300 en",
-					"el curso del primer trimestre del año. El modo de agregación del indicador <strong>\"Número de consultaciones\"</strong>",
-					"es <strong>\"suma\"</strong>",
-				"</li>",
-				"<li>",
-					"Si una zona quirúrgica tiene una tasa de mortalidad de 5% en enero, 7% en febrero y 10% en marzo, no se puede calcular",
-					"su tasa de mortalidad en el primer trimestre del año sin conocer el número de operaciones de cada mes.",
-					"El modo de agregación del indicador <strong>\"Tasa de mortalidad postoperatoria\"</strong> valdra <strong>\"No agregación directa posible\"</strong>",
-				"</li>",
-				"<li>",
-					"Si un pueblo tiene una población de 510 habitantes en enero, 600 en febrero y 550 en marzo, podemos decir que su población",
-					"en el primero trimestre del año vale 553. El modo de agregación del indicador <strong>\"Población\"</strong> es",
-					"<strong>\"Promedia no ponderada\"</strong>",
-				"</li>",
-			"</ul>"
-		].join(' '),
-
-		geo_aggregation: "Agregación geografica",
-		geo_aggregation_sum: "Suma (por ejemplo: población, número de medicos, de vehiculos disponibles, de consultaciones, de nacimientos, ...)",
-		geo_aggregation_average: "Promedia no ponderada (usar unicamente para indicadores que son promedios por lugar de actividad)",
-		geo_aggregation_none: "No agregación directa posible (todas las tasas, porcentajes, indicadores calculados, ...)",
-	},
-	login: {
-		error: "Usuario o contraseña inválido",
-		please_connect: "Conectese",
-		login: 'Usuario',
-		password: "Contraseña",
-		connect: "Conectar",
-		change_password_please: "Entre su nueva contraseña",
-		new_password: "Contraseña",
-		new_password_again: "Repita su contraseña",
-		change_password: "Cambiar"
 	},
 	form: {
 		mandatory: "Este campo es obligatorio",

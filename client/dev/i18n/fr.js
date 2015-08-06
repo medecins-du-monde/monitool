@@ -177,6 +177,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		actions: "Actions",
 		groups: "Groupes",
 		basics: "Données de base",
 		general: "Général",
@@ -222,7 +223,6 @@ var FRENCH_TRANSLATION = {
 		please_select_variable: "Selectionnez une variable",
 		no_partitions_available: "Pas de partitions disponibles",
 
-
 		collection_site_list: "Lieux de collecte",
 		collection_form_list: "Formulaires de collecte",
 		collection_input_list: "Saisie",
@@ -232,7 +232,6 @@ var FRENCH_TRANSLATION = {
 
 		collection_form_planning: "Planning de saisie",
 		collection_form_structure: "Structure du formulaire",
-		aggregation: "Agrégation",
 
 		remove_partition: "Supprimer la partition",
 
@@ -252,17 +251,9 @@ var FRENCH_TRANSLATION = {
 		value: "Valeur",
 		activity: "Activités",
 		activity_management: "Suivi des activités",
-		indicator_selection: "Selection des indicateurs",
-		planning: "Planning",
-		indicators_computation: "Calcul des indicateurs",
 		partitions: "Partitions",
-		new_partition_element: "Ajouter un element",
-		new_partition: "Ajouter une partition",
 		variable: "Variable",
-		new_variable: "Ajouter une variable",
 		section: "Section",
-		new_section: "Ajouter une section",
-		see_partitions: "Voir les partition selectionnées",
 
 		unknown: "Inconnu",
 		color: "Couleur",
@@ -327,7 +318,6 @@ var FRENCH_TRANSLATION = {
 		value_source: 'Source de la valeur',
 		input_mode: 'Mode de saisie',
 		manual_input: 'Saisies manuelles',
-		external_input: 'Applications externes',
 
 		periodicities: {
 			day: 'Tous les jours',
@@ -359,16 +349,10 @@ var FRENCH_TRANSLATION = {
 
 		relevance: 'Pertinence',
 		relevance_ph: 'Pourquoi collectez-vous cet indicateur?',
-		limits: 'Limites',
-		minimum_ph: 'minimum',
-		maximum_ph: 'maximum',
-		orange_zone: 'Zone Orange',
-		green_zone: 'Zone Verte',
 		baseline: 'Baseline',
 		baseline_ph: 'Valeur de référence',
 		target_ph: 'Valeur à atteindre',
 		target: 'Cible',
-		add_target: 'Ajouter une cible',
 		general_data: 'Données générales',
 
 		goal: 'Objectif général',
@@ -414,25 +398,11 @@ var FRENCH_TRANSLATION = {
 		you_are_not_owner: "Vous ne pouvez pas éditer ce projet",
 		you_are_not_editor: "Vous ne pouvez pas saisir sur ce projet",
 
-		status_green: "Cet indicateur est en zone verte",
-		status_orange: "Cet indicateur est en zone orange",
-		status_red: "Cet indicateur est en zone rouge",
-		status_unknown: "Cet indicateur est en dehors<br/>des limites fixées<br/>dans le cadre logique",
-
 		formula: "Formule: {{name}}",
 		link: "Lien: {{name}}",
 		links: "Liens"
 	},
 	indicator: {
-
-		// mandatory => Mandatory. Should be collected for all new projects of this thematic.
-		// optional  => Optional. Can be collected on new projects of this thematic.
-		// forbidden => Forbidden. Must not be collected on any new projects.
-
-		// broad_accredited => Applicable to different projects and accredited by an authority.
-		// broad_not_accredited => Applicable to different projects but not accredited.
-		// limited => Too narrow to be applicable to many projets.
-		// single => Can only be used for a specific project.
 
 		is_mandatory: "Obligatoire - Doit être collecté pour tous les projets de même thématique",
 		is_optional: "Optionnel - Peut-être collecté ou non sur les projets de même thématique",
@@ -502,27 +472,6 @@ var FRENCH_TRANSLATION = {
 		new_theme_name: "Nom de la nouvelle thématique",
 		only_core: "Ne voir que les indicateurs recommandés",
 		is_external: "Cet indicateur provient d'une autre thématique",
-	},
-
-	client: {
-		clients: "Application externes",
-		id: "Identifiant",
-		secret: "Secret",
-		name: "Nom de l'application",
-		num_tokens: "Nombre de délégations",
-		allowed_redirects: "Redirections autorisées"
-	},
-
-	login: {
-		error: "Identifiant ou mot de passe invalide",
-		please_connect: "Connectez-vous",
-		login: 'Identifiant',
-		password: "Mot de passe",
-		connect: "Me connecter",
-		change_password_please: "Entrez votre nouveau mot de passe",
-		new_password: "Mot de passe",
-		new_password_again: "Répétez le mot de passe",
-		change_password: "Changer mon mot de passe"
 	},
 	form: {
 		mandatory: "Ce champ est obligatoire",
