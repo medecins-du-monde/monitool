@@ -107,7 +107,9 @@ var ENGLISH_TRANSLATION = {
 		logical_frame: 'Logical Frame',
 		description: 'Description',
 		reporting: 'Reporting',
-		detailed_reporting: 'Detailed reporting',
+		reporting_general: 'General reporting',
+		reporting_by_indicator: 'By indicator reporting',
+		reporting_by_variable: 'By variable reporting',
 		reporting_analysis: 'Descriptive Analysis',
 		columns: "Columns",
 		colorize: 'Colorize',
@@ -355,12 +357,12 @@ var ENGLISH_TRANSLATION = {
 		target: 'Targets',
 		general_data: 'General data',
 
-		goal: 'Main goal',
-		goal_short: "Goal",
+		goal: 'General objective',
+		goal_short: "General objective",
 		intervention_logic: 'Description',
 		intervention_logic_goal_ph: 'Describe the project\'s contribution on a program or policy',
 		intervention_logic_purpose_ph: 'Describe the tangible advantages that are provided to the beneficiaries',
-		assumptions_purpose_ph: 'External factors that could jeopardize reaching the purpose',
+		assumptions_purpose_ph: 'External factors that could jeopardize reaching the specific objective',
 		purpose_short: 'Purpose',
 		output_short: 'Output',
 
@@ -369,16 +371,16 @@ var ENGLISH_TRANSLATION = {
 		name_ph: 'For Instance: [Laos] Primary health care',
 		add_indicator: 'Add an indicator',
 
-		purpose: 'Purpose',
-		purposes: 'Purposes',
+		purpose: 'Specific objective',
+		purposes: 'Specific objectives',
 		assumptions: 'Assumptions',
-		output: "Output",
+		output: "Result",
 		activity: 'Activity',
 		activities: 'Activities',
 		prerequisite: 'Prerequisite',
 		activity_prereq_ph: 'What are the prerequisites that have to be met before starting the activity?',
 		activity_desc_ph: 'Product or tangible service brought by the project',
-		output_assumptions_ph: 'External factors that could jeopardize reaching the output',
+		output_assumptions_ph: 'External factors that could jeopardize reaching the result',
 		output_desc_ph: 'Product or tangible service brought by the project',
 
 		add_activity: 'Add activity',
@@ -403,6 +405,9 @@ var ENGLISH_TRANSLATION = {
 		links: "Links"
 	},
 	indicator: {
+		classification: "Classification",
+		is_unchanged: "Button is locked because the form content did not change since last save.",
+		is_invalid: "Button is locked because the form is invalid. Did you fill all names and formulas?",
 
 		is_mandatory: "Mandatory. Should be collected for all new projects of this thematic.",
 		is_optional: "Optional. Can be collected on new projects of this thematic.",

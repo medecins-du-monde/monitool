@@ -72,7 +72,7 @@ angular
 			link: function($scope, element, attributes) {
 				var v = $scope.$eval(attributes.operation);
 				$scope.translationKey = 'indicator.is_' + v;
-				$scope.iconClass = {forbidden: 'fa-ban', common: 'fa-question', recommended: 'fa-book', mandatory: 'fa-asterisk'}[v];
+				$scope.iconClass = {forbidden: 'fa-ban', optional: 'fa-question', mandatory: 'fa-asterisk'}[v];
 			}
 		}
 	});

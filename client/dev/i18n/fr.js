@@ -107,7 +107,9 @@ var FRENCH_TRANSLATION = {
 		logical_frame: 'Cadre logique',
 		description: 'Description',
 		reporting: 'Statistiques',
-		detailed_reporting: 'Statistiques détaillées',
+		reporting_general: 'Statistiques générales',
+		reporting_by_indicator: 'Statistiques par indicateur',
+		reporting_by_variable: 'Statistiques par variable',
 		reporting_analysis: "Analyse descriptive",
 		columns: "Colonnes",
 		colorize: 'Colorer',
@@ -403,6 +405,9 @@ var FRENCH_TRANSLATION = {
 		links: "Liens"
 	},
 	indicator: {
+		classification: "Classification",
+		is_unchanged: "Le bouton est vérouillé car auncune modication n'a eu lieu",
+		is_invalid: "Le bouton est vérouillé car le formulaire est invalide. Avez-vous rempli les noms et les éléments de la formule?",
 
 		is_mandatory: "Obligatoire - Doit être collecté pour tous les projets de même thématique",
 		is_optional: "Optionnel - Peut-être collecté ou non sur les projets de même thématique",

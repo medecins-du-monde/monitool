@@ -7,7 +7,7 @@
 
 <form class="form-horizontal" role="form" name="indicatorForm" novalidate>
 	<fieldset>
-		<legend translate="indicator.metadata"></legend>
+		<legend translate="indicator.classification"></legend>
 
 		<div class="form-group">
 			<label for="input-themes" class="col-sm-2 control-label" translate="indicator.themes"></label>
@@ -73,11 +73,6 @@
 				<tr>
 					<th translate="indicator.operation"></th>
 					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.operation)|translate">
-						<!--
-							mandatory => Mandatory for all projects in the same thematic.
-							optional  => Can be collected on new projects.
-							forbidden => Forbidden. Cannot be collected on new projects.
-						-->
 						<select id="input-operation" class="form-control" ng-model="indicator.operation">
 							<option value="mandatory" translate="indicator.is_mandatory"></option>
 							<option value="optional" translate="indicator.is_optional"></option>
@@ -88,12 +83,6 @@
 				<tr>
 					<th translate="indicator.scope"></th>
 					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.scope)|translate">
-						<!--
-							broad_accredited => Applicable to different projects and accredited by an authority.
-							broad_not_accredited => Applicable to different projects but not accredited.
-							limited => Too narrow to be applicable to many projets.
-							single => Can only be used for a specific project.
-						-->
 						<select id="input-scope" class="form-control" ng-model="indicator.scope">
 							<option value="broad" translate="indicator.is_broad"></option>
 							<option value="limited" translate="indicator.is_limited"></option>
@@ -140,7 +129,11 @@
 	</fieldset>
 
 	<div class="pull-right" acl-has-role="indicator">
-		<a class="btn btn-primary" ng-disabled="indicatorForm.$invalid || isUnchanged()" ng-click="save()">
+		<a class="btn btn-primary"
+		   ng-disabled="indicatorForm.$invalid || isUnchanged()"
+		   tooltip="coucou"
+		   ng-click="save()">
+
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>
 		</a>

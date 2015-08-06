@@ -202,7 +202,7 @@ module.exports = {
 
 	set: function(newProject, callback) {
 		var removeInputs = function(mode, oldProject, newProject, removeFinishedCallback) {
-			var listName = {entity: 'inputEntities', form: 'dataCollection'}[mode];
+			var listName = {entity: 'entities', form: 'forms'}[mode];
 
 			var oldForms = oldProject[listName].map(function(f) { return f.id; }),
 				newForms = newProject[listName].map(function(f) { return f.id; }),
@@ -249,11 +249,11 @@ module.exports = {
 			return callback(errors);
 
 		// Check group ids
-		var entityIds = item.inputEntities.map(function(e) { return e.id; });
-		item.inputGroups.forEach(function(group) {
+		var entityIds = item.entities.map(function(e) { return e.id; });
+		item.groups.forEach(function(group) {
 			group.members.forEach(function(entityId) {
 				if (entityIds.indexOf(entityId) === -1)
-					errors.push({field: "inputGroups.members", message: entityId + ' is unknown.'});
+					errors.push({field: "groups.members", message: entityId + ' is unknown.'});
 			});
 		});
 

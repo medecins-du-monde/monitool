@@ -17,8 +17,8 @@ angular
 			link: function($scope) {
 				$scope.$watch('project', function(project) {
 					$scope.sources = [{id: null, name: "---", group: null}];
-					$scope.project.dataCollection.forEach(function(form) {
-						form.aggregatedData.forEach(function(section) {
+					$scope.project.forms.forEach(function(form) {
+						form.sections.forEach(function(section) {
 							section.elements.forEach(function(element) {
 								$scope.sources.push({id: element.id, name: element.name, group: section.name, element: element});
 							});
@@ -38,13 +38,13 @@ angular
 		 * Search a variable in a project.
 		 */
 		var findVariable = function(project, variableId) {
-			var numForms = project.dataCollection.length;
+			var numForms = project.forms.length;
 			for (var i = 0; i < numForms; ++i) {
-				var form = project.dataCollection[i],
-					numSections = form.aggregatedData.length;
+				var form = project.forms[i],
+					numSections = form.sections.length;
 
 				for (var j = 0; j < numSections; ++j) {
-					var section = form.aggregatedData[j],
+					var section = form.sections[j],
 						numElements = section.elements.length;
 
 					for (var k = 0; k < numElements; ++k)

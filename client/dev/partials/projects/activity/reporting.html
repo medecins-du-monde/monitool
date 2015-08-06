@@ -1,7 +1,7 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
-	<li class="active" translate="shared.reporting"></li>
+	<li class="active" translate="shared.reporting_general"></li>
 </ol>
 
 <doc-reminder pages="project.presentation_project,project.statistics"></doc-reminder>
@@ -79,10 +79,10 @@
 						<select class="form-control input-sm" id="filter-by-input" ng-model="filters.entityId">
 							<option value="">{{'project.full_project'|translate}}</option>
 							<optgroup label="{{'project.collection_site_list'|translate}}">
-								<option ng-repeat="entity in project.inputEntities" value="{{entity.id}}">{{entity.name}}</option>
+								<option ng-repeat="entity in project.entities" value="{{entity.id}}">{{entity.name}}</option>
 							</optgroup>
 							<optgroup label="{{'project.groups'|translate}}">
-								<option ng-repeat="group in project.inputGroups" value="{{group.id}}">{{group.name}}</option>
+								<option ng-repeat="group in project.groups" value="{{group.id}}">{{group.name}}</option>
 							</optgroup>
 						</select>
 					</div>

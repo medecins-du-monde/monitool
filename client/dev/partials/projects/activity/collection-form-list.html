@@ -19,10 +19,10 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-if="project.dataCollection.length == 0">
+		<tr ng-if="project.forms.length == 0">
 			<td colspan="7" style="text-align: center" translate="project.no_forms"></td>
 		</tr>
-		<tr ng-repeat="form in project.dataCollection">
+		<tr ng-repeat="form in project.forms">
 			<td>{{form.name}}</td>
 			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
 			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>

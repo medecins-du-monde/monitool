@@ -15,6 +15,14 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.types = types;
 		$scope.themes = themes;
 
+		// that's a bit hacky, we should us proper angular form validation.
+		$scope.lockedReason = function() {
+			if ($scope.isUnchanged())
+				return 'indicator.is_unchanged';
+			else
+				return 'indicator.is_invalid';
+		}
+
 		// Formula handlers
 		$scope.addFormula = function() {
 			$scope.indicator.formulas[makeUUID()] = {expression: '', parameters: {}};

@@ -18,10 +18,10 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-if="!project.inputEntities.length">
+			<tr ng-if="!project.entities.length">
 				<td colspan="2" style="text-align: center" translate="project.no_input_entities"></td>
 			</tr>
-			<tr ng-repeat="inputEntity in project.inputEntities track by inputEntity.id">
+			<tr ng-repeat="inputEntity in project.entities track by inputEntity.id">
 				<td acl-has-project-role="owner" acl-fallback="inputEntity.name">
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
@@ -35,10 +35,10 @@
 					</ng-form>
 				</td>
 				<td style="text-align: right" acl-has-project-role="owner">
-					<a class="btn btn-default btn-sm" ng-click="up($index, project.inputEntities)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
+					<a class="btn btn-default btn-sm" ng-click="up($index, project.entities)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
 						<i class="fa fa-caret-square-o-up"></i>
 					</a>
-					<a class="btn btn-default btn-sm" ng-click="down($index, project.inputEntities)" ng-if="!$last" tooltip="{{'shared.down'|translate}}">
+					<a class="btn btn-default btn-sm" ng-click="down($index, project.entities)" ng-if="!$last" tooltip="{{'shared.down'|translate}}">
 						<i class="fa fa-caret-square-o-down"></i>
 					</a>
 					<a class="btn btn-danger btn-sm" ng-click="deleteEntity(inputEntity.id)" tooltip="{{'shared.delete'|translate}}">
@@ -67,10 +67,10 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-if="!project.inputGroups.length">
+			<tr ng-if="!project.groups.length">
 				<td colspan="3" style="text-align: center" translate="project.no_input_groups"></td>
 			</tr>
-			<tr ng-repeat="inputGroup in project.inputGroups track by inputGroup.id">
+			<tr ng-repeat="inputGroup in project.groups track by inputGroup.id">
 				<td acl-has-project-role="owner" acl-fallback="inputGroup.name">
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
@@ -86,20 +86,20 @@
 				<td>
 					<ui-select multiple ng-model="inputGroup.members" theme="bootstrap" acl-has-project-role="owner">
 						<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
-						<ui-select-choices repeat="inputEntity.id as inputEntity in project.inputEntities">
+						<ui-select-choices repeat="inputEntity.id as inputEntity in project.entities">
 							{{inputEntity.name}}
 						</ui-select-choices>
 					</ui-select>
 
 					<span acl-lacks-project-role="owner">
-						{{inputGroup.members | getObjects:project.inputEntities | pluck:'name' | join:', '}}
+						{{inputGroup.members | getObjects:project.entities | pluck:'name' | join:', '}}
 					</span>
 				</td>
 				<td style="text-align: right" acl-has-project-role="owner">
-					<a class="btn btn-default btn-sm" ng-click="up($index, project.inputGroups)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
+					<a class="btn btn-default btn-sm" ng-click="up($index, project.groups)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
 						<i class="fa fa-caret-square-o-up"></i>
 					</a>
-					<a class="btn btn-default btn-sm" ng-click="down($index, project.inputGroups)" ng-if="!$last" tooltip="{{'shared.down'|translate}}">
+					<a class="btn btn-default btn-sm" ng-click="down($index, project.groups)" ng-if="!$last" tooltip="{{'shared.down'|translate}}">
 						<i class="fa fa-caret-square-o-down"></i>
 					</a>
 					<a class="btn btn-danger btn-sm" ng-click="deleteGroup(inputGroup.id)" tooltip="{{'shared.delete'|translate}}">

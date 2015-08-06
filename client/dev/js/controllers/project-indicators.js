@@ -186,7 +186,7 @@ angular.module('monitool.controllers.project.indicators', [])
 			delete $scope.project.indicators[indicatorId];
 
 			// Remove from all forms that have a reference to it.
-			$scope.project.dataCollection.forEach(function(form) {
+			$scope.project.forms.forEach(function(form) {
 				var numFields = form.fields.length;
 				for (var i = 0; i < numFields; ++i)
 					if (form.fields[i].indicatorId == indicatorId) {
@@ -232,7 +232,7 @@ angular.module('monitool.controllers.project.indicators', [])
 			// find a group that match the entityId.
 			var entityFilter = null;
 			if ($scope.filters.entityId) {
-				var group = $scope.project.inputGroups.find(function(g) { return g.id == $scope.filters.entityId; });
+				var group = $scope.project.groups.find(function(g) { return g.id == $scope.filters.entityId; });
 				entityFilter = group ? group.members : [$scope.filters.entityId];
 			}
 
@@ -280,7 +280,7 @@ angular.module('monitool.controllers.project.indicators', [])
 		});
 	})
 
-	.controller('ProjectDetailedReportingController', function($scope, inputs, mtReporting) {
+	.controller('ProjectDetailedReportingController', function($scope, $filter, inputs, mtReporting) {
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
 
@@ -327,23 +327,23 @@ angular.module('monitool.controllers.project.indicators', [])
 		};
 
 		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['inputs', 'groupBy', 'indicatorId'], function() {
+		$scope.$watchGroup(['inputs', 'groupBy', 'indicatorId', 'language'], function() {
 			var indicator = $scope.indicatorsById[$scope.indicatorId],
 				indicatorMeta = $scope.project.indicators[$scope.indicatorId],
 				reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy, indicator);
 
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end);
 			$scope.rows = [
-				makeRow($scope.project._id, 'All', $scope.cols, reporting, indicator, indicatorMeta, 0)
+				makeRow($scope.project._id, $filter('translate')('project.full_project'), $scope.cols, reporting, indicator, indicatorMeta, 0),
+				{ id: makeUUID(), type: "header", text: $filter('translate')('project.collection_site_list'), indent: 0 }
 			];
 
-			$scope.rows.push({ id: makeUUID(), type: "header", text: 'Entities', indent: 0 });
-			Array.prototype.push.apply($scope.rows, $scope.project.inputEntities.map(function(entity) {
+			Array.prototype.push.apply($scope.rows, $scope.project.entities.map(function(entity) {
 				return makeRow(entity.id, entity.name, $scope.cols, reporting, indicator, indicatorMeta, 1);
 			}));
 
-			$scope.rows.push({ id: makeUUID(), type: "header", text: 'Groups', indent: 0 });
-			Array.prototype.push.apply($scope.rows, $scope.project.inputGroups.map(function(group) {
+			$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.groups'), indent: 0 });
+			Array.prototype.push.apply($scope.rows, $scope.project.groups.map(function(group) {
 				return makeRow(group.id, group.name, $scope.cols, reporting, indicator, indicatorMeta, 1);
 			}));
 		});

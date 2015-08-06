@@ -9,9 +9,9 @@ var validate = validator({
 	"$schema": "http://json-schema.org/schema#",
 	"title": "Monitool indicator schema",
 	"type": "object",
-	"additionalProperties": false,
+	"additionalProperties": true,
 	"required": [
-		"_id", "type", "name", "unit", "types", "themes", "formulas"
+		// "_id", "type", "name", "unit", "types", "themes", "formulas"
 	],
 	"properties": {
 		"_id":  { "$ref": "#/definitions/uuid" },

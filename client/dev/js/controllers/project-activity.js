@@ -4,7 +4,7 @@ angular.module('monitool.controllers.project.activity', [])
 
 	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input, project) {
 		$scope.createEntity = function() {
-			$scope.project.inputEntities.push({id: makeUUID(), name: ''});
+			$scope.project.entities.push({id: makeUUID(), name: ''});
 		};
 
 		$scope.deleteEntity = function(entityId) {
@@ -17,8 +17,8 @@ angular.module('monitool.controllers.project.activity', [])
 
 				// If there are none, just confirm that the user wants to do this for real.
 				if (really) {
-					$scope.project.inputEntities = $scope.project.inputEntities.filter(function(e) { return e.id !== entityId; });
-					$scope.project.inputGroups.forEach(function(group) {
+					$scope.project.entities = $scope.project.entities.filter(function(e) { return e.id !== entityId; });
+					$scope.project.groups.forEach(function(group) {
 						var index = group.members.indexOf(entityId);
 						if (index !== -1)
 							group.members.splice(index, 1);
@@ -28,12 +28,13 @@ angular.module('monitool.controllers.project.activity', [])
 		};
 
 		$scope.createGroup = function() {
-			$scope.project.inputGroups.push({id: makeUUID(), name: '', members: []});
+			$scope.project.groups.push({id: makeUUID(), name: '', members: []});
 		};
 
 		$scope.deleteGroup = function(inputEntityId) {
-			$scope.project.inputGroups = 
-				$scope.project.inputGroups.filter(function(entity) { return entity.id !== inputEntityId; });
+			$scope.project.groups = $scope.project.groups.filter(function(entity) {
+				return entity.id !== inputEntityId;
+			});
 		};
 
 		$scope.up = function(index, array) {
@@ -55,7 +56,7 @@ angular.module('monitool.controllers.project.activity', [])
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.formUsage = formUsage;
-		$scope.formIndex = $scope.project.dataCollection.findIndex(function(f) {
+		$scope.formIndex = $scope.project.forms.findIndex(function(f) {
 			return f.id === form.id;
 		});
 
@@ -79,7 +80,7 @@ angular.module('monitool.controllers.project.activity', [])
 
 			// If there are none, just confirm that the user wants to do this for real.
 			if (really) {
-				$scope.project.dataCollection.splice($scope.formIndex, 1);
+				$scope.project.forms.splice($scope.formIndex, 1);
 				$scope.formIndex = -1;
 				$scope.$parent.save().then(function() {
 					$state.go('main.project.collection_form_list');
@@ -87,9 +88,9 @@ angular.module('monitool.controllers.project.activity', [])
 			}
 		};
 
-		$scope.$watch('form.aggregatedData', function(aggregatedData) {
+		$scope.$watch('form.sections', function(sections) {
 			$scope.maxPartitions = 0;
-			aggregatedData.forEach(function(section) {
+			sections.forEach(function(section) {
 				section.elements.forEach(function(element) {
 					$scope.maxPartitions = Math.max(element.partitions.length, $scope.maxPartitions);
 				});
@@ -120,39 +121,39 @@ angular.module('monitool.controllers.project.activity', [])
 			if (index == 0)
 				throw new Error();
 
-			var element = $scope.form.aggregatedData[index];
+			var element = $scope.form.sections[index];
 
-			$scope.form.aggregatedData[index] = $scope.form.aggregatedData[index - 1];
-			$scope.form.aggregatedData[index - 1] = element;
+			$scope.form.sections[index] = $scope.form.sections[index - 1];
+			$scope.form.sections[index - 1] = element;
 		};
 
 		$scope.downSection = function(index) {
-			if (index == $scope.form.aggregatedData.length - 1)
+			if (index == $scope.form.sections.length - 1)
 				throw new Error();
 
-			var element = $scope.form.aggregatedData[index];
-			$scope.form.aggregatedData[index] = $scope.form.aggregatedData[index + 1];
-			$scope.form.aggregatedData[index + 1] = element;
+			var element = $scope.form.sections[index];
+			$scope.form.sections[index] = $scope.form.sections[index + 1];
+			$scope.form.sections[index + 1] = element;
 		};
 
 		$scope.upElement = function(index, parentIndex) {
-			var element = $scope.form.aggregatedData[parentIndex].elements[index];
-			$scope.form.aggregatedData[parentIndex].elements.splice(index, 1);
+			var element = $scope.form.sections[parentIndex].elements[index];
+			$scope.form.sections[parentIndex].elements.splice(index, 1);
 
 			if (index == 0)
-				$scope.form.aggregatedData[parentIndex - 1].elements.push(element);
+				$scope.form.sections[parentIndex - 1].elements.push(element);
 			else
-				$scope.form.aggregatedData[parentIndex].elements.splice(index - 1, 0, element);
+				$scope.form.sections[parentIndex].elements.splice(index - 1, 0, element);
 		};
 
 		$scope.downElement = function(index, parentIndex) {
-			var element = $scope.form.aggregatedData[parentIndex].elements[index];
-			$scope.form.aggregatedData[parentIndex].elements.splice(index, 1);
+			var element = $scope.form.sections[parentIndex].elements[index];
+			$scope.form.sections[parentIndex].elements.splice(index, 1);
 
-			if ($scope.form.aggregatedData[parentIndex].elements.length == index)
-				$scope.form.aggregatedData[parentIndex + 1].elements.unshift(element);
+			if ($scope.form.sections[parentIndex].elements.length == index)
+				$scope.form.sections[parentIndex + 1].elements.unshift(element);
 			else
-				$scope.form.aggregatedData[parentIndex].elements.splice(index + 1, 0, element);
+				$scope.form.sections[parentIndex].elements.splice(index + 1, 0, element);
 		};
 
 		$scope.remove = function(item, target) {
@@ -167,11 +168,11 @@ angular.module('monitool.controllers.project.activity', [])
 		$scope.save = function() {
 			// replace or add the form in the project.
 			if ($scope.formIndex === -1) {
-				$scope.formIndex = $scope.project.dataCollection.length
-				$scope.project.dataCollection.push(angular.copy($scope.form));
+				$scope.formIndex = $scope.project.forms.length
+				$scope.project.forms.push(angular.copy($scope.form));
 			}
 			else
-				$scope.project.dataCollection[$scope.formIndex] = angular.copy($scope.form);
+				$scope.project.forms[$scope.formIndex] = angular.copy($scope.form);
 
 			// call ProjectMenuController save method.
 			return $scope.$parent.save().then(function() {
@@ -202,7 +203,7 @@ angular.module('monitool.controllers.project.activity', [])
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
 		$scope.previousInput = inputs.previous;
-		$scope.inputEntity   = $scope.project.inputEntities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
+		$scope.inputEntity   = $scope.project.entities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
 		$scope.save = function() {
 			$scope.currentInput.$save(function() { $state.go('main.project.collection_input_list'); });
@@ -238,7 +239,7 @@ angular.module('monitool.controllers.project.activity', [])
 			// find a group that match the entityId.
 			var entityFilter = null;
 			if ($scope.filters.entityId) {
-				var group = $scope.project.inputGroups.find(function(g) { return g.id == $scope.filters.entityId; });
+				var group = $scope.project.groups.find(function(g) { return g.id == $scope.filters.entityId; });
 				entityFilter = group ? group.members : [$scope.filters.entityId];
 			}
 
@@ -256,9 +257,9 @@ angular.module('monitool.controllers.project.activity', [])
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project)
 			$scope.rows = [];
 
-			$scope.project.dataCollection.forEach(function(form) {
+			$scope.project.forms.forEach(function(form) {
 				$scope.rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
-				form.aggregatedData.forEach(function(section) {
+				form.sections.forEach(function(section) {
 					$scope.rows.push({ id: section.id, type: "header", text: section.name, indent: 1 });
 					section.elements.forEach(function(variable) {
 						var row = {};
@@ -344,7 +345,7 @@ angular.module('monitool.controllers.project.activity', [])
 		$scope.plots = {};
 	})
 
-	.controller('ProjectActivityDetailedReportingController', function($scope, inputs, mtReporting) {
+	.controller('ProjectActivityDetailedReportingController', function($scope, $filter, inputs, mtReporting) {
 		// Create default filter so that all inputs are used.
 		$scope.filters = {};
 		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
@@ -372,7 +373,7 @@ angular.module('monitool.controllers.project.activity', [])
 			});
 		}, true);
 
-		$scope.planning = {variable: $scope.project.dataCollection[0].aggregatedData[0].elements[0].id, filter: []};
+		$scope.planning = {variable: $scope.project.forms[0].sections[0].elements[0].id, filter: []};
 
 		var makeRow = function(rowId, rowName, variableId, filters, reporting, indent) {
 			return {
@@ -398,19 +399,19 @@ angular.module('monitool.controllers.project.activity', [])
 		}
 
 		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['inputs', 'groupBy', 'planning.variable', 'planning.filter'], function() {
+		$scope.$watchGroup(['inputs', 'groupBy', 'planning.variable', 'planning.filter', 'language'], function() {
 			var reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy);
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
 			$scope.rows = [];
 
-			$scope.rows.push(makeRow($scope.project._id, "All", $scope.planning.variable, $scope.planning.filter, reporting, 0));
-			$scope.rows.push({ id: makeUUID(), type: "header", text: 'Entities', indent: 0 });
-			$scope.project.inputEntities.forEach(function(entity) {
+			$scope.rows.push(makeRow($scope.project._id, $filter('translate')('project.full_project'), $scope.planning.variable, $scope.planning.filter, reporting, 0));
+			$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.collection_site_list'), indent: 0 });
+			$scope.project.entities.forEach(function(entity) {
 				$scope.rows.push(makeRow(entity.id, entity.name, $scope.planning.variable, $scope.planning.filter, reporting, 1));
 			});
 
-			$scope.rows.push({ id: makeUUID(), type: "header", text: 'Groups', indent: 0 });
-			$scope.project.inputGroups.forEach(function(group) {
+			$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.groups'), indent: 0 });
+			$scope.project.groups.forEach(function(group) {
 				$scope.rows.push(makeRow(group.id, group.name, $scope.planning.variable, $scope.planning.filter, reporting, 1));
 			});
 		});

@@ -153,73 +153,149 @@ gulp.task('design-docs', function(callback) {
 
 
 gulp.task('update-database', function(callback) {
-	// request.get(config.couchdb.url + '/' + config.couchdb.bucket + '/_all_docs?include_docs=true', function(error, response, result) {
-	// 	var updates = [];
+	request.get(config.couchdb.url + '/' + config.couchdb.bucket + '/_all_docs?include_docs=true', function(error, response, result) {
+		var updates = [];
 
-	// 	JSON.parse(result).rows.forEach(function(row) {
-	// 		var doc = row.doc, update = false;
+		JSON.parse(result).rows.forEach(function(row) {
+			var doc = row.doc, update = false;
 
-	// 		if (doc.type === 'indicator') {
-	// 			if (doc.geoAggregation) {
-	// 				delete doc.geoAggregation;
-	// 				update = true;
-	// 			}
-	// 			if (doc.timeAggregation) {
-	// 				delete doc.timeAggregation;
-	// 				update = true;
-	// 			}
+			if (doc.type === 'project') {
+				if (doc.entities)
+					return;
 
-	// 			for (var formulaId in doc.formulas)
-	// 				for (var key in doc.formulas[formulaId].parameters) {
-	// 					if (doc.formulas[formulaId].parameters[key].timeAggregation) {
-	// 						delete doc.formulas[formulaId].parameters[key].timeAggregation;
-	// 						update = true;
-	// 					}
+				// rename entities, groups and forms
+				doc.entities = doc.inputEntities;
+				doc.groups = doc.inputGroups;
+				doc.forms = doc.dataCollection;
 
-	// 					if (doc.formulas[formulaId].parameters[key].geoAggregation) {
-	// 						delete doc.formulas[formulaId].parameters[key].geoAggregation;
-	// 						update = true;
-	// 					}
+				delete doc.inputEntities;
+				delete doc.inputGroups;
+				delete doc.dataCollection;
 
-	// 					if (doc.formulas[formulaId].parameters[key].name) {
-	// 						doc.formulas[formulaId].parameters[key].fr = doc.formulas[formulaId].parameters[key].name;
-	// 						doc.formulas[formulaId].parameters[key].es = doc.formulas[formulaId].parameters[key].name;
-	// 						doc.formulas[formulaId].parameters[key].en = doc.formulas[formulaId].parameters[key].name;
-	// 						delete doc.formulas[formulaId].parameters[key].name;
-	// 						update = true;
-	// 					}
-	// 				}
-	// 		}
-	// 		else if (doc.type == 'project')
-	// 			doc.dataCollection.forEach(function(form) {
-	// 				form.rawData.forEach(function(section) {
-	// 					section.elements.forEach(function(element) {
-	// 						if (!element.timeAgg) {
-	// 							element.timeAgg = 'sum';
-	// 							update = true;
-	// 						}
+				doc.forms.forEach(function(form) {
+					// rename sections
+					form.sections = form.rawData;
+					delete form.rawData;
 
-	// 						if (!element.geoAgg) {
-	// 							element.geoAgg = 'sum';
-	// 							update = true;
-	// 						}
-	// 					});
-	// 				});
-	// 			});
+					// rewrite partitions
+					form.sections.forEach(function(section) {
+						section.elements.forEach(function(element) {
+							element.partitions = [];
+							if (element.partition1.length)
+								element.partitions.push(element.partition1);
+							if (element.partition2.length)
+								element.partitions.push(element.partition2);
+							delete element.partition1;
+							delete element.partition2;
+						});
+					});
 
-	// 		if (update)
-	// 			updates.push(doc);
-	// 	});
+					// move indicator computation to the indicator meta in the root project.
+					form.fields.forEach(function(field) {
+						var indicatorMeta = doc.indicators[field.indicatorId];
+						if (field.type == 'formula') {
+							indicatorMeta.formula = field.formulaId;
+							indicatorMeta.parameters = {};
 
-	// 	console.log("Updated documents", updates.length);
+							for (var key in field.parameters) {
+								if (field.parameters[key].type === 'raw')
+									indicatorMeta.parameters[key] = {
+										variable: field.parameters[key].rawId,
+										filter: field.parameters[key].filter.map(function(filter) {
+											return Array.isArray(filter) ? filter.sort().join('.') : filter;
+										})
+									};
+								else if (field.parameters[key].type === 'zero')
+									indicatorMeta.parameters[key] = {variable: null, filter: []};
+								else
+									throw new Error('Invalid subfield type');
+							}
+						}
+						else if (field.type === 'raw') {
+							indicatorMeta.formula = null;
+							indicatorMeta.variable = field.rawId;
+							indicatorMeta.filter = field.filter.map(function(filter) {
+								return Array.isArray(filter) ? filter.sort().join('.') : filter;
+							});
+						}
+						else if (field.type === 'zero') {
+							indicatorMeta.formula = null;
+							indicatorMeta.variable = null;
+							indicatorMeta.filter = [];
+						}
+						else
+							throw new Error('Unexpected field type.');
+					});
 
-	// 	async.eachSeries(
-	// 		updates,
-	// 		function(doc, cb) {
-	// 			request({method: "PUT", url: config.couchdb.url + '/' + config.couchdb.bucket + '/' + doc._id, json: doc}, cb)
-	// 		},
-	// 		callback
-	// 	);
-	// });
+					delete form.fields;
+				});
+
+				// Remove custom coloring in indicatorMeta
+				for (var indicatorId in doc.indicators) {
+					delete doc.indicators[indicatorId].showRed;
+					delete doc.indicators[indicatorId].showYellow;
+				}
+			}
+			else if (doc.type === 'indicator') {
+				if (['forbidden', 'optional', 'mandatory'].indexOf(doc.operation) !== -1 && doc.scope)
+					return;
+
+				if (['forbidden', 'optional', 'mandatory'].indexOf(doc.operation) === -1)
+					doc.operation = 'optional';
+
+				if (!doc.scope)
+					doc.scope = 'broad';
+			}
+			else if (doc.type === 'input') {
+				var updated = false;
+
+				var values = {};
+				for (var elementId in doc.values) {
+					if (elementId === 'sum')
+						continue;
+					else if (typeof doc.values[elementId] === 'number')
+						values[elementId] = doc.values[elementId];
+					else {
+						updated = true;
+						for (var p1 in doc.values[elementId]) {
+							if (p1 === 'sum')
+								continue;
+							else if (typeof doc.values[elementId][p1] === 'number')
+								values[elementId + '.' + p1] = doc.values[elementId][p1];
+							else {
+								for (var p2 in doc.values[elementId][p1]) {
+									if (p2 === 'sum')
+										continue;
+									else
+										values[elementId + '.' + [p1, p2].sort().join('.')] = doc.values[elementId][p1][p2];
+								}
+							}
+						}
+					}
+				}
+
+				doc.values = values;
+
+				if (!updated)
+					return;
+			}
+			else
+				return
+
+			updates.push(doc);
+		});
+
+		console.log("Updated documents", updates.length);
+		// console.log(updates)
+
+		async.eachLimit(
+			updates,
+			4,
+			function(doc, cb) {
+				request({method: "PUT", url: config.couchdb.url + '/' + config.couchdb.bucket + '/' + doc._id, json: doc}, cb)
+			},
+			callback
+		);
+	});
 });
 

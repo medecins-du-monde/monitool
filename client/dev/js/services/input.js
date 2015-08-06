@@ -74,11 +74,11 @@ angular.module('monitool.services.models.input', [])
 				var displayedInputs = []
 
 				// iterate on all inputs that should exist according to the project forms (and current date).
-				project.dataCollection.forEach(function(form) {
+				project.forms.forEach(function(form) {
 					_getPeriods(form, project).forEach(function(period) {
 						var inputEntities;
 						if (form.collect === 'entity')
-							inputEntities = project.inputEntities;
+							inputEntities = project.entities;
 						else if (form.collect === 'project')
 							inputEntities = [{id: "none"}];
 						else
@@ -106,9 +106,9 @@ angular.module('monitool.services.models.input', [])
 						filled: 'invalid',
 						period: moment(parts[3], 'YYYY-MM-DD'),
 						formId: parts[2],
-						formName: project.dataCollection.find(function(form) { return form.id === parts[2]; }).name,
+						formName: project.forms.find(function(form) { return form.id === parts[2]; }).name,
 						inputEntityId: parts[1],
-						inputEntityName: parts[1] == 'none' ? undefined : project.inputEntities.find(function(entity) { return entity.id === parts[1]; }).name
+						inputEntityName: parts[1] == 'none' ? undefined : project.entities.find(function(entity) { return entity.id === parts[1]; }).name
 					});
 				});
 
@@ -154,7 +154,7 @@ angular.module('monitool.services.models.input', [])
 			// Index forms by their uuid.
 			var formsById = {};
 			projects.forEach(function(project) {
-				project.dataCollection.forEach(function(form) {
+				project.forms.forEach(function(form) {
 					formsById[form.id] = form;
 				});
 			});
@@ -224,7 +224,7 @@ angular.module('monitool.services.models.input', [])
 
 			// Index form elements by id so that we can check everything faster.
 			var elementsById = {};
-			form.aggregatedData.forEach(function(section) {
+			form.sections.forEach(function(section) {
 				section.elements.forEach(function(element) {
 					elementsById[element.id] = element;
 				});

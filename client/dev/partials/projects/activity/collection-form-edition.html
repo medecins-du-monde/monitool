@@ -163,7 +163,7 @@
 				<th colspan="2" translate="project.actions"></th>
 			</tr>
 		</thead>
-		<tbody ng-repeat="section in form.aggregatedData track by section.id">
+		<tbody ng-repeat="section in form.sections track by section.id">
 
 			<!-- variable row -->
 			<tr ng-repeat="element in section.elements track by element.id">
@@ -276,7 +276,7 @@
 
 						<i class="fa fa-caret-square-o-down"></i>
 					</a>
-					<a ng-click="remove(section, form.aggregatedData)"
+					<a ng-click="remove(section, form.sections)"
 					   tooltip="{{'project.remove_section'|translate}}">
 						<i class="fa fa-times" style="color: red"></i>
 					</a>
@@ -302,7 +302,7 @@
 					<a ng-click="downSection($index)" tooltip="{{'project.section_down'|translate}}" ng-if="!$last">
 						<i class="fa fa-caret-square-o-down"></i>
 					</a>
-					<a ng-click="remove(section, form.aggregatedData)" tooltip="{{'project.remove_section'|translate}}">
+					<a ng-click="remove(section, form.sections)" tooltip="{{'project.remove_section'|translate}}">
 						<i class="fa fa-times" style="color: red"></i>
 					</a>
 				</td>
@@ -311,7 +311,7 @@
 		<tbody acl-has-project-role="owner">
 			<tr>
 				<td colspan="{{maxPartitions + 6}}" style="text-align: center">
-					<a ng-click="newSection(form.aggregatedData)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_section"></a>
+					<a ng-click="newSection(form.sections)" class="btn btn-xs btn-default" style="width: 100%" translate="project.new_section"></a>
 				</td>
 			</tr>
 		</tbody>

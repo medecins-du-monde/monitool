@@ -54,7 +54,7 @@ angular.module('monitool.services.reporting', [])
 
 			var newInput = Input.makeFake(form);
 
-			form.aggregatedData.forEach(function(section) {
+			form.sections.forEach(function(section) {
 				section.elements.forEach(function(element) {
 					var elementMode = element[mode], values;
 
@@ -100,7 +100,7 @@ angular.module('monitool.services.reporting', [])
 			var result = {};
 
 			for (var formId in inputsByFormEntity) {
-				var form = project.dataCollection.find(function(f) { return f.id === formId; });
+				var form = project.forms.find(function(f) { return f.id === formId; });
 
 				// group by time first, and then by geo.
 				for (var entityId in inputsByFormEntity[formId])
@@ -207,7 +207,7 @@ angular.module('monitool.services.reporting', [])
 
 				for (var inputId = 0; inputId < numInputs; ++inputId) {
 					var input = inputs[inputId],
-						aggregationKeys = input.getAggregationKeys(currentGroupBy, project.inputGroups),
+						aggregationKeys = input.getAggregationKeys(currentGroupBy, project.groups),
 						numAggregationKeys = aggregationKeys.length;
 
 					for (var j = 0; j < numAggregationKeys; ++j) {
@@ -230,7 +230,7 @@ angular.module('monitool.services.reporting', [])
 			var type;
 			if (!entityId)
 				type = 'project';
-			else if (project.inputGroups.find(function(g) { return g.id === entityId }))
+			else if (project.groups.find(function(g) { return g.id === entityId }))
 				type = 'group';
 			else
 				type = 'entity';
@@ -254,23 +254,23 @@ angular.module('monitool.services.reporting', [])
 			}
 			else if (groupBy === 'entity') {
 				if (type === 'project')
-					return project.inputEntities.concat([{id:'total',name:'Total'}]);
+					return project.entities.concat([{id:'total',name:'Total'}]);
 				else if (type === 'entity')
-					return project.inputEntities.filter(function(e) { return e.id === entityId })
+					return project.entities.filter(function(e) { return e.id === entityId })
 												.concat([{id:'total',name:'Total'}]);
 				else  if (type === 'group') {
-					var group = project.inputGroups.find(function(g) { return g.id === entityId });
-					return project.inputEntities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
+					var group = project.groups.find(function(g) { return g.id === entityId });
+					return project.entities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
 												.concat([{id:'total',name:'Total'}]);
 				}
 			}
 			else if (groupBy === 'group') {
 				if (type === 'project')
-					return project.inputGroups;
+					return project.groups;
 				else if (type === 'entity')
-					return project.inputGroups.filter(function(g) { return g.members.indexOf(entityId) !== -1 });
+					return project.groups.filter(function(g) { return g.members.indexOf(entityId) !== -1 });
 				else if (type === 'group')
-					return project.inputGroups.filter(function(g) { return g.id === entityId });
+					return project.groups.filter(function(g) { return g.id === entityId });
 			}
 			else
 				throw new Error('Invalid groupBy: ' + groupBy)

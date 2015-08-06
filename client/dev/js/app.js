@@ -326,10 +326,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						end: project.end,
 						intermediaryDates: [],
 						active: true,
-						aggregatedData: []
+						sections: []
 					};
 				else
-					return project.dataCollection.find(function(form) {
+					return project.forms.find(function(form) {
 						return form.id == $stateParams.formId;
 					});
 			},
@@ -356,11 +356,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectCollectionInputEditionController',
 		resolve: {
 			inputs: function(Input, $stateParams, project) {
-				var form = project.dataCollection.find(function(f) { return f.id == $stateParams.formId});
+				var form = project.forms.find(function(f) { return f.id == $stateParams.formId});
 				return Input.fetchLasts($stateParams.projectId, $stateParams.entityId, form, $stateParams.period);
 			},
 			form: function($stateParams, project) {
-				return project.dataCollection.find(function(form) { return form.id == $stateParams.formId; });
+				return project.forms.find(function(form) { return form.id == $stateParams.formId; });
 			}
 		}
 	});

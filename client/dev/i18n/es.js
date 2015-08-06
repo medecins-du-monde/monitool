@@ -107,7 +107,10 @@ var SPANISH_TRANSLATION = {
 		logical_frame: 'Marco lógico',
 		description: 'Descripción',
 		reporting: 'Estadísticas',
-		detailed_reporting: 'Estadísticas detalladas',
+		reporting_general: 'Estadísticas generales',
+		reporting_by_indicator: 'Estadísticas por indicador',
+		reporting_by_variable: 'Estadísticas por variable',
+		reporting_analysis: "Analyse descriptive",
 		reporting_analysis: "Análisis descriptivo",
 		columns: "Columnas",
 		colorize: 'Colorear',
@@ -403,6 +406,9 @@ var SPANISH_TRANSLATION = {
 		links: "Vínculos"
 	},
 	indicator: {
+		classification: "Clasificación",
+		is_unchanged: "Ningun dato ha cambiado desde la última vez que ha salvado.",
+		is_invalid: "El formulario no es valido. ¿ha rellenado todos los nombre y elementos en las formulas?",
 
 		is_mandatory: "Obligatorio - Debe ser colectado por todos los proyectos de misma tématica",
 		is_optional: "Opcional - Puede o no ser colectado por proyecto de misma tématica",
