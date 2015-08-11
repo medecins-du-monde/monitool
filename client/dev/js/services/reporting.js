@@ -149,11 +149,11 @@ angular.module('monitool.services.reporting', [])
 				}
 				catch (e) {
 					console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope));
-					return undefined;
+					return 'INVALID_FORMULA';
 				}
 			}
 			// if the indicator can be directly taken from the activity report.
-			else {
+			else if (indicatorMeta.variable) {
 				// just extract the value.
 				var numFilters = indicatorMeta.filter.length;
 
@@ -166,6 +166,9 @@ angular.module('monitool.services.reporting', [])
 					return accumulator;
 				}
 			}
+			// There is nothing. We don't know how to compute.
+			else
+				return 'MISSING_DEFINITION';
 		}
 
 
@@ -185,8 +188,8 @@ angular.module('monitool.services.reporting', [])
 				var result = _groupInputs(project, inputs);
 
 				// if indicator definitions are available, compute them.
-				if (indicatorsById) {
-					for (var indicatorId in project.indicators) {
+				for (var indicatorId in project.indicators) {
+					if (indicatorsById && indicatorsById[indicatorId]) {
 						var indicator = indicatorsById[indicatorId],
 							indicatorMeta = project.indicators[indicatorId];
 

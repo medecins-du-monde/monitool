@@ -330,7 +330,7 @@ angular.module('monitool.controllers.project.indicators', [])
 		$scope.$watchGroup(['inputs', 'groupBy', 'indicatorId', 'language'], function() {
 			var indicator = $scope.indicatorsById[$scope.indicatorId],
 				indicatorMeta = $scope.project.indicators[$scope.indicatorId],
-				reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy, indicator);
+				reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy, $scope.indicatorsById);
 
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end);
 			$scope.rows = [
