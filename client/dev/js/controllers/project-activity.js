@@ -194,7 +194,18 @@ angular.module('monitool.controllers.project.activity', [])
 		$scope.finishedInputs = inputs.filter(function(i) { return i.filled == 'yes'; });
 		$scope.waitingInputs = inputs.filter(function(i) { return i.filled == 'no'; });
 		$scope.invalidInputs = inputs.filter(function(i) { return i.filled == 'invalid'; });
-		$scope.inputs = $scope.waitingInputs;
+
+		// if admin or entry operator, display waiting inputs.
+		if ($scope.project.dataEntryOperators.indexOf($scope.userCtx._id) !== -1 ||
+			$scope.userCtx.roles.indexOf('_admin') !== -1) {
+
+			$scope.inputs = $scope.waitingInputs;
+			$scope.showWaiting = true;
+		}
+		else {
+			$scope.inputs = $scope.finishedInputs;
+			$scope.showWaiting = false;
+		}
 	})
 
 

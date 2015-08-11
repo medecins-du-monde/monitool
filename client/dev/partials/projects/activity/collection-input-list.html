@@ -7,7 +7,7 @@
 <doc-reminder pages="project.presentation_project,project.input_forms,project.change_definition,project.inputs"></doc-reminder>
 
 <ul class="nav nav-tabs" role="tablist">
-	<li ng-class="{active:inputs==waitingInputs}">
+	<li ng-class="{active:inputs==waitingInputs}" ng-show="showWaiting">
 		<a ng-click="inputs=waitingInputs">{{'project.waiting_inputs'|translate}}</a>
 	</li>
 	<li ng-class="{active:inputs==finishedInputs}">
