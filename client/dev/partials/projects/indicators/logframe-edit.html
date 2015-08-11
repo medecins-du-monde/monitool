@@ -181,7 +181,7 @@
 								<div class="form-group">
 									<label class="col-sm-2 control-label" translate="project.activities"></label>
 									<div class="col-sm-10">
-										<div class="input-group" style="margin-bottom: 5px; " ng-repeat="activity in output.activities">
+										<div class="input-group" style="margin-bottom: 5px;" ng-repeat="activity in output.activities" acl-has-project-role="owner" acl-fallback="activity.description">
 											<input type="text"
 												   class="form-control"
 												   name="activity"
@@ -189,11 +189,11 @@
 												   ng-model="activity.description"/>
 
 											<span class="input-group-btn">
-												<a class="btn btn-danger ng-scope" ng-click="removeActivity(activity, output)" translate="shared.remove">Retirer</a>
+												<a class="btn btn-danger" ng-click="removeActivity(activity, output)" translate="shared.remove">Retirer</a>
 											</span>
 										</div>
 
-										<p acl-has-project-role="owner" class="form-control-static">
+										<p class="form-control-static" acl-has-project-role="owner">
 											<a ng-click="addActivity(output)" translate="project.add_activity"></a>
 										</p>
 									</div>

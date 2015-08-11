@@ -8,7 +8,13 @@
 
 function _makeReadOnly(scope, element, attributes) {
 	// replace by raw text
-	if (attributes.aclFallback) {
+	if (attributes.mtContentEditable !== undefined || attributes.contenteditable !== undefined) {
+		element.removeAttr('mt-content-editable');
+		element.removeAttr('contenteditable');
+		element.removeAttr('ng-model')
+	}
+	
+	else if (attributes.aclFallback) {
 		var fallback = scope.$eval(attributes.aclFallback) || '';
 
 		// handle boolean and dates case.
@@ -27,6 +33,7 @@ function _makeReadOnly(scope, element, attributes) {
 
 		element.html(fallback.toString());
 	}
+	// Just remove editable properties
 	else {
 		element.remove();
 	}

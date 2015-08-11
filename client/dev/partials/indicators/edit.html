@@ -48,25 +48,29 @@
 			<tbody>
 				<tr>
 					<th translate="shared.name"></th>
-					<td ng-repeat="(code, language) in languages">
-						<textarea class="form-control" name="someName" required ng-model="indicator.name[code]" placeholder="{{translations[code].indicator.name_ph}}"></textarea>
+					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator.name[code]|nl2br">
+ 						<textarea class="form-control"
+								  name="someName"
+								  required
+								  ng-model="indicator.name[code]"
+								  placeholder="{{translations[code].indicator.name_ph}}"></textarea>
 					</td>
 				</tr>
 				<tr>
 					<th translate="indicator.standard"></th>
-					<td ng-repeat="(code, language) in languages">
+					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator.standard[code]|nl2br">
 						<textarea class="form-control" ng-model="indicator.standard[code]" placeholder="{{translations[code].indicator.standard_ph}}"></textarea>
 					</td>
 				</tr>
 				<tr>
 					<th translate="indicator.sources"></th>
-					<td ng-repeat="(code, language) in languages">
+					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator.sources[code]|nl2br">
 						<textarea class="form-control" ng-model="indicator.sources[code]" placeholder="{{translations[code].indicator.sources_ph}}"></textarea>
 					</td>
 				</tr>
 				<tr>
 					<th translate="indicator.comments"></th>
-					<td ng-repeat="(code, language) in languages">
+					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator.comments[code]|nl2br">
 						<textarea class="form-control" ng-model="indicator.comments[code]" placeholder="{{translations[code].indicator.comments_ph}}"></textarea>
 					</td>
 				</tr>

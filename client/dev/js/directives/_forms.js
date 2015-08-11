@@ -81,6 +81,8 @@ angular.module('monitool.directives.form', [])
 			link: function($scope, element, attributes, controller) {
 				element.attr('contenteditable', true);
 
+				console.log('content editable')
+
 				// view -> model
 				element.on('blur', function() {
 					$scope.$apply(function() {

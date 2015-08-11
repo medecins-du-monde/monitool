@@ -48,3 +48,8 @@ angular.module('monitool.filters.shared', [])
 		}
 	})
 
+	.filter('nl2br', function() {
+		return function(str) {
+			return str.replace(/\n/g, "<br/>");
+		};
+	})

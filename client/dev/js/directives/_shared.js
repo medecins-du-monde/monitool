@@ -79,4 +79,3 @@ angular.module('monitool.directives.shared', [])
 			}
 		}
 	})
-

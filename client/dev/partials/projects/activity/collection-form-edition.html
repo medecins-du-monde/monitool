@@ -9,7 +9,8 @@
 
 <div class="alert alert-danger noprint"
 	 ng-if="formUsage.length"
-	 ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}">
+	 ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}"
+	 acl-has-project-role="owner">
 </div>
 
 <form class="form-horizontal" role="form" name="formForm" novalidate>
@@ -160,7 +161,7 @@
 				<th translate="project.variable"></th>
 				<th translate="project.aggregation"></th>
 				<th translate="project.partitions" colspan="{{maxPartitions + 1}}"></th>
-				<th colspan="2" translate="project.actions"></th>
+				<th colspan="2" translate="project.actions" acl-has-project-role="owner"></th>
 			</tr>
 		</thead>
 		<tbody ng-repeat="section in form.sections track by section.id">
@@ -171,30 +172,22 @@
 				<!-- section name (only if first variable of section) -->
 				<td rowspan="{{section.elements.length + 1}}"
 					ng-if="$first"
+					mt-content-editable
 					acl-has-project-role="owner"
 					acl-fallback="section.name"
-					mt-content-editable ng-model="section.name"></td>
+					ng-model="section.name"></td>
 
 				<!-- variable name -->
 				<td acl-has-project-role="owner"
 					acl-fallback="element.name"
 					mt-content-editable
+					acl-project-has-role="owner"
 					ng-model="element.name"></td>
 				
 				<!-- variable aggregation -->
 				<td>
-					{{'project.different_geos'|translate}}<br/>
-					<select ng-model="element.geoAgg">
-						<option value="none" translate="project.none"></option>
-						<option value="sum" translate="project.sum"></option>
-						<option value="average" translate="project.average"></option>
-						<option value="highest" translate="project.highest"></option>
-						<option value="lowest" translate="project.lowest"></option>
-						<option value="last" translate="project.last"></option>
-					</select><br/>
-
-					{{'project.same_geos'|translate}}<br/>
-					<select ng-model="element.timeAgg">
+					{{'project.different_geos'|translate}}:
+					<select ng-model="element.geoAgg" acl-has-project-role="owner">
 						<option value="none" translate="project.none"></option>
 						<option value="sum" translate="project.sum"></option>
 						<option value="average" translate="project.average"></option>
@@ -202,11 +195,25 @@
 						<option value="lowest" translate="project.lowest"></option>
 						<option value="last" translate="project.last"></option>
 					</select>
+					<span acl-lacks-project-role="owner">{{'project.' + element.geoAgg | translate}}</span>
+
+					<br/>
+
+					{{'project.same_geos'|translate}}:
+					<select ng-model="element.timeAgg" acl-has-project-role="owner">
+						<option value="none" translate="project.none"></option>
+						<option value="sum" translate="project.sum"></option>
+						<option value="average" translate="project.average"></option>
+						<option value="highest" translate="project.highest"></option>
+						<option value="lowest" translate="project.lowest"></option>
+						<option value="last" translate="project.last"></option>
+					</select>
+					<span acl-lacks-project-role="owner">{{'project.' + element.timeAgg | translate}}</span>
 				</td>
 
 				<!-- variable partitions -->
 				<td ng-repeat="partition in element.partitions">
-					<div class="input-group" ng-repeat="p in partition track by p.id" style="margin-bottom: 2px;">
+					<div class="input-group" ng-repeat="p in partition track by p.id" style="margin-bottom: 2px;" acl-has-project-role="owner" acl-fallback="p.name">
 						<input class="form-control input-xs" ng-model="p.name" required>
 						<span class="input-group-addon">
 							<i ng-click="remove(p, partition)"
@@ -230,7 +237,7 @@
 						   translate="project.remove_partition"></div>
 					</div>
 				</td>
-				<td>
+				<td acl-has-project-role="owner">
 					<a ng-click="newPartition(element.partitions)"
 					   class="btn btn-xs btn-default btn-block"
 					   translate="project.add_partition"></a>
@@ -243,7 +250,7 @@
 				<!-- /!\  -->
 
 				<!-- variable actions -->
-				<td>
+				<td acl-has-project-role="owner">
 					<a ng-click="upElement($index, $parent.$parent.$index)"
 					   tooltip="{{'project.variable_up'|translate}}"
 					   ng-if="!$parent.$first || !$first">
@@ -263,7 +270,10 @@
 				</td>
 	
 				<!-- section actions (only if first variable) -->
-				<td rowspan="{{section.elements.length + 1}}" ng-if="$first" acl-has-project-role="owner" acl-fallback="section.name">
+				<td rowspan="{{section.elements.length + 1}}"
+					ng-if="$first"
+					acl-has-project-role="owner">
+
 					<a ng-click="upSection($parent.$parent.$index)"
 					   tooltip="{{'project.section_up'|translate}}"
 					   ng-if="!$parent.$parent.$first">
@@ -286,15 +296,16 @@
 
  			<!-- add new variable row. If section is empty, also contain section form elements --> 
 			<tr acl-has-project-role="owner">
-				<td ng-if="section.elements.length === 0">
-					<span mt-content-editable ng-model="section.name"></span>
-				</td>
+				
+				<td ng-if="section.elements.length === 0" mt-content-editable acl-project-has-role="owner" ng-model="section.name"></td>
+
 				<td colspan="{{maxPartitions + 4}}" style="text-align: center">
 					<a ng-click="newVariable(section.elements)"
 					   class="btn btn-xs btn-default" 
 					   style="width: 100%"
 					   translate="project.new_variable"></a>
 				</td>
+
 				<td ng-if="section.elements.length === 0">
 					<a ng-click="upSection($index)" tooltip="{{'project.section_up'|translate}}" ng-if="!$first">
 						<i class="fa fa-caret-square-o-up"></i>
