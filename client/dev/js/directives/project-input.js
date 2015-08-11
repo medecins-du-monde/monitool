@@ -8,7 +8,8 @@ angular.module('monitool.directives.projectInput', [])
 			scope: {
 				variable: '=',
 				data: '=',
-				oldData: '='
+				oldData: '=',
+				project: '='
 			},
 			templateUrl: "partials/projects/activity/_input_grid.html",
 

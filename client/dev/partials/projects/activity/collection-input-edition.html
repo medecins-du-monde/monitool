@@ -29,7 +29,11 @@
 					</div>
 
 					<div ng-if="variable.partitions.length > 0">
-						<input-grid variable="variable" data="currentInput.values" old-data="previousInput.values" />
+						<input-grid 
+							variable="variable"
+							data="currentInput.values"
+							old-data="previousInput.values"
+							project="project" />
 					</div>
 
 				</div>

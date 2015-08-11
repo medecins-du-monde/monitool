@@ -33,10 +33,10 @@ function _makeReadOnly(scope, element, attributes) {
 };
 
 angular.module('monitool.directives.acl', [])
-	.directive('aclHasRole', function() {
+	.directive('aclHasRole', function($rootScope) {
 		return {
 			link: function(scope, element, attributes) {
-				var unwatch = scope.$watch('userCtx', function(userCtx) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
 					if (!userCtx)
 						return;
 
@@ -51,10 +51,10 @@ angular.module('monitool.directives.acl', [])
 			}
 		}
 	})
-	.directive('aclHasProjectRole', function() {
+	.directive('aclHasProjectRole', function($rootScope) {
 		return {
 			link: function(scope, element, attributes) {
-				var unwatch = scope.$watch('userCtx', function(userCtx) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
 					if (!userCtx)
 						return;
 
@@ -78,10 +78,10 @@ angular.module('monitool.directives.acl', [])
 			}
 		}
 	})
-	.directive('aclLacksRole', function() {
+	.directive('aclLacksRole', function($rootScope) {
 		return {
 			link: function(scope, element, attributes) {
-				var unwatch = scope.$watch('userCtx', function(userCtx) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
 					if (!userCtx)
 						return;
 
@@ -96,10 +96,10 @@ angular.module('monitool.directives.acl', [])
 			}
 		}
 	})
-	.directive('aclLacksProjectRole', function() {
+	.directive('aclLacksProjectRole', function($rootScope) {
 		return {
 			link: function(scope, element, attributes) {
-				var unwatch = scope.$watch('userCtx', function(userCtx) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
 					if (!userCtx)
 						return;
 

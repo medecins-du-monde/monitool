@@ -23,7 +23,10 @@
 				{{headerCol.name}}
 			</th>
 			
-			<td ng-repeat="dataCol in row.dataCols">
+			<td ng-repeat="dataCol in row.dataCols"
+				acl-has-project-role="input"
+				acl-fallback="data[variable.id + '.' + dataCol]">
+
 				<input type="number"
 					class="form-control input-sm"
 					ng-model="data[variable.id + '.' + dataCol]"
