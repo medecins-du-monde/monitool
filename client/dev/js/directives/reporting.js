@@ -117,6 +117,7 @@ angular.module('monitool.directives.reporting', [])
 				$scope.$watch('col', function(value) {
 
 					if (typeof value === "string" || Number.isNaN(value)) {
+						// element.html('<span style="font-size: 6px">' + value + '</span>');
 						element.html('<i class="fa fa-ban"></i>');
 						element.css('background-color', '');
 					}

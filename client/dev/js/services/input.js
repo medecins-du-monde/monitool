@@ -274,11 +274,19 @@ angular.module('monitool.services.models.input', [])
 				for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
 					// Build subset key
 					var subsetKey = variableId;
-					for (var partitionIndex = 0; partitionIndex < numElements; ++partitionIndex)
+					for (var partitionIndex = 0; partitionIndex < numElements; ++partitionIndex) {
 						if (subsetIndex & (1 << partitionIndex))
 							subsetKey += '.' + parts[partitionIndex];
+					}
 
 					result[subsetKey] = result[subsetKey] || 0; // initialize if needed
+
+					// handle CANNOT_AGGREGATE.
+					if (typeof this.values[key] !== 'number') {
+						result[subsetKey] = this.values[key];
+						break;
+					}
+
 					result[subsetKey] += this.values[key];
 				}
 			}

@@ -12,16 +12,13 @@ angular.module('monitool.services.reporting', [])
 		 * mode is none, sum, average, highest, lowest, last
 		 */
 		var _aggregateValues = function(mode, values) {
-			// filter out unanswered questions
-			values = values.filter(function(v) { return v !== undefined && v !== null; });
-
-			// if nothing remains, we can't aggregate.
-			if (values.length == 0)
-				return undefined;
+			// if there is an error value in the array we need to aggregate, pass it up.
+			if (values.find(function(value) { return typeof value === 'string'; }))
+				return 'CANNOT_AGGREGATE';
 
 			switch (mode) {
 				case "none":
-					return values.length == 1 ? values[0] : undefined;
+					return values.length == 1 ? values[0] : 'CANNOT_AGGREGATE';
 
 				case "sum":
 					return values.reduce(function(a, b) { return a + b; });
@@ -37,6 +34,9 @@ angular.module('monitool.services.reporting', [])
 
 				case "last":
 					return values[values.length - 1];
+
+				default:
+					throw new Error('Invalid mode')
 			}
 		};
 
@@ -45,6 +45,13 @@ angular.module('monitool.services.reporting', [])
 		 * mode is geoAgg or timeAgg
 		 */
 		var _groupInputLayer = function(mode, inputs, form) {
+			// speed optim
+			if (inputs.length === 0)
+				return Input.makeFake(form);
+
+			if (inputs.length === 1)
+				return inputs[0];
+
 			if (mode === 'timeAgg')
 				inputs.sort(function(a, b) { return a.period < b.period ? -1 : 1; }); // sort inputs by date.
 			else if (mode === 'geoAgg')
@@ -59,14 +66,14 @@ angular.module('monitool.services.reporting', [])
 					var elementMode = element[mode], values;
 
 					if (element.partitions.length === 0) {
-						values = inputs.map(function(input) { return input.values[element.id]; });
+						values = inputs.map(function(input) { return input.values[element.id] || 0; }); // if a field is not filled we assume 0
 						newInput.values[element.id] = _aggregateValues(elementMode, values);
 					}
 					else {
 						itertools.product(element.partitions).map(function(list) {
 							return list.pluck('id').sort().join('.');
 						}).forEach(function(partition) {
-							values = inputs.pluck('values').pluck(element.id + '.' + partition);
+							values = inputs.map(function(input) { return input.values[element.id + '.' + partition] || 0; }); // if a field is not filled we assume 0
 							newInput.values[element.id + '.' + partition] = _aggregateValues(elementMode, values);
 						});
 					}
@@ -137,8 +144,13 @@ angular.module('monitool.services.reporting', [])
 						localScope[key] = activityData[parameter.variable];
 					else {
 						localScope[key] = 0;
-						for (var filterId = 0; filterId < numFilters; ++filterId)
-							localScope[key] += activityData[parameter.variable + '.' + parameter.filter[filterId]];
+						for (var filterId = 0; filterId < numFilters; ++filterId) {
+							var accItem = activityData[parameter.variable + '.' + parameter.filter[filterId]];
+							if (typeof accItem !== "number")
+								return accItem;
+
+							localScope[key] += accItem;
+						}
 					}
 				}
 
@@ -148,7 +160,6 @@ angular.module('monitool.services.reporting', [])
 					return Parser.evaluate(formula.expression, localScope);
 				}
 				catch (e) {
-					console.log('failed to evaluate', formula.expression, 'against', JSON.stringify(localScope));
 					return 'INVALID_FORMULA';
 				}
 			}
@@ -161,8 +172,13 @@ angular.module('monitool.services.reporting', [])
 					return activityData[indicatorMeta.variable];
 				else {
 					var accumulator = 0;
-					for (var filterId = 0; filterId < numFilters; ++filterId)
-						accumulator += activityData[indicatorMeta.variable + '.' + indicatorMeta.filter[filterId]];
+					for (var filterId = 0; filterId < numFilters; ++filterId) {
+						var accumulatorItem = activityData[indicatorMeta.variable + '.' + indicatorMeta.filter[filterId]];
+						if (typeof accumulatorItem !== "number")
+							return accumulatorItem;
+
+						accumulator += accumulatorItem;
+					}
 					return accumulator;
 				}
 			}
