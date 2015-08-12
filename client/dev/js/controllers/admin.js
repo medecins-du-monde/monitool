@@ -86,12 +86,3 @@ angular.module('monitool.controllers.admin', [])
 				entity.$delete();
 		};
 	})
-
-	.controller('ClientListController', function($scope, clients) {
-		$scope.clients = clients;
-	})
-
-	.controller('ClientController', function($scope, client) {
-		$scope.client = client;
-	});
-

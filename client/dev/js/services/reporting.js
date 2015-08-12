@@ -1,20 +1,29 @@
 "use strict";
 
-angular.module('monitool.services.reporting', [])
+angular
+
+	// Define module
+	.module(
+		'monitool.services.reporting',
+		[
+			'monitool.services.models.input',
+			'monitool.services.itertools'
+		]
+	)
 
 	// TODO profiling this piece of code for perfs could not hurt.
 	// we will see how bad if performs on the wild.
-	.factory('mtReporting', function($q, Input, itertools) {
-
+	.service('mtReporting', function($q, Input, itertools) {
 
 		/**
 		 * This takes a mode and an array of values.
 		 * mode is none, sum, average, highest, lowest, last
 		 */
-		var _aggregateValues = function(mode, values) {
+		this._aggregateValues = function(mode, values) {
 			// if there is an error value in the array we need to aggregate, pass it up.
-			if (values.find(function(value) { return typeof value === 'string'; }))
-				return 'CANNOT_AGGREGATE';
+			var foundError = values.find(function(value) { return typeof value === 'string'; });
+			if (foundError)
+				return foundError;
 
 			switch (mode) {
 				case "none":
@@ -44,7 +53,7 @@ angular.module('monitool.services.reporting', [])
 		 * Given a list of inputs of the same form, aggregate them, using the time or geo mode.
 		 * mode is geoAgg or timeAgg
 		 */
-		var _groupInputLayer = function(mode, inputs, form) {
+		this._groupInputLayer = function(mode, inputs, form) {
 			// speed optim
 			if (inputs.length === 0)
 				return Input.makeFake(form);
@@ -67,18 +76,18 @@ angular.module('monitool.services.reporting', [])
 
 					if (element.partitions.length === 0) {
 						values = inputs.map(function(input) { return input.values[element.id] || 0; }); // if a field is not filled we assume 0
-						newInput.values[element.id] = _aggregateValues(elementMode, values);
+						newInput.values[element.id] = this._aggregateValues(elementMode, values);
 					}
 					else {
 						itertools.product(element.partitions).map(function(list) {
 							return list.pluck('id').sort().join('.');
 						}).forEach(function(partition) {
 							values = inputs.map(function(input) { return input.values[element.id + '.' + partition] || 0; }); // if a field is not filled we assume 0
-							newInput.values[element.id + '.' + partition] = _aggregateValues(elementMode, values);
+							newInput.values[element.id + '.' + partition] = this._aggregateValues(elementMode, values);
 						});
 					}
-				});
-			});
+				}, this);
+			}, this);
 
 			return newInput;
 		};
@@ -87,7 +96,7 @@ angular.module('monitool.services.reporting', [])
 		 * Given a project, and a list of inputs (of mixed forms)
 		 * Generate a hash containing the aggregated data, with all possible partition sums
 		 */
-		var _groupInputs = function(project, inputs) {
+		this._groupInputs = function(project, inputs) {
 			// we build {form: {location: [Input(), Input(), Input()]}}
 			var inputsByFormEntity = {},
 				numInputs = inputs.length;
@@ -111,10 +120,10 @@ angular.module('monitool.services.reporting', [])
 
 				// group by time first, and then by geo.
 				for (var entityId in inputsByFormEntity[formId])
-					inputsByFormEntity[formId][entityId] = _groupInputLayer('timeAgg', inputsByFormEntity[formId][entityId], form);
+					inputsByFormEntity[formId][entityId] = this._groupInputLayer('timeAgg', inputsByFormEntity[formId][entityId], form);
 
 				inputsByFormEntity[formId] = Object.keys(inputsByFormEntity[formId]).map(function(key) { return inputsByFormEntity[formId][key]; }); // Object.values...
-				var formResult = _groupInputLayer('timeAgg', inputsByFormEntity[formId], form); // group them.
+				var formResult = this._groupInputLayer('timeAgg', inputsByFormEntity[formId], form); // group them.
 
 				// Copy raw data into final result.
 				// we use guids across forms so no collision check is needed.
@@ -130,7 +139,7 @@ angular.module('monitool.services.reporting', [])
 		 * Given a hash containing activity data, an indicator, and it's metadata from the project,
 		 * compute the indicator's value.
 		 */
-		var _computeIndicatorValue = function(activityData, indicator, indicatorMeta) {
+		this._computeIndicatorValue = function(activityData, indicator, indicatorMeta) {
 			// if the indicator has to be computed with a formula.
 			if (indicatorMeta.formula) {
 				// Retrieve the formula parameters from activity reporting.
@@ -196,12 +205,12 @@ angular.module('monitool.services.reporting', [])
 		 * groupBys = ['entity', 'month']
 		 * => {entityId: {2010-01: {variableId: 23, variableId2: 45}}}
 		 */
-		var computeReporting = function(project, inputs, groupBys, indicatorsById) {
+		this.computeReporting = function(project, inputs, groupBys, indicatorsById) {
 
 			// there is no more group by => we can aggregate all inputs left in a single hash.
 			if (groupBys.length === 0) {
 				// Group all inputs that remain at the leaf into a hash with all possible sums.
-				var result = _groupInputs(project, inputs);
+				var result = this._groupInputs(project, inputs);
 
 				// if indicator definitions are available, compute them.
 				for (var indicatorId in project.indicators) {
@@ -209,7 +218,7 @@ angular.module('monitool.services.reporting', [])
 						var indicator = indicatorsById[indicatorId],
 							indicatorMeta = project.indicators[indicatorId];
 
-						result[indicatorId] = _computeIndicatorValue(result, indicator, indicatorMeta);
+						result[indicatorId] = this._computeIndicatorValue(result, indicator, indicatorMeta);
 					}
 				}
 
@@ -239,13 +248,13 @@ angular.module('monitool.services.reporting', [])
 				}
 
 				for (var aggKey in groups)
-					groups[aggKey] = computeReporting(project, groups[aggKey], otherGroupBys, indicatorsById);
+					groups[aggKey] = this.computeReporting(project, groups[aggKey], otherGroupBys, indicatorsById);
 				
 				return groups;
 			}
 		};
 
-		var getColumns = function(groupBy, begin, end, entityId, project) {
+		this.getColumns = function(groupBy, begin, end, entityId, project) {
 			var type;
 			if (!entityId)
 				type = 'project';
@@ -300,13 +309,13 @@ angular.module('monitool.services.reporting', [])
 		 * - {projectId}/reporting
 		 * - {projectId}/
 		 */
-		var computeProjectReporting = function(projectInputs, project, groupBy, indicatorsById) {
-			return computeReporting(project, projectInputs, [groupBy], indicatorsById);
+		this.computeProjectReporting = function(projectInputs, project, groupBy, indicatorsById) {
+			return this.computeReporting(project, projectInputs, [groupBy], indicatorsById);
 		};
 
-		var computeProjectDetailedReporting = function(projectInputs, project, groupBy, indicatorsById) {
-			var byEntity  = computeReporting(project, projectInputs, ['entity', groupBy], indicatorsById),
-				byGroup   = computeReporting(project, projectInputs, ['group', groupBy], indicatorsById);
+		this.computeProjectDetailedReporting = function(projectInputs, project, groupBy, indicatorsById) {
+			var byEntity  = this.computeReporting(project, projectInputs, ['entity', groupBy], indicatorsById),
+				byGroup   = this.computeReporting(project, projectInputs, ['group', groupBy], indicatorsById);
 
 			var result = {};
 			Object.keys(byEntity).forEach(function(key) { result[key] = byEntity[key]; });
@@ -316,7 +325,7 @@ angular.module('monitool.services.reporting', [])
 			return result;
 		};
 
-		var computeIndicatorReporting = function(inputs, projects, indicator, groupBy) {
+		this.computeIndicatorReporting = function(inputs, projects, indicator, groupBy) {
 			var indicatorsById = {};
 			indicatorsById[indicator._id] = indicator;
 
@@ -325,7 +334,7 @@ angular.module('monitool.services.reporting', [])
 				var indicatorMeta = project.indicators[indicator._id],
 					projectInputs = inputs.filter(function(input) { return input.project === project._id; });
 
-				var reporting = computeReporting(project, projectInputs, [groupBy], indicatorsById);
+				var reporting = this.computeReporting(project, projectInputs, [groupBy], indicatorsById);
 				
 				result[project._id] = {};
 				for (var regroupKey in reporting)
@@ -333,14 +342,5 @@ angular.module('monitool.services.reporting', [])
 			});
 
 			return result;
-		};
-
-
-
-		return {
-			getColumns: getColumns,
-			computeProjectReporting: computeProjectReporting,
-			computeProjectDetailedReporting: computeProjectDetailedReporting,
-			computeIndicatorReporting: computeIndicatorReporting
 		};
 	})

@@ -1,7 +1,6 @@
 "use strict";
 
 var app = angular.module('monitool.app', [
-	'angularMoment',
 
 	'monitool.controllers.admin',
 	'monitool.controllers.helper',
@@ -30,6 +29,7 @@ var app = angular.module('monitool.app', [
 	'monitool.services.string',
 	'monitool.services.models.input',
 	
+	'angularMoment',
 	'ngCookies',
 	'ngResource',
 	'pascalprecht.translate',
@@ -662,7 +662,7 @@ angular.element(document).ready(function() {
 			window.location.href = '/authentication/login';
 		
 		else 
-			angular.element('body').html('Server seems to be down.');
+			console.log('Server seems to be down.');
 	});
 });
 

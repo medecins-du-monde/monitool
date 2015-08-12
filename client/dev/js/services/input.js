@@ -1,6 +1,17 @@
 "use strict";
 
-angular.module('monitool.services.models.input', [])
+angular
+	
+	// Define module
+	.module(
+		'monitool.services.models.input',
+		[
+			'ngResource',
+			'monitool.services.itertools'
+		]
+	)
+
+	// Define Input factory
 	.factory('Input', function($resource, $q, itertools) {
 
 		// this has nothing to do on the root scope.

@@ -53,3 +53,5 @@ angular.module('monitool.filters.shared', [])
 			return str.replace(/\n/g, "<br/>");
 		};
 	})
+
+	
