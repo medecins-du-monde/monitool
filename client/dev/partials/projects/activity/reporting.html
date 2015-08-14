@@ -140,11 +140,11 @@
 							ng-click="onSplitClick(row.id, p.index)"
 							tooltip="{{p.fullname}}">
 						<i class="fa" ng-class="{'fa-plus-circle': splits[row.id]!=p.index,'fa-minus-circle': splits[row.id]==p.index,}"></i>
-						{{p.name}}
+						{{p.index + 1}}
 					</button>
 				</div>
 			</td>
-			<td ng-repeat="col in row.cols track by $index">{{col}}</td>
+			<td ng-repeat="col in row.cols track by $index" activity-reporting-field></td>
 		</tr>
 
 	</tbody>

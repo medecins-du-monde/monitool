@@ -12,10 +12,13 @@ module.exports = function(config) {
 		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
 		frameworks: ['jasmine'],
 
+		client: {
+			captureConsole: true
+		},
+
 
 		// list of files / patterns to load in the browser
 		files: [
-
 			'client/dev/bower_components/moment/min/moment.min.js',
 			'client/dev/bower_components/Blob.js/Blob.js',
 			'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
@@ -57,7 +60,7 @@ module.exports = function(config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ['progress'],
+		reporters: ['spec'],
 
 
 		// web server port

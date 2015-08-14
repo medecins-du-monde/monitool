@@ -75,16 +75,16 @@ angular
 					var elementMode = element[mode], values;
 
 					if (element.partitions.length === 0) {
-						values = inputs.map(function(input) { return input.values[element.id] || 0; }); // if a field is not filled we assume 0
+						values = inputs.map(function(input) { return input.values[element.id]; }); // if a field is not filled we assume 0
 						newInput.values[element.id] = this._aggregateValues(elementMode, values);
 					}
 					else {
 						itertools.product(element.partitions).map(function(list) {
 							return list.pluck('id').sort().join('.');
 						}).forEach(function(partition) {
-							values = inputs.map(function(input) { return input.values[element.id + '.' + partition] || 0; }); // if a field is not filled we assume 0
+							values = inputs.map(function(input) { return input.values[element.id + '.' + partition]; }); // if a field is not filled we assume 0
 							newInput.values[element.id + '.' + partition] = this._aggregateValues(elementMode, values);
-						});
+						}, this);
 					}
 				}, this);
 			}, this);
@@ -113,7 +113,7 @@ angular
 			}
 
 			// group layer by layer (starting with the deepest one).
-			var result = {};
+			var result = new Input({type: "input", project: project._id, values: {}});
 
 			for (var formId in inputsByFormEntity) {
 				var form = project.forms.find(function(f) { return f.id === formId; });
@@ -123,13 +123,13 @@ angular
 					inputsByFormEntity[formId][entityId] = this._groupInputLayer('timeAgg', inputsByFormEntity[formId][entityId], form);
 
 				inputsByFormEntity[formId] = Object.keys(inputsByFormEntity[formId]).map(function(key) { return inputsByFormEntity[formId][key]; }); // Object.values...
-				var formResult = this._groupInputLayer('timeAgg', inputsByFormEntity[formId], form); // group them.
+				var formResult = this._groupInputLayer('geoAgg', inputsByFormEntity[formId], form); // group them.
 
 				// Copy raw data into final result.
 				// we use guids across forms so no collision check is needed.
-				var allValues = formResult.computeSums(); // This line compute all possible sums among partitions in the activity data.
-				for (var rawId in allValues)
-					result[rawId] = allValues[rawId];
+				// var allValues = formResult.computeSums(); // This line compute all possible sums among partitions in the activity data.
+				for (var rawId in formResult.values)
+					result.values[rawId] = formResult.values[rawId];
 			}
 
 			return result;
@@ -210,7 +210,7 @@ angular
 			// there is no more group by => we can aggregate all inputs left in a single hash.
 			if (groupBys.length === 0) {
 				// Group all inputs that remain at the leaf into a hash with all possible sums.
-				var result = this._groupInputs(project, inputs);
+				var result = this._groupInputs(project, inputs).computeSums();
 
 				// if indicator definitions are available, compute them.
 				for (var indicatorId in project.indicators) {

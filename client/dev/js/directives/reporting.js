@@ -110,15 +110,48 @@ angular.module('monitool.directives.reporting', [])
 		};
 	})
 
-	.directive('reportingField', function() {
+	.directive('activityReportingField', function() {
 		return {
 			scope: false,
 			link: function($scope, element, attributes, controller) {
 				$scope.$watch('col', function(value) {
 
-					if (typeof value === "string" || Number.isNaN(value)) {
+					if (typeof value === "string") {
 						// element.html('<span style="font-size: 6px">' + value + '</span>');
 						element.html('<i class="fa fa-ban"></i>');
+						element.css('background-color', '');
+					}
+					else if (Number.isNaN(value)) {
+						element.html('<i class="fa fa-exclamation-triangle"></i>');
+						element.css('background-color', '');
+					}
+					else if (typeof value === "number") {
+						// if baseline and target are available.
+						element.css('background-color', '');
+						element.html(Math.round(value));
+					}
+					else {
+						element.html('');
+						element.css('background-color', '#eee');
+					}
+				}, true);
+			}
+		}
+	})
+
+	.directive('indicatorReportingField', function() {
+		return {
+			scope: false,
+			link: function($scope, element, attributes, controller) {
+				$scope.$watch('col', function(value) {
+
+					if (typeof value === "string") {
+						// element.html('<span style="font-size: 6px">' + value + '</span>');
+						element.html('<i class="fa fa-ban"></i>');
+						element.css('background-color', '');
+					}
+					else if (Number.isNaN(value)) {
+						element.html('<i class="fa fa-exclamation-triangle"></i>');
 						element.css('background-color', '');
 					}
 					else if (typeof value === "number") {

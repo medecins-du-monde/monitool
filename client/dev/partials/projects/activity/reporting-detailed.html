@@ -122,7 +122,7 @@
 
 			<th ng-if="row.type === 'header'" colspan="{{1 + cols.length}}" class="indent{{row.indent}}">{{row.text}}</th>
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">{{row.name}}</td>
-			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index">{{col}}</td>
+			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" activity-reporting-field></td>
 		</tr>
 	</tbody>
 </table>

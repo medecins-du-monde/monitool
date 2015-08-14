@@ -233,35 +233,31 @@ angular
 			if (this.form !== form.id)
 				throw new Error('Invalid form');
 
-			// Index form elements by id so that we can check everything faster.
-			var elementsById = {};
-			form.sections.forEach(function(section) {
-				section.elements.forEach(function(element) {
-					elementsById[element.id] = element;
-				});
-			});
+			var newValues = {},
+				sums = this.computeSums();
 
-			var newValues = {};
-			
-			Object.keys(this.values).forEach(function(key) {
-				// first index = element.id, all others = partitions.
-				var parts = key.split('.');
+			var numSections = form.sections.length;
+			for (var i = 0; i < numSections; ++i) {
+				var elements = form.sections[i].elements,
+					numElements = elements.length;
 
-				// Value is invalid.
-				if (typeof this.values[key] !== 'number')
-					return;
+				for (var j = 0; j < numElements; ++j) {
+					var element = elements[j];
 
-				// Element is undefined or
-				// Number of partitions is unexpected
-				var element = elementsById[parts[0]];
-				if (!element || parts.length !== element.partitions.length + 1)
-					return;
+					if (element.partitions.length === 0)
+						newValues[element.id] = sums[element.id] || 0;
+					else {
+						var partitions = itertools.product(element.partitions),
+							numPartitions = partitions.length;
 
-				// now check that all partitions exist
-				// IMPLEMENT ME!
+						for (var k = 0; k < numPartitions; ++k) {
+							var key = element.id + '.' + partitions[k].pluck('id').sort().join('.');
 
-				newValues[key] = this.values[key];
-			}, this);
+							newValues[key] = sums[key] || 0;
+						}
+					}
+				}
+			}
 
 			this.values = newValues;
 		};
