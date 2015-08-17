@@ -339,7 +339,7 @@ angular
 				result[project._id] = {};
 				for (var regroupKey in reporting)
 					result[project._id][regroupKey] = reporting[regroupKey][indicator._id];
-			});
+			}, this);
 
 			return result;
 		};
