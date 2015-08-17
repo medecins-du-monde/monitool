@@ -34,20 +34,17 @@
 			<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 			<div class="col-sm-10">
 				<div class="form-control-static">
-					<p ng-repeat="indicatorId in project.logicalFrame.indicators">
+					<ul>
+						<li ng-repeat="indicatorId in project.logicalFrame.indicators">
+							<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)">{{indicatorsById[indicatorId].name[language]}}</a>
+						</li>
+					</ul>
 
-						<i class="fa fa-external-link fa-fw"
-							ng-if="isExternal(indicatorId)"
-							tooltip="{{'indicator.is_external'|translate}}"
-							tooltip-placement="right"></i>
-
-						<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
-
-						<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)"
-						   ng-bind="indicatorsById[indicatorId].name[language]"></a>
-					</p>
-					<p acl-has-project-role="owner">
-						<a ng-click="editIndicator('new', project.logicalFrame.indicators)" translate="project.add_indicator"></a>
+ 					<p acl-has-project-role="owner">
+						<a class="btn btn-default" ng-click="editIndicator('new', project.logicalFrame.indicators)">
+							<i class="fa fa-plus"></i>
+							{{"project.add_indicator"|translate}}
+						</a>
 					</p>
 				</div>
 			</div>
@@ -100,19 +97,17 @@
 						<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 						<div class="col-sm-10">
 							<div class="form-control-static">
-								<p ng-repeat="indicatorId in purpose.indicators">
-									<i class="fa fa-external-link fa-fw"
-										ng-if="isExternal(indicatorId)"
-										tooltip="{{'indicator.is_external'|translate}}"
-										tooltip-placement="right"></i>
+								<ul>
+									<li ng-repeat="indicatorId in purpose.indicators">
+										<a ng-click="editIndicator(indicatorId, purpose.indicators)">{{indicatorsById[indicatorId].name[language]}}</a>
+									</li>
+								</ul>
 
-									<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
-
-									<a ng-click="editIndicator(indicatorId, purpose.indicators)"
-									   ng-bind="indicatorsById[indicatorId].name[language]"></a>
-								</p>
 								<p acl-has-project-role="owner">
-									<a ng-click="editIndicator('new', purpose.indicators)" translate="project.add_indicator"></a>
+									<a class="btn btn-default" ng-click="editIndicator('new', purpose.indicators)">
+										<i class="fa fa-plus"></i>
+										{{"project.add_indicator"|translate}}
+									</a>
 								</p>
 							</div>
 						</div>
@@ -160,19 +155,17 @@
 									<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 									<div class="col-sm-10">
 										<div class="form-control-static">
-											<p ng-repeat="indicatorId in output.indicators">
-												<i class="fa fa-external-link fa-fw"
-													ng-if="isExternal(indicatorId)"
-													tooltip="{{'indicator.is_external'|translate}}"
-													tooltip-placement="right"></i>
+											<ul>
+												<li ng-repeat="indicatorId in output.indicators">
+													<a ng-click="editIndicator(indicatorId, output.indicators)">{{indicatorsById[indicatorId].name[language]}}</a>
+												</li>
+											</ul>
 
-												<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
-
-												<a ng-click="editIndicator(indicatorId, output.indicators)"
-												   ng-bind="indicatorsById[indicatorId].name[language]"></a>
-											</p>
 											<p acl-has-project-role="owner">
-												<a ng-click="editIndicator('new', output.indicators)" translate="project.add_indicator"></a>
+												<a class="btn btn-default" ng-click="editIndicator('new', output.indicators)">
+													<i class="fa fa-plus"></i>
+													{{"project.add_indicator"|translate}}
+												</a>
 											</p>
 										</div>
 									</div>
@@ -180,11 +173,9 @@
 
 								<div class="form-group">
 									<label class="col-sm-2 control-label" translate="project.activities"></label>
-									<div class="col-sm-10">
-										<div class="input-group" style="margin-bottom: 5px;" ng-repeat="activity in output.activities" acl-has-project-role="owner" acl-fallback="activity.description">
-											<input type="text"
-												   class="form-control"
-												   name="activity"
+									<div class="col-sm-10" acl-has-project-role="owner">
+										<div class="input-group" style="margin-bottom: 5px;" ng-repeat="activity in output.activities">
+											<input type="text" class="form-control" name="activity"
 												   placeholder="{{'project.activity_desc_ph'|translate}}"
 												   ng-model="activity.description"/>
 
@@ -193,9 +184,18 @@
 											</span>
 										</div>
 
-										<p class="form-control-static" acl-has-project-role="owner">
-											<a ng-click="addActivity(output)" translate="project.add_activity"></a>
+										<p class="form-control-static">
+											<a ng-click="addActivity(output)" class="btn btn-default">
+												<i class="fa fa-plus"></i>
+												{{"project.add_activity"|translate}}
+											</a>
 										</p>
+									</div>
+
+									<div class="col-sm-10" acl-lacks-project-role="owner">
+										<ul>
+											<li ng-repeat="activity in output.activities">{{activity.description}}</li>
+										</ul>
 									</div>
 								</div>
 							</ng-form>
@@ -222,19 +222,17 @@
 
 		<p ng-if="otherIndicators.length == 0" translate="project.no_additional_indicators"></p>
 
-		<p ng-repeat="indicatorId in otherIndicators">
-			<i class="fa fa-external-link fa-fw"
-				ng-if="isExternal(indicatorId)"
-				tooltip="{{'indicator.is_external'|translate}}"
-				tooltip-placement="right"></i>
-
-			<indicator-icon ng-if="!isExternal(indicatorId)" operation="indicatorsById[indicatorId].operation"></indicator-icon>
-
-			<a ng-click="editIndicator(indicatorId, null)">{{indicatorsById[indicatorId].name[language]}}</a>
-		</p>
+		<ul>
+			<li ng-repeat="indicatorId in otherIndicators">
+				<a ng-click="editIndicator(indicatorId, null)">{{indicatorsById[indicatorId].name[language]}}</a>
+			</li>
+		</ul>
 
 		<p acl-has-project-role="owner">
-			<a ng-click="editIndicator('new', null)" translate="project.add_indicator"></a>
+			<a class="btn btn-default" ng-click="editIndicator('new', null)">
+				<i class="fa fa-plus"></i>
+				{{"project.add_indicator"|translate}}
+			</a>
 		</p>
 	</fieldset>
 	

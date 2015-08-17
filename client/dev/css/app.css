@@ -365,3 +365,7 @@ ul:hover>.onrollover {
 .form-control-static {
   min-height: 22px;
  }
+
+ ul {
+  padding-left: 20px;
+}
