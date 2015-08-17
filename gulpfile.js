@@ -237,14 +237,14 @@ gulp.task('update-database', function(callback) {
 				}
 			}
 			else if (doc.type === 'indicator') {
-				if (['forbidden', 'optional', 'mandatory'].indexOf(doc.operation) !== -1 && doc.scope)
+				if (['forbidden', 'approved', 'waiting', 'mandatory'].indexOf(doc.operation) !== -1)
 					return;
 
-				if (['forbidden', 'optional', 'mandatory'].indexOf(doc.operation) === -1)
-					doc.operation = 'optional';
+				if (['forbidden', 'approved', 'waiting', 'mandatory'].indexOf(doc.operation) === -1)
+					doc.operation = 'waiting';
 
-				if (!doc.scope)
-					doc.scope = 'broad';
+				delete doc.scope;
+				delete doc.approval;
 			}
 			else if (doc.type === 'input') {
 				var updated = false;

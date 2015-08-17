@@ -410,12 +410,11 @@ var FRENCH_TRANSLATION = {
 		is_invalid: "Le bouton est vérouillé car le formulaire est invalide. Avez-vous rempli les noms et les éléments de la formule?",
 
 		is_mandatory: "Obligatoire - Doit être collecté pour tous les projets de même thématique",
-		is_optional: "Optionnel - Peut-être collecté ou non sur les projets de même thématique",
-		is_forbidden: "Interdit - Ne doit plus être collecté sur les nouveaux projets",
-
-		is_broad: "Applicable à des projets différents",
-		is_limited: "Applicable un nombre restreint de projets similaires entre eux",
-		is_single: "Uniquement applicable à un projet en particulier",
+		is_approved: "Approuvé - Peut ou non être collecté sur les projets de même thématique",
+		is_waiting: "En attente - Le siège ne s'est pas prononcé sur la qualité de cet indicateur",
+		is_forbidden: "Rejeté - Ne doit plus être collecté sur les nouveaux projets",
+		
+		num_collecting_projects: "Nombre de projets collectant cet indicateur",
 
 		search: "Rechercher",
 		search_ph: "Rentrez au moins 3 caractères",

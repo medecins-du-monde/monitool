@@ -30,7 +30,8 @@
 
 		<div class="indicator-level-3" ng-repeat="indicator in type.children" ng-if="type.open">
 			<span class="pull-right">
-				{{indicator.__usage}} <i class="fa fa-building-o"></i>
+				
+				<span class="label label-default" tooltip="{{'indicator.num_collecting_projects'|translate}}">{{indicator.__usage}}</span>
 
 				<a class="btn btn-xs btn-default"
 				   ui-sref="main.indicator.reporting({indicatorId: indicator._id})"
@@ -48,9 +49,8 @@
 				   translate="shared.display"></a>
 			</span>
 
-			<indicator-icon operation="indicator.operation"></indicator-icon>
-
-			{{indicator.name[language]}}
+			<indicator-operation indicator="indicator"></indicator-operation>
+			<span>{{indicator.name[language]}}</span>
 		</div>
 	</div>
 </div>

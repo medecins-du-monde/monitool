@@ -8,7 +8,7 @@
 
 	<div class="indicator-level-3" ng-repeat="indicator in type.children" ng-if="type.open">
 		<span class="pull-right">
-			{{indicator.__usage}} <i class="fa fa-building-o"></i>
+			<span class="label label-default" tooltip="{{'indicator.num_collecting_projects'|translate}}">{{indicator.__usage}}</span>
 
 			<a class="btn btn-xs btn-default"
 				ng-click="choose(indicator._id)"
@@ -16,12 +16,7 @@
 				translate="shared.choose"></a>
 		</span>
 
-		<indicator-icon ng-if="project.themes.indexOf(theme._id) !== -1" operation="indicator.operation"></indicator-icon>
-
-		<i class="fa fa-external-link fa-fw"
-			ng-if="project.themes.indexOf(theme._id) === -1"
-			tooltip="{{'indicator.is_external'|translate}}"
-			tooltip-placement="right"></i>
+		<indicator-operation indicator="indicator"></indicator-operation>
 
 		{{indicator.name[language]}}
 	</div>

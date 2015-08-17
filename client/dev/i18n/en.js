@@ -410,12 +410,11 @@ var ENGLISH_TRANSLATION = {
 		is_invalid: "Button is locked because the form is invalid. Did you fill all names and formulas?",
 
 		is_mandatory: "Mandatory. Should be collected for all new projects of this thematic.",
-		is_optional: "Optional. Can be collected on new projects of this thematic.",
+		is_approved: "Approved. Can be collected on new projects of this thematic.",
+		is_waiting: "Waiting. Headquarters have not graded the quality of this indicator yet.",
 		is_forbidden: "Forbidden. Must not be collected on any new projects.",
-
-		is_broad: "Applicable to different projects.",
-		is_limited: "Too narrow to be applicable to many projets.",
-		is_single: "Can only be used for a specific project.",
+		
+		num_collecting_projects: "Nombre de projets collectant cet indicateur",
 
 		search: "Search",
 		search_ph: "Enter at least 3 characters",

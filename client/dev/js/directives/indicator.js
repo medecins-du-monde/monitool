@@ -63,16 +63,18 @@ angular
 		}
 	})
 
-	.directive('indicatorIcon', function() {
+	.directive('indicatorOperation', function() {
 		return {
 			restrict: 'E',
 			replace: true,
 			scope: true,
-			template: '<i class="fa fa-fw" ng-class="iconClass" tooltip="{{translationKey|translate}}" tooltip-placement="right"></i>',
+			template: '<i class="fa fa-fw" ng-class="operationClass" tooltip="{{operationTranslation|translate}}" tooltip-placement="right" ></i>',
 			link: function($scope, element, attributes) {
-				var v = $scope.$eval(attributes.operation);
-				$scope.translationKey = 'indicator.is_' + v;
-				$scope.iconClass = {forbidden: 'fa-ban', optional: 'fa-question', mandatory: 'fa-asterisk'}[v];
+				var indicator = $scope.$eval(attributes.indicator);
+				$scope.operationClass = {forbidden: 'fa-ban text-danger', approved: 'fa-check text-success', waiting: 'fa-clock-o text-warning', mandatory: 'fa-asterisk text-success'}[indicator.operation];
+				$scope.operationTranslation = 'indicator.is_' + indicator.operation;
 			}
 		}
-	});
+	})
+
+

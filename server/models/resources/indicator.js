@@ -23,9 +23,9 @@ var validate = validator({
 		"sources":    { "$ref": "#/definitions/translated" },
 		"comments":   { "$ref": "#/definitions/translated" },
 
-		"operation":       { "type": "string", "enum": ["forbidden", "common", "recommended", "mandatory"] },
-		"target": 		   { "type": "string", "enum": ["lower_is_better", "higher_is_better", "around_is_better", "non_relevant"] },
-		"unit":            { "type": "string", "enum": ["‰", "%", ""] },
+		"operation": { "type": "string", "enum": ["mandatory", "approved", "waiting", "forbidden"] },
+		"target":    { "type": "string", "enum": ["lower_is_better", "higher_is_better", "around_is_better", "non_relevant"] },
+		"unit":      { "type": "string", "enum": ["‰", "%", ""] },
 
 		"types": {
 			"type": "array",

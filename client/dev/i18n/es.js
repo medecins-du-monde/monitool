@@ -110,7 +110,6 @@ var SPANISH_TRANSLATION = {
 		reporting_general: 'Estadísticas generales',
 		reporting_by_indicator: 'Estadísticas por indicador',
 		reporting_by_variable: 'Estadísticas por variable',
-		reporting_analysis: "Analyse descriptive",
 		reporting_analysis: "Análisis descriptivo",
 		columns: "Columnas",
 		colorize: 'Colorear',
@@ -411,12 +410,11 @@ var SPANISH_TRANSLATION = {
 		is_invalid: "El formulario no es valido. ¿ha rellenado todos los nombre y elementos en las formulas?",
 
 		is_mandatory: "Obligatorio - Debe ser colectado por todos los proyectos de misma tématica",
-		is_optional: "Opcional - Puede o no ser colectado por proyecto de misma tématica",
+		is_approved: "Opcional - Puede o no ser colectado por proyecto de misma tématica",
+		is_waiting: "En espera - La sede no se ha pronunciado aún sobre la calidad de este indicador",
 		is_forbidden: "Prohibido - Ne debe ser colectado en nuevos proyectos",
-
-		is_broad: "Aplicable en proyectos diferentes",
-		is_limited: "Aplicable sobre pocos proyectos, parecidos entre ellos",
-		is_single: "Aplicable unicamente a un proyecto en particular",
+		
+		num_collecting_projects: "Número de proyectos que colectan este indicador",
 
 		search: "Buscar",
 		search_ph: "Entre por lo menos 3 caracteres",

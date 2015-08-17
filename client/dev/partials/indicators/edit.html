@@ -79,18 +79,9 @@
 					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.operation)|translate">
 						<select id="input-operation" class="form-control" ng-model="indicator.operation">
 							<option value="mandatory" translate="indicator.is_mandatory"></option>
-							<option value="optional" translate="indicator.is_optional"></option>
+							<option value="approved" translate="indicator.is_approved"></option>
+							<option value="waiting" translate="indicator.is_waiting"></option>
 							<option value="forbidden" translate="indicator.is_forbidden"></option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<th translate="indicator.scope"></th>
-					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.scope)|translate">
-						<select id="input-scope" class="form-control" ng-model="indicator.scope">
-							<option value="broad" translate="indicator.is_broad"></option>
-							<option value="limited" translate="indicator.is_limited"></option>
-							<option value="single" translate="indicator.is_single"></option>
 						</select>
 					</td>
 				</tr>
@@ -135,7 +126,6 @@
 	<div class="pull-right" acl-has-role="indicator">
 		<a class="btn btn-primary"
 		   ng-disabled="indicatorForm.$invalid || isUnchanged()"
-		   tooltip="coucou"
 		   ng-click="save()">
 
 			<i class="fa fa-floppy-o"></i>
