@@ -261,7 +261,7 @@ var SPANISH_TRANSLATION = {
 		color: "Color",
 
 		specs: "Especificaciones",
-		indicators_management: "Seguimiento de indicadores",
+		result_management: "Seguimiento de resultados",
 		additional_indicators: "Indicadores adicionales",
 		no_additional_indicators: "Ningun indicador adicional ha sido definido",
 		no_purposes: "Ningun objetivo específico ha sido definido",

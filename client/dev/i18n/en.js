@@ -252,7 +252,7 @@ var ENGLISH_TRANSLATION = {
 
 		value: "Value",
 		activity: "Activity",
-		activity_management: "Activity management",
+		activity_management: "Activity follow-up",
 		partitions: "Partitions",
 		variable: "Variable",
 		section: "Section",
@@ -261,7 +261,7 @@ var ENGLISH_TRANSLATION = {
 		color: "Color",
 
 		specs: "Specifications",
-		indicators_management: "Indicators management",
+		result_management: "Results follow-up",
 		additional_indicators: "Additional indicators",
 		no_additional_indicators: "No additional indicators were defined",
 		no_purposes: "No purposes were defined yet",

@@ -261,7 +261,7 @@ var FRENCH_TRANSLATION = {
 		color: "Couleur",
 
 		specs: "Spécifications",
-		indicators_management: "Suivi des indicateurs",
+		result_management: "Suivi des résultats",
 		additional_indicators: "Indicateurs supplémentaires",
 		no_additional_indicators: "Aucun indicateur supplémentaire n'a été défini",
 		no_purposes: "Aucun objectif spécifique n'a été défini",
