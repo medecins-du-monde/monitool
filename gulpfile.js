@@ -91,7 +91,7 @@ gulp.task('build-js', ['bower'], function() {
 
 	// js are annotated, uglified
 	queue.queue(
-		gulp.src(['client/dev/js/**/*.js', 'client/dev/i18n/**/*.js'])
+		gulp.src(['client/dev/js/**/*.js', 'client/dev/i18n/**/*.js', '!client/dev/js/**/*_test.js'])
 			.pipe(ngAnnotate())
 			.pipe(uglify())
 	);
