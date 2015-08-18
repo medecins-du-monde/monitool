@@ -68,13 +68,6 @@ angular.module('monitool.controllers.project.indicators', [])
 			});
 		};
 
-		$scope.isExternal = function(indicatorId) {
-			// FIXME: Use !$scope.project.themes.some(is internal)
-			return $scope.project.themes.filter(function(theme) {
-				return $scope.indicatorsById[indicatorId].themes.indexOf(theme) !== -1
-			}).length === 0;
-		};
-
 		$scope.$watch('project', function(project) {
 			$scope.otherIndicators = $scope.getUnassignedIndicators();
 		}, true);
