@@ -46,8 +46,7 @@ angular
 					standard: angular.copy(tran),
 					sources: angular.copy(tran),
 					comments: angular.copy(tran),
-					operation: "optional",
-					scope: "broad",
+					operation: "waiting",
 					target: "higher_is_better",
 					unit: "%",
 					types: [], themes: [], formulas: {}

@@ -1,0 +1,112 @@
+<form class="form-horizontal noprint" role="form" novalidate>
+	<legend>Selection des données</legend>
+
+	<div class="form-group">
+		<label for="variable-input" class="col-sm-1 control-label" translate="project.variable"></label>
+		<div class="col-sm-11">
+				<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
+				<project-activity-variable project="project" planning="planning"></project-activity-variable>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="rows-input" class="col-sm-1 control-label" translate="project.rows"></label>
+		<div class="col-sm-11">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-table fa-fw"></i></span>
+				<ui-select id="rows-input" multiple ng-model="planning.rows" name="rows" theme="bootstrap">
+					<ui-select-match placeholder="{{'project.select_rows'|translate}}">{{$item.name|translate}}</ui-select-match>
+					<ui-select-choices repeat="row.id as row in availableRows">{{row.name|translate}}</ui-select-choices>
+				</ui-select>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="cols-input" class="col-sm-1 control-label" translate="project.cols"></label>
+		<div class="col-sm-11">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-columns fa-fw"></i></span>
+				<ui-select id="cols-input" multiple ng-model="planning.cols" name="cols" theme="bootstrap">
+					<ui-select-match placeholder="{{'project.select_cols'|translate}}">{{$item.name|translate}}</ui-select-match>
+					<ui-select-choices repeat="col.id as col in availableCols">{{col.name|translate}}</ui-select-choices>
+				</ui-select>
+			</div>
+		</div>
+	</div>
+
+
+
+	<legend>Filtres</legend>
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate="shared.begin"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						<input type="text" 
+							   datepicker-popup="longDate"
+							   name="begin"
+							   ng-model="dates.begin"
+							   is-open="beginDateOpen"
+							   ng-click = "beginDateOpen = true"
+							   required
+							   ng-max="dates.end"
+							   class="form-control input-sm" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						<input type="text" 
+							   datepicker-popup="longDate"
+							   name="end"
+							   ng-model="dates.end"
+							   is-open="endDateOpen"
+							   ng-click = "endDateOpen = true"
+							   ng-min="dates.begin"
+							   class="form-control input-sm"
+							   required />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group" ng-repeat="dimension in dimensions" ng-if="dimension.id != 'day' && dimension.id != 'week' && dimension.id != 'month' && dimension.id != 'quarter' && dimension.id != 'year'">
+		<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{('project.' + dimension.id)|translate}}</label>
+		<div class="col-sm-11">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
+				<ui-select id="{{dimension.id}}-input" multiple ng-model="planning.filters[dimension.id]" name="{{dimension}}" theme="bootstrap">
+					<ui-select-match placeholder="{{'project.select_filters'|translate}}">{{$item.name}}</ui-select-match>
+					<ui-select-choices repeat="filter.id as filter in dimension.items">{{filter.name}}</ui-select-choices>
+				</ui-select>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<legend>Résultat</legend>
+
+<div ng-if="display.cols.length == 0 && display.rows.length == 0">
+	<table class="table table-bordered">
+		<tbody>
+			<tr>
+				<td>{{display.data}}</td>
+			</tr>
+		</tbody>
+	</table>
+	
+</div>
+
+<olap-grid cols="display.cols" rows="display.rows" data="display.data"></olap-grid>

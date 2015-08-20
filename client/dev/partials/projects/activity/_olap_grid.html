@@ -1,0 +1,29 @@
+
+<style>
+	.data-grid th {
+		text-align: center;
+		vertical-align: middle !important;
+	}
+</style>
+
+<table class="table table-bordered table-condensed data-grid">
+	<thead>
+		<tr ng-repeat="row in grid.header">
+			<th colspan="{{grid.body[0].headerCols.length}}"
+				rowspan="{{grid.header.length}}"
+				ng-if="$first"></th>
+			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}">{{col.name}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="row in grid.body">
+			<th ng-repeat="headerCol in row.headerCols"
+				ng-if="$parent.$index % rowspans[$index] == 0"
+				rowspan="{{rowspans[$index]}}">
+				{{headerCol.name}}
+			</th>
+			
+			<td ng-repeat="col in row.dataCols track by $index" activity-reporting-field></td>
+		</tr>
+	</tbody>
+</table>

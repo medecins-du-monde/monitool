@@ -179,6 +179,18 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		cols: "Colonnes",
+		rows: "Lignes",
+		partition0: "Partition 0",
+		partition1: "Partition 1",
+		partition2: "Partition 2",
+		partition3: "Partition 3",
+		partition4: "Partition 4",
+		entity: "Lieu de collecte",
+		select_cols: "Sélectionnez les colonnes",
+		select_rows: "Sélectionnez les lignes",
+		pivot_table: "Tableau croisé dynamique",
+
 		actions: "Actions",
 		groups: "Groupes",
 		basics: "Données de base",
@@ -221,6 +233,7 @@ var FRENCH_TRANSLATION = {
 		variable_up: "Monter la variable d'un cran",
 		variable_down: "Descendre la variable d'un cran",
 		remove_section: "Supprimer la section",
+		add_section: "Ajouter une section",
 
 		please_select_variable: "Selectionnez une variable",
 		no_partitions_available: "Pas de partitions disponibles",

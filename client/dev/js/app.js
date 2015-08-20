@@ -388,6 +388,19 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
+	$stateProvider.state('main.project.olap', {
+		url: '/olap',
+		templateUrl: 'partials/projects/activity/olap.html',
+		controller: 'ProjectActivityOlapController',
+		resolve: {
+			inputs: function(Input, project) {
+				return Input.fetchForProject(project);
+			}
+		}
+	});
+
+
+
 
 	///////////////////////////
 	// Project Indicators

@@ -1,6 +1,12 @@
 "use strict";
 
-angular.module('monitool.controllers.project.activity', [])
+angular
+	.module(
+		'monitool.controllers.project.activity',
+		[
+			"monitool.services.olap"
+		]
+	)
 
 	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input, project) {
 		$scope.createEntity = function() {
@@ -356,77 +362,175 @@ angular.module('monitool.controllers.project.activity', [])
 		$scope.plots = {};
 	})
 
-	.controller('ProjectActivityDetailedReportingController', function($scope, $filter, inputs, mtReporting) {
-		// Create default filter so that all inputs are used.
-		$scope.filters = {};
-		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
-		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
+	// .controller('ProjectActivityDetailedReportingController', function($scope, $filter, inputs, mtReporting) {
+	// 	// Create default filter so that all inputs are used.
+	// 	$scope.filters = {};
+	// 	$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+	// 	$scope.filters.end = new Date('0000-01-01T00:00:00Z');
+	// 	for (var i = 0; i < inputs.length; ++i) {
+	// 		if (inputs[i].period < $scope.filters.begin)
+	// 			$scope.filters.begin = inputs[i].period;
+	// 		if (inputs[i].period > $scope.filters.end)
+	// 			$scope.filters.end = inputs[i].period;
+	// 	}
+
+	// 	// default group by
+	// 	if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+	// 		$scope.groupBy = 'month';
+	// 	else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+	// 		$scope.groupBy = 'quarter';
+	// 	else
+	// 		$scope.groupBy = 'year';
+
+	// 	// When filter changes (or init), build the list of inputs to pass to the scope.
+	// 	$scope.$watch('filters', function() {
+	// 		// ...rebuild usedInputs
+	// 		$scope.inputs = inputs.filter(function(input) {
+	// 			return input.period >= $scope.filters.begin && input.period <= $scope.filters.end;
+	// 		});
+	// 	}, true);
+
+	// 	$scope.planning = {variable: $scope.project.forms[0].sections[0].elements[0].id, filter: []};
+
+	// 	var makeRow = function(rowId, rowName, variableId, filters, reporting, indent) {
+	// 		return {
+	// 			id: rowId,
+	// 			type: "data",
+	// 			name: rowName,
+	// 			indent: indent,
+	// 			cols: $scope.cols.map(function(col) {
+	// 				try {
+	// 					if (filters.length == 0)
+	// 						return reporting[rowId][col.id][variableId];
+	// 					else {
+	// 						var total = 0;
+	// 						filters.forEach(function(filter) {
+	// 							total += reporting[rowId][col.id][variableId + '.' + filter];
+	// 						});
+	// 						return total;
+	// 					}
+	// 				}
+	// 				catch (e) { return undefined; }
+	// 			})
+	// 		};			
+	// 	}
+
+	// 	// when input list change, or regrouping is needed, compute table rows again.
+	// 	$scope.$watchGroup(['inputs', 'groupBy', 'planning.variable', 'planning.filter', 'language'], function() {
+	// 		var reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy);
+	// 		$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
+	// 		$scope.rows = [];
+
+	// 		$scope.rows.push(makeRow($scope.project._id, $filter('translate')('project.full_project'), $scope.planning.variable, $scope.planning.filter, reporting, 0));
+	// 		$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.collection_site_list'), indent: 0 });
+	// 		$scope.project.entities.forEach(function(entity) {
+	// 			$scope.rows.push(makeRow(entity.id, entity.name, $scope.planning.variable, $scope.planning.filter, reporting, 1));
+	// 		});
+
+	// 		$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.groups'), indent: 0 });
+	// 		$scope.project.groups.forEach(function(group) {
+	// 			$scope.rows.push(makeRow(group.id, group.name, $scope.planning.variable, $scope.planning.filter, reporting, 1));
+	// 		});
+	// 	});
+
+	// 	// This hash allows to select indicators for plotting. It is used by directives.
+	// 	$scope.plots = {};
+	// })
+
+	.controller('ProjectActivityOlapController', function($scope, Olap, inputs) {
+		var cubes = Olap.Cube.fromProject($scope.project, inputs);
+
+		$scope.planning = {variable: $scope.project.forms[0].sections[0].elements[0].id };
+
+		$scope.dates = {};
+		$scope.dates.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.dates.end = new Date('0000-01-01T00:00:00Z');
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.begin)
-				$scope.filters.begin = inputs[i].period;
-			if (inputs[i].period > $scope.filters.end)
-				$scope.filters.end = inputs[i].period;
+			if (inputs[i].period < $scope.dates.begin)
+				$scope.dates.begin = inputs[i].period;
+			if (inputs[i].period > $scope.dates.end)
+				$scope.dates.end = inputs[i].period;
 		}
 
-		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
-			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
-			$scope.groupBy = 'quarter';
-		else
-			$scope.groupBy = 'year';
-
-		// When filter changes (or init), build the list of inputs to pass to the scope.
-		$scope.$watch('filters', function() {
-			// ...rebuild usedInputs
-			$scope.inputs = inputs.filter(function(input) {
-				return input.period >= $scope.filters.begin && input.period <= $scope.filters.end;
-			});
-		}, true);
-
-		$scope.planning = {variable: $scope.project.forms[0].sections[0].elements[0].id, filter: []};
-
-		var makeRow = function(rowId, rowName, variableId, filters, reporting, indent) {
-			return {
-				id: rowId,
-				type: "data",
-				name: rowName,
-				indent: indent,
-				cols: $scope.cols.map(function(col) {
-					try {
-						if (filters.length == 0)
-							return reporting[rowId][col.id][variableId];
-						else {
-							var total = 0;
-							filters.forEach(function(filter) {
-								total += reporting[rowId][col.id][variableId + '.' + filter];
-							});
-							return total;
-						}
-					}
-					catch (e) { return undefined; }
-				})
-			};			
-		}
-
-		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['inputs', 'groupBy', 'planning.variable', 'planning.filter', 'language'], function() {
-			var reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy);
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
-			$scope.rows = [];
-
-			$scope.rows.push(makeRow($scope.project._id, $filter('translate')('project.full_project'), $scope.planning.variable, $scope.planning.filter, reporting, 0));
-			$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.collection_site_list'), indent: 0 });
-			$scope.project.entities.forEach(function(entity) {
-				$scope.rows.push(makeRow(entity.id, entity.name, $scope.planning.variable, $scope.planning.filter, reporting, 1));
-			});
-
-			$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.groups'), indent: 0 });
-			$scope.project.groups.forEach(function(group) {
-				$scope.rows.push(makeRow(group.id, group.name, $scope.planning.variable, $scope.planning.filter, reporting, 1));
+		// When variable change, reset the whole query object.
+		$scope.$watch('planning.variable', function(variableId) {
+			var cube = cubes[variableId];
+			$scope.dimensions = cube.dimensions;
+			$scope.planning.cols = [];
+			$scope.planning.rows = [];
+			$scope.planning.filters = {};
+			cube.dimensions.forEach(function(dimension) {
+				$scope.planning.filters[dimension.id] = [];
 			});
 		});
 
-		// This hash allows to select indicators for plotting. It is used by directives.
-		$scope.plots = {};
-	});
+		// when a date change, update related filters.
+		// This is also underperformant as hell, but no worst than the olap implementation.
+		$scope.$watch('[dates.begin,dates.end]', function() {
+			var begin = moment($scope.dates.begin), end = moment($scope.dates.end),
+				filters = {
+					year: {begin: begin.format('YYYY'), end: end.format('YYYY')},
+					quarter: {begin: begin.format('YYYY-[Q]Q'), end: end.format('YYYY-[Q]Q')},
+					month: {begin: begin.format('YYYY-MM'), end: end.format('YYYY-MM')},
+					week: {begin: begin.format('YYYY-[W]WW'), end: end.format('YYYY-[W]WW')},
+					day: {begin: begin.format('YYYY-MM-DD'), end: end.format('YYYY-MM-DD')}
+				};
+
+			for (var key in filters) {
+				var dimension = $scope.dimensions.find(function(dim) { return dim.id == key; });
+				$scope.planning.filters[key] = dimension.items.pluck('id').filter(function(el) {
+					return filters[key].begin <= el && el <= filters[key].end;
+				});
+			}
+		}, true)
+
+		// When a row,col,filter change, update the table.
+		$scope.$watch('[planning.rows,planning.cols,planning.filters]', function() {
+			// update available rows and cols
+			var timeFields = ['year', 'quarter', 'month', 'week', 'day'],
+				timeUsedOnCols = timeFields.find(function(tf) { return $scope.planning.cols.indexOf(tf) !== -1; }),
+				timeUsedOnRows = timeFields.find(function(tf) { return $scope.planning.rows.indexOf(tf) !== -1; });
+			
+			$scope.availableCols = $scope.dimensions.filter(function(dimension) {
+				if (timeFields.indexOf(dimension.id) !== -1)
+					return timeUsedOnCols == dimension.id || (!timeUsedOnRows && !timeUsedOnCols);
+				else
+					return $scope.planning.rows.indexOf(dimension.id) == -1;
+			});
+
+			$scope.availableRows = $scope.dimensions.filter(function(dimension) {
+				if (timeFields.indexOf(dimension.id) !== -1)
+					return timeUsedOnRows == dimension.id || (!timeUsedOnRows && !timeUsedOnCols);
+				else
+					return $scope.planning.cols.indexOf(dimension.id) == -1;
+			});
+
+			// Execute query.
+			var makeRowCol = function(selectedDimId) {
+				var dimension = $scope.dimensions.find(function(dim) { return dim.id == selectedDimId; });
+				return {items: dimension.items.filter(function(dimItem) {
+					return !filters[dimension.id] || filters[dimension.id].indexOf(dimItem.id) !== -1;
+				})};
+			};
+
+			var dimensionsIds = $scope.planning.cols.concat($scope.planning.rows);
+			var filters = {};
+			for (var key in $scope.planning.filters)
+				if ($scope.planning.filters[key].length !== 0)
+					filters[key] = $scope.planning.filters[key];
+			
+			$scope.display = {
+				data: cubes[$scope.planning.variable].query(dimensionsIds, filters),
+				cols: $scope.planning.cols.map(makeRowCol),
+				rows: $scope.planning.rows.map(makeRowCol),
+				filters: filters
+			};
+
+			// work around grid bug...
+			if ($scope.display.rows.length === 0) {
+				$scope.display.rows = $scope.display.cols;
+				$scope.display.cols = [];
+			}
+		}, true);
+
+	})

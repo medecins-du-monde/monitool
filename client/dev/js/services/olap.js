@@ -1,19 +1,33 @@
 "use strict";
 
 /**
- * Ineficient OLAP cube implementation, but good enought for what we need.
+ * Incredibly ineficient OLAP cube implementation.
+ * No cache, trees, contiguous buffers that could make this fast.
+ * It should be good enought for what we need but implement this properly if too slow
+ * (or find an implementation on the internet).
+ *
+ * Also, we should rename methods so that their names make sense to someone that uses olap cubes
+ * (facts, measures, dimensions, slice, dice, ... instead of filter, query, etc)
  */
 angular
-	.module('monitool.services.olap', [])
-	.factory('Olap', function() {
+
+	.module(
+		'monitool.services.olap',
+		[
+			'monitool.services.itertools'
+		]
+	)
+
+	.factory('Olap', function(itertools) {
 
 		/**
 		 * id = "month"
 		 * items = ["2010-01", "2010-02", ...]
 		 * aggregation = "sum"
 		 */
-		var Dimension = function(id, items, aggregation) {
+		var Dimension = function(id, name, items, aggregation) {
 			this.id = id;
+			this.name = name;
 			this.items = items;
 			this.aggregation = aggregation;
 		};
@@ -91,6 +105,103 @@ angular
 			this._sortCubes();
 		};
 
+		Cube.fromProject = function(project, allInputs) {
+			// Create all cubes.
+			var cubes = {};
+
+			project.forms.forEach(function(form) {
+				var inputs = allInputs.filter(function(input) { return input.form == form.id; });
+
+				// Create shared dimension elements.
+				var entities = project.entities,
+					years    = {},
+					quarters = {},
+					months   = {},
+					weeks    = {},
+					days     = {};
+
+				// Create dimensionValues for each input in advance.
+				var refDimensionValuesByInput = {};
+				inputs.forEach(function(input) {
+					var period = moment(input.period);
+					var refDimensionValues = {
+						year: period.format('YYYY'),
+						quarter: period.format('YYYY-[Q]Q'),
+						month: period.format('YYYY-MM'),
+						week: period.format('YYYY-[W]WW'),
+						day: period.format('YYYY-MM-DD'),
+						entity: input.entity
+					};
+
+					refDimensionValuesByInput[input._id] = refDimensionValues;
+					years[refDimensionValues.year] = true;
+					quarters[refDimensionValues.quarter] = true;
+					months[refDimensionValues.month] = true;
+					weeks[refDimensionValues.week] = true;
+					days[refDimensionValues.day] = true;
+				});
+
+				years    = Object.keys(years).sort().map(function(t) { return {id: t, name: t}; });
+				quarters = Object.keys(quarters).sort().map(function(t) { return {id: t, name: t}; });
+				months   = Object.keys(months).sort().map(function(t) { return {id: t, name: t}; });
+				weeks    = Object.keys(weeks).sort().map(function(t) { return {id: t, name: t}; });
+				days     = Object.keys(days).sort().map(function(t) { return {id: t, name: t}; });
+
+				form.sections.forEach(function(section) {
+					section.elements.forEach(function(element) {
+						var numPartitions = element.partitions.length;
+
+						var dimensions = element.partitions.map(function(partition, index) {
+							var name = partition.pluck('name').join(' / ');
+							if (name.length > 80)
+								name = name.substring(0, 80 - 3) + '...';
+							return new Dimension('partition' + index, name, partition, 'sum')
+						}).concat([
+							new Dimension('entity', 'project.entity', entities, element.geoAgg),
+							new Dimension('year', 'shared.year', years, element.timeAgg),
+							new Dimension('quarter', 'shared.quarter', quarters, element.timeAgg),
+							new Dimension('month', 'shared.month', months, element.timeAgg),
+							new Dimension('week', 'shared.week', weeks, element.timeAgg),
+							new Dimension('day', 'shared.day', days, element.timeAgg)
+						]);
+
+						var elementaryCubes = [];
+						inputs.forEach(function(input) {
+							var refDimensionValues = refDimensionValuesByInput[input._id];
+
+							if (numPartitions > 0) {
+								var elCubes = itertools.product(element.partitions).map(function(partition) {
+									var dimensionValues = {};
+
+									// clone shared dimensions
+									for (var key in refDimensionValues)
+										dimensionValues[key] = refDimensionValues[key];
+
+									// add partitions
+									for (var i = 0; i < numPartitions; ++i)
+										dimensionValues['partition' + i] = partition[i].id;
+									
+									var value = input.values[element.id + '.' + partition.pluck('id').sort().join('.')] || 0;
+									return new ElementaryCube(dimensionValues, value);
+								});
+
+								// append new cubes
+								Array.prototype.push.apply(elementaryCubes, elCubes);
+							}
+							else {
+								elementaryCubes.push(new ElementaryCube(refDimensionValues, input.values[element.id] || 0));
+							}
+						}, this);
+
+						cubes[element.id] = new Cube(element.id, dimensions, elementaryCubes);
+
+					}, this);
+				}, this);
+			}, this);
+
+			return cubes;
+		};
+
 		Cube.prototype._sortCubes = function() {
 			var numDimensions = this.dimensions.length;
 
@@ -99,8 +210,8 @@ angular
 				// take the first dimension that allow to separate those apart.
 				for (var i = 0; i < numDimensions; ++i) {
 					var dimension = this.dimensions[i],
-						index1 = dimension.items.indexOf(datum1.dimensionValues[dimension.id]),
-						index2 = dimension.items.indexOf(datum2.dimensionValues[dimension.id]);
+						index1 = dimension.items.findIndex(function(item) { return item.id == datum1.dimensionValues[dimension.id]; }),
+						index2 = dimension.items.findIndex(function(item) { return item.id == datum2.dimensionValues[dimension.id]; });
 
 					if (index1 != index2)
 						return index1 - index2;
@@ -121,7 +232,6 @@ angular
 				var newCubes = [];
 				while (elementaryCubes.length) {
 					var start = 0, end = 1;
-
 
 					while (end < elementaryCubes.length
 							&& elementaryCubes[end].dimensionValues[dimension.id] 
@@ -159,15 +269,15 @@ angular
 
 				dimension.items.forEach(function(dimensionItem) {
 					// Skip this dimension item if it is explicitely filtered.
-					if (filterValues[dimensionId] && filterValues[dimensionId].indexOf(dimensionItem) === -1)
+					if (filterValues[dimensionId] && filterValues[dimensionId].indexOf(dimensionItem.id) === -1)
 						return;
 
 					// Restrict filterValues filter.
 					var oldFilter = filterValues[dimensionId];
-					filterValues[dimensionId] = [dimensionItem];
+					filterValues[dimensionId] = [dimensionItem.id];
 
 					// Compute branch of the result tree.
-					result[dimensionItem] = this.query(otherDimensionIds, filterValues);
+					result[dimensionItem.id] = this.query(otherDimensionIds, filterValues);
 
 					// Restore filter to its former value
 					if (oldFilter === undefined)

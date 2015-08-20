@@ -298,4 +298,82 @@ angular.module('monitool.directives.reporting', [])
 				"result": "=data"
 			}
 		}
-	});
+	})
+
+
+	.directive('olapGrid', function(itertools) {
+		return {
+			restrict: 'E',
+			scope: {
+				cols: '=',
+				rows: '=',
+				data: '=',
+				filters: '='
+			},
+			templateUrl: "partials/projects/activity/_olap_grid.html",
+
+			link: function($scope, element) {
+				$scope.$watch('[cols,rows,data,filters]', function() {
+					// Create empty grid.
+					var grid = {header: [], body: []};
+					
+					// Create header rows.
+					var totalCols = $scope.cols.reduce(function(memo, col) { return memo * col.items.length; }, 1),
+						colspan = totalCols, // current colspan is total number of columns.
+						numCols = 1; // current numCols is 1.
+
+					// console.log(totalCols, colspan, numCols)
+
+					for (var i = 0; i < $scope.cols.length; ++i) {
+						// adapt colspan and number of columns
+						colspan /= $scope.cols[i].items.length; 
+						numCols *= $scope.cols[i].items.length;
+
+						// Create header row
+						var row = {colspan: colspan, cols: []};
+						for (var k = 0; k < numCols; ++k)
+							row.cols.push($scope.cols[i].items[k % $scope.cols[i].items.length]);
+
+						grid.header.push(row);
+					}
+
+					// console.log(grid.header)
+
+					// Create data rows.
+					$scope.rowspans = [];
+					var rowspan = $scope.rows.reduce(function(memo, row) { return memo * row.items.length; }, 1);
+					for (var i = 0; i < $scope.rows.length; ++i) {
+						rowspan /= $scope.rows[i].items.length;
+						$scope.rowspans[i] = rowspan;
+					}
+
+					itertools.product($scope.rows.pluck('items')).forEach(function(headers) {
+						grid.body.push({
+							headerCols: headers,
+							dataCols:
+								itertools.product(
+									$scope.cols.pluck('items').concat(headers.map(function(a) { return [a]; }))
+								).map(function(els) {
+									try {
+										var result = $scope.data;
+										var numEls = els.length;
+										for (var i =0 ; i < numEls; ++i)
+											result = result[els[i].id];
+										return result;
+									}
+									catch (e) {
+										return null;
+									}
+								})
+						});
+					});
+
+					$scope.grid = grid;
+				}, true);
+			}
+		}
+	})
+
+
+
+

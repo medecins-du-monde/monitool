@@ -179,6 +179,18 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		cols: "Columnas",
+		rows: "Linear",
+		partition0: "Partición 0",
+		partition1: "Partición 1",
+		partition2: "Partición 2",
+		partition3: "Partición 3",
+		partition4: "Partición 4",
+		entity: "Lugar de actividad",
+		select_cols: "Selecione las columnas",
+		select_rows: "Selecione las lineas",
+		pivot_table: "Tabla dinámica",
+
 		actions: "Actions",
 		groups: "Grupos",
 		basics: "Datos de base",
@@ -221,6 +233,7 @@ var SPANISH_TRANSLATION = {
 		variable_up: "Subir la variable",
 		variable_down: "Bajar la variable",
 		remove_section: "Quitar este apartado",
+		add_section: "Añadir una sección",
 
 		please_select_variable: "Seleccione una variable",
 		no_partitions_available: "Ningúna partición disponible",

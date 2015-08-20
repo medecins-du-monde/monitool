@@ -179,6 +179,18 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		cols: "Columns",
+		rows: "Rows",
+		partition0: "Partition 0",
+		partition1: "Partition 1",
+		partition2: "Partition 2",
+		partition3: "Partition 3",
+		partition4: "Partition 4",
+		entity: "Input entity",
+		select_cols: "Please select columns",
+		select_rows: "Please select rows",
+		pivot_table: "Pivot table",
+
 		actions: "Actions",
 		groups: "Groups",
 		basics: "Basics",
@@ -221,6 +233,7 @@ var ENGLISH_TRANSLATION = {
 		variable_up: "Move up",
 		variable_down: "Move down",
 		remove_section: "Remove this section",
+		add_section: "Add section",
 
 		please_select_variable: "Please select a variable",
 		no_partitions_available: "No partitions available",
