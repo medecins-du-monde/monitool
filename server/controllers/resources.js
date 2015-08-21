@@ -93,7 +93,7 @@ module.exports = express.Router()
 
 		Model.get(request.params.id, function(error, data) {
 			if (error) {
-				if (error.error === 'not_found')
+				if (error === 'not_found')
 					return response.status(404).json({error: true, message: "Not Found"});
 				else
 					return response.status(500).json({error: true, message: "Server"});
@@ -103,38 +103,38 @@ module.exports = express.Router()
 		});
 	})
 
-	.get('/client', function(request, response) {
-		Client.list({}, function(error, clients) {
-			AccessToken.list({}, function(error, accessTokens) {
-				// SLOW!
+	// .get('/client', function(request, response) {
+	// 	Client.list({}, function(error, clients) {
+	// 		AccessToken.list({}, function(error, accessTokens) {
+	// 			// SLOW!
 				
-				clients.forEach(function(c) { c.__numUserTokens = 0; c.__numTokens = 0; });
-				if (request.user.roles.indexOf('_admin') === -1)
-					clients.forEach(function(c) { delete c.secret; });
+	// 			clients.forEach(function(c) { c.__numUserTokens = 0; c.__numTokens = 0; });
+	// 			if (request.user.roles.indexOf('_admin') === -1)
+	// 				clients.forEach(function(c) { delete c.secret; });
 
-				accessTokens.forEach(function(accessToken) {
-					clients.forEach(function(c) {
-						if (accessToken.clientId === c._id) {
-							if (accessToken.userId === request.user._id)
-								c.__numUserTokens++;
-							c.__numTokens++;
-						}
-					});
-				});
+	// 			accessTokens.forEach(function(accessToken) {
+	// 				clients.forEach(function(c) {
+	// 					if (accessToken.clientId === c._id) {
+	// 						if (accessToken.userId === request.user._id)
+	// 							c.__numUserTokens++;
+	// 						c.__numTokens++;
+	// 					}
+	// 				});
+	// 			});
 
-				response.json(clients);
-			})
-		});
-	})
+	// 			response.json(clients);
+	// 		})
+	// 	});
+	// })
 
-	.get('/client/:id', function(request, response) {
-		Client.get(request.params.id, function(error, client) {
-			if (request.user.roles.indexOf('_admin') === -1)
-				delete client.secret;
+	// .get('/client/:id', function(request, response) {
+	// 	Client.get(request.params.id, function(error, client) {
+	// 		if (request.user.roles.indexOf('_admin') === -1)
+	// 			delete client.secret;
 
-			response.json(client);
-		});
-	})
+	// 		response.json(client);
+	// 	});
+	// })
 
 	.put('/:modelName(indicator|project|input|report|theme|type)/:id', bodyParser, function(request, response) {
 		var modelName  = request.params.modelName,

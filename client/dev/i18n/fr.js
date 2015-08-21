@@ -179,6 +179,9 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		are_you_sure_to_delete: "Tapez: 'Je suis sûr de vouloir supprimer ce projet' pour confirmer",
+		are_you_sure_to_delete_answer: "Je suis sûr de vouloir supprimer ce projet",
+
 		cols: "Colonnes",
 		rows: "Lignes",
 		partition0: "Partition 0",

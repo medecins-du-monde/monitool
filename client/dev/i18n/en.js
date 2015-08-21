@@ -179,6 +179,9 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		are_you_sure_to_delete: "Please type: 'Yes, I do want to delete this project' to confirm",
+		are_you_sure_to_delete_answer: "Yes, I do want to delete this project",
+
 		cols: "Columns",
 		rows: "Rows",
 		partition0: "Partition 0",

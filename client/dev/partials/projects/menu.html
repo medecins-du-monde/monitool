@@ -136,6 +136,22 @@
  					</div>
 				</div>
 			</div>
+
+			<div class="panel panel-danger" acl-has-project-role="owner">
+				<div class="panel-collapse">
+					<div class="list-group">
+
+						<a class="list-group-item list-group-item-danger"
+						   ng-click="deleteProject()"
+						   eat-click-if="!project._id"
+						   disable-if="!project._id">
+						   
+							<i class="fa fa-trash fa-fw"></i>
+							<span translate="shared.delete"></span>
+						</a>
+ 					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 

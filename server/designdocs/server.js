@@ -53,6 +53,11 @@ module.exports = {
 							emit(indicatorMeta.formula, 'project_on_formula');
 					}
 				}
+				else if (doc.type === 'input') {
+					emit(doc.project, 'input_on_project');
+					emit(doc.form, 'input_on_form');
+					emit(doc.entity, 'input_on_entity');
+				}
 
 			}.toString(),
 			reduce: '_count'

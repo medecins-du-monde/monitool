@@ -41,6 +41,8 @@ module.exports = {
 			database.view('server', 'reverse_dependencies', {group: true, key: id}, function(error, data) {
 				var usage = data.rows.length ? data.rows[0].value : 0;
 
+				console.log(data);
+
 				if (usage === 0)
 					return database.destroy(id, document._rev, callback);
 				else

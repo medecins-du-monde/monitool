@@ -21,6 +21,22 @@ angular.module('monitool.controllers.project.shared', [])
 		$scope.master = angular.copy(project);
 		$scope.indicatorsById = indicatorsById;
 
+
+		$scope.deleteProject = function() {
+			var translate = $filter('translate'),
+				question  = translate('project.are_you_sure_to_delete'),
+				answer    = translate('project.are_you_sure_to_delete_answer');
+
+			if (window.prompt(question) === answer) {
+				menuWatch();
+				pageChangeWatch();
+
+				project.$delete(function() {
+					$state.go('main.projects');
+				});
+			}
+		};
+
 		// save, reset and isUnchanged are all defined here, because those are shared between all project views.
 		$scope.save = function() {
 			if ($stateParams.projectId === 'new')
@@ -36,7 +52,7 @@ angular.module('monitool.controllers.project.shared', [])
 			});
 		};
 
-		$scope.$watch('project', function(project) {
+		var menuWatch = $scope.$watch('project', function(project) {
 			$scope.projectHasIndicators = false;
 			for (var indicatorId in project.indicators) {
 				$scope.projectHasIndicators = true;
@@ -89,8 +105,8 @@ angular.module('monitool.controllers.project.shared', [])
 		};
 
 		// We restore $scope.master on $scope.project to avoid unsaved changes from a given tab to pollute changes to another one.
-		$scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-			var pages = ['main.project.logical_frame', 'main.project.input_entities', 'main.project.input_groups', 'main.project.user_list'];
+		var pageChangeWatch = $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+			var pages = ['main.project.logical_frame', 'main.project.collection_site_list', 'main.project.basics', 'main.project.user_list'];
 
 			// if unsaved changes were made
 			if (pages.indexOf(fromState.name) !== -1 && !angular.equals($scope.master, $scope.project)) {

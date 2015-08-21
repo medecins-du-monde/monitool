@@ -183,7 +183,20 @@ var validate = validator({
 module.exports = {
 
 	get: Abstract.get.bind(this, 'project'),
-	delete: Abstract.delete.bind(this, 'project'),
+
+	delete: function(id, callback) {
+		var opts = {include_docs: true, startkey: [id], endkey: [id, {}]};
+
+		database.view('reporting', 'inputs_by_project_date', opts, function(error, result) {
+			var inputs = result.rows.map(function(row) {
+				return { _id: row.id, _rev: row.doc._rev, _deleted: true };
+			});
+
+			database.bulk({docs: inputs}, {}, function() {
+				Abstract.delete('project', id, callback);
+			});
+		});
+	},
 
 	list: function(options, callback) {
 		if (options.mode === 'indicator_reporting')
