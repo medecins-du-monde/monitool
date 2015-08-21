@@ -40,18 +40,18 @@ module.exports = {
 							numUsers--;
 						}
 					}
-					users.forEach(function(name) { emit(name, "project_on_user"); });
-
-					for (var indicatorId in doc.indicators)
-						emit(indicatorId, "project_on_indicator");
 					
-					doc.dataCollection.forEach(function(form) {
-						form.fields.forEach(function(field) {
-							if (field.type === 'formula') {
-								emit(field.formulaId, "project_on_formula");
-							}
-						});
+					users.forEach(function(name) {
+						emit(name, "project_on_user");
 					});
+
+					for (var indicatorId in doc.indicators) {
+						var indicatorMeta = doc.indicators[indicatorId];
+
+						emit(indicatorId, "project_on_indicator");
+						if (indicatorMeta.formula)
+							emit(indicatorMeta.formula, 'project_on_formula');
+					}
 				}
 
 			}.toString(),

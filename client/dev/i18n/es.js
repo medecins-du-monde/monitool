@@ -418,6 +418,9 @@ var SPANISH_TRANSLATION = {
 		links: "Vínculos"
 	},
 	indicator: {
+		delete_indicator: "¿Esta seguro que quiere suprimir este indicador? Afectara a todos los proyectos que lo usan.",
+		delete_formula: "¿Esta seguro que quiere suprimir esta formula? Afectara a todos los proyectos que la usan.",
+
 		classification: "Clasificación",
 		is_unchanged: "Ningun dato ha cambiado desde la última vez que ha salvado.",
 		is_invalid: "El formulario no es valido. ¿ha rellenado todos los nombre y elementos en las formulas?",

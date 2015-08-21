@@ -418,6 +418,9 @@ var FRENCH_TRANSLATION = {
 		links: "Liens"
 	},
 	indicator: {
+		delete_indicator: "Etes-vous sûr de vouloir supprimer cet indicateur? Cette décision affecte tous les projets qui l'utilisent.",
+		delete_formula: "Etes-vous sûr de vouloir supprimer cette formule? Cette décision affecte tous les projets qui l'utilisent.",
+
 		classification: "Classification",
 		is_unchanged: "Le bouton est vérouillé car auncune modication n'a eu lieu",
 		is_invalid: "Le bouton est vérouillé car le formulaire est invalide. Avez-vous rempli les noms et les éléments de la formule?",

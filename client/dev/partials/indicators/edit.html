@@ -136,5 +136,10 @@
 			<i class="fa fa-undo"></i>
 			<span translate="shared.remove_changes"></span>
 		</a>
+
+		<a class="btn btn-danger" ng-if="!isNew" ng-click="delete()">
+			<i class="fa fa-trash"></i>
+			<span translate="shared.delete"></span>
+		</a> 
 	</div>
 </form>

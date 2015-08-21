@@ -89,7 +89,6 @@ var validate = validator({
 
 var Indicator = module.exports = {
 	get: Abstract.get.bind(this, 'indicator'),
-	delete: Abstract.delete.bind(this, 'indicator'),
 
 	list: function(options, callback) {
 		var opt;
@@ -126,30 +125,53 @@ var Indicator = module.exports = {
 				});
 
 				// Fetch all projectIds that use this formula in a datacollection
-				database.view('server', 'reverse_dependencies', {keys: changedFormulasIds, reduce: false, offset: 0}, function(error, data) {
+				database.view('server', 'reverse_dependencies', {keys: changedFormulasIds, reduce: false, offset: 0, include_docs: true}, function(error, result) {
 					// Fetch all projects.
-					database.fetch({keys: data.rows.map(function(row) { return row.id; })}, function(error, result) {
-						
-						var projects = result.rows.map(function(row) { return row.doc; });
+					var projects = result.rows.map(function(row) { return row.doc; });
 
-						// Remove the field from the concerned datacollections
-						projects.forEach(function(project) {
-							project.dataCollection.forEach(function(form) {
-								form.fields = form.fields.filter(function(field) {
-									return field.type !== 'formula' || changedFormulasIds.indexOf(field.formulaId) === -1;
-								});
-							});
-						});
+					// unset the indicator computation.
+					projects.forEach(function(project) {
+						var indicatorMeta = project.indicators[newIndicator._id];
+						indicatorMeta.formula = null,
+						indicatorMeta.variable = null,
+						indicatorMeta.filter = []
+						delete indicatorMeta.parameters;
+					});
 
-						// save them all
-						database.bulk({docs: projects}, function() {
-							Abstract.set(newIndicator, callback);
-						});
+					// save them all
+					database.bulk({docs: projects}, function() {
+						Abstract.set(newIndicator, callback);
 					});
 				});
 			}
 			else
 				Abstract.set(newIndicator, callback);
+		});
+	},
+
+	"delete": function(id, callback) {
+		var options = {keys: [id], reduce: false, offset: 0, include_docs: true};
+
+		database.view('server', 'reverse_dependencies', options, function(error, result) {
+			var projects = result.rows.map(function(row) { return row.doc; })
+
+			projects.forEach(function(project) {
+				delete project.indicators[id];
+
+				project.logicalFrame.indicators = project.logicalFrame.indicators.filter(function(indicatorId) { return indicatorId !== id; });
+				project.logicalFrame.purposes.forEach(function(purpose) {
+					purpose.indicators = purpose.indicators.filter(function(indicatorId) { return indicatorId !== id; });
+					purpose.outputs.forEach(function(output) {
+						output.indicators = output.indicators.filter(function(indicatorId) { return indicatorId !== id; });
+					});
+				});
+			});
+
+			// save them all
+			database.bulk({docs: projects}, function() {
+				// delete indicator
+				Abstract.delete('indicator', id, callback);
+			});
 		});
 	},
 

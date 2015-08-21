@@ -418,6 +418,9 @@ var ENGLISH_TRANSLATION = {
 		links: "Links"
 	},
 	indicator: {
+		delete_indicator: "Are you sure that you wish to delete this indicator? It will affect all projects using it.",
+		delete_formula: "Are you sure that you wish to delete this formula? It will affect all projects using it.",
+
 		classification: "Classification",
 		is_unchanged: "Button is locked because the form content did not change since last save.",
 		is_invalid: "Button is locked because the form is invalid. Did you fill all names and formulas?",

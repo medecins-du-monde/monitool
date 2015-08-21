@@ -7,13 +7,14 @@ angular.module('monitool.controllers.indicator', [])
 		$scope.searchField = '';
 	})
 	
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, indicator, types, themes) {
+	.controller('IndicatorEditController', function($state, $scope, $stateParams, $filter, indicator, types, themes) {
 		$scope.translations = {fr: FRENCH_TRANSLATION, es: SPANISH_TRANSLATION, en: ENGLISH_TRANSLATION};
 		$scope.numLanguages = 3;
 		$scope.indicator = indicator;
 		$scope.master = angular.copy(indicator);
 		$scope.types = types;
 		$scope.themes = themes;
+		$scope.isNew = $stateParams.indicatorId === 'new';
 
 		// that's a bit hacky, we should us proper angular form validation.
 		$scope.lockedReason = function() {
@@ -21,7 +22,7 @@ angular.module('monitool.controllers.indicator', [])
 				return 'indicator.is_unchanged';
 			else
 				return 'indicator.is_invalid';
-		}
+		};
 
 		// Formula handlers
 		$scope.addFormula = function() {
@@ -29,7 +30,10 @@ angular.module('monitool.controllers.indicator', [])
 		};
 
 		$scope.deleteFormula = function(formulaId) {
-			delete $scope.indicator.formulas[formulaId];
+			var question = $filter('translate')('indicator.delete_formula');
+
+			if (window.confirm(question))
+				delete $scope.indicator.formulas[formulaId];
 		};
 
 		// Form actions
@@ -51,6 +55,16 @@ angular.module('monitool.controllers.indicator', [])
 
 		$scope.reset = function() {
 			$scope.indicator = angular.copy($scope.master);
+		};
+
+		$scope.delete = function() {
+			var question = $filter('translate')('indicator.delete_indicator');
+
+			if (window.confirm(question)) {
+				indicator.$delete(function() {
+					$state.go('main.indicators');
+				});
+			}
 		};
 	})
 	
