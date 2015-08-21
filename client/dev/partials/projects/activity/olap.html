@@ -98,8 +98,13 @@
 
 <legend>Résultat</legend>
 
+<button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_table"></span>
+</button>
+
 <div ng-if="display.cols.length == 0 && display.rows.length == 0">
-	<table class="table table-bordered">
+	<table class="table table-bordered" id="reporting">
 		<tbody>
 			<tr>
 				<td>{{display.data}}</td>
