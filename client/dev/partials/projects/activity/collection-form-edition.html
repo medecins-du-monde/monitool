@@ -157,11 +157,11 @@
 	<table class="table table-bordered table-condensed table-aggregated-data">
 		<thead>
 			<tr>
-				<th translate="project.section"></th>
-				<th translate="project.variable"></th>
-				<th translate="project.aggregation"></th>
-				<th translate="project.partitions" colspan="{{maxPartitions + 1}}"></th>
-				<th colspan="2" translate="project.actions" acl-has-project-role="owner"></th>
+				<th translate="project.section" style="width: 15%"></th>
+				<th translate="project.variable" style="width: 15%"></th>
+				<th translate="project.aggregation" style="width: 15%"></th>
+				<th translate="project.partitions" colspan="{{maxPartitions + 1}}" style="width: 55%"></th>
+				<th colspan="2" translate="project.actions" acl-has-project-role="owner" style="width: 10%"></th>
 			</tr>
 		</thead>
 		<tbody ng-repeat="section in form.sections track by section.id">
