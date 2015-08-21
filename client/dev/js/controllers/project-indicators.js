@@ -108,6 +108,7 @@ angular.module('monitool.controllers.project.indicators', [])
 		// Retrieve indicator array where we need to add or remove indicator ids.
 		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
 			relevance: '',
+			colorize: true,
 			baseline: null,
 			target: null,
 			formula: null,
@@ -248,6 +249,7 @@ angular.module('monitool.controllers.project.indicators', [])
 					id: indicatorId,
 					name: $scope.indicatorsById[indicatorId].name,
 					unit: $scope.indicatorsById[indicatorId].unit,
+					colorize: $scope.project.indicators[indicatorId].colorize,
 					baseline: $scope.project.indicators[indicatorId].baseline,
 					target: $scope.project.indicators[indicatorId].target,
 					cols: $scope.cols.map(function(col) {
@@ -310,6 +312,7 @@ angular.module('monitool.controllers.project.indicators', [])
 			return {
 				id: rowId, type:'data', indent: indent || 0, name: rowName,
 				unit: indicator.unit,
+				colorize: indicatorMeta.colorize,
 				baseline: indicatorMeta.baseline,
 				target: indicatorMeta.target,
 				cols: cols.map(function(col) {

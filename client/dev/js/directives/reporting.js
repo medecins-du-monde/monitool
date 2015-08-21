@@ -156,7 +156,7 @@ angular.module('monitool.directives.reporting', [])
 					}
 					else if (typeof value === "number") {
 						// if baseline and target are available.
-						if ($scope.row.baseline !== null && $scope.row.target !== null) {
+						if ($scope.row.colorize && $scope.row.baseline !== null && $scope.row.target !== null) {
 							var progress = null;
 
 							// compute progress 

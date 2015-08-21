@@ -234,6 +234,7 @@ gulp.task('update-database', function(callback) {
 				for (var indicatorId in doc.indicators) {
 					delete doc.indicators[indicatorId].showRed;
 					delete doc.indicators[indicatorId].showYellow;
+					doc.indicators[indicatorId].colorize = true;
 				}
 			}
 			else if (doc.type === 'indicator') {

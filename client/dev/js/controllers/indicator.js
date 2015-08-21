@@ -97,6 +97,7 @@ angular.module('monitool.controllers.indicator', [])
 					indent: 0,
 					name: project.name,
 					unit: indicator.unit,
+					colorize: project.indicators[indicator._id].colorize,
 					baseline: project.indicators[indicator._id].baseline,
 					target: project.indicators[indicator._id].target,
 					cols: $scope.cols.map(function(col) {
