@@ -58,7 +58,7 @@ angular
 
 	})
 
-	.controller('ProjectCollectionFormEditionController', function($scope, $state, $filter, formUsage, form) {
+	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, formUsage, form) {
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.formUsage = formUsage;
@@ -183,6 +183,9 @@ angular
 			// call ProjectMenuController save method.
 			return $scope.$parent.save().then(function() {
 				$scope.master = angular.copy($scope.form);
+
+				if ($stateParams.formId === 'new')
+					$state.go('main.project.collection_form_edition', {formId: form.id});
 			});
 		};
 
