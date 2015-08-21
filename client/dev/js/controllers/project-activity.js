@@ -440,7 +440,13 @@ angular
 	.controller('ProjectActivityOlapController', function($scope, Olap, inputs) {
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
-		$scope.planning = {variable: $scope.project.forms[0].sections[0].elements[0].id };
+		$scope.planning = {variable: null };
+		$scope.project.forms.forEach(function(form) {
+			form.sections.forEach(function(section) {
+				if (!$scope.planning.variable && section.elements.length)
+					$scope.planning.variable = section.elements[0].id;
+			});
+		});
 
 		$scope.dates = {};
 		$scope.dates.begin = new Date('9999-01-01T00:00:00Z')

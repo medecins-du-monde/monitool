@@ -66,16 +66,50 @@ angular.module('monitool.directives.shared', [])
 	.directive('disableIf', function() {
 		return {
 			retrict: 'A',
-			scope: false,
+			scope: {
+				disableIf: "="
+			},
 			link: function($scope, element, attributes) {
-				var disable = $scope.$eval(attributes.disableIf);
-
-				if (disable) {
-					element.removeAttr('ui-sref');
-					element.removeAttr('ui-sref-active');
-					element.removeAttr('href');
-					element.addClass('disabled')
-				}
+				$scope.$watch('disableIf', function(disable) {
+					if (disable)
+						element.addClass('disabled')
+					else
+						element.removeClass('disabled')
+				});
 			}
 		}
 	})
+
+	.directive('eatClickIf', function($parse, $rootScope) {
+		return {
+		 	// this ensure eatClickIf be compiled before ngClick
+			priority: 100,
+			restrict: 'A',
+			compile: function($element, attr) {
+				var fn = $parse(attr.eatClickIf);
+				return {
+					pre: function link(scope, element) {
+						var eventName = 'click';
+
+						element.on(eventName, function(event) {
+							var callback = function() {
+								if (fn(scope, {$event: event})) {
+									// prevents ng-click to be executed
+									event.stopImmediatePropagation();
+									// prevents href 
+									event.preventDefault();
+									return false;
+								}
+							};
+
+							if ($rootScope.$$phase)
+								scope.$evalAsync(callback);
+							else
+								scope.$apply(callback);
+						});
+					},
+					post: function() {}
+				};
+			}
+		}
+	});

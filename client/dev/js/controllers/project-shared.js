@@ -36,6 +36,26 @@ angular.module('monitool.controllers.project.shared', [])
 			});
 		};
 
+		$scope.$watch('project', function(project) {
+			$scope.projectHasIndicators = false;
+			for (var indicatorId in project.indicators) {
+				$scope.projectHasIndicators = true;
+				break;
+			}
+
+			$scope.projectHasForms = false;
+			project.forms.forEach(function(form) {
+				form.sections.forEach(function(section) {
+					if (section.elements.length)
+						$scope.projectHasForms = true;
+				});
+			});
+
+			$scope.projectHasEntities = !!project.entities.length;
+		}, true);
+
+
+		// is this still useful?
 		$scope.$on('languageChange', function(e) {
 			// @hack that will make copies of all dates, and force datepickers to redraw...
 			$scope.project = angular.copy($scope.project);

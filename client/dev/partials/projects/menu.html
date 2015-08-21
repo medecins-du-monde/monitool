@@ -9,12 +9,18 @@
 
 				<div class="panel-collapse">
 					<div class="list-group">
-						<a ui-sref="main.project.basics" ui-sref-active="active" class="list-group-item">
+						<a ui-sref="main.project.basics"
+						   ui-sref-active="active"
+						   class="list-group-item">
+
 							<i class="fa fa-info-circle fa-fw"></i>
 							<span translate="project.basics"></span>
 						</a>
 
-						<a ui-sref="main.project.user_list" ui-sref-active="active" class="list-group-item" disable-if="!project._id">
+						<a ui-sref="main.project.user_list"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   eat-click-if="!project._id" disable-if="!project._id">
 							<i class="fa fa-user fa-fw"></i>
 							<span translate="project.users"></span>
 						</a>
@@ -32,6 +38,7 @@
 						<a ui-sref="main.project.collection_site_list"
 						   ui-sref-active="active"
 						   class="list-group-item"
+						   eat-click-if="!project._id"
 						   disable-if="!project._id">
 
 							<i class="fa fa-map-marker fa-fw"></i>
@@ -41,6 +48,7 @@
 						<a ui-sref="main.project.collection_form_list"
 						   class="list-group-item"
 						   ng-class="{active: $state.is('main.project.collection_form_list') || $state.is('main.project.collection_form_edition')}"
+						   eat-click-if="!project._id"
 						   disable-if="!project._id">
 							
 							<i class="fa fa-table fa-fw"></i>
@@ -50,7 +58,8 @@
 						<a ui-sref="main.project.collection_input_list"
 						   class="list-group-item"
 						   ng-class="{active: $state.is('main.project.collection_input_list') || $state.is('main.project.collection_input_edition')}"
-						   disable-if="!project._id">
+						   eat-click-if="!project._id || !projectHasForms || !projectHasEntities"
+						   disable-if="!project._id || !projectHasForms || !projectHasEntities">
 							
 							<i class="fa fa-pencil fa-fw"></i>
 							<span translate="project.collection_input_list"></span>
@@ -59,7 +68,8 @@
 						<a ui-sref="main.project.activity_reporting"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   disable-if="!project._id">
+						   eat-click-if="!project._id || !projectHasForms || !projectHasEntities"
+						   disable-if="!project._id || !projectHasForms || !projectHasEntities">
 
 							<i class="fa fa-line-chart fa-fw"></i>
 							<span translate="shared.reporting_general"></span>
@@ -68,8 +78,8 @@
 						<a ui-sref="main.project.olap"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   disable-if="!project._id">
-
+						   eat-click-if="!project._id || !projectHasForms || !projectHasEntities"
+						   disable-if="!project._id || !projectHasForms || !projectHasEntities">
 							<i class="fa fa-table fa-fw"></i>
 							<span translate="project.pivot_table"></span>
 						</a>
@@ -85,22 +95,40 @@
 				<div class="panel-collapse">
 					<div class="list-group">
 
-						<a ui-sref="main.project.logical_frame" ui-sref-active="active" class="list-group-item" disable-if="!project._id">
+						<a ui-sref="main.project.logical_frame"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   eat-click-if="!project._id" disable-if="!project._id">
+
 							<i class="fa fa-building-o fa-fw"></i>
 							<span translate="shared.logical_frame"></span>
 						</a>
 
-						<a ui-sref="main.project.indicators_reporting" ui-sref-active="active" class="list-group-item" disable-if="!project._id">
+						<a ui-sref="main.project.indicators_reporting"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   eat-click-if="!project._id || !projectHasIndicators || !projectHasForms || !projectHasEntities"
+						   disable-if="!project._id || !projectHasIndicators || !projectHasForms || !projectHasEntities">
 							<i class="fa fa-line-chart fa-fw"></i>
 							<span translate="shared.reporting_general"></span>
 						</a>
 
-						<a ui-sref="main.project.detailed_indicators_reporting" ui-sref-active="active" class="list-group-item" disable-if="!project._id">
+						<a ui-sref="main.project.detailed_indicators_reporting"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   eat-click-if="!project._id || !projectHasIndicators || !projectHasForms || !projectHasEntities"
+						   disable-if="!project._id || !projectHasIndicators || !projectHasForms || !projectHasEntities">
+
 							<i class="fa fa-bar-chart fa-fw"></i>
 							<span translate="shared.reporting_by_indicator"></span>
 						</a>
-<!-- 
-						<a ui-sref="main.project.reporting_analysis_list" ui-sref-active="active" class="list-group-item" disable-if="!project._id">
+<!--
+						<a ui-sref="main.project.reporting_analysis_list"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   eat-click-if="!project._id"
+						   disable-if="!project._id">
+
 							<i class="fa fa-lightbulb-o fa-fw"></i>
 							<span translate="shared.reporting_analysis"></span>
 						</a>
@@ -113,3 +141,4 @@
 
 	<div class="col-md-10 print-full-width" ui-view></div>
 </div>
+

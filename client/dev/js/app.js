@@ -33,7 +33,7 @@ var app = angular.module('monitool.app', [
 	'ngCookies',
 	'ngResource',
 	'pascalprecht.translate',
-	'textAngular',
+	// 'textAngular',
 	'ui.bootstrap',
 	'ui.bootstrap.showErrors',
 	'ui.router',
@@ -377,16 +377,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 
-	$stateProvider.state('main.project.detailed_activity_reporting', {
-		url: '/activity-detailed-reporting',
-		templateUrl: 'partials/projects/activity/reporting-detailed.html',
-		controller: 'ProjectActivityDetailedReportingController',
-		resolve: {
-			inputs: function(Input, project) {
-				return Input.fetchForProject(project);
-			}
-		}
-	});
+	// $stateProvider.state('main.project.detailed_activity_reporting', {
+	// 	url: '/activity-detailed-reporting',
+	// 	templateUrl: 'partials/projects/activity/reporting-detailed.html',
+	// 	controller: 'ProjectActivityDetailedReportingController',
+	// 	resolve: {
+	// 		inputs: function(Input, project) {
+	// 			return Input.fetchForProject(project);
+	// 		}
+	// 	}
+	// });
 
 	$stateProvider.state('main.project.olap', {
 		url: '/olap',

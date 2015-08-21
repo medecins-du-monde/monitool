@@ -22,7 +22,7 @@ var files = {
 		'client/dev/bower_components/bootstrap-css-only/css/bootstrap.min.css',
 		'client/dev/bower_components/angular-ui-select/dist/select.min.css',
 		'client/dev/bower_components/c3/c3.min.css',
-		'client/dev/bower_components/textAngular/src/textAngular.css',
+		// 'client/dev/bower_components/textAngular/src/textAngular.css',
 	],
 	js: [
 		'client/dev/bower_components/moment/min/moment.min.js',
@@ -43,9 +43,9 @@ var files = {
 		'client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js',
 		'client/dev/bower_components/d3/d3.min.js',
 		'client/dev/bower_components/c3/c3.min.js',
-		'client/dev/bower_components/textAngular/dist/textAngular-rangy.min.js',
-		'client/dev/bower_components/textAngular/dist/textAngular-sanitize.min.js',
-		'client/dev/bower_components/textAngular/dist/textAngular.min.js',
+		// 'client/dev/bower_components/textAngular/dist/textAngular-rangy.min.js',
+		// 'client/dev/bower_components/textAngular/dist/textAngular-sanitize.min.js',
+		// 'client/dev/bower_components/textAngular/dist/textAngular.min.js',
 
 		'client/dev/bower_components/Blob.js/Blob.js',
 		'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
