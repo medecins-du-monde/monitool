@@ -21,8 +21,10 @@
 						   ui-sref-active="active"
 						   class="list-group-item"
 						   eat-click-if="!project._id" disable-if="!project._id">
+							<span class="label label-default pull-right">{{project.owners.length}}/{{project.dataEntryOperators.length}}</span>
 							<i class="fa fa-user fa-fw"></i>
 							<span translate="project.users"></span>
+
 						</a>
 					</div>
 				</div>
@@ -41,8 +43,10 @@
 						   eat-click-if="!project._id"
 						   disable-if="!project._id">
 
+							<span class="label label-default pull-right">{{project.entities.length}}</span>
 							<i class="fa fa-map-marker fa-fw"></i>
 							<span translate="project.collection_site_list"></span>
+
 						</a>
 
 						<a ui-sref="main.project.collection_form_list"
@@ -51,8 +55,10 @@
 						   eat-click-if="!project._id"
 						   disable-if="!project._id">
 							
+							<span class="label label-default pull-right">{{project.forms.length}}</span>
 							<i class="fa fa-table fa-fw"></i>
 							<span translate="project.collection_form_list"></span>
+
 						</a>
 
 						<a ui-sref="main.project.collection_input_list"
@@ -100,6 +106,7 @@
 						   class="list-group-item"
 						   eat-click-if="!project._id" disable-if="!project._id">
 
+							<span class="label label-default pull-right">{{numIndicators}}</span>
 							<i class="fa fa-building-o fa-fw"></i>
 							<span translate="shared.logical_frame"></span>
 						</a>

@@ -68,6 +68,7 @@ angular.module('monitool.controllers.project.shared', [])
 			});
 
 			$scope.projectHasEntities = !!project.entities.length;
+			$scope.numIndicators = Object.keys(project.indicators).length;
 		}, true);
 
 
