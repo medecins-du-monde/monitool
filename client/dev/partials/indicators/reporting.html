@@ -101,10 +101,10 @@
 	<tbody>
 		<tr ng-repeat="row in rows track by $index">
 			<td class="noprint" style="text-align: center">
-				<input id="plot-{{row.id}}" type="checkbox" ng-model="plots[row.id]" />
+				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" />
 			</td>
 			<td class="indent{{row.indent}}">
-				{{row.name}}
+				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
 			<td>{{row.baseline}}{{row.unit}}</td>
 			<td>{{row.target}}{{row.unit}}</td>

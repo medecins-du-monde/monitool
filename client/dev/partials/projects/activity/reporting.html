@@ -122,7 +122,7 @@
 	<tbody>
 		<tr ng-repeat="row in rows">
 			<td style="text-align: center">
-				<input type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data'" />
+				<input id={{row.id}} type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data'" />
 			</td>
 
 			<th ng-if="row.type === 'header'"
@@ -131,7 +131,8 @@
 
 			<td ng-if="row.type === 'data'"
 				class="indent{{row.indent}}">
-				{{row.name}}
+				
+				<label for="{{row.id}}">{{row.name}}</label>
 
 				<div class="button-group pull-right">
 					<button class="btn btn-default btn-xs"
