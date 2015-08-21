@@ -109,8 +109,8 @@ angular.module('monitool.controllers.project.indicators', [])
 		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
 			relevance: '',
 			colorize: true,
-			baseline: null,
-			target: null,
+			baseline: 0,
+			target: 100,
 			formula: null,
 			variable: null,
 			filter: []
@@ -131,8 +131,16 @@ angular.module('monitool.controllers.project.indicators', [])
 		// Handle baseline and target
 		$scope.baselineUnknown = $scope.planning.baseline === null;
 		$scope.targetUnknown = $scope.planning.target === null;
-		$scope.$watch('baselineUnknown', function(value) { $scope.planning.baseline = value ? null : 0; });
-		$scope.$watch('targetUnknown', function(value) { $scope.planning.target = value ? null : 100; });
+		
+		$scope.$watch('baselineUnknown', function(value, oldValue) {
+			if (value !== oldValue)
+				$scope.planning.baseline = value ? null : 0;
+		});
+
+		$scope.$watch('targetUnknown', function(value, oldValue) {
+			if (value !== oldValue)
+				$scope.planning.target = value ? null : 100;
+		});
 
 		$scope.$watch('planning.formula', function(formulaId, oldFormulaId) {
 			if (formulaId !== oldFormulaId) {
