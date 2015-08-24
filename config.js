@@ -9,7 +9,9 @@ catch (e) {
 			url: process.env['couchdb.url'],
 			bucket: process.env['couchdb.bucket'],
 			host: process.env['couchdb.host'],
-			sessionBucket: process.env['couchdb.sessionBucket']
+			sessionBucket: process.env['couchdb.sessionBucket'],
+			username: process.env['couchdb.username'],
+			password: process.env['couchdb.password']
 		},
 		ping: {
 			active: process.env['ping.active'],

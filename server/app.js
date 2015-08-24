@@ -11,7 +11,12 @@ var express      = require('express'),
 	config       = require('../config');
 
 var CouchSessionStore = require('connect-couchdb')(session),
-	store = new CouchSessionStore({name: config.couchdb.sessionBucket, host: config.couchdb.host});
+	store = new CouchSessionStore({
+		name: config.couchdb.sessionBucket,
+		host: config.couchdb.host,
+		username: config.couchdb.username,
+		password: config.couchdb.password
+	});
 
 
 express()
