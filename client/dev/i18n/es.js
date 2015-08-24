@@ -251,8 +251,6 @@ var SPANISH_TRANSLATION = {
 		collection_form_planning: "Calendario",
 		collection_form_structure: "Estructura",
 
-		remove_partition: "Quitar esta partición",
-
 		delete_form_easy: "¿Esta seguro que quiere suprimir este formulario de entrada?",
 		delete_form_hard: "Si suprime este formulario, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
 		delete_form_hard_answer: "Suprimir las {{num_inputs}} entradas",
@@ -269,7 +267,6 @@ var SPANISH_TRANSLATION = {
 		value: "Valor",
 		activity: "Actividad",
 		activity_management: "Seguimiento de actividades",
-		partitions: "Particiónes",
 		variable: "Variable",
 		section: "Apartado",
 
@@ -391,7 +388,6 @@ var SPANISH_TRANSLATION = {
 		purposes: 'Objectivos Específicos',
 		assumptions: 'Hipotesis',
 		output: "Resultado",
-		activity: 'Actividad',
 		activities: 'Actividades',
 		prerequisite: 'Requisito previo',
 		activity_prereq_ph: '¿Qué requisitos previos se deben verificar antes de poder empezar esta actividad?',

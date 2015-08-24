@@ -251,8 +251,6 @@ var FRENCH_TRANSLATION = {
 		collection_form_planning: "Planning de saisie",
 		collection_form_structure: "Structure du formulaire",
 
-		remove_partition: "Supprimer la partition",
-
 		delete_form_easy: "Voulez-vous vraiment supprimer ce planning de saisie?",
 		delete_form_hard: "Si vous supprimez ce planning, toutes les saisies associées seront supprimés. Tapez \"Supprimer les {{num_inputs}} saisies\" pour confirmer",
 		delete_form_hard_answer: "Supprimer les {{num_inputs}} saisies",
@@ -269,7 +267,6 @@ var FRENCH_TRANSLATION = {
 		value: "Valeur",
 		activity: "Activités",
 		activity_management: "Suivi des activités",
-		partitions: "Partitions",
 		variable: "Variable",
 		section: "Section",
 
@@ -391,7 +388,6 @@ var FRENCH_TRANSLATION = {
 		purposes: 'Objectifs Spécifiques',
 		assumptions: 'Hypothèses',
 		output: "Résultat",
-		activity: 'Activité',
 		activities: 'Activités',
 		prerequisite: 'Prérequis',
 		activity_prereq_ph: 'Quels sont les prérequis pour mettre en place d\'activité?',

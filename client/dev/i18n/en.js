@@ -251,8 +251,6 @@ var ENGLISH_TRANSLATION = {
 		collection_form_planning: "Calendar",
 		collection_form_structure: "Structure",
 
-		remove_partition: "Remove this partition",
-
 		delete_form_easy: "Are you sure to delete this input form?",
 		delete_form_hard: "If you delete this input form, all linked entries will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
 		delete_form_hard_answer: "Delete the {{num_inputs}} inputs",
@@ -269,7 +267,6 @@ var ENGLISH_TRANSLATION = {
 		value: "Value",
 		activity: "Activity",
 		activity_management: "Activity follow-up",
-		partitions: "Partitions",
 		variable: "Variable",
 		section: "Section",
 
@@ -391,7 +388,6 @@ var ENGLISH_TRANSLATION = {
 		purposes: 'Specific objectives',
 		assumptions: 'Assumptions',
 		output: "Result",
-		activity: 'Activity',
 		activities: 'Activities',
 		prerequisite: 'Prerequisite',
 		activity_prereq_ph: 'What are the prerequisites that have to be met before starting the activity?',
