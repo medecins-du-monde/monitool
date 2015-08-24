@@ -11,7 +11,7 @@ var express      = require('express'),
 	config       = require('../config');
 
 var CouchSessionStore = require('connect-couchdb')(session),
-	store = new CouchSessionStore({name: "monitool-sessions", host: "localhost"});
+	store = new CouchSessionStore({name: config.couchdb.sessionBucket, host: config.couchdb.host});
 
 
 express()
