@@ -8,6 +8,7 @@ catch (e) {
 		couchdb: {
 			url: process.env['couchdb.url'],
 			bucket: process.env['couchdb.bucket'],
+			host: process.env['couchdb.host'],
 			sessionBucket: process.env['couchdb.sessionBucket']
 		},
 		ping: {
