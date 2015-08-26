@@ -40,6 +40,7 @@ var checkEditPermissions = function(user, modelName, modelId, callback) {
 		});
 
 	else if (["input", "report"].indexOf(modelName) !== -1) {
+		// FIXME! Security hole
 		callback(null)
 	}
 
@@ -136,7 +137,7 @@ module.exports = express.Router()
 	// 	});
 	// })
 
-	.put('/:modelName(indicator|project|input|report|theme|type)/:id', bodyParser, function(request, response) {
+	.put('/:modelName(indicator|project|input|report|theme|type|user)/:id', bodyParser, function(request, response) {
 		var modelName  = request.params.modelName,
 			ModelClass = ModelsByName[request.params.modelName],
 			newModel   = request.body;
