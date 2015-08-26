@@ -70,10 +70,12 @@ angular.module('monitool.controllers.admin', [])
 
 		$scope.save = function(entityIndex) {
 			var entity = $scope.entities[entityIndex],
-				usage  = entity.__usage;
+				projectUsage = entity.__projectUsage,
+				indicatorUsage = entity.__indicatorUsage;
 
 			entity.$save(function(error) {
-				entity.__usage = usage;
+				entity.__projectUsage = projectUsage;
+				entity.__indicatorUsage = indicatorUsage;
 				$scope.master[entityIndex] = angular.copy(entity);
 			});
 		};
