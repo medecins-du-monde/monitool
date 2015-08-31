@@ -182,6 +182,9 @@ var FRENCH_TRANSLATION = {
 		are_you_sure_to_delete: "Tapez: 'Je suis sûr de vouloir supprimer ce projet' pour confirmer",
 		are_you_sure_to_delete_answer: "Je suis sûr de vouloir supprimer ce projet",
 
+		data_selection: "Selection des données",
+		filters: "Filtres",
+
 		cols: "Colonnes",
 		rows: "Lignes",
 		partition0: "Partition 0",

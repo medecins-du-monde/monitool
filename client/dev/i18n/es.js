@@ -182,6 +182,9 @@ var SPANISH_TRANSLATION = {
 		are_you_sure_to_delete: "Por favor entre: 'Estoy seguro de querer suprimir este proyecto' para confirmar.",
 		are_you_sure_to_delete_answer: "Estoy seguro de querer suprimir este proyecto",
 
+		data_selection: "Seleccione los datos",
+		filters: "Filtros",
+
 		cols: "Columnas",
 		rows: "Linear",
 		partition0: "Partición 0",
