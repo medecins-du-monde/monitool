@@ -7,6 +7,11 @@ function makeUUID() {
   });
 }
 
+
+Number.isNaN = Number.isNaN || function(value) {
+  return typeof value === "number" && isNaN(value);
+};
+
 // pluck function
 if (!Array.prototype.pluck) {
   Array.prototype.pluck = function(col) {
