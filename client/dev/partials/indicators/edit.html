@@ -46,32 +46,31 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<th translate="shared.name"></th>
-					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator.name[code]|nl2br">
- 						<textarea class="form-control"
-								  name="someName"
-								  required
-								  ng-model="indicator.name[code]"
-								  placeholder="{{translations[code].indicator.name_ph}}"></textarea>
-					</td>
-				</tr>
-				<tr>
-					<th translate="indicator.standard"></th>
-					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator.standard[code]|nl2br">
-						<textarea class="form-control" ng-model="indicator.standard[code]" placeholder="{{translations[code].indicator.standard_ph}}"></textarea>
-					</td>
-				</tr>
-				<tr>
-					<th translate="indicator.sources"></th>
-					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator.sources[code]|nl2br">
-						<textarea class="form-control" ng-model="indicator.sources[code]" placeholder="{{translations[code].indicator.sources_ph}}"></textarea>
-					</td>
-				</tr>
-				<tr>
-					<th translate="indicator.comments"></th>
-					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator.comments[code]|nl2br">
-						<textarea class="form-control" ng-model="indicator.comments[code]" placeholder="{{translations[code].indicator.comments_ph}}"></textarea>
+				<tr ng-repeat="field in ['name', 'standard', 'sources', 'comments']">
+					<th>{{('indicator.'+field)|translate}}</th>
+					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator[field][code]|nl2br">
+						<div class="input-group">
+	 						<textarea class="form-control"
+									  name="{{field + '.' + code}}"
+									  ng-required="field == 'name'"
+									  ng-model="indicator[field][code]"
+									  placeholder="{{translations[code].indicator[field + '_ph']}}"></textarea>
+
+							<span class="input-group-addon">
+								<div dropdown>
+									<span id="single-button" dropdown-toggle>
+										<i class="fa fa-language"></i>
+									</span>
+
+									<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="single-button">
+										<li ng-class="{disabled:!indicator[field][codeInner]}" role="menuitem" ng-repeat="(codeInner, languageInner) in languages" ng-if="code != codeInner">
+											<a ng-click="translate(field, code, codeInner)">{{('indicator.translate_from_' + codeInner)|translate}}</a>
+										</li>
+									</ul>
+								</div>
+							</span>
+						</div>
+
 					</td>
 				</tr>
 				<tr>

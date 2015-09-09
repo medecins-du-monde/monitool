@@ -23,7 +23,23 @@
 			<tr ng-repeat="(symbol, parameter) in formula.parameters">
 				<td>{{'indicator.parameter'|translate}} <strong>"{{symbol}}"</strong></td>
 				<td acl-has-role="indicator" acl-fallback="parameter[code]" ng-repeat="(code, language) in languages">
-					<textarea type="text" class="form-control" ng-model="parameter[code]" required placeholder="{{translations[code].indicator.param_name_ph}}"></textarea>
+					<div class="input-group">
+						<textarea type="text" class="form-control" ng-model="parameter[code]" required placeholder="{{translations[code].indicator.param_name_ph}}"></textarea>
+						<span class="input-group-addon">
+							<div dropdown>
+								<span id="single-button" dropdown-toggle>
+									<i class="fa fa-language"></i>
+								</span>
+
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="single-button">
+									<li ng-class="{disabled:!parameter[codeInner]}" role="menuitem" ng-repeat="(codeInner, languageInner) in languages" ng-if="code != codeInner">
+										<a ng-click="translate(symbol, code, codeInner)">{{('indicator.translate_from_' + codeInner)|translate}}</a>
+									</li>
+								</ul>
+							</div>
+						</span>
+					</div>
+
 				</td>
 			</tr>
 		</tbody>

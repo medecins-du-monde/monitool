@@ -420,6 +420,11 @@ var ENGLISH_TRANSLATION = {
 		links: "Links"
 	},
 	indicator: {
+		name: "Name",
+		translate_from_fr: "Translate automatically from french",
+		translate_from_es: "Translate automatically from spanish",
+		translate_from_en: "Translate automatically from english",
+
 		delete_indicator: "Are you sure that you wish to delete this indicator? It will affect all projects using it.",
 		delete_formula: "Are you sure that you wish to delete this formula? It will affect all projects using it.",
 

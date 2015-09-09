@@ -1,9 +1,14 @@
 "use strict";
 
 angular
-	.module('monitool.directives.indicatorForm', [])
+	.module(
+		'monitool.directives.indicatorForm',
+		[
+			'monitool.services.translate',
+		]
+	)
 
-	.directive('formula', function($rootScope) {
+	.directive('formula', function($rootScope, googleTranslation) {
 		return {
 			templateUrl: 'partials/indicators/edit-formula.html',
 			scope: {formula: '=', id: '='},
@@ -15,6 +20,12 @@ angular
 
 				$scope.delete = function() {
 					$scope.$parent.deleteFormula($scope.id);
+				};
+
+				$scope.translate = function(key, destLanguage, sourceLanguage) {
+					googleTranslation.translate($scope.formula.parameters[key][sourceLanguage], destLanguage, sourceLanguage).then(function(result) {
+						$scope.formula.parameters[key][destLanguage] = result;
+					});
 				};
 
 				$scope.$watch('formula.expression', function(formula) {

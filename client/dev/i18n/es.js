@@ -420,6 +420,11 @@ var SPANISH_TRANSLATION = {
 		links: "Vínculos"
 	},
 	indicator: {
+		name: "Nombre",
+		translate_from_fr: "Traducir automaticamente desde el francès",
+		translate_from_es: "Traducir automaticamente desde el español",
+		translate_from_en: "Traducir automaticamente desde el inglès",
+
 		delete_indicator: "¿Esta seguro que quiere suprimir este indicador? Afectara a todos los proyectos que lo usan.",
 		delete_formula: "¿Esta seguro que quiere suprimir esta formula? Afectara a todos los proyectos que la usan.",
 

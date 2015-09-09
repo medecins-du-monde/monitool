@@ -1,13 +1,20 @@
 "use strict";
 
-angular.module('monitool.controllers.indicator', [])
+angular
+
+	.module(
+		'monitool.controllers.indicator',
+		[
+			'monitool.services.translate',
+		]
+	)
 
 	.controller('IndicatorListController', function($scope, hierarchy) {
 		$scope.hierarchy = hierarchy;
 		$scope.searchField = '';
 	})
 	
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, $filter, indicator, types, themes) {
+	.controller('IndicatorEditController', function($state, $scope, $stateParams, $filter, googleTranslation, indicator, types, themes) {
 		$scope.translations = {fr: FRENCH_TRANSLATION, es: SPANISH_TRANSLATION, en: ENGLISH_TRANSLATION};
 		$scope.numLanguages = 3;
 		$scope.indicator = indicator;
@@ -34,6 +41,12 @@ angular.module('monitool.controllers.indicator', [])
 
 			if (window.confirm(question))
 				delete $scope.indicator.formulas[formulaId];
+		};
+
+		$scope.translate = function(key, destLanguage, sourceLanguage) {
+			googleTranslation.translate(indicator[key][sourceLanguage], destLanguage, sourceLanguage).then(function(result) {
+				indicator[key][destLanguage] = result;
+			});
 		};
 
 		// Form actions
