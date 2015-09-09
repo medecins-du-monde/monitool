@@ -20,8 +20,27 @@
 		<tr ng-repeat="(entityIndex, entity) in entities track by entity._id">
 			<td acl-has-role="indicator" acl-fallback="entity.name[code]" ng-repeat="(code, language) in languages">
 				<ng-form name="entityForm">
+					
 					<div class="form-group" show-errors style="margin: 0">
-						<input type="text" name="name" ng-model="entity.name[code]" class="form-control input-sm" required />
+
+
+						<div class="input-group">
+							<input type="text" name="name" ng-model="entity.name[code]" class="form-control input-sm" required />
+	 						
+							<span class="input-group-addon">
+								<div dropdown>
+									<span id="single-button" dropdown-toggle>
+										<i class="fa fa-language"></i>
+									</span>
+
+									<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="single-button">
+										<li ng-class="{disabled:!entity.name[codeInner]}" role="menuitem" ng-repeat="(codeInner, languageInner) in languages" ng-if="code != codeInner">
+											<a ng-click="translate(entityIndex, code, codeInner)">{{('indicator.translate_from_' + codeInner)|translate}}</a>
+										</li>
+									</ul>
+								</div>
+							</span>
+						</div>
 					</div>
 				</ng-form>
 			</td>
