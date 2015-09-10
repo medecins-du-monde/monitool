@@ -16,13 +16,6 @@
 							<span translate="help.page.presentation_general"></span>
 						</a>
 
-						<a ui-sref="main.help.offline_access" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('offline_access')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('offline_access') && $state.is('main.help.offline_access')"></i>
-							<i class="fa fa-plug fa-fw"></i>
-							<span translate="help.page.offline_access"></span>
-						</a>
-
 						<a ui-sref="main.help.acls" ui-sref-active="active" class="list-group-item">
 							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('acls')"></i>
 							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('acls') && $state.is('main.help.acls')"></i>
@@ -40,50 +33,6 @@
 				</div>
 			</div>
 
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title" translate="help.block.indicators"></h4>
-				</div>
-
-				<div class="panel-collapse">
-					<div class="list-group">
-						<a ui-sref="main.help.presentation_indicator" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('presentation_indicator')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('presentation_indicator') && $state.is('main.help.presentation_indicator')"></i>
-							<i class="fa fa-eye fa-fw"></i>
-							<span translate="help.page.presentation_indicator"></span>
-						</a>
-
-						<a ui-sref="main.help.completeness" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('completeness')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('completeness') && $state.is('main.help.completeness')"></i>
-							<i class="fa fa-chain-broken fa-fw"></i>
-							<span translate="help.page.completeness"></span>
-						</a>
-
-						<a ui-sref="main.help.operation_modes" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('operation_modes')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('operation_modes') && $state.is('main.help.operation_modes')"></i>
-							<i class="fa fa-code-fork fa-fw"></i>
-							<span translate="help.page.operation_modes"></span>
-						</a>
-
-						<a ui-sref="main.help.computation" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('computation')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('computation') && $state.is('main.help.computation')"></i>
-							<i class="fa fa-calculator fa-fw"></i>
-							<span translate="help.page.computation"></span>
-						</a>
-
-						<a ui-sref="main.help.collection_history" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('collection_history')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('collection_history') && $state.is('main.help.collection_history')"></i>
-							<i class="fa fa-archive fa-fw"></i>
-							<span translate="help.page.collection_history"></span>
-						</a>
-					</div>
-				</div>
-			</div>
 
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -153,6 +102,51 @@
 							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('change_definition') && $state.is('main.help.change_definition')"></i>
 							<i class="fa fa-repeat fa-fw"></i>
 							<span translate="help.page.change_definition"></span>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title" translate="help.block.indicators"></h4>
+				</div>
+
+				<div class="panel-collapse">
+					<div class="list-group">
+						<a ui-sref="main.help.presentation_indicator" ui-sref-active="active" class="list-group-item">
+							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('presentation_indicator')"></i>
+							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('presentation_indicator') && $state.is('main.help.presentation_indicator')"></i>
+							<i class="fa fa-eye fa-fw"></i>
+							<span translate="help.page.presentation_indicator"></span>
+						</a>
+
+						<a ui-sref="main.help.completeness" ui-sref-active="active" class="list-group-item">
+							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('completeness')"></i>
+							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('completeness') && $state.is('main.help.completeness')"></i>
+							<i class="fa fa-chain-broken fa-fw"></i>
+							<span translate="help.page.completeness"></span>
+						</a>
+
+						<a ui-sref="main.help.operation_modes" ui-sref-active="active" class="list-group-item">
+							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('operation_modes')"></i>
+							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('operation_modes') && $state.is('main.help.operation_modes')"></i>
+							<i class="fa fa-code-fork fa-fw"></i>
+							<span translate="help.page.operation_modes"></span>
+						</a>
+
+						<a ui-sref="main.help.computation" ui-sref-active="active" class="list-group-item">
+							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('computation')"></i>
+							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('computation') && $state.is('main.help.computation')"></i>
+							<i class="fa fa-calculator fa-fw"></i>
+							<span translate="help.page.computation"></span>
+						</a>
+
+						<a ui-sref="main.help.collection_history" ui-sref-active="active" class="list-group-item">
+							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('collection_history')"></i>
+							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('collection_history') && $state.is('main.help.collection_history')"></i>
+							<i class="fa fa-archive fa-fw"></i>
+							<span translate="help.page.collection_history"></span>
 						</a>
 					</div>
 				</div>

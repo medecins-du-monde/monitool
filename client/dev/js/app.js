@@ -540,12 +540,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/help/general/presentation_general.html'
 	});
 
-	$stateProvider.state('main.help.offline_access', {
-		controller: 'HelpController',
-		url: "/offline_access",
-		templateUrl: 'partials/help/general/offline_access.html'
-	});
-
 	$stateProvider.state('main.help.acls', {
 		controller: 'HelpController',
 		url: "/acls",
