@@ -1,0 +1,118 @@
+<ol class="breadcrumb">
+	<li class="active" translate="shared.help"></li>
+	<li class="active" translate="help.block.project"></li>
+	<li class="active" translate="help.page.change_definition"></li>
+</ol>
+
+<div ng-switch="language">
+	<div ng-switch-when="fr">
+		
+		<p>Lors du suivi d'un projet avec monitool, on respecte généralement l'ordre suivant:</p>
+		<ol>
+			<li>Conception des formulaires de collecte et saisie des lieux d'activité</li>
+			<li>Saisie du cadre logique et des indicateurs</li>
+			<li>Suivi du projet (saisies de données)</li>
+		</ol>
+
+		<p>Cependant, quelles sont les conséquences de modifier un projet dans lequel des données de suivi ont déjà été saisies?</p>
+
+		<h3>Conséquences par type de modification</h3>
+
+		<h4 style="color: green">
+			<i class="fa fa-check"></i>
+			Modifications ne causant pas de pertes de données
+		</h4>
+
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Modifier un cadre logique</h4>
+
+					<p>Toute modification d’un cadre logique, en incluant le changement des indicateurs suivis, ne pose pas de problème particulier: les statistiques générées selon rétroactivement corrigées pour correspondre au nouveau cadre logique.</p>
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Ajouter un nouveau lieux de collecte</h4>
+
+					<p>L’ajout d’un nouveau lieu d’activité demandera cependant de saisir rétroactivement toutes des données spécifiées par les formulaires de collecte</p>
+					<p>Il est possible de réaliser des saisies vides si les données ne sont pas connues.</p>
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Renommer des indicateurs, variables, partitions...</h4>
+					Le nom sera changé rétroactivement. Attention cependant aux non-sens (ne pas renommer « nombre de consultations » en « nombre de patients »).
+				</div>
+
+			</div>
+		</div>
+
+		<h4 style="color: orange">
+			<i class="fa fa-check"></i>
+			Modifications causant des pertes de données explicites
+		</h4>
+		
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Retrait d'un lieu de collecte</h4>
+					Toutes les saisies associées à ce lieux de collecte seront définitivement perdues.
+				</div>
+				<div class="col-xs-6">
+					<h4>Retrait d'un formulaire de collecte</h4>
+					Toutes les saisies associées à ce formulaire de collecte seront définitivement perdues.
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Retrait d'une variable dans un formulaire de collecte</h4>
+					Toutes les saisies associées à cet variable seront définitivement perdues.<br/>
+					Attention! Si le calcul d'un indicateur dépendait de cette valeur, il ne pourra plus être calculé sur tout son historique.
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Retrait d'une partition dans un formulaire de collecte</h4>
+					La partition sera perdu. Attention! Si le calcul d'un indicateur dépendait de la variable concernée, sa valeur va changer sur tout son historique.
+				</div>
+			</div>
+		</div>
+
+		<h4 style="color: darkred">
+			<i class="fa fa-exclamation-triangle"></i>
+			Modifications causant des pertes de données implicites
+		</h4>
+
+
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Ajout d'une partition sur une variable</h4>
+
+					L'ajout d'une nouvelle partition sur une variable cause la perte de toutes les données historiques sur l'ensemble de la variable.
+					Il sera nécessaire de refaire l'intégralité de la saisie de cette variable
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Changement du mode de collecte d'un formulaire</h4>
+					Il sera nécessaire de refaire l'intégralité de la saisie du formulaire.
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Changement de la périodicité d'un formulaire</h4>
+					Il sera nécessaire de refaire l'intégralité de la saisie du formulaire en fonction de la nouvelle périodicité.
+				</div>
+			</div>
+		</div>
+
+		<h3>Sur le rôle des dates de début et fin des plannings de saisies</h3>
+		<p>Nous avons vu que toutes les modifications réalisées sur un planning de saisies sont rétroactives.</p>
+		<p>Ce comportement est désiré dans le cas où des erreurs ont été faites dans la création du planning initial, et que l’utilisateur désire les corriger rétroactivement. Un autre cas de figure possible est que les modifications à réaliser ne sont pas liées à des erreurs commises, mais à une modification du projet.</p>
+		<p>Dans ce cas, modifier un planning de saisie en utilisation n’est en aucun cas la marche à suivre : pour modifier les mécaniques de collecte de statistiques d’un projet, il suffit de changer la date de fin des formulaires de saisies utilisés à la date du jour, puis d’en créer des nouveaux qui commencent à partir de cette date.</p>
+		<p>On peut ainsi avoir un projet qui change considérablement de méthodes de collecte (réécriture complète des données brutes saisies sur le terrain par exemple) sans rien perdre de l’historique des saisies.</p>
+
+	</div>
+	<div ng-switch-when="es">
+		La documentación solo esta traducida en francès por ahora.
+	</div>
+	<div ng-switch-when="en">
+		The documentation is only available in french for now.
+	</div>
+</div>

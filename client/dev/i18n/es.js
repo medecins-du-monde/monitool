@@ -60,6 +60,9 @@ var SPANISH_LOCALE = {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		user_guide: "Guía del usuario",
+		home: "Inicio",
+
 		up: "Subir",
 		down: "Bajar",
 		sum: "Suma",
@@ -170,6 +173,10 @@ var SPANISH_TRANSLATION = {
 			statistics: "Estadísticas",
 			descriptive_analysis: "Análisis descriptivo",
 			change_definition: "Modicaciones",
+
+			data_path: "Camino de los datos",
+			activities_demography: "Actividades & Demografía",
+			objectives_results: "Objetivos & Resultados"
 		},
 		reminder: {
 			have_you_read_single_pre: "¿Ha leido la sección ",
@@ -179,6 +186,9 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		cant_create: "No esta autorizado a crear nuevos proyectos",
+		my_projects: "Mis proyectos",
+
 		are_you_sure_to_delete: "Por favor entre: 'Estoy seguro de querer suprimir este proyecto' para confirmar.",
 		are_you_sure_to_delete_answer: "Estoy seguro de querer suprimir este proyecto",
 
@@ -269,7 +279,7 @@ var SPANISH_TRANSLATION = {
 
 		value: "Valor",
 		activity: "Actividad",
-		activity_management: "Seguimiento de actividades",
+		activity_management: "Actividades y Demografía",
 		variable: "Variable",
 		section: "Apartado",
 
@@ -277,7 +287,7 @@ var SPANISH_TRANSLATION = {
 		color: "Color",
 
 		specs: "Especificaciones",
-		result_management: "Seguimiento de resultados",
+		result_management: "Objectivos & resultados",
 		additional_indicators: "Indicadores adicionales",
 		no_additional_indicators: "Ningun indicador adicional ha sido definido",
 		no_purposes: "Ningun objetivo específico ha sido definido",
@@ -420,6 +430,7 @@ var SPANISH_TRANSLATION = {
 		links: "Vínculos"
 	},
 	indicator: {
+		cant_create: "No esta autorizado a crear nuevos indicadores",
 		name: "Nombre",
 		translate_from_fr: "Traducir automaticamente desde el francès",
 		translate_from_es: "Traducir automaticamente desde el español",

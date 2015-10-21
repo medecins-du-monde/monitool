@@ -5,10 +5,20 @@ angular.module('monitool.controllers.project.shared', [])
 	.controller('ProjectListController', function($scope, projects, themes) {
 		$scope.themes         = themes;
 		$scope.pred           = 'name'; // default sorting predicate
+
+		$scope.myProjects = projects.filter(function(p) {
+			return p.owners.indexOf($scope.userCtx._id) !== -1 || p.dataEntryOperators.indexOf($scope.userCtx._id) !== -1; 
+		});
+
+		$scope.runningProjects = projects.filter(function(p) {
+			return $scope.myProjects.indexOf(p) === -1 && p.end >= new Date()
+		});
 		
-		$scope.runningProjects  = projects.filter(function(p) { return p.end >= new Date() });
-		$scope.finishedProjects = projects.filter(function(p) { return p.end < new Date() });
-		$scope.projects         = $scope.runningProjects;
+		$scope.finishedProjects = projects.filter(function(p) {
+			return $scope.myProjects.indexOf(p) === -1 && p.end < new Date()
+		});
+		
+		$scope.projects = $scope.myProjects;
 	})
 
 	.controller('ProjectMenuController', function($scope, $state, $stateParams, $filter, project, indicatorsById) {

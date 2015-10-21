@@ -11,9 +11,15 @@
 		
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav" ng-if="userCtx">
+				<li ng-class="{active: $state.includes('main.home')}">
+					<a ui-sref="main.home">
+						<i class="fa fa-fw fa-home"></i>
+						<span translate="shared.home"></span>
+					</a>
+				</li>
 				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}">
 					<a ui-sref="main.projects">
-						<i class="fa fa-fw fa-building"></i>
+						<i class="fa fa-fw fa-object-group"></i>
 						<span translate="shared.projects"></span>
 					</a>
 				</li>
@@ -34,7 +40,7 @@
 				<li ng-class="{active: $state.includes('main.help')}">
 					<a ui-sref="main.help.presentation_general">
 						<i class="fa fa-fw fa-question"></i>
-						<span translate="shared.help"></span>
+						<span translate="shared.user_guide"></span>
 					</a>
 				</li>
 			</ul>

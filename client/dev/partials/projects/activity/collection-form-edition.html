@@ -9,8 +9,10 @@
 
 <div class="alert alert-danger noprint"
 	 ng-if="formUsage.length"
-	 ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}"
+	 
 	 acl-has-project-role="owner">
+<!-- {{ 'project.collection_form_warning'|translate:{num_inputs:formUsage.length} }}
+ -->	 <span ng-bind-html=" 'project.collection_form_warning'|translate:{num_inputs:formUsage.length} "></span>
 </div>
 
 <form class="form-horizontal" role="form" name="formForm" novalidate>

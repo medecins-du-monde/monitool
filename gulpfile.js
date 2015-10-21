@@ -44,7 +44,7 @@ var files = {
 		'client/dev/bower_components/d3/d3.min.js',
 		'client/dev/bower_components/c3/c3.min.js',
 		// 'client/dev/bower_components/textAngular/dist/textAngular-rangy.min.js',
-		// 'client/dev/bower_components/textAngular/dist/textAngular-sanitize.min.js',
+		'client/dev/bower_components/textAngular/dist/textAngular-sanitize.min.js',
 		// 'client/dev/bower_components/textAngular/dist/textAngular.min.js',
 
 		'client/dev/bower_components/Blob.js/Blob.js',

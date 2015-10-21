@@ -60,6 +60,8 @@ var FRENCH_LOCALE = {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		user_guide: "Guide d'utilisation",
+		home: "Accueil",
 		up: "Monter d'un cran",
 		down: "Descendre d'un cran",
 		sum: "Total",
@@ -170,6 +172,10 @@ var FRENCH_TRANSLATION = {
 			statistics: "Statistiques",
 			descriptive_analysis: "Analyse Descriptives",
 			change_definition: "Re-spécification",
+
+			data_path: "Chemin des données",
+			activities_demography: "Activités & Demographie",
+			objectives_results: "Objectifs & Resultats"
 		},
 		reminder: {
 			have_you_read_single_pre: "Avez-vous lu la section",
@@ -179,6 +185,9 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		cant_create: "Vous n'êtes pas autorisé à créer de nouveaux projets",
+		my_projects: "Mes projets",
+
 		are_you_sure_to_delete: "Tapez: 'Je suis sûr de vouloir supprimer ce projet' pour confirmer",
 		are_you_sure_to_delete_answer: "Je suis sûr de vouloir supprimer ce projet",
 
@@ -269,7 +278,7 @@ var FRENCH_TRANSLATION = {
 
 		value: "Valeur",
 		activity: "Activités",
-		activity_management: "Suivi des activités",
+		activity_management: "Activités & Démographie",
 		variable: "Variable",
 		section: "Section",
 
@@ -277,7 +286,7 @@ var FRENCH_TRANSLATION = {
 		color: "Couleur",
 
 		specs: "Spécifications",
-		result_management: "Suivi des résultats",
+		result_management: "Objectifs & résultats",
 		additional_indicators: "Indicateurs supplémentaires",
 		no_additional_indicators: "Aucun indicateur supplémentaire n'a été défini",
 		no_purposes: "Aucun objectif spécifique n'a été défini",
@@ -420,6 +429,7 @@ var FRENCH_TRANSLATION = {
 		links: "Liens"
 	},
 	indicator: {
+		cant_create: "Vous n'êtes pas autorisé à créer de nouveaux indicateurs",
 		name: "Nom",
 		translate_from_fr: "Traduire automatiquement à partir du français",
 		translate_from_es: "Traduire automatiquement à partir de l'espagnol",

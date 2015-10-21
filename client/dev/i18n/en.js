@@ -60,6 +60,9 @@ var ENGLISH_LOCALE = {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		user_guide: "User guide",
+		home: "Home",
+
 		up: "Up",
 		down: "Down",
 		sum: "Sum",
@@ -170,6 +173,11 @@ var ENGLISH_TRANSLATION = {
 			statistics: "Statistics",
 			descriptive_analysis: "Descriptive analysis",
 			change_definition: "Modifying projects",
+
+			data_path: "Data path",
+			activities_demography: "Activities & Demography",
+			objectives_results: "Objectives & Results"
+
 		},
 		reminder: {
 			have_you_read_single_pre: "Did you read the ",
@@ -179,6 +187,8 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		cant_create: "You are not allowed to create new projects",
+		my_projects: "My projects",
 		are_you_sure_to_delete: "Please type: 'Yes, I do want to delete this project' to confirm",
 		are_you_sure_to_delete_answer: "Yes, I do want to delete this project",
 
@@ -269,7 +279,7 @@ var ENGLISH_TRANSLATION = {
 
 		value: "Value",
 		activity: "Activity",
-		activity_management: "Activity follow-up",
+		activity_management: "Activities & Demography",
 		variable: "Variable",
 		section: "Section",
 
@@ -277,7 +287,7 @@ var ENGLISH_TRANSLATION = {
 		color: "Color",
 
 		specs: "Specifications",
-		result_management: "Results follow-up",
+		result_management: "Objectives & results",
 		additional_indicators: "Additional indicators",
 		no_additional_indicators: "No additional indicators were defined",
 		no_purposes: "No purposes were defined yet",
@@ -323,7 +333,7 @@ var ENGLISH_TRANSLATION = {
 		waiting_inputs_tooltip: '',
 		reporting_tooltip: '',
 
-		create: "Create a new project",
+		create: "Create new project",
 		input_forms: 'Input forms',
 		input_form: 'Input form',
 		data_collection: 'Data collection',
@@ -420,6 +430,8 @@ var ENGLISH_TRANSLATION = {
 		links: "Links"
 	},
 	indicator: {
+		cant_create: "You are not allowed to create new indicators",
+
 		name: "Name",
 		translate_from_fr: "Translate automatically from french",
 		translate_from_es: "Translate automatically from spanish",
@@ -489,7 +501,7 @@ var ENGLISH_TRANSLATION = {
 		alphabetical_order: 'Alphabetical order',
 		num_inputs: 'Number of inputs',
 		num_projects: 'Number of projects',
-		create_new: 'Create  new indicator',
+		create_new: 'Create new indicator',
 
 		themes_list: "Themes list",
 		types_list: "Types list",

@@ -7,7 +7,17 @@
 	<span translate="project.create"></span>
 </a>
 
+<div class="pull-right" tooltip="{{'project.cant_create'|translate}}" tooltip-placement="left" acl-lacks-role="project" style="cursor: not-allowed">
+	<a class="btn btn-primary disabled">
+		<i class="fa fa-plus"></i>
+		<span translate="project.create"></span>
+	</a>
+</div>
+
 <ul class="nav nav-tabs" role="tablist">
+	<li ng-class="{active:projects==myProjects}">
+		<a ng-click="projects=myProjects">{{'project.my_projects'|translate}}</a>
+	</li>
 	<li ng-class="{active:projects==runningProjects}">
 		<a ng-click="projects=runningProjects">{{'project.running'|translate}}</a>
 	</li>
@@ -34,13 +44,22 @@
 		</tr>
 		<tr ng-repeat="project in projects|orderBy:pred:rev">
 			<td style="text-align: center">
-				<i class="fa fa-building-o fa-fw"
+				<i class="fa fa-object-group fa-fw"
 				   tooltip="{{'project.you_are_owner'|translate}}"
-				   tooltip-placement="right" acl-has-project-role="owner" acl-project="project"></i>
+				   tooltip-placement="right" acl-has-project-role="owner" acl-project="project" style="color: green"></i>
 
 				<i class="fa fa-pencil fa-fw"
 				   tooltip="{{'project.you_are_editor'|translate}}"
-				   tooltip-placement="right" acl-has-project-role="input" acl-project="project"></i>
+				   tooltip-placement="right" acl-has-project-role="input" acl-project="project" style="color: green"></i>
+
+				<i class="fa fa-object-group fa-fw"
+				   tooltip="{{'project.you_are_not_owner'|translate}}"
+				   tooltip-placement="right" acl-lacks-project-role="owner" acl-project="project" style="color: darkred"></i>
+
+				<i class="fa fa-pencil fa-fw"
+				   tooltip="{{'project.you_are_not_editor'|translate}}"
+				   tooltip-placement="right" acl-lacks-project-role="input" acl-project="project" style="color: darkred"></i>
+
 			</td>
 			<td><a ui-sref="main.project.basics({projectId: project._id})">{{project.name}}</a></td>
 			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>

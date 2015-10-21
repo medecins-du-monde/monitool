@@ -4,7 +4,8 @@ angular
 	.module(
 		'monitool.controllers.project.activity',
 		[
-			"monitool.services.olap"
+			"monitool.services.olap",
+			"ngSanitize"
 		]
 	)
 

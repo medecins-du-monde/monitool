@@ -25,6 +25,10 @@ angular
 		};
 	})
 
+	.controller('HomeController', function($scope) {
+		
+	})
+
 	.controller('HelpMenuController', function($scope) {
 		// tell page which are read for now
 		$scope.isDocRead = function(page) {
