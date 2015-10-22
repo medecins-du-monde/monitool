@@ -149,7 +149,7 @@ var ENGLISH_TRANSLATION = {
 			general: "Overall",
 			indicators: "Indicators catalog",
 			create_project: "Project's creation",
-			create_project: "Project's follow-up"
+			input_follow_up: "Project's follow-up"
 		},
 		page: {
 			presentation_general: "Introduction",
