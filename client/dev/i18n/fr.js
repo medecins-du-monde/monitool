@@ -147,7 +147,8 @@ var FRENCH_TRANSLATION = {
 		block: {
 			general: "Général",
 			indicators: "Catalogue d'indicateurs",
-			project: "Projets",
+			create_project: "Projet: Création",
+			input_follow_up: "Projet: Suivi"
 		},
 		page: {
 			presentation_general: "Présentation",

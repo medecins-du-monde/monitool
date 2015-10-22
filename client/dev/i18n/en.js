@@ -148,7 +148,8 @@ var ENGLISH_TRANSLATION = {
 		block: {
 			general: "Overall",
 			indicators: "Indicators catalog",
-			project: "Projects",
+			create_project: "Project's creation",
+			create_project: "Project's follow-up"
 		},
 		page: {
 			presentation_general: "Introduction",

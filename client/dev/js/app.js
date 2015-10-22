@@ -551,25 +551,20 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/help/general/presentation_general.html'
 	});
 
-	$stateProvider.state('main.help.acls', {
-		controller: 'HelpController',
-		url: "/acls",
-		templateUrl: 'partials/help/general/acls.html'
-	});
-
-	$stateProvider.state('main.help.translation', {
-		controller: 'HelpController',
-		url: "/translation",
-		templateUrl: 'partials/help/general/translation.html'
-	});
-
-	// create project
-
 	$stateProvider.state('main.help.data_path', {
 		controller: 'HelpController',
 		url: "/data_path",
-		templateUrl: 'partials/help/project_create/data_path.html'
+		templateUrl: 'partials/help/general/data_path.html'
 	});
+
+	// $stateProvider.state('main.help.acls', {
+	// 	controller: 'HelpController',
+	// 	url: "/acls",
+	// 	templateUrl: 'partials/help/general/acls.html'
+	// });
+
+	// create project
+
 
 	$stateProvider.state('main.help.users', {
 		controller: 'HelpController',
@@ -654,6 +649,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/help/indicators/collection_history.html'
 	});
 
+	$stateProvider.state('main.help.translation', {
+		controller: 'HelpController',
+		url: "/translation",
+		templateUrl: 'partials/help/general/translation.html'
+	});
 
 });
 

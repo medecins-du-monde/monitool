@@ -62,7 +62,6 @@ var SPANISH_TRANSLATION = {
 	shared: {
 		user_guide: "Guía del usuario",
 		home: "Inicio",
-
 		up: "Subir",
 		down: "Bajar",
 		sum: "Suma",
@@ -148,7 +147,8 @@ var SPANISH_TRANSLATION = {
 		block: {
 			general: "General",
 			indicators: "Catálogo de indicadores",
-			project: "Proyectos",
+			create_project: "Proyectos: creación",
+			input_follow_up: "Proyectos: seguimiento"
 		},
 		page: {
 			presentation_general: "Presentación",
