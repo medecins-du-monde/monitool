@@ -148,37 +148,22 @@ var ENGLISH_TRANSLATION = {
 		block: {
 			general: "Overall",
 			indicators: "Indicators catalog",
-			create_project: "Project's creation",
-			input_follow_up: "Project's follow-up"
+			project: "Project"
 		},
 		page: {
-			presentation_general: "Introduction",
-			presentation_project: "Introduction",
-			presentation_indicator: "Introduction",
-
-			offline_access: "Offline access",
-			acls: "Authorization",
-			translation: "Translation",
-
-			completeness: "Completeness and limitations",
-			operation_modes: "Operation modes",
-			computation: "Computation and aggregation",
-			collection_history: "Collection history",
-
-			logical_frame: "Logical frame",
-			entities_groups: "Input entities and groups",
-			input_forms: "Input forms",
-			users: "Authorization",
-
-			inputs: "Inputs",
-			statistics: "Statistics",
-			descriptive_analysis: "Descriptive analysis",
-			change_definition: "Modifying projects",
-
+			presentation_general: "Presentation",
 			data_path: "Data path",
-			activities_demography: "Activities & Demography",
-			objectives_results: "Objectives & Results"
-
+			create: "Create a new project",
+			structure: "Give structure to activity data",
+			input: "Make a data input",
+			activity_followup: "Activities follow-up",
+			logical_frame: "Input a logical framework",
+			objectives_results: "Objectives & results follow-up",
+			change_definition: "Change a started project",
+			indicator_usage: "Use the indicator catalog",
+			create_new_indicator: "Create an indicator",
+			merge_indicators: "Merge two indicators",
+			indicator_reporting: "Follow a cross-cutting indicator"
 		},
 		reminder: {
 			have_you_read_single_pre: "Did you read the ",

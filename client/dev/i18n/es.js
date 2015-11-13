@@ -147,36 +147,22 @@ var SPANISH_TRANSLATION = {
 		block: {
 			general: "General",
 			indicators: "Catálogo de indicadores",
-			create_project: "Proyectos: creación",
-			input_follow_up: "Proyectos: seguimiento"
+			project: "Proyecto"
 		},
 		page: {
 			presentation_general: "Presentación",
-			presentation_project: "Presentación",
-			presentation_indicator: "Presentación",
-
-			offline_access: "Uso desconectado",
-			acls: "Derechos de acceso",
-			translation: "Traducción",
-
-			completeness: "Integridad y limitaciones",
-			operation_modes: "Modos de operación",
-			computation: "Formulas y agregación",
-			collection_history: "Historial de colecta",
-
-			logical_frame: "Marco lógico",
-			entities_groups: "Lugares de actividad y grupos",
-			input_forms: "Formularios",
-			users: "Derechos de acceso",
-
-			inputs: "Entradas",
-			statistics: "Estadísticas",
-			descriptive_analysis: "Análisis descriptivo",
-			change_definition: "Modicaciones",
-
-			data_path: "Camino de los datos",
-			activities_demography: "Actividades & Demografía",
-			objectives_results: "Objetivos & Resultados"
+			data_path: "Etapas de los datos",
+			create: "Crear un nuevo proyecto",
+			structure: "Estructurar los datos de seguimiento",
+			input: "Hacer una entrada de datos",
+			activity_followup: "Seguir las actividades",
+			logical_frame: "Entrar un marco lógico",
+			objectives_results: "Seguir los objetivos & resultatos",
+			change_definition: "Cambiar un proyecto en curso",
+			indicator_usage: "Usar el catálogo",
+			create_new_indicator: "Crear un indicador",
+			merge_indicators: "Fusionar dos indicadores",
+			indicator_reporting: "Seguir un indicator transversal"
 		},
 		reminder: {
 			have_you_read_single_pre: "¿Ha leido la sección ",

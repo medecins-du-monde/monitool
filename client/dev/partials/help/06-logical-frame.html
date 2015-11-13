@@ -1,0 +1,366 @@
+<ol class="breadcrumb">
+	<li class="active" translate="shared.help"></li>
+	<li class="active" translate="help.block.general"></li>
+	<li class="active" translate="help.page.logical_frame"></li>
+</ol>
+
+<div ng-switch="language">
+	<div ng-switch-when="fr">
+
+		<h3>Prérequis</h3>
+		<p>Lorsqu’un projet est ajouté sur http://monitool.medecinsdumonde.net, deux cas de figure existent :</p>
+
+		<ul>
+			<li>C’est un projet dont le cadre logique est en cours de création, et on désire utiliser le Monitool pour structurer sa collecte de donnée.</li>
+			<li>Le projet est déjà entièrement construit à l’avance sur d’autres supports.</li>
+		</ul>
+
+
+		<p>Dans le premier cas, il est fréquent de saisir simultanément le cadre logique du projet et les formulaires de collecte nécessaire au calcul des indicateurs. Ceux sont les indicateurs du cadre logique qui déterminent en effet une partie des données qu’il est nécessaire de collecter.</p>
+		<p>Dans le deuxième cas, le projet étant déjà construit, il suffit de rentrer les formulaires de collecte, puis le cadre logique avec ses indicateurs.</p>
+
+
+		<h3>Le cadre logique</h3>
+
+		<p>Rendez-vous sur « Cadre logique » dans « Objectifs &amp; résultats »</p>
+		<img src="img/05-01.png" class="img-thumbnail" />
+
+		<p>La structure de cadre logique de l’outil est la suivante :</p>
+		<img src="img/05-02.png" class="img-thumbnail" />
+
+		<p>Pour le saisir suivez les étapes suivantes :</p>
+
+		<ol>
+			<li>
+				Rentrez l’objectif général du projet, puis cliquez sur « ajouter un objectif spécifique » autant de fois que vous avez d’objectifs à rentrer.<br/>
+				<img src="img/05-03.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Remplir le ou les objectifs spécifiques du projet, puis cliquer sur « Ajouter un résultat attendu » autant de fois que nécessaire<br/>
+				<img src="img/05-04.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Saisir les résultats<br/>
+				<img src="img/05-05.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Répéter les opérations antérieures jusqu’à avoir saisi tout le cadre logique du projet.
+			</li>
+		</ol>
+
+		<h3>Les indicateurs</h3>
+		L’outil propose d’ajouter des indicateurs pour mesurer l’avancement des objectifs et des résultats du cadre logique.
+
+		Deux conditions sont nécessaires pour ajouter un indicateur à un projet:
+		<ul>
+			<li>
+				Qu’il soit présent dans le catalogue d’indicateur.
+				<ul>
+					<li>Il n’est pas possible de créer des indicateurs spécifiques pour un seul projet.</li>
+					<li>C’est un effet voulu afin d’augmenter la qualité des indicateurs mesurés au sein de l’ONG.</li>
+				</ul>
+			</li>
+			<li>Que les données nécessaires à son calcul soient disponibles dans les formulaires de collecte du projet.</li>
+		</ul>
+
+		<ol>
+			<li>
+				Cliquer sur « Ajouter un indicateur »<br/>
+				<img src="img/05-06.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Choisissez un indicateur dans la liste proposée
+				<ol>
+					<li>Pour lister tous les indicateurs du catalogue à la place, cliquer sur « Voir aussi les autres thématiques »</li>
+					<li>Pour faire une recherche par mot clefs, rentrer du texte dans le champ « Rechercher »</li>
+					<li>Sinon, explorez le catalogue en cliquant sur les thématiques.</li>
+				</ol>
+				<img src="img/05-07.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Remplissez le premier bloc
+				<ol>
+					<li>Les informations que vous y rentrerez ne sont pas prises en compte dans le calcul des indicateurs</li>
+					<li>Leur rôle est de faciliter les transmissions de poste.</li>
+				</ol>
+				<img src="img/05-08.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Choisissez la formule de calcul que vous désirez utiliser
+				<ol>
+					<li>Le but est ici de fournir à l’outil les informations dont il a besoin pour calculer l’indicateur à partir des données présentes dans les formulaires de collecte.</li>
+					<li>Pour chaque indicateur, plusieurs formules de calcul peuvent être disponibles.</li>
+				</ol>
+				<img src="img/05-09.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Remplissez le tableau de correspondance qui apparaît
+				<ol>
+					<li>Choisissez la variable adaptée</li>
+					<li>Si nécessaire utilisez le filtre pour restreindre uniquement à certaines partions de la variable (cf formulaires de collecte).</li>
+				</ol>
+				<img src="img/05-10.png" class="img-thumbnail" /><br/>
+				<img src="img/05-11.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Répétez l’opération pour les autres paramètres de la formule		<br/>
+				<img src="img/05-12.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Si vous disposez d’une cible et d’une baseline chiffrée sur cet indicateur, entrez les dans les cases prévu à cet effet.
+				<ol>
+					<li>Cochez « Inconnu » si la baseline ou la cible ne sont pas connus</li>
+					<li>Cochez colorer pour améliorer la lecture de l’indicateur dans les tableaux de statistiques si c’est pertinent.</li>
+				</ol>
+				<img src="img/05-13.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Cliquez sur « Ajouter »<br/>
+				<img src="img/05-14.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Répéter l’opération pour chaque indicateur
+			</li>
+			<li>
+				Ne pas oublier de sauvegarder le cadre logique<br/>
+				<img src="img/05-15.png" class="img-thumbnail" />
+			</li>
+		</ol>
+	</div>
+	<div ng-switch-when="es">
+
+		<h3>Requisitos previos</h3>
+
+		<p>Cuando se agrega un proyecto para http://monitool.medecinsdumonde.net existen dos escenarios:</p>
+		<ul>
+			<li>Es un proyecto que tiene como marco lógico que se está creando, y desea utilizar el Monitool para estructurar la recopilación de datos.</li>
+			<li>El proyecto ya está totalmente construido con antelación en otros medios.</li>
+		</ul>
+
+
+		<p>En el primer caso, es común para introducir simultáneamente los formularios marco y recogida lógicos de proyectos necesarios para el cálculo de los indicadores. Esos son los indicadores del marco lógico que determinan, de hecho, algunos de los datos deben ser recogidos.</p>
+		<p>En el segundo caso, el proyecto ya está construido, entra formularios de recogida y el marco lógico con indicadores.</p>
+
+		<h3>El marco lógico</h3>
+
+		<p>Visita "Marco Lógico" en "Metas y Resultados»</p>
+		<img src="img/05-01.png" class="img-thumbnail" />
+		<p>La estructura de trama lógica de la herramienta es el siguiente:</p>
+		<img src="img/05-02.png" class="img-thumbnail" />
+
+		<p>Para introducir los siguientes pasos:</p>
+		<ol>
+			<li>
+				Introduzca el objetivo general del proyecto, haga clic en "agregar un objetivo específico" tantas veces como usted tiene que conseguir objetivos.<br/>
+				<img src="img/05-03.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Relleno o objetivos específicos del proyecto, a continuación, haga clic en "Añadir un resultado esperado" tantas veces como sea necesario<br/>
+				<img src="img/05-04.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Entre los resultados<br/>
+				<img src="img/05-05.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Repita los pasos anteriores hasta que haya introducido todo el marco lógico del proyecto.
+			</li>
+		</ol>
+
+		<h3>Indicadores</h3>
+		La herramienta propone añadir indicadores para medir el progreso de los objetivos y resultados del marco lógico.
+		Dos condiciones son necesarias para agregar un indicador a un proyecto:
+		<ul>
+			<li>
+				Está presente en el catálogo indicador.
+				<ul>
+					<li>No es posible establecer indicadores específicos para un solo proyecto.</li>
+					<li>Este es un efecto deseado de aumentar la calidad de los indicadores medidos dentro de la ONG.</li>
+				</ul>
+			</li>
+			<li>
+				Los datos necesarios para su cálculo están disponibles en los formularios de recogida de Proyecto.
+			</li>
+		</ul>
+
+		<ol>
+			<li>
+				Haga clic en "Añadir indicador"<br/>
+				<img src="img/05-06.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Elija un indicador de la lista
+				
+				<ol>
+					<li>Para una lista de todo el catálogo de indicadores de lugar, haga clic en "Ver también otra temática"</li>
+					<li>Para buscar por palabra clave, escriba el texto en el "Buscar"</li>
+					<li>Como alternativa, explorar el catálogo haciendo clic en los temas.</li>
+				</ol>
+				<img src="img/05-07.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Rellene el primer bloque
+				<ol>
+					<li>La información que regrese no se tienen en cuenta en el cálculo de indicadores</li>
+					<li>Su papel es el de facilitar posteriores transmisiones.</li>
+				</ol>
+				<img src="img/05-08.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Seleccione la fórmula que desea utilizar
+				<ol>
+					<li>El objetivo aquí es proporcionar la herramienta con la información necesaria para calcular el indicador de los datos presentes en los formularios de recogida.</li>
+					<li>Para cada indicador, varias fórmulas pueden estar disponibles.</li>
+				</ol>
+				<img src="img/05-09.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Llene la tabla de correspondencias que aparece
+				<ol>
+					<li>Seleccione la variable apropiada</li>
+					<li>Si es necesario, utilice el filtro para restringir sólo algunos se iban variable (ver formularios de recogida).</li>
+				</ol>
+				<img src="img/05-10.png" class="img-thumbnail" /><br/>
+				<img src="img/05-11.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Repita el proceso para los demás parámetros de la fórmula<br/>
+				<img src="img/05-12.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Si usted tiene un objetivo y una línea de base cifrado en este indicador, introduzca en las casillas previstas a tal efecto.
+				<ol>
+					<li>Marque "Desconocido" si la línea de base o de destino no se conocen</li>
+					<li>Compruebe colorante para facilitar la lectura del indicador en gráficos estadísticos, si procede.</li>
+				</ol>
+				<img src="img/05-13.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Haga clic en "Agregar"<br/>
+				<img src="img/05-14.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Repita para cada indicador
+			</li>
+			<li>
+				No se olvide de guardar el marco lógico<br/>
+				<img src="img/05-15.png" class="img-thumbnail" />
+			</li>
+		</ol>
+	</div>
+	<div ng-switch-when="en">
+
+		<h3>Prerequisites</h3>
+
+		When a project is added to http://monitool.medecinsdumonde.net two scenarios exist:
+		<ul>
+			<li>It is a project whose logical framework is being created, and you wish to use the Monitool to structure its data collection.</li>
+			<li>The project is already fully constructed in advance on other media.</li>
+		</ul>
+
+		In the first case, it is common to simultaneously enter the project logical framework and collection forms required to calculate the indicators. Those are the logical framework indicators which determine in fact some of the data need to be collected.
+		In the second case, the project is already built, simply enter collection forms and the logical framework with indicators.
+
+		<h3>The logical framework</h3>
+
+		<p>Visit "Logical Framework" in "Goals &amp; Results»</p>
+		<p>The logical frame structure of the tool is as follows:</p>
+		<img src="img/05-01.png" class="img-thumbnail" />
+
+		<p>To enter the following steps:</p>
+		<img src="img/05-02.png" class="img-thumbnail" />
+
+		<ol>
+			<li>
+				Enter the general objective of the project, then click "add a specific objective" as many times as you have to get goals.<br/>
+				<img src="img/05-03.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Fill or specific project objectives, then click on "Add an expected result" as many times as necessary<br/>
+				<img src="img/05-04.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Enter the results<br/>
+				<img src="img/05-05.png" class="img-thumbnail" />
+			</li>
+			<li>Repeat the previous steps until you have entered all the logical framework of the project.</li>
+		</ol>
+
+		<h3>Indicators</h3>
+		
+		The tool proposes to add indicators to measure the progress of the objectives and results of the logical framework.
+		Two conditions are necessary to add an indicator to a project:
+		<ul>
+			<li>It is present in the indicator catalog.</li>
+			<li>It is not possible to establish specific indicators for a single project.</li>
+		</ul>
+
+		This is a desired effect to increase the quality of the indicators measured within the NGO.
+		The data necessary for its calculation are available in Project collection forms.
+
+		<ol>
+			<li>
+				Click on "Add indicator"<br/>
+				<img src="img/05-06.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Choose an indicator from the list
+
+				<ol>
+					<li>To list all the indicators catalog instead, click on "See also other thematic"</li>
+					<li>To search by key word, enter the text in the "Search"</li>
+					<li>Alternatively, explore the catalog by clicking on the topics.</li>
+				</ol>
+				<img src="img/05-07.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Fill in the first block
+				<ol>
+					<li>The information you return it are not taken into account in the calculation of indicators</li>
+					<li>Their role is to facilitate post transmissions.</li>
+				</ol>
+				<img src="img/05-08.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Select the formula you want to use
+				<ol>
+					<li>The goal here is to provide the tool with the information it needs to calculate the indicator from the data present in the collection forms.</li>
+					<li>For each indicator, several formulas may be available.</li>
+				</ol>
+				<img src="img/05-09.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Fill the correlation table that appears
+				<ol>
+					<li>Select the appropriate variable</li>
+					<li>If necessary use the filter to restrict only some were leaving variable (see collection forms).</li>
+				</ol>
+				<img src="img/05-10.png" class="img-thumbnail" /><br/>
+				<img src="img/05-11.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Repeat for the other parameters of the formula<br/>
+				<img src="img/05-12.png" class="img-thumbnail" />
+			</li>
+			<li>
+				If you have a target and a baseline encrypted on this indicator, enter them in the boxes provided for this purpose.
+				<ol>
+					<li>Check "Unknown" if the baseline or target are not known</li>
+					<li>Check coloring to improve readability of the indicator in statistics charts if relevant.</li>
+				</ol>
+				<img src="img/05-13.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Click "Add"<br/>
+				<img src="img/05-14.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Repeat for each indicator
+			</li>
+			<li>
+				Do not forget to save the logical framework<br/>
+				<img src="img/05-15.png" class="img-thumbnail" />
+			</li>
+		</ol>
+	</div>
+</div>

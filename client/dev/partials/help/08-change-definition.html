@@ -1,0 +1,219 @@
+<ol class="breadcrumb">
+	<li class="active" translate="shared.help"></li>
+	<li class="active" translate="help.block.project"></li>
+	<li class="active" translate="help.page.change_definition"></li>
+</ol>
+
+<div ng-switch="language">
+	<div ng-switch-when="fr">
+		
+		<p>Lors du suivi d'un projet avec monitool, on respecte généralement l'ordre suivant:</p>
+		<ol>
+			<li>Conception des formulaires de collecte et saisie des lieux d'activité</li>
+			<li>Saisie du cadre logique et des indicateurs</li>
+			<li>Suivi du projet (saisies de données)</li>
+		</ol>
+
+		<p>Cependant, quelles sont les conséquences de modifier un projet dans lequel des données de suivi ont déjà été saisies?</p>
+
+		<h3>Conséquences par type de modification</h3>
+
+		<h4 style="color: green">
+			<i class="fa fa-check"></i>
+			Modifications ne causant pas de pertes de données
+		</h4>
+
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Modifier un cadre logique</h4>
+
+					<p>Toute modification d’un cadre logique, en incluant le changement des indicateurs suivis, ne pose pas de problème particulier: les statistiques générées selon rétroactivement corrigées pour correspondre au nouveau cadre logique.</p>
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Ajouter un nouveau lieux de collecte</h4>
+
+					<p>L’ajout d’un nouveau lieu d’activité demandera cependant de saisir rétroactivement toutes des données spécifiées par les formulaires de collecte</p>
+					<p>Il est possible de réaliser des saisies vides si les données ne sont pas connues.</p>
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Renommer des indicateurs, variables, partitions...</h4>
+					Le nom sera changé rétroactivement. Attention cependant aux non-sens (ne pas renommer « nombre de consultations » en « nombre de patients »).
+				</div>
+
+			</div>
+		</div>
+
+		<h4 style="color: orange">
+			<i class="fa fa-check"></i>
+			Modifications causant des pertes de données explicites
+		</h4>
+		
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Retrait d'un lieu de collecte</h4>
+					Toutes les saisies associées à ce lieux de collecte seront définitivement perdues.
+				</div>
+				<div class="col-xs-6">
+					<h4>Retrait d'un formulaire de collecte</h4>
+					Toutes les saisies associées à ce formulaire de collecte seront définitivement perdues.
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Retrait d'une variable dans un formulaire de collecte</h4>
+					Toutes les saisies associées à cet variable seront définitivement perdues.<br/>
+					Attention! Si le calcul d'un indicateur dépendait de cette valeur, il ne pourra plus être calculé sur tout son historique.
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Retrait d'une partition dans un formulaire de collecte</h4>
+					La partition sera perdu. Attention! Si le calcul d'un indicateur dépendait de la variable concernée, sa valeur va changer sur tout son historique.
+				</div>
+			</div>
+		</div>
+
+		<h4 style="color: darkred">
+			<i class="fa fa-exclamation-triangle"></i>
+			Modifications causant des pertes de données implicites
+		</h4>
+
+
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Ajout d'une partition sur une variable</h4>
+
+					L'ajout d'une nouvelle partition sur une variable cause la perte de toutes les données historiques sur l'ensemble de la variable.
+					Il sera nécessaire de refaire l'intégralité de la saisie de cette variable
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Changement du mode de collecte d'un formulaire</h4>
+					Il sera nécessaire de refaire l'intégralité de la saisie du formulaire.
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Changement de la périodicité d'un formulaire</h4>
+					Il sera nécessaire de refaire l'intégralité de la saisie du formulaire en fonction de la nouvelle périodicité.
+				</div>
+			</div>
+		</div>
+
+		<h3>Sur le rôle des dates de début et fin des formulaires de collecte</h3>
+		<p>Nous avons vu que toutes les modifications réalisées sur un formulaire de collecte sont rétroactives.</p>
+		<p>Ce comportement est désiré dans le cas où des erreurs ont été faites dans la création du formulaire initial, et que l’utilisateur désire les corriger rétroactivement. Un autre cas de figure possible est que les modifications à réaliser ne sont pas liées à des erreurs commises, mais à une modification du projet.</p>
+		<p>Dans ce cas, modifier un formulaire de collecte en utilisation n’est en aucun cas la marche à suivre : pour modifier les mécaniques de collecte de statistiques d’un projet, il suffit de changer la date de fin des formulaires de collecte utilisés à la date du jour, puis d’en créer des nouveaux qui commencent à partir de cette date.</p>
+		<p>On peut ainsi avoir un projet qui change considérablement de méthodes de collecte (réécriture complète des données saisies sur le terrain par exemple) sans rien perdre de l’historique des saisies.</p>
+
+	</div>
+	<div ng-switch-when="en">
+		<p>When tracking a project with Monitool the following order is generally respected:</p>
+
+		<ol>
+			<li>Design collection forms and enter data collection sites</li>
+			<li>Enter the Logical Frame and indicators of the project</li>
+			<li>Project follow-up (data entry &amp; reporting)</li>
+		</ol>
+
+		<p>However, what are the consequences of changing a project in which monitoring data has already been entered?</p>
+
+		<h3>Consequences by type of change</h3>
+		<h4 style="color: green">
+			<i class="fa-check fa"></i>
+			Changes that do not cause data loss
+		</h4>
+
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Edit logical frame</h4>
+
+					<p>All modification of a logical frame, including the change of monitored indicators, poses no particular problem: reporting will be generated retroactively to match the new logical frame</p>
+				</div>
+				
+				<div class="col-xs-6">
+					<h4>Add new collection sites</h4>
+
+					<p>The addition of a new collection site, ask to retroactively enter all of the data specified by the collection forms</p>
+					<p>It is possible to save empty inputs if the data are unknown.</p>
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Rename indicators, variables or partitions...</h4>
+					The name will be changed retroactively.
+					Be careful though to nonsense (do not rename "number of visits" to "number of patients").
+				</div>
+			</div>
+
+		</div>
+		<h4 style="color: orange">
+			<i class="fa-check fa"></i>
+			Changes causing explicit data loss
+		</h4>
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Removing a collection site</h4>
+					All entries associated with that collection site will be permanently lost.
+				</div>
+				<div class="col-xs-6">
+					<h4>Removing a collection form</h4>
+					All entries associated with this collection form will be permanently lost.
+				</div>
+				<div class="col-xs-6">
+					<h4>Removing a variable in a collection form</h4>
+
+					All entries associated with this variable will be lost permanently. <br/>
+					Warning! If the calculation of an indicator depends on this value, it will no longer be available on all of its history.
+				</div>
+
+				<div class="col-xs-6">
+					<h4>Removing a partition in a collection form</h4>
+
+					The partition will be lost.<br/>
+					Warning! If the calculation of an indicator dependent on the concerned variable, its value will change over its history.
+				</div>
+			</div>
+		</div>
+		
+		<h4 style="color: darkred">
+			<i class="fa fa-exclamation-triangle"></i>
+			Changes causing implicit data loss
+		</h4>
+
+		<div class="well">
+			<div class="row">
+				<div class="col-xs-6">
+					<h4>Adding a partition on a variable</h4>
+
+					The addition of a new partition on a variable causes the loss of all historical data on the entire variable. It will be necessary to redo the entire data entry for this variable.
+				</div>
+				<div class="col-xs-6">
+					<h4>Change the mode of collection of a form</h4>
+					
+					It will be necessary redo the entire data entry for the form. 
+				</div>
+				<div class="col-xs-6">
+					<h4>Change the periodicity of a form</h4>
+
+					It will be necessary to redo the entire data entry for the form according to the new frequency.
+				</div>
+			</div>
+		</div>
+
+		<h3>On the role of the start and end dates of forms</h3>
+
+		<p>We have seen that all changes made on a collection form are retroactive .</p>
+		<p>This behavior is desired in case mistakes were made in setting up the initial form, and the user wishes to correct retroactively. Another case of figure is that changes are not related to mistakes, but to a change in the project.</p>
+
+		<p>In this case, changing the form mid-project is not the way to go: just edit the end date of the form that needs to change and to create a new one that start from that date.</p>
+		<p>This allows a projet to change considerably its data collection methods without losing any data.</p>
+
+	</div>
+	<div ng-switch-when="es">
+		La documentación solo esta traducida en francés e inglés por ahora.
+	</div>
+</div>

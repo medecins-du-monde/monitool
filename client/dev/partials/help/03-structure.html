@@ -1,0 +1,474 @@
+<ol class="breadcrumb">
+	<li class="active" translate="shared.help"></li>
+	<li class="active" translate="help.block.general"></li>
+	<li class="active" translate="help.page.structure"></li>
+</ol>
+
+<div ng-switch="language">
+	<div ng-switch-when="fr">
+
+		<h3>Lieux de collecte</h3>
+
+		<h4>Fonctionnement</h4>
+		<p>Il est fréquent qu’un projet exerce ses activités sur des lieux d’activité qui ne sont pas homogènes (des villages, centres de santé, hôpitaux, …).</p>
+		<p>Lors de l’analyse d’un projet, il peut être plus pertinent plutôt que de consulter la valeur des indicateurs individuellement par lieu d’activité, ou au contraire, agrégés au niveau du projet, de réaliser une agrégation intermédiaire par proximité géographique, nombre de bénéficiaires gérés…</p>
+		<p>La mécanique des groupes d’activité répond à cette problématique.</p>
+		<p>Prenons pour exemple pour un projet de réduction des risques en France, qui exerce son activité dans les lieux suivants (en bleu).</p>
+
+		<div ng-include="'partials/help/03-structure-schema.html'" style="width: 500px; display: block;"></div>
+
+
+		<p>L’utilisateur peut créer trois groupes d’activité, ce qui lui permettra à l’avenir de disposer d’un niveau d’agrégation supplémentaire lors de l’analyse de ses données.</p>
+		<p>Il est important de noter qu’un lieu d’activité peut appartenir à plusieurs groupes simultanément.</p>
+
+
+		<h4>Mise en pratique</h4>
+		<ol>
+			<li>
+				Se rendre sur la page des lieux de collecte<br/>
+				<img src="img/02-01.png" class="img-thumbnail" />
+			</li>
+
+			<li>
+				Ajouter des lieux de collecte
+				<ol>
+					<li>C’est simplement la liste des lieux où le projet collecte des données</li>
+					<li>Il est possible d’être plus ou moins précis selon les besoins du projet.</li>
+				</ol>
+
+				<img src="img/02-02.png" class="img-thumbnail" /><br/>
+				<img src="img/02-03.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Ajouter des groupes de collecte
+				<ol>
+					<li>Ceux-ci n’ont que pour rôle de faciliter le traitement des statistiques ultérieurement</li>
+					<li>Les groupes ne sont pas exclusifs</li>
+				</ol>
+				<img src="img/02-04.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Sauvegarder<br/>
+				<img src="img/02-05.png" class="img-thumbnail" />
+			</li>
+		</ol>
+
+		<h3>Formulaires de collecte</h3>
+
+		Les formulaires de collecte ont pour rôle de lister les données que l’on désire collecter.
+
+		<ol>
+			<li>
+				Se rendre sur la page de la liste des formulaires de collecte<br/>
+				<img src="img/02-06.png" class="img-thumbnail" />
+			</li>
+
+			<li>
+				Créer un nouveau formulaire<br/>
+				<img src="img/02-07.png" class="img-thumbnail" />
+			</li>
+
+			<li>
+				Remplir les champs de la partie « planning de saisie »
+				<ol>
+					<li>Nom : Permet de nommer le formulaire pour le retrouver facilement ultérieurement.</li>
+					<li>Collecter sur : Décider si les données que vous allez collecter sont pertinentes pour niveau de chaque lieu de collecte, ou uniquement au sein du projet en général.</li>
+						<ol>
+							<li>i. « Nombre de consultations » est une donnée à collecter au niveau de chaque lieu de collecte</li>
+							<li>ii. « Nombre de documents de formation produits » est une donnée qui n’a de sens que sur le projet général (si ces documents ne sont pas produits de façon indépendante par chaque lieux de collecte, mais au siège du projet).</li>
+						</ol>
+					<li>Périodicité : À quelle périodicité ces données sont-elles collectés sur le projet ?</li>
+					<li>Dates de début et fin : Généralement, ce sont les mêmes dates que pour le projet, mais il est possible de définir des formulaires qui ne s’appliquent que sur une période définie.</li>
+				</ol>
+				<img src="img/02-08.png" class="img-thumbnail" />
+			</li>
+			
+			<li>
+				Ajouter des sections qui font sens en fonction des sources des données que vous allez lister<br/>
+				<img src="img/02-09.png" class="img-thumbnail" />
+			</li>
+
+			<li>
+				Ajouter la liste des variables que l’on désire collecter dans chacune des sections
+				<ol>
+					<li>Une variable est une grandeur que l’on désire mesurer.</li>
+					<li>C’est généralement une grandeur que l’on peut sommer entre les lieux de collecte et les périodes de saisie</li>
+					<li>Très rarement, des pourcentages ou autres valeurs calculées</li>
+				</ol>
+				<img src="img/02-10.png" class="img-thumbnail" />
+			</li>
+
+			<li>
+				Corriger la colonne « agrégation » pour les valeurs qui ne sont pas sommable
+				<ol>
+					<li>Cette étape est indispensable</li>
+					<li>C’est le cas de deux variables dans notre exemple : « Nombre de patients » et « Population de référence ».</li>
+					<li>On ne peut pas calculer le « nombre de patients » sur une période d’un trimestre à partir de cette même valeur par mois. On indique donc « ne pas agréger » dans la case « Agrégation sur un même lieu ».</li>
+					<li>La population sur un trimestre vaut la moyenne des populations par mois. On indique donc « Moyenne » dans la même case pour « population de référence ».</li>
+				</ol>
+				<img src="img/02-11.png" class="img-thumbnail" /><br/>
+				<img src="img/02-12.png" class="img-thumbnail" />
+			</li>
+
+			<li>
+				Si nécessaire partitionner les variables collectées
+				<ol>
+					<li>Celles-ci permettent de diviser une variable en sous-variables qui peuvent se sommer entre-elles</li>
+					<li>Les cases d’agrégations n’agissent pas sur les partitions : les données doivent être sommables. Leur rôle est de gérer l’agrégation de plusieurs saisies (par exemple sur des lieux de collecte différents).</li>
+					<li>Lorsqu’une variable est divisée en sous-variables, la variable doit faire sens une fois sommée.</li>
+				</ol>
+				<img src="img/02-13.png" class="img-thumbnail" />
+			</li>
+
+			<li>
+				Sauvegarder<br/>
+				<img src="img/02-14.png" class="img-thumbnail" />
+			</li>
+
+			<li>Vérifier que toutes les données nécessaires au calcul des indicateurs du cadre logique sont disponibles (vous pourrez corriger les formulaires ultérieurement)</li>
+		</ol>
+
+		<h3>Pourquoi plusieurs formulaires ?</h3>
+
+		<p>Chaque formulaire est caractérisé par sa périodicité et par sa portée (collecter sur tous les lieux de collecte indépendamment, ou sur le projet en général ?)</p>
+		<p>Imaginons un projet qui désire collecter:</p>
+		<ul>
+			<li>mensuellement par lieux de collecte (les données issues des évaluations de personnel)</li>
+			<li>hebdomadairement par lieux de collecte (les données issues du registre de consultations de centres de santé)</li>
+			<li>mensuellement au niveau du projet (le nombre de formations organisées et le nombre de participants)</li>
+		</ul>
+
+		<p>Il devra simplement créer trois formulaires de collecte.</p>
+
+		<h3>Structure de donnée : Les erreurs à éviter</h3>
+
+		<ol>
+			<li>
+				Créer plusieurs variables au lieu d’utiliser les partitions
+				<ol>
+					<li>Facile d’oublier une catégorie</li>
+					<li>Des cases à remplir une par une lors de la saisie, au lieu de tableaux structurés</li>
+					<li>L’exploitation des données impossibles (le logiciel ne peut lier les variables entre-elles et calculer les sommes automatiquement)</li>
+				</ol>
+				<img src="img/02-15.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Faire des partitions qui ne sont pas mutuellement exclusives
+				<ol>
+					<li>Les totaux calculés automatiquement seront faux, et par extension, les tableaux, graphes et indicateurs qui en dépendent</li>
+					<li>La saisie plus longue que sur éléments bien dissociés</li>
+				</ol>
+				<img src="img/02-16.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Faire des partitions qui sont incomplètes (les totaux seront faux)<br/>
+				<img src="img/02-17.png" class="img-thumbnail" />
+			</li>
+		</ol>
+
+	</div>
+	<div ng-switch-when="es">
+
+
+		<h3>Sitios de recolección</h3>
+
+		<h4>Modo de operación</h4>
+
+		<p>Es frequente que un proyecto tenga actividades en sitios que no se parecen entre ellos (pueblos, centros de salud, hospitales...)</p>
+		<p>Cuando se analizan los datos, suele ser mas pertinente consultar los indicadores por grupos de lugares que consultarlos sobre el proyecto entero</p>
+
+		<p>Por ejemplo en un proyecto de reducción de riesgos en Francia que ejerce sus actividades en los sitios siguientes (azúl).</p>
+
+		<div ng-include="'partials/help/03-structure-schema.html'" style="width: 500px; display: block;"></div>
+
+		<p>El usuario puede crear tres grupos, para tener un nivel de agregación adicional cuando hara su analisis de datos.</p>
+		<p>Un mismo lugar puede pertenecer a varios grupos.</p>
+
+
+		<h4>Puesta en práctica</h4>
+
+		Los datos recogidos en el campo están segmentados por colección de sitios
+
+		<ol>
+			<li>
+				Ir a los sitios de recolección de la página<br/>
+				<img src="img/02-01.png" class="img-thumbnail" />
+			</li>
+
+			<li>
+				Agregue los sitios de recolección
+				<ol>
+					<li>Se trata simplemente de una lista de lugares donde el proyecto de recopilación de datos</li>
+					<li>Es posible ser más o menos precisa dependiendo de las necesidades del proyecto.</li>
+				</ol>
+
+				<img src="img/02-02.png" class="img-thumbnail" /><br/>
+				<img src="img/02-03.png" class="img-thumbnail" />
+			<li>
+				Grupos Add recoger
+				<ol>
+					<li>Sólo han cometido es facilitar la tramitación de las estadísticas más tarde</li>
+					<li>Los grupos no son exclusivos</li>
+				</ol>
+				<img src="img/02-04.png" class="img-thumbnail" />
+			</li>
+			
+			<li>
+				Guardar<br/>
+				<img src="img/02-05.png" class="img-thumbnail" />
+			</li>
+		</ol>
+
+		<h3>Formularios de recogida de Proyecto Volver</h3>
+		Papel formularios de recogida es hacer una lista de los datos que ha de ser recogida en las instalaciones de recogida.
+
+		<ol>
+			<li>
+				Ir a la página de la lista de formularios de recogida<br/>
+				<img src="img/02-06.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Cree un nuevo formulario<br/>
+				<img src="img/02-07.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Complete los campos de la sección de "planificación de entrada"
+				<ol>
+					<li>Nombre: permite asignar un nombre a la forma de recuperarlo posteriormente con facilidad.</li>
+					<li>Recoger en: Decida si los datos que recopila es relevante para el nivel de cada lugar de recolección o sólo dentro del proyecto en general.</li>
+						<ol>
+							<li>i. "Visitas" es datos que deben recogerse en cada lugar de recolección</li>
+							<li>ii. "Muchos productos materiales de capacitación" son datos que sólo tiene sentido en el proyecto en general (si estos documentos no son producidos de forma independiente por cada colección de sitios, pero en la sede del proyecto).</li>
+						</ol>
+					<li>Frecuencia: ¿A qué frecuencia estos datos se recogerán en el proyecto?</li>
+					<li>Inicio y final: Por lo general, son las mismas fechas que para el proyecto, pero es posible definir las formas que sólo se aplican durante un período definido.</li>
+				</ol>
+				<img src="img/02-08.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Agregue secciones que tienen sentido en términos de fuentes de datos que se van a listar<br/>
+				<img src="img/02-09.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Agregue la lista de variables que se percibirá en cada sección
+				<ol>
+					<li>Una variable es una variable que se va a medir.</li>
+					<li>En general, es una magnitud que puede convocar entre los puntos de recogida y los períodos de entrada</li>
+					<li>En muy raras ocasiones, porcentajes u otros valores calculados</li>
+				</ol>
+				<img src="img/02-10.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Corrija la columna de "agregación" de valores que no son integrables
+				<ol>
+					<li>Este paso es esencial</li>
+					<li>Este es el caso de dos variables en nuestro ejemplo: "Número de pacientes" y "población de referencia".</li>
+					<li>No podemos calcular el "número de pacientes" durante un período de un cuarto de la misma cantidad por mes. Entonces dijimos "no se agregan" en la "agregación en un solo lugar."</li>
+					<li>La población es de alrededor de un cuarto de la población promedio por mes. Por lo tanto, indica "Media" en la misma caja de "población de referencia".</li>
+				</ol>
+				<img src="img/02-11.png" class="img-thumbnail" /><br/>
+				<img src="img/02-12.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Si es necesario partición las variables recogidas
+				<ol>
+					<li>Estos permiten dividir una variable sub-variables que pueden sumar entre sí</li>
+					<li>Agregaciones de células no actúan sobre las particiones: los datos deben ser integrable. Su función es la gestión de la agregación de varias convulsiones (por ejemplo, en diferentes sitios de recolección).</li>
+					<li>Cuando una variable se divide en sub-variables, la variable debe tener sentido una vez convocado.</li>
+				</ol>
+				<img src="img/02-13.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Guarde<br/>
+				<img src="img/02-14.png" class="img-thumbnail" />
+			</li>
+			<li>Compruebe que todos los datos necesarios para el cálculo de los indicadores del marco lógico están disponibles (se puede corregir formas posteriores)</li>
+		</ol>
+
+		<h3>¿Por varias formas?</h3>
+		Cada forma se caracteriza por su frecuencia y su alcance (recoger todos los sitios de recolección de manera independiente o en el proyecto en general?)
+		Imagine un proyecto que quiere recoger:
+		<ul>
+			<li>mensualmente por lugares de recolección (datos de las evaluaciones del personal)</li>
+			<li>semanalmente por los sitios de recolección (los datos del registro de centros de consultas de salud)</li>
+			<li>mensual a nivel de proyecto (el número de cursos de formación organizados y número de participantes)</li>
+		</ul>
+
+		Simplemente va a crear de tres formas colección.
+
+		<h3>Estructura de datos: Errores a evitar</h3>
+		<ol>
+			<li>
+				Cree múltiples variables en lugar de utilizar las particiones
+				<ol>
+					<li>Fácil de olvidar una categoría</li>
+					<li>De las cajas para llenar uno por uno al escribir, en lugar de tablas estructuradas</li>
+					<li>Los datos de funcionamiento que no puede (el software se puede unir entre sí las variables y calcular las cantidades automáticamente)</li>
+				</ol>
+				<img src="img/02-15.png" class="img-thumbnail" />
+			</li>
+			<li>
+				particiones que no son mutuamente excluyentes
+				<ol>
+					<li>Los totales se calculan automáticamente falso, y por extensión, tablas, gráficos e indicadores que dependen</li>
+					<li>La entrada más larga elementos, así disociado</li>
+				</ol>
+				<img src="img/02-16.png" class="img-thumbnail" />
+			</li>
+			<li>
+				particiones que sean incompletas (totales serán mal)<br/>
+				<img src="img/02-17.png" class="img-thumbnail" />
+			</li>
+		</ol>
+
+	</div>
+	<div ng-switch-when="en">
+
+		<h3>Collection sites</h3>
+
+		<h4>Why?</h4>
+
+		<p>It's frequent for a project to have activities in sites that are not alike between them (towns, health centers, hospitals, ...).</p>
+		<p>When analysing a project's data, it can be more relevant to consult indicators over groups of collection sites, instead of either on the project as a whole, or by collection site.</p>
+		<p>For instance, for a harm reduction project in France, working on the following collection site (in blue).</p>
+
+		<div ng-include="'partials/help/03-structure-schema.html'" style="width: 500px; display: block;"></div>
+
+		<p>The user can create three groups, which will provide him a new aggregation level for indicator analysis.</p>
+		<p>It's important to remember while working that each collection site can be in multiple groups.</p>
+
+		<h4>Practical usage</h4>
+
+		The data collected in the field are segmented by site collection
+		<ol>
+			<li>
+				Go to the page collection sites<br/>
+				<img src="img/02-01.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Add collection sites
+				<ol>
+					<li>It is simply a list of locations where the data collection project</li>
+					<li>It is possible to be more or less precise depending on project needs.</li>
+				</ol>
+
+				<img src="img/02-02.png" class="img-thumbnail" /><br/>
+				<img src="img/02-03.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Add collecting groups
+				<ol>
+					<li>They have only role is to facilitate the processing of statistics later</li>
+					<li>The groups are not exclusive</li>
+				</ol>
+				<img src="img/02-04.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Save<br/>
+				<img src="img/02-05.png" class="img-thumbnail" />
+			</li>
+		</ol>
+
+		<h3>Back Project collection forms</h3>
+		Collection forms role is to list the data that is to be collected on collection facilities.
+		<ol>
+			<li>
+				Go to the page of the list of collection forms<br/>
+				<img src="img/02-06.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Create a new form<br/>
+				<img src="img/02-07.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Complete the fields in the section "Input planning"
+				<ol>
+					<li>Name: Allows you to name the form to retrieve it later easily.
+					<li>Collect at: Decide if the data you collect is relevant to the level of each collection site or only within the project in general.
+						<ol>
+							<li>"Visits" is data to be collected at each collection site
+							<li>"Many products training materials" is data that makes sense only on the overall project (if these documents are not produced independently by each site collection, but at project headquarters).
+						</ol>
+					<li>Frequency: At what frequency these data be collected on the project?
+					<li>Start and end: Generally, it is the same dates as for the project, but it is possible to define forms that apply only over a defined period.
+				</ol>
+				<img src="img/02-08.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Add sections that make sense in terms of data sources you are going to list<br/>
+				<img src="img/02-09.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Add the list of variables that is to be collected in each section
+				<ol>
+					<li>A variable is a variable that is to be measured.</li>
+					<li>It is generally a magnitude that can summon between collection points and input periods</li>
+					<li>Very rarely, percentages or other calculated values</li>
+				</ol>
+				<img src="img/02-10.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Correct the "aggregation" column for values ​​that are not integrable
+				<ol>
+					<li>This step is essential</li>
+					<li>This is the case of two variables in our example: "Number of patients" and "Reference population".</li>
+					<li>We can not calculate the "number of patients" over a period of a quarter from the same amount per month. So we said "do not aggregate" in the "Aggregation in one place."</li>
+					<li>The population is about a quarter of the average population per month. Therefore indicates "Medium" in the same box for "reference population".</li>
+				</ol>
+				<img src="img/02-11.png" class="img-thumbnail" /><br/>
+				<img src="img/02-12.png" class="img-thumbnail" />
+			</li>
+			<li>
+				If necessary partition the variables collected
+				<ol>
+					<li>These allow to divide a variable sub-variables that can sum to one another</li>
+					<li>Aggregations of cells do not act on partitions: data must be integrable. Their role is to manage the aggregation of several seizures (eg on different collection sites).</li>
+					<li>When a variable is divided into sub-variables, the variable must make sense once summoned.</li>
+				</ol>
+				<img src="img/02-13.png" class="img-thumbnail" />
+			</li>
+			<li>
+				Save<br/>
+				<img src="img/02-14.png" class="img-thumbnail" />
+			</li>
+			<li>Check that all the data necessary to calculate the logical framework indicators are available (you can correct later forms)</li>
+		</ol>
+
+
+		<h3>Why several forms?</h3>
+		Each form is characterized by its frequency and its scope (collect all collection sites independently or on the project in general?)
+		Imagine a project that wants to collect:
+		<ul>
+			<li>monthly by collection locations (data from personnel evaluations)</li>
+			<li>weekly by collection sites (the data from the register of consultations health centers)</li>
+			<li>monthly at the project level (the number of training courses organized and number of participants)</li>
+		</ul>
+
+		It will simply create three forms collection.
+
+		<h3>Data structure: Mistakes to Avoid</h3>
+		<ol>
+			<li>Create multiple variables instead of using partitions
+				<ol>
+					<li>Easy to forget a category</li>
+					<li>Of boxes to fill one by one when typing, instead of structured tables</li>
+					<li>The operating data that can not (the software can bind variables to one another and calculate the amounts automatically)</li>
+				</ol>
+				<img src="img/02-15.png" class="img-thumbnail" />
+			</li>
+			<li>partitions that are not mutually exclusive
+				<ol>
+					<li>The totals will be calculated automatically false, and by extension, tables, graphs and indicators that depend</li>
+					<li>The longest entry as well dissociated elements</li>
+				</ol>
+				<img src="img/02-16.png" class="img-thumbnail" />
+			</li>
+			<li>
+				partitions which are incomplete (totals will be wrong)<br/>
+				<img src="img/02-17.png" class="img-thumbnail" />
+			</li>
+		</ol>
+
+
+	</div>
+</div>

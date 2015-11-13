@@ -147,36 +147,22 @@ var FRENCH_TRANSLATION = {
 		block: {
 			general: "Général",
 			indicators: "Catalogue d'indicateurs",
-			create_project: "Projet: Création",
-			input_follow_up: "Projet: Suivi"
+			project: "Projet"
 		},
 		page: {
 			presentation_general: "Présentation",
-			presentation_project: "Présentation",
-			presentation_indicator: "Présentation",
-
-			offline_access: "Utilisation offline",
-			acls: "Droits d'accès",
-			translation: "Traduction",
-
-			completeness: "Exhaustivité et contraintes",
-			operation_modes: "Mode d'opérations",
-			computation: "Formules et agrégation",
-			collection_history: "Historique de collecte",
-
-			logical_frame: "Cadre logique",
-			entities_groups: "Lieux de collecte et groupes",
-			input_forms: "Plannings de saisie",
-			users: "Droits d'accès",
-
-			inputs: "Saisies",
-			statistics: "Statistiques",
-			descriptive_analysis: "Analyse Descriptives",
-			change_definition: "Re-spécification",
-
 			data_path: "Chemin des données",
-			activities_demography: "Activités & Demographie",
-			objectives_results: "Objectifs & Resultats"
+			create: "Créer un nouveau projet",
+			structure: "Structurer des données d'activité",
+			input: "Réaliser une saisie",
+			activity_followup: "Suivre des activités",
+			logical_frame: "Rentrer un cadre logique",
+			objectives_results: "Suivre des objectifs & résultats",
+			change_definition: "Modifier un projet en cours",
+			indicator_usage: "Utiliser le catalogue",
+			create_new_indicator: "Créer un indicateur",
+			merge_indicators: "Fusionner deux indicateurs",
+			indicator_reporting: "Suivre un indicateur en transversal"
 		},
 		reminder: {
 			have_you_read_single_pre: "Avez-vous lu la section",

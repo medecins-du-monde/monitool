@@ -544,115 +544,84 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/help/menu.html',
 	});
 
-	// overall
+
+
 	$stateProvider.state('main.help.presentation_general', {
 		controller: 'HelpController',
 		url: "/presentation_general",
-		templateUrl: 'partials/help/general/presentation_general.html'
+		templateUrl: 'partials/help/00-presentation_general.html'
 	});
 
 	$stateProvider.state('main.help.data_path', {
 		controller: 'HelpController',
 		url: "/data_path",
-		templateUrl: 'partials/help/general/data_path.html'
+		templateUrl: 'partials/help/01-data_path.html'
 	});
 
-	// $stateProvider.state('main.help.acls', {
-	// 	controller: 'HelpController',
-	// 	url: "/acls",
-	// 	templateUrl: 'partials/help/general/acls.html'
-	// });
-
-	// create project
-
-
-	$stateProvider.state('main.help.users', {
+	$stateProvider.state('main.help.create', {
 		controller: 'HelpController',
-		url: "/users",
-		templateUrl: 'partials/help/project_create/users.html'
+		url: "/create",
+		templateUrl: 'partials/help/02-create.html'
 	});
 
-	$stateProvider.state('main.help.entities_groups', {
+	$stateProvider.state('main.help.structure', {
 		controller: 'HelpController',
-		url: "/entities_groups",
-		templateUrl: 'partials/help/project_create/entities_groups.html'
+		url: "/structure",
+		templateUrl: 'partials/help/03-structure.html'
 	});
 
-	$stateProvider.state('main.help.activities_demography', {
+	$stateProvider.state('main.help.input', {
 		controller: 'HelpController',
-		url: "/activities_demography",
-		templateUrl: 'partials/help/project_create/activities_demography.html'
+		url: "/input",
+		templateUrl: 'partials/help/04-input.html'
 	});
-	
+
+	$stateProvider.state('main.help.activity_followup', {
+		controller: 'HelpController',
+		url: "/activity-followup",
+		templateUrl: 'partials/help/05-activity-followup.html'
+	});
+
+	$stateProvider.state('main.help.logical_frame', {
+		controller: 'HelpController',
+		url: "/logical-frame",
+		templateUrl: 'partials/help/06-logical-frame.html'
+	});
+
 	$stateProvider.state('main.help.objectives_results', {
 		controller: 'HelpController',
-		url: "/objectives_results",
-		templateUrl: 'partials/help/project_create/objectives_results.html'
+		url: "/objectives-results",
+		templateUrl: 'partials/help/07-objectives-results.html'
 	});
-
-
-	// project follow up
-
-	$stateProvider.state('main.help.inputs', {
-		controller: 'HelpController',
-		url: "/inputs",
-		templateUrl: 'partials/help/project_follow_up/inputs.html'
-	});
-
-	$stateProvider.state('main.help.statistics', {
-		controller: 'HelpController',
-		url: "/statistics",
-		templateUrl: 'partials/help/project_follow_up/statistics.html'
-	});
-
-	// $stateProvider.state('main.help.descriptive_analysis', {
-	// 	controller: 'HelpController',
-	// 	url: "/descriptive_analysis",
-	// 	templateUrl: 'partials/help/project_follow_up/descriptive_analysis.html'
-	// });
 
 	$stateProvider.state('main.help.change_definition', {
 		controller: 'HelpController',
-		url: "/change_definition",
-		templateUrl: 'partials/help/project_follow_up/change_definition.html'
+		url: "/change-definition",
+		templateUrl: 'partials/help/08-change-definition.html'
 	});
 
-	// indicators
-
-	$stateProvider.state('main.help.presentation_indicator', {
+	$stateProvider.state('main.help.indicator_usage', {
 		controller: 'HelpController',
-		url: "/presentation_indicator",
-		templateUrl: 'partials/help/indicators/presentation_indicator.html'
+		url: "/indicator-usage",
+		templateUrl: 'partials/help/09-indicator-usage.html'
 	});
 
-	$stateProvider.state('main.help.completeness', {
+	$stateProvider.state('main.help.create_new_indicator', {
 		controller: 'HelpController',
-		url: "/completeness",
-		templateUrl: 'partials/help/indicators/completeness.html'
+		url: "/create-new-indicator",
+		templateUrl: 'partials/help/10-create-new-indicator.html'
 	});
 
-	$stateProvider.state('main.help.operation_modes', {
+	$stateProvider.state('main.help.merge_indicators', {
 		controller: 'HelpController',
-		url: "/operation_modes",
-		templateUrl: 'partials/help/indicators/operation_modes.html'
+		url: "/merge-indicators",
+		templateUrl: 'partials/help/11-merge-indicators.html'
 	});
 
-	$stateProvider.state('main.help.computation', {
+	$stateProvider.state('main.help.indicator_reporting', {
 		controller: 'HelpController',
-		url: "/computation",
-		templateUrl: 'partials/help/indicators/computation.html'
-	});
-
-	$stateProvider.state('main.help.collection_history', {
-		controller: 'HelpController',
-		url: "/collection_history",
-		templateUrl: 'partials/help/indicators/collection_history.html'
-	});
-
-	$stateProvider.state('main.help.translation', {
-		controller: 'HelpController',
-		url: "/translation",
-		templateUrl: 'partials/help/general/translation.html'
+		url: "/indicator-reporting",
+		templateUrl: 'partials/help/12-indicator-reporting.html'
 	});
 
 });

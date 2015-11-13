@@ -5,7 +5,7 @@
 	<li class="active">{{form.name}}</li>
 </ol>
 
-<doc-reminder pages="create_project.change_definition"></doc-reminder>
+<doc-reminder pages="project.structure,project.change_definition"></doc-reminder>
 
 <div class="alert alert-danger noprint"
 	 ng-if="formUsage.length"
@@ -215,7 +215,7 @@
 
 				<!-- variable partitions -->
 				<td ng-repeat="partition in element.partitions">
-					<div class="input-group" ng-repeat="p in partition track by p.id" style="margin-bottom: 2px;" acl-has-project-role="owner" acl-fallback="p.name">
+					<div class="input-group" ng-repeat="p in partition track by p.id" style="margin-bottom: 2px;" acl-has-project-role="owner">
 						<input class="form-control input-xs" ng-model="p.name" required>
 						<span class="input-group-addon">
 							<i ng-click="remove(p, partition)"
@@ -223,6 +223,10 @@
 							   tooltip="{{'project.remove_partition_element'|translate}}"></i>
 						</span>
 					</div>
+
+					<ul acl-lacks-project-role="owner">
+						<li ng-repeat="p in partition track by p.id">{{p.name}}</li>
+					</ul>
 
 					<div class="input-group" acl-has-project-role="owner" style="margin-bottom: 2px;">
 						<input class="form-control input-xs" disabled>
