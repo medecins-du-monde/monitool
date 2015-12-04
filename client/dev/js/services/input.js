@@ -113,14 +113,20 @@ angular
 
 				Object.keys(existingInputs).forEach(function(inputId) {
 					var parts = inputId.split(':');
-					displayedInputs.push({
-						filled: 'invalid',
-						period: moment(parts[3], 'YYYY-MM-DD'),
-						formId: parts[2],
-						formName: project.forms.find(function(form) { return form.id === parts[2]; }).name,
-						inputEntityId: parts[1],
-						inputEntityName: parts[1] == 'none' ? undefined : project.entities.find(function(entity) { return entity.id === parts[1]; }).name
-					});
+
+					try {
+						displayedInputs.push({
+							filled: 'invalid',
+							period: moment(parts[3], 'YYYY-MM-DD'),
+							formId: parts[2],
+							formName: project.forms.find(function(form) { return form.id === parts[2]; }).name,
+							inputEntityId: parts[1],
+							inputEntityName: parts[1] == 'none' ? undefined : project.entities.find(function(entity) { return entity.id === parts[1]; }).name
+						});
+					}
+					catch(e) {
+						console.log('Dropping input: ', inputId);
+					}
 				});
 
 				return displayedInputs;
@@ -177,7 +183,17 @@ angular
 
 			return $q.all(promises).then(function(inputs) {
 				// Reduce the inputs array.
-				inputs = inputs.reduce(function(m, i) { return m.concat(i); }, []);
+				inputs = inputs.reduce(function(m, i) {
+					return m.concat(i);
+				}, []);
+
+				// remove inputs that have no matching form
+				inputs = inputs.filter(function(input) {
+					if (!formsById[input.form])
+						console.log('Dropping input: ', input._id);
+
+					return !!formsById[input.form];
+				});
 
 				// ask each input to sanitize itself with the relevant form.
 				inputs.forEach(function(input) {
