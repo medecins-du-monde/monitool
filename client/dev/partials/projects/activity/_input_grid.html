@@ -1,37 +1,48 @@
 
-<style>
-	.data-grid th {
-		text-align: center;
-		vertical-align: middle !important;
-	}
-</style>
+<div ng-if="variable.partitions.length == 0"
+	 acl-has-project-role="input"
+	 acl-fallback="currentInput.values[variable.id]">
 
-<table class="table table-bordered table-condensed data-grid">
-	<thead>
-		<tr ng-repeat="row in grid.header">
-			<th colspan="{{grid.body[0].headerCols.length}}"
-				rowspan="{{grid.header.length}}"
-				ng-if="$first"></th>
-			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}">{{col.name}}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-repeat="row in grid.body">
-			<th ng-repeat="headerCol in row.headerCols"
-				ng-if="$parent.$index % rowspans[$index] == 0"
-				rowspan="{{rowspans[$index]}}">
-				{{headerCol.name}}
-			</th>
-			
-			<td ng-repeat="dataCol in row.dataCols"
-				acl-has-project-role="input"
-				acl-fallback="data[variable.id + '.' + dataCol]">
+	<input computable
+	       type="text"
+		   class="form-control"
+		   ng-model="data[variable.id]"
+		   placeholder="{{'project.last_input'|translate}}{{oldData[variable.id] || '?'}}" />
+</div>
 
-				<input type="number"
-					class="form-control input-sm"
-					ng-model="data[variable.id + '.' + dataCol]"
-					placeholder="{{'project.last_input'|translate}}{{oldData[variable.id + '.' + dataCol] || '?'}}" />
-			</td>
-		</tr>
-	</tbody>
-</table>
+<div ng-if="variable.partitions.length > 0">
+
+	<table class="table table-bordered table-condensed data-grid">
+		<thead>
+			<tr ng-repeat="row in grid.header">
+				<th colspan="{{grid.body[0].headerCols.length}}"
+					rowspan="{{grid.header.length}}"
+					ng-if="$first"></th>
+
+				<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}">{{col.name}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="row in grid.body">
+				<th ng-repeat="headerCol in row.headerCols"
+					ng-if="$parent.$index % rowspans[$index] == 0"
+					style="width: 20%"
+					rowspan="{{rowspans[$index]}}">
+					{{headerCol.name}}
+				</th>
+				
+				<td ng-repeat="dataCol in row.dataCols"
+					acl-has-project-role="input"
+					acl-fallback="data[variable.id + '.' + dataCol]">
+
+					<input computable
+					       type="text"
+						   class="form-control input-sm"
+						   ng-model="data[variable.id + '.' + dataCol]"
+						   placeholder="{{'project.last_input'|translate}}{{oldData[variable.id + '.' + dataCol] || '?'}}" />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+</div>

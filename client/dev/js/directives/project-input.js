@@ -2,6 +2,34 @@
 
 angular.module('monitool.directives.projectInput', [])
 
+	.directive('computable', function() {
+		var parser = function(value) {
+			try { return Parser.evaluate(value, {}); }
+			catch (e) { return value; }
+		};
+
+		var validator = function(modelValue, viewValue) {
+			return typeof modelValue == 'number';
+		};
+
+		var blur = function(ngModel) {
+			if (typeof ngModel.$modelValue == 'number') {
+				ngModel.$setViewValue(ngModel.$modelValue.toString());
+				ngModel.$render();
+			}
+		};
+
+		return {
+			require: '?ngModel',
+			scope: false,
+			link: function($scope, element, attributes, ngModel) {
+				ngModel.$parsers.push(parser);
+				ngModel.$validators.isNumber = validator
+				element.on('blur', blur.bind(null, ngModel));
+			}
+		};
+	})
+
 	.directive('inputGrid', function(itertools) {
 		return {
 			restrict: 'E',
@@ -20,49 +48,52 @@ angular.module('monitool.directives.projectInput', [])
 				// cf: partitions.slice().sort(function(a, b) { return a.length - b.length; }),
 
 				// Split partitions in cols and rows.
-				var partitions = $scope.variable.partitions,
-					cols = partitions.slice(0, partitions.length / 2),
-					rows = partitions.slice(partitions.length / 2);
+				var partitions = $scope.variable.partitions;
+
+				if (partitions.length > 0) {
+					var cols = partitions.slice(0, partitions.length / 2),
+						rows = partitions.slice(partitions.length / 2);
 					
-				// Create empty grid.
-				var grid = {header: [], body: []};
-				
-				// Create header rows.
-				var totalCols = cols.reduce(function(memo, item) { return memo * item.length; }, 1),
-					colspan = totalCols, // current colspan is total number of columns.
-					numCols = 1; // current numcols is 1.
+					// Create empty grid.
+					var grid = {header: [], body: []};
+					
+					// Create header rows.
+					var totalCols = cols.reduce(function(memo, item) { return memo * item.length; }, 1),
+						colspan = totalCols, // current colspan is total number of columns.
+						numCols = 1; // current numcols is 1.
 
-				for (var i = 0; i < cols.length; ++i) {
-					// adapt colspan and number of columns
-					colspan /= cols[i].length; 
-					numCols *= cols[i].length;
+					for (var i = 0; i < cols.length; ++i) {
+						// adapt colspan and number of columns
+						colspan /= cols[i].length; 
+						numCols *= cols[i].length;
 
-					// Create header row
-					var row = {colspan: colspan, cols: []};
-					for (var k = 0; k < numCols; ++k)
-						row.cols.push(cols[i][k % cols[i].length]);
+						// Create header row
+						var row = {colspan: colspan, cols: []};
+						for (var k = 0; k < numCols; ++k)
+							row.cols.push(cols[i][k % cols[i].length]);
 
-					grid.header.push(row);
-				}
+						grid.header.push(row);
+					}
 
-				// Create data rows.
-				$scope.rowspans = [];
-				var rowspan = rows.reduce(function(memo, item) { return memo * item.length; }, 1);
-				for (var i = 0; i < rows.length; ++i) {
-					rowspan /= rows[i].length;
-					$scope.rowspans[i] = rowspan;
-				}
+					// Create data rows.
+					$scope.rowspans = [];
+					var rowspan = rows.reduce(function(memo, item) { return memo * item.length; }, 1);
+					for (var i = 0; i < rows.length; ++i) {
+						rowspan /= rows[i].length;
+						$scope.rowspans[i] = rowspan;
+					}
 
-				itertools.product(rows).forEach(function(headers) {
-					grid.body.push({
-						headerCols: headers,
-						dataCols: itertools.product(headers.map(function(a) {return[a]}).concat(cols)).map(function(els) {
-							return els.map(function(el) { return el.id}).sort().join('.');
-						})
+					itertools.product(rows).forEach(function(headers) {
+						grid.body.push({
+							headerCols: headers,
+							dataCols: itertools.product(headers.map(function(a) {return[a]}).concat(cols)).map(function(els) {
+								return els.map(function(el) { return el.id}).sort().join('.');
+							})
+						});
 					});
-				});
 
-				$scope.grid = grid;
+					$scope.grid = grid;
+				}
 			}
 		}
 	})
