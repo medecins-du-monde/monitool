@@ -14,16 +14,13 @@
 	<div class="panel-body">
 		<form class="form-horizontal">
 
-			<div class="form-group" ng-repeat="variable in section.elements">
-				<label for="raw-{{variable.id}}" class="col-sm-2 control-label" ng-bind="variable.name"></label>
-				<div class="col-sm-10">
-					<input-grid 
-						variable="variable"
-						data="currentInput.values"
-						old-data="previousInput.values"
-						project="project" />
-				</div>
-			</div>
+		<input-grid
+			ng-repeat="variable in section.elements"
+			variable="variable"
+			data="currentInput.values"
+			old-data="previousInput.values"
+			project="project" />
+
 		</form>
 	</div>
 </div>

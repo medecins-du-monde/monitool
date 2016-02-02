@@ -1,4 +1,13 @@
 
+Math.factorial = function(num) {
+  var rval=1;
+  for (var i = 2; i <= num; i++)
+    rval = rval * i;
+  return rval;
+};
+
+
+
 // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 function makeUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
