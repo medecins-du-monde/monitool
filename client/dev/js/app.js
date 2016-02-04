@@ -354,7 +354,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/activity/collection-input-list.html',
 		controller: 'ProjectCollectionInputListController',
 		resolve: {
-			inputs: function(Input, project) {
+			inputsStatus: function(Input, project) {
 				return Input.fetchProjectStatus(project);
 			}
 		}

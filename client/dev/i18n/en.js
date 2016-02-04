@@ -181,6 +181,15 @@ var ENGLISH_TRANSLATION = {
 		data_selection: "Data selection",
 		filters: "Filters",
 
+		input_status: {
+			'done-read': "Open",
+			'outofschedule-read': "Open (out of calendar)",
+
+			'done-edit': "Edit",
+			'expected-edit': "Create",
+			'outofschedule-edit': "Open (wrong date)"
+		},
+
 		cols: "Columns",
 		rows: "Rows",
 		partition0: "Partition 0",

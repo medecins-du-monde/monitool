@@ -181,6 +181,15 @@ var SPANISH_TRANSLATION = {
 		data_selection: "Seleccione los datos",
 		filters: "Filtros",
 
+		input_status: {
+			'done-read': "Consultar",
+			'outofschedule-read': "Consultar (fuera calendario)",
+
+			'done-edit': "Editar",
+			'expected-edit': "Crear",
+			'outofschedule-edit': "Consultar (fuera calendario)"
+		},
+
 		cols: "Columnas",
 		rows: "Linear",
 		partition0: "Partición 0",

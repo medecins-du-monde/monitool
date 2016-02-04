@@ -5,7 +5,8 @@ angular
 		'monitool.controllers.project.activity',
 		[
 			"monitool.services.olap",
-			"ngSanitize"
+			"ngSanitize",
+			"ngHandsontable"
 		]
 	)
 
@@ -199,25 +200,57 @@ angular
 		};
 	})
 
-	.controller('ProjectCollectionInputListController', function($scope, project, inputs) {
-		$scope.pred = 'period';
-		$scope.finishedInputs = inputs.filter(function(i) { return i.filled == 'yes'; });
-		$scope.waitingInputs = inputs.filter(function(i) { return i.filled == 'no'; });
-		$scope.invalidInputs = inputs.filter(function(i) { return i.filled == 'invalid'; });
+	.controller('ProjectCollectionInputListController', function($scope, project, inputsStatus, Input) {
+		$scope.canEdit = project.dataEntryOperators.indexOf($scope.userCtx._id) !== -1 || $scope.userCtx.roles.indexOf('_admin') !== -1;
 
-		// if admin or entry operator, display waiting inputs.
-		if ($scope.project.dataEntryOperators.indexOf($scope.userCtx._id) !== -1 ||
-			$scope.userCtx.roles.indexOf('_admin') !== -1) {
+		$scope.selectedForm = project.forms[0];
+		$scope.showFinished = !$scope.canEdit;
 
-			$scope.inputs = $scope.waitingInputs;
-			$scope.showWaiting = true;
+		if (!$scope.canEdit) {
+			for (var formId in inputsStatus)
+				for (var strDate in inputsStatus[formId]) {
+					if (inputsStatus[formId][strDate] === 'expected')
+						delete inputsStatus[formId][strDate];
+					else {
+						var isEmpty = true;
+						for (var entityId in inputsStatus[formId][strDate])
+							if (inputsStatus[formId][strDate][entityId] === 'expected')
+								delete inputsStatus[formId][strDate][entityId]
+							else
+								isEmpty = false;
+
+						if (isEmpty)
+							delete inputsStatus[formId][strDate];
+					}
+				}
 		}
-		else {
-			$scope.inputs = $scope.finishedInputs;
-			$scope.showWaiting = false;
-		}
+
+		$scope.$watch('showFinished', function(showFinished) {
+			if (showFinished) {
+				$scope.inputsStatus = inputsStatus;
+			}
+			else {
+				$scope.inputsStatus = JSON.parse(JSON.stringify(inputsStatus));
+
+				for (var formId in $scope.inputsStatus)
+					for (var strDate in $scope.inputsStatus[formId]) {
+						var isAllDone = true;
+
+						if (typeof $scope.inputsStatus[formId][strDate] === 'string')
+							isAllDone = $scope.inputsStatus[formId][strDate] === 'done';
+						else
+							for (var entityId in $scope.inputsStatus[formId][strDate])
+								if ($scope.inputsStatus[formId][strDate][entityId] !== 'done') {
+									isAllDone = false;
+									break;
+								}
+
+						if (isAllDone)
+							delete $scope.inputsStatus[formId][strDate];
+					}
+			}
+		});
 	})
-
 
 	.controller('ProjectCollectionInputEditionController', function($scope, $state, mtReporting, form, inputs, indicatorsById) {
 		$scope.form          = form;

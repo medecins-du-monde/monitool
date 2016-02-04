@@ -77,59 +77,54 @@ angular
 		};
 
 		Input.fetchProjectStatus = function(project) {
-			return Input.query({mode: 'project_input_ids', projectId: project._id}).$promise.then(function(result) {
-				// create hash with all existing inputs
-				var existingInputs = {};
-				result.forEach(function(id) { existingInputs[id] = true; });
-				
-				var displayedInputs = []
+			return Input.query({mode: 'project_input_ids', projectId: project._id}).$promise.then(function(inputsDone) {
+				var prj = {};
 
-				// iterate on all inputs that should exist according to the project forms (and current date).
+				inputsDone.forEach(function(inputId) {
+					var splitted      = inputId.split(':'),
+						projectId     = splitted[0],
+						inputEntityId = splitted[1],
+						formId        = splitted[2],
+						strPeriod     = splitted[3];
+
+					prj[formId] = prj[formId] || {};
+
+					if (inputEntityId === 'none')
+						prj[formId][strPeriod] = 'outofschedule';
+					else {
+						prj[formId][strPeriod] = prj[formId][strPeriod] || {};
+						prj[formId][strPeriod][inputEntityId] = 'outofschedule';
+					}
+				});
+
 				project.forms.forEach(function(form) {
+					prj[form.id] = prj[form.id] || {};
+
 					_getPeriods(form, project).forEach(function(period) {
-						var inputEntities;
-						if (form.collect === 'entity')
-							inputEntities = project.entities;
-						else if (form.collect === 'project')
-							inputEntities = [{id: "none"}];
+						var strPeriod = period.format('YYYY-MM-DD');
+
+						if (form.collect === 'entity') {
+							prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
+
+							project.entities.forEach(function(inputEntity) {
+								if (prj[form.id][strPeriod][inputEntity.id] == 'outofschedule')
+									prj[form.id][strPeriod][inputEntity.id] = 'done';
+								else
+									prj[form.id][strPeriod][inputEntity.id] = form.active ? 'expected' : 'inactive';
+							});
+						}
+						else if (form.collect === 'project') {
+							if (prj[form.id][strPeriod] == 'outofschedule')
+								prj[form.id][strPeriod] = 'done';
+							else
+								prj[form.id][strPeriod] = form.active ? 'expected' : 'inactive';
+						}
 						else
 							throw new Error('Invalid form.collect value.');
-
-						inputEntities.forEach(function(inputEntity) {
-							var inputId = [project._id, inputEntity.id, form.id, period.format('YYYY-MM-DD')].join(':');
-							if (form.active || existingInputs[inputId])
-								displayedInputs.push({
-									filled: existingInputs[inputId] ? 'yes' : 'no',
-									period: period,
-									formId: form.id, formName: form.name,
-									inputEntityId: inputEntity.id,
-									inputEntityName: inputEntity.name
-								});
-
-							delete existingInputs[inputId];
-						});
 					});
 				});
 
-				Object.keys(existingInputs).forEach(function(inputId) {
-					var parts = inputId.split(':');
-
-					try {
-						displayedInputs.push({
-							filled: 'invalid',
-							period: moment(parts[3], 'YYYY-MM-DD'),
-							formId: parts[2],
-							formName: project.forms.find(function(form) { return form.id === parts[2]; }).name,
-							inputEntityId: parts[1],
-							inputEntityName: parts[1] == 'none' ? undefined : project.entities.find(function(entity) { return entity.id === parts[1]; }).name
-						});
-					}
-					catch(e) {
-						console.log('Dropping input: ', inputId);
-					}
-				});
-
-				return displayedInputs;
+				return prj;
 			});
 		};
 

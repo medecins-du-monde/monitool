@@ -181,6 +181,15 @@ var FRENCH_TRANSLATION = {
 		data_selection: "Selection des données",
 		filters: "Filtres",
 
+		input_status: {
+			'done-read': "Afficher",
+			'outofschedule-read': "Afficher (Hors calendrier)",
+
+			'done-edit': "Modifier",
+			'expected-edit': "Saisir",
+			'outofschedule-edit': "Afficher (Hors calendrier)"
+		},
+
 		cols: "Colonnes",
 		rows: "Lignes",
 		partition0: "Partition 0",

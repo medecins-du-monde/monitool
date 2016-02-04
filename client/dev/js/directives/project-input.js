@@ -2,35 +2,7 @@
 
 angular.module('monitool.directives.projectInput', [])
 
-	.directive('computable', function() {
-		var parser = function(value) {
-			try { return Parser.evaluate(value, {}); }
-			catch (e) { return value; }
-		};
-
-		var validator = function(modelValue, viewValue) {
-			return typeof modelValue == 'number';
-		};
-
-		var blur = function(ngModel) {
-			if (typeof ngModel.$modelValue == 'number') {
-				ngModel.$setViewValue(ngModel.$modelValue.toString());
-				ngModel.$render();
-			}
-		};
-
-		return {
-			require: '?ngModel',
-			scope: false,
-			link: function($scope, element, attributes, ngModel) {
-				ngModel.$parsers.push(parser);
-				ngModel.$validators.isNumber = validator
-				element.on('blur', blur.bind(null, ngModel));
-			}
-		};
-	})
- 
-	.directive('inputGrid', function(itertools) {
+	.directive('inputGrid', function(itertools, $rootScope) {
 
 		var computeNthPermutation = function(n, i) {
 			var j, k = 0,
@@ -58,6 +30,18 @@ angular.module('monitool.directives.projectInput', [])
 			return perm;
 		}
 
+		
+
+		var headerOptions = {
+				readOnly: true,
+				renderer: function(instance, td, row, col, prop, value, cellProperties) {
+					Handsontable.renderers.TextRenderer.apply(this, arguments);
+					td.style.color = 'black';
+				    td.style.background = '#eee';
+				}
+			},
+			dataOptions = {type: 'numeric'};
+
 		return {
 			restrict: 'E',
 			scope: {
@@ -69,74 +53,139 @@ angular.module('monitool.directives.projectInput', [])
 			templateUrl: "partials/projects/activity/_input_grid.html",
 
 			link: function($scope, element) {
-				// FIXME
-				// we would like to implement something to ensure that columns do not get
-				// too much crowded (by putting most stress on rows)
-				// cf: partitions.slice().sort(function(a, b) { return a.length - b.length; }),
-				var numPermutations = Math.factorial($scope.variable.partitions.length);
+				if ($rootScope.userCtx.roles.indexOf("_admin") === -1 && $scope.project.dataEntryOperators.indexOf($rootScope.userCtx._id) === -1)
+					var dataOptions = {type: 'numeric', readOnly: true};
 
-				$scope.rotation = (window.localStorage['input.rotation.' + $scope.variable.id] % numPermutations) || 0;
-
-				$scope.rotate = function(offset) {
-					$scope.rotation
-						= window.localStorage['input.rotation.' + $scope.variable.id]
-						= ((($scope.rotation + offset) % numPermutations) + numPermutations) % numPermutations;
-
-					createTable();
-				};
+				// Compute the number of possible permutation of partitions, and retrieve or init current rotation.
+				$scope.numPermutations = Math.factorial($scope.variable.partitions.length);
+				$scope.rotation = (window.localStorage['input.rotation.' + $scope.variable.id] % $scope.numPermutations) || 0;
 				
 				var createTable = function() {
 					// Split partitions in cols and rows.
 					var numPartitions = $scope.variable.partitions.length,
 						partitions = computeNthPermutation(numPartitions, $scope.rotation).map(function(i) { return $scope.variable.partitions[i]; });
 
+					var topPartitions  = partitions.slice(0, partitions.length / 2),
+						leftPartitions = partitions.slice(partitions.length / 2);
+
+					var totalCols = topPartitions.reduce(function(memo, item) { return memo * item.length; }, 1),
+						totalRows = leftPartitions.reduce(function(memo, item) { return memo * item.length; }, 1),
+						colspan = totalCols, // current colspan is total number of columns.
+						numCols = 1;
+
+					$scope.settings = {
+						stretchH: "all",
+						// mergeCells: [],
+						colWidths: 'xxx',  // i have no idea why, but this keeps all columns to the same width
+						maxCols: totalCols + leftPartitions.length,
+						maxRows: totalRows + topPartitions.length,
+						cells: function(row, col, prop) {
+							return row < topPartitions.length || col < leftPartitions.length ? headerOptions : dataOptions;
+						}
+					};
+
+					$scope.tableRows = []
+
 					if (partitions.length > 0) {
-						var cols = partitions.slice(0, partitions.length / 2),
-							rows = partitions.slice(partitions.length / 2);
-						
-						// Create empty grid.
-						var grid = {header: [], body: []};
-						
-						// Create header rows.
-						var totalCols = cols.reduce(function(memo, item) { return memo * item.length; }, 1),
-							colspan = totalCols, // current colspan is total number of columns.
-							numCols = 1; // current numcols is 1.
+						topPartitions.forEach(function(topPartition, topPartitionIndex) {
+							// Adapt colspan and number of columns
+							colspan /= topPartition.length; 
+							numCols *= topPartition.length;
 
-						for (var i = 0; i < cols.length; ++i) {
-							// adapt colspan and number of columns
-							colspan /= cols[i].length; 
-							numCols *= cols[i].length;
+							var i, row = [];
 
-							// Create header row
-							var row = {colspan: colspan, cols: []};
-							for (var k = 0; k < numCols; ++k)
-								row.cols.push(cols[i][k % cols[i].length]);
+							// push empty cells to fit the line headers
+							for (i = 0; i < leftPartitions.length; ++i)
+								row.push('');
 
-							grid.header.push(row);
-						}
+							// push headers from the partition
+							for (var k = 0; k < numCols; ++k) {
+								// $scope.settings.mergeCells.push({row: topPartitionIndex, col: leftPartitions.length + k * colspan, colspan: colspan});
 
-						// Create data rows.
-						$scope.rowspans = [];
-						var rowspan = rows.reduce(function(memo, item) { return memo * item.length; }, 1);
-						for (var i = 0; i < rows.length; ++i) {
-							rowspan /= rows[i].length;
-							$scope.rowspans[i] = rowspan;
-						}
+								row.push(topPartition[k % topPartition.length].name);
+								for (i = 0; i < colspan - 1; ++i)
+									row.push('');
+							}
 
-						itertools.product(rows).forEach(function(headers) {
-							grid.body.push({
-								headerCols: headers,
-								dataCols: itertools.product(headers.map(function(a) {return[a]}).concat(cols)).map(function(els) {
-									return els.map(function(el) { return el.id}).sort().join('.');
-								})
-							});
+							$scope.tableRows.push(row);
 						});
 
-						$scope.grid = grid;
+						// Create data rows.
+						var rowspans = [];
+						var rowspan = totalRows;
+						for (var i = 0; i < leftPartitions.length; ++i) {
+							rowspan /= leftPartitions[i].length;
+							rowspans[i] = rowspan;
+						}
+
+						itertools.product(leftPartitions).forEach(function(headers, index) {
+							// Init row with the labels on the left.
+							var row = [];
+
+							headers.forEach(function(header, index2) {
+								row.push(index % rowspans[index2] == 0 ? header.name : '');
+							});
+					
+							// build ids for each field in the row
+							var fieldIds = itertools.product(headers.map(function(a) {return[a]}).concat(topPartitions)).map(function(els) {
+								return els.map(function(el) { return el.id}).sort().join('.');
+							});
+
+							row = row.concat(fieldIds.map(function(id) { return $scope.data[$scope.variable.id + '.' + id] || 0;}));
+
+							$scope.tableRows.push(row);
+						});
+					}
+					else {
+						$scope.tableRows.push([$scope.data[$scope.variable.id] || 0]);
+					}
+				};
+
+				var rotate = function(offset) {
+					$scope.rotation
+						= window.localStorage['input.rotation.' + $scope.variable.id]
+						= ((($scope.rotation + offset) % $scope.numPermutations) + $scope.numPermutations) % $scope.numPermutations;
+
+					createTable();
+				}
+
+				var updateData = function(newValue, oldValue) {
+					if (!newValue)
+						return;
+
+					var numPartitions = $scope.variable.partitions.length,
+						partitions = computeNthPermutation(numPartitions, $scope.rotation).map(function(i) { return $scope.variable.partitions[i]; });
+
+					var topPartitions  = partitions.slice(0, partitions.length / 2),
+						leftPartitions = partitions.slice(partitions.length / 2);
+
+					for (var y = topPartitions.length; y < $scope.tableRows.length; ++y)
+						for (var x = leftPartitions.length; x < $scope.tableRows[y].length; ++x) {
+							if (typeof $scope.tableRows[y][x] == 'string')
+								try { $scope.tableRows[y][x] = Parser.evaluate($scope.tableRows[y][x], {}); }
+								catch (e) {}
+							}
+
+					// we need to tell handsontable to update in some way.
+					if (numPartitions > 0) {
+						itertools.product(leftPartitions).forEach(function(headers, row) {
+							// build ids for each field in the row
+							var fieldIds = itertools.product(headers.map(function(a) {return[a]}).concat(topPartitions)).map(function(els) {
+								return els.map(function(el) { return el.id}).sort().join('.');
+							}).forEach(function(fieldId, col) {
+								var value = $scope.tableRows[row + topPartitions.length][col + leftPartitions.length];
+								$scope.data[$scope.variable.id + '.' + fieldId] = typeof value == 'number' ? value : 0;
+							});
+						});
+					}
+					else {
+						$scope.data[$scope.variable.id] = $scope.tableRows[0][0];
 					}
 				};
 
 				createTable();
+				$scope.$watch('tableRows', updateData, true);
+				$scope.rotate = rotate;
 			}
 		}
 	})

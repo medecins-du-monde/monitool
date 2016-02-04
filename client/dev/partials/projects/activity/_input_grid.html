@@ -4,59 +4,15 @@
 	<label for="raw-{{variable.id}}" class="col-sm-2 control-label">
 		{{variable.name}}<br/>
 
-		<ul class="pagination pagination-sm">
-			<li><a ng-click="rotate(-1)"><span>&laquo;</span></a></li>
-			<li><span>Rotation {{rotation}}</span></li>
-			<li><a ng-click="rotate(1)"><span>&raquo;</span></a></li>
-		</ul>
+		<div class="btn-group btn-group-xs" ng-if="variable.partitions.length > 1">
+			<button ng-click="rotate(-1)" class="btn btn-default"><i class="fa fa-caret-left"></i></button>
+			<button class="btn btn-default" disabled>{{rotation + 1}}</button>
+			<button ng-click="rotate(1)" class="btn btn-default"><i class="fa fa-caret-right"></i></button>
+		</div>
 	</label>
 
-	<div class="col-sm-10">
-		<div ng-if="variable.partitions.length == 0"
-			 acl-has-project-role="input"
-			 acl-fallback="currentInput.values[variable.id]">
-
-			<input computable
-			       type="text"
-				   class="form-control"
-				   ng-model="data[variable.id]"
-				   placeholder="{{'project.last_input'|translate}}{{oldData[variable.id] || '?'}}" />
-		</div>
-
-		<div ng-if="variable.partitions.length > 0">
-
-			<table class="table table-bordered table-condensed data-grid">
-				<thead>
-					<tr ng-repeat="row in grid.header">
-						<th colspan="{{grid.body[0].headerCols.length}}" rowspan="{{grid.header.length}}" ng-if="$first">
-							
-		 				</th>
-						<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}">{{col.name}}</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="row in grid.body">
-						<th ng-repeat="headerCol in row.headerCols"
-							ng-if="$parent.$index % rowspans[$index] == 0"
-							style="width: 20%"
-							rowspan="{{rowspans[$index]}}">
-							{{headerCol.name}}
-						</th>
-						
-						<td ng-repeat="dataCol in row.dataCols"
-							acl-has-project-role="input"
-							acl-fallback="data[variable.id + '.' + dataCol]">
-
-							<input computable
-							       type="text"
-								   class="form-control input-sm"
-								   ng-model="data[variable.id + '.' + dataCol]"
-								   placeholder="{{'project.last_input'|translate}}{{oldData[variable.id + '.' + dataCol] || '?'}}" />
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
+	<!-- This is the strangest thing. Remove ng-if="1" breaks everything! (HOT ignores settings...) -->
+	<div class="col-sm-10" ng-if="1">
+		<hot-table settings="settings" datarows="tableRows"></hot-table>
 	</div>
 </div>
