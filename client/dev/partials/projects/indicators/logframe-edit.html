@@ -36,7 +36,7 @@
 				<div class="form-control-static">
 					<ul>
 						<li ng-repeat="indicatorId in project.logicalFrame.indicators">
-							<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)">{{indicatorsById[indicatorId].name[language]}}</a>
+							<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)">{{project.indicators[indicatorId].display}}</a>
 						</li>
 					</ul>
 
@@ -99,7 +99,7 @@
 							<div class="form-control-static">
 								<ul>
 									<li ng-repeat="indicatorId in purpose.indicators">
-										<a ng-click="editIndicator(indicatorId, purpose.indicators)">{{indicatorsById[indicatorId].name[language]}}</a>
+										<a ng-click="editIndicator(indicatorId, purpose.indicators)">{{project.indicators[indicatorId].display}}</a>
 									</li>
 								</ul>
 
@@ -157,7 +157,7 @@
 										<div class="form-control-static">
 											<ul>
 												<li ng-repeat="indicatorId in output.indicators">
-													<a ng-click="editIndicator(indicatorId, output.indicators)">{{indicatorsById[indicatorId].name[language]}}</a>
+													<a ng-click="editIndicator(indicatorId, output.indicators)">{{project.indicators[indicatorId].display}}</a>
 												</li>
 											</ul>
 
@@ -224,7 +224,7 @@
 
 		<ul>
 			<li ng-repeat="indicatorId in otherIndicators">
-				<a ng-click="editIndicator(indicatorId, null)">{{indicatorsById[indicatorId].name[language]}}</a>
+				<a ng-click="editIndicator(indicatorId, null)">{{project.indicators[indicatorId].display}}</a>
 			</li>
 		</ul>
 

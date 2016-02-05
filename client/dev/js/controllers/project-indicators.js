@@ -107,6 +107,7 @@ angular.module('monitool.controllers.project.indicators', [])
 
 		// Retrieve indicator array where we need to add or remove indicator ids.
 		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
+			display: '',
 			relevance: '',
 			colorize: true,
 			baseline: 0,
@@ -121,11 +122,14 @@ angular.module('monitool.controllers.project.indicators', [])
 		$scope.isDetachable = !!target;
 
 		// Load the indicator if it's a new one. Take is from the hash if not.
-		if ($scope.indicatorsById[indicatorId])
+		if ($scope.indicatorsById[indicatorId]) {
 			$scope.indicator = $scope.indicatorsById[indicatorId];
+			$scope.planning.display = $scope.planning.display || $scope.indicator.name[$scope.language];
+		}
 		else // we also store it in the hash for future usage in ProjectLogicalFrameController
 			mtFetch.indicator(indicatorId).then(function(indicator) {
 				$scope.indicatorsById[indicatorId] = $scope.indicator = indicator;
+				$scope.planning.display = $scope.planning.display || indicator.name[$scope.language];
 			});
 
 		// Handle baseline and target
@@ -244,7 +248,7 @@ angular.module('monitool.controllers.project.indicators', [])
 			var getStats = function(indent, indicatorId) {
 				return {
 					id: indicatorId,
-					name: $scope.indicatorsById[indicatorId].name,
+					name: $scope.project.indicators[indicatorId].display,
 					unit: $scope.indicatorsById[indicatorId].unit,
 					colorize: $scope.project.indicators[indicatorId].colorize,
 					baseline: $scope.project.indicators[indicatorId].baseline,

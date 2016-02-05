@@ -127,7 +127,7 @@
 
 			<th ng-if="row.type === 'header'" colspan="{{3 + cols.length}}" class="indent{{row.indent}}">{{row.text}}</th>
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
-				<label for="{{row.id}}">{{row.name[language]}}</label>
+				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
 			<td ng-if="row.type === 'data'">{{row.baseline}}{{row.unit}}</td>
 			<td ng-if="row.type === 'data'">{{row.target}}{{row.unit}}</td>
