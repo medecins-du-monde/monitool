@@ -311,7 +311,7 @@ angular.module('monitool.directives.form', [])
 
 					// Special case, only one row.
 					if (partitions.length == 1) {
-						partitions[0].forEach(function(p, rowIndex) { modelValue[p] = viewValue[rowIndex][1]; });
+						partitions[0].forEach(function(p, rowIndex) { modelValue[p.id] = viewValue[rowIndex][1]; });
 						return modelValue;
 					}
 
