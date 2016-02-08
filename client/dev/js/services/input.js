@@ -16,13 +16,36 @@ angular
 
 		// this has nothing to do on the root scope.
 		// => move it to a service and factorize with the similiar function in mtReporting
-		var _getPeriods = function(form, project) {
+		var _getPeriods = function(entity, form, project) {
 			var periods;
 			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
 				var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
 
-				var current = moment(form.useProjectStart ? project.begin : form.start).startOf(period),
-					end     = moment(form.useProjectEnd ? project.end : project.end).endOf(period);
+				var current, end;
+				if (entity) {
+					// FIXME spaghettis
+					if (!entity.start && !form.start)
+						current = moment(project.begin).startOf(period);
+					else if (!entity.start && form.start)
+						current = moment(form.start).startOf(period);
+					else if (entity.start && !form.start)
+						current = moment(entity.start).startOf(period);
+					else
+						current = moment.max(entity.start, form.start).startOf(period);
+
+					if (!entity.end && !form.end)
+						end = moment(project.end).startOf(period);
+					else if (!entity.end && form.end)
+						end = moment(form.end).startOf(period);
+					else if (entity.end && !form.end)
+						end = moment(entity.end).startOf(period);
+					else
+						end = moment.min(entity.end, form.end).startOf(period);
+				}
+				else {
+					current = moment(form.start || project.begin).startOf(period),
+					end     = moment(form.end || project.end).endOf(period);
+				}
 
 				if (end.isAfter()) // do not allow to go in the future
 					end = moment();
@@ -34,9 +57,7 @@ angular
 				}
 			}
 			else if (form.periodicity === 'planned') {
-				periods = form.intermediaryDates.map(function(period) {
-					return moment(period);
-				});
+				periods = form.intermediaryDates.map(function(period) { return moment(period); });
 				periods.unshift(moment(form.start));
 				periods.push(moment(form.end));
 			}
@@ -88,40 +109,41 @@ angular
 						strPeriod     = splitted[3];
 
 					prj[formId] = prj[formId] || {};
-
-					if (inputEntityId === 'none')
-						prj[formId][strPeriod] = 'outofschedule';
-					else {
-						prj[formId][strPeriod] = prj[formId][strPeriod] || {};
-						prj[formId][strPeriod][inputEntityId] = 'outofschedule';
-					}
+					prj[formId][strPeriod] = prj[formId][strPeriod] || {};
+					prj[formId][strPeriod][inputEntityId] = 'outofschedule';
 				});
 
 				project.forms.forEach(function(form) {
 					prj[form.id] = prj[form.id] || {};
 
-					_getPeriods(form, project).forEach(function(period) {
-						var strPeriod = period.format('YYYY-MM-DD');
+					if (form.collect === 'entity')
+						project.entities.forEach(function(inputEntity) {
+							_getPeriods(inputEntity, form, project).forEach(function(period) {
+								var strPeriod = period.format('YYYY-MM-DD');
 
-						if (form.collect === 'entity') {
-							prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
+								prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
 
-							project.entities.forEach(function(inputEntity) {
 								if (prj[form.id][strPeriod][inputEntity.id] == 'outofschedule')
 									prj[form.id][strPeriod][inputEntity.id] = 'done';
 								else
-									prj[form.id][strPeriod][inputEntity.id] = form.active ? 'expected' : 'inactive';
+									prj[form.id][strPeriod][inputEntity.id] = 'expected';
 							});
-						}
-						else if (form.collect === 'project') {
-							if (prj[form.id][strPeriod] == 'outofschedule')
-								prj[form.id][strPeriod] = 'done';
+						});
+					
+					else if (form.collect === 'project')
+						_getPeriods(null, form, project).forEach(function(period) {
+							var strPeriod = period.format('YYYY-MM-DD');
+
+							prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
+
+							if (prj[form.id][strPeriod]['none'] == 'outofschedule')
+								prj[form.id][strPeriod]['none'] = 'done';
 							else
-								prj[form.id][strPeriod] = form.active ? 'expected' : 'inactive';
-						}
-						else
-							throw new Error('Invalid form.collect value.');
-					});
+								prj[form.id][strPeriod]['none'] = 'expected';
+						});
+					
+					else
+						throw new Error('Invalid form.collect value.');
 				});
 
 				return prj;
@@ -247,25 +269,29 @@ angular
 			var newValues = {},
 				sums = this.computeSums();
 
-			var numSections = form.sections.length;
-			for (var i = 0; i < numSections; ++i) {
-				var elements = form.sections[i].elements,
-					numElements = elements.length;
+			var elements = form.elements, numElements = elements.length;
 
-				for (var j = 0; j < numElements; ++j) {
-					var element = elements[j];
+			for (var j = 0; j < numElements; ++j) {
+				var element = elements[j];
 
-					if (element.partitions.length === 0)
-						newValues[element.id] = sums[element.id] || 0;
-					else {
-						var partitions = itertools.product(element.partitions),
-							numPartitions = partitions.length;
+				if (element.partitions.length === 0) {
+					if (sums[element.id])
+						newValues[element.id] = {'': sums[element.id][''] || 0};
+					else
+						newValues[element.id] = {'': 0};
+				}
+				else {
+					var partitions = itertools.product(element.partitions),
+						numPartitions = partitions.length;
 
-						for (var k = 0; k < numPartitions; ++k) {
-							var key = element.id + '.' + partitions[k].pluck('id').sort().join('.');
-
-							newValues[key] = sums[key] || 0;
-						}
+					newValues[element.id] = {};
+					for (var k = 0; k < numPartitions; ++k) {
+						var key = partitions[k].pluck('id').sort().join('.');
+						
+						if (sums[element.id])
+							newValues[element.id][key] = sums[element.id][key] || 0;
+						else
+							newValues[element.id][key] = 0;
 					}
 				}
 			}
@@ -281,31 +307,31 @@ angular
 		Input.prototype.computeSums = function() {
 			var result = {};
 
-			for (var key in this.values) {
-				var parts = key.split('.'),
-					variableId = parts.shift();
+			for (var elementId in this.values) {
+				result[elementId] = {};
 
-				// now we need to create a key for each subset of the partition.
-				var numElements = parts.length,
-					numSubsets = Math.pow(2, parts.length);
+				for (var partitionIds in this.values[elementId]) {
+					// now we need to create a key for each subset of the partition.
+					var splittedPartitionIds = partitionIds == '' ? [] : partitionIds.split('.'),
+						numSubsets = Math.pow(2, splittedPartitionIds.length);
 
-				for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
-					// Build subset key
-					var subsetKey = variableId;
-					for (var partitionIndex = 0; partitionIndex < numElements; ++partitionIndex) {
-						if (subsetIndex & (1 << partitionIndex))
-							subsetKey += '.' + parts[partitionIndex];
+					for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
+						var subsetKey = splittedPartitionIds.filter(function(id, index) { return subsetIndex & (1 << index); }).join('.');
+
+						// if result was set as a string previously, skip
+						if (typeof result[elementId][subsetKey] === 'string')
+							continue
+
+						// if value is a string, skip as well
+						if (typeof this.values[elementId][partitionIds] === 'string') {
+							result[elementId][subsetKey] = this.values[elementId][partitionIds];
+							continue;
+						}
+
+						if (result[elementId][subsetKey] == undefined)
+							result[elementId][subsetKey] = 0; // initialize if needed
+						result[elementId][subsetKey] += this.values[elementId][partitionIds];
 					}
-
-					result[subsetKey] = result[subsetKey] || 0; // initialize if needed
-
-					// handle CANNOT_AGGREGATE.
-					if (typeof this.values[key] !== 'number') {
-						result[subsetKey] = this.values[key];
-						break;
-					}
-
-					result[subsetKey] += this.values[key];
 				}
 			}
 

@@ -12,7 +12,7 @@ angular
 
 	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input, project) {
 		$scope.createEntity = function() {
-			$scope.project.entities.push({id: makeUUID(), name: ''});
+			$scope.project.entities.push({id: makeUUID(), name: '', start: null, end: null});
 		};
 
 		$scope.deleteEntity = function(entityId) {
@@ -96,21 +96,15 @@ angular
 			}
 		};
 
-		$scope.$watch('form.sections', function(sections) {
+		$scope.$watch('form.elements', function(elements) {
 			$scope.maxPartitions = 0;
-			sections.forEach(function(section) {
-				section.elements.forEach(function(element) {
-					$scope.maxPartitions = Math.max(element.partitions.length, $scope.maxPartitions);
-				});
+			elements.forEach(function(element) {
+				$scope.maxPartitions = Math.max(element.partitions.length, $scope.maxPartitions);
 			});
 		}, true);
 
-		$scope.newSection = function(target) {
-			target.push({id: makeUUID(), name: "", elements: []});
-		};
-
-		$scope.newVariable = function(target) {
-			target.push({id: makeUUID(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
+		$scope.newVariable = function() {
+			$scope.form.elements.push({id: makeUUID(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
 		};
 
 		$scope.newPartition = function(target) {
@@ -125,50 +119,20 @@ angular
 			target.splice(target.indexOf(partition), 1);
 		};
 
-		$scope.upSection = function(index) {
-			if (index == 0)
-				throw new Error();
-
-			var element = $scope.form.sections[index];
-
-			$scope.form.sections[index] = $scope.form.sections[index - 1];
-			$scope.form.sections[index - 1] = element;
+		$scope.upElement = function(index) {
+			var element = $scope.form.elements[index];
+			$scope.form.elements.splice(index, 1);
+			$scope.form.elements.splice(index - 1, 0, element);
 		};
 
-		$scope.downSection = function(index) {
-			if (index == $scope.form.sections.length - 1)
-				throw new Error();
-
-			var element = $scope.form.sections[index];
-			$scope.form.sections[index] = $scope.form.sections[index + 1];
-			$scope.form.sections[index + 1] = element;
-		};
-
-		$scope.upElement = function(index, parentIndex) {
-			var element = $scope.form.sections[parentIndex].elements[index];
-			$scope.form.sections[parentIndex].elements.splice(index, 1);
-
-			if (index == 0)
-				$scope.form.sections[parentIndex - 1].elements.push(element);
-			else
-				$scope.form.sections[parentIndex].elements.splice(index - 1, 0, element);
-		};
-
-		$scope.downElement = function(index, parentIndex) {
-			var element = $scope.form.sections[parentIndex].elements[index];
-			$scope.form.sections[parentIndex].elements.splice(index, 1);
-
-			if ($scope.form.sections[parentIndex].elements.length == index)
-				$scope.form.sections[parentIndex + 1].elements.unshift(element);
-			else
-				$scope.form.sections[parentIndex].elements.splice(index + 1, 0, element);
+		$scope.downElement = function(index) {
+			var element = $scope.form.elements[index];
+			$scope.form.elements.splice(index, 1);
+			$scope.form.elements.splice(index + 1, 0, element);
 		};
 
 		$scope.remove = function(item, target) {
-			var index = target.findIndex(function(arrItem) {
-				return item.id === arrItem.id;
-			});
-
+			var index = target.findIndex(function(arrItem) { return item.id === arrItem.id; });
 			if (index !== -1)
 				target.splice(index, 1)
 		};
@@ -206,6 +170,20 @@ angular
 		$scope.selectedForm = project.forms[0];
 		$scope.showFinished = !$scope.canEdit;
 
+		// show/hide columns
+		$scope.showProject = false;
+		$scope.showEntities = false;
+		for (var formId in inputsStatus)
+			for (var strDate in inputsStatus[formId])
+				for (var entityId in inputsStatus[formId][strDate]) {
+					if (entityId == 'none')
+						$scope.showProject = true;
+					else
+						$scope.showEntities = true;
+				}
+		$scope.colWidth = (100 / (1 + ($scope.showEntities ? project.entities.length : 0) + ($scope.showProject ? 1 : 0))) + '%';
+
+		// Remove the expected inputs for people that cannot edit.
 		if (!$scope.canEdit) {
 			for (var formId in inputsStatus)
 				for (var strDate in inputsStatus[formId]) {
@@ -226,6 +204,7 @@ angular
 		}
 
 		$scope.$watch('showFinished', function(showFinished) {
+			// Remove rows that are finished
 			if (showFinished) {
 				$scope.inputsStatus = inputsStatus;
 			}
@@ -256,8 +235,40 @@ angular
 		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
-		$scope.previousInput = inputs.previous;
+		// $scope.previousInput = inputs.previous;
 		$scope.inputEntity   = $scope.project.entities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
+
+		// Handle rotations.
+		$scope.partitions = {};
+		$scope.rotations  = {};
+		$scope.positions  = {};
+
+		$scope.move = function(offset, element) {
+			var numPositions = element.partitions.length - 1;
+			$scope.positions[element.id]
+				= window.localStorage['input.position.' + element.id]
+				= ((($scope.positions[element.id] + offset) % numPositions) + numPositions) % numPositions;
+		};
+
+		$scope.rotate = function(offset, element) {
+			var numPermutations = Math.factorial(element.partitions.length);
+			$scope.rotations[element.id]
+				= window.localStorage['input.rotation.' + element.id]
+				= ((($scope.rotations[element.id] + offset) % numPermutations) + numPermutations) % numPermutations;
+
+			$scope.partitions[element.id] = computeNthPermutation(element.partitions.length, $scope.rotations[element.id]).map(function(i) { return element.partitions[i]; });
+		};
+
+		form.elements.forEach(function(element) {
+			$scope.rotations[element.id] = (window.localStorage['input.rotation.' + element.id] % Math.factorial(element.partitions.length)) || 0
+			if (window.localStorage['input.position.' + element.id] != undefined)
+				$scope.positions[element.id] = window.localStorage['input.position.' + element.id] % (element.partitions.length - 1);
+			else
+				$scope.positions[element.id] = Math.floor(element.partitions.length / 2)
+
+			$scope.rotate(0, element)
+			$scope.move(0, element)
+		});
 
 		$scope.save = function() {
 			$scope.currentInput.$save(function() { $state.go('main.project.collection_input_list'); });
@@ -313,74 +324,70 @@ angular
 
 			$scope.project.forms.forEach(function(form) {
 				$scope.rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
-				form.sections.forEach(function(section) {
-					$scope.rows.push({ id: section.id, type: "header", text: section.name, indent: 1 });
-					section.elements.forEach(function(variable) {
-						var row = {};
-						row.id = variable.id;
-						row.type = "data";
-						row.name = variable.name;
-						row.indent = 2;
-						
-						row.partitions = variable.partitions.map(function(p, index) {
-							return {
-								index: index,
-								name: p.map(function(p) {
-									return p.name.substring(0, 1).toLocaleUpperCase();
-								}).join('/'),
-								fullname: p.pluck('name').join(' / ')
-							}
-						});
-
-						row.cols = $scope.cols.map(function(col) {
-							try { return reporting[col.id][variable.id]; }
-							catch (e) { return undefined; }
-						});
-
-						$scope.rows.push(row);
-
-						if ($scope.splits[row.id] !== undefined) {
-							var partitionIndex = $scope.splits[row.id];
-
-							variable.partitions[partitionIndex].forEach(function(part) {
-								var childRow = {};
-								childRow.id = variable.id + '.' + partitionIndex + '/' + part.id;
-								childRow.type = "data";
-								childRow.name = part.name;
-								childRow.indent = 3;
-
-								childRow.partitions = row.partitions.slice();
-								childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
-
-								childRow.cols = $scope.cols.map(function(col) {
-									try { return reporting[col.id][variable.id + '.' + part.id]; }
-									catch (e) { return undefined; }
-								})
-
-								$scope.rows.push(childRow);
-
-								if ($scope.splits[childRow.id] !== undefined) {
-									var childPartitionIndex = $scope.splits[childRow.id];
-
-									variable.partitions[childPartitionIndex].forEach(function(subPart) {
-										var subChildRow = {};
-										subChildRow.id = variable.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
-										subChildRow.type = "data";
-										subChildRow.name = subPart.name;
-										subChildRow.indent = 4;
-
-										subChildRow.cols = $scope.cols.map(function(col) {
-											var id = variable.id + '.' + [part.id, subPart.id].sort().join('.');
-											try { return reporting[col.id][id]; }
-											catch (e) { return undefined; }
-										})
-
-										$scope.rows.push(subChildRow);
-									});
-								}
-							});
+				
+				form.elements.forEach(function(variable) {
+					var row = {};
+					row.id = variable.id;
+					row.type = "data";
+					row.name = variable.name;
+					row.indent = 1;
+					
+					row.partitions = variable.partitions.map(function(p, index) {
+						return {
+							index: index,
+							name: p.map(function(p) { return p.name.substring(0, 1).toLocaleUpperCase(); }).join('/'),
+							fullname: p.pluck('name').join(' / ')
 						}
 					});
+
+					row.cols = $scope.cols.map(function(col) {
+						try { return reporting[col.id][variable.id]['']; }
+						catch (e) { return undefined; }
+					});
+
+					$scope.rows.push(row);
+
+					if ($scope.splits[row.id] !== undefined) {
+						var partitionIndex = $scope.splits[row.id];
+
+						variable.partitions[partitionIndex].forEach(function(part) {
+							var childRow = {};
+							childRow.id = variable.id + '.' + partitionIndex + '/' + part.id;
+							childRow.type = "data";
+							childRow.name = part.name;
+							childRow.indent = 2;
+
+							childRow.partitions = row.partitions.slice();
+							childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
+
+							childRow.cols = $scope.cols.map(function(col) {
+								try { return reporting[col.id][variable.id][part.id]; }
+								catch (e) { return undefined; }
+							})
+
+							$scope.rows.push(childRow);
+
+							if ($scope.splits[childRow.id] !== undefined) {
+								var childPartitionIndex = $scope.splits[childRow.id];
+
+								variable.partitions[childPartitionIndex].forEach(function(subPart) {
+									var subChildRow = {};
+									subChildRow.id = variable.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
+									subChildRow.type = "data";
+									subChildRow.name = subPart.name;
+									subChildRow.indent = 3;
+
+									subChildRow.cols = $scope.cols.map(function(col) {
+										var id = [part.id, subPart.id].sort().join('.');
+										try { return reporting[col.id][variable.id][id]; }
+										catch (e) { return undefined; }
+									})
+
+									$scope.rows.push(subChildRow);
+								});
+							}
+						});
+					}
 				});
 			});
 		});
@@ -404,10 +411,8 @@ angular
 
 		$scope.planning = {variable: null };
 		$scope.project.forms.forEach(function(form) {
-			form.sections.forEach(function(section) {
-				if (!$scope.planning.variable && section.elements.length)
-					$scope.planning.variable = section.elements[0].id;
-			});
+			if (!$scope.planning.variable && form.elements.length)
+				$scope.planning.variable = form.elements[0].id;
 		});
 
 		$scope.dates = {};

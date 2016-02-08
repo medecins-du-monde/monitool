@@ -15,7 +15,6 @@ var app = angular.module('monitool.app', [
 	'monitool.directives.shared',
 	
 	'monitool.directives.indicatorForm',
-	'monitool.directives.projectInput',
 	'monitool.directives.projectLogframe',
 	'monitool.directives.projectForm',
 	'monitool.directives.reporting',
@@ -330,13 +329,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						name: '',
 						periodicity: 'month', 
 						collect: 'entity',
-						useProjectStart: true,
-						useProjectEnd: true,
-						start: project.begin,
-						end: project.end,
+						start: null,
+						end: null,
 						intermediaryDates: [],
 						active: true,
-						sections: []
+						elements: []
 					};
 				else
 					return project.forms.find(function(form) {
@@ -385,18 +382,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			}
 		}
 	});
-
-
-	// $stateProvider.state('main.project.detailed_activity_reporting', {
-	// 	url: '/activity-detailed-reporting',
-	// 	templateUrl: 'partials/projects/activity/reporting-detailed.html',
-	// 	controller: 'ProjectActivityDetailedReportingController',
-	// 	resolve: {
-	// 		inputs: function(Input, project) {
-	// 			return Input.fetchForProject(project);
-	// 		}
-	// 	}
-	// });
 
 	$stateProvider.state('main.project.olap', {
 		url: '/olap',
@@ -451,30 +436,30 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.reporting_analysis_list', {
-		url: '/reporting-analysis-list',
-		templateUrl: 'partials/projects/indicators/analysis-list.html',
-		controller: 'ProjectReportingAnalysisListController',
-		resolve: {
-			reports: function(mtFetch, $stateParams) {
-				return mtFetch.reports({mode: "dates_only", projectId: $stateParams.projectId});
-			}
-		}
-	});
+	// $stateProvider.state('main.project.reporting_analysis_list', {
+	// 	url: '/reporting-analysis-list',
+	// 	templateUrl: 'partials/projects/indicators/analysis-list.html',
+	// 	controller: 'ProjectReportingAnalysisListController',
+	// 	resolve: {
+	// 		reports: function(mtFetch, $stateParams) {
+	// 			return mtFetch.reports({mode: "dates_only", projectId: $stateParams.projectId});
+	// 		}
+	// 	}
+	// });
 
-	$stateProvider.state('main.project.reporting_analysis', {
-		url: '/reporting-analysis/:reportId',
-		templateUrl: 'partials/projects/indicators/analysis.html',
-		controller: 'ProjectReportingAnalysisController',
-		resolve: {
-			report: function(mtFetch, $stateParams) {
-				var report = mtFetch.report($stateParams.reportId);
-				if ($stateParams.reportId === 'new')
-					report.project = $stateParams.projectId;
-				return report;
-			}
-		}
-	});
+	// $stateProvider.state('main.project.reporting_analysis', {
+	// 	url: '/reporting-analysis/:reportId',
+	// 	templateUrl: 'partials/projects/indicators/analysis.html',
+	// 	controller: 'ProjectReportingAnalysisController',
+	// 	resolve: {
+	// 		report: function(mtFetch, $stateParams) {
+	// 			var report = mtFetch.report($stateParams.reportId);
+	// 			if ($stateParams.reportId === 'new')
+	// 				report.project = $stateParams.projectId;
+	// 			return report;
+	// 		}
+	// 	}
+	// });
 
 	///////////////////////////
 	// Indicators

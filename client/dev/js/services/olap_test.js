@@ -16,10 +16,30 @@ describe('Olap', function() {
 		cube = new Olap.Cube(
 			'num_consultations',
 			[
-				new Olap.Dimension('gender', ['male', 'female', 'transgenre'], 'sum'),
-				new Olap.Dimension('place', ['paris', 'madrid', 'london', 'rome'], 'sum'),
-				new Olap.Dimension('age', ['-15', '+15-18', '+18'], 'sum'),
-				new Olap.Dimension('pathology', ['hiv', 'hbv', 'other'], 'sum')
+				new Olap.Dimension('gender', 'Gender', [
+					{id: 'male', name: "Male"},
+					{id: 'female', name: 'Female'},
+					{id: 'transgenre', name: 'Transgenre'}
+				], 'sum'),
+
+				new Olap.Dimension('place', 'Place', [
+					{id: 'paris', name: 'Paris'},
+					{id: 'madrid', name: 'Madrid'},
+					{id: 'london', name: 'London'},
+					{id: 'rome', name: 'Rome'}
+				], 'sum'),
+
+				new Olap.Dimension('age', 'Age', [
+					{id: '-15', name: '-15'},
+					{id: '+15-18', name: '+15-18'},
+					{id: '+18', name: '+18'}
+				], 'sum'),
+
+				new Olap.Dimension('pathology', 'Pathology', [
+					{id: 'hiv', name: 'HIV'},
+					{id: 'hbv', name: 'HBV'},
+					{id: 'other', name: 'Other'}
+				], 'sum')
 			],
 			[
 				new Olap.ElementaryCube({gender: 'male', place: 'paris',  age: '-15', pathology: 'other'}, 1),

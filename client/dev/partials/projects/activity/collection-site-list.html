@@ -14,12 +14,14 @@
 		<thead>
 			<tr>
 				<th translate="project.entity_name"></th>
+				<th style="width: 200px" translate="project.begin"></th>
+				<th style="width: 200px" translate="project.end"></th>				
 				<th style="width: 90px" acl-has-project-role="owner"></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-if="!project.entities.length">
-				<td colspan="2" style="text-align: center" translate="project.no_input_entities"></td>
+				<td colspan="4" style="text-align: center" translate="project.no_input_entities"></td>
 			</tr>
 			<tr ng-repeat="inputEntity in project.entities track by inputEntity.id">
 				<td acl-has-project-role="owner" acl-fallback="inputEntity.name">
@@ -33,6 +35,12 @@
 								   required />
 						</div>
 					</ng-form>
+				</td>
+				<td>
+					<optional-date ng-model="inputEntity.start" default="project.begin"></optional-date>
+				</td>
+				<td>
+					<optional-date ng-model="inputEntity.end" default="project.end"></optional-date>
 				</td>
 				<td style="text-align: right" acl-has-project-role="owner">
 					<a class="btn btn-default btn-sm" ng-click="up($index, project.entities)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
@@ -49,7 +57,7 @@
 		</tbody>
 		<tfoot acl-has-project-role="owner">
 			<tr>
-				<td colspan="3">
+				<td colspan="4">
 					<a class="btn btn-default btn-xs" ng-click="createEntity()" style="width: 100%" translate="shared.add"></a>
 				</td>
 			</tr>

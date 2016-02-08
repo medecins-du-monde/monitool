@@ -18,10 +18,8 @@ angular
 				$scope.$watch('project', function(project) {
 					$scope.sources = [{id: null, name: "---", group: null}];
 					$scope.project.forms.forEach(function(form) {
-						form.sections.forEach(function(section) {
-							section.elements.forEach(function(element) {
-								$scope.sources.push({id: element.id, name: element.name, group: section.name, element: element});
-							});
+						form.elements.forEach(function(element) {
+							$scope.sources.push({id: element.id, name: element.name, group: form.name, element: element});
 						});
 					});
 				});
@@ -41,16 +39,11 @@ angular
 			var numForms = project.forms.length;
 			for (var i = 0; i < numForms; ++i) {
 				var form = project.forms[i],
-					numSections = form.sections.length;
+					numElements = form.elements.length;
 
-				for (var j = 0; j < numSections; ++j) {
-					var section = form.sections[j],
-						numElements = section.elements.length;
-
-					for (var k = 0; k < numElements; ++k)
-						if (section.elements[k].id === variableId)
-							return section.elements[k];
-				}
+				for (var k = 0; k < numElements; ++k)
+					if (form.elements[k].id === variableId)
+						return form.elements[k];
 			}
 	 	};
 

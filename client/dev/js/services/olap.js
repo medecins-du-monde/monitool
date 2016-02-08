@@ -147,55 +147,53 @@ angular
 				weeks    = Object.keys(weeks).sort().map(function(t) { return {id: t, name: t}; });
 				days     = Object.keys(days).sort().map(function(t) { return {id: t, name: t}; });
 
-				form.sections.forEach(function(section) {
-					section.elements.forEach(function(element) {
-						var numPartitions = element.partitions.length;
+				form.elements.forEach(function(element) {
+					var numPartitions = element.partitions.length;
 
-						var dimensions = element.partitions.map(function(partition, index) {
-							var name = partition.pluck('name').join(' / ');
-							if (name.length > 80)
-								name = name.substring(0, 80 - 3) + '...';
-							return new Dimension('partition' + index, name, partition, 'sum')
-						}).concat([
-							new Dimension('entity', 'project.entity', entities, element.geoAgg),
-							new Dimension('year', 'shared.year', years, element.timeAgg),
-							new Dimension('quarter', 'shared.quarter', quarters, element.timeAgg),
-							new Dimension('month', 'shared.month', months, element.timeAgg),
-							new Dimension('week', 'shared.week', weeks, element.timeAgg),
-							new Dimension('day', 'shared.day', days, element.timeAgg)
-						]);
+					var dimensions = element.partitions.map(function(partition, index) {
+						var name = partition.pluck('name').join(' / ');
+						if (name.length > 80)
+							name = name.substring(0, 80 - 3) + '...';
+						return new Dimension('partition' + index, name, partition, 'sum')
+					}).concat([
+						new Dimension('entity', 'project.entity', entities, element.geoAgg),
+						new Dimension('year', 'shared.year', years, element.timeAgg),
+						new Dimension('quarter', 'shared.quarter', quarters, element.timeAgg),
+						new Dimension('month', 'shared.month', months, element.timeAgg),
+						new Dimension('week', 'shared.week', weeks, element.timeAgg),
+						new Dimension('day', 'shared.day', days, element.timeAgg)
+					]);
 
-						var elementaryCubes = [];
-						inputs.forEach(function(input) {
-							var refDimensionValues = refDimensionValuesByInput[input._id];
+					var elementaryCubes = [];
+					inputs.forEach(function(input) {
+						var refDimensionValues = refDimensionValuesByInput[input._id];
 
-							if (numPartitions > 0) {
-								var elCubes = itertools.product(element.partitions).map(function(partition) {
-									var dimensionValues = {};
+						if (numPartitions > 0) {
+							var elCubes = itertools.product(element.partitions).map(function(partition) {
+								var dimensionValues = {};
 
-									// clone shared dimensions
-									for (var key in refDimensionValues)
-										dimensionValues[key] = refDimensionValues[key];
+								// clone shared dimensions
+								for (var key in refDimensionValues)
+									dimensionValues[key] = refDimensionValues[key];
 
-									// add partitions
-									for (var i = 0; i < numPartitions; ++i)
-										dimensionValues['partition' + i] = partition[i].id;
-									
-									var value = input.values[element.id + '.' + partition.pluck('id').sort().join('.')] || 0;
-									return new ElementaryCube(dimensionValues, value);
-								});
+								// add partitions
+								for (var i = 0; i < numPartitions; ++i)
+									dimensionValues['partition' + i] = partition[i].id;
+								
+								var value = input.values[element.id][partition.pluck('id').sort().join('.')] || 0;
+								return new ElementaryCube(dimensionValues, value);
+							});
 
-								// append new cubes
-								Array.prototype.push.apply(elementaryCubes, elCubes);
-							}
-							else {
-								elementaryCubes.push(new ElementaryCube(refDimensionValues, input.values[element.id] || 0));
-							}
-						}, this);
-
-						cubes[element.id] = new Cube(element.id, dimensions, elementaryCubes);
-
+							// append new cubes
+							Array.prototype.push.apply(elementaryCubes, elCubes);
+						}
+						else {
+							elementaryCubes.push(new ElementaryCube(refDimensionValues, input.values[element.id][''] || 0));
+						}
 					}, this);
+
+					cubes[element.id] = new Cube(element.id, dimensions, elementaryCubes);
+
 				}, this);
 			}, this);
 
@@ -206,12 +204,12 @@ angular
 			var numDimensions = this.dimensions.length;
 
 			// Sort them by their dimension values.
-			this.elementaryCubes.sort(function(datum1, datum2) {
+			this.elementaryCubes.sort(function(elCube1, elCube2) {
 				// take the first dimension that allow to separate those apart.
 				for (var i = 0; i < numDimensions; ++i) {
 					var dimension = this.dimensions[i],
-						index1 = dimension.items.findIndex(function(item) { return item.id == datum1.dimensionValues[dimension.id]; }),
-						index2 = dimension.items.findIndex(function(item) { return item.id == datum2.dimensionValues[dimension.id]; });
+						index1 = dimension.items.findIndex(function(dimItem) { return dimItem.id == elCube1.dimensionValues[dimension.id]; }),
+						index2 = dimension.items.findIndex(function(dimItem) { return dimItem.id == elCube2.dimensionValues[dimension.id]; });
 
 					if (index1 != index2)
 						return index1 - index2;

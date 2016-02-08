@@ -1,0 +1,12 @@
+
+<div class="input-group">
+	<div class="input-group-addon">
+		<input type="checkbox" ng-model="specifyValue" />
+	</div>
+
+	<input type="number"
+		   ng-model="chosenValue"
+		   ng-disabled="!specifyValue"
+		   ng-required="specifyValue"
+		   class="form-control" />
+</div>

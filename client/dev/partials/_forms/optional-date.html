@@ -1,0 +1,16 @@
+
+<div class="input-group">
+	<div class="input-group-addon">
+		<input type="checkbox" ng-model="specifyDate" />
+	</div>
+
+	<input type="text" 
+		   datepicker-popup="longDate"
+		   name="start"
+		   ng-model="chosenDate"
+		   is-open="chosenDateOpen"
+		   ng-click = "chosenDateOpen = true"
+		   ng-disabled="!specifyDate"
+		   ng-required="specifyDate"
+		   class="form-control" />
+</div>

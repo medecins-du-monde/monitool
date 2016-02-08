@@ -10,7 +10,6 @@
 			<th translate="shared.name"></th>
 			<th translate="shared.begin"></th>
 			<th translate="shared.end"></th>
-			<th translate="shared.active"></th>
 			<th translate="project.periodicity"></th>
 			<th translate="project.collect"></th>
 			<th></th>
@@ -22,9 +21,8 @@
 		</tr>
 		<tr ng-repeat="form in project.forms">
 			<td>{{form.name}}</td>
-			<td>{{form.start | amDateFormat: 'D MMMM YYYY'}}</td>
-			<td>{{form.end | amDateFormat: 'D MMMM YYYY'}}</td>
-			<td><i fa-boolean="form.active"></i></td>
+			<td>{{(form.start || project.begin) | amDateFormat: 'D MMMM YYYY'}}</td>
+			<td>{{(form.end || project.end) | amDateFormat: 'D MMMM YYYY'}}</td>
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>{{'project.collects.' + form.collect|translate}}</td>
 			<td>

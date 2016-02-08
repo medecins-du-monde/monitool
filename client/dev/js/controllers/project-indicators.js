@@ -108,10 +108,9 @@ angular.module('monitool.controllers.project.indicators', [])
 		// Retrieve indicator array where we need to add or remove indicator ids.
 		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
 			display: '',
-			relevance: '',
 			colorize: true,
-			baseline: 0,
-			target: 100,
+			baseline: null,
+			target: null,
 			formula: null,
 			variable: null,
 			filter: []
@@ -131,20 +130,6 @@ angular.module('monitool.controllers.project.indicators', [])
 				$scope.indicatorsById[indicatorId] = $scope.indicator = indicator;
 				$scope.planning.display = $scope.planning.display || indicator.name[$scope.language];
 			});
-
-		// Handle baseline and target
-		$scope.baselineUnknown = $scope.planning.baseline === null;
-		$scope.targetUnknown = $scope.planning.target === null;
-		
-		$scope.$watch('baselineUnknown', function(value, oldValue) {
-			if (value !== oldValue)
-				$scope.planning.baseline = value ? null : 0;
-		});
-
-		$scope.$watch('targetUnknown', function(value, oldValue) {
-			if (value !== oldValue)
-				$scope.planning.target = value ? null : 100;
-		});
 
 		$scope.$watch('planning.formula', function(formulaId, oldFormulaId) {
 			if (formulaId !== oldFormulaId) {

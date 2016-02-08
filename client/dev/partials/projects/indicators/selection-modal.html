@@ -38,7 +38,7 @@
 				ng-include="'partials/projects/indicators/selection-modal-tree.html'"
 				ng-repeat="theme in hierarchy|hierarchyFilter:searchField"
 				ng-if="theme._id === project.themes[0]"
- 				ng-init="theme.open = true"></div>
+				ng-init="theme.open = true"></div>
 		</div>
 
 		<div ng-if="project.themes.length != 1">

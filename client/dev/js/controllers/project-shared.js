@@ -71,10 +71,8 @@ angular.module('monitool.controllers.project.shared', [])
 
 			$scope.projectHasForms = false;
 			project.forms.forEach(function(form) {
-				form.sections.forEach(function(section) {
-					if (section.elements.length)
-						$scope.projectHasForms = true;
-				});
+				if (form.elements.length)
+					$scope.projectHasForms = true;
 			});
 
 			$scope.projectHasEntities = !!project.entities.length;

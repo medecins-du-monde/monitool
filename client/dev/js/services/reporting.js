@@ -70,23 +70,21 @@ angular
 
 			var newInput = Input.makeFake(form);
 
-			form.sections.forEach(function(section) {
-				section.elements.forEach(function(element) {
-					var elementMode = element[mode], values;
+			form.elements.forEach(function(element) {
+				var elementMode = element[mode], values;
 
-					if (element.partitions.length === 0) {
-						values = inputs.map(function(input) { return input.values[element.id]; }); // if a field is not filled we assume 0
-						newInput.values[element.id] = this._aggregateValues(elementMode, values);
-					}
-					else {
-						itertools.product(element.partitions).map(function(list) {
-							return list.pluck('id').sort().join('.');
-						}).forEach(function(partition) {
-							values = inputs.map(function(input) { return input.values[element.id + '.' + partition]; }); // if a field is not filled we assume 0
-							newInput.values[element.id + '.' + partition] = this._aggregateValues(elementMode, values);
-						}, this);
-					}
-				}, this);
+				if (element.partitions.length === 0) {
+					values = inputs.map(function(input) { return input.values[element.id]['']; }); // if a field is not filled we assume 0
+					newInput.values[element.id] = {'': this._aggregateValues(elementMode, values)};
+				}
+				else {
+					itertools.product(element.partitions).map(function(list) {
+						return list.pluck('id').sort().join('.');
+					}).forEach(function(partition) {
+						values = inputs.map(function(input) { return input.values[element.id][partition]; }); // if a field is not filled we assume 0
+						newInput.values[element.id][partition] = this._aggregateValues(elementMode, values);
+					}, this);
+				}
 			}, this);
 
 			return newInput;
@@ -150,11 +148,11 @@ angular
 						numFilters = parameter.filter.length;
 
 					if (numFilters == 0)
-						localScope[key] = activityData[parameter.variable];
+						localScope[key] = activityData[parameter.variable][''];
 					else {
 						localScope[key] = 0;
 						for (var filterId = 0; filterId < numFilters; ++filterId) {
-							var accItem = activityData[parameter.variable + '.' + parameter.filter[filterId]];
+							var accItem = activityData[parameter.variable][parameter.filter[filterId]];
 							if (typeof accItem !== "number")
 								return accItem;
 
@@ -178,11 +176,11 @@ angular
 				var numFilters = indicatorMeta.filter.length;
 
 				if (numFilters == 0)
-					return activityData[indicatorMeta.variable];
+					return activityData[indicatorMeta.variable][''];
 				else {
 					var accumulator = 0;
 					for (var filterId = 0; filterId < numFilters; ++filterId) {
-						var accumulatorItem = activityData[indicatorMeta.variable + '.' + indicatorMeta.filter[filterId]];
+						var accumulatorItem = activityData[indicatorMeta.variable][indicatorMeta.filter[filterId]];
 						if (typeof accumulatorItem !== "number")
 							return accumulatorItem;
 
