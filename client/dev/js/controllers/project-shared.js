@@ -17,7 +17,7 @@ angular.module('monitool.controllers.project.shared', [])
 		$scope.finishedProjects = projects.filter(function(p) {
 			return $scope.myProjects.indexOf(p) === -1 && p.end < new Date()
 		});
-		
+
 		$scope.projects = $scope.myProjects;
 	})
 
@@ -31,6 +31,73 @@ angular.module('monitool.controllers.project.shared', [])
 		$scope.master = angular.copy(project);
 		$scope.indicatorsById = indicatorsById;
 
+		$scope.cloneProject = function() {
+			var translate = $filter('translate'),
+				question  = translate('project.please_enter_new_name');
+
+			var newName = window.prompt(question),
+				newProject = angular.copy($scope.project);
+
+			if (!newName)
+				return;
+
+			// change all ids, just in case
+			var old2new = {};
+			newProject._id = makeUUID();
+			newProject.name = newName;
+			delete newProject._rev;
+			newProject.owners = [$scope.userCtx._id];
+			newProject.dataEntryOperators = [$scope.userCtx._id];
+			newProject.entities.forEach(function(entity) {
+				old2new[entity.id] = makeUUID();
+				entity.id = old2new[entity.id];
+			});
+
+			newProject.groups.forEach(function(group) {
+				old2new[group.id] = makeUUID();
+				group.id = old2new[group.id];
+				group.entities = group.entities.map(function(oldId) { return old2new[oldId]; });
+			});
+
+			newProject.forms.forEach(function(form) {
+				old2new[form.id] = makeUUID();
+				form.id = old2new[form.id];
+
+				form.elements.forEach(function(element) {
+					old2new[element.id] = makeUUID();
+					element.id = old2new[element.id];
+
+					element.partitions.forEach(function(partition) {
+						partition.forEach(function(pElement) {
+							old2new[pElement.id] = makeUUID();
+							pElement.id = old2new[pElement.id];
+						});
+					});
+				});
+			});
+
+			for (var indicatorId in newProject.indicators) {
+				var planning = newProject.indicators[indicatorId];
+				if (planning.variable) {
+					planning.variable = old2new[planning.variable];
+					planning.filter = planning.filter.map(function(filter) {
+						return filter.split('.').map(function(s) { return old2new[s]; }).join('.');
+					});
+				}
+				else if (planning.formula) {
+					for (var key in planning.parameters) {
+						planning.parameters[key].variable = old2new[planning.parameters[key].variable];
+						planning.parameters[key].filter = planning.parameters[key].filter.map(function(filter) {
+							return filter.split('.').map(function(s) { return old2new[s]; }).join('.');
+						});
+					}
+				}
+			}
+
+			newProject.$save()
+				.then(function() { $state.go('main.projects'); })
+				.catch(function(error) { $scope.error = error; });
+		}
 
 		$scope.deleteProject = function() {
 			var translate = $filter('translate'),

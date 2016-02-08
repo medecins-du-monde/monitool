@@ -60,6 +60,7 @@ var ENGLISH_LOCALE = {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		clone: "Clone",
 		user_guide: "User guide",
 		home: "Home",
 

@@ -36,12 +36,13 @@
 						</div>
 					</ng-form>
 				</td>
-				<td>
+				<td acl-has-project-role="owner" acl-fallback="project.begin">
 					<optional-date ng-model="inputEntity.start" default="project.begin"></optional-date>
 				</td>
-				<td>
+				<td acl-has-project-role="owner" acl-fallback="project.end">
 					<optional-date ng-model="inputEntity.end" default="project.end"></optional-date>
 				</td>
+
 				<td style="text-align: right" acl-has-project-role="owner">
 					<a class="btn btn-default btn-sm" ng-click="up($index, project.entities)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
 						<i class="fa fa-caret-square-o-up"></i>
@@ -91,18 +92,16 @@
 						</div>
 					</ng-form>
 				</td>
-				<td>
-					<ui-select multiple ng-model="inputGroup.members" theme="bootstrap" acl-has-project-role="owner">
+				
+				<td acl-has-project-role="owner" acl-fallback="inputGroup.members | getObjects:project.entities | pluck:'name' | join:', '">
+					<ui-select multiple ng-model="inputGroup.members" theme="bootstrap">
 						<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
 						<ui-select-choices repeat="inputEntity.id as inputEntity in project.entities">
 							{{inputEntity.name}}
 						</ui-select-choices>
 					</ui-select>
-
-					<span acl-lacks-project-role="owner">
-						{{inputGroup.members | getObjects:project.entities | pluck:'name' | join:', '}}
-					</span>
 				</td>
+
 				<td style="text-align: right" acl-has-project-role="owner">
 					<a class="btn btn-default btn-sm" ng-click="up($index, project.groups)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
 						<i class="fa fa-caret-square-o-up"></i>

@@ -60,6 +60,7 @@ var FRENCH_LOCALE = {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		clone: "Cloner",
 		user_guide: "Guide d'utilisation",
 		home: "Accueil",
 		up: "Monter d'un cran",

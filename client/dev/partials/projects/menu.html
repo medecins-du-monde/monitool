@@ -144,15 +144,20 @@
 				</div>
 			</div>
 
-			<div class="panel panel-danger" acl-has-project-role="owner">
+			<div class="panel panel-default">
 				<div class="panel-collapse">
 					<div class="list-group">
+						<a class="list-group-item list-group-item-info" ng-click="cloneProject()" eat-click-if="!project._id" disable-if="!project._id" acl-has-role="project">
+							<i class="fa fa-clone fa-fw"></i>
+							<span translate="shared.clone"></span>
+						</a>
 
-						<a class="list-group-item list-group-item-danger"
-						   ng-click="deleteProject()"
-						   eat-click-if="!project._id"
-						   disable-if="!project._id">
-						   
+						<a class="list-group-item list-group-item-info" disable-if="1" acl-lacks-role="project" tooltip="{{'project.cant_create'|translate}}">
+							<i class="fa fa-clone fa-fw"></i>
+							<span translate="shared.clone"></span>
+						</a>						
+
+						<a class="list-group-item list-group-item-danger" ng-click="deleteProject()" eat-click-if="!project._id" disable-if="!project._id" acl-has-project-role="owner">
 							<i class="fa fa-trash fa-fw"></i>
 							<span translate="shared.delete"></span>
 						</a>

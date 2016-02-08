@@ -181,7 +181,7 @@ angular
 					else
 						$scope.showEntities = true;
 				}
-		$scope.colWidth = (100 / (1 + ($scope.showEntities ? project.entities.length : 0) + ($scope.showProject ? 1 : 0))) + '%';
+		$scope.numCols = 1 + ($scope.showEntities ? project.entities.length : 0) + ($scope.showProject ? 1 : 0);
 
 		// Remove the expected inputs for people that cannot edit.
 		if (!$scope.canEdit) {

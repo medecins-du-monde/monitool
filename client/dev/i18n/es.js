@@ -60,6 +60,7 @@ var SPANISH_LOCALE = {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		clone: "Clonar",
 		user_guide: "Guía del usuario",
 		home: "Inicio",
 		up: "Subir",
