@@ -186,10 +186,27 @@ angular
 
 		Input.fetchForProjects = function(projects) {
 			// Index forms by their uuid.
-			var formsById = {};
+			var formsById = {}, validInputIds = {};
+
+			// list all possible input ids to exclude inputs that are out of calendar.
 			projects.forEach(function(project) {
 				project.forms.forEach(function(form) {
 					formsById[form.id] = form;
+
+					if (form.collect === 'entity')
+						project.entities.forEach(function(inputEntity) {
+							_getPeriods(inputEntity, form, project).forEach(function(period) {
+								validInputIds[project._id + ':' + inputEntity.id + ':' + form.id + ':' + period.format('YYYY-MM-DD')] = true;
+							});
+						});
+					
+					else if (form.collect === 'project')
+						_getPeriods(null, form, project).forEach(function(period) {
+							validInputIds[project._id + ':none:' + form.id + ':' + period.format('YYYY-MM-DD')] = true;
+						});
+					
+					else
+						throw new Error('Invalid form.collect value.');
 				});
 			});
 
@@ -206,10 +223,10 @@ angular
 
 				// remove inputs that have no matching form
 				inputs = inputs.filter(function(input) {
-					if (!formsById[input.form])
+					if (!formsById[input.form] || !validInputIds[input._id])
 						console.log('Dropping input: ', input._id);
 
-					return !!formsById[input.form];
+					return formsById[input.form] && validInputIds[input._id];
 				});
 
 				// ask each input to sanitize itself with the relevant form.
