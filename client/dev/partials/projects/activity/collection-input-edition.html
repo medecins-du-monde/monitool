@@ -14,26 +14,31 @@
 	
 	<div class="form-group" ng-repeat="element in form.elements">
 		<label class="col-sm-2 control-label">
+			<a ng-click="currentInput.values[element.id] = lastInput.values[element.id]"
+			   tooltip="{{'project.fill_with_last_input' | translate}}"
+			   ng-if="lastInput"><i class="fa fa-clipboard"></i></a>
+
 			{{element.name}}<br/>
 
+
 			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 1">
-				<span style="font-weight: normal">Ordre</span>
-				<div class="btn-group btn-group-xs">
-					<button ng-click="rotate(-1, element)" class="btn btn-default"><i class="fa fa-caret-left"></i></button>
-					<button class="btn btn-default" disabled>{{rotations[element.id] + 1}}</button>
-					<button ng-click="rotate(1, element)" class="btn btn-default"><i class="fa fa-caret-right"></i></button>
+				<span style="font-weight: normal" translate="project.field_order"></span>
+				<div class="btn-group btn-group-xxs">
+					<a ng-click="rotate(-1, element)" class="btn btn-default"><i class="fa fa-caret-left"></i></a>
+					<a class="btn btn-default" disabled>{{rotations[element.id] + 1}}</a>
+					<a ng-click="rotate(1, element)" class="btn btn-default"><i class="fa fa-caret-right"></i></a>
 				</div>
 			</div>
 
 			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 2">
-				<span style="font-weight: normal">Distribution</span>
-				<div class="btn-group btn-group-xs">
-					<button ng-click="move(-1, element)" class="btn btn-default"><i class="fa fa-caret-left"></i></button>
-					<button class="btn btn-default" disabled>
+				<span style="font-weight: normal" translate="project.field_distribution"></span>
+				<div class="btn-group btn-group-xxs">
+					<a ng-click="move(-1, element)" class="btn btn-default"><i class="fa fa-caret-left"></i></a>
+					<a class="btn btn-default" disabled>
 						C{{positions[element.id] + 1}}
 						L{{element.partitions.length - positions[element.id] - 1}}
-					</button>
-					<button ng-click="move(1, element)" class="btn btn-default"><i class="fa fa-caret-right"></i></button>
+					</a>
+					<a ng-click="move(1, element)" class="btn btn-default"><i class="fa fa-caret-right"></i></a>
 				</div>
 			</div>
 
@@ -43,7 +48,6 @@
 			<input-grid partitions="partitions[element.id]" ng-model="currentInput.values[element.id]" offset="positions[element.id]"></input-grid>
 		</div>
 	</div>
-
 </form>
 
 <div acl-has-project-role="input">

@@ -242,6 +242,7 @@ angular
 		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
+		$scope.lastInput     = inputs.previous;
 		$scope.master        = angular.copy($scope.currentInput)
 		$scope.inputEntity   = $scope.project.entities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
@@ -309,7 +310,6 @@ angular
 					event.preventDefault();
 			}
 		});
-
 	})
 
 	.controller('ProjectActivityReportingController', function($scope, inputs, mtReporting) {

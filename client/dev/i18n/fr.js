@@ -173,24 +173,24 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		fill_with_last_input: "Remplir avec les données de la saisie précédente",
+		date_due: "Date de rendu",
+		show_finished: "Voir les saisies réalisées",
+		field_order: "Ordre",
+		field_distribution: "Distribution",
 		cant_create: "Vous n'êtes pas autorisé à créer de nouveaux projets",
 		my_projects: "Mes projets",
-
 		are_you_sure_to_delete: "Tapez: 'Je suis sûr de vouloir supprimer ce projet' pour confirmer",
 		are_you_sure_to_delete_answer: "Je suis sûr de vouloir supprimer ce projet",
-
 		data_selection: "Selection des données",
 		filters: "Filtres",
-
 		input_status: {
 			'done-read': "Afficher",
 			'outofschedule-read': "Afficher (Hors calendrier)",
-
 			'done-edit': "Modifier",
 			'expected-edit': "Saisir",
 			'outofschedule-edit': "Afficher (Hors calendrier)"
 		},
-
 		cols: "Colonnes",
 		rows: "Lignes",
 		partition0: "Partition 0",
@@ -293,7 +293,6 @@ var FRENCH_TRANSLATION = {
 		add_new_indicator_to_form: "Ajouter un nouvel indicateur au formulaire",
 
 		form_name_ph: "ex: Collecte mensuelle pour les centres de santé",
-		collect: "Collecter sur",
 
 		analysis: "Analyse",
 		analysis_insert_data: "Insérer des données",
@@ -351,9 +350,10 @@ var FRENCH_TRANSLATION = {
 			year: 'Tous les ans',
 			planned: 'Planifiée'
 		},
+		collect: "Collecter",
 		collects: {
-			entity: "Lieux de collecte",
-			project: "Projet"
+			entity: "Pour chaque lieu de collecte",
+			project: "Une fois pour tout le projet"
 		},
 
 		add_intermediary: "Ajouter une saisie",

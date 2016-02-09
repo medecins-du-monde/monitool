@@ -174,23 +174,24 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		fill_with_last_input: "Fill with last input",
+		date_due: "Date",
+		show_finished: "See all data entries",
+		field_order: "Order",
+		field_distribution: "Distribution",
 		cant_create: "You are not allowed to create new projects",
 		my_projects: "My projects",
 		are_you_sure_to_delete: "Please type: 'Yes, I do want to delete this project' to confirm",
 		are_you_sure_to_delete_answer: "Yes, I do want to delete this project",
-
 		data_selection: "Data selection",
 		filters: "Filters",
-
 		input_status: {
 			'done-read': "Open",
 			'outofschedule-read': "Open (out of calendar)",
-
 			'done-edit': "Edit",
 			'expected-edit': "Create",
 			'outofschedule-edit': "Open (wrong date)"
 		},
-
 		cols: "Columns",
 		rows: "Rows",
 		partition0: "Partition 0",
@@ -292,7 +293,6 @@ var ENGLISH_TRANSLATION = {
 		indicator_distribution: "Indicators repartition by form and period",
 		add_new_indicator_to_form: "Add a new indicator to the form",
 
-		collect: "Collect on",
 		form_name_ph: "For instance: Monthly collection on health centers",
 
 		analysis: "Analysis",
@@ -351,9 +351,10 @@ var ENGLISH_TRANSLATION = {
 			year: "Every year",
 			planned: 'Planned'
 		},
+		collect: "Collect",
 		collects: {
-			entity: "Input entity",
-			project: "Project"
+			entity: "Once for each input entity",
+			project: "Once for the whole project"
 		},
 		
 		add_intermediary: "Add a date",

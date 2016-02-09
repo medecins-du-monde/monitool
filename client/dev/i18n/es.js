@@ -173,24 +173,24 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		fill_with_last_input: "Rellenar con los datos de la última entrada",
+		date_due: "Fecha",
+		show_finished: "Ver todas las entradas",
+		field_order: "Orden",
+		field_distribution: "Distribución",
 		cant_create: "No esta autorizado a crear nuevos proyectos",
 		my_projects: "Mis proyectos",
-
 		are_you_sure_to_delete: "Por favor entre: 'Estoy seguro de querer suprimir este proyecto' para confirmar.",
 		are_you_sure_to_delete_answer: "Estoy seguro de querer suprimir este proyecto",
-
 		data_selection: "Seleccione los datos",
 		filters: "Filtros",
-
 		input_status: {
 			'done-read': "Consultar",
 			'outofschedule-read': "Consultar (fuera calendario)",
-
 			'done-edit': "Editar",
 			'expected-edit': "Crear",
 			'outofschedule-edit': "Consultar (fuera calendario)"
 		},
-
 		cols: "Columnas",
 		rows: "Linear",
 		partition0: "Partición 0",
@@ -293,7 +293,6 @@ var SPANISH_TRANSLATION = {
 		add_new_indicator_to_form: "Añadir un nuevo indicator al formulario",
 
 		form_name_ph: "ej: Recuperación mensual en los centros de salud",
-		collect: "Recuperar por",
 
 		analysis: "Análisis",
 		analysis_insert_data: "Insertar datos",
@@ -351,9 +350,10 @@ var SPANISH_TRANSLATION = {
 			year: 'Cada año',
 			planned: 'Planificado'
 		},
+		collect: "Recuperar",
 		collects: {
-			entity: "Lugar de actividad",
-			project: "Proyecto"
+			entity: "Para cada lugar de actividad por separado",
+			project: "Una vez para todo el proyecto"
 		},
 		
 		add_intermediary: "Añadir una fecha",
