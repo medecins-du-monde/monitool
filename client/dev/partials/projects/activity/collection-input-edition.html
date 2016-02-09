@@ -47,13 +47,18 @@
 </form>
 
 <div acl-has-project-role="input">
-	<button class="btn btn-default" ng-click="save()">
+	<a class="btn btn-primary" ng-click="save()">
 		<i class="fa fa-floppy-o"></i>
 		<span translate="shared.save"></span>
-	</button>
+	</a>
 
-	<button class="btn btn-danger" ng-click="delete()" ng-if="!isNew">
+	<a ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</a>
+
+	<a class="btn btn-danger" ng-click="delete()" ng-if="!isNew">
 		<i class="fa fa-remove"></i>
 		<span translate="shared.delete"></span>
-	</button>
+	</a>
 </div>

@@ -132,7 +132,7 @@ var ENGLISH_TRANSLATION = {
 		change_password: "Change password",
 		detach: "Detach",
 
-		stay_here_check: 'You made changes. Click OK to stay on this page, Cancel to leave.',
+		sure_to_leave: 'You made changes. Click OK to confirm that you want to leave without saving.',
 		filter: "Filter",
 		'export': "Export",
 		none: "None"

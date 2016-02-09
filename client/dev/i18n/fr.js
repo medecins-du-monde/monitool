@@ -131,7 +131,7 @@ var FRENCH_TRANSLATION = {
 		change_password: "Changer le mot de passe",
 		detach: "Déplacer vers supplémentaires",
 
-		stay_here_check: 'Vous avez realisé des changements. OK pour rester sur cette page, Annuler pour perdre les modifications.',
+		sure_to_leave: 'Vous avez realisé des changements. Êtes-vous sûr de vouloir quitter sans sauvegarder?',
 		filter: "Filtre",
 		'export': "Export",
 		none: "Aucune"

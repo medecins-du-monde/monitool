@@ -131,7 +131,7 @@ var SPANISH_TRANSLATION = {
 		change_password: "Cambiar contraseña",
 		detach: "Desconectar",
 
-		stay_here_check: 'Ha realizado cambios. Selectione acceptar para quedarse en esta página, cancelar para perder los cambios.',
+		sure_to_leave: 'Ha realizado cambios. ¿Esta seguro de querer cambiar de página sin salvar?',
 		filter: "Filtro",
 		'export': "Exportar",
 		none: "Ningúno"

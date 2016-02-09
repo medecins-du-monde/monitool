@@ -187,10 +187,10 @@ angular.module('monitool.controllers.project.shared', [])
 			// if unsaved changes were made
 			if (pages.indexOf(fromState.name) !== -1 && !angular.equals($scope.master, $scope.project)) {
 				// then ask the user if he meant it
-				if (window.confirm($filter('translate')('shared.stay_here_check')))
-					event.preventDefault();
-				else
+				if (window.confirm($filter('translate')('shared.sure_to_leave')))
 					$scope.reset();
+				else
+					event.preventDefault();
 			}
 		});
 	})

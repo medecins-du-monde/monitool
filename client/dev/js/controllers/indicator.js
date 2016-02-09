@@ -74,11 +74,22 @@ angular
 			var question = $filter('translate')('indicator.delete_indicator');
 
 			if (window.confirm(question)) {
+				pageChangeWatch();
+
 				indicator.$delete(function() {
 					$state.go('main.indicators');
 				});
 			}
 		};
+
+		var pageChangeWatch = $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+			// if unsaved changes were made
+			if (!angular.equals($scope.master, $scope.indicator)) {
+				// then ask the user if he meant it
+				if (!window.confirm($filter('translate')('shared.sure_to_leave')))
+					event.preventDefault();
+			}
+		});
 	})
 	
 	.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, inputs) {

@@ -64,9 +64,7 @@ angular
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.formUsage = formUsage;
-		$scope.formIndex = $scope.project.forms.findIndex(function(f) {
-			return f.id === form.id;
-		});
+		$scope.formIndex = $scope.project.forms.findIndex(function(f) { return f.id === form.id; });
 
 		$scope.addIntermediary = function() {
 			if (-1 === $scope.form.intermediaryDates.findIndex(function(key) { return !key; }))
@@ -95,6 +93,15 @@ angular
 				});
 			}
 		};
+
+		var pageChangeWatch = $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+			// if unsaved changes were made
+			if (!angular.equals($scope.master, $scope.form)) {
+				// then ask the user if he meant it
+				if (!window.confirm($filter('translate')('shared.sure_to_leave')))
+					event.preventDefault();
+			}
+		});
 
 		$scope.$watch('form.elements', function(elements) {
 			$scope.maxPartitions = 0;
@@ -231,11 +238,11 @@ angular
 		});
 	})
 
-	.controller('ProjectCollectionInputEditionController', function($scope, $state, mtReporting, form, inputs, indicatorsById) {
+	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, mtReporting, form, inputs, indicatorsById) {
 		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
-		// $scope.previousInput = inputs.previous;
+		$scope.master        = angular.copy($scope.currentInput)
 		$scope.inputEntity   = $scope.project.entities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
 		// Handle rotations.
@@ -271,12 +278,38 @@ angular
 		});
 
 		$scope.save = function() {
+			pageChangeWatch()
 			$scope.currentInput.$save(function() { $state.go('main.project.collection_input_list'); });
 		};
 
-		$scope.delete = function() {
-			$scope.currentInput.$delete(function() { $state.go('main.project.collection_input_list'); });
+		$scope.reset = function() {
+			$scope.currentInput = angular.copy($scope.master);
 		};
+
+		$scope.isUnchanged = function() {
+			return angular.equals($scope.master, $scope.currentInput);
+		};
+
+		$scope.delete = function() {
+			var easy_question = $filter('translate')('project.delete_form_easy');
+
+			if (window.confirm(easy_question)) {
+				pageChangeWatch(); // remove the change page watch, because it will trigger otherwise.
+				$scope.currentInput.$delete(function() {
+					$state.go('main.project.collection_input_list');
+				});
+			}
+		};
+
+		var pageChangeWatch = $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+			// if unsaved changes were made
+			if (!angular.equals($scope.master, $scope.currentInput)) {
+				// then ask the user if he meant it
+				if (!window.confirm($filter('translate')('shared.sure_to_leave')))
+					event.preventDefault();
+			}
+		});
+
 	})
 
 	.controller('ProjectActivityReportingController', function($scope, inputs, mtReporting) {
@@ -506,4 +539,4 @@ angular
 			}
 		}, true);
 
-	})
+	});
