@@ -120,7 +120,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in rows">
+ 		<tr ng-repeat="row in rows">
 			<td style="text-align: center">
 				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data'" />
 			</td>
@@ -129,11 +129,9 @@
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
 				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
-			<td ng-if="row.type === 'data'">{{row.baseline}}{{row.unit}}</td>
-			<td ng-if="row.type === 'data'">{{row.target}}{{row.unit}}</td>
+			<td ng-if="row.type === 'data'">{{row.baseline}}</td>
+			<td ng-if="row.type === 'data'">{{row.target}}</td>
 			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" indicator-reporting-field></td>
 		</tr>
 	</tbody>
 </table>
-
-

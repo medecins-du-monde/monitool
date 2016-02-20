@@ -1,6 +1,6 @@
 <div class="modal-body">
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
-		<legend ng-bind="indicator.name[language]"></legend>
+		<legend translate="project.edit_indicator"></legend>
 
 		<div class="form-group" show-errors>
 			<label for="display-input" class="col-sm-2 control-label" translate="project.display"></label>
@@ -10,95 +10,115 @@
 			</div>
 		</div>
 
-		<div class="well well-sm" acl-has-project-role="owner">
-			<div class="form-group">
-				<label for="formula-input" class="col-sm-2 control-label" translate="indicator.formula"></label>
-				<div class="col-sm-10">
-					<select class="form-control" name="planning-formula" ng-model="planning.formula" ng-options="id as formula.expression for (id, formula) in indicator.formulas">
-						<option value="" translate="shared.none"></option>
-					</select>
-				</div>
-			</div>
+		<div class="form-group">
+			<label for="indicator-input" class="col-sm-2 control-label" translate="shared.indicator"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.indicator">
+				<div class="input-group">
+					<input id="indicator-input" type="text" ng-model="planning.indicator" class="form-control" disabled />
 
-			<div class="form-group" ng-if="!planning.formula">
-				<label for="source2-input" class="col-sm-2 control-label" translate="project.variable"></label>
-				<div class="col-sm-10">
-					<project-activity-variable project="project" planning="planning"></project-activity-variable>
-				</div>
-			</div>
-
-			<div class="form-group" ng-if="planning.variable">
-				<label for="source2-input" class="col-sm-2 control-label" translate="shared.filter"></label>
-				<div class="col-sm-10">
-					<project-activity-filter project="project" planning="planning"></project-activity-filter>
-				</div>
-			</div>
-
-			<table class="table table-bordered table-condensed" ng-if="planning.formula" style="background-color: white">
-				<thead>
-					<tr>
-						<th>Nom</th>
-						<th>Variable</th>
-						<th>Filtre</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="(paramKey, value) in planning.parameters">
-						<td ng-bind="indicator.formulas[planning.formula].parameters[paramKey][language]"></td>
-						<td>
-							<project-activity-variable project="project" planning="value"></project-activity-variable>
-						</td>
-						<td style="padding: 0">
-							<project-activity-filter project="project" planning="value"></project-activity-filter>
-						</td>
-					<tr>
-				</tbody>
-			</table>
-		</div>
-
-		<div class="well well-sm">
-
-			<div class="form-group">
-				<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
-				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.colorize">
-					<input id="colorize-input"
-						   type="checkbox"
-						   ng-model="planning.colorize"
-						   ng-disabled="planning.baseline == null || planning.target == null" />
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
-				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
-					<optional-number ng-model="planning.baseline" default="0"></optional-number>
- 				</div>
-			</div>
-
-			<div class="form-group">
-				<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
-				<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.target">
-					<optional-number ng-model="planning.target" default="100"></optional-number>
+					<span class="input-group-btn">
+						<a class="btn btn-default" translate="project.choose"></a>
+					</span>
 				</div>
 			</div>
 		</div>
+
+		<div class="form-group">
+			<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
+				<optional-number ng-model="planning.baseline" default="0"></optional-number>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.target">
+				<optional-number ng-model="planning.target" default="100"></optional-number>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.colorize">
+				<input id="colorize-input"
+					   type="checkbox"
+					   ng-model="planning.colorize"
+					   ng-disabled="planning.baseline == null || planning.target == null" />
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="targetType-input" class="col-sm-2 control-label" translate="indicator.target"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.targetType">
+				<select id="input-target" class="form-control" ng-model="planning.targetType" required>
+					<option value="lower_is_better" translate="indicator.lower_is_better"></option>
+					<option value="higher_is_better" translate="indicator.higher_is_better"></option>
+					<option value="around_is_better" translate="indicator.around_is_better"></option>
+					<option value="non_relevant" translate="indicator.non_relevant"></option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="unit-input" class="col-sm-2 control-label" translate="indicator.unit"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.unit">
+				<select id="input-unit" name="unit" ng-model="planning.unit" class="form-control" required>
+					<option value="none" translate="indicator.other"></option>
+					<option value="%" translate="indicator.percent"></option>
+					<option value="‰" translate="indicator.permille"></option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="formula-input" class="col-sm-2 control-label" translate="project.formula"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.formula">
+				<input expression id="colorize-input" class="form-control" ng-model="planning.formula" />
+			</div>
+		</div>
+
+
+
+		<table class="table table-bordered table-condensed table-stripped">
+			<thead>
+				<tr>
+					<th style="width: 20%">Paramètre</th>
+					<th style="width: 40%">Variable</th>
+					<th style="width: 40%">Filtre</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="(key, parameter) in planning.parameters">
+					<td>{{key}}</td>
+					<td>
+						<select required
+								class="form-control"
+								ng-model="parameter.elementId"
+								ng-options="v.id as v.name group by v.group for v in elements"></select>
+					</td>
+					<td ng-if="filters[parameter.elementId] == null">
+						<input value="{{'project.please_select_variable'|translate}}" class="form-control input-sm" disabled />
+					</td>
+					<td ng-if="filters[parameter.elementId].length == 0">
+						<input value="{{'project.no_partitions_available'|translate}}" class="form-control input-sm" disabled />	
+						
+					</td>
+					<td ng-if="filters[parameter.elementId].length > 0">
+						<select class="form-control"
+								ng-model="parameter.filter"
+								ng-options="p.filter as p.name group by p.group for p in filters[parameter.elementId]"></select>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
 	</form>
 </div>
 
 <div class="modal-footer">
-	<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="isNew" acl-has-project-role="owner">
-		<i class="fa fa-plus"></i>
-		<span translate="shared.add"></span>
-	</button>
-
-	<button ng-click="save()" ng-disabled="planningForm.$invalid || isUnchanged()" class="btn btn-primary" ng-if="!isNew" acl-has-project-role="owner">
-		<i class="fa fa-floppy-o"></i>
-		<span translate="shared.edit"></span>
-	</button>
-
-	<button ng-click="detach()" class="btn btn-default" ng-if="!isNew && isDetachable" acl-has-project-role="owner">
-		<i class="fa fa-arrow-down"></i>
-		<span translate="shared.detach"></span>
+	<button ng-click="save()" ng-disabled="planningForm.$invalid" class="btn btn-primary" acl-has-project-role="owner">
+		<i class="fa fa-object-group"></i>
+		<span translate="project.update_logframe"></span>
 	</button>
 
 	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew" acl-has-project-role="owner">

@@ -23,30 +23,12 @@ angular
 		$scope.themes = themes;
 		$scope.isNew = $stateParams.indicatorId === 'new';
 
-		// that's a bit hacky, we should us proper angular form validation.
-		$scope.lockedReason = function() {
-			if ($scope.isUnchanged())
-				return 'indicator.is_unchanged';
-			else
-				return 'indicator.is_invalid';
-		};
-
-		// Formula handlers
-		$scope.addFormula = function() {
-			$scope.indicator.formulas[makeUUID()] = {expression: '', parameters: {}};
-		};
-
-		$scope.deleteFormula = function(formulaId) {
-			var question = $filter('translate')('indicator.delete_formula');
-
-			if (window.confirm(question))
-				delete $scope.indicator.formulas[formulaId];
-		};
-
 		$scope.translate = function(key, destLanguage, sourceLanguage) {
-			googleTranslation.translate(indicator[key][sourceLanguage], destLanguage, sourceLanguage).then(function(result) {
-				indicator[key][destLanguage] = result;
-			});
+			googleTranslation
+				.translate(indicator[key][sourceLanguage], destLanguage, sourceLanguage)
+				.then(function(result) {
+					indicator[key][destLanguage] = result;
+				});
 		};
 
 		// Form actions

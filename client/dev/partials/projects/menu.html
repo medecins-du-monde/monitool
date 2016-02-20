@@ -106,7 +106,6 @@
 						   class="list-group-item"
 						   eat-click-if="!project._id" disable-if="!project._id">
 
-							<span class="label label-default pull-right">{{numIndicators}}</span>
 							<i class="fa fa-object-group fa-fw"></i>
 							<span translate="shared.logical_frame"></span>
 						</a>
@@ -114,8 +113,8 @@
 						<a ui-sref="main.project.indicators_reporting"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id || !projectHasIndicators || !projectHasForms || !projectHasEntities"
-						   disable-if="!project._id || !projectHasIndicators || !projectHasForms || !projectHasEntities">
+						   eat-click-if="!project._id || !projectHasForms || !projectHasEntities"
+						   disable-if="!project._id || !projectHasForms || !projectHasEntities">
 							<i class="fa fa-line-chart fa-fw"></i>
 							<span translate="shared.reporting_general"></span>
 						</a>
@@ -123,8 +122,8 @@
 						<a ui-sref="main.project.detailed_indicators_reporting"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id || !projectHasIndicators || !projectHasForms || !projectHasEntities"
-						   disable-if="!project._id || !projectHasIndicators || !projectHasForms || !projectHasEntities">
+						   eat-click-if="!project._id || !projectHasForms || !projectHasEntities"
+						   disable-if="!project._id || !projectHasForms || !projectHasEntities">
 
 							<i class="fa fa-bar-chart fa-fw"></i>
 							<span translate="shared.reporting_by_indicator"></span>

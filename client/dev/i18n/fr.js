@@ -173,6 +173,12 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		update_logframe: "Mettre à jour le cadre logique",
+		edit_indicator: "Édition indicateur",
+		display: "Nom",
+		display_ph: "Taux de CPN1 au sein des structures de santés",
+		choose: "Lier à un indicateur du catalogue",
+
 		fill_with_last_input: "Remplir avec les données de la saisie précédente",
 		date_due: "Date de rendu",
 		show_finished: "Voir les saisies réalisées",

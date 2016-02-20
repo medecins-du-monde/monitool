@@ -276,6 +276,8 @@ angular
 
 					// Compute branch of the result tree.
 					result[dimensionItem.id] = this.query(otherDimensionIds, filterValues);
+					if (result[dimensionItem.id] === undefined)
+						delete result[dimensionItem.id];
 
 					// Restore filter to its former value
 					if (oldFilter === undefined)
@@ -326,7 +328,7 @@ angular
 				if (elementaryCubes.length)
 					return this.dimensions[0].aggregate(elementaryCubes).value;
 				else
-					return 0; // fill empty leafs on the tree.
+					return undefined;
 			}
 		};
 

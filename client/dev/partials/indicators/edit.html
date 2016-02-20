@@ -84,41 +84,8 @@
 						</select>
 					</td>
 				</tr>
-				<tr>
-					<th translate="indicator.target"></th>
-					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.' + indicator.target)|translate">
-						<select id="input-target" class="form-control" ng-model="indicator.target">
-							<option value="lower_is_better" translate="indicator.lower_is_better"></option>
-							<option value="higher_is_better" translate="indicator.higher_is_better"></option>
-							<option value="around_is_better" translate="indicator.around_is_better"></option>
-							<option value="non_relevant" translate="indicator.non_relevant"></option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<th translate="indicator.unit"></th>
-					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="indicator.unit">
-						<select id="input-unit" name="unit" ng-model="indicator.unit" class="form-control">
-							<option value="" translate="indicator.other"></option>
-							<option value="%" translate="indicator.percent"></option>
-							<option value="‰" translate="indicator.permille"></option>
-						</select>
-					</td>
-				</tr>
 			</tbody>
 		</table>
-
-	</fieldset>
-
-	<fieldset>
-		<legend translate="indicator.formulas"></legend>
-
-		<div formula="formula" id="formulaId" ng-repeat="(formulaId, formula) in indicator.formulas"></div>
-
-		<a class="btn btn-default" ng-click="addFormula()" acl-has-role="indicator">
-			<i class="fa fa-plus"></i>
-			<span translate="indicator.add_formula"></span>
-		</a>
 
 	</fieldset>
 

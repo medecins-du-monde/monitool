@@ -35,237 +35,107 @@ angular.module('monitool.controllers.project.indicators', [])
 		};
 
 		// handle indicator add, edit and remove are handled in a modal window.
-		$scope.editIndicator = function(indicatorId, target) {
-			var indicatorIdPromise;
-			if (indicatorId === 'new')
-				indicatorIdPromise = $modal.open({
-					controller: 'ProjectIndicatorSelectionModalController',
-					templateUrl: 'partials/projects/indicators/selection-modal.html',
-					size: 'lg',
-					scope: $scope,
-					resolve: {
-						forbiddenIds: function() { return target ? $scope.getAssignedIndicators() : Object.keys($scope.project.indicators); },
-						hierarchy: function(mtFetch) { return mtFetch.themes({mode: 'tree', partial: '1'}); }
-					}
-				}).result;
-			else
-				indicatorIdPromise = $q.when(indicatorId);
+		$scope.editIndicator = function(planning, parent) {
+			var promise = $modal.open({
+				controller: 'ProjectIndicatorEditionModalController',
+				templateUrl: 'partials/projects/indicators/edition-modal.html',
+				size: 'lg',
+				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
+				resolve: {planning: function() { return planning; }}
+			}).result;
 
-			indicatorIdPromise.then(function(chosenIndicatorId) {
-				// are we only reparenting an indicator?
-				if (indicatorId === 'new' && $scope.project.indicators[chosenIndicatorId])
-					// put it into new target
-					target.push(chosenIndicatorId);
-				else
-					// edit.
-					$modal.open({
-						controller: 'ProjectIndicatorEditionModalController',
-						templateUrl: 'partials/projects/indicators/edition-modal.html',
-						size: 'lg',
-						scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
-						resolve: {indicatorId: function() { return chosenIndicatorId; }, target: function() { return target; }}
-					});
+			promise.then(function(newPlanning) {
+				if (planning && !newPlanning)
+					parent.splice(parent.indexOf(planning), 1);
+				else if (!planning && newPlanning)
+					parent.push(newPlanning);
+				else if (planning && newPlanning)
+					parent.splice(parent.indexOf(planning), 1, newPlanning);
 			});
 		};
-
-		$scope.$watch('project', function(project) {
-			$scope.otherIndicators = $scope.getUnassignedIndicators();
-		}, true);
 	})
 
-
-	.controller('ProjectIndicatorSelectionModalController', function($scope, $modalInstance, mtRemoveDiacritics, forbiddenIds, hierarchy) {
-		$scope.forbidden = forbiddenIds;
-		$scope.hierarchy = hierarchy;
-		$scope.searchField = '';
-
-		$scope.missingIndicators = {};
-		hierarchy.forEach(function(theme) {
-			if ($scope.project.themes.indexOf(theme._id) !== -1)
-				theme.children.forEach(function(type) {
-					type.children.forEach(function(indicator) {
-						if (!$scope.project.indicators[indicator._id] && indicator.operation === 'mandatory')
-							$scope.missingIndicators[indicator._id] = indicator;
+	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, itertools, planning) {
+		// Build possible variables and filters.
+		$scope.elements = []
+		$scope.filters = {};
+		$scope.project.forms.forEach(function(form) {
+			form.elements.forEach(function(element) {
+				$scope.elements.push({id: element.id, name: element.name, group: form.name});
+				$scope.filters[element.id] = [{group: null, name: "Tous", filter: {}}];
+				element.partitions.forEach(function(partition, index) {
+					partition.forEach(function(partitionElement) {
+						var filter = {};
+						filter['partition' + index] = [partitionElement.id];
+						$scope.filters[element.id].push({
+							group: "Partition " + index,
+							name: "Uniquement " + partitionElement.name,
+							filter: filter
+						});
 					});
 				});
+			});
 		});
-		$scope.missingIndicators = Object.keys($scope.missingIndicators).map(function(id) { return $scope.missingIndicators[id]; });
-
-		$scope.choose = function(indicatorId) {
-			$modalInstance.close(indicatorId);
-		};
-
-		$scope.cancel = function() {
-			$modalInstance.dismiss()
-		};
-	})
-
-	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, mtFetch, indicatorId, target) {
-		//////////////////
-		// Init code
-		//////////////////
 
 		// Retrieve indicator array where we need to add or remove indicator ids.
-		$scope.planning = angular.copy($scope.project.indicators[indicatorId]) || {
+		$scope.planning = planning ? angular.copy(planning) : {
 			display: '',
+			indicatorId: null,
 			colorize: true,
 			baseline: null,
 			target: null,
-			formula: null,
-			variable: null,
-			filter: []
+			formula: "default",
+			parameters: {'default': {elementId: null, filter: null}}
 		};
+		$scope.isNew = !planning;
 
-		// Init display helper variable
-		$scope.isNew = !$scope.project.indicators[indicatorId];
-		$scope.isDetachable = !!target;
+		// List all parameters
+		var parameters = {};
+		for (var key in $scope.planning.parameters)
+			parameters[key] = $scope.planning.parameters[key];
 
-		// Load the indicator if it's a new one. Take is from the hash if not.
-		if ($scope.indicatorsById[indicatorId]) {
-			$scope.indicator = $scope.indicatorsById[indicatorId];
-			$scope.planning.display = $scope.planning.display || $scope.indicator.name[$scope.language];
-		}
-		else // we also store it in the hash for future usage in ProjectLogicalFrameController
-			mtFetch.indicator(indicatorId).then(function(indicator) {
-				$scope.indicatorsById[indicatorId] = $scope.indicator = indicator;
-				$scope.planning.display = $scope.planning.display || indicator.name[$scope.language];
-			});
+		$scope.$watch('planning.formula', function(formula) {
+			var newSymbols, oldSymbols = Object.keys($scope.planning.parameters).sort();
+			try { newSymbols = Parser.parse($scope.planning.formula).variables().sort(); }
+			catch (e) { newSymbols = []; }
 
-		$scope.$watch('planning.formula', function(formulaId, oldFormulaId) {
-			if (formulaId !== oldFormulaId) {
-				if (formulaId == null) {
-					delete $scope.planning.parameters;
-
-					$scope.planning.variable = null;
-					$scope.planning.filter = [];
-				}
-				else if (!$scope.planning.parameters) {
-					delete $scope.planning.variable;
-					delete $scope.planning.filter;
-
-					$scope.planning.parameters = {};
-					for (var key in $scope.indicator.formulas[formulaId].parameters)
-						$scope.planning.parameters[key] = {variable: null, filter: []}
-				}
-			}
-		});
-
-		$scope.isUnchanged = function() {
-			return angular.equals($scope.planning, $scope.project.indicators[indicatorId]);
-		};
-
-		$scope.save = function() {
-			// This should be done on the ProjectLogicalFrameController?
-			if ($scope.isNew)
-				target && target.push(indicatorId);
-
-			// we need to change the project now, because we've been working on a copy of the indicator's planning
-			$scope.project.indicators[indicatorId] = $scope.planning;
-			$modalInstance.close();
-		};
-
-		$scope.detach = function() {
-			target && target.splice(target.indexOf(indicatorId), 1);
-			$modalInstance.close();
-		};
-
-		$scope.delete = function() {
-			// Remove from logframe.
-			target && target.splice(target.indexOf(indicatorId), 1);
-
-			// Remove from plannings.
-			delete $scope.project.indicators[indicatorId];
-
-			$modalInstance.close();
-		};
-
-		$scope.cancel = function() {
-			$modalInstance.close();
-		};
-	})
-
-	.controller('ProjectReportingController', function($scope, inputs, mtReporting) {
-		// This hash allows to select indicators for plotting. It is used by directives.
-		$scope.plots = {};
-
-		// Create default filter so that all inputs are used.
-		$scope.filters = {entityId: ""};
-		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
-		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
-		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.begin)
-				$scope.filters.begin = inputs[i].period;
-			if (inputs[i].period > $scope.filters.end)
-				$scope.filters.end = inputs[i].period;
-		}
-
-		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
-			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
-			$scope.groupBy = 'quarter';
-		else
-			$scope.groupBy = 'year';
-
-		// When filter changes (or init), build the list of inputs to pass to the scope.
-		$scope.$watch('filters', function() {
-			// find a group that match the entityId.
-			var entityFilter = null;
-			if ($scope.filters.entityId) {
-				var group = $scope.project.groups.find(function(g) { return g.id == $scope.filters.entityId; });
-				entityFilter = group ? group.members : [$scope.filters.entityId];
-			}
-
-			// ...rebuild usedInputs
-			$scope.inputs = inputs.filter(function(input) {
-				return input.period >= $scope.filters.begin
-					&& input.period <= $scope.filters.end
-					&& (!entityFilter || entityFilter.indexOf(input.entity) !== -1);
-			});
-		}, true);
-
-		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['inputs', 'groupBy'], function() {
-			var reporting = mtReporting.computeProjectReporting($scope.inputs, $scope.project, $scope.groupBy, $scope.indicatorsById);
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project)
-			$scope.rows = [];
-
-			var getStats = function(indent, indicatorId) {
-				return {
-					id: indicatorId,
-					name: $scope.project.indicators[indicatorId].display,
-					unit: $scope.indicatorsById[indicatorId].unit,
-					colorize: $scope.project.indicators[indicatorId].colorize,
-					baseline: $scope.project.indicators[indicatorId].baseline,
-					target: $scope.project.indicators[indicatorId].target,
-					cols: $scope.cols.map(function(col) {
-						return reporting[col.id] && reporting[col.id][indicatorId] !== undefined ? reporting[col.id][indicatorId] : null;
-					}),
-					type:'data',
-					indent: indent
-				};
-			};
-
-			$scope.rows.push({type: 'header', text: $scope.project.logicalFrame.goal, indent: 0});
-			Array.prototype.push.apply($scope.rows, $scope.project.logicalFrame.indicators.map(getStats.bind(null, 0)));
-			$scope.project.logicalFrame.purposes.forEach(function(purpose) {
-				$scope.rows.push({type: 'header', text: purpose.description, indent: 1});
-				Array.prototype.push.apply($scope.rows, purpose.indicators.map(getStats.bind(null, 1)));
-				purpose.outputs.forEach(function(output) {
-					$scope.rows.push({type: 'header', text: output.description, indent: 2});
-					Array.prototype.push.apply($scope.rows, output.indicators.map(getStats.bind(null, 2)));
+			if (!angular.equals(newSymbols, oldSymbols)) {
+				// Remove old symbols from formula
+				oldSymbols.filter(function(s) { return newSymbols.indexOf(s) === -1; }).forEach(function(s) {
+					parameters[s] = $scope.planning.parameters[s];
+					delete $scope.planning.parameters[s];
 				});
-			});
 
-			Array.prototype.push.apply($scope.rows, $scope.getUnassignedIndicators().map(getStats.bind(null, 0)));
+				// Add new symbols to formula
+				newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; }).forEach(function(s) {
+					$scope.planning.parameters[s] = parameters[s] || {elementId: null, filter: []};
+				});
+			}
 		});
+
+		// that's a bit overkill
+		$scope.$watch('planning.parameters', function() {
+			for (var key in $scope.planning.parameters) {
+				if ($scope.planning.parameters[key].elementId) {
+					var allowedFilters = $scope.filters[$scope.planning.parameters[key].elementId],
+						setFilter      = $scope.planning.parameters[key].filter;
+
+					if (!allowedFilters.find(function(f) { return f.filter == setFilter; })) {
+						$scope.planning.parameters[key].filter = allowedFilters[0].filter;
+						continue;
+					}
+				}
+			}
+		}, true);
+
+		$scope.save   = function() { $modalInstance.close($scope.planning); };
+		$scope.delete = function() { $modalInstance.close(null); };
+		$scope.cancel = function() { $modalInstance.dismiss(); };
 	})
 
-	.controller('ProjectDetailedReportingController', function($scope, $filter, inputs, mtReporting) {
+	.controller('ProjectReportingController', function($scope, Olap, inputs, mtReporting) {
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
-
-		$scope.indicatorId = Object.keys($scope.project.indicators)[0];
 
 		// Create default filter so that all inputs are used.
 		$scope.filters = {entityId: ""};
@@ -286,49 +156,106 @@ angular.module('monitool.controllers.project.indicators', [])
 		else
 			$scope.groupBy = 'year';
 
-		// When filter changes (or init), build the list of inputs to pass to the scope.
-		$scope.$watch('filters', function() {
-			// ...rebuild usedInputs
-			$scope.inputs = inputs.filter(function(input) {
-				return input.period >= $scope.filters.begin && input.period <= $scope.filters.end;
-			});
-		}, true);
-
-		var makeRow = function(rowId, rowName, cols, reporting, indicator, indicatorMeta, indent) {
-			return {
-				id: rowId, type:'data', indent: indent || 0, name: rowName,
-				unit: indicator.unit,
-				colorize: indicatorMeta.colorize,
-				baseline: indicatorMeta.baseline,
-				target: indicatorMeta.target,
-				cols: cols.map(function(col) {
-					try { return reporting[rowId][col.id][indicator._id]; }
-					catch (e) { return null; }
-				})
-			};
-		};
+		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
 		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['inputs', 'groupBy', 'indicatorId', 'language'], function() {
-			var indicator = $scope.indicatorsById[$scope.indicatorId],
-				indicatorMeta = $scope.project.indicators[$scope.indicatorId],
-				reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy, $scope.indicatorsById);
-
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end);
-			$scope.rows = [
-				makeRow($scope.project._id, $filter('translate')('project.full_project'), $scope.cols, reporting, indicator, indicatorMeta, 0),
-				{ id: makeUUID(), type: "header", text: $filter('translate')('project.collection_site_list'), indent: 0 }
-			];
-
-			Array.prototype.push.apply($scope.rows, $scope.project.entities.map(function(entity) {
-				return makeRow(entity.id, entity.name, $scope.cols, reporting, indicator, indicatorMeta, 1);
-			}));
-
-			$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.groups'), indent: 0 });
-			Array.prototype.push.apply($scope.rows, $scope.project.groups.map(function(group) {
-				return makeRow(group.id, group.name, $scope.cols, reporting, indicator, indicatorMeta, 1);
-			}));
+		$scope.$watchGroup(['filters.begin', 'filters.end', 'filters.entityId', 'groupBy'], function() {
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project);
+			$scope.rows = mtReporting.computeReporting(cubes, $scope.project, $scope.project.logicalFrame, $scope.groupBy, $scope.filters);
 		});
+	})
+
+	.controller('ProjectDetailedReportingController', function($scope, $filter, Olap, inputs, mtReporting) {
+		// This hash allows to select indicators for plotting. It is used by directives.
+		$scope.plots = {};
+
+		// Create default filter so that all inputs are used.
+		$scope.filters = {entityId: ""};
+		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
+		for (var i = 0; i < inputs.length; ++i) {
+			if (inputs[i].period < $scope.filters.begin)
+				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period > $scope.filters.end)
+				$scope.filters.end = inputs[i].period;
+		}
+
+		// default group by
+		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'month';
+		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'quarter';
+		else
+			$scope.groupBy = 'year';
+
+		// Create list of indicators to choose from, and set default value.
+		$scope.indicators = [];
+		Array.prototype.push.apply($scope.indicators, $scope.project.logicalFrame.indicators);
+		$scope.project.logicalFrame.purposes.forEach(function(purpose) {
+			Array.prototype.push.apply($scope.indicators, purpose.indicators);
+			purpose.outputs.forEach(function(output) {
+				Array.prototype.push.apply($scope.indicators, purpose.indicators);
+			}, this);
+		}, this);
+
+		$scope.indicator  = $scope.indicators[0];
+		$scope.indicators = $scope.indicators.map(function(indicator) {
+			return {indicator: indicator, group: "Logical Frame"}
+		});
+
+		var cubes = Olap.Cube.fromProject($scope.project, inputs);
+
+		$scope.$watchGroup(['indicator', 'filters', 'groupBy'], function() {
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
+			$scope.rows = mtReporting.computeDetailedReporting(cubes, $scope.project, $scope.indicator, $scope.groupBy, $scope.filters);
+		}, true);
+
+
+
+		// $scope.indicatorId = Object.keys($scope.project.indicators)[0];
+		// When filter changes (or init), build the list of inputs to pass to the scope.
+		// $scope.$watch('filters', function() {
+		// 	// ...rebuild usedInputs
+		// 	$scope.inputs = inputs.filter(function(input) {
+		// 		return input.period >= $scope.filters.begin && input.period <= $scope.filters.end;
+		// 	});
+		// }, true);
+
+		// var makeRow = function(rowId, rowName, cols, reporting, indicator, indicatorMeta, indent) {
+		// 	return {
+		// 		id: rowId, type:'data', indent: indent || 0, name: rowName,
+		// 		unit: indicator.unit,
+		// 		colorize: indicatorMeta.colorize,
+		// 		baseline: indicatorMeta.baseline,
+		// 		target: indicatorMeta.target,
+		// 		cols: cols.map(function(col) {
+		// 			try { return reporting[rowId][col.id][indicator._id]; }
+		// 			catch (e) { return null; }
+		// 		})
+		// 	};
+		// };
+
+		// when input list change, or regrouping is needed, compute table rows again.
+		// $scope.$watchGroup(['inputs', 'groupBy', 'indicatorId'], function() {
+		// 	var indicator = $scope.indicatorsById[$scope.indicatorId],
+		// 		indicatorMeta = $scope.project.indicators[$scope.indicatorId],
+		// 		reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy, $scope.indicatorsById);
+
+		// 	$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end);
+		// 	$scope.rows = [
+		// 		makeRow($scope.project._id, $filter('translate')('project.full_project'), $scope.cols, reporting, indicator, indicatorMeta, 0),
+		// 		{ id: makeUUID(), type: "header", text: $filter('translate')('project.collection_site_list'), indent: 0 }
+		// 	];
+
+		// 	Array.prototype.push.apply($scope.rows, $scope.project.entities.map(function(entity) {
+		// 		return makeRow(entity.id, entity.name, $scope.cols, reporting, indicator, indicatorMeta, 1);
+		// 	}));
+
+		// 	$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.groups'), indent: 0 });
+		// 	Array.prototype.push.apply($scope.rows, $scope.project.groups.map(function(group) {
+		// 		return makeRow(group.id, group.name, $scope.cols, reporting, indicator, indicatorMeta, 1);
+		// 	}));
+		// });
 	})
 
 	// .controller('ProjectReportingAnalysisListController', function($scope, reports) {

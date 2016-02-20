@@ -21,7 +21,7 @@ angular.module('monitool.controllers.project.shared', [])
 		$scope.projects = $scope.myProjects;
 	})
 
-	.controller('ProjectMenuController', function($scope, $state, $stateParams, $filter, project, indicatorsById) {
+	.controller('ProjectMenuController', function($scope, $state, $stateParams, $filter, project) {
 		if ($stateParams.projectId === 'new') {
 			project.owners.push($scope.userCtx._id);
 			project.dataEntryOperators.push($scope.userCtx._id);
@@ -29,7 +29,6 @@ angular.module('monitool.controllers.project.shared', [])
 
 		$scope.project = project;
 		$scope.master = angular.copy(project);
-		$scope.indicatorsById = indicatorsById;
 
 		$scope.cloneProject = function() {
 			var translate = $filter('translate'),
@@ -143,7 +142,8 @@ angular.module('monitool.controllers.project.shared', [])
 			});
 
 			$scope.projectHasEntities = !!project.entities.length;
-			$scope.numIndicators = Object.keys(project.indicators).length;
+
+
 		}, true);
 
 
@@ -159,25 +159,6 @@ angular.module('monitool.controllers.project.shared', [])
 
 		$scope.isUnchanged = function() {
 			return angular.equals($scope.master, $scope.project);
-		};
-
-		$scope.getAssignedIndicators = function() {
-			var result = [];
-			result = $scope.project.logicalFrame.indicators.concat(result);
-			$scope.project.logicalFrame.purposes.forEach(function(purpose) {
-				result = purpose.indicators.concat(result);
-				purpose.outputs.forEach(function(output) {
-					result = output.indicators.concat(result);
-				});
-			});
-			return result;
-		};
-
-		$scope.getUnassignedIndicators = function() {
-			var assignedIndicators = $scope.getAssignedIndicators();
-			return Object.keys($scope.project.indicators).filter(function(indicatorId) {
-				return assignedIndicators.indexOf(indicatorId) === -1;
-			});
 		};
 
 		// We restore $scope.master on $scope.project to avoid unsaved changes from a given tab to pollute changes to another one.

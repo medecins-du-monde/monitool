@@ -238,7 +238,7 @@ angular
 		});
 	})
 
-	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, mtReporting, form, inputs, indicatorsById) {
+	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, mtReporting, form, inputs) {
 		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
@@ -312,7 +312,7 @@ angular
 		});
 	})
 
-	.controller('ProjectActivityReportingController', function($scope, inputs, mtReporting) {
+	.controller('ProjectActivityReportingController', function($scope, Olap, inputs, mtReporting) {
 		// Create default filter so that all inputs are used.
 		$scope.filters = {entityId: ""};
 		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
@@ -332,115 +332,37 @@ angular
 		else
 			$scope.groupBy = 'year';
 
-		// When filter changes (or init), build the list of inputs to pass to the scope.
-		$scope.$watch('filters', function() {
-			// find a group that match the entityId.
-			var entityFilter = null;
-			if ($scope.filters.entityId) {
-				var group = $scope.project.groups.find(function(g) { return g.id == $scope.filters.entityId; });
-				entityFilter = group ? group.members : [$scope.filters.entityId];
-			}
-
-			// ...rebuild usedInputs
-			$scope.inputs = inputs.filter(function(input) {
-				return input.period >= $scope.filters.begin
-					&& input.period <= $scope.filters.end
-					&& (!entityFilter || entityFilter.indexOf(input.entity) !== -1);
-			});
-		}, true);
-
-		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['inputs', 'groupBy'], function() {
-			var reporting = mtReporting.computeProjectReporting($scope.inputs, $scope.project, $scope.groupBy);
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project)
-			$scope.rows = [];
-
-			$scope.project.forms.forEach(function(form) {
-				$scope.rows.push({ id: form.id, type: "header", text: form.name, indent: 0 });
-				
-				form.elements.forEach(function(variable) {
-					var row = {};
-					row.id = variable.id;
-					row.type = "data";
-					row.name = variable.name;
-					row.indent = 1;
-					
-					row.partitions = variable.partitions.map(function(p, index) {
-						return {
-							index: index,
-							name: p.map(function(p) { return p.name.substring(0, 1).toLocaleUpperCase(); }).join('/'),
-							fullname: p.pluck('name').join(' / ')
-						}
-					});
-
-					row.cols = $scope.cols.map(function(col) {
-						try { return reporting[col.id][variable.id]['']; }
-						catch (e) { return undefined; }
-					});
-
-					$scope.rows.push(row);
-
-					if ($scope.splits[row.id] !== undefined) {
-						var partitionIndex = $scope.splits[row.id];
-
-						variable.partitions[partitionIndex].forEach(function(part) {
-							var childRow = {};
-							childRow.id = variable.id + '.' + partitionIndex + '/' + part.id;
-							childRow.type = "data";
-							childRow.name = part.name;
-							childRow.indent = 2;
-
-							childRow.partitions = row.partitions.slice();
-							childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
-
-							childRow.cols = $scope.cols.map(function(col) {
-								try { return reporting[col.id][variable.id][part.id]; }
-								catch (e) { return undefined; }
-							})
-
-							$scope.rows.push(childRow);
-
-							if ($scope.splits[childRow.id] !== undefined) {
-								var childPartitionIndex = $scope.splits[childRow.id];
-
-								variable.partitions[childPartitionIndex].forEach(function(subPart) {
-									var subChildRow = {};
-									subChildRow.id = variable.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
-									subChildRow.type = "data";
-									subChildRow.name = subPart.name;
-									subChildRow.indent = 3;
-
-									subChildRow.cols = $scope.cols.map(function(col) {
-										var id = [part.id, subPart.id].sort().join('.');
-										try { return reporting[col.id][variable.id][id]; }
-										catch (e) { return undefined; }
-									})
-
-									$scope.rows.push(subChildRow);
-								});
-							}
-						});
-					}
-				});
-			});
-		});
-
 		$scope.splits = {};
 		$scope.onSplitClick = function(variableId, index) {
 			if ($scope.splits[variableId] !== index)
 				$scope.splits[variableId] = index;
 			else
 				delete $scope.splits[variableId];
-
-			$scope.inputs = $scope.inputs.slice(); // don't leave this hack here or kittens will die horribly
 		};
 
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
+
+		// when input list change, or regrouping is needed, compute table rows again.
+		var cubes = Olap.Cube.fromProject($scope.project, inputs);
+
+		$scope.$watch('[filters, groupBy, splits]', function() {
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project)
+			$scope.rows = mtReporting.computeActivityReporting(cubes, $scope.project, $scope.groupBy, $scope.filters, $scope.splits);
+		}, true);
 	})
 
 	.controller('ProjectActivityOlapController', function($scope, Olap, inputs) {
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
+
+		// default variable
+		$scope.sources = [{id: null, name: "---", group: null}];
+		$scope.project.forms.forEach(function(form) {
+			form.elements.forEach(function(element) {
+				$scope.sources.push({id: element.id, name: element.name, group: form.name, element: element});
+			});
+		});
+
 
 		$scope.planning = {variable: null };
 		$scope.project.forms.forEach(function(form) {

@@ -5,252 +5,12 @@ angular
 	// Define module
 	.module(
 		'monitool.services.reporting',
-		[
-			'monitool.services.models.input',
-			'monitool.services.itertools'
-		]
+		[]
 	)
 
 	// TODO profiling this piece of code for perfs could not hurt.
 	// we will see how bad if performs on the wild.
-	.service('mtReporting', function($q, Input, itertools) {
-
-		/**
-		 * This takes a mode and an array of values.
-		 * mode is none, sum, average, highest, lowest, last
-		 */
-		this._aggregateValues = function(mode, values) {
-			// if there is an error value in the array we need to aggregate, pass it up.
-			var foundError = values.find(function(value) { return typeof value === 'string'; });
-			if (foundError)
-				return foundError;
-
-			switch (mode) {
-				case "none":
-					return values.length == 1 ? values[0] : 'CANNOT_AGGREGATE';
-
-				case "sum":
-					return values.reduce(function(a, b) { return a + b; });
-
-				case "average":
-					return values.reduce(function(a, b, index, arr) { return a + b / arr.length; }, 0);
-
-				case "highest":
-					return values.reduce(function(a, b) { return a > b ? a : b; });
-
-				case "lowest":
-					return values.reduce(function(a, b) { return a > b ? b : a; });
-
-				case "last":
-					return values[values.length - 1];
-
-				default:
-					throw new Error('Invalid mode')
-			}
-		};
-
-		/**
-		 * Given a list of inputs of the same form, aggregate them, using the time or geo mode.
-		 * mode is geoAgg or timeAgg
-		 */
-		this._groupInputLayer = function(mode, inputs, form) {
-			// speed optim
-			if (inputs.length === 0)
-				return Input.makeFake(form);
-
-			if (inputs.length === 1)
-				return inputs[0];
-
-			if (mode === 'timeAgg')
-				inputs.sort(function(a, b) { return a.period < b.period ? -1 : 1; }); // sort inputs by date.
-			else if (mode === 'geoAgg')
-				inputs.sort(function(a, b) { return a.entity < b.entity ? -1 : 1; }); // sort inputs by entity.
-			else
-				throw new Error('Invalid mode.');
-
-			var newInput = Input.makeFake(form);
-
-			form.elements.forEach(function(element) {
-				var elementMode = element[mode], values;
-
-				if (element.partitions.length === 0) {
-					values = inputs.map(function(input) { return input.values[element.id]['']; }); // if a field is not filled we assume 0
-					newInput.values[element.id] = {'': this._aggregateValues(elementMode, values)};
-				}
-				else {
-					itertools.product(element.partitions).map(function(list) {
-						return list.pluck('id').sort().join('.');
-					}).forEach(function(partition) {
-						values = inputs.map(function(input) { return input.values[element.id][partition]; }); // if a field is not filled we assume 0
-						newInput.values[element.id][partition] = this._aggregateValues(elementMode, values);
-					}, this);
-				}
-			}, this);
-
-			return newInput;
-		};
-
-		/**
-		 * Given a project, and a list of inputs (of mixed forms)
-		 * Generate a hash containing the aggregated data, with all possible partition sums
-		 */
-		this._groupInputs = function(project, inputs) {
-			// we build {form: {location: [Input(), Input(), Input()]}}
-			var inputsByFormEntity = {},
-				numInputs = inputs.length;
-
-			for (var inputId = 0; inputId < numInputs; ++inputId) {
-				var input = inputs[inputId]
-
-				if (inputsByFormEntity[input.form] === undefined)
-					inputsByFormEntity[input.form] = {};
-				if (inputsByFormEntity[input.form][input.entity] === undefined)
-					inputsByFormEntity[input.form][input.entity] = [];
-				
-				inputsByFormEntity[input.form][input.entity].push(input);
-			}
-
-			// group layer by layer (starting with the deepest one).
-			var result = new Input({type: "input", project: project._id, values: {}});
-
-			for (var formId in inputsByFormEntity) {
-				var form = project.forms.find(function(f) { return f.id === formId; });
-
-				// group by time first, and then by geo.
-				for (var entityId in inputsByFormEntity[formId])
-					inputsByFormEntity[formId][entityId] = this._groupInputLayer('timeAgg', inputsByFormEntity[formId][entityId], form);
-
-				inputsByFormEntity[formId] = Object.keys(inputsByFormEntity[formId]).map(function(key) { return inputsByFormEntity[formId][key]; }); // Object.values...
-				var formResult = this._groupInputLayer('geoAgg', inputsByFormEntity[formId], form); // group them.
-
-				// Copy raw data into final result.
-				// we use guids across forms so no collision check is needed.
-				// var allValues = formResult.computeSums(); // This line compute all possible sums among partitions in the activity data.
-				for (var rawId in formResult.values)
-					result.values[rawId] = formResult.values[rawId];
-			}
-
-			return result;
-		};
-
-		/**
-		 * Given a hash containing activity data, an indicator, and it's metadata from the project,
-		 * compute the indicator's value.
-		 */
-		this._computeIndicatorValue = function(activityData, indicator, indicatorMeta) {
-			// if the indicator has to be computed with a formula.
-			if (indicatorMeta.formula) {
-				// Retrieve the formula parameters from activity reporting.
-				var localScope = {};
-
-				for (var key in indicatorMeta.parameters) {
-					var parameter = indicatorMeta.parameters[key],
-						numFilters = parameter.filter.length;
-
-					if (numFilters == 0)
-						localScope[key] = activityData[parameter.variable][''];
-					else {
-						localScope[key] = 0;
-						for (var filterId = 0; filterId < numFilters; ++filterId) {
-							var accItem = activityData[parameter.variable][parameter.filter[filterId]];
-							if (typeof accItem !== "number")
-								return accItem;
-
-							localScope[key] += accItem;
-						}
-					}
-				}
-
-				// and compute the result.
-				var formula = indicator.formulas[indicatorMeta.formula];
-				try {
-					return Parser.evaluate(formula.expression, localScope);
-				}
-				catch (e) {
-					return 'INVALID_FORMULA';
-				}
-			}
-			// if the indicator can be directly taken from the activity report.
-			else if (indicatorMeta.variable) {
-				// just extract the value.
-				var numFilters = indicatorMeta.filter.length;
-
-				if (numFilters == 0)
-					return activityData[indicatorMeta.variable][''];
-				else {
-					var accumulator = 0;
-					for (var filterId = 0; filterId < numFilters; ++filterId) {
-						var accumulatorItem = activityData[indicatorMeta.variable][indicatorMeta.filter[filterId]];
-						if (typeof accumulatorItem !== "number")
-							return accumulatorItem;
-
-						accumulator += accumulatorItem;
-					}
-					return accumulator;
-				}
-			}
-			// There is nothing. We don't know how to compute.
-			else
-				return 'MISSING_DEFINITION';
-		}
-
-
-		/**
-		 * This function accepts a list of groupBy and should be able to build any pivot table.
-		 * 
-		 * project  = Project(id, name, forms)
-		 * inputs   = [Input(), Input()]
-		 * groupBys = ['entity', 'month']
-		 * => {entityId: {2010-01: {variableId: 23, variableId2: 45}}}
-		 */
-		this.computeReporting = function(project, inputs, groupBys, indicatorsById) {
-
-			// there is no more group by => we can aggregate all inputs left in a single hash.
-			if (groupBys.length === 0) {
-				// Group all inputs that remain at the leaf into a hash with all possible sums.
-				var result = this._groupInputs(project, inputs).computeSums();
-
-				// if indicator definitions are available, compute them.
-				for (var indicatorId in project.indicators) {
-					if (indicatorsById && indicatorsById[indicatorId]) {
-						var indicator = indicatorsById[indicatorId],
-							indicatorMeta = project.indicators[indicatorId];
-
-						result[indicatorId] = this._computeIndicatorValue(result, indicator, indicatorMeta);
-					}
-				}
-
-				return result;
-			}
-			// we need to split our inputs into hashes
-			else {
-				// split group bys into head and tail.
-				var currentGroupBy = groupBys[0], otherGroupBys = groupBys.slice(1);
-
-				// group inputs in a hashmap.
-				var groups = {},
-					numInputs = inputs.length;
-
-				for (var inputId = 0; inputId < numInputs; ++inputId) {
-					var input = inputs[inputId],
-						aggregationKeys = input.getAggregationKeys(currentGroupBy, project.groups),
-						numAggregationKeys = aggregationKeys.length;
-
-					for (var j = 0; j < numAggregationKeys; ++j) {
-						var aggKey = aggregationKeys[j];
-						if (groups[aggKey] == undefined)
-							groups[aggKey] = [];
-
-						groups[aggKey].push(input)
-					}
-				}
-
-				for (var aggKey in groups)
-					groups[aggKey] = this.computeReporting(project, groups[aggKey], otherGroupBys, indicatorsById);
-				
-				return groups;
-			}
-		};
+	.service('mtReporting', function($filter) {
 
 		this.getColumns = function(groupBy, begin, end, entityId, project) {
 			var type;
@@ -302,43 +62,247 @@ angular
 				throw new Error('Invalid groupBy: ' + groupBy)
 		};
 
-		/**
-		 * Helper function for
-		 * - {projectId}/reporting
-		 * - {projectId}/
-		 */
-		this.computeProjectReporting = function(projectInputs, project, groupBy, indicatorsById) {
-			return this.computeReporting(project, projectInputs, [groupBy], indicatorsById);
-		};
 
-		this.computeProjectDetailedReporting = function(projectInputs, project, groupBy, indicatorsById) {
-			var byEntity  = this.computeReporting(project, projectInputs, ['entity', groupBy], indicatorsById),
-				byGroup   = this.computeReporting(project, projectInputs, ['group', groupBy], indicatorsById);
+		this._queryCube = function(groups, cube, dimensionIds, filterValues) {
+			dimensionIds = dimensionIds.slice();
+			filterValues = JSON.parse(JSON.stringify(filterValues));
+			
+			var result;
 
-			var result = {};
-			Object.keys(byEntity).forEach(function(key) { result[key] = byEntity[key]; });
-			Object.keys(byGroup).forEach(function(key) { result[key] = byGroup[key]; });
-			result[project._id] = byEntity.total;
+			// Replace group filters by entities filters.
+			if (filterValues.group && filterValues.group.length === 1) {
+				// Check that we are not overriding something.
+				if (filterValues.entity)
+					throw new Error('unsupported');
+
+				filterValues.entity = groups.find(function(g) { return g.id == filterValues.group[0]; }).members;
+				delete filterValues.group;
+			}
+			else if (filterValues.group)
+				throw new Error('unsupported');
+
+			// If user want to group by group, we need to cheat: use filters and merge result.
+			var groupIndex = dimensionIds.indexOf('group');
+
+			// console.log(dimensionIds, filterValues);
+
+			// The cheat only works when group is first in the list.
+			if (groupIndex == 0) {
+				// Check that we are not overriding something.
+				if (filterValues.entity)
+					throw new Error('unsupported');
+				
+				dimensionIds.shift(); // remove first element.
+
+				result = {total: cube.query(dimensionIds, filterValues)};
+				groups.forEach(function(group) {
+					filterValues.entity = group.members;
+					result[group.id] = cube.query(dimensionIds, filterValues);
+				});
+			}
+			else if (groupIndex > 0) {
+				throw new Error('unsupported groupIndex > 1');
+			}
+			else if (dimensionIds.length == 1) {
+				result = cube.query(dimensionIds, filterValues);
+				var total = cube.query([], filterValues);
+				if (total !== undefined)
+					result.total = total;
+			}
+			else {
+				throw new Error('unsupported');
+			}
 
 			return result;
 		};
 
-		this.computeIndicatorReporting = function(inputs, projects, indicator, groupBy) {
-			var indicatorsById = {};
-			indicatorsById[indicator._id] = indicator;
+		this._computeIndicator = function(groups, cubes, indicator, groupBy, filters) {
+			// Ask the olap cube to compute the components we need to compute the indicator.
+			// Like this: {'numerator': {'2010-01': 4, ...}, ...}
+			var components = {};
+			for (var key in indicator.parameters) {
+				var parameter = indicator.parameters[key];
 
+				// We should intersect filters of same dimension, but we know in advance that 
+				// having 2 filters of the same dim never happens.
+				var k, filter = {};
+				for (k in filters) filter[k] = filters[k];
+				for (k in parameter.filter) filter[k] = parameter.filter[k];
+
+				components[key] = this._queryCube(groups, cubes[parameter.elementId], [groupBy], filter);
+			}
+
+			// Inverse group and component key, to get scopes
+			// Like this: {'2010-01': {'numerator': 4, ...}, ...}
+			var localScopes = {};
+			for (var key in components) {
+				for (var group in components[key]) {
+					if (localScopes[group] == undefined)
+						localScopes[group] = {};
+
+					localScopes[group][key] = components[key][group];
+				}
+			}
+
+			// Compute indicator
 			var result = {};
-			projects.forEach(function(project) {
-				var indicatorMeta = project.indicators[indicator._id],
-					projectInputs = inputs.filter(function(input) { return input.project === project._id; });
+			for (var group in localScopes) {
+				try { result[group] = Parser.evaluate(indicator.formula, localScopes[group]); }
+				catch (e) { result[group] = 'INVALID_FORMULA'; }
+			}
 
-				var reporting = this.computeReporting(project, projectInputs, [groupBy], indicatorsById);
-				
-				result[project._id] = {};
-				for (var regroupKey in reporting)
-					result[project._id][regroupKey] = reporting[regroupKey][indicator._id];
+			return result;
+		};
+
+		this._makeActivityRow = function(groups, cubes, indent, groupBy, filters, columns, element) {
+			var values = this._queryCube(groups, cubes[element.id], [groupBy], filters);
+
+			return {
+				id: makeUUID(),
+				name: element.name,
+				cols: columns.map(function(col) { return values[col.id]; }),
+				type: 'data',
+				indent: indent
+			};
+		};
+
+		this._makeIndicatorRow = function(groups, cubes, indent, groupBy, filters, columns, indicator) {
+			var indicatorValues = this._computeIndicator(groups, cubes, indicator, groupBy, filters),
+				baseline = indicator.baseline,
+				target = indicator.target;
+
+			if (typeof baseline == 'number' && indicator.unit != 'none')
+				baseline += indicator.unit;
+
+			if (typeof target == 'number' && indicator.unit != 'none')
+				target += indicator.unit;
+
+			return {
+				id: makeUUID(),
+				name: indicator.display, unit: indicator.unit, colorize: indicator.colorize,
+				baseline: baseline, target: target, targetType: indicator.targetType,
+				cols: columns.map(function(col) { return indicatorValues[col.id]; }),
+				type: 'data',
+				indent: indent
+			};
+		};
+
+		this.computeActivityReporting = function(cubes, project, groupBy, filters, splits) {
+			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project);
+
+			// Computing too much. We could: qFilters[groupBy] = columns.pluck('id');
+			var qFilters = {};
+			if (filters.entityId && project.entities.pluck('id').indexOf(filters.entityId) != -1)
+				qFilters.entity = [filters.entityId];
+			else if (filters.entityId)
+				qFilters.group = [filters.entityId];
+
+			// Create rows.
+			var rows = [];
+			project.forms.forEach(function(form) {
+				rows.push({type: 'header', text: form.name});
+				form.elements.forEach(function(element) {
+					var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, qFilters, columns, element);
+					row.id = element.id;
+					row.partitions = element.partitions.map(function(p, index) {
+						return {
+							index: index,
+							name: p.map(function(p) { return p.name.substring(0, 1).toLocaleUpperCase(); }).join('/'),
+							fullname: p.pluck('name').join(' / ')
+						}
+					});
+					rows.push(row);
+
+					if (splits[row.id] !== undefined) {
+						var partitionIndex = splits[row.id];
+						element.partitions[partitionIndex].forEach(function(part) {
+							// add filter
+							qFilters['partition' + partitionIndex] = [part.id];
+
+							var childRow = this._makeActivityRow(project.groups, cubes, 2, groupBy, qFilters, columns, element);
+							childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
+							childRow.partitions = row.partitions.slice();
+							childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
+							rows.push(childRow)
+
+							if (splits[childRow.id] !== undefined) {
+								var childPartitionIndex = splits[childRow.id];
+
+								element.partitions[childPartitionIndex].forEach(function(subPart) {
+									// add filter
+									qFilters['partition' + childPartitionIndex] = [subPart.id];
+
+									var subChildRow = this._makeActivityRow(project.groups, cubes, 3, groupBy, qFilters, columns, element);
+									subChildRow.id = element.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
+									subChildRow.name = subPart.name;
+									rows.push(subChildRow);
+
+									// remove filter
+									delete qFilters['partition' + childPartitionIndex];
+								}, this);
+							}
+
+							// remove filter
+							delete qFilters['partition' + partitionIndex];
+						}, this);
+					}
+				}, this);
 			}, this);
 
-			return result;
+			return rows;
 		};
-	})
+
+		this.computeReporting = function(cubes, project, logicalFrame, groupBy, filters) {
+			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project),
+				rows = [];
+
+			// Computing too much. We could: qFilters[groupBy] = columns.pluck('id');
+			var qFilters = {};
+			if (filters.entityId && project.entities.pluck('id').indexOf(filters.entityId) != -1)
+				qFilters.entity = [filters.entityId];
+			else if (filters.entityId)
+				qFilters.group = [filters.entityId];
+
+			rows.push({type: 'header', text: logicalFrame.goal, indent: 0});
+			Array.prototype.push.apply(rows, logicalFrame.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 0, groupBy, qFilters, columns)));
+			logicalFrame.purposes.forEach(function(purpose) {
+				rows.push({type: 'header', text: purpose.description, indent: 1});
+				Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 1, groupBy, qFilters, columns)));
+				purpose.outputs.forEach(function(output) {
+					rows.push({type: 'header', text: purpose.description, indent: 2});
+					Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 2, groupBy, qFilters, columns)));
+				}, this);
+			}, this);
+
+			return rows;
+		};
+
+		this.computeDetailedReporting = function(cubes, project, indicator, groupBy, filters) {
+			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project);
+			var rows = []
+
+			var row = this._makeIndicatorRow(project.groups, cubes, 0, groupBy, {}, columns, indicator)
+			row.name = $filter('translate')('project.full_project');
+
+			rows.push(row)
+			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
+
+			project.entities.forEach(function(entity) {
+				var row = this._makeIndicatorRow(project.groups, cubes, 1, groupBy, {entity: [entity.id]}, columns, indicator);
+				row.name = entity.name;
+				rows.push(row);
+			}, this);
+
+			rows.push({type: 'header', text: $filter('translate')('project.groups')})
+
+			project.groups.forEach(function(group) {
+				var row = this._makeIndicatorRow(project.groups, cubes, 1, groupBy, {group: [group.id]}, columns, indicator);
+				row.name = group.name;
+				rows.push(row);
+			}, this);
+
+			return rows;
+		};
+	});
+
+

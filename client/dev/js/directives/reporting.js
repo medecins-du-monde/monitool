@@ -115,7 +115,6 @@ angular.module('monitool.directives.reporting', [])
 			scope: false,
 			link: function($scope, element, attributes, controller) {
 				$scope.$watch('col', function(value) {
-
 					if (typeof value === "string") {
 						// element.html('<span style="font-size: 6px">' + value + '</span>');
 						element.html('<i class="fa fa-ban"></i>');
@@ -143,6 +142,7 @@ angular.module('monitool.directives.reporting', [])
 		return {
 			scope: false,
 			link: function($scope, element, attributes, controller) {
+
 				$scope.$watch('col', function(value) {
 
 					if (typeof value === "string") {
@@ -160,7 +160,7 @@ angular.module('monitool.directives.reporting', [])
 							var progress = null;
 
 							// compute progress 
-							if ($scope.row.target === 'around_is_better')
+							if ($scope.row.targetType === 'around_is_better')
 								progress = 1 - Math.abs(value - $scope.row.target) / ($scope.row.target - $scope.row.baseline);
 							else
 								progress = (value - $scope.row.baseline) / ($scope.row.target - $scope.row.baseline);
@@ -176,7 +176,10 @@ angular.module('monitool.directives.reporting', [])
 						else
 							element.css('background-color', '');
 
-						element.html(Math.round(value) + $scope.row.unit);
+						if ($scope.row.unit == 'none')
+							element.html(Math.round(value));
+						else
+							element.html(Math.round(value) + $scope.row.unit);
 					}
 					else {
 						element.html('');

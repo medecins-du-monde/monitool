@@ -6,7 +6,6 @@
 
 <doc-reminder pages="project.logical_frame"></doc-reminder>
 
-
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate>
 
 	<fieldset>
@@ -35,13 +34,13 @@
 			<div class="col-sm-10">
 				<div class="form-control-static">
 					<ul>
-						<li ng-repeat="indicatorId in project.logicalFrame.indicators">
-							<a ng-click="editIndicator(indicatorId, project.logicalFrame.indicators)">{{project.indicators[indicatorId].display}}</a>
+						<li ng-repeat="indicator in project.logicalFrame.indicators">
+							<a ng-click="editIndicator(indicator, project.logicalFrame.indicators)">{{indicator.display}}</a>
 						</li>
 					</ul>
 
  					<p acl-has-project-role="owner">
-						<a class="btn btn-default" ng-click="editIndicator('new', project.logicalFrame.indicators)">
+						<a class="btn btn-default" ng-click="editIndicator(null, project.logicalFrame.indicators)">
 							<i class="fa fa-plus"></i>
 							{{"project.add_indicator"|translate}}
 						</a>
@@ -98,13 +97,13 @@
 						<div class="col-sm-10">
 							<div class="form-control-static">
 								<ul>
-									<li ng-repeat="indicatorId in purpose.indicators">
-										<a ng-click="editIndicator(indicatorId, purpose.indicators)">{{project.indicators[indicatorId].display}}</a>
+									<li ng-repeat="indicator in purpose.indicators">
+										<a ng-click="editIndicator(indicator, purpose.indicators)">{{indicator.display}}</a>
 									</li>
 								</ul>
 
 								<p acl-has-project-role="owner">
-									<a class="btn btn-default" ng-click="editIndicator('new', purpose.indicators)">
+									<a class="btn btn-default" ng-click="editIndicator(null, purpose.indicators)">
 										<i class="fa fa-plus"></i>
 										{{"project.add_indicator"|translate}}
 									</a>
@@ -156,13 +155,13 @@
 									<div class="col-sm-10">
 										<div class="form-control-static">
 											<ul>
-												<li ng-repeat="indicatorId in output.indicators">
-													<a ng-click="editIndicator(indicatorId, output.indicators)">{{project.indicators[indicatorId].display}}</a>
+												<li ng-repeat="indicator in output.indicators">
+													<a ng-click="editIndicator(indicator, output.indicators)">{{indicator.display}}</a>
 												</li>
 											</ul>
 
 											<p acl-has-project-role="owner">
-												<a class="btn btn-default" ng-click="editIndicator('new', output.indicators)">
+												<a class="btn btn-default" ng-click="editIndicator(null, output.indicators)">
 													<i class="fa fa-plus"></i>
 													{{"project.add_indicator"|translate}}
 												</a>
@@ -215,30 +214,9 @@
 			<span translate="project.add_purpose"></span>
 		</a>
 	</fieldset>
-	<br/>
 
-	<fieldset>
-		<legend translate="project.additional_indicators"></legend>
-
-		<p ng-if="otherIndicators.length == 0" translate="project.no_additional_indicators"></p>
-
-		<ul>
-			<li ng-repeat="indicatorId in otherIndicators">
-				<a ng-click="editIndicator(indicatorId, null)">{{project.indicators[indicatorId].display}}</a>
-			</li>
-		</ul>
-
-		<p acl-has-project-role="owner">
-			<a class="btn btn-default" ng-click="editIndicator('new', null)">
-				<i class="fa fa-plus"></i>
-				{{"project.add_indicator"|translate}}
-			</a>
-		</p>
-	</fieldset>
-	
 	<div acl-has-project-role="owner">
-		<br/><br/>
-
+		<br/>
 		<a ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>

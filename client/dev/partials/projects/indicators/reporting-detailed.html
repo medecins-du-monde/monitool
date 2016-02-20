@@ -17,8 +17,8 @@
 						<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
 						<select id="indicator-input"
 								class="form-control input-sm"
-								ng-model="indicatorId"
-								ng-options="id as indicator.display for (id, indicator) in project.indicators"></select>
+								ng-model="indicator"
+								ng-options="i.indicator as i.indicator.display group by i.group for i in indicators"></select>
 					</div>
 				</div>
 			</div>
@@ -112,8 +112,6 @@
 		<tr>
 			<th style="width: 30px"></th>
 			<th translate="shared.name"></th>
-			<th translate="project.baseline"></th>
-			<th translate="project.target"></th>
 			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
@@ -127,8 +125,6 @@
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
 				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
-			<td ng-if="row.type === 'data'">{{row.baseline}}{{row.unit}}</td>
-			<td ng-if="row.type === 'data'">{{row.target}}{{row.unit}}</td>
 			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" indicator-reporting-field></td>
 		</tr>
 	</tbody>

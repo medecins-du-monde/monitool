@@ -16,7 +16,6 @@ var app = angular.module('monitool.app', [
 	
 	'monitool.directives.indicatorForm',
 	'monitool.directives.projectLogframe',
-	'monitool.directives.projectForm',
 	'monitool.directives.reporting',
 
 	'monitool.filters.shared',
@@ -263,12 +262,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			project: function(mtFetch, $stateParams) {
 				return mtFetch.project($stateParams.projectId);
-			},
-			indicatorsById: function(mtFetch, $stateParams) {
-				if ($stateParams.projectId !== 'new')
-					return mtFetch.indicators({mode: 'project', projectId: $stateParams.projectId}, true);
-				else 
-					return {};
 			}
 		}
 	});
