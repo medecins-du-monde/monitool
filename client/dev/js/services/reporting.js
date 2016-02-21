@@ -221,6 +221,7 @@ angular
 
 							var childRow = this._makeActivityRow(project.groups, cubes, 2, groupBy, qFilters, columns, element);
 							childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
+							childRow.name = part.name;
 							childRow.partitions = row.partitions.slice();
 							childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
 							rows.push(childRow)
