@@ -3,14 +3,35 @@
 angular.module('monitool.controllers.project.indicators', [])
 
 	.controller('ProjectLogicalFrameController', function($scope, $q, $modal) {
+		$scope.logicalFrameIndex = $scope.project.logicalFrames.length ? 0 : null;
+		
+		$scope.setLogicalFrame = function(index) {
+			$scope.logicalFrameIndex = index;
+		};
+
+		$scope.createLogicalFrame = function() {
+			$scope.project.logicalFrames.push({
+				name: '',
+				goal: '',
+				indicators: [],
+				purposes: []
+			});
+			$scope.logicalFrameIndex = $scope.project.logicalFrames.length - 1;
+		};
+
+		$scope.deleteLogicalFrame = function() {
+			$scope.project.logicalFrames.splice($scope.logicalFrameIndex, 1);
+			$scope.logicalFrameIndex = $scope.project.logicalFrames.length ? 0 : null;
+		};
+
 		// handle purpose add and remove
 		$scope.addPurpose = function() {
-			$scope.project.logicalFrame.purposes.push({
+			$scope.project.logicalFrames[$scope.logicalFrameIndex].purposes.push({
 				description: "", assumptions: "", indicators: [], outputs: []});
 		};
 
 		$scope.removePurpose = function(purpose) {
-			$scope.project.logicalFrame.purposes.splice(
+			$scope.project.logicalFrames[$scope.logicalFrameIndex].purposes.splice(
 				$scope.project.logicalFrame.purposes.indexOf(purpose), 1
 			);
 		};
@@ -84,6 +105,8 @@ angular.module('monitool.controllers.project.indicators', [])
 			colorize: true,
 			baseline: null,
 			target: null,
+			unit: 'none',
+			targetType: 'higher_is_better',
 			formula: "default",
 			parameters: {'default': {elementId: null, filter: null}}
 		};
@@ -136,6 +159,8 @@ angular.module('monitool.controllers.project.indicators', [])
 	.controller('ProjectReportingController', function($scope, Olap, inputs, mtReporting) {
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
+		$scope.currentLogframe = $scope.project.logicalFrames[0];
+		$scope.setLogicalFrame = function(lf) { $scope.currentLogframe = lf; };
 
 		// Create default filter so that all inputs are used.
 		$scope.filters = {entityId: ""};
@@ -159,9 +184,9 @@ angular.module('monitool.controllers.project.indicators', [])
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
 		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['filters.begin', 'filters.end', 'filters.entityId', 'groupBy'], function() {
+		$scope.$watchGroup(['filters.begin', 'filters.end', 'filters.entityId', 'groupBy', 'currentLogframe'], function() {
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project);
-			$scope.rows = mtReporting.computeReporting(cubes, $scope.project, $scope.project.logicalFrame, $scope.groupBy, $scope.filters);
+			$scope.rows = mtReporting.computeReporting(cubes, $scope.project, $scope.currentLogframe, $scope.groupBy, $scope.filters);
 		});
 	})
 
@@ -190,18 +215,17 @@ angular.module('monitool.controllers.project.indicators', [])
 
 		// Create list of indicators to choose from, and set default value.
 		$scope.indicators = [];
-		Array.prototype.push.apply($scope.indicators, $scope.project.logicalFrame.indicators);
-		$scope.project.logicalFrame.purposes.forEach(function(purpose) {
-			Array.prototype.push.apply($scope.indicators, purpose.indicators);
-			purpose.outputs.forEach(function(output) {
-				Array.prototype.push.apply($scope.indicators, purpose.indicators);
+		$scope.project.logicalFrames.forEach(function(logicalFrame) {
+			var fn = function(i) { return {indicator: i, name: i.display, group: logicalFrame.name}; };
+			Array.prototype.push.apply($scope.indicators, logicalFrame.indicators.map(fn));
+			logicalFrame.purposes.forEach(function(purpose, purposeIndex) {
+				Array.prototype.push.apply($scope.indicators, purpose.indicators.map(fn));
+				purpose.outputs.forEach(function(output, outputIndex) {
+					Array.prototype.push.apply($scope.indicators, purpose.indicators.map(fn));
+				}, this);
 			}, this);
 		}, this);
-
-		$scope.indicator  = $scope.indicators[0];
-		$scope.indicators = $scope.indicators.map(function(indicator) {
-			return {indicator: indicator, group: "Logical Frame"}
-		});
+		$scope.indicator = $scope.indicators[0].indicator;
 
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
@@ -209,53 +233,6 @@ angular.module('monitool.controllers.project.indicators', [])
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
 			$scope.rows = mtReporting.computeDetailedReporting(cubes, $scope.project, $scope.indicator, $scope.groupBy, $scope.filters);
 		}, true);
-
-
-
-		// $scope.indicatorId = Object.keys($scope.project.indicators)[0];
-		// When filter changes (or init), build the list of inputs to pass to the scope.
-		// $scope.$watch('filters', function() {
-		// 	// ...rebuild usedInputs
-		// 	$scope.inputs = inputs.filter(function(input) {
-		// 		return input.period >= $scope.filters.begin && input.period <= $scope.filters.end;
-		// 	});
-		// }, true);
-
-		// var makeRow = function(rowId, rowName, cols, reporting, indicator, indicatorMeta, indent) {
-		// 	return {
-		// 		id: rowId, type:'data', indent: indent || 0, name: rowName,
-		// 		unit: indicator.unit,
-		// 		colorize: indicatorMeta.colorize,
-		// 		baseline: indicatorMeta.baseline,
-		// 		target: indicatorMeta.target,
-		// 		cols: cols.map(function(col) {
-		// 			try { return reporting[rowId][col.id][indicator._id]; }
-		// 			catch (e) { return null; }
-		// 		})
-		// 	};
-		// };
-
-		// when input list change, or regrouping is needed, compute table rows again.
-		// $scope.$watchGroup(['inputs', 'groupBy', 'indicatorId'], function() {
-		// 	var indicator = $scope.indicatorsById[$scope.indicatorId],
-		// 		indicatorMeta = $scope.project.indicators[$scope.indicatorId],
-		// 		reporting = mtReporting.computeProjectDetailedReporting($scope.inputs, $scope.project, $scope.groupBy, $scope.indicatorsById);
-
-		// 	$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end);
-		// 	$scope.rows = [
-		// 		makeRow($scope.project._id, $filter('translate')('project.full_project'), $scope.cols, reporting, indicator, indicatorMeta, 0),
-		// 		{ id: makeUUID(), type: "header", text: $filter('translate')('project.collection_site_list'), indent: 0 }
-		// 	];
-
-		// 	Array.prototype.push.apply($scope.rows, $scope.project.entities.map(function(entity) {
-		// 		return makeRow(entity.id, entity.name, $scope.cols, reporting, indicator, indicatorMeta, 1);
-		// 	}));
-
-		// 	$scope.rows.push({ id: makeUUID(), type: "header", text: $filter('translate')('project.groups'), indent: 0 });
-		// 	Array.prototype.push.apply($scope.rows, $scope.project.groups.map(function(group) {
-		// 		return makeRow(group.id, group.name, $scope.cols, reporting, indicator, indicatorMeta, 1);
-		// 	}));
-		// });
 	})
 
 	// .controller('ProjectReportingAnalysisListController', function($scope, reports) {

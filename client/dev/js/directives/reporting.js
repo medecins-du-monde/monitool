@@ -101,7 +101,6 @@ angular.module('monitool.directives.reporting', [])
 					e.preventDefault();
 				});
 
-
 				// <-- event handler leak
 				// $scope.on('$destroy', function() {
 				// 	element.off('click');
@@ -325,8 +324,6 @@ angular.module('monitool.directives.reporting', [])
 						colspan = totalCols, // current colspan is total number of columns.
 						numCols = 1; // current numCols is 1.
 
-					// console.log(totalCols, colspan, numCols)
-
 					for (var i = 0; i < $scope.cols.length; ++i) {
 						// adapt colspan and number of columns
 						colspan /= $scope.cols[i].items.length; 
@@ -339,8 +336,6 @@ angular.module('monitool.directives.reporting', [])
 
 						grid.header.push(row);
 					}
-
-					// console.log(grid.header)
 
 					// Create data rows.
 					$scope.rowspans = [];
@@ -376,7 +371,4 @@ angular.module('monitool.directives.reporting', [])
 			}
 		}
 	})
-
-
-
 

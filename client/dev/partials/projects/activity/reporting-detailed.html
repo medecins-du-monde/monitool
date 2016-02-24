@@ -1,22 +1,31 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
-	<li class="active" translate="shared.reporting_general"></li>
+	<li class="active" translate="project.reporting_compare_sites"></li>
 </ol>
 
-<doc-reminder pages="project.objectives_results"></doc-reminder>
-
-<ul class="nav nav-tabs">
-	<li ng-class="{active: currentLogframe==logframe}" ng-repeat="logframe in project.logicalFrames">
-		<a ng-click="setLogicalFrame(logframe)">{{logframe.name||('project.unnamed_logframe'|translate)}}</a>
-	</li>
-</ul>
-<br/>
 <form class="form-horizontal noprint" novalidate>
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="form-group">
+				<label for="element-input" class="col-sm-1 control-label" translate="project.variable"></label>
+				<div class="col-sm-11">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
+						<select id="element-input"
+								class="form-control input-sm"
+								ng-model="element"
+								ng-options="i.element as i.name group by i.group for i in elements"></select>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="form-group">
-				<label for="indicator" class="col-sm-2 control-label" translate="shared.begin"></label>
+				<label class="col-sm-2 control-label" translate="shared.begin"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
@@ -35,7 +44,7 @@
 		</div>
 		<div class="col-sm-6">
 			<div class="form-group">
-				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
+				<label class="col-sm-2 control-label" translate="shared.end"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
@@ -67,33 +76,11 @@
 							<option value="month" translate="shared.month"></option>
 							<option value="quarter" translate="shared.quarter"></option>
 							<option value="year" translate="shared.year"></option>
-							<option value="entity" translate="project.collection_site_list"></option>
-							<option value="group" translate="project.groups"></option>
 						</select>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="col-sm-6">
-			<div class="form-group">
-				<label for="filter-by-input" class="col-sm-2 control-label" translate="shared.filter"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
-						<select class="form-control input-sm" id="filter-by-input" ng-model="filters.entityId">
-							<option value="" translate="project.full_project"></option>
-							<optgroup label="{{'project.collection_site_list'|translate}}">
-								<option ng-repeat="entity in project.entities" value="{{entity.id}}">{{entity.name}}</option>
-							</optgroup>
-							<optgroup label="{{'project.groups'|translate}}">
-								<option ng-repeat="group in project.groups" value="{{group.id}}">{{group.name}}</option>
-							</optgroup>
-						</select>
-					</div>
-				</div>
-			</div>
-		</div>
-
 	</div>
 </form>
 
@@ -120,13 +107,11 @@
 		<tr>
 			<th style="width: 30px"></th>
 			<th translate="shared.name"></th>
-			<th translate="project.baseline"></th>
-			<th translate="project.target"></th>
 			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
 	<tbody>
- 		<tr ng-repeat="row in rows">
+		<tr ng-repeat="row in rows">
 			<td style="text-align: center">
 				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data'" />
 			</td>
@@ -135,9 +120,9 @@
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
 				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
-			<td ng-if="row.type === 'data'">{{row.baseline}}</td>
-			<td ng-if="row.type === 'data'">{{row.target}}</td>
-			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" indicator-reporting-field></td>
+			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" activity-reporting-field></td>
 		</tr>
 	</tbody>
 </table>
+
+

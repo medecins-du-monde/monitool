@@ -1,7 +1,7 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
-	<li class="active" translate="shared.reporting_by_indicator"></li>
+	<li class="active" translate="project.reporting_compare_sites"></li>
 </ol>
 
 <doc-reminder pages="project.objectives_results"></doc-reminder>
@@ -18,7 +18,7 @@
 						<select id="indicator-input"
 								class="form-control input-sm"
 								ng-model="indicator"
-								ng-options="i.indicator as i.indicator.display group by i.group for i in indicators"></select>
+								ng-options="i.indicator as i.name group by i.group for i in indicators"></select>
 					</div>
 				</div>
 			</div>

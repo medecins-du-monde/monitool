@@ -107,7 +107,7 @@ var FRENCH_TRANSLATION = {
 		choose: 'Choisir',
 		edition: 'Édition',
 		cancel: 'Annuler',
-		logical_frame: 'Cadre logique',
+		logical_frames: 'Cadres logiques',
 		description: 'Description',
 		reporting: 'Statistiques',
 		reporting_general: 'Statistiques générales',
@@ -173,6 +173,10 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		create_logframe: "Ajouter un cadre logique",
+		reporting_compare_sites: "Comparer les lieux",
+		unnamed_logframe: "Cadre logique sans nom",
+
 		update_logframe: "Mettre à jour le cadre logique",
 		edit_indicator: "Édition indicateur",
 		display: "Nom",

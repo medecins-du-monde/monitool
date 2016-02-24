@@ -63,41 +63,55 @@ angular
 		};
 
 
+		// OLAP cubes do not support dimensions that overlap, and we have one: groups.
+		// This function abstracts
 		this._queryCube = function(groups, cube, dimensionIds, filterValues) {
-			dimensionIds = dimensionIds.slice();
 			filterValues = JSON.parse(JSON.stringify(filterValues));
-			
-			var result;
+			dimensionIds = dimensionIds.slice()
 
-			// Replace group filters by entities filters.
-			if (filterValues.group && filterValues.group.length === 1) {
-				// Check that we are not overriding something.
-				if (filterValues.entity)
-					throw new Error('unsupported');
+			// Replace filterValues.group by filterValues.entity
+			if (filterValues.group) {
+				var entityIds = {};
+				
+				groups.forEach(function(group) {
+					// we could also iterate on filterValues.group and array.find the real group. This is a bit unclear.
+					if (filterValues.group.indexOf(group.id) !== -1) 
+						group.members.forEach(function(entityId) {
+							entityIds[entityId] = true;
+						});
+				});
 
-				filterValues.entity = groups.find(function(g) { return g.id == filterValues.group[0]; }).members;
+				entityIds = Object.keys(entityIds);
+
+				if (!filterValues.entity)
+					filterValues.entity = entityIds;
+				else
+					filterValues.entity = filterValues.entity.filter(function(entity) { return entityIds.indexOf(entity) !== -1; });
+
 				delete filterValues.group;
 			}
-			else if (filterValues.group)
-				throw new Error('unsupported');
+
+			var result;
 
 			// If user want to group by group, we need to cheat: use filters and merge result.
 			var groupIndex = dimensionIds.indexOf('group');
 
-			// console.log(dimensionIds, filterValues);
-
 			// The cheat only works when group is first in the list.
 			if (groupIndex == 0) {
-				// Check that we are not overriding something.
-				if (filterValues.entity)
-					throw new Error('unsupported');
-				
-				dimensionIds.shift(); // remove first element.
+				dimensionIds.shift(); // remove 'group' dimension (we are will iterate manually).
 
 				result = {total: cube.query(dimensionIds, filterValues)};
 				groups.forEach(function(group) {
-					filterValues.entity = group.members;
-					result[group.id] = cube.query(dimensionIds, filterValues);
+					// clone filterValues
+					var filterValuesCpy = JSON.parse(JSON.stringify(filterValues));
+
+					// intersect current filter with new constraint
+					if (!filterValuesCpy.entity)
+						filterValuesCpy.entity = group.members;
+					else
+						filterValuesCpy.entity = filterValuesCpy.entity.filter(function(entity) { return group.members.indexOf(entity) !== -1; });
+
+					result[group.id] = cube.query(dimensionIds, filterValuesCpy);
 				});
 			}
 			else if (groupIndex > 0) {
@@ -253,6 +267,39 @@ angular
 			return rows;
 		};
 
+
+
+		this.computeDetailedActivityReporting = function(cubes, project, element, groupBy, filters) {
+			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project);
+			var rows = []
+
+
+			var row = this._makeActivityRow(project.groups, cubes, 0, groupBy, {}, columns, element)
+			row.name = $filter('translate')('project.full_project');
+
+			rows.push(row)
+			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
+
+			project.entities.forEach(function(entity) {
+				var row = this._makeActivityRow(project.groups, cubes, 0, groupBy, {entity: [entity.id]}, columns, element)
+
+				row.name = entity.name;
+				rows.push(row);
+			}, this);
+
+			rows.push({type: 'header', text: $filter('translate')('project.groups')})
+
+			project.groups.forEach(function(group) {
+				var row = this._makeActivityRow(project.groups, cubes, 0, groupBy, {entity: group.members}, columns, element)
+
+				row.name = group.name;
+				rows.push(row);
+			}, this);
+
+			return rows;
+		};
+
+
 		this.computeReporting = function(cubes, project, logicalFrame, groupBy, filters) {
 			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project),
 				rows = [];
@@ -297,7 +344,7 @@ angular
 			rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
 			project.groups.forEach(function(group) {
-				var row = this._makeIndicatorRow(project.groups, cubes, 1, groupBy, {group: [group.id]}, columns, indicator);
+				var row = this._makeIndicatorRow(project.groups, cubes, 1, groupBy, {entity: group.members}, columns, indicator);
 				row.name = group.name;
 				rows.push(row);
 			}, this);
@@ -305,5 +352,3 @@ angular
 			return rows;
 		};
 	});
-
-

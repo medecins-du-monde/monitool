@@ -376,6 +376,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
+	$stateProvider.state('main.project.detailed_activity_reporting', {
+		url: '/detailed-activity-reporting',
+		templateUrl: 'partials/projects/activity/reporting-detailed.html',
+		controller: 'ProjectActivityDetailedReportingController',
+		resolve: {
+			inputs: function(Input, project) {
+				return Input.fetchForProject(project);
+			}
+		}
+	});
+
 	$stateProvider.state('main.project.olap', {
 		url: '/olap',
 		templateUrl: 'partials/projects/activity/olap.html',

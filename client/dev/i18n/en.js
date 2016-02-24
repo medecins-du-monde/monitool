@@ -108,7 +108,7 @@ var ENGLISH_TRANSLATION = {
 		choose: 'Choose',
 		edition: 'Edition',
 		cancel: 'Cancel',
-		logical_frame: 'Logical Frame',
+		logical_frames: 'Logical Frames',
 		description: 'Description',
 		reporting: 'Reporting',
 		reporting_general: 'General reporting',

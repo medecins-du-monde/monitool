@@ -10,7 +10,6 @@
  * (facts, measures, dimensions, slice, dice, ... instead of filter, query, etc)
  */
 angular
-
 	.module(
 		'monitool.services.olap',
 		[

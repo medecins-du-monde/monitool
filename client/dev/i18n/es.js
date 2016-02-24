@@ -107,7 +107,7 @@ var SPANISH_TRANSLATION = {
 		choose: 'Elegir',
 		edition: 'Edición',
 		cancel: 'Cancelar',
-		logical_frame: 'Marco lógico',
+		logical_frames: 'Marcos lógicos',
 		description: 'Descripción',
 		reporting: 'Estadísticas',
 		reporting_general: 'Estadísticas generales',

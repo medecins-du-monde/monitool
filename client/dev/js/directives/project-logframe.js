@@ -7,18 +7,10 @@ angular.module('monitool.directives.projectLogframe', [])
 			restrict: "AE",
 			scope: false,
 			link: function($scope, element) {
-				var name = function(indicatorId) {
-					return $scope.indicatorsById[indicatorId].name;
-				};
-
-				var source = function(indicatorId) {
-					return $scope.project.indicators[indicatorId].source;
-				};
-
 				element.on('click', function() {
 
 				// $scope.$watch('project.logicalFrame', function(logFrame) {
-					var logFrame = $scope.project.logicalFrame;
+					var logFrame = $scope.project.logicalFrames[$scope.logicalFrameIndex];
 					var tableRows;
 
 					tableRows = [[
@@ -34,8 +26,8 @@ angular.module('monitool.directives.projectLogframe', [])
 							{content: "Overall objectives", rowspan: logFrame.indicators.length},
 							{content: logFrame.goal, rowspan: logFrame.indicators.length},
 							{content: "", rowspan: logFrame.indicators.length},
-							{content: name(logFrame.indicators[0])},
-							{content: source(logFrame.indicators[0])},
+							{content: logFrame.indicators[0].display},
+							{content: ''},
 						]);
 
 						logFrame.indicators.slice(1).forEach(function(indicatorId) {
@@ -64,8 +56,8 @@ angular.module('monitool.directives.projectLogframe', [])
 							var firstLine = [
 								{content: purpose.description, rowspan: purpose.indicators.length},
 								{content: purpose.assumptions, rowspan: purpose.indicators.length},
-								{content: name(purpose.indicators[0])},
-								{content: source(purpose.indicators[0])},
+								{content: purpose.indicators[0].display},
+								{content: ''},
 							];
 
 							if (isFirst) {
@@ -75,10 +67,10 @@ angular.module('monitool.directives.projectLogframe', [])
 
 							tableRows.push(firstLine);
 
-							purpose.indicators.slice(1).forEach(function(indicatorId) {
+							purpose.indicators.slice(1).forEach(function(indicator) {
 								tableRows.push([
-									{content: name(indicatorId)},
-									{content: source(indicatorId)}
+									{content: indicator.display},
+									{content: ''}
 								]);
 							});
 						}
@@ -113,8 +105,8 @@ angular.module('monitool.directives.projectLogframe', [])
 								var firstLine = [
 									{content: output.description, rowspan: output.indicators.length},
 									{content: output.assumptions, rowspan: output.indicators.length},
-									{content: name(output.indicators[0])},
-									{content: source(output.indicators[0])},
+									{content: output.indicators[0].display},
+									{content: ''},
 								];
 
 								if (isFirst) {
@@ -124,11 +116,8 @@ angular.module('monitool.directives.projectLogframe', [])
 
 								tableRows.push(firstLine);
 
-								output.indicators.slice(1).forEach(function(indicatorId) {
-									tableRows.push([
-										{content: name(indicatorId)},
-										{content: source(indicatorId)}
-									]);
+								output.indicators.slice(1).forEach(function(indicator) {
+									tableRows.push([{content: indicator.display}, {content: ''}]);
 								});
 							}
 							else {

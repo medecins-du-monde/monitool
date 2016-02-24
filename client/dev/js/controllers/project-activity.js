@@ -178,17 +178,23 @@ angular
 		$scope.showFinished = !$scope.canEdit;
 
 		// show/hide columns
-		$scope.showProject = false;
-		$scope.showEntities = false;
-		for (var formId in inputsStatus)
+		$scope.showProject = {};
+		$scope.showEntities = {};
+		$scope.numCols = {};
+		for (var formId in inputsStatus) {
+			$scope.showProject[formId] = false;
+			$scope.showEntities[formId] = false;
+
 			for (var strDate in inputsStatus[formId])
 				for (var entityId in inputsStatus[formId][strDate]) {
 					if (entityId == 'none')
-						$scope.showProject = true;
+						$scope.showProject[formId] = true;
 					else
-						$scope.showEntities = true;
+						$scope.showEntities[formId] = true;
 				}
-		$scope.numCols = 1 + ($scope.showEntities ? project.entities.length : 0) + ($scope.showProject ? 1 : 0);
+
+			$scope.numCols[formId] = 1 + ($scope.showEntities[formId] ? project.entities.length : 0) + ($scope.showProject[formId] ? 1 : 0);
+		}
 
 		// Remove the expected inputs for people that cannot edit.
 		if (!$scope.canEdit) {
@@ -349,6 +355,52 @@ angular
 		$scope.$watch('[filters, groupBy, splits]', function() {
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project)
 			$scope.rows = mtReporting.computeActivityReporting(cubes, $scope.project, $scope.groupBy, $scope.filters, $scope.splits);
+		}, true);
+	})
+
+
+	.controller('ProjectActivityDetailedReportingController', function($scope, $filter, Olap, inputs, mtReporting) {
+		// This hash allows to select indicators for plotting. It is used by directives.
+		$scope.plots = {};
+
+		// Create default filter so that all inputs are used.
+		$scope.filters = {};
+		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
+		for (var i = 0; i < inputs.length; ++i) {
+			if (inputs[i].period < $scope.filters.begin)
+				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period > $scope.filters.end)
+				$scope.filters.end = inputs[i].period;
+		}
+
+		// default group by
+		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'month';
+		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+			$scope.groupBy = 'quarter';
+		else
+			$scope.groupBy = 'year';
+
+		// Create list of indicators to choose from, and set default value.
+		$scope.elements = [];
+		$scope.project.forms.forEach(function(form) {
+			form.elements.forEach(function(element) {
+				$scope.elements.push({
+					element: element,
+					name: element.name,
+					group: form.name
+				})
+			});
+		});
+
+		$scope.element  = $scope.elements[0].element;
+
+		var cubes = Olap.Cube.fromProject($scope.project, inputs);
+
+		$scope.$watchGroup(['element', 'filters', 'groupBy'], function() {
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
+			$scope.rows = mtReporting.computeDetailedActivityReporting(cubes, $scope.project, $scope.element, $scope.groupBy, $scope.filters);
 		}, true);
 	})
 

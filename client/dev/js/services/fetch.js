@@ -22,11 +22,10 @@ angular
 					begin: new Date(),
 					end: new Date(),
 					themes: [],
-					logicalFrame: {goal: "", indicators: [], purposes: []},
+					logicalFrames: [],
 					entities: [],
 					groups: [],
 					forms: [],
-					indicators: {},
 					owners: [],
 					dataEntryOperators: []
 				});

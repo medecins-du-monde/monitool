@@ -3,8 +3,8 @@
 angular.module('monitool.controllers.project.shared', [])
 
 	.controller('ProjectListController', function($scope, projects, themes) {
-		$scope.themes         = themes;
-		$scope.pred           = 'name'; // default sorting predicate
+		$scope.themes = themes;
+		$scope.pred = 'name'; // default sorting predicate
 
 		$scope.myProjects = projects.filter(function(p) {
 			return p.owners.indexOf($scope.userCtx._id) !== -1 || p.dataEntryOperators.indexOf($scope.userCtx._id) !== -1; 
@@ -130,19 +130,34 @@ angular.module('monitool.controllers.project.shared', [])
 
 		var menuWatch = $scope.$watch('project', function(project) {
 			$scope.projectHasIndicators = false;
-			for (var indicatorId in project.indicators) {
-				$scope.projectHasIndicators = true;
-				break;
-			}
 
-			$scope.projectHasForms = false;
+			outerloop:
+				for (var lfIndex = 0; lfIndex < project.logicalFrames.length; ++lfIndex) {
+					if (project.logicalFrames[lfIndex].indicators.length) {
+						$scope.projectHasIndicators = true;
+						break outerloop;
+					}
+
+					for (var pIndex = 0; pIndex < project.logicalFrames[lfIndex].purposes.length; ++pIndex) {
+						if (project.logicalFrames[lfIndex].purposes[pIndex].indicators.length) {
+							$scope.projectHasIndicators = true;
+							break outerloop;
+						}
+
+						for (var oIndex = 0; oIndex < project.logicalFrames[lfIndex].purposes[pIndex].outputs.length; ++oIndex) {
+							if (project.logicalFrames[lfIndex].purposes[pIndex].outputs[oIndex].indicators.length) {
+								$scope.projectHasIndicators = true;
+								break outerloop;
+							}
+						}
+					}
+				}
+
+			$scope.projectHasFormElements = false;
 			project.forms.forEach(function(form) {
 				if (form.elements.length)
-					$scope.projectHasForms = true;
+					$scope.projectHasFormElements = true;
 			});
-
-			$scope.projectHasEntities = !!project.entities.length;
-
 
 		}, true);
 

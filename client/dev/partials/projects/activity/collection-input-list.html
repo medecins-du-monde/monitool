@@ -23,18 +23,20 @@
 
 <style> td { text-align: center; } td a { display: block;width: 100%;}</style>
 
+<div style="overflow: auto">
+
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th ng-style="{width: (100 / numCols) + '%'}" translate="project.date_due"></th>
-			<th ng-style="{width: (100 / numCols) + '%'}" ng-if="showProject" translate="shared.project"></th>
-			<th ng-style="{width: (100 / numCols) + '%'}" ng-if="showEntities" ng-repeat="entity in project.entities">{{entity.name}}</th>
+			<th ng-style="{width: (100 / numCols[selectedForm.id]) + '%'}" translate="project.date_due"></th>
+			<th ng-style="{width: (100 / numCols[selectedForm.id]) + '%'}" ng-if="showProject[selectedForm.id]" translate="shared.project"></th>
+			<th ng-style="{width: (100 / numCols[selectedForm.id]) + '%'}" ng-if="showEntities[selectedForm.id]" ng-repeat="entity in project.entities">{{entity.name}}</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="(date, status) in inputsStatus[selectedForm.id]">
 			<th>{{date}}</th>
-			<td ng-if="showProject">
+			<td ng-if="showProject[selectedForm.id]">
 				<a class="btn btn-xs"
 				   ng-class="{'btn-default': status.none === 'done', 'btn-primary': status.none === 'expected', 'btn-danger': status.none === 'outofschedule'}"
 				   ui-sref="main.project.collection_input_edition({period: date, formId: selectedForm.id, entityId: 'none'})"
@@ -42,7 +44,7 @@
 					{{('project.input_status.' + status.none + (canEdit ? '-edit' : '-read')) | translate}}
 				</a>
 			</td>
-			<td ng-if="showEntities" ng-repeat="entity in project.entities">
+			<td ng-if="showEntities[selectedForm.id]" ng-repeat="entity in project.entities">
 				<a class="btn btn-xs"
 				   ng-class="{'btn-default': status[entity.id] === 'done', 'btn-primary': status[entity.id] === 'expected', 'btn-danger': status[entity.id] === 'outofschedule'}"
 				   ui-sref="main.project.collection_input_edition({period: date, formId: selectedForm.id, entityId: entity.id})"
@@ -53,3 +55,5 @@
 		</tr>
 	</tbody>
 </table>
+
+</div>

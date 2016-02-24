@@ -1,31 +1,62 @@
 <ol class="breadcrumb noprint">
 	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
-	<li class="active" translate="shared.logical_frame"></li>
+	<li class="active" translate="shared.logical_frames"></li>
 </ol>
 
 <doc-reminder pages="project.logical_frame"></doc-reminder>
 
-<form class="form-horizontal noprint" role="form" name="projectForm" novalidate>
+<ul class="nav nav-tabs">
+	<li ng-class="{active: logicalFrameIndex == index}" ng-repeat="(index, logframe) in project.logicalFrames">
+		<a ng-click="setLogicalFrame(index)">{{logframe.name||('project.unnamed_logframe'|translate)}}</a>
+	</li>
 
+	<li class="">
+		<a ng-click="createLogicalFrame()" class="btn-primary">
+			<i class="fa fa-plus"></i>
+			{{'project.create_logframe'|translate}}
+		</a>
+	</li>
+</ul>
+
+<br/>
+
+<form class="form-horizontal noprint" role="form" name="projectForm" novalidate ng-if="logicalFrameIndex !== null">
 	<fieldset>
 		<legend>
-			<a class="btn btn-primary btn-xs pull-right noprint" log-frame-xls style="margin-bottom: 10px;">
+			<a class="btn btn-danger btn-xs pull-right noprint" ng-click="deleteLogicalFrame()" style="margin-bottom: 10px">
+				<i class="fa fa-times"></i>
+				<span translate="shared.delete"></span>
+			</a>
+			
+			<a class="btn btn-primary btn-xs pull-right noprint" log-frame-xls style="margin-bottom: 10px; margin-right: 5px">
 				<i class="fa fa-download"></i>
 				<span translate="shared.download_table"></span>
 			</a>
+
 			<span translate="project.goal"></span>
 		</legend>
 
 		<div class="form-group" show-errors>
+			<label for="logframe-name-input" class="col-sm-2 control-label" translate="shared.name"></label>
+
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.logicalFrames[logicalFrameIndex].name">
+				<input class="form-control"
+					   name="nameDesc"
+					   id="logframe-name-input"
+					   ng-model="project.logicalFrames[logicalFrameIndex].name"></textarea>
+			</div>
+		</div>
+
+		<div class="form-group" show-errors>
 			<label for="logframe-goal-input" class="col-sm-2 control-label" translate="project.goal"></label>
 
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.logicalFrame.goal">
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.logicalFrames[logicalFrameIndex].goal">
 				<textarea class="form-control"
 						  name="goalDesc"
 						  id="logframe-goal-input"
 						  placeholder="{{'project.intervention_logic_goal_ph'|translate}}"
-						  ng-model="project.logicalFrame.goal"></textarea>
+						  ng-model="project.logicalFrames[logicalFrameIndex].goal"></textarea>
 			</div>
 		</div>
 
@@ -34,13 +65,13 @@
 			<div class="col-sm-10">
 				<div class="form-control-static">
 					<ul>
-						<li ng-repeat="indicator in project.logicalFrame.indicators">
-							<a ng-click="editIndicator(indicator, project.logicalFrame.indicators)">{{indicator.display}}</a>
+						<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">
+							<a ng-click="editIndicator(indicator, project.logicalFrames[logicalFrameIndex].indicators)">{{indicator.display}}</a>
 						</li>
 					</ul>
 
  					<p acl-has-project-role="owner">
-						<a class="btn btn-default" ng-click="editIndicator(null, project.logicalFrame.indicators)">
+						<a class="btn btn-default" ng-click="editIndicator(null, project.logicalFrames[logicalFrameIndex].indicators)">
 							<i class="fa fa-plus"></i>
 							{{"project.add_indicator"|translate}}
 						</a>
@@ -53,9 +84,9 @@
 	<fieldset>
 		<legend translate="project.purposes"></legend>
 		
-		<p ng-if="project.logicalFrame.purposes.length == 0" translate="project.no_purposes"></p>
+		<p ng-if="project.logicalFrames[logicalFrameIndex].purposes.length == 0" translate="project.no_purposes"></p>
 
-		<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrame.purposes">
+		<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrames[logicalFrameIndex].purposes">
 
 			<div class="panel-heading">
 				<div class="panel-title">
