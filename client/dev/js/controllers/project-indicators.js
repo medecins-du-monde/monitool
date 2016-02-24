@@ -221,10 +221,11 @@ angular.module('monitool.controllers.project.indicators', [])
 			logicalFrame.purposes.forEach(function(purpose, purposeIndex) {
 				Array.prototype.push.apply($scope.indicators, purpose.indicators.map(fn));
 				purpose.outputs.forEach(function(output, outputIndex) {
-					Array.prototype.push.apply($scope.indicators, purpose.indicators.map(fn));
+					Array.prototype.push.apply($scope.indicators, output.indicators.map(fn));
 				}, this);
 			}, this);
 		}, this);
+		
 		$scope.indicator = $scope.indicators[0].indicator;
 
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);

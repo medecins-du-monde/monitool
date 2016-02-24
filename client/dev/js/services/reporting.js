@@ -268,7 +268,6 @@ angular
 		};
 
 
-
 		this.computeDetailedActivityReporting = function(cubes, project, element, groupBy, filters) {
 			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project);
 			var rows = []
@@ -281,8 +280,7 @@ angular
 			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
 			project.entities.forEach(function(entity) {
-				var row = this._makeActivityRow(project.groups, cubes, 0, groupBy, {entity: [entity.id]}, columns, element)
-
+				var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, {entity: [entity.id]}, columns, element);
 				row.name = entity.name;
 				rows.push(row);
 			}, this);
@@ -290,8 +288,7 @@ angular
 			rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
 			project.groups.forEach(function(group) {
-				var row = this._makeActivityRow(project.groups, cubes, 0, groupBy, {entity: group.members}, columns, element)
-
+				var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, {entity: group.members}, columns, element);
 				row.name = group.name;
 				rows.push(row);
 			}, this);
@@ -317,8 +314,8 @@ angular
 				rows.push({type: 'header', text: purpose.description, indent: 1});
 				Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 1, groupBy, qFilters, columns)));
 				purpose.outputs.forEach(function(output) {
-					rows.push({type: 'header', text: purpose.description, indent: 2});
-					Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 2, groupBy, qFilters, columns)));
+					rows.push({type: 'header', text: output.description, indent: 2});
+					Array.prototype.push.apply(rows, output.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 2, groupBy, qFilters, columns)));
 				}, this);
 			}, this);
 
