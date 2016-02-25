@@ -4,7 +4,7 @@ module.exports = {
 	_id: '_design/server',
 
 	views: {	
-		
+
 		types_usage: {
 			map: function(doc) {
 				if (doc.type === 'indicator') {
@@ -40,18 +40,31 @@ module.exports = {
 							numUsers--;
 						}
 					}
-					
+
 					users.forEach(function(name) {
 						emit(name, "project_on_user");
 					});
 
-					for (var indicatorId in doc.indicators) {
-						var indicatorMeta = doc.indicators[indicatorId];
+					doc.logicalFrames.forEach(function(logicalFrame) {
+						logicalFrame.indicators.forEach(function(indicator) {
+							if (indicator.indicatorId)
+								emit(indicator.indicatorId, "project_on_indicator");
+						});
 
-						emit(indicatorId, "project_on_indicator");
-						if (indicatorMeta.formula)
-							emit(indicatorMeta.formula, 'project_on_formula');
-					}
+						logicalFrame.purposes.forEach(function(purpose) {
+							purpose.indicators.forEach(function(indicator) {
+								if (indicator.indicatorId)
+									emit(indicator.indicatorId, "project_on_indicator");
+							});
+
+							purpose.outputs.forEach(function(output) {
+								output.indicators.forEach(function(indicator) {
+									if (indicator.indicatorId)
+										emit(indicator.indicatorId, "project_on_indicator");
+								});
+							});
+						});
+					});
 				}
 				else if (doc.type === 'input') {
 					emit(doc.project, 'input_on_project');
