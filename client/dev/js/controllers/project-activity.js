@@ -222,7 +222,7 @@ angular
 				$scope.inputsStatus = inputsStatus;
 			}
 			else {
-				$scope.inputsStatus = JSON.parse(JSON.stringify(inputsStatus));
+				$scope.inputsStatus = angular.copy(inputsStatus);
 
 				for (var formId in $scope.inputsStatus)
 					for (var strDate in $scope.inputsStatus[formId]) {

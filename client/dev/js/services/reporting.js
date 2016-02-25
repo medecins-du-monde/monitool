@@ -66,7 +66,7 @@ angular
 		// OLAP cubes do not support dimensions that overlap, and we have one: groups.
 		// This function abstracts
 		this._queryCube = function(groups, cube, dimensionIds, filterValues) {
-			filterValues = JSON.parse(JSON.stringify(filterValues));
+			filterValues = angular.copy(filterValues);
 			dimensionIds = dimensionIds.slice()
 
 			// Replace filterValues.group by filterValues.entity
@@ -103,7 +103,7 @@ angular
 				result = {total: cube.query(dimensionIds, filterValues)};
 				groups.forEach(function(group) {
 					// clone filterValues
-					var filterValuesCpy = JSON.parse(JSON.stringify(filterValues));
+					var filterValuesCpy = angular.copy(filterValues);
 
 					// intersect current filter with new constraint
 					if (!filterValuesCpy.entity)
