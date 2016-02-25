@@ -47,6 +47,7 @@ angular.module('monitool.controllers.project.shared', [])
 			delete newProject._rev;
 			newProject.owners = [$scope.userCtx._id];
 			newProject.dataEntryOperators = [$scope.userCtx._id];
+
 			newProject.entities.forEach(function(entity) {
 				old2new[entity.id] = makeUUID();
 				entity.id = old2new[entity.id];
@@ -55,7 +56,7 @@ angular.module('monitool.controllers.project.shared', [])
 			newProject.groups.forEach(function(group) {
 				old2new[group.id] = makeUUID();
 				group.id = old2new[group.id];
-				group.entities = group.entities.map(function(oldId) { return old2new[oldId]; });
+				group.members = group.members.map(function(oldId) { return old2new[oldId]; });
 			});
 
 			newProject.forms.forEach(function(form) {
@@ -75,28 +76,30 @@ angular.module('monitool.controllers.project.shared', [])
 				});
 			});
 
-			for (var indicatorId in newProject.indicators) {
-				var planning = newProject.indicators[indicatorId];
-				if (planning.variable) {
-					planning.variable = old2new[planning.variable];
-					planning.filter = planning.filter.map(function(filter) {
-						return filter.split('.').map(function(s) { return old2new[s]; }).join('.');
+			var updateIndicator = function(indicator) {
+				for (var key in indicator.parameters) {
+					var param = indicator.parameters[key];
+
+					param.elementId = old2new[param.elementId];
+					for (key in param.filter)
+						param.filter[key] = param.filter[key].map(function(i) { return old2new[i]; });
+				}
+			};
+
+			newProject.logicalFrames.forEach(function(logframe) {
+				logframe.indicators.forEach(updateIndicator);
+				logframe.purposes.forEach(function(purpose) {
+					purpose.indicators.forEach(updateIndicator);
+					purpose.outputs.forEach(function(output) {
+						output.indicators.forEach(updateIndicator);
 					});
-				}
-				else if (planning.formula) {
-					for (var key in planning.parameters) {
-						planning.parameters[key].variable = old2new[planning.parameters[key].variable];
-						planning.parameters[key].filter = planning.parameters[key].filter.map(function(filter) {
-							return filter.split('.').map(function(s) { return old2new[s]; }).join('.');
-						});
-					}
-				}
-			}
+				});
+			});
 
 			newProject.$save()
 				.then(function() { $state.go('main.projects'); })
 				.catch(function(error) { $scope.error = error; });
-		}
+		};
 
 		$scope.deleteProject = function() {
 			var translate = $filter('translate'),
@@ -158,9 +161,7 @@ angular.module('monitool.controllers.project.shared', [])
 				if (form.elements.length)
 					$scope.projectHasFormElements = true;
 			});
-
 		}, true);
-
 
 		// is this still useful?
 		$scope.$on('languageChange', function(e) {
