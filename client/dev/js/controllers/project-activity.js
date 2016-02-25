@@ -66,15 +66,6 @@ angular
 		$scope.formUsage = formUsage;
 		$scope.formIndex = $scope.project.forms.findIndex(function(f) { return f.id === form.id; });
 
-		$scope.addIntermediary = function() {
-			if (-1 === $scope.form.intermediaryDates.findIndex(function(key) { return !key; }))
-				$scope.form.intermediaryDates.push(null);
-		};
-
-		$scope.removeIntermediary = function(index) {
-			$scope.form.intermediaryDates.splice(index, 1);
-		};
-
 		$scope.delete = function() {
 			// Fetch this forms inputs.
 			var easy_question = $filter('translate')('project.delete_form_easy'),

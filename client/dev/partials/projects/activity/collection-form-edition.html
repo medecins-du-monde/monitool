@@ -49,50 +49,19 @@
 				<option value="month" translate="project.periodicities.month"></option>
 				<option value="quarter" translate="project.periodicities.quarter"></option>
 				<option value="year" translate="project.periodicities.year"></option>
-				<option value="planned" translate="project.periodicities.planned"></option>
+				<option value="free" translate="project.periodicities.free"></option>
 			</select>
 		</div>
 	</div>
 
-	<div class="form-group">
+	<div class="form-group" ng-if="form.periodicity !== 'free'">
 		<label for="periodicity" class="col-sm-2 control-label" translate="shared.begin"></label>
 		<div class="col-sm-10">
 			<optional-date ng-model="form.start" default="project.begin"></optional-date>
 		</div>
 	</div>
 
-	<div class="form-group" ng-if="form.periodicity === 'planned'">
-		<label class="col-sm-2 control-label" translate="project.intermediary_periods"></label>
-		<div class="col-sm-10">
-			<div ng-repeat="(index, period) in form.intermediaryDates" class="row" style="padding-bottom: 10px">
-				<ng-form name="intermediaryForm">
-					<div class="col-sm-10 form-group" show-errors style="margin: 0">
-						<input type="text" 
-							   datepicker-popup="longDate"
-							   name="period"
-							   ng-model="form.intermediaryDates[index]"
-							   is-open="periodDateOpen"
-							   ng-click="periodDateOpen=true"
-							   required
-							   ng-min="form.start"
-							   ng-max="form.end"
-							   class="form-control" />
-					</div>
-					<div class="col-sm-2">
-						<button class="btn btn-danger" ng-click="removeIntermediary(index)" translate="shared.delete"></button>
-					</div>
-				</ng-form>
-			</div>
-
-			<div class="row" acl-has-project-role="owner">
-				<div class="col-sm-12">
-					<button class="btn btn-default" ng-click="addIntermediary()" translate="project.add_intermediary"></button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="form-group">
+	<div class="form-group" ng-if="form.periodicity !== 'free'">
 		<label for="periodicity" class="col-sm-2 control-label" translate="shared.end"></label>
 		<div class="col-sm-10">
 			<optional-date ng-model="form.end" default="project.end"></optional-date>

@@ -349,7 +349,7 @@ var ENGLISH_TRANSLATION = {
 			month: 'Every month',
 			quarter: 'Every quarter',
 			year: "Every year",
-			planned: 'Planned'
+			free: 'Free'
 		},
 		collect: "Collect",
 		collects: {

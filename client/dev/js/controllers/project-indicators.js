@@ -74,27 +74,26 @@ angular.module('monitool.controllers.project.indicators', [])
 					parent.splice(parent.indexOf(planning), 1, newPlanning);
 			});
 		};
+
+		$scope.reset = function() {
+			$scope.$parent.reset();
+
+			if ($scope.project.logicalFrames.length == 0)
+				$scope.logicalFrameIndex = null;
+			else if ($scope.logicalFrameIndex >= $scope.project.logicalFrames.length)
+				$scope.logicalFrameIndex = 0;
+		};
 	})
 
 	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, itertools, planning) {
 		// Build possible variables and filters.
 		$scope.elements = []
 		$scope.filters = {};
+
 		$scope.project.forms.forEach(function(form) {
 			form.elements.forEach(function(element) {
 				$scope.elements.push({id: element.id, name: element.name, group: form.name});
-				$scope.filters[element.id] = [{group: null, name: "Tous", filter: {}}];
-				element.partitions.forEach(function(partition, index) {
-					partition.forEach(function(partitionElement) {
-						var filter = {};
-						filter['partition' + index] = [partitionElement.id];
-						$scope.filters[element.id].push({
-							group: "Partition " + index,
-							name: "Uniquement " + partitionElement.name,
-							filter: filter
-						});
-					});
-				});
+				$scope.filters[element.id] = element;
 			});
 		});
 
@@ -117,7 +116,7 @@ angular.module('monitool.controllers.project.indicators', [])
 		for (var key in $scope.planning.parameters)
 			parameters[key] = $scope.planning.parameters[key];
 
-		$scope.$watch('planning.formula', function(formula) {
+		var formulaWatch = $scope.$watch('planning.formula', function(formula) {
 			var newSymbols, oldSymbols = Object.keys($scope.planning.parameters).sort();
 			try { newSymbols = Parser.parse($scope.planning.formula).variables().sort(); }
 			catch (e) { newSymbols = []; }
@@ -131,27 +130,50 @@ angular.module('monitool.controllers.project.indicators', [])
 
 				// Add new symbols to formula
 				newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; }).forEach(function(s) {
-					$scope.planning.parameters[s] = parameters[s] || {elementId: null, filter: []};
+					$scope.planning.parameters[s] = parameters[s] || {elementId: null, filter: {}};
 				});
 			}
 		});
 
 		// that's a bit overkill
-		$scope.$watch('planning.parameters', function() {
+		var paramWatch = $scope.$watch('planning.parameters', function() {
+			$scope.numParameters = 0;
+
 			for (var key in $scope.planning.parameters) {
 				if ($scope.planning.parameters[key].elementId) {
-					var allowedFilters = $scope.filters[$scope.planning.parameters[key].elementId],
-						setFilter      = $scope.planning.parameters[key].filter;
+					var element = $scope.filters[$scope.planning.parameters[key].elementId],
+						filter  = $scope.planning.parameters[key].filter;
+					
+					$scope.numParameters = Math.max($scope.numParameters, element.partitions.length);
 
-					if (!allowedFilters.find(function(f) { return f.filter == setFilter; })) {
-						$scope.planning.parameters[key].filter = allowedFilters[0].filter;
-						continue;
+					for (var filterKey in filter) {
+						var partitionId = filterKey.substring('partition'.length);
+
+						if (partitionId >= element.partitions.length)
+							delete filter[filterKey];
+						else {
+							filter[filterKey] = filter[filterKey].filter(function(partitionElement) {
+								return element.partitions[partitionId].find(function(p) { return p.id == partitionElement; });
+							});
+						}
 					}
 				}
 			}
+
 		}, true);
 
-		$scope.save   = function() { $modalInstance.close($scope.planning); };
+		$scope.save   = function() {
+			formulaWatch();
+			paramWatch();
+
+			for (var key in $scope.planning.parameters)
+				for (var filterKey in $scope.planning.parameters[key].filter)
+					if ($scope.planning.parameters[key].filter[filterKey].length == 0)
+						delete $scope.planning.parameters[key].filter[filterKey];
+
+			$modalInstance.close($scope.planning);
+		};
+		
 		$scope.delete = function() { $modalInstance.close(null); };
 		$scope.cancel = function() { $modalInstance.dismiss(); };
 	})
@@ -225,7 +247,7 @@ angular.module('monitool.controllers.project.indicators', [])
 				}, this);
 			}, this);
 		}, this);
-		
+
 		$scope.indicator = $scope.indicators[0].indicator;
 
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);

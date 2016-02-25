@@ -348,7 +348,7 @@ var SPANISH_TRANSLATION = {
 			month: 'Cada mes',
 			quarter: 'Cada trimestre',
 			year: 'Cada año',
-			planned: 'Planificado'
+			free: 'Libre'
 		},
 		collect: "Recuperar",
 		collects: {

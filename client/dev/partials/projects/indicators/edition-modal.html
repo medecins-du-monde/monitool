@@ -77,36 +77,29 @@
 			</div>
 		</div>
 
-
-
 		<table class="table table-bordered table-condensed table-stripped">
 			<thead>
 				<tr>
-					<th style="width: 20%">Paramètre</th>
-					<th style="width: 40%">Variable</th>
-					<th style="width: 40%">Filtre</th>
+					<th translate="project.variable"></th>
+					<th translate="project.parameters"></th>
+					<th translate="project.filters" colspan="{{numParameters}}" ng-if="numParameters != 0"></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="(key, parameter) in planning.parameters">
-					<td>{{key}}</td>
-					<td>
+					<td style="width: 15%">{{key}}</td>
+					<td ng-style="{width: 85 / (numParameters + 1) + '%'}">
 						<select required
 								class="form-control"
 								ng-model="parameter.elementId"
 								ng-options="v.id as v.name group by v.group for v in elements"></select>
 					</td>
-					<td ng-if="filters[parameter.elementId] == null">
-						<input value="{{'project.please_select_variable'|translate}}" class="form-control input-sm" disabled />
-					</td>
-					<td ng-if="filters[parameter.elementId].length == 0">
-						<input value="{{'project.no_partitions_available'|translate}}" class="form-control input-sm" disabled />	
-						
-					</td>
-					<td ng-if="filters[parameter.elementId].length > 0">
-						<select class="form-control"
-								ng-model="parameter.filter"
-								ng-options="p.filter as p.name group by p.group for p in filters[parameter.elementId]"></select>
+
+					<td ng-style="{width: 85 / (numParameters + 1) + '%'}" ng-repeat="(index, partition) in filters[parameter.elementId].partitions">
+						<ui-select multiple ng-model="parameter.filter['partition' + index]" theme="bootstrap" required>
+							<ui-select-match placeholder="{{'project.all_selected'|translate}}">{{$item.name}}</ui-select-match>
+							<ui-select-choices repeat="p.id as p in partition">{{p.name}}</ui-select-choices>
+						</ui-select>
 					</td>
 				</tr>
 			</tbody>

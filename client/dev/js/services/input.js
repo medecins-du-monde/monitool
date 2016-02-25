@@ -56,10 +56,8 @@ angular
 					current.add(1, form.periodicity);
 				}
 			}
-			else if (form.periodicity === 'planned') {
-				periods = form.intermediaryDates.map(function(period) { return moment(period); });
-				periods.unshift(moment(form.start));
-				periods.push(moment(form.end));
+			else if (form.periodicity === 'free') {
+				periods = [];
 			}
 			else
 				throw new Error(form.periodicity + ' is not a valid periodicity');

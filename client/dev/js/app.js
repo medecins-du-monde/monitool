@@ -324,7 +324,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						collect: 'entity',
 						start: null,
 						end: null,
-						intermediaryDates: [],
 						active: true,
 						elements: []
 					};

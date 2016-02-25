@@ -358,7 +358,7 @@ var FRENCH_TRANSLATION = {
 			month: 'Tous les mois',
 			quarter: 'Tous les trimestres',
 			year: 'Tous les ans',
-			planned: 'Planifiée'
+			free: 'Libre'
 		},
 		collect: "Collecter",
 		collects: {
