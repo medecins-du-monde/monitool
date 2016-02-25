@@ -28,10 +28,31 @@ module.exports = {
 		// secondary key
 		projects_by_indicator: {
 			map: function(doc) {
-				if (doc.type === 'project')
-					for (var indicatorId in doc.indicators)
-						emit(indicatorId);
-			}.toString()
+				if (doc.type === 'project') {
+					doc.logicalFrames.forEach(function(logicalFrame) {
+						logicalFrame.indicators.forEach(function(indicator) {
+							if (indicator.indicatorId)
+								emit(indicator.indicatorId)
+						});
+
+						logicalFrame.purposes.forEach(function(purpose) {
+							purpose.indicators.forEach(function(indicator) {
+								if (indicator.indicatorId)
+									emit(indicator.indicatorId)
+							});
+
+							purpose.outputs.forEach(function(output) {
+								output.indicators.forEach(function(indicator) {
+									if (indicator.indicatorId)
+										emit(indicator.indicatorId)
+								});
+							});
+						});
+					});
+				}
+			}.toString(),
+
+			reduce: '_count'
 		},
 
 		// listings
@@ -97,16 +118,6 @@ module.exports = {
 						});
 					});
 				}
-			}.toString(),
-
-			reduce: "_count"
-		},
-
-		indicator_usage: {
-			map: function(doc) {
-				if (doc.type === 'project')
-					for (var indicatorId in doc.indicators)
-						emit(indicatorId);
 			}.toString(),
 
 			reduce: "_count"

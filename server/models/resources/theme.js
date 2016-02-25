@@ -48,7 +48,7 @@ module.exports = {
 		if (options.mode === 'tree') {
 			async.map([
 				['shortlists', 'indicator_tree', {reduce: false}],
-				['shortlists', 'indicator_usage', {group: true}],
+				['shortlists', 'projects_by_indicator', {group: true}],
 				['shortlists', 'by_type', {include_docs: true, key: 'theme'}],
 				['shortlists', 'by_type', {include_docs: true, key: 'type'}],
 			], function(params, callback) {
