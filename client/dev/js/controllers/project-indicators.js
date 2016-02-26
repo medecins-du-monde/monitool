@@ -85,7 +85,7 @@ angular.module('monitool.controllers.project.indicators', [])
 		};
 	})
 
-	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, itertools, planning) {
+	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, mtFetch, planning) {
 		// Build possible variables and filters.
 		$scope.elements = []
 		$scope.filters = {};
@@ -110,6 +110,18 @@ angular.module('monitool.controllers.project.indicators', [])
 			parameters: {'default': {elementId: null, filter: null}}
 		};
 		$scope.isNew = !planning;
+
+
+		// load indicator to display name.
+		$scope.$watch('planning.indicatorId', function(indicatorId) {
+			console.log(indicatorId)
+			if (indicatorId == null)
+				$scope.indicator = null;
+			else
+				mtFetch.indicator(indicatorId).then(function(indicator) {
+					$scope.indicator = indicator;
+				});
+		});
 
 		// List all parameters
 		var parameters = {};
