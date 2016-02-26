@@ -452,7 +452,6 @@ var FRENCH_TRANSLATION = {
 		is_mandatory: "Obligatoire - Doit être collecté pour tous les projets de même thématique",
 		is_approved: "Approuvé - Peut ou non être collecté sur les projets de même thématique",
 		is_waiting: "En attente - Le siège ne s'est pas prononcé sur la qualité de cet indicateur",
-		is_forbidden: "Rejeté - Ne doit plus être collecté sur les nouveaux projets",
 		
 		num_collecting_projects: "Nombre de projets collectant cet indicateur",
 

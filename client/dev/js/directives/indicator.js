@@ -39,10 +39,9 @@ angular
 			template: '<i class="fa fa-fw" ng-class="operationClass" tooltip="{{operationTranslation|translate}}" tooltip-placement="right" ></i>',
 			link: function($scope, element, attributes) {
 				var indicator = $scope.$eval(attributes.indicator);
-				$scope.operationClass = {forbidden: 'fa-ban text-danger', approved: 'fa-check text-success', waiting: 'fa-clock-o text-warning', mandatory: 'fa-asterisk text-success'}[indicator.operation];
+				$scope.operationClass = {approved: 'fa-check text-success', waiting: 'fa-clock-o text-warning', mandatory: 'fa-asterisk text-success'}[indicator.operation];
 				$scope.operationTranslation = 'indicator.is_' + indicator.operation;
 			}
 		}
-	})
-
+	});
 

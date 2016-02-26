@@ -442,7 +442,6 @@ var SPANISH_TRANSLATION = {
 		is_mandatory: "Obligatorio - Debe ser colectado por todos los proyectos de misma tématica",
 		is_approved: "Opcional - Puede o no ser colectado por proyecto de misma tématica",
 		is_waiting: "En espera - La sede no se ha pronunciado aún sobre la calidad de este indicador",
-		is_forbidden: "Prohibido - Ne debe ser colectado en nuevos proyectos",
 		
 		num_collecting_projects: "Número de proyectos que colectan este indicador",
 

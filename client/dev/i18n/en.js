@@ -444,7 +444,6 @@ var ENGLISH_TRANSLATION = {
 		is_mandatory: "Mandatory. Should be collected for all new projects of this thematic.",
 		is_approved: "Approved. Can be collected on new projects of this thematic.",
 		is_waiting: "Waiting. Headquarters have not graded the quality of this indicator yet.",
-		is_forbidden: "Forbidden. Must not be collected on any new projects.",
 		
 		num_collecting_projects: "Nombre de projets collectant cet indicateur",
 
