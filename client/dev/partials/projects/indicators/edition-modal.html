@@ -11,15 +11,12 @@
 		</div>
 
 		<div class="form-group">
-			<label for="indicator-input" class="col-sm-2 control-label" translate="shared.indicator"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="indicator.name[language]">
-				<div class="input-group">
-					<input id="indicator-input" type="text" ng-model="indicator.name[language]" class="form-control" disabled />
-
-					<span class="input-group-btn">
-						<a class="btn btn-default" translate="project.choose"></a>
-					</span>
-				</div>
+			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.colorize">
+				<input id="colorize-input"
+					   type="checkbox"
+					   ng-model="planning.colorize"
+					   ng-disabled="planning.baseline == null || planning.target == null" />
 			</div>
 		</div>
 
@@ -34,16 +31,6 @@
 			<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.target">
 				<optional-number ng-model="planning.target" default="100"></optional-number>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.colorize">
-				<input id="colorize-input"
-					   type="checkbox"
-					   ng-model="planning.colorize"
-					   ng-disabled="planning.baseline == null || planning.target == null" />
 			</div>
 		</div>
 
@@ -80,8 +67,8 @@
 		<table class="table table-bordered table-condensed table-stripped">
 			<thead>
 				<tr>
+					<th translate="project.parameter"></th>
 					<th translate="project.variable"></th>
-					<th translate="project.parameters"></th>
 					<th translate="project.filters" colspan="{{numParameters}}" ng-if="numParameters != 0"></th>
 				</tr>
 			</thead>
@@ -114,14 +101,12 @@
 						ng-style="{width: (numParameters - filters[parameter.elementId].partitions.length) * 85 / (numParameters + 1) + '%'}"
 						colspan="{{numParameters - filters[parameter.elementId].partitions.length}}"></td>
 					
-					<td ng-if="!parameter.elementId"
+					<td ng-if="!parameter.elementId && numParameters != 0"
 						ng-style="{width: numParameters * 85 / (numParameters + 1) + '%'}"
 						colspan="{{numParameters}}"></td>
-
 				</tr>
 			</tbody>
 		</table>
-
 	</form>
 </div>
 

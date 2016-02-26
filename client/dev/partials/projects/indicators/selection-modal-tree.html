@@ -10,11 +10,8 @@
 		<span class="pull-right">
 			<span class="label label-default"
 				  tooltip="{{'indicator.num_collecting_projects'|translate}}">{{indicator.__usage}}</span>
-		
-			<a class="btn btn-xs btn-default"
-				ng-click="choose(indicator._id)"
-				ng-disabled="forbidden.indexOf(indicator._id) !== -1"
-				translate="shared.choose"></a>
+
+			<a class="btn btn-xs btn-default" ng-click="choose(indicator._id)" translate="shared.choose"></a>
 		</span>
 
 		<indicator-operation indicator="indicator"></indicator-operation>

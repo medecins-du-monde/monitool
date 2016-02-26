@@ -66,7 +66,19 @@
 				<div class="form-control-static">
 					<ul>
 						<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">
-							<a ng-click="editIndicator(indicator, project.logicalFrames[logicalFrameIndex].indicators)">{{indicator.display}}</a>
+							{{indicator.display}}
+
+							<a class="btn btn-xxs btn-default" ng-click="editIndicator(indicator, project.logicalFrames[logicalFrameIndex].indicators)" tooltip="{{'shared.edit'|translate}}">
+								<i class="fa fa-pencil"></i>
+							</a>
+
+							<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
+								<i class="fa fa-link"></i>
+							</a>
+
+							<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
+								<i class="fa fa-unlink"></i>
+							</a>
 						</li>
 					</ul>
 
@@ -129,7 +141,19 @@
 							<div class="form-control-static">
 								<ul>
 									<li ng-repeat="indicator in purpose.indicators">
-										<a ng-click="editIndicator(indicator, purpose.indicators)">{{indicator.display}}</a>
+										{{indicator.display}}
+
+										<a class="btn btn-xxs btn-default" ng-click="editIndicator(indicator, purpose.indicators)" tooltip="{{'shared.edit'|translate}}">
+											<i class="fa fa-pencil"></i>
+										</a>
+
+										<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
+											<i class="fa fa-link"></i>
+										</a>
+
+										<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
+											<i class="fa fa-unlink"></i>
+										</a>
 									</li>
 								</ul>
 
@@ -187,7 +211,19 @@
 										<div class="form-control-static">
 											<ul>
 												<li ng-repeat="indicator in output.indicators">
-													<a ng-click="editIndicator(indicator, output.indicators)">{{indicator.display}}</a>
+													{{indicator.display}}
+
+													<a class="btn btn-xxs btn-default" ng-click="editIndicator(indicator, output.indicators)" tooltip="{{'shared.edit'|translate}}">
+														<i class="fa fa-pencil"></i>
+													</a>
+
+													<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
+														<i class="fa fa-link"></i>
+													</a>
+
+													<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
+														<i class="fa fa-unlink"></i>
+													</a>
 												</li>
 											</ul>
 

@@ -75,6 +75,26 @@ angular.module('monitool.controllers.project.indicators', [])
 			});
 		};
 
+		$scope.link = function(planning) {
+			var promise = $modal.open({
+				controller: 'ProjectIndicatorSelectionModalController',
+				templateUrl: 'partials/projects/indicators/selection-modal.html',
+				size: 'lg',
+				scope: $scope,
+				resolve: {
+					hierarchy: function(mtFetch) { return mtFetch.themes({mode: 'tree'}); }
+				}
+			}).result;
+
+			promise.then(function(indicatorId) {
+				planning.indicatorId = indicatorId;
+			});
+		};
+
+		$scope.unlink = function(planning) {
+			planning.indicatorId = null;
+		};
+
 		$scope.reset = function() {
 			$scope.$parent.reset();
 
@@ -83,6 +103,39 @@ angular.module('monitool.controllers.project.indicators', [])
 			else if ($scope.logicalFrameIndex >= $scope.project.logicalFrames.length)
 				$scope.logicalFrameIndex = 0;
 		};
+	})
+
+	.controller('ProjectIndicatorSelectionModalController', function($scope, $modalInstance, hierarchy) {
+		// Compute indicators that we have in at least one logical frame.
+		var projectIndicators = {};
+		$scope.project.logicalFrames.forEach(function(logicalFrame) {
+			logicalFrame.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
+			logicalFrame.purposes.forEach(function(purpose) {
+				purpose.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
+				purpose.outputs.forEach(function(output) {
+					output.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
+				});
+			});
+		});
+
+		// Compute indicators that are missing.
+		$scope.missingIndicators = {};
+		hierarchy.forEach(function(theme) {
+			if ($scope.project.themes.indexOf(theme._id) !== -1)
+				theme.children.forEach(function(type) {
+					type.children.forEach(function(indicator) {
+						if (!projectIndicators[indicator._id] && indicator.operation === 'mandatory')
+							$scope.missingIndicators[indicator._id] = indicator;
+					});
+				});
+		});
+		$scope.missingIndicators = Object.keys($scope.missingIndicators).map(function(id) { return $scope.missingIndicators[id]; });
+
+		$scope.hierarchy = hierarchy;
+		$scope.searchField = '';
+
+		$scope.choose = function(indicatorId) { $modalInstance.close(indicatorId); };
+		$scope.cancel = function() { $modalInstance.dismiss() };
 	})
 
 	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, mtFetch, planning) {
@@ -110,18 +163,6 @@ angular.module('monitool.controllers.project.indicators', [])
 			parameters: {'default': {elementId: null, filter: null}}
 		};
 		$scope.isNew = !planning;
-
-
-		// load indicator to display name.
-		$scope.$watch('planning.indicatorId', function(indicatorId) {
-			console.log(indicatorId)
-			if (indicatorId == null)
-				$scope.indicator = null;
-			else
-				mtFetch.indicator(indicatorId).then(function(indicator) {
-					$scope.indicator = indicator;
-				});
-		});
 
 		// List all parameters
 		var parameters = {};

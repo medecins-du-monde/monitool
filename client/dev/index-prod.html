@@ -4,10 +4,84 @@
 		<title>Monitool</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="monitool2.css" />
+
+		<style type="text/css">
+			body {
+				background-color: #EEE;
+			}		
+	
+			#load-container{
+				position: absolute;
+				top: 50%;
+				margin-top: -200px;/* half of #content height*/
+				left: 0;
+				width: 100%;
+			}
+
+			#load-content {
+				width: 624px;
+				margin-left: auto;
+				margin-right: auto;
+				height: 395px;
+				text-align: center;
+				background-color: #FFF;
+				border: 1px solid #CCC;
+				border-radius: 5px;
+			}
+
+			#load-content h3 {
+				margin-top: 10px;
+			}
+			
+			#load-content img {
+				width: 300px;
+			}
+
+			#load-content .progress {
+				width: 80%;
+				margin: auto;
+			}
+
+		</style>
+
 	</head>
 	<body>
-		<link rel="stylesheet" type="text/css" href="monitool2.css" />
-		<script type="text/javascript" src="monitool2.js"></script>
 		<div ui-view></div>
+		
+		<div id="load-container">
+			<div id="load-content">
+				<img src="/img/logo_color.svg">
+				<h3>Loading</h3>
+				
+				<div class="progress">
+					<div id="progress" class="progress-bar progress-bar-info" style="width: 0"></div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var req = new XMLHttpRequest();
+
+			req.addEventListener("progress", function(event) {
+				var el = document.getElementById('progress')
+				progress.style.width = 100 * event.loaded / 1459825 + '%'; 
+			}, false);
+
+			req.addEventListener("load", function(e) {
+				document.body.style.backgroundColor = 'white';
+
+				var loader = document.getElementById('load-container');
+				loader.parentNode.removeChild(loader);
+
+				var s = document.createElement("script");
+				s.innerHTML = e.target.responseText;
+				document.documentElement.appendChild(s);
+			}, false);
+
+			req.open("GET", "monitool2.js");
+			req.send();
+		</script>
+
 	</body>
 </html>

@@ -57,9 +57,6 @@ module.exports = {
 				var indicators = result[0], usage = result[1], themes = result[2], types = result[3];
 				var indicatorsById = {}, themesById = {'': {children: {}}}, typesById = {'': {children: {}}};
 
-				if (options.partial)
-					indicators.rows = indicators.rows.filter(function(row) { return row.value.operation !== 'forbidden'; });
-
 				indicators.rows.forEach(function(row) {
 					row.value.__usage = 0;
 					indicatorsById[row.id] = row.value;

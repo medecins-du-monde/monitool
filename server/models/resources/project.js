@@ -201,6 +201,9 @@ module.exports = {
 	list: function(options, callback) {
 		if (options.mode === 'indicator_reporting')
 			database.view('shortlists', 'projects_by_indicator', {key: options.indicatorId, include_docs: true, reduce: false}, function(error, result) {
+
+				console.log(result)
+
 				callback(null, result.rows.map(function(row) { return row.doc; }));
 			});
 

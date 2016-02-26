@@ -173,6 +173,11 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		link_indicator: "Lier à un indicateur du catalogue",
+		unlink_indicator: 'Retirer le lien avec le catalogue',
+
+		parameter: "Paramètre",
+		all_selected: "Pas de filtre",
 		create_logframe: "Ajouter un cadre logique",
 		reporting_compare_sites: "Comparer les lieux",
 		unnamed_logframe: "Cadre logique sans nom",
@@ -431,7 +436,7 @@ var FRENCH_TRANSLATION = {
 		you_are_not_owner: "Vous ne pouvez pas éditer ce projet",
 		you_are_not_editor: "Vous ne pouvez pas saisir sur ce projet",
 
-		formula: "Formule: {{name}}",
+		formula: "Formule",
 		link: "Lien: {{name}}",
 		links: "Liens"
 	},

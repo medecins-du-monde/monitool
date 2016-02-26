@@ -9,8 +9,8 @@
 		<tr>
 			<th ng-repeat="(code, language) in languages">{{('menu.'+language)|translate}}</th>
 
-			<th ng-if="entityType === 'theme'" translate="indicator.num_projects"></th>
-			<th translate="indicator.num_indicators"></th>
+			<th style="width:80px" ng-if="entityType === 'theme'" translate="indicator.num_projects"></th>
+			<th style="width:80px" translate="indicator.num_indicators"></th>
 			<th style="width:225px" acl-has-role="indicator"></th>
 		</tr>
 	</thead>
@@ -18,10 +18,7 @@
 		<tr ng-repeat="(entityIndex, entity) in entities track by entity._id">
 			<td acl-has-role="indicator" acl-fallback="entity.name[code]" ng-repeat="(code, language) in languages">
 				<ng-form name="entityForm">
-					
 					<div class="form-group" show-errors style="margin: 0">
-
-
 						<div class="input-group">
 							<input type="text" name="name" ng-model="entity.name[code]" class="form-control input-sm" required />
 	 						
@@ -45,14 +42,14 @@
 			<td ng-if="entityType === 'theme'">{{entity.__projectUsage || 0}}</td>
 			<td>{{entity.__indicatorUsage || 0}}</td>
 			<td acl-has-role="indicator">
-				<button class="btn btn-primary btn-sm" ng-click="save(entityIndex)" ng-disabled="!entity.name || !hasChanged(entityIndex)">
+				<a class="btn btn-primary btn-xs" ng-click="save(entityIndex)" ng-disabled="!entity.name || !hasChanged(entityIndex)">
 					<i class="fa fa-floppy-o"></i>
 					<span translate>shared.save</span>
-				</button>
-				<button class="btn btn-danger btn-sm" ng-disabled="entity.__projectUsage || entity.__indicatorUsage" ng-click="remove(entityIndex)">
+				</a>
+				<a class="btn btn-danger btn-xs" ng-disabled="entity.__projectUsage || entity.__indicatorUsage" ng-click="remove(entityIndex)">
 					<i class="fa fa-remove"></i>
 					<span translate>shared.delete</span>
-				</button>
+				</a>
 			</td>
 		</tr>
 		<tr acl-has-role="indicator">
