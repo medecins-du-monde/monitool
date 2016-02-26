@@ -74,7 +74,7 @@ angular
 		});
 	})
 	
-	.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, inputs) {
+	.controller('IndicatorReportingController', function($scope, Olap, mtReporting, indicator, projects, inputs) {
 		$scope.indicator = indicator;
 		$scope.plots = {};
 
@@ -97,34 +97,47 @@ angular
 		else
 			$scope.groupBy = 'year';
 
-		// When filter changes (or init), build the list of inputs to pass to the scope.
-		$scope.$watch('filters', function() {
-			$scope.inputs = inputs.filter(function(input) {
-				return input.period >= $scope.filters.begin && input.period <= $scope.filters.end;
-			});
-		}, true);
+		var cubes = {};
+		projects.forEach(function(project) {
+			var projectInputs = inputs.filter(function(i) { return i.project == project._id; });
+			cubes[project._id] = Olap.Cube.fromProject(project, projectInputs);
+		});
 
 		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['inputs', 'groupBy'], function() {
-			var reporting = mtReporting.computeIndicatorReporting($scope.inputs, projects, indicator, $scope.groupBy);
+		$scope.$watchGroup(['filters', 'groupBy'], function() {
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end);
-			$scope.rows = [];
+			$scope.rows = projects.map(function(project) {
+				var planning = null;
+				outerloop:
+					for (var lfIndex = 0; lfIndex < project.logicalFrames.length; ++lfIndex) {
+						planning = project.logicalFrames[lfIndex].indicators.find(function(i) { return i.indicatorId === indicator._id; });
+						if (planning)
+							break outerloop;
 
-			projects.forEach(function(project) {
-				$scope.rows.push({
-					id: project._id,
-					type: 'data',
-					indent: 0,
-					name: project.name,
-					unit: indicator.unit,
-					colorize: project.indicators[indicator._id].colorize,
-					baseline: project.indicators[indicator._id].baseline,
-					target: project.indicators[indicator._id].target,
-					cols: $scope.cols.map(function(col) {
-						try { return reporting[project._id][col.id]; }
-						catch (e) { return null; }
-					})
-				});
+						for (var pIndex = 0; pIndex < project.logicalFrames[lfIndex].purposes.length; ++pIndex) {
+							planning = project.logicalFrames[lfIndex].purposes[pIndex].indicators.find(function(i) { return i.indicatorId === indicator._id; });
+							if (planning)
+								break outerloop;
+
+							for (var oIndex = 0; oIndex < project.logicalFrames[lfIndex].purposes[pIndex].outputs.length; ++oIndex) {
+								planning = project.logicalFrames[lfIndex].purposes[pIndex].outputs[oIndex].indicators.find(function(i) { return i.indicatorId === indicator._id; });
+								if (planning)
+									break outerloop;
+							}
+						}
+					}
+
+				var row = mtReporting._makeIndicatorRow(
+					project.groups,
+					cubes[project._id],
+					0,
+					$scope.groupBy,
+					{}, // $scope.filters,
+					$scope.cols,
+					planning
+				);
+				row.name = project.name;
+				return row;
 			});
 		});
 	});
