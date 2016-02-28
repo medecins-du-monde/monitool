@@ -17,9 +17,11 @@ var ModelsByName = {indicator: Indicator, input: Input, report: Report, project:
 
 
 // All routes here should be protected behind a bearer token
-
 var checkEditPermissions = function(user, modelName, modelId, callback) {
-	if (user.roles.indexOf('_admin') !== -1)
+	if (user.type !== 'user' && user.type !== 'partner')
+		callback('not_a_user');
+
+	if (user.type === 'user' && user.roles.indexOf('_admin') !== -1)
 		// admins can do what they want
 		callback(null);
 
@@ -34,9 +36,21 @@ var checkEditPermissions = function(user, modelName, modelId, callback) {
 				// user is crafting this query to see if it can overwrite a type with a project?
 				callback('uuid_must_be_unique_across_types');
 			
-			else
+			else {
 				// check if the user is allowed to update this particular project
-				callback(project.owners.indexOf(user._id) === -1 ? 'missing_permission' : null);
+				if (user.type == 'user') {
+					if (project.users.filter(function(u) { return u.role == 'owner' && u.id == user._id; }).length)
+						callback(null);
+					else
+						callback('user_not_is_allowed_list');
+				}
+				else if (user.type == 'partner') {
+					if (project.users.filter(function(u) { return u.role == 'owner' && u.username == user.username; }).length)
+						callback(null);
+					else
+						callback('partner_not_is_allowed_list');
+				}
+			}
 		});
 
 	else if (["input", "report"].indexOf(modelName) !== -1) {
@@ -54,10 +68,11 @@ var checkEditPermissions = function(user, modelName, modelId, callback) {
 
 
 module.exports = express.Router()
+
 	.use(function(request, response, next) {
 		// we check that user is properly authenticated with a cookie.
 		// and that it's really a user, not a client that found a way to get a cookie.
-		if (request.isAuthenticated && request.isAuthenticated() && request.user && request.user.type === 'user')
+		if (request.isAuthenticated && request.isAuthenticated() && request.user && (request.user.type === 'user' || request.user.type === 'partner'))
 			next();
 		else {
 			passport.authenticate('user_accesstoken', {session: false}, function(error, user, info) {
@@ -74,9 +89,10 @@ module.exports = express.Router()
 		}
 	})
 
-	.get('/user/me', function(request, response) {
+	.get('/myself', function(request, response) {
 		response.json(request.user || null);
 	})
+
 
 	.get('/:modelName(project|indicator|input|report|theme|type|user)', function(request, response) {
 		var Model = ModelsByName[request.params.modelName];

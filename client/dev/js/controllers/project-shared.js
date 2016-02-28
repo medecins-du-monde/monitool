@@ -7,7 +7,7 @@ angular.module('monitool.controllers.project.shared', [])
 		$scope.pred = 'name'; // default sorting predicate
 
 		$scope.myProjects = projects.filter(function(p) {
-			return p.owners.indexOf($scope.userCtx._id) !== -1 || p.dataEntryOperators.indexOf($scope.userCtx._id) !== -1; 
+			return p.users.find(function(u) { return u.id == $scope.userCtx._id; });
 		});
 
 		$scope.runningProjects = projects.filter(function(p) {

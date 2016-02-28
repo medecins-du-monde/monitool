@@ -1,5 +1,5 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="project.collection_form_list"></li>
 </ol>
@@ -21,8 +21,8 @@
 		</tr>
 		<tr ng-repeat="form in project.forms">
 			<td>{{form.name}}</td>
-			<td>{{(form.start || project.begin) | amDateFormat: 'D MMMM YYYY'}}</td>
-			<td>{{(form.end || project.end) | amDateFormat: 'D MMMM YYYY'}}</td>
+			<td>{{(form.start || project.begin) | amDateFormat: 'YYYY-MM-DD'}}</td>
+			<td>{{(form.end || project.end) | amDateFormat: 'YYYY-MM-DD'}}</td>
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>{{'project.collects.' + form.collect|translate}}</td>
 			<td>

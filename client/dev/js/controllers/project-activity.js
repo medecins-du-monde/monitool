@@ -5,56 +5,9 @@ angular
 		'monitool.controllers.project.activity',
 		[
 			"monitool.services.olap",
-			"ngSanitize",
-			"ngHandsontable"
+			"ngSanitize"
 		]
 	)
-
-	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input, project) {
-		$scope.createEntity = function() {
-			$scope.project.entities.push({id: makeUUID(), name: '', start: null, end: null});
-		};
-
-		$scope.deleteEntity = function(entityId) {
-			// Fetch this forms inputs.
-			Input.query({mode: "ids_by_entity", entityId: entityId}).$promise.then(function(inputIds) {
-				var question = $filter('translate')('project.delete_entity', {num_inputs: inputIds.length}),
-					answer = $filter('translate')('project.delete_entity_answer', {num_inputs: inputIds.length});
-
-				var really = inputIds.length == 0 || (inputIds.length && window.prompt(question) == answer);
-
-				// If there are none, just confirm that the user wants to do this for real.
-				if (really) {
-					$scope.project.entities = $scope.project.entities.filter(function(e) { return e.id !== entityId; });
-					$scope.project.groups.forEach(function(group) {
-						var index = group.members.indexOf(entityId);
-						if (index !== -1)
-							group.members.splice(index, 1);
-					});
-				}
-			});
-		};
-
-		$scope.createGroup = function() {
-			$scope.project.groups.push({id: makeUUID(), name: '', members: []});
-		};
-
-		$scope.deleteGroup = function(inputEntityId) {
-			$scope.project.groups = $scope.project.groups.filter(function(entity) {
-				return entity.id !== inputEntityId;
-			});
-		};
-
-		$scope.up = function(index, array) {
-			var element = array.splice(index, 1);
-			array.splice(index - 1, 0, element[0]);
-		};
-
-		$scope.down = function(index, array) {
-			var element = array.splice(index, 1);
-			array.splice(index + 1, 0, element[0]);
-		};
-	})
 
 	.controller('ProjectCollectionFormListController', function() {
 
@@ -163,7 +116,31 @@ angular
 	})
 
 	.controller('ProjectCollectionInputListController', function($scope, project, inputsStatus, Input) {
-		$scope.canEdit = project.dataEntryOperators.indexOf($scope.userCtx._id) !== -1 || $scope.userCtx.roles.indexOf('_admin') !== -1;
+		var projectUser = project.users.find(function(u) {
+			return (
+				($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
+				($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username)
+			);
+		});
+
+		$scope.canEdit = {};
+		[{id: 'none'}].concat(project.entities).forEach(function(entity) {
+			if ($scope.userCtx.type == 'user' && $scope.userCtx.roles.indexOf('_admin') !== -1)
+				$scope.canEdit[entity.id] = true;
+			else if (!projectUser)
+				$scope.canEdit[entity.id] = false;
+			else {
+				var role = projectUser.role;
+				if (role == 'owner')
+					$scope.canEdit[entity.id] = true;
+				else if (role == 'input')
+					$scope.canEdit[entity.id] = projectUser.entities.length == 0 || projectUser.entities.indexOf(entity.id) != -1;
+				else if (role == 'read')
+					$scope.canEdit[entity.id] = false;
+				else
+					throw new Error('invalid role');
+			}
+		});
 
 		$scope.selectedForm = project.forms[0];
 		$scope.showFinished = !$scope.canEdit;
@@ -188,24 +165,19 @@ angular
 		}
 
 		// Remove the expected inputs for people that cannot edit.
-		if (!$scope.canEdit) {
-			for (var formId in inputsStatus)
-				for (var strDate in inputsStatus[formId]) {
-					if (inputsStatus[formId][strDate] === 'expected')
-						delete inputsStatus[formId][strDate];
-					else {
-						var isEmpty = true;
-						for (var entityId in inputsStatus[formId][strDate])
-							if (inputsStatus[formId][strDate][entityId] === 'expected')
-								delete inputsStatus[formId][strDate][entityId]
-							else
-								isEmpty = false;
-
-						if (isEmpty)
-							delete inputsStatus[formId][strDate];
-					}
+		for (var formId in inputsStatus)
+			for (var strDate in inputsStatus[formId]) {
+				var isEmpty = true;
+				for (var entityId in inputsStatus[formId][strDate]) {
+					if (inputsStatus[formId][strDate][entityId] === 'expected' && !$scope.canEdit[entityId])
+						delete inputsStatus[formId][strDate][entityId];
+					else
+						isEmpty = false;
 				}
-		}
+
+				if (isEmpty)
+					delete inputsStatus[formId][strDate];
+			}
 
 		$scope.$watch('showFinished', function(showFinished) {
 			// Remove rows that are finished
@@ -235,13 +207,34 @@ angular
 		});
 	})
 
-	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, mtReporting, form, inputs) {
+	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, form, inputs) {
 		$scope.form          = form;
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
 		$scope.lastInput     = inputs.previous;
 		$scope.master        = angular.copy($scope.currentInput)
 		$scope.inputEntity   = $scope.project.entities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
+
+		// Can user edit this input?
+		var projectUser = $scope.project.users.find(function(u) {
+			return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) || ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
+		});
+
+		if ($scope.userCtx.type == 'user' && $scope.userCtx.roles.indexOf('_admin') !== -1)
+			$scope.canEdit = true;
+		else if (!projectUser)
+			$scope.canEdit = false;
+		else {
+			var role = projectUser.role;
+			if (role == 'owner')
+				$scope.canEdit = true;
+			else if (role == 'input')
+				$scope.canEdit = projectUser.entities.length == 0 || projectUser.entities.indexOf($scope.currentInput.entity) != -1;
+			else if (role == 'read')
+				$scope.canEdit = false;
+			else
+				throw new Error('invalid role');
+		}
 
 		// Handle rotations.
 		$scope.partitions = {};

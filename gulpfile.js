@@ -49,7 +49,6 @@ var files = {
 		'client/dev/bower_components/textAngular/dist/textAngular-sanitize.min.js',
 		// 'client/dev/bower_components/textAngular/dist/textAngular.min.js',
 		'client/dev/bower_components/handsontable/dist/handsontable.full.min.js',
-		'client/dev/bower_components/ngHandsontable/dist/ngHandsontable.min.js',
 
 		'client/dev/bower_components/Blob.js/Blob.js',
 		'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',

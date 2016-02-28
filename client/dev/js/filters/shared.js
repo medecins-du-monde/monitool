@@ -3,6 +3,15 @@
 // https://gist.github.com/darlanalves/5b0865b7e3c8e3b00b67
 
 angular.module('monitool.filters.shared', [])
+
+	.filter('translate_list', function($filter) {
+		return function(items) {
+			return items.map(function(i) {
+				return $filter('translate')(i);
+			});
+		};
+	})
+
 	.filter('join', function() {
 		return function(list, token) {
 			return (list||[]).join(token);

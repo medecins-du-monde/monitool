@@ -1,0 +1,98 @@
+<div class="modal-body">
+	<form class="form-horizontal" role="form" name="userForm" novalidate>
+		<legend translate="project.edit_user"></legend>
+
+		<div class="form-group">
+			<label for="type-input" class="col-sm-3 control-label" translate="project.user_type"></label>
+			<div class="col-sm-9">
+				<select id="type-input" class="form-control" ng-model="user.type" required>
+					<option value="internal" translate="project.user_types.internal"></option>
+					<option value="partner" translate="project.user_types.partner"></option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="user.type == 'internal'">
+			<label for="user-input" class="col-sm-3 control-label" translate="project.user"></label>
+			<div class="col-sm-9">
+				<select id="user-input"
+						class="form-control"
+						ng-model="user.id"
+						ng-options="u._id as u.name for (id, u) in availableUsers"
+						required></select>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="user.type == 'partner'">
+			<label for="fullname-input" class="col-sm-3 control-label" translate="project.user_fullname"></label>
+			<div class="col-sm-9">
+				<input id="fullname-input" type="text" ng-model="user.name" class="form-control" required>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="user.type == 'partner'">
+			<label for="login-input" class="col-sm-3 control-label" translate="project.username"></label>
+			<div class="col-sm-9">
+				<input id="login-input"
+					   type="text"
+					   ng-model="user.username"
+					   class="form-control"
+					   ng-minlength="4"
+					   ng-pattern="/^[a-z\.\-]+$/"
+   					   required>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="user.type == 'partner'">
+			<label for="password-input" class="col-sm-3 control-label" translate="project.password"></label>
+			<div class="col-sm-9">
+				<input id="password-input"
+					   type="password"
+					   ng-model="user.password"
+					   class="form-control"
+					   ng-minlength="6"
+					   required>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="role-input" class="col-sm-3 control-label" translate="project.user_role"></label>
+			<div class="col-sm-9">
+				<select id="role-input" class="form-control" ng-model="user.role" required>
+					<option value="owner" translate="project.user_roles.owner"></option>
+					<option value="input" translate="project.user_roles.input"></option>
+					<option value="read" translate="project.user_roles.read"></option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="user.role == 'input'">
+			<label for="entities-input" class="col-sm-3 control-label" translate="project.collection_site_list"></label>
+			<div class="col-sm-9">
+				<ui-select multiple ng-model="user.entities" theme="bootstrap">
+					<ui-select-match placeholder="">{{$item.name|translate}}</ui-select-match>
+					<ui-select-choices repeat="entity.id as entity in availableEntities">
+						{{entity.name|translate}}
+					</ui-select-choices>
+				</ui-select>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button ng-click="done()" ng-disabled="userForm.$invalid" class="btn btn-primary" acl-has-project-role="owner">
+		<i class="fa fa-object-group"></i>
+		<span translate="project.update_user"></span>
+	</button>
+
+	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew" acl-has-project-role="owner">
+		<i class="fa fa-remove"></i>
+		<span translate="shared.delete"></span>
+	</button>
+
+	<button ng-click="cancel()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.cancel"></span>
+	</button>
+</div>

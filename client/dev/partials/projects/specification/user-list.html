@@ -1,5 +1,5 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.projects" translate>shared.projects</a></li>
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="project.users"></li>
 </ol>
@@ -8,27 +8,41 @@
 
 <form class="form-horizontal" role="form" name="usersForm" novalidate>
 
-	<div class="form-group">
-		<label for="input-owner" class="col-sm-2 control-label" translate="project.owners"></label>
-		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.owners | getObjects:users | pluck:'name' | join:', '">
-			
-			<ui-select multiple ng-model="project.owners" theme="bootstrap" required>
-				<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
-				<ui-select-choices repeat="user._id as user in users">{{user.name}}</ui-select-choices>
-			</ui-select>
-		</div>
-	</div>
-
-	<div class="form-group">
-		<label for="input-input" class="col-sm-2 control-label" translate="project.dataEntryOperators"></label>
-		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.dataEntryOperators | getObjects:users | pluck:'name' | join:', '">
-
-			<ui-select multiple ng-model="project.dataEntryOperators" theme="bootstrap" required>
-				<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
-				<ui-select-choices repeat="user._id as user in users">{{user.name}}</ui-select-choices>
-			</ui-select>
-		</div>
-	</div>
+	<table class="table table-bordered table-stripped table-condensed">
+		<thead>
+			<tr>
+				<th style="width: 10%">Organisation</th>
+				<th style="width: 20%">Nom</th>
+				<th style="width: 25%">Droits</th>
+				<th style="width: 40%">Lieux</th>
+				<th style="width: 15%" acl-has-project-role="owner"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="user in project.users">
+				<td style="text-align: center">
+					<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
+				</td>
+				<td>{{user.name || users[user.id].name}}</td>
+				<td>{{('project.user_roles.' + user.role)|translate}}</td>
+				<td>
+					{{user.entities|getObjects:availableEntities|pluck:'name'|translate_list|join:', '}}
+				</td>
+				<td acl-has-project-role="owner">
+					<a class="btn btn-default btn-xs" ng-click="editUser(user)">
+					   <i class="fa fa-pencil"></i> Modifier
+					</a>
+				</td>
+			</tr>
+		</tbody>
+		<tfoot acl-has-project-role="owner">
+			<tr>
+				<td colspan="5">
+					<a class="btn btn-default btn-xs" ng-click="editUser()" style="width: 100%" translate="shared.add"></a>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
 
 	<div acl-has-project-role="owner">
 		<button ng-click="save()" ng-disabled="project.owners.length == 0 || isUnchanged()" class="btn btn-primary">

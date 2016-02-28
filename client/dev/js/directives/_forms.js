@@ -215,7 +215,8 @@ angular.module('monitool.directives.form', [])
 				    td.style.background = '#eee';
 				}
 			},
-			dataOptions = {type: 'numeric'};
+			dataOptions = {type: 'numeric'},
+			dataReadOnlyOptions = {type: 'numeric', readOnly: true};
 
 		return {
 			restrict: 'E',

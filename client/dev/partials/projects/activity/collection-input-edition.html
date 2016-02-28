@@ -1,5 +1,5 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
 	<li><a ui-sref="main.project.collection_input_list" translate="project.collection_input_list"></a></li>
 	<li class="active" ng-bind="form.name"></li>
@@ -19,7 +19,6 @@
 			   ng-if="lastInput"><i class="fa fa-clipboard"></i></a>
 
 			{{element.name}}<br/>
-
 
 			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 1">
 				<span style="font-weight: normal" translate="project.field_order"></span>
@@ -50,7 +49,7 @@
 	</div>
 </form>
 
-<div acl-has-project-role="input">
+<div ng-if="canEdit">
 	<a class="btn btn-primary" ng-click="save()">
 		<i class="fa fa-floppy-o"></i>
 		<span translate="shared.save"></span>

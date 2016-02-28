@@ -38,25 +38,6 @@ var app = angular.module('monitool.app', [
 	'ui.select',
 ]);
 
-// Uncomment to add 1 second of latency to every query
-// http://blog.brillskills.com/2013/05/simulating-latency-for-angularjs-http-calls-with-response-interceptors/
-// 
-// app.config(function($httpProvider) {
-// 
-// 	$httpProvider.responseInterceptors.push(function($q, $timeout) {
-// 		return function(promise) {
-// 			return promise.then(function(response) {
-// 				return $timeout(function() {
-// 					return response;
-// 				}, 1000);
-// 			}, function(response) {
-// 				return $q.reject(response);
-// 			});
-// 		};
-// 	});
-// });
-
-
 /**
  * Init translation modules
  */
@@ -175,60 +156,62 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// states
 	///////////////////////////
 
+	
 	$stateProvider.state('main', {
 		abstract: true,
 		controller: 'MainMenuController',
-		templateUrl: 'partials/menu.html'
+		templateUrl: window.user.type == 'user' ? 'partials/menu.html' : 'partials/menu-single-project.html'
 	});
 
 	///////////////////////////
 	// Admin
 	///////////////////////////
 
-	$stateProvider.state('main.admin', {
-		abstract: true,
-		templateUrl: 'partials/admin/menu.html'
-	});
+	if (window.user.type == 'user') {
+		$stateProvider.state('main.admin', {
+			abstract: true,
+			templateUrl: 'partials/admin/menu.html'
+		});
 
-	$stateProvider.state('main.admin.users', {
-		controller: 'UsersController',
-		url: '/admin/users',
-		templateUrl: 'partials/admin/users.html',
-		resolve: {
-			users: function(mtFetch) {
-				return mtFetch.users();
+		$stateProvider.state('main.admin.users', {
+			controller: 'UsersController',
+			url: '/admin/users',
+			templateUrl: 'partials/admin/users.html',
+			resolve: {
+				users: function(mtFetch) {
+					return mtFetch.users();
+				}
 			}
-		}
-	});
-	
-	$stateProvider.state('main.admin.theme_list', {
-		url: '/admin/themes',
-		templateUrl: 'partials/admin/theme-type-list.html',
-		controller: 'ThemeTypeListController',
-		resolve: {
-			entities: function(mtFetch) {
-				return mtFetch.themes({with_counts: 1});
+		});
+		
+		$stateProvider.state('main.admin.theme_list', {
+			url: '/admin/themes',
+			templateUrl: 'partials/admin/theme-type-list.html',
+			controller: 'ThemeTypeListController',
+			resolve: {
+				entities: function(mtFetch) {
+					return mtFetch.themes({with_counts: 1});
+				}
+			},
+			data: {
+				entityType: 'theme'
 			}
-		},
-		data: {
-			entityType: 'theme'
-		}
-	});
+		});
 
-	$stateProvider.state('main.admin.type_list', {
-		url: '/admin/types',
-		templateUrl: 'partials/admin/theme-type-list.html',
-		controller: 'ThemeTypeListController',
-		resolve: {
-			entities: function(mtFetch) {
-				return mtFetch.types({with_counts: 1});
+		$stateProvider.state('main.admin.type_list', {
+			url: '/admin/types',
+			templateUrl: 'partials/admin/theme-type-list.html',
+			controller: 'ThemeTypeListController',
+			resolve: {
+				entities: function(mtFetch) {
+					return mtFetch.types({with_counts: 1});
+				}
+			},
+			data: {
+				entityType: 'type'
 			}
-		},
-		data: {
-			entityType: 'type'
-		}
-	});
-
+		});
+	}
 
 	///////////////////////////
 	// Project
@@ -239,29 +222,33 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/home.html',
 		controller: 'HomeController',
 		resolve: {
-
 		}
 	});
 
 
-	$stateProvider.state('main.projects', {
-		url: '/projects',
-		templateUrl: 'partials/projects/list.html',
-		controller: 'ProjectListController',
-		resolve: {
-			projects: function(mtFetch) { return mtFetch.projects({mode: 'list'}); },
-			themes: function(mtFetch) { return mtFetch.themes({}); }
-		}
-	});
+	if (window.user.type == 'user') {
+		$stateProvider.state('main.projects', {
+			url: '/projects',
+			templateUrl: 'partials/projects/list.html',
+			controller: 'ProjectListController',
+			resolve: {
+				projects: function(mtFetch) { return mtFetch.projects({mode: 'list'}); },
+				themes: function(mtFetch) { return mtFetch.themes({}); }
+			}
+		});
+	}
 
 	$stateProvider.state('main.project', {
 		abstract: true,
-		url: '/projects/:projectId',
+		url: window.user.type == 'user' ? '/projects/:projectId' : '/project',
 		controller: 'ProjectMenuController',
 		templateUrl: 'partials/projects/menu.html',
 		resolve: {
-			project: function(mtFetch, $stateParams) {
-				return mtFetch.project($stateParams.projectId);
+			project: function(mtFetch, $rootScope, $stateParams) {
+				if ($rootScope.userCtx.type == 'user')
+					return mtFetch.project($stateParams.projectId);
+				else
+					return mtFetch.project($rootScope.userCtx.projectId);
 			}
 		}
 	});
@@ -270,7 +257,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	///////////////////////////
 	// Project Specification
 	///////////////////////////
-
 
 	$stateProvider.state('main.project.basics', {
 		url: '/basics',
@@ -282,6 +268,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			}
 		}
 	});
+
+	$stateProvider.state('main.project.collection_site_list', {
+		url: '/collection-site',
+		templateUrl: 'partials/projects/specification/collection-site-list.html',
+		controller: 'ProjectCollectionSiteListController'
+	});
+
 
 	$stateProvider.state('main.project.user_list', {
 		url: '/users',
@@ -297,12 +290,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	///////////////////////////
 	// Project Raw data
 	///////////////////////////
-
-	$stateProvider.state('main.project.collection_site_list', {
-		url: '/collection-site',
-		templateUrl: 'partials/projects/activity/collection-site-list.html',
-		controller: 'ProjectCollectionSiteListController'
-	});
 
 	$stateProvider.state('main.project.collection_form_list', {
 		url: '/collection-form',
@@ -356,7 +343,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		resolve: {
 			inputs: function(Input, $stateParams, project) {
 				var form = project.forms.find(function(f) { return f.id == $stateParams.formId});
-				return Input.fetchLasts($stateParams.projectId, $stateParams.entityId, form, $stateParams.period);
+				return Input.fetchLasts(project._id, $stateParams.entityId, form, $stateParams.period);
 			},
 			form: function($stateParams, project) {
 				return project.forms.find(function(form) { return form.id == $stateParams.formId; });
@@ -398,12 +385,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 
-
-
 	///////////////////////////
 	// Project Indicators
 	///////////////////////////
-
 
 	$stateProvider.state('main.project.logical_frame', {
 		url: '/logical-frame',
@@ -481,45 +465,46 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Indicator
 	///////////////////////////
 
-	$stateProvider.state('main.indicator', {
-		abstract: true,
-		url: '/indicator/:indicatorId',
-		template: '<div ui-view></div>',
-		resolve: {
-			indicator: function(mtFetch, $stateParams) {
-				return mtFetch.indicator($stateParams.indicatorId);
+	if (window.user.type == 'user') {
+		$stateProvider.state('main.indicator', {
+			abstract: true,
+			url: '/indicator/:indicatorId',
+			template: '<div ui-view></div>',
+			resolve: {
+				indicator: function(mtFetch, $stateParams) {
+					return mtFetch.indicator($stateParams.indicatorId);
+				}
 			}
-		}
-	});
+		});
 
-	$stateProvider.state('main.indicator.edit', {
-		url: '/edit',
-		templateUrl: 'partials/indicators/edit.html',
-		controller: 'IndicatorEditController',
-		resolve: {
-			types: function(mtFetch) {
-				return mtFetch.types();
-			},
-			themes: function(mtFetch) {
-				return mtFetch.themes();
+		$stateProvider.state('main.indicator.edit', {
+			url: '/edit',
+			templateUrl: 'partials/indicators/edit.html',
+			controller: 'IndicatorEditController',
+			resolve: {
+				types: function(mtFetch) {
+					return mtFetch.types();
+				},
+				themes: function(mtFetch) {
+					return mtFetch.themes();
+				}
 			}
-		}
-	});
+		});
 
-	$stateProvider.state('main.indicator.reporting', {
-		url: '/reporting',
-		templateUrl: 'partials/indicators/reporting.html',
-		controller: 'IndicatorReportingController',
-		resolve: {
-			projects: function($stateParams, mtFetch) {
-				return mtFetch.projects({mode: "indicator_reporting", indicatorId: $stateParams.indicatorId});
-			},
-			inputs: function(Input, projects) {
-				return Input.fetchForProjects(projects);
+		$stateProvider.state('main.indicator.reporting', {
+			url: '/reporting',
+			templateUrl: 'partials/indicators/reporting.html',
+			controller: 'IndicatorReportingController',
+			resolve: {
+				projects: function($stateParams, mtFetch) {
+					return mtFetch.projects({mode: "indicator_reporting", indicatorId: $stateParams.indicatorId});
+				},
+				inputs: function(Input, projects) {
+					return Input.fetchForProjects(projects);
+				}
 			}
-		}
-	});
-
+		});
+	}
 
 	///////////////////////////
 	// Help
@@ -531,8 +516,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/help',
 		templateUrl: 'partials/help/menu.html',
 	});
-
-
 
 	$stateProvider.state('main.help.presentation_general', {
 		controller: 'HelpController',
@@ -546,11 +529,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/help/01-data_path.html'
 	});
 
-	$stateProvider.state('main.help.create', {
-		controller: 'HelpController',
-		url: "/create",
-		templateUrl: 'partials/help/02-create.html'
-	});
+	if (window.user.type == 'user') {
+		$stateProvider.state('main.help.create', {
+			controller: 'HelpController',
+			url: "/create",
+			templateUrl: 'partials/help/02-create.html'
+		});
+	}
 
 	$stateProvider.state('main.help.structure', {
 		controller: 'HelpController',
@@ -588,30 +573,31 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/help/08-change-definition.html'
 	});
 
-	$stateProvider.state('main.help.indicator_usage', {
-		controller: 'HelpController',
-		url: "/indicator-usage",
-		templateUrl: 'partials/help/09-indicator-usage.html'
-	});
+	if (window.user.type == 'user') {
+		$stateProvider.state('main.help.indicator_usage', {
+			controller: 'HelpController',
+			url: "/indicator-usage",
+			templateUrl: 'partials/help/09-indicator-usage.html'
+		});
 
-	$stateProvider.state('main.help.create_new_indicator', {
-		controller: 'HelpController',
-		url: "/create-new-indicator",
-		templateUrl: 'partials/help/10-create-new-indicator.html'
-	});
+		$stateProvider.state('main.help.create_new_indicator', {
+			controller: 'HelpController',
+			url: "/create-new-indicator",
+			templateUrl: 'partials/help/10-create-new-indicator.html'
+		});
 
-	$stateProvider.state('main.help.merge_indicators', {
-		controller: 'HelpController',
-		url: "/merge-indicators",
-		templateUrl: 'partials/help/11-merge-indicators.html'
-	});
+		$stateProvider.state('main.help.merge_indicators', {
+			controller: 'HelpController',
+			url: "/merge-indicators",
+			templateUrl: 'partials/help/11-merge-indicators.html'
+		});
 
-	$stateProvider.state('main.help.indicator_reporting', {
-		controller: 'HelpController',
-		url: "/indicator-reporting",
-		templateUrl: 'partials/help/12-indicator-reporting.html'
-	});
-
+		$stateProvider.state('main.help.indicator_reporting', {
+			controller: 'HelpController',
+			url: "/indicator-reporting",
+			templateUrl: 'partials/help/12-indicator-reporting.html'
+		});
+	}
 });
 
 
@@ -619,33 +605,6 @@ app.run(function($rootScope, $state, mtFetch) {
 	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
 		console.log(error)
 		console.log(error.stack)
-	});
-});
-
-
-// Angular is not loaded yet...
-function load(url, callback) {
-	var xhr = new XMLHttpRequest();
-	
-	xhr.onreadystatechange = function() {
-		xhr.readyState === 4 && callback(xhr);
-	};
-	
-	xhr.open('GET', url, true);
-	xhr.send('');
-};
-
-angular.element(document).ready(function() {
-	load('/resources/user/me', function(response) {
-		if (response.status === 200) {
-			window.user = JSON.parse(response.responseText);
-			angular.bootstrap(document, ['monitool.app']);
-		}
-		else if (response.status === 401)
-			window.location.href = '/authentication/login';
-		
-		else 
-			console.log('Server seems to be down.');
 	});
 });
 

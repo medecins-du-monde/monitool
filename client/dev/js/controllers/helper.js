@@ -19,10 +19,6 @@ angular
 			$rootScope.language = langKey;
 			$scope.$broadcast('languageChange');
 		};
-
-		$scope.logout = function() {
-			window.location.href = 'https://mdm1.sharepoint.com';
-		};
 	})
 
 	.controller('HomeController', function($scope) {

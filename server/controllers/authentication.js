@@ -89,6 +89,15 @@ module.exports = express.Router()
 	// Configure Login/Logout routes.
 	///////////////////////////////////////////////////////////////
 
+	.post(
+		'/login-partner',
+		bodyParser,
+		passport.authenticate('partner_local', {
+			successRedirect: '/',
+			failureRedirect: '/',
+		})
+	)
+
 	.get(
 		'/login',
 
@@ -113,7 +122,9 @@ module.exports = express.Router()
 	.get(
 		'/login-callback',
 		
-		passport.authenticate('user_azure'),
+		passport.authenticate('user_azure', {
+			failureRedirect: '/'
+		}),
 		
 		function(request, response) {
 			if (request.session.nextUrl) {
@@ -123,4 +134,11 @@ module.exports = express.Router()
 			else
 				response.render('redirect', {url: '/'});
 		}
-	);
+	)
+
+	// FIXME this query is not idempotent, and should be POST.
+	.get('/logout', function(request, response) {
+		request.session.destroy();
+		request.logout();
+		response.redirect('/');
+	});

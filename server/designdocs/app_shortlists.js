@@ -25,6 +25,26 @@ module.exports = {
 			}.toString()
 		},
 
+		partners: {
+			map: function(doc) {
+				if (doc.type === 'project') {
+					doc.users.forEach(function(user) {
+						if (user.type == 'partner') {
+							emit(user.username, {
+								type: 'partner',
+								username: user.username,
+								password: user.password,
+								name: user.name,
+								role: user.role,
+								entities: user.entities,
+								projectId: doc._id
+							});
+						}
+					});
+				}
+			}.toString()
+		},
+
 		// secondary key
 		projects_by_indicator: {
 			map: function(doc) {
@@ -63,7 +83,9 @@ module.exports = {
 						_id: doc._id,
 						name: doc.name,
 						begin: doc.begin, end: doc.end,
-						owners: doc.owners, dataEntryOperators: doc.dataEntryOperators,
+						users: doc.users.map(function(user) {
+							return {type: user.type, id: user.id, username: user.username, role: user.role};
+						}),
 						themes: doc.themes
 					});
 			}.toString()

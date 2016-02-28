@@ -1,11 +1,6 @@
 "use strict";
 
-// acl-has-role
-// acl-has-project-role
-// acl-lacks-role
-// acl-lacks-project-role
-// acl-fallback
-
+// FIXME why put this in the global scope?
 function _makeReadOnly(scope, element, attributes) {
 	// replace by raw text
 	if (attributes.mtContentEditable !== undefined || attributes.contenteditable !== undefined) {
@@ -39,6 +34,45 @@ function _makeReadOnly(scope, element, attributes) {
 	}
 };
 
+function _isAllowedProject(userCtx, scope, element, attributes) {
+	var project = scope.project || scope.$eval(attributes.aclProject),
+		role    = attributes.aclHasProjectRole || attributes.aclLacksProjectRole;
+
+	if (role !== 'owner' && role !== 'input')
+		throw new Error("acl-has-project-role must be called with either 'owner' or 'input'");
+
+	var isAllowed = false;
+	if (userCtx.type == 'user') {
+		if (userCtx.roles.indexOf('_admin') !== -1)
+			isAllowed = true;
+		else {
+			var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
+			if (internalUser) {
+				if (role == 'owner' && internalUser.role == 'owner')
+					isAllowed = true;
+				else if (role == 'input' && (internalUser.role == 'owner' || internalUser.role == 'input'))
+					isAllowed = true;
+			}
+		}
+	}
+	else if (userCtx.type == 'partner') {
+		// we know that this is the right project already, because partner as no
+		// routes to reach other projects, but just in case.
+		if (userCtx.projectId == project._id) {
+			if (role == 'owner' && userCtx.role == 'owner')
+				isAllowed = true;
+			else if (role == 'input' && (userCtx.role == 'owner' || userCtx.role == 'input'))
+				isAllowed = true;
+		}
+	}
+	else
+		throw new Error('invalid user type');
+	
+	return isAllowed;	
+};
+
+
+
 angular.module('monitool.directives.acl', [])
 	.directive('aclHasRole', function($rootScope) {
 		return {
@@ -48,7 +82,9 @@ angular.module('monitool.directives.acl', [])
 						return;
 
 					var roles = userCtx.roles || [],
-						isAllowed = roles.indexOf(attributes.aclHasRole) !== -1 || roles.indexOf('_admin') !== -1;
+						isAllowed =
+							userCtx.type == 'user' && // partners cannot do anything
+							(roles.indexOf(attributes.aclHasRole) !== -1 || roles.indexOf('_admin') !== -1);
 
 					if (!isAllowed)
 						_makeReadOnly(scope, element, attributes);
@@ -65,18 +101,7 @@ angular.module('monitool.directives.acl', [])
 					if (!userCtx)
 						return;
 
-					var roles = userCtx.roles || [],
-						project = scope.$eval(attributes.project) || scope.project,
-						owners;
-
-					if (attributes.aclHasProjectRole === 'owner')
-						owners = project.owners || [];
-					else if (attributes.aclHasProjectRole === 'input')
-						owners = project.dataEntryOperators || [];
-					else
-						throw new Error("acl-has-project-role must be called with either 'owner' or 'input'");
-
-					var isAllowed = owners.indexOf(userCtx._id) !== -1 || roles.indexOf('_admin') !== -1;
+					var isAllowed = _isAllowedProject(userCtx, scope, element, attributes);
 					if (!isAllowed)
 						_makeReadOnly(scope, element, attributes);
 
@@ -93,7 +118,9 @@ angular.module('monitool.directives.acl', [])
 						return;
 
 					var roles = userCtx.roles || [],
-						isForbidden = roles.indexOf(attributes.aclLacksRole) === -1 && roles.indexOf('_admin') === -1;
+						isForbidden = 
+							userCtx.type != 'user' || // partners cannot do anything
+							(roles.indexOf(attributes.aclLacksRole) === -1 && roles.indexOf('_admin') === -1);
 
 					if (!isForbidden)
 						_makeReadOnly(scope, element, attributes);
@@ -110,19 +137,8 @@ angular.module('monitool.directives.acl', [])
 					if (!userCtx)
 						return;
 
-					var roles = userCtx.roles || [],
-						project = scope.$eval(attributes.project) || scope.project,
-						owners;
-
-					if (attributes.aclLacksProjectRole === 'owner')
-						owners = scope.project.owners || [];
-					else if (attributes.aclLacksProjectRole === 'input')
-						owners = scope.project.dataEntryOperators || [];
-					else
-						throw new Error("acl-lacks-project-role must be called with either 'owner' or 'input'");
-
-					var isForbidden = owners.indexOf(userCtx._id) === -1 && roles.indexOf('_admin') === -1;
-					if (!isForbidden)
+					var isAllowed = _isAllowedProject(userCtx, scope, element, attributes);
+					if (isAllowed)
 						_makeReadOnly(scope, element, attributes);
 
 					unwatch();

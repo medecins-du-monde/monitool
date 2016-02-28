@@ -3,6 +3,7 @@
 var passport               = require('passport'),
 	BasicStrategy          = require('passport-http').BasicStrategy,
 	BearerStrategy         = require('passport-http-bearer').Strategy,
+	LocalStrategy          = require('passport-local').Strategy,
 	OAuth2Strategy         = require('passport-oauth2'),
 	ClientPasswordStrategy = require('passport-oauth2-client-password'),
 	User                   = require('../models/authentication/user'),
@@ -10,19 +11,47 @@ var passport               = require('passport'),
 	AccessToken            = require('../models/authentication/access-token'),
 	config                 = require('../../config');
 
+var database = require('../models/database');
 
 /////////////////////////////////////////////////////////////////////////////
 // User serialization
 /////////////////////////////////////////////////////////////////////////////
 
 passport.serializeUser(function(user, done) {
-	done(null, user._id);
+	if (user.type == 'user')
+		done(null, user._id);
+
+	else if (user.type === 'partner')
+		done(null, 'partner:' + user.username);
+
+	// clients are not allowed to have sessions, so this should never be called.
+	// let's make sure of that
+	else
+		throw new Error('Clients cannot have sessions. Use bearer token or basic auth');
+
 });
 
 passport.deserializeUser(function(id, done) {
-	User.get(id, function(error, user) {
-		done(error, user);
-	});
+	var type = id.substring(0, id.indexOf(':'));
+
+	if (type === 'usr') {
+		User.get(id, function(error, user) {
+			done(error, user);
+		});
+	}
+	else if (type === 'partner') {
+		database.view('shortlists', 'partners', {key: id.substring('partner:'.length)}, function(error, data) {
+			if (error)
+				return done('db_fail');
+
+			if (data.rows.length == 0)
+				return done('partner_not_found');
+
+			done(null, data.rows[0].value)
+		});
+	}
+	else
+		throw new Error('Clients cannot have sessions.');
 });
 
 
@@ -46,7 +75,7 @@ var strategy = new OAuth2Strategy(
 				domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
 			if (domain !== 'medecinsdumonde.net')
-				done(
+				return done(
 					"You must use an account from medecinsdumonde.net (not " + domain + ").\n" +
 					"Try closing and reopening your browser to log in again."
 				);
@@ -122,6 +151,27 @@ passport.use('user_accesstoken', new BearerStrategy(function(strAccessToken, don
 	});
 }));
 
+/////////////////////////////////////////////////////////////////////////////
+// User authentication with email and password (MDM partners)
+/////////////////////////////////////////////////////////////////////////////
+
+passport.use('partner_local', new LocalStrategy(
+	function(username, password, done) {
+		database.view('shortlists', 'partners', {key: username}, function(error, data) {
+			if (error)
+				return done('failed to connect to DB');
+
+			if (data.rows.length == 0)
+				return done(null, false);
+
+			var partner = data.rows[0].value;
+			if (partner.password !== password)
+				return done(null, false);
+
+			done(null, partner)
+		})
+	}
+));
 
 
 /////////////////////////////////////////////////////////////////////////////

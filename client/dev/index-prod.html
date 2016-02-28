@@ -5,46 +5,6 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<link rel="stylesheet" type="text/css" href="monitool2.css" />
-
-		<style type="text/css">
-			body {
-				background-color: #EEE;
-			}		
-	
-			#load-container{
-				position: absolute;
-				top: 50%;
-				margin-top: -200px;/* half of #content height*/
-				left: 0;
-				width: 100%;
-			}
-
-			#load-content {
-				width: 624px;
-				margin-left: auto;
-				margin-right: auto;
-				height: 395px;
-				text-align: center;
-				background-color: #FFF;
-				border: 1px solid #CCC;
-				border-radius: 5px;
-			}
-
-			#load-content h3 {
-				margin-top: 10px;
-			}
-			
-			#load-content img {
-				width: 300px;
-			}
-
-			#load-content .progress {
-				width: 80%;
-				margin: auto;
-			}
-
-		</style>
-
 	</head>
 	<body>
 		<div ui-view></div>
@@ -52,11 +12,25 @@
 		<div id="load-container">
 			<div id="load-content">
 				<img src="/img/logo_color.svg">
-				<h3>Loading</h3>
 				
-				<div class="progress">
-					<div id="progress" class="progress-bar progress-bar-info" style="width: 0"></div>
+				<div id="loader">
+					<h3>Loading</h3>
+					
+					<div class="progress">
+						<div id="progress" class="progress-bar progress-bar-info" style="width: 0"></div>
+					</div>
 				</div>
+				
+				<div id="login_buttons" style="display: none">
+					<a href="/authentication/login" class="btn btn-primary btn-lg btn-block">Use MDM account</a>
+
+					<form class="form-inline" style="margin-top: 5px" action="/authentication/login-partner" method="POST">
+						<input type="text" class="form-control input-lg" name="username" placeholder="Username" style="width: 187px">
+						<input type="password" class="form-control input-lg" name="password" placeholder="Password" style="width: 187px">
+						<button class="btn btn-default btn-lg">Use partner account</button>
+					</form>
+				</div>
+
 			</div>
 		</div>
 
@@ -69,11 +43,11 @@
 			}, false);
 
 			req.addEventListener("load", function(e) {
-				document.body.style.backgroundColor = 'white';
-
-				var loader = document.getElementById('load-container');
+				// remove loading bar.
+				var loader = document.getElementById('loader');
 				loader.parentNode.removeChild(loader);
 
+				// append main script to document.
 				var s = document.createElement("script");
 				s.innerHTML = e.target.responseText;
 				document.documentElement.appendChild(s);
@@ -82,6 +56,5 @@
 			req.open("GET", "monitool2.js");
 			req.send();
 		</script>
-
 	</body>
 </html>

@@ -44,7 +44,7 @@
 
 				<div class="panel-collapse">
 					<div class="list-group">
-						<a ui-sref="main.help.create" ui-sref-active="active" class="list-group-item">
+						<a ui-sref="main.help.create" ui-sref-active="active" class="list-group-item" ng-if="userCtx.type == 'user'">
 							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('create')"></i>
 							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('create') && $state.is('main.help.create')"></i>
 							<i class="fa fa-plus fa-fw"></i>
@@ -97,7 +97,7 @@
 			</div>
 	
 
-			<div class="panel panel-default">
+			<div class="panel panel-default" ng-if="userCtx.type == 'user'">
 				<div class="panel-heading">
 					<h4 class="panel-title" translate="help.block.indicators"></h4>
 				</div>

@@ -173,6 +173,25 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		edit_user: "Édition utilisateur",
+		update_user: "Mettre à jour l'utilisateur",
+		user_type: "Type",
+		user_types: {
+			internal: "Compte MDM",
+			partner: "Compte Partenaire"
+		},
+
+		user_role: "Rôle",
+		user_roles: {
+			owner: "Propriétaire",
+			input: "Saisisseur",
+			read: "Consultation uniquement"
+		},
+		user_fullname: "Nom complet",
+		user: "Utilisateur",
+		username: "Login",
+		password: "Mot de passe",
+
 		link_indicator: "Lier à un indicateur du catalogue",
 		unlink_indicator: 'Retirer le lien avec le catalogue',
 

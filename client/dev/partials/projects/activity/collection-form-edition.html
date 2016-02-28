@@ -1,5 +1,5 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
 	<li><a ui-sref="main.project.collection_form_list" translate="project.collection_form_list"></a></li>
 	<li class="active">{{form.name}}</li>
@@ -56,27 +56,28 @@
 
 	<div class="form-group" ng-if="form.periodicity !== 'free'">
 		<label for="periodicity" class="col-sm-2 control-label" translate="shared.begin"></label>
-		<div class="col-sm-10">
+		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="(form.start || project.begin)|amDateFormat:'YYYY-MM-DD'">
 			<optional-date ng-model="form.start" default="project.begin"></optional-date>
 		</div>
 	</div>
 
 	<div class="form-group" ng-if="form.periodicity !== 'free'">
 		<label for="periodicity" class="col-sm-2 control-label" translate="shared.end"></label>
-		<div class="col-sm-10">
+		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="(form.end || project.end)|amDateFormat:'YYYY-MM-DD'">
 			<optional-date ng-model="form.end" default="project.end"></optional-date>
 		</div>
 	</div>
 
 	<legend translate="project.collection_form_structure"></legend>
 
-	<table class="table table-bordered table-condensed table-aggregated-data">
+	<!-- Editable table -->
+	<table class="table table-bordered table-condensed table-aggregated-data" acl-has-project-role="owner">
 		<thead>
 			<tr>
 				<th translate="project.variable" style="width: 15%"></th>
 				<th translate="project.aggregation" style="width: 15%"></th>
 				<th translate="project.partitions" colspan="{{maxPartitions + 1}}" style="width: 60%"></th>
-				<th colspan="2" translate="project.actions" acl-has-project-role="owner" style="width: 10%"></th>
+				<th colspan="2" translate="project.actions" style="width: 10%"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -84,15 +85,12 @@
 			<tr ng-repeat="element in form.elements track by element.id">
 
 				<!-- variable name -->
-				<td acl-has-project-role="owner"
-					acl-fallback="element.name"
-					mt-content-editable
-					ng-model="element.name"></td>
+				<td mt-content-editable ng-model="element.name"></td>
 				
 				<!-- variable aggregation -->
 				<td>
 					{{'project.different_geos'|translate}}:
-					<select ng-model="element.geoAgg" acl-has-project-role="owner">
+					<select ng-model="element.geoAgg">
 						<option value="none" translate="project.none"></option>
 						<option value="sum" translate="project.sum"></option>
 						<option value="average" translate="project.average"></option>
@@ -100,12 +98,11 @@
 						<option value="lowest" translate="project.lowest"></option>
 						<option value="last" translate="project.last"></option>
 					</select>
-					<span acl-lacks-project-role="owner">{{'project.' + element.geoAgg | translate}}</span>
-
+					
 					<br/>
 
 					{{'project.same_geos'|translate}}:
-					<select ng-model="element.timeAgg" acl-has-project-role="owner">
+					<select ng-model="element.timeAgg">
 						<option value="none" translate="project.none"></option>
 						<option value="sum" translate="project.sum"></option>
 						<option value="average" translate="project.average"></option>
@@ -113,40 +110,29 @@
 						<option value="lowest" translate="project.lowest"></option>
 						<option value="last" translate="project.last"></option>
 					</select>
-					<span acl-lacks-project-role="owner">{{'project.' + element.timeAgg | translate}}</span>
 				</td>
 
 				<!-- variable partitions -->
 				<td ng-repeat="partition in element.partitions">
-					<div class="input-group" ng-repeat="p in partition track by p.id" style="margin-bottom: 2px;" acl-has-project-role="owner">
+					<div class="input-group" ng-repeat="p in partition track by p.id" style="margin-bottom: 2px;">
 						<input class="form-control input-xs" ng-model="p.name" required>
-						<span class="input-group-addon">
-							<i ng-click="remove(p, partition)"
-							   class="fa fa-fw fa-times text-danger"
-							   tooltip="{{'project.remove_partition_element'|translate}}"></i>
+						<span class="input-group-addon" ng-click="remove(p, partition)">
+							<i class="fa fa-fw fa-times text-danger"></i>
 						</span>
 					</div>
 
-					<ul acl-lacks-project-role="owner">
-						<li ng-repeat="p in partition track by p.id">{{p.name}}</li>
-					</ul>
-
-					<div class="input-group" acl-has-project-role="owner" style="margin-bottom: 2px;">
+					<div class="input-group" style="margin-bottom: 2px;">
 						<input class="form-control input-xs" disabled>
-						<span class="input-group-addon">
-							<i ng-click="newPartitionElement(partition)"
-							   class="fa fa-fw fa-plus"
-							   tooltip="{{'project.add_partition_element'|translate}}"></i>
+						<span class="input-group-addon" ng-click="newPartitionElement(partition)">
+							<i class="fa fa-fw fa-plus"></i>
 						</span>
 					</div>
 
-					<div acl-has-project-role="owner">
-						<div class="btn btn-xs btn-danger btn-block"
-						   ng-click="remPartition(partition, element.partitions)"
-						   translate="project.remove_partition"></div>
-					</div>
+					<a class="btn btn-xs btn-danger btn-block"
+					   ng-click="remPartition(partition, element.partitions)"
+					   translate="project.remove_partition"></a>
 				</td>
-				<td acl-has-project-role="owner">
+				<td>
 					<a ng-click="newPartition(element.partitions)"
 					   class="btn btn-xs btn-default btn-block"
 					   translate="project.add_partition"></a>
@@ -159,7 +145,7 @@
 				<!-- /!\  -->
 
 				<!-- variable actions -->
-				<td acl-has-project-role="owner">
+				<td>
 					<a ng-click="upElement($index, $parent.$parent.$index)"
 					   tooltip="{{'project.variable_up'|translate}}"
 					   ng-if="!$first">
@@ -180,11 +166,43 @@
  			</tr>
 
  			<!-- add new variable row --> 
-			<tr acl-has-project-role="owner">
+			<tr>
 				<td colspan="{{maxPartitions + 4}}" style="text-align: center">
-					<a ng-click="newVariable()" class="btn btn-xs btn-default"  style="width: 100%" translate="project.add_variable"></a>
+					<a ng-click="newVariable()" class="btn btn-xs btn-default" style="width: 100%" translate="project.add_variable"></a>
 				</td>
 			</tr>
+		</tbody>
+	</table>
+
+	<!-- Read Only table -->
+	<table class="table table-bordered table-condensed table-aggregated-data" acl-lacks-project-role="owner">
+		<thead>
+			<tr>
+				<th translate="project.variable" style="width: 15%"></th>
+				<th translate="project.aggregation" style="width: 15%"></th>
+				<th translate="project.partitions" colspan="{{maxPartitions}}" style="width: 70%" ng-if="maxPartitions != 0"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="element in form.elements track by element.id">
+				<td>{{element.name}}</td>
+				<td>
+					{{'project.different_geos'|translate}}:
+					<span>{{'project.' + element.geoAgg | translate}}</span>
+					<br/>
+					{{'project.same_geos'|translate}}:
+					<span>{{'project.' + element.timeAgg | translate}}</span>
+				</td>
+
+				<!-- variable partitions -->
+				<td ng-repeat="partition in element.partitions">
+					<ul>
+						<li ng-repeat="p in partition track by p.id">{{p.name}}</li>
+					</ul>
+				</td>
+				<td colspan="{{maxPartitions - element.partitions.length}}"
+					ng-if="maxPartitions - element.partitions.length > 0"></td>
+ 			</tr>
 		</tbody>
 	</table>
 

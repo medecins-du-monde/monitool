@@ -14,7 +14,6 @@
 
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			
-
 			<ul class="nav navbar-nav">
 				<li ng-class="{active: $state.includes('main.home')}">
 					<a ui-sref="main.home">
@@ -22,23 +21,10 @@
 						<span translate="shared.home"></span>
 					</a>
 				</li>
-				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}">
-					<a ui-sref="main.projects">
+				<li ng-class="{active: $state.includes('main.project')}">
+					<a ui-sref="main.project.basics">
 						<i class="fa fa-fw fa-object-group"></i>
-						<span translate="shared.projects"></span>
-					</a>
-				</li>
-				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator')}">
-					<a ui-sref="main.indicators">
-						<i class="fa fa-fw fa-book"></i>
-						<span translate="shared.indicators_catalog"></span>
-					</a>
-				</li>
-
-				<li ng-class="{active: $state.includes('main.admin')}" acl-has-role="_admin">
-					<a ui-sref="main.admin.users">
-						<i class="fa fa-fw fa-cogs"></i>
-						<span translate="shared.settings"></span>
+						<span translate="shared.project"></span>
 					</a>
 				</li>
 
@@ -64,7 +50,7 @@
 					</ul>
 				</li>
 				
-				<li dropdown>
+				<li>
 					<a href="#" dropdown-toggle>
 						<i class="fa fa-fw fa-user"></i>
 						{{userCtx.name}}
@@ -78,7 +64,6 @@
 							</a>
 						</li>
 					</ul>
-
 				</li>
 			</ul>
 		</div>

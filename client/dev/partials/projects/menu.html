@@ -17,14 +17,26 @@
 							<span translate="project.basics"></span>
 						</a>
 
+						<a ui-sref="main.project.collection_site_list"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   eat-click-if="!project._id"
+						   disable-if="!project._id">
+
+							<span class="label label-default pull-right">{{project.entities.length}}</span>
+							<i class="fa fa-map-marker fa-fw"></i>
+							<span translate="project.collection_site_list"></span>
+
+						</a>
+
 						<a ui-sref="main.project.user_list"
 						   ui-sref-active="active"
 						   class="list-group-item"
 						   eat-click-if="!project._id" disable-if="!project._id">
-							<span class="label label-default pull-right">{{project.owners.length}}/{{project.dataEntryOperators.length}}</span>
+
+						   <span class="label label-default pull-right">{{project.users.length}}</span>
 							<i class="fa fa-user fa-fw"></i>
 							<span translate="project.users"></span>
-
 						</a>
 					</div>
 				</div>
@@ -37,17 +49,6 @@
 
 				<div class="panel-collapse">
 					<div class="list-group">
-						<a ui-sref="main.project.collection_site_list"
-						   ui-sref-active="active"
-						   class="list-group-item"
-						   eat-click-if="!project._id"
-						   disable-if="!project._id">
-
-							<span class="label label-default pull-right">{{project.entities.length}}</span>
-							<i class="fa fa-map-marker fa-fw"></i>
-							<span translate="project.collection_site_list"></span>
-
-						</a>
 
 						<a ui-sref="main.project.collection_form_list"
 						   class="list-group-item"
@@ -153,7 +154,7 @@
 				</div>
 			</div>
 
-			<div class="panel panel-default">
+			<div class="panel panel-default" ng-if="userCtx.type == 'user'">
 				<div class="panel-collapse">
 					<div class="list-group">
 						<a class="list-group-item list-group-item-info" ng-click="cloneProject()" eat-click-if="!project._id" disable-if="!project._id" acl-has-role="project">
