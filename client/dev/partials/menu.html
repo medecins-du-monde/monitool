@@ -9,11 +9,9 @@
 			</button>
 
 			<img alt="Brand" src="/img/logo.svg" style="height: 30px; margin: 0">
-
 		</div>
 
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			
 
 			<ul class="nav navbar-nav">
 				<li ng-class="{active: $state.includes('main.home')}">
@@ -22,20 +20,29 @@
 						<span translate="shared.home"></span>
 					</a>
 				</li>
-				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}">
+
+				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}" ng-if="userCtx.type == 'user'">
 					<a ui-sref="main.projects">
 						<i class="fa fa-fw fa-object-group"></i>
 						<span translate="shared.projects"></span>
 					</a>
 				</li>
-				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator')}">
+
+				<li ng-class="{active: $state.includes('main.project')}" ng-if="userCtx.type == 'partner'">
+					<a ui-sref="main.project.basics">
+						<i class="fa fa-fw fa-object-group"></i>
+						<span translate="shared.project"></span>
+					</a>
+				</li>
+
+				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator')}" ng-if="userCtx.type == 'user'">
 					<a ui-sref="main.indicators">
 						<i class="fa fa-fw fa-book"></i>
 						<span translate="shared.indicators_catalog"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.admin')}" acl-has-role="_admin">
+				<li ng-class="{active: $state.includes('main.admin')}" ng-if="userCtx.type == 'user'" acl-has-role="_admin">
 					<a ui-sref="main.admin.users">
 						<i class="fa fa-fw fa-cogs"></i>
 						<span translate="shared.settings"></span>

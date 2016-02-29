@@ -160,7 +160,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main', {
 		abstract: true,
 		controller: 'MainMenuController',
-		templateUrl: window.user.type == 'user' ? 'partials/menu.html' : 'partials/menu-single-project.html'
+		templateUrl: 'partials/menu.html'
 	});
 
 	///////////////////////////
