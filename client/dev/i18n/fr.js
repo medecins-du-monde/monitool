@@ -386,6 +386,7 @@ var FRENCH_TRANSLATION = {
 		},
 		collect: "Collecter",
 		collects: {
+			some_entity: "Pour certains lieux de collecte",
 			entity: "Pour chaque lieu de collecte",
 			project: "Une fois pour tout le projet"
 		},

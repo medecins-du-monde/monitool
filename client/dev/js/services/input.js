@@ -114,7 +114,23 @@ angular
 				project.forms.forEach(function(form) {
 					prj[form.id] = prj[form.id] || {};
 
-					if (form.collect === 'entity')
+					if (form.collect === 'some_entity') {
+						form.entities.forEach(function(entityId) {
+							var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
+
+							_getPeriods(inputEntity, form, project).forEach(function(period) {
+								var strPeriod = period.format('YYYY-MM-DD');
+
+								prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
+
+								if (prj[form.id][strPeriod][inputEntity.id] == 'outofschedule')
+									prj[form.id][strPeriod][inputEntity.id] = 'done';
+								else
+									prj[form.id][strPeriod][inputEntity.id] = 'expected';
+							});
+						});
+					}
+					else if (form.collect === 'entity')
 						project.entities.forEach(function(inputEntity) {
 							_getPeriods(inputEntity, form, project).forEach(function(period) {
 								var strPeriod = period.format('YYYY-MM-DD');
@@ -134,10 +150,10 @@ angular
 
 							prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
 
-							if (prj[form.id][strPeriod]['none'] == 'outofschedule')
-								prj[form.id][strPeriod]['none'] = 'done';
+							if (prj[form.id][strPeriod].none == 'outofschedule')
+								prj[form.id][strPeriod].none = 'done';
 							else
-								prj[form.id][strPeriod]['none'] = 'expected';
+								prj[form.id][strPeriod].none = 'expected';
 						});
 					
 					else
@@ -191,7 +207,15 @@ angular
 				project.forms.forEach(function(form) {
 					formsById[form.id] = form;
 
-					if (form.collect === 'entity')
+					if (form.collect === 'some_entity')
+						form.entities.forEach(function(entityId) {
+							var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
+							_getPeriods(inputEntity, form, project).forEach(function(period) {
+								validInputIds[project._id + ':' + inputEntity.id + ':' + form.id + ':' + period.format('YYYY-MM-DD')] = true;
+							});
+						});
+
+					else if (form.collect === 'entity')
 						project.entities.forEach(function(inputEntity) {
 							_getPeriods(inputEntity, form, project).forEach(function(period) {
 								validInputIds[project._id + ':' + inputEntity.id + ':' + form.id + ':' + period.format('YYYY-MM-DD')] = true;
@@ -236,42 +260,42 @@ angular
 			});
 		};
 
-		Input.aggregate = function(inputs, form, groupBy, projectGroups) {
-			var groupedInputs = {};
+		// Input.aggregate = function(inputs, form, groupBy, projectGroups) {
+		// 	var groupedInputs = {};
 
-			// Transform input list to {"2010-Q1": { "someEntityId": [Input('2010-02'), Input('2010-01'), ...], ... }}
-			inputs.forEach(function(input) {
-				input.getAggregationKeys(groupBy, projectGroups).forEach(function(key) {
-					!groupedInputs[key] && (groupedInputs[key] = {});
-					!groupedInputs[key][input.entity] && (groupedInputs[key][input.entity] = []);
-					groupedInputs[key][input.entity].push(input);
-				});
-			});
+		// 	// Transform input list to {"2010-Q1": { "someEntityId": [Input('2010-02'), Input('2010-01'), ...], ... }}
+		// 	inputs.forEach(function(input) {
+		// 		input.getAggregationKeys(groupBy, projectGroups).forEach(function(key) {
+		// 			!groupedInputs[key] && (groupedInputs[key] = {});
+		// 			!groupedInputs[key][input.entity] && (groupedInputs[key][input.entity] = []);
+		// 			groupedInputs[key][input.entity].push(input);
+		// 		});
+		// 	});
 
-			// Transform to {"2010-Q1": [[Input('2010-01'), Input('2010-02'), ...], ...]}
-			for (var groupKey in groupedInputs) {
-				for (var entityId in groupedInputs[groupKey]) {
-					// sort by date so that "last" aggregation mode works
-					groupedInputs[groupKey][entityId].sort(function(a, b) { return a < b ? -1 : 1; });
-				}
+		// 	// Transform to {"2010-Q1": [[Input('2010-01'), Input('2010-02'), ...], ...]}
+		// 	for (var groupKey in groupedInputs) {
+		// 		for (var entityId in groupedInputs[groupKey]) {
+		// 			// sort by date so that "last" aggregation mode works
+		// 			groupedInputs[groupKey][entityId].sort(function(a, b) { return a < b ? -1 : 1; });
+		// 		}
 
-				// transform into array
-				groupedInputs[groupKey] = Object.keys(groupedInputs[groupKey]).map(function(k) { return groupedInputs[groupKey][k]; });
-			}
+		// 		// transform into array
+		// 		groupedInputs[groupKey] = Object.keys(groupedInputs[groupKey]).map(function(k) { return groupedInputs[groupKey][k]; });
+		// 	}
 
-			// Now we need to aggregate by levels. We will obtain {"2010-Q1": Input()}
-			for (var key in groupedInputs) {
-				// aggregate by time first.
-				groupedInputs[key].forEach(function(sameEntityInputs, index) {
-					groupedInputs[key][index] = _groupInputs('timeAgg', sameEntityInputs, form);
-				});
+		// 	// Now we need to aggregate by levels. We will obtain {"2010-Q1": Input()}
+		// 	for (var key in groupedInputs) {
+		// 		// aggregate by time first.
+		// 		groupedInputs[key].forEach(function(sameEntityInputs, index) {
+		// 			groupedInputs[key][index] = _groupInputs('timeAgg', sameEntityInputs, form);
+		// 		});
 
-				// and then by location
-				groupedInputs[key] = _groupInputs('geoAgg', groupedInputs[key], form);
-			}
+		// 		// and then by location
+		// 		groupedInputs[key] = _groupInputs('geoAgg', groupedInputs[key], form);
+		// 	}
 
-			return groupedInputs;
-		};
+		// 	return groupedInputs;
+		// };
 
 
 		/**
@@ -357,42 +381,42 @@ angular
 		/**
 		 * Compute all aggregations keys this input should be included in
 		 */
-		Input.prototype.getAggregationKeys = function(aggregationType, projectGroups) {
-			// annotate each input with keys that will later tell the sumBy function how to aggregate the data.
-			var period = moment(this.period);
+	// 	Input.prototype.getAggregationKeys = function(aggregationType, projectGroups) {
+	// 		// annotate each input with keys that will later tell the sumBy function how to aggregate the data.
+	// 		var period = moment(this.period);
 
-			switch (aggregationType) {
-				case 'year':
-					return ['total', period.format('YYYY')];
+	// 		switch (aggregationType) {
+	// 			case 'year':
+	// 				return ['total', period.format('YYYY')];
 
-				case 'quarter':
-					return ['total', period.format('YYYY-[Q]Q')];
+	// 			case 'quarter':
+	// 				return ['total', period.format('YYYY-[Q]Q')];
 
-				case 'month':
-					return ['total', period.format('YYYY-MM')];
+	// 			case 'month':
+	// 				return ['total', period.format('YYYY-MM')];
 
-				case 'week':
-					return ['total', period.format('YYYY-[W]WW')];
+	// 			case 'week':
+	// 				return ['total', period.format('YYYY-[W]WW')];
 
-				case 'day':
-					return ['total', period.format('YYYY-MM-DD')];
+	// 			case 'day':
+	// 				return ['total', period.format('YYYY-MM-DD')];
 
-				case 'entity':
-					return this.entity !== 'none' ? ['total', this.entity] : ['total'];
+	// 			case 'entity':
+	// 				return this.entity !== 'none' ? ['total', this.entity] : ['total'];
 
-				case 'group':
-					// FIXME this test appears to be always false
-					if (this.entity !== 'none' && projectGroups)
-						return projectGroups.filter(function(group) {
-							return group.members.indexOf(this.entity) !== -1;
-						}, this).pluck('id')
-					else
-						return [];
+	// 			case 'group':
+	// 				// FIXME this test appears to be always false
+	// 				if (this.entity !== 'none' && projectGroups)
+	// 					return projectGroups.filter(function(group) {
+	// 						return group.members.indexOf(this.entity) !== -1;
+	// 					}, this).pluck('id')
+	// 				else
+	// 					return [];
 
-				case 'project':
-					return ['total', this.project];
-			}
-		};
+	// 			case 'project':
+	// 				return ['total', this.project];
+	// 		}
+	// 	};
 
 		return Input;
 	});

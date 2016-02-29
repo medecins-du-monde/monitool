@@ -39,6 +39,14 @@ angular.module('monitool.controllers.project.spec', [])
 							}
 						}
 					});
+
+					$scope.project.forms.forEach(function(form) {
+						if (form.collect == 'some_entity') {
+							var index = form.entities.indexOf(entityId);
+							if (index !== -1)
+								form.entities.splice(index, 1);
+						}
+					});
 				}
 			});
 		};
