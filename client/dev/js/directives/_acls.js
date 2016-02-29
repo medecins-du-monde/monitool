@@ -50,7 +50,7 @@ function _isAllowedProject(userCtx, scope, element, attributes) {
 			if (internalUser) {
 				if (role == 'owner' && internalUser.role == 'owner')
 					isAllowed = true;
-				else if (role == 'input' && (internalUser.role == 'owner' || internalUser.role == 'input'))
+				else if (role == 'input' && (internalUser.role == 'owner' || internalUser.role == 'input' || internalUser.role == 'input_all'))
 					isAllowed = true;
 			}
 		}
@@ -61,7 +61,7 @@ function _isAllowedProject(userCtx, scope, element, attributes) {
 		if (userCtx.projectId == project._id) {
 			if (role == 'owner' && userCtx.role == 'owner')
 				isAllowed = true;
-			else if (role == 'input' && (userCtx.role == 'owner' || userCtx.role == 'input'))
+			else if (role == 'input' && (userCtx.role == 'owner' || userCtx.role == 'input' || internalUser.role == 'input_all'))
 				isAllowed = true;
 		}
 	}

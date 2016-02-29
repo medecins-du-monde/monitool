@@ -6,6 +6,21 @@ function isEmpty(value) {
 
 angular.module('monitool.directives.form', [])
 
+	.directive('uiRequired', function() {
+		return {
+			require: 'ngModel',
+			link: function(scope, elm, attrs, ctrl) {
+				ctrl.$validators.required = function(modelValue, viewValue) {
+					return !((viewValue && viewValue.length === 0 || false) && attrs.uiRequired === 'true');
+				};
+
+				attrs.$observe('uiRequired', function() {
+					ctrl.$setValidity('required', !(attrs.uiRequired === 'true' && ctrl.$viewValue && ctrl.$viewValue.length === 0));
+				});
+			}
+		};
+	})
+
 	.directive('ngMin', function() {
 		return {
 			restrict: 'A',

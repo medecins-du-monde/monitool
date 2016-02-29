@@ -60,6 +60,7 @@
 			<div class="col-sm-9">
 				<select id="role-input" class="form-control" ng-model="user.role" required>
 					<option value="owner" translate="project.user_roles.owner"></option>
+					<option value="input_all" translate="project.user_roles.input_all"></option>
 					<option value="input" translate="project.user_roles.input"></option>
 					<option value="read" translate="project.user_roles.read"></option>
 				</select>
@@ -69,7 +70,7 @@
 		<div class="form-group" ng-if="user.role == 'input'">
 			<label for="entities-input" class="col-sm-3 control-label" translate="project.collection_site_list"></label>
 			<div class="col-sm-9">
-				<ui-select multiple ng-model="user.entities" theme="bootstrap">
+				<ui-select multiple ng-model="user.entities" theme="bootstrap" name="entities" ui-required="true">
 					<ui-select-match placeholder="">{{$item.name|translate}}</ui-select-match>
 					<ui-select-choices repeat="entity.id as entity in availableEntities">
 						{{entity.name|translate}}

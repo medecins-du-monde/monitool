@@ -131,10 +131,10 @@ angular
 				$scope.canEdit[entity.id] = false;
 			else {
 				var role = projectUser.role;
-				if (role == 'owner')
+				if (role == 'owner' || role == 'input_all')
 					$scope.canEdit[entity.id] = true;
 				else if (role == 'input')
-					$scope.canEdit[entity.id] = projectUser.entities.length == 0 || projectUser.entities.indexOf(entity.id) != -1;
+					$scope.canEdit[entity.id] = projectUser.entities.indexOf(entity.id) != -1;
 				else if (role == 'read')
 					$scope.canEdit[entity.id] = false;
 				else
@@ -226,10 +226,10 @@ angular
 			$scope.canEdit = false;
 		else {
 			var role = projectUser.role;
-			if (role == 'owner')
+			if (role == 'owner' || role == 'input_all')
 				$scope.canEdit = true;
 			else if (role == 'input')
-				$scope.canEdit = projectUser.entities.length == 0 || projectUser.entities.indexOf($scope.currentInput.entity) != -1;
+				$scope.canEdit = projectUser.entities.indexOf($scope.currentInput.entity) != -1;
 			else if (role == 'read')
 				$scope.canEdit = false;
 			else
