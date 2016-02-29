@@ -35,21 +35,45 @@ angular
 			var newElCube = elCubes[0].clone();
 			delete newElCube.dimensionValues[this.id]; // this one we can drop
 
+			var numCubes = elCubes.length, i = 0, result;
+
 			switch (this.aggregation) {
 				case "sum":
-					newElCube.value = elCubes.reduce(function(memo, cube) { return memo + cube.value; }, 0);
+					result = 0;
+					while (i != numCubes) {
+						result += elCubes[i].value;
+						++i;
+					}
+					newElCube.value = result;
 					break;
 
 				case "average":
-					newElCube.value = elCubes.reduce(function(memo, cube) { return memo + cube.value; }, 0) / elCubes.length;
+					result = 0;
+					while (i != numCubes) {
+						result += elCubes[i].value;
+						++i;
+					}
+					newElCube.value = result / numCubes;
 					break;
 
 				case "highest":
-					newElCube.value = elCubes.reduce(function(memo, cube) { return memo > cube.value ? memo : cube.value; }, Math.MIN_VALUE);
+					result = Math.MIN_VALUE;
+					while (i != numCubes) {
+						if (elCubes[i].value > result)
+							result = elCubes[i].value;
+						++i;
+					}
+					newElCube.value = result;
 					break;
 
 				case "lowest":
-					newElCube.value = elCubes.reduce(function(memo, cube) { return memo > cube.value ? cube.value : memo; }, Math.MAX_VALUE);
+					result = Math.MAX_VALUE;
+					while (i != numCubes) {
+						if (elCubes[i].value < result)
+							result = elCubes[i].value;
+						++i;
+					}
+					newElCube.value = result;
 					break;
 
 				case "last":
@@ -75,7 +99,7 @@ angular
 
 		ElementaryCube.prototype.matchFilter = function(filterValues) {
 			for (var dimensionId in filterValues)
-				if (filterValues[dimensionId].indexOf(this.dimensionValues[dimensionId]) === -1)
+				if (!filterValues[dimensionId][this.dimensionValues[dimensionId]])
 					return false;
 
 			return true;
@@ -201,14 +225,20 @@ angular
 
 		Cube.prototype._sortCubes = function() {
 			var numDimensions = this.dimensions.length;
+			var dimensionIndexes = this.dimensions.map(function(dimension) {
+				var r = {};
+				dimension.items.forEach(function(item, index) { r[item.id] = index; });
+				return r;
+			});
 
 			// Sort them by their dimension values.
 			this.elementaryCubes.sort(function(elCube1, elCube2) {
 				// take the first dimension that allow to separate those apart.
 				for (var i = 0; i < numDimensions; ++i) {
 					var dimension = this.dimensions[i],
-						index1 = dimension.items.findIndex(function(dimItem) { return dimItem.id == elCube1.dimensionValues[dimension.id]; }),
-						index2 = dimension.items.findIndex(function(dimItem) { return dimItem.id == elCube2.dimensionValues[dimension.id]; });
+						dimensionIndex = dimensionIndexes[i],
+						index1 = dimensionIndex[elCube1.dimensionValues[dimension.id]], //dimension.items.findIndex(function(dimItem) { return dimItem.id == elCube1.dimensionValues[dimension.id]; }),
+						index2 = dimensionIndex[elCube2.dimensionValues[dimension.id]]; //dimension.items.findIndex(function(dimItem) { return dimItem.id == elCube2.dimensionValues[dimension.id]; });
 
 					if (index1 != index2)
 						return index1 - index2;
@@ -252,6 +282,23 @@ angular
 		 * filter = {year: ['2014'], partition1: ["2d31a636-1739-4b77-98a5-bf9b7a080626"]}
 		 */
 		Cube.prototype.query = function(dimensionIds, filterValues) {
+			var fastFilterValues = {};
+			for (var dimensionName in filterValues) {
+				fastFilterValues[dimensionName] = {};
+				filterValues[dimensionName].forEach(function(dimValue) {
+					fastFilterValues[dimensionName][dimValue] = true;
+				});
+			}
+
+			return this._query_fast(dimensionIds, fastFilterValues);
+		};
+
+
+		/**
+		 * dimensions = ['month', 'partition2']
+		 * filter = {year: {'2014': true}, partition1: {"2d31a636-1739-4b77-98a5-bf9b7a080626": true}}
+		 */
+		Cube.prototype._query_fast = function(dimensionIds, filterValues) {
 			dimensionIds = dimensionIds || [];
 			filterValues = filterValues || {};
 
@@ -266,15 +313,16 @@ angular
 
 				dimension.items.forEach(function(dimensionItem) {
 					// Skip this dimension item if it is explicitely filtered.
-					if (filterValues[dimensionId] && filterValues[dimensionId].indexOf(dimensionItem.id) === -1)
+					if (filterValues[dimensionId] && !filterValues[dimensionId][dimensionItem.id])
 						return;
 
 					// Restrict filterValues filter.
 					var oldFilter = filterValues[dimensionId];
-					filterValues[dimensionId] = [dimensionItem.id];
+					filterValues[dimensionId] = {};
+					filterValues[dimensionId][dimensionItem.id] = true;
 
 					// Compute branch of the result tree.
-					result[dimensionItem.id] = this.query(otherDimensionIds, filterValues);
+					result[dimensionItem.id] = this._query_fast(otherDimensionIds, filterValues);
 					if (result[dimensionItem.id] === undefined)
 						delete result[dimensionItem.id];
 
