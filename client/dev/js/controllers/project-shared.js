@@ -23,8 +23,11 @@ angular.module('monitool.controllers.project.shared', [])
 
 	.controller('ProjectMenuController', function($scope, $state, $stateParams, $filter, project) {
 		if ($stateParams.projectId === 'new') {
-			project.owners.push($scope.userCtx._id);
-			project.dataEntryOperators.push($scope.userCtx._id);
+			project.users.push({
+				type: "internal",
+				id: $scope.userCtx._id,
+				role: "owner"
+			});
 		}
 
 		$scope.project = project;
@@ -45,8 +48,7 @@ angular.module('monitool.controllers.project.shared', [])
 			newProject._id = makeUUID();
 			newProject.name = newName;
 			delete newProject._rev;
-			newProject.owners = [$scope.userCtx._id];
-			newProject.dataEntryOperators = [$scope.userCtx._id];
+			newProject.users = [{type: "internal", id: $scope.userCtx._id, role: "owner"}];
 
 			newProject.entities.forEach(function(entity) {
 				old2new[entity.id] = makeUUID();

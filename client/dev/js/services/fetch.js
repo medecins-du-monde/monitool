@@ -26,8 +26,7 @@ angular
 					entities: [],
 					groups: [],
 					forms: [],
-					owners: [],
-					dataEntryOperators: []
+					users: []
 				});
 			else
 				return Project.get({id: id}).$promise;
