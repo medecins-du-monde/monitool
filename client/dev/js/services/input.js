@@ -31,7 +31,7 @@ angular
 					else if (entity.start && !form.start)
 						current = moment(entity.start).startOf(period);
 					else
-						current = moment.max(entity.start, form.start).startOf(period);
+						current = moment.max(moment(entity.start), moment(form.start)).startOf(period);
 
 					if (!entity.end && !form.end)
 						end = moment(project.end).startOf(period);
@@ -40,7 +40,7 @@ angular
 					else if (entity.end && !form.end)
 						end = moment(entity.end).startOf(period);
 					else
-						end = moment.min(entity.end, form.end).startOf(period);
+						end = moment.min(moment(entity.end), moment(form.end)).startOf(period);
 				}
 				else {
 					current = moment(form.start || project.begin).startOf(period),
@@ -260,44 +260,6 @@ angular
 			});
 		};
 
-		// Input.aggregate = function(inputs, form, groupBy, projectGroups) {
-		// 	var groupedInputs = {};
-
-		// 	// Transform input list to {"2010-Q1": { "someEntityId": [Input('2010-02'), Input('2010-01'), ...], ... }}
-		// 	inputs.forEach(function(input) {
-		// 		input.getAggregationKeys(groupBy, projectGroups).forEach(function(key) {
-		// 			!groupedInputs[key] && (groupedInputs[key] = {});
-		// 			!groupedInputs[key][input.entity] && (groupedInputs[key][input.entity] = []);
-		// 			groupedInputs[key][input.entity].push(input);
-		// 		});
-		// 	});
-
-		// 	// Transform to {"2010-Q1": [[Input('2010-01'), Input('2010-02'), ...], ...]}
-		// 	for (var groupKey in groupedInputs) {
-		// 		for (var entityId in groupedInputs[groupKey]) {
-		// 			// sort by date so that "last" aggregation mode works
-		// 			groupedInputs[groupKey][entityId].sort(function(a, b) { return a < b ? -1 : 1; });
-		// 		}
-
-		// 		// transform into array
-		// 		groupedInputs[groupKey] = Object.keys(groupedInputs[groupKey]).map(function(k) { return groupedInputs[groupKey][k]; });
-		// 	}
-
-		// 	// Now we need to aggregate by levels. We will obtain {"2010-Q1": Input()}
-		// 	for (var key in groupedInputs) {
-		// 		// aggregate by time first.
-		// 		groupedInputs[key].forEach(function(sameEntityInputs, index) {
-		// 			groupedInputs[key][index] = _groupInputs('timeAgg', sameEntityInputs, form);
-		// 		});
-
-		// 		// and then by location
-		// 		groupedInputs[key] = _groupInputs('geoAgg', groupedInputs[key], form);
-		// 	}
-
-		// 	return groupedInputs;
-		// };
-
-
 		/**
 		 * Change values to match a given form
 		 */
@@ -376,47 +338,6 @@ angular
 
 			return result;
 		};
-
-
-		/**
-		 * Compute all aggregations keys this input should be included in
-		 */
-	// 	Input.prototype.getAggregationKeys = function(aggregationType, projectGroups) {
-	// 		// annotate each input with keys that will later tell the sumBy function how to aggregate the data.
-	// 		var period = moment(this.period);
-
-	// 		switch (aggregationType) {
-	// 			case 'year':
-	// 				return ['total', period.format('YYYY')];
-
-	// 			case 'quarter':
-	// 				return ['total', period.format('YYYY-[Q]Q')];
-
-	// 			case 'month':
-	// 				return ['total', period.format('YYYY-MM')];
-
-	// 			case 'week':
-	// 				return ['total', period.format('YYYY-[W]WW')];
-
-	// 			case 'day':
-	// 				return ['total', period.format('YYYY-MM-DD')];
-
-	// 			case 'entity':
-	// 				return this.entity !== 'none' ? ['total', this.entity] : ['total'];
-
-	// 			case 'group':
-	// 				// FIXME this test appears to be always false
-	// 				if (this.entity !== 'none' && projectGroups)
-	// 					return projectGroups.filter(function(group) {
-	// 						return group.members.indexOf(this.entity) !== -1;
-	// 					}, this).pluck('id')
-	// 				else
-	// 					return [];
-
-	// 			case 'project':
-	// 				return ['total', this.project];
-	// 		}
-	// 	};
 
 		return Input;
 	});
