@@ -335,10 +335,10 @@ angular.module('monitool.directives.form', [])
 						offset = $scope.$eval(attributes.offset) + 1;
 
 					if (partitions.length == 0)
-						hotTable.updateSettings({ maxCols: 1, maxRows: 1, cells: function(row, col, prop) { return dataOptions; }});
+						hotTable.updateSettings({ maxCols: 1, maxRows: 1, cells: function(row, col, prop) { return ($scope.canEdit ? dataOptions : dataReadOnlyOptions); }});
 					
 					else if (partitions.length == 1)
-						hotTable.updateSettings({ maxCols: 2, maxRows: partitions[0].length, cells: function(row, col, prop) { return col == 1 ? dataOptions : headerOptions; }});
+						hotTable.updateSettings({ maxCols: 2, maxRows: partitions[0].length, cells: function(row, col, prop) { return col == 1 ? ($scope.canEdit ? dataOptions : dataReadOnlyOptions) : headerOptions; }});
 					
 					else {
 						// Split partitions in cols and rows.
@@ -352,7 +352,7 @@ angular.module('monitool.directives.form', [])
 							maxCols: totalCols + leftPartitions.length,
 							maxRows: totalRows + topPartitions.length,
 							cells: function(row, col, prop) {
-								return row < topPartitions.length || col < leftPartitions.length ? headerOptions : dataOptions;
+								return row < topPartitions.length || col < leftPartitions.length ? headerOptions : ($scope.canEdit ? dataOptions : dataReadOnlyOptions);
 							}
 						});
 					}
