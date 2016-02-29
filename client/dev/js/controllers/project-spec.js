@@ -22,10 +22,22 @@ angular.module('monitool.controllers.project.spec', [])
 				// If there are none, just confirm that the user wants to do this for real.
 				if (really) {
 					$scope.project.entities = $scope.project.entities.filter(function(e) { return e.id !== entityId; });
+					
 					$scope.project.groups.forEach(function(group) {
 						var index = group.members.indexOf(entityId);
 						if (index !== -1)
 							group.members.splice(index, 1);
+					});
+
+					$scope.project.users.forEach(function(user) {
+						if (user.role == 'input' && user.entities) {
+							var index = user.entities.indexOf(entityId);
+							if (index !== -1) {
+								user.entities.splice(index, 1);
+								if (user.entities.length == 0)
+									user.role = 'read';
+							}
+						}
 					});
 				}
 			});
