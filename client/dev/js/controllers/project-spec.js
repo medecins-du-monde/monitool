@@ -112,6 +112,7 @@ angular.module('monitool.controllers.project.spec', [])
 			return true;
 		});
 
+		$scope.isNew = !user;
 		$scope.user = user ? angular.copy(user) : {
 			type: "internal",
 			id: null,
