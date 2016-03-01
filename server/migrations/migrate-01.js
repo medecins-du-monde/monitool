@@ -64,8 +64,8 @@ old.list({include_docs: true}, function(error, result) {
 			if (form.useProjectEnd)
 				form.end = null;
 
-			if (form.collect == 'planned')
-				form.collect = 'free';
+			if (form.periodicity == 'planned')
+				form.periodicity = 'free';
 			
 			delete form.active;
 			delete form.intermediaryDates;
@@ -87,10 +87,10 @@ old.list({include_docs: true}, function(error, result) {
 			var newIndicator = {
 				display: indicator.name.fr,
 				indicatorId: indicatorId,
-				colorize: planning.colorize,
-				baseline: planning.baseline,
-				target: planning.target,
-				unit: indicator.unit,
+				colorize: planning.colorize || false,
+				baseline: planning.baseline || null,
+				target: planning.target || null,
+				unit: indicator.unit == '' ? 'none' : indicator.unit,
 				targetType: indicator.target,
 				formula: null,
 				parameters: {}
@@ -100,17 +100,22 @@ old.list({include_docs: true}, function(error, result) {
 			if (planning.formula) {
 				var formula = indicator.formulas[planning.formula];
 				newIndicator.formula = formula.expression;
-				for (var key in planning.parameters)
-					newIndicator.parameters[key] = {variable: planning.parameters[key].variable, filter: {}};
+				for (var key in planning.parameters) {
+					newIndicator.parameters[key] = {elementId: planning.parameters[key].variable, filter: {}};
+					if (!planning.parameters[key].variable) {
+						console.log('invalid complex indicator...');
+						return null;
+					}
+				}
 			}
 			else if (planning.variable) {
 				newIndicator.formula = 'default';
 				newIndicator.parameters = {
-					'default': {variable: planning.variable, filter: {}}
+					'default': {elementId: planning.variable, filter: {}}
 				};
 			}
 			else {
-				console.log('invalid indicator...');
+				console.log('invalid simple indicator...');
 				newIndicator = null;
 			}
 
