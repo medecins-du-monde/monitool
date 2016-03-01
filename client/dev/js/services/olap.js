@@ -80,8 +80,11 @@ angular
 					newElCube.value = elCubes[elCubes.length - 1].value;
 					break;
 
+				case 'none':
+					newElCube.value = numCubes == 1 ? elCubes[0].value : NaN;
+					break;
 				default:
-					throw new Error('Invalid mode')
+					throw new Error('Invalid mode: ' + this.aggregation);
 			}
 
 			return newElCube;
