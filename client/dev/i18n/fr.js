@@ -173,6 +173,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		please_enter_new_name: "Entrez un nom pour le nouveau projet",
 		edit_user: "Édition utilisateur",
 		update_user: "Mettre à jour l'utilisateur",
 		user_type: "Type",

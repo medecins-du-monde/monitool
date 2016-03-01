@@ -76,6 +76,10 @@ angular.module('monitool.controllers.project.shared', [])
 						});
 					});
 				});
+
+				if (form.collect == 'some_entity') {
+					form.entities = form.entities.map(function(oldId) { return old2new[oldId]; });
+				}
 			});
 
 			var updateIndicator = function(indicator) {
