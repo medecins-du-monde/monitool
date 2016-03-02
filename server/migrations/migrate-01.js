@@ -159,7 +159,8 @@ old.list({include_docs: true}, function(error, result) {
 			project.logicalFrames.push({
 				name: "Extra indicators",
 				goal: "Extra indicators",
-				indicators: Object.keys(project.indicators).map(fixIndicator)
+				indicators: Object.keys(project.indicators).map(fixIndicator),
+				purposes: []
 			});
 
 		delete project.indicators;
