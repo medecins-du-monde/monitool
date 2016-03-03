@@ -173,6 +173,23 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		dimensions: {
+			day: "Jours",
+			week: "Semaines",
+			month: "Mois",
+			quarter: "Trimestres",
+			year: "Années",
+			partition0: "Partition 0",
+			partition1: "Partition 1",
+			partition2: "Partition 2",
+			partition3: "Partition 3",
+			partition4: "Partition 4",
+			partition5: "Partition 5",
+			partition6: "Partition 6",
+			entity: "Lieux de collecte",
+			group: "Groupe de collecte"
+		},
+
 		please_enter_new_name: "Entrez un nom pour le nouveau projet",
 		edit_user: "Édition utilisateur",
 		update_user: "Mettre à jour l'utilisateur",

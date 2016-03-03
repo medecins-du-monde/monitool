@@ -390,12 +390,13 @@ angular
 
 		// default variable
 		$scope.sources = [{id: null, name: "---", group: null}];
+		var elements = {};
 		$scope.project.forms.forEach(function(form) {
 			form.elements.forEach(function(element) {
+				elements[element.id] = element;
 				$scope.sources.push({id: element.id, name: element.name, group: form.name, element: element});
 			});
 		});
-
 
 		$scope.planning = {variable: null };
 		$scope.project.forms.forEach(function(form) {
@@ -415,8 +416,22 @@ angular
 
 		// When variable change, reset the whole query object.
 		$scope.$watch('planning.variable', function(variableId) {
-			var cube = cubes[variableId];
-			$scope.dimensions = cube.dimensions.concat(cube.dimensionGroups);
+			var cube = cubes[variableId], element = elements[variableId];
+
+			$scope.dimensions = cube.dimensions.concat(cube.dimensionGroups).map(function(dimension) {
+				if (dimension.id == 'day' || dimension.id == 'week' || dimension.id == 'month' || dimension.id == 'quarter' || dimension.id == 'year')
+					return {id: dimension.id, group: "time", items: dimension.items.map(function(item) { return {id: item, name: item}; })};
+				else if (dimension.id == 'entity')
+					return { id: 'entity', group: "location", items: $scope.project.entities };
+				else if (dimension.id == 'group')
+					return { id: 'group', group: "location", items: $scope.project.groups };
+				else
+					return { id: dimension.id, group: "partition", items: element.partitions[parseInt(dimension.id.substring('partition'.length))] };
+			}).sort(function(a, b) { 
+				var order = ['day', 'week', 'month', 'quarter', 'year', 'entity', 'group', 'partition0', 'partition1', 'partition2', 'partition3', 'partition4', 'partition5', 'partition6'];
+				return order.indexOf(a.id) - order.indexOf(b.id);
+			});
+
 			$scope.planning.cols = [];
 			$scope.planning.rows = [];
 			$scope.planning.filters = {};

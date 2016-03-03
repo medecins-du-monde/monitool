@@ -356,7 +356,7 @@ angular.module('monitool.directives.reporting', [])
 										var result = $scope.data;
 										var numEls = els.length;
 										for (var i =0 ; i < numEls; ++i)
-											result = result[els[i]];
+											result = result[els[i].id];
 										return result;
 									}
 									catch (e) {
