@@ -385,7 +385,7 @@ angular
 		}, true);
 	})
 
-	.controller('ProjectActivityOlapController', function($scope, Olap, inputs) {
+	.controller('ProjectActivityOlapController', function($scope, $filter, Olap, inputs) {
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
 		// default variable
@@ -420,13 +420,13 @@ angular
 
 			$scope.dimensions = cube.dimensions.concat(cube.dimensionGroups).map(function(dimension) {
 				if (dimension.id == 'day' || dimension.id == 'week' || dimension.id == 'month' || dimension.id == 'quarter' || dimension.id == 'year')
-					return {id: dimension.id, group: "time", items: dimension.items.map(function(item) { return {id: item, name: item}; })};
+					return {id: dimension.id, group: $filter('translate')('project.group.time'), items: dimension.items.map(function(item) { return {id: item, name: item}; })};
 				else if (dimension.id == 'entity')
-					return { id: 'entity', group: "location", items: $scope.project.entities };
+					return {id: 'entity', group: $filter('translate')('project.group.location'), items: $scope.project.entities};
 				else if (dimension.id == 'group')
-					return { id: 'group', group: "location", items: $scope.project.groups };
+					return {id: 'group', group: $filter('translate')('project.group.location'), items: $scope.project.groups};
 				else
-					return { id: dimension.id, group: "partition", items: element.partitions[parseInt(dimension.id.substring('partition'.length))] };
+					return {id: dimension.id, group: $filter('translate')('project.group.partition'), items: element.partitions[parseInt(dimension.id.substring('partition'.length))]};
 			}).sort(function(a, b) { 
 				var order = ['day', 'week', 'month', 'quarter', 'year', 'entity', 'group', 'partition0', 'partition1', 'partition2', 'partition3', 'partition4', 'partition5', 'partition6'];
 				return order.indexOf(a.id) - order.indexOf(b.id);
@@ -461,7 +461,7 @@ angular
 		}, true)
 
 		// When a row,col,filter change, update the table.
-		$scope.$watch('[planning.rows,planning.cols,planning.filters]', function() {
+		$scope.$watch('[planning.rows, planning.cols, planning.filters]', function() {
 			// update available rows and cols
 			var timeFields = ['year', 'quarter', 'month', 'week', 'day'],
 				timeUsedOnCols = timeFields.find(function(tf) { return $scope.planning.cols.indexOf(tf) !== -1; }),
@@ -485,7 +485,7 @@ angular
 			var makeRowCol = function(selectedDimId) {
 				var dimension = $scope.dimensions.find(function(dim) { return dim.id == selectedDimId; });
 				return {items: dimension.items.filter(function(dimItem) {
-					return !filters[dimension.id] || filters[dimension.id].indexOf(dimItem) !== -1;
+					return !filters[dimension.id] || filters[dimension.id].indexOf(dimItem.id) !== -1;
 				})};
 			};
 
@@ -508,5 +508,4 @@ angular
 				$scope.display.cols = [];
 			}
 		}, true);
-
 	});

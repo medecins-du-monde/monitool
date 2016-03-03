@@ -189,6 +189,11 @@ var FRENCH_TRANSLATION = {
 			entity: "Lieux de collecte",
 			group: "Groupe de collecte"
 		},
+		group: {
+			location: "Lieux",
+			partition: "Partitions",
+			time: "Dates"
+		},
 
 		please_enter_new_name: "Entrez un nom pour le nouveau projet",
 		edit_user: "Édition utilisateur",
