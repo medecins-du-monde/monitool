@@ -24,364 +24,384 @@ angular
 		 * items = ["2010-01", "2010-02", ...]
 		 * aggregation = "sum"
 		 */
-		var Dimension = function(id, name, items, aggregation) {
+		var Dimension = function(id, items, aggregation) {
 			this.id = id;
-			this.name = name;
 			this.items = items;
 			this.aggregation = aggregation;
 		};
 
-		Dimension.prototype.aggregate = function(elCubes) {
-			var newElCube = elCubes[0].clone();
-			delete newElCube.dimensionValues[this.id]; // this one we can drop
-
-			var numCubes = elCubes.length, i = 0, result;
-
-			switch (this.aggregation) {
-				case "sum":
-					result = 0;
-					while (i != numCubes) {
-						result += elCubes[i].value;
-						++i;
-					}
-					newElCube.value = result;
-					break;
-
-				case "average":
-					result = 0;
-					while (i != numCubes) {
-						result += elCubes[i].value;
-						++i;
-					}
-					newElCube.value = result / numCubes;
-					break;
-
-				case "highest":
-					result = Math.MIN_VALUE;
-					while (i != numCubes) {
-						if (elCubes[i].value > result)
-							result = elCubes[i].value;
-						++i;
-					}
-					newElCube.value = result;
-					break;
-
-				case "lowest":
-					result = Math.MAX_VALUE;
-					while (i != numCubes) {
-						if (elCubes[i].value < result)
-							result = elCubes[i].value;
-						++i;
-					}
-					newElCube.value = result;
-					break;
-
-				case "last":
-					newElCube.value = elCubes[elCubes.length - 1].value;
-					break;
-
-				case 'none':
-					newElCube.value = numCubes == 1 ? elCubes[0].value : NaN;
-					break;
-				default:
-					throw new Error('Invalid mode: ' + this.aggregation);
-			}
-
-			return newElCube;
+		var DimensionGroup = function(id, childDimension, mapping) {
+			this.id = id;
+			this.childDimension = childDimension;
+			this.items = Object.keys(mapping);
+			this.mapping = mapping;
 		};
-
-
-		/**
-		 * dimensions = {month: "2010-01", year: "2010", "partition1": "1d38d1ef-55b8-4959-9552-3dcce1ce2ebb", ...}
-		 * value = 45
-		 */
-		var ElementaryCube = function(dimensionValues, value) {
-			this.dimensionValues = dimensionValues;
-			this.value = value;
-		};
-
-		ElementaryCube.prototype.matchFilter = function(filterValues) {
-			for (var dimensionId in filterValues)
-				if (!filterValues[dimensionId][this.dimensionValues[dimensionId]])
-					return false;
-
-			return true;
-		};
-
-		ElementaryCube.prototype.clone = function() {
-			var dimValues = {};
-			for (var dimensionId in this.dimensionValues)
-				dimValues[dimensionId] = this.dimensionValues[dimensionId];
-
-			return new ElementaryCube(dimValues, this.value);
-		};
-
-
 
 		/**
 		 * id = "a2b442c9-1dde-42dd-9a04-773818d75e71" (variableId from form)
 		 * dimensions = [Dimension(...), Dimension(...), Dimension(...), ...]
 		 * data = [ElementaryCube(...), ElementaryCube(...), ElementaryCube(...), ...]
 		 */
-		var Cube = function(id, dimensions, elementaryCubes) {
+		var Cube = function(id, dimensions, dimensionGroups, data) {
 			this.id = id;
 			this.dimensions = dimensions;
-			this.elementaryCubes = elementaryCubes;
+			this.dimensionGroups = dimensionGroups;
+			this.data = data;
 
-			this._sortCubes();
+			// Check size.
+			var dataSize = 1;
+			dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
+			if (!data)
+				this.data = new Array(dataSize);
+			else if (data.length !== dataSize)
+				throw new Error('Invalid data size');
+		};
+
+		Cube.prototype._getDimension = function(dimensionId) {
+			var dimension, numDimension = this.dimensions.length;
+			for (var dimensionIndex = 0; dimensionIndex < numDimension; ++dimensionIndex)
+				if (this.dimensions[dimensionIndex].id == dimensionId) {
+					dimension = this.dimensions[dimensionIndex];
+					break;
+				}
+
+			return dimension;
+		};
+
+		Cube.prototype._getDimensionGroup = function(dimensionGroupId) {
+			var dimensionGroup, numDimensionGroups = this.dimensionGroups.length;
+			for (var dimensionGroupIndex = 0; dimensionGroupIndex < numDimensionGroups; ++dimensionGroupIndex)
+				if (this.dimensionGroups[dimensionGroupIndex].id == dimensionGroupId) {
+					dimensionGroup = this.dimensionGroups[dimensionGroupIndex];
+					break;
+				}
+
+			return dimensionGroup;
 		};
 
 		Cube.fromProject = function(project, allInputs) {
-			// Create all cubes.
+			var inputsByForm = {};
+			project.forms.forEach(function(form) { inputsByForm[form.id] = [] });
+			allInputs.forEach(function(input) { inputsByForm[input.form].push(input); });
+
 			var cubes = {};
-
 			project.forms.forEach(function(form) {
-				var inputs = allInputs.filter(function(input) { return input.form == form.id; });
+				var inputs = inputsByForm[form.id];
+				
+				// create entity dimension if relevant (once for the element).
+				var entities = null, groups = null;
+				if (form.collect == 'entity' || form.collect == 'some_entity') {
+					entities = project.entities.pluck('id');
+					groups = {};
+					project.groups.forEach(function(group) { groups[group.id] = group.members; });
+				}
+				
+				var days = {}; // dimension
+				var weeks = {}, months = {}, quarters = {}, years = {}; // dimensionGroups
+				inputs.forEach(function(i) {
+					var period = moment(i.period);
+					var day = period.format('YYYY-MM-DD'),
+						week = period.format('YYYY-[W]WW'),
+						month = period.format('YYYY-MM'),
+						quarter = period.format('YYYY-[Q]Q'),
+						year = period.format('YYYY');
 
-				// Create shared dimension elements.
-				var entities = project.entities,
-					years    = {},
-					quarters = {},
-					months   = {},
-					weeks    = {},
-					days     = {};
+					if (!weeks[week]) weeks[week] = {};
+					if (!months[month]) months[month] = {};
+					if (!quarters[quarter]) quarters[quarter] = {};
+					if (!years[year]) years[year] = {};
 
-				// Create dimensionValues for each input in advance.
-				var refDimensionValuesByInput = {};
-				inputs.forEach(function(input) {
-					var period = moment(input.period);
-					var refDimensionValues = {
-						year: period.format('YYYY'),
-						quarter: period.format('YYYY-[Q]Q'),
-						month: period.format('YYYY-MM'),
-						week: period.format('YYYY-[W]WW'),
-						day: period.format('YYYY-MM-DD'),
-						entity: input.entity
-					};
-
-					refDimensionValuesByInput[input._id] = refDimensionValues;
-					years[refDimensionValues.year] = true;
-					quarters[refDimensionValues.quarter] = true;
-					months[refDimensionValues.month] = true;
-					weeks[refDimensionValues.week] = true;
-					days[refDimensionValues.day] = true;
+					days[day] = true;
+					weeks[week][day] = true;
+					months[month][day] = true;
+					quarters[quarter][day] = true;
+					years[year][day] = true;
 				});
 
-				years    = Object.keys(years).sort().map(function(t) { return {id: t, name: t}; });
-				quarters = Object.keys(quarters).sort().map(function(t) { return {id: t, name: t}; });
-				months   = Object.keys(months).sort().map(function(t) { return {id: t, name: t}; });
-				weeks    = Object.keys(weeks).sort().map(function(t) { return {id: t, name: t}; });
-				days     = Object.keys(days).sort().map(function(t) { return {id: t, name: t}; });
+				days = Object.keys(days);
+				for (var week in weeks) weeks[week] = Object.keys(weeks[week]);
+				for (var month in months) months[month] = Object.keys(months[month]);
+				for (var quarter in quarters) quarters[quarter] = Object.keys(quarters[quarter]);
+				for (var year in years) years[year] = Object.keys(years[year]);
 
+				// Create empty cubes
 				form.elements.forEach(function(element) {
-					var numPartitions = element.partitions.length;
+					// Create dimensions.
+					var dimensions = [];
+					dimensions.push(new Dimension('day', days, element.timeAgg));
+					if (form.collect == 'entity' || form.collect == 'some_entity')
+						dimensions.push(new Dimension('entity', entities, element.geoAgg));
 
-					var dimensions = element.partitions.map(function(partition, index) {
-						var name = partition.pluck('name').join(' / ');
-						if (name.length > 80)
-							name = name.substring(0, 80 - 3) + '...';
-						return new Dimension('partition' + index, name, partition, 'sum')
-					}).concat([
-						new Dimension('entity', 'project.entity', entities, element.geoAgg),
-						new Dimension('year', 'shared.year', years, element.timeAgg),
-						new Dimension('quarter', 'shared.quarter', quarters, element.timeAgg),
-						new Dimension('month', 'shared.month', months, element.timeAgg),
-						new Dimension('week', 'shared.week', weeks, element.timeAgg),
-						new Dimension('day', 'shared.day', days, element.timeAgg)
-					]);
+					element.partitions.forEach(function(partition, index) {
+						dimensions.push(new Dimension('partition' + index, partition.pluck('id'), 'sum'));
+					});
 
-					var elementaryCubes = [];
-					inputs.forEach(function(input) {
-						var refDimensionValues = refDimensionValuesByInput[input._id];
+					var dimensionGroups = [
+						new DimensionGroup('week', 'day', weeks),
+						new DimensionGroup('month', 'day', months),
+						new DimensionGroup('quarter', 'day', quarters),
+						new DimensionGroup('year', 'day', years)
+					];
 
-						if (numPartitions > 0) {
-							var elCubes = itertools.product(element.partitions).map(function(partition) {
-								var dimensionValues = {};
+					if (form.collect == 'entity' || form.collect == 'some_entity')
+						dimensionGroups.push(new DimensionGroup('group', 'entity', groups));
 
-								// clone shared dimensions
-								for (var key in refDimensionValues)
-									dimensionValues[key] = refDimensionValues[key];
+					cubes[element.id] = new Cube(element.id, dimensions, dimensionGroups);
+				});
 
-								// add partitions
-								for (var i = 0; i < numPartitions; ++i)
-									dimensionValues['partition' + i] = partition[i].id;
-								
-								var value = input.values[element.id][partition.pluck('id').sort().join('.')] || 0;
-								return new ElementaryCube(dimensionValues, value);
-							});
+				// Fill cubes
+				inputs.forEach(function(input) {
+					var period = moment(input.period).format('YYYY-MM-DD');
 
-							// append new cubes
-							Array.prototype.push.apply(elementaryCubes, elCubes);
-						}
-						else {
-							elementaryCubes.push(new ElementaryCube(refDimensionValues, input.values[element.id][''] || 0));
-						}
-					}, this);
+					form.elements.forEach(function(element) {
+						var source = input.values[element.id],
+							numSources = source.length,
+							target = cubes[element.id].data;
 
-					cubes[element.id] = new Cube(element.id, dimensions, elementaryCubes);
+						// Compute location where this subtable should go.
+						var offset = days.indexOf(period); // FIXME slow & useless
+						if (form.collect == 'entity' || form.collect == 'some_entity')
+							offset = offset * entities.length + entities.indexOf(input.entity);
 
-				}, this);
-			}, this);
+						element.partitions.forEach(function(partition) { offset *= partition.length; });
+
+						// Copy into destination table.
+						for (var i = 0; i < numSources; ++i)
+							target[offset + i] = source[i];
+					});
+
+				});
+			});
 
 			return cubes;
 		};
 
-		Cube.prototype._sortCubes = function() {
-			var numDimensions = this.dimensions.length;
-			var dimensionIndexes = this.dimensions.map(function(dimension) {
-				var r = {};
-				dimension.items.forEach(function(item, index) { r[item.id] = index; });
-				return r;
-			});
+		Cube.prototype.query = function(dimensionIds, filter) {
+			// End condition
+			if (dimensionIds.length == 0)
+				return this._query_total(filter);
+			
+			var dimensionId = dimensionIds.shift();
 
-			// Sort them by their dimension values.
-			this.elementaryCubes.sort(function(elCube1, elCube2) {
-				// take the first dimension that allow to separate those apart.
-				for (var i = 0; i < numDimensions; ++i) {
-					var dimension = this.dimensions[i],
-						dimensionIndex = dimensionIndexes[i],
-						index1 = dimensionIndex[elCube1.dimensionValues[dimension.id]], //dimension.items.findIndex(function(dimItem) { return dimItem.id == elCube1.dimensionValues[dimension.id]; }),
-						index2 = dimensionIndex[elCube2.dimensionValues[dimension.id]]; //dimension.items.findIndex(function(dimItem) { return dimItem.id == elCube2.dimensionValues[dimension.id]; });
+			// search dimension
+			var dimension = this._getDimension(dimensionId) || this._getDimensionGroup(dimensionId);
 
-					if (index1 != index2)
-						return index1 - index2;
-				}
+			// Build tree
+			var result = {};
+			var numDimensionItems = dimension.items.length;
+			var contributions = 0;
+			for (var dimensionItemId = 0; dimensionItemId < numDimensionItems; ++dimensionItemId) {
+				var dimensionItem = dimension.items[dimensionItemId];
 
-				// both elements match on all dimensions. This should never happen under normal operation.
-				throw new Error('Two elementary cubes were found with the same dimensionValues.');
-			}.bind(this));
+				// Intersect main filter with branch filter (branch filter is only one item, so it's easy to compute).
+				var oldFilter = filter[dimensionId];
+				if (!oldFilter || oldFilter.indexOf(dimensionItem) !== -1)
+					filter[dimensionId] = [dimensionItem];
+				else
+					// Either lines do the same. Continuing is a bit faster.
+					// filter[dimensionId] = [];
+					continue;
+				
+				// Compute branch of the result tree.
+				result[dimensionItem] = this.query(dimensionIds, filter);
+
+				// Remove if empty
+				if (result[dimensionItem] === undefined)
+					delete result[dimensionItem];
+				else
+					++contributions;
+
+				// Restore filter to its former value
+				if (oldFilter === undefined)
+					delete filter[dimensionId];
+				else
+					filter[dimensionId] = oldFilter;
+			}
+
+			dimensionIds.unshift(dimensionId);
+
+			return contributions ? result : undefined;
 		};
 
-		Cube.prototype._aggregateCubes = function(elementaryCubes) {
-			var numDimensions = this.dimensions.length;
-
-			// group dimension by dimension in reverse order.
-			for (var i = numDimensions - 1; i >= 0; --i) {
-				var dimension = this.dimensions[i];
-
-				var newCubes = [];
-				while (elementaryCubes.length) {
-					var start = 0, end = 1;
-
-					while (end < elementaryCubes.length
-							&& elementaryCubes[end].dimensionValues[dimension.id] 
-							=== elementaryCubes[0].dimensionValues[dimension.id])
-
-						++end;
-
-					var sameDimensionCubes = elementaryCubes.splice(0, end);
-					var aggregatedCube = dimension.aggregate(sameDimensionCubes);
-
-					newCubes.push(aggregatedCube);
-
-				}
-
-				elementaryCubes = newCubes;
-			}
-		}
-
 		/**
-		 * dimensions = ['month', 'partition2']
 		 * filter = {year: ['2014'], partition1: ["2d31a636-1739-4b77-98a5-bf9b7a080626"]}
 		 */
-		Cube.prototype.query = function(dimensionIds, filterValues) {
-			var fastFilterValues = {};
-			for (var dimensionName in filterValues) {
-				fastFilterValues[dimensionName] = {};
-				filterValues[dimensionName].forEach(function(dimValue) {
-					fastFilterValues[dimensionName][dimValue] = true;
-				});
+		Cube.prototype._query_total = function(filter) {
+			// rewrite the filter so that it contains only dimensions.
+			filter = this._remove_dimension_groups(filter);
+			filter = this._rewrite_as_indexes(filter);
+
+			return this._query_rec(filter, 0);
+		};
+
+		// FIXME we need to push/pop instead of shift/unshift (it's 10 times faster).
+		Cube.prototype._query_rec = function(allIndexes, offset) {
+			if (allIndexes.length == 0)
+				return this.data[offset];
+
+			var dimension  = this.dimensions[this.dimensions.length - allIndexes.length],
+				indexes    = allIndexes.shift(),
+				numIndexes = indexes.length;
+
+			var result, tmp, contributions = 0;
+			
+			// Compute offset at this level.
+			offset *= dimension.items.length;
+
+			// Aggregate
+			if (dimension.aggregation == 'sum') {
+				result = 0;
+				for (var i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(allIndexes, offset + indexes[i])
+					if (tmp !== undefined) {
+						++contributions;
+						result += tmp
+					}
+				}
+			}
+			else if (dimension.aggregation == 'average') {
+				result = 0;
+				for (var i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(allIndexes, offset + indexes[i])
+					if (tmp !== undefined) {
+						++contributions;
+						result += tmp
+					}
+				}
+				result /= numIndexes;
+			}
+			else if (dimension.aggregation == 'highest') {
+				result = Math.MIN_VALUE;
+				for (var i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(allIndexes, offset + indexes[i]);
+					if (tmp !== undefined && tmp > result) {
+						++contributions;
+						result = tmp;
+					}
+				}
+			}
+			else if (dimension.aggregation == 'lowest') {
+				result = Math.MAX_VALUE;
+				for (var i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(allIndexes, offset + indexes[i])
+					if (tmp !== undefined && tmp < result) {
+						++contributions;
+						result = tmp;
+					}
+				}
+			}
+			else if (dimension.aggregation == 'last') {
+				result = this._query_rec(allIndexes, offset + indexes[indexes.length - 1]);
+				++contributions;
 			}
 
-			return this._query_fast(dimensionIds, fastFilterValues);
+			else if (dimension.aggregation == 'none') {
+				for (var i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(allIndexes, offset + indexes[i])
+					if (tmp !== undefined) {
+						result = tmp;
+						++contributions;
+					}
+				}
+				if (contributions > 1)
+					result = NaN;
+			}
+
+			else
+				throw new Error('Invalid mode: ' + dimension.aggregation);
+
+			if (contributions == 0)
+				result = undefined;
+
+			allIndexes.unshift(indexes)
+
+			return result;
 		};
 
 
 		/**
-		 * dimensions = ['month', 'partition2']
-		 * filter = {year: {'2014': true}, partition1: {"2d31a636-1739-4b77-98a5-bf9b7a080626": true}}
+		 * when querying the cube with _query_total(), we only support
+		 * using dimensions (and not dimensionGroups).
+		 * 
+		 * This rewrites any filter so that they use dimensions.
 		 */
-		Cube.prototype._query_fast = function(dimensionIds, filterValues) {
-			dimensionIds = dimensionIds || [];
-			filterValues = filterValues || {};
+		Cube.prototype._remove_dimension_groups = function(oldFilters) {
+			var newFilters = {};
 
-			// Split by dimension {dim1Element1: {dim2Element1: **RECURSION_ELSE**}}
-			if (dimensionIds.length) {
-				var result = {};
+			for (var dimensionId in oldFilters) {
+				var dimension = this._getDimension(dimensionId),
+					oldFilter = oldFilters[dimensionId];
 
-				// Recurse.
-				var dimensionId = dimensionIds[0],
-					dimension = this.dimensions.find(function(d) { return d.id === dimensionId; }),
-					otherDimensionIds = dimensionIds.slice(1);
-
-				dimension.items.forEach(function(dimensionItem) {
-					// Skip this dimension item if it is explicitely filtered.
-					if (filterValues[dimensionId] && !filterValues[dimensionId][dimensionItem.id])
-						return;
-
-					// Restrict filterValues filter.
-					var oldFilter = filterValues[dimensionId];
-					filterValues[dimensionId] = {};
-					filterValues[dimensionId][dimensionItem.id] = true;
-
-					// Compute branch of the result tree.
-					result[dimensionItem.id] = this._query_fast(otherDimensionIds, filterValues);
-					if (result[dimensionItem.id] === undefined)
-						delete result[dimensionItem.id];
-
-					// Restore filter to its former value
-					if (oldFilter === undefined)
-						delete filterValues[dimensionId];
+				// if the dimension exists, we have nothing to do.
+				if (dimension) {
+					// Insersect our new filter with the existing one.
+					if (!newFilters[dimension.id])
+						newFilters[dimension.id] = oldFilter;
 					else
-						filterValues[dimensionId] = oldFilter;
-				}, this);
+						newFilters[dimension.id] = oldFilter.filter(function(e) {
+							return newFilters[dimension.id].indexOf(e) !== -1;
+						});
+				}
+				// the dimension does not exists.
+				else {
+					var dimensionGroup = this._getDimensionGroup(dimensionId);
 
-				return result;
-			}
-			// Aggregate everything
-			else {
-				// Retrieve all datas that match our filter.
-				var numDimensions = this.dimensions.length,
-					elementaryCubes = this.elementaryCubes.filter(function(elCube) { return elCube.matchFilter(filterValues); });
+					// if it's a group, replace it.
+					if (dimensionGroup) {
+						// Build new filter by concatenating elements.
+						var newFilter = [];
+						oldFilter.forEach(function(v) { Array.prototype.push.apply(newFilter, dimensionGroup.mapping[v]); });
 
-				// Aggregate everything
-				for (var i = numDimensions - 1; i >= 0; --i) {
-					var dimension = this.dimensions[i];
-
-					var newCubes = [];
-					while (elementaryCubes.length) {
-						var start = 0, end = 1;
-
-						while (end < elementaryCubes.length) {
-							for (var j = 0; j < i; ++j) {
-								var dim = this.dimensions[j];
-								if (elementaryCubes[end].dimensionValues[dim.id]
-									!== elementaryCubes[0].dimensionValues[dim.id])
-									break;
-							}
-
-							if (j == i)
-								++end;
-							else
-								break;
+						// If there are duplicates, remove them.
+						var i = newFilter.length - 2;
+						while (i > 0) {
+							if (newFilter[i] == newFilter[i + 1])
+								newFilter.splice(i, 1);
+							--i
 						}
 
-						var sameDimensionCubes = elementaryCubes.splice(0, end);
-						var aggregatedCube = dimension.aggregate(sameDimensionCubes);
-
-						newCubes.push(aggregatedCube);
+						// Insersect our new filter with the existing one.
+						if (!newFilters[dimensionGroup.childDimension])
+							newFilters[dimensionGroup.childDimension] = newFilter;
+						else
+							newFilters[dimensionGroup.childDimension] = newFilter.filter(function(e) {
+								return newFilters[dimensionGroup.childDimension].indexOf(e) !== -1;
+							});
 					}
-
-					elementaryCubes = newCubes;
+					// if it's not a dimension nor a dimensionGroup, raise.
+					else
+						throw new Error('Invalid dimension in filter: ' + dimensionId);
 				}
-
-				if (elementaryCubes.length)
-					return this.dimensions[0].aggregate(elementaryCubes).value;
-				else
-					return undefined;
 			}
+
+			return newFilters;
 		};
 
-		return {Dimension: Dimension, ElementaryCube: ElementaryCube, Cube: Cube}
+		Cube.prototype._rewrite_as_indexes = function(filter) {
+			// Rewrite the filter again in the form of integers.
+			// We don't want to rewrite it into the _query_rec function, because it is
+			// more efficient to do it only once here, instead of many times on the rec function.
+			return this.dimensions.map(function(dimension) {
+				var i, result;
+
+				// No filter => filter is range(0, dimension.items.length)
+				if (!filter[dimension.id]) {
+					result = new Array(dimension.items.length);
+					for (i = 0; i < result.length; ++i)
+						result[i] = i;
+				}
+				// Yes filter => map strings to ids in the real query.
+				else {
+					// Now we need to map our list of strings to indexes.
+					result = new Array(filter[dimension.id].length);
+					for (i = 0; i < result.length; ++i)
+						result[i] = dimension.items.indexOf(filter[dimension.id][i]);
+				}
+
+				return result;
+			});
+		};
+
+		return {Dimension: Dimension, Cube: Cube}
 	});
 

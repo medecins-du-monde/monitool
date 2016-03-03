@@ -237,7 +237,6 @@ angular
 		}
 
 		// Handle rotations.
-		$scope.partitions = {};
 		$scope.rotations  = {};
 		$scope.positions  = {};
 
@@ -253,8 +252,6 @@ angular
 			$scope.rotations[element.id]
 				= window.localStorage['input.rotation.' + element.id]
 				= ((($scope.rotations[element.id] + offset) % numPermutations) + numPermutations) % numPermutations;
-
-			$scope.partitions[element.id] = computeNthPermutation(element.partitions.length, $scope.rotations[element.id]).map(function(i) { return element.partitions[i]; });
 		};
 
 		form.elements.forEach(function(element) {
@@ -264,8 +261,8 @@ angular
 			else
 				$scope.positions[element.id] = Math.floor(element.partitions.length / 2)
 
-			$scope.rotate(0, element)
-			$scope.move(0, element)
+			$scope.rotate(0, element);
+			$scope.move(0, element);
 		});
 
 		$scope.save = function() {
@@ -419,7 +416,7 @@ angular
 		// When variable change, reset the whole query object.
 		$scope.$watch('planning.variable', function(variableId) {
 			var cube = cubes[variableId];
-			$scope.dimensions = cube.dimensions;
+			$scope.dimensions = cube.dimensions.concat(cube.dimensionGroups);
 			$scope.planning.cols = [];
 			$scope.planning.rows = [];
 			$scope.planning.filters = {};
@@ -442,7 +439,7 @@ angular
 
 			for (var key in filters) {
 				var dimension = $scope.dimensions.find(function(dim) { return dim.id == key; });
-				$scope.planning.filters[key] = dimension.items.pluck('id').filter(function(el) {
+				$scope.planning.filters[key] = dimension.items.filter(function(el) {
 					return filters[key].begin <= el && el <= filters[key].end;
 				});
 			}
@@ -473,7 +470,7 @@ angular
 			var makeRowCol = function(selectedDimId) {
 				var dimension = $scope.dimensions.find(function(dim) { return dim.id == selectedDimId; });
 				return {items: dimension.items.filter(function(dimItem) {
-					return !filters[dimension.id] || filters[dimension.id].indexOf(dimItem.id) !== -1;
+					return !filters[dimension.id] || filters[dimension.id].indexOf(dimItem) !== -1;
 				})};
 			};
 

@@ -238,7 +238,7 @@ angular.module('monitool.directives.form', [])
 			require: 'ngModel',
 			template: "<div></div>",
 			link: function($scope, element, attributes, ngModelController) {
-				$scope.$watchGroup([attributes.partitions, attributes.offset], function(newValue, oldValue) {
+				$scope.$watchGroup([attributes.rotation, attributes.offset], function(newValue, oldValue) {
 					// When the partition definition changes, we need to trigger a full parse + redraw.
 					// The AngularJS API is missing the method so we use a side-effect to do it.
 					// 
@@ -249,40 +249,51 @@ angular.module('monitool.directives.form', [])
 
 				ngModelController.$formatters.push(function(modelValue) {
 					var partitions = $scope.$eval(attributes.partitions),
-						offset = $scope.$eval(attributes.offset) + 1;
+						offset     = $scope.$eval(attributes.offset) + 1,
+						rotation   = $scope.$eval(attributes.rotation);
 
 					// Special case, only one field.
 					if (partitions.length == 0)
-						return [[modelValue['']]];
+						return [[modelValue[0]]];
 
 					// Special case, only one row.
 					if (partitions.length == 1)
-						return partitions[0].map(function(p) { return [p.name, modelValue[p.id]]; });
+						return partitions[0].map(function(p, index) { return [p.name, modelValue[index]]; });
+
+					// FIXME: cheat
+					partitions.forEach(function(partition, partitionIndex) {
+						partition.forEach(function(partitionElement, partitionElementIndex) {
+							partitionElement.partitionIndex = partitionIndex;
+							partitionElement.partitionElementIndex = partitionElementIndex;
+						});
+					});
 
 					// General case.
-					var topPartitions  = partitions.slice(0, offset),
-						leftPartitions = partitions.slice(offset);
+					var permutation      = computeNthPermutation(partitions.length, rotation),
+						topPartitionIds  = permutation.slice(0, offset),
+						leftPartitionIds = permutation.slice(offset);
 
-					var totalCols = topPartitions.reduce(function(memo, item) { return memo * item.length; }, 1),
-						totalRows = leftPartitions.reduce(function(memo, item) { return memo * item.length; }, 1),
+					var totalCols = topPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].length; }, 1),
+						totalRows = leftPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].length; }, 1),
 						colspan   = totalCols, // current colspan is total number of columns.
 						numCols   = 1;
 
 					// Create top header rows.
-					var topHeaderRows = topPartitions.map(function(topPartition, topPartitionIndex) {
+					var topHeaderRows = topPartitionIds.map(function(topPartitionId) {
 						// Adapt colspan and number of columns
-						colspan /= topPartition.length; 
-						numCols *= topPartition.length;
+						colspan /= partitions[topPartitionId].length; 
+						numCols *= partitions[topPartitionId].length;
 
 						var i, row = [];
 
 						// push empty cells to fit the line headers
-						for (i = 0; i < leftPartitions.length; ++i)
+						for (i = 0; i < leftPartitionIds.length; ++i)
 							row.push('');
 
 						// push headers from the partition
 						for (var k = 0; k < numCols; ++k) {
-							row.push(topPartition[k % topPartition.length].name);
+							row.push(partitions[topPartitionId][k % partitions[topPartitionId].length].name);
+
 							for (i = 0; i < colspan - 1; ++i)
 								row.push('');
 						}
@@ -293,23 +304,39 @@ angular.module('monitool.directives.form', [])
 					// Create WTF IS THIS????
 					var rowspans = [];
 					var rowspan = totalRows;
-					for (var i = 0; i < leftPartitions.length; ++i) {
-						rowspan /= leftPartitions[i].length;
+					for (var i = 0; i < leftPartitionIds.length; ++i) {
+						rowspan /= partitions[leftPartitionIds[i]].length;
 						rowspans[i] = rowspan;
 					}
 
 					// Create data rows
-					var contentRows = itertools.product(leftPartitions).map(function(curLeftPartition, index) {
-						var leftHeaderCols = curLeftPartition.map(function(p, index2) {
-							return index % rowspans[index2] == 0 ? p.name : '';
+					var contentRows = itertools.product(leftPartitionIds.map(function(id) { return partitions[id]; })).map(function(curLeftPartitionElements, contentRowIndex) {
+						var leftHeaderCols = curLeftPartitionElements.map(function(p, titleColIndex) {
+							return contentRowIndex % rowspans[titleColIndex] == 0 ? p.name : '';
 						});
 
-						var dataCols = itertools.product(topPartitions).map(function(curTopPartition) {
-							var fieldId = curLeftPartition.concat(curTopPartition).map(function(p) { return p.id; }).sort().join('.');
-							return modelValue[fieldId];
+						var dataCols = itertools.product(topPartitionIds.map(function(id) { return partitions[id]; })).map(function(curTopPartitionElements) {
+							var partitionElements = curLeftPartitionElements.concat(curTopPartitionElements).sort(function(pe1, pe2) { return pe1.partitionIndex - pe2.partitionIndex; });
+
+							var fieldIndex = 0;
+							partitionElements.forEach(function(pe) {
+								fieldIndex = fieldIndex * partitions[pe.partitionIndex].length + pe.partitionElementIndex;
+							});
+
+							return modelValue[fieldIndex];
 						});
+
 
 						return leftHeaderCols.concat(dataCols)
+					});
+
+
+					// FIXME: repare cheating.
+					partitions.forEach(function(partition, partitionIndex) {
+						partition.forEach(function(partitionElement, partitionElementIndex) {
+							delete partitionElement.partitionIndex;
+							delete partitionElement.partitionElementIndex;
+						});
 					});
 
 					return topHeaderRows.concat(contentRows);
@@ -317,28 +344,52 @@ angular.module('monitool.directives.form', [])
 
 				ngModelController.$parsers.push(function(viewValue) {
 					var partitions = $scope.$eval(attributes.partitions),
-						offset = $scope.$eval(attributes.offset) + 1;
+						offset     = $scope.$eval(attributes.offset) + 1,
+						rotation   = $scope.$eval(attributes.rotation);
 
 					// Special case, only one field.
 					if (partitions.length == 0)
-						return {'': viewValue[0][0]};
-
-					var modelValue = {};
+						return [viewValue[0][0]];
 
 					// Special case, only one row.
-					if (partitions.length == 1) {
-						partitions[0].forEach(function(p, rowIndex) { modelValue[p.id] = viewValue[rowIndex][1]; });
-						return modelValue;
-					}
+					if (partitions.length == 1)
+						return viewValue.map(function(row) { return row[1]; });
+
+
+					// FIXME: cheat
+					partitions.forEach(function(partition, partitionIndex) {
+						partition.forEach(function(partitionElement, partitionElementIndex) {
+							partitionElement.partitionIndex = partitionIndex;
+							partitionElement.partitionElementIndex = partitionElementIndex;
+						});
+					});
 
 					// General case.
-					var topPartitions  = partitions.slice(0, offset),
-						leftPartitions = partitions.slice(offset);
+					var numFields = 1;
+					partitions.forEach(function(partition) { numFields *= partition.length; });
+
+					var modelValue       = new Array(numFields),
+						permutation      = computeNthPermutation(partitions.length, rotation),
+						topPartitions    = permutation.slice(0, offset).map(function(id) { return partitions[id]; }),
+						leftPartitions   = permutation.slice(offset).map(function(id) { return partitions[id]; });
 
 					itertools.product(leftPartitions).map(function(curLeftPartition, rowIndex) {
 						itertools.product(topPartitions).forEach(function(curTopPartition, colIndex) {
-							var fieldId = curLeftPartition.concat(curTopPartition).map(function(p) { return p.id; }).sort().join('.');
-							modelValue[fieldId] = viewValue[rowIndex + topPartitions.length][colIndex + leftPartitions.length];
+							var partitionElements = curLeftPartition.concat(curTopPartition).sort(function(pe1, pe2) { return pe1.partitionIndex - pe2.partitionIndex; });
+							var fieldIndex = 0;
+							partitionElements.forEach(function(pe) {
+								fieldIndex = fieldIndex * partitions[pe.partitionIndex].length + pe.partitionElementIndex;
+							});
+
+							modelValue[fieldIndex] = viewValue[rowIndex + topPartitions.length][colIndex + leftPartitions.length];
+						});
+					});
+
+					// FIXME: repare cheating.
+					partitions.forEach(function(partition, partitionIndex) {
+						partition.forEach(function(partitionElement, partitionElementIndex) {
+							delete partitionElement.partitionIndex;
+							delete partitionElement.partitionElementIndex;
 						});
 					});
 
@@ -347,7 +398,8 @@ angular.module('monitool.directives.form', [])
 
 				ngModelController.$render = function() {
 					var partitions = $scope.$eval(attributes.partitions),
-						offset = $scope.$eval(attributes.offset) + 1;
+						offset     = $scope.$eval(attributes.offset) + 1,
+						rotation   = $scope.$eval(attributes.rotation);
 
 					if (partitions.length == 0)
 						hotTable.updateSettings({ maxCols: 1, maxRows: 1, cells: function(row, col, prop) { return ($scope.canEdit ? dataOptions : dataReadOnlyOptions); }});
@@ -357,17 +409,18 @@ angular.module('monitool.directives.form', [])
 					
 					else {
 						// Split partitions in cols and rows.
-						var topPartitions  = partitions.slice(0, offset),
-							leftPartitions = partitions.slice(offset);
+						var permutation      = computeNthPermutation(partitions.length, rotation),
+							topPartitionIds  = permutation.slice(0, offset),
+							leftPartitionIds = permutation.slice(offset);
 
-						var totalCols = topPartitions.reduce(function(memo, item) { return memo * item.length; }, 1),
-							totalRows = leftPartitions.reduce(function(memo, item) { return memo * item.length; }, 1);
+						var totalCols = topPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].length; }, 1),
+							totalRows = leftPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].length; }, 1);
 
 						hotTable.updateSettings({
-							maxCols: totalCols + leftPartitions.length,
-							maxRows: totalRows + topPartitions.length,
+							maxCols: totalCols + leftPartitionIds.length,
+							maxRows: totalRows + topPartitionIds.length,
 							cells: function(row, col, prop) {
-								return row < topPartitions.length || col < leftPartitions.length ? headerOptions : ($scope.canEdit ? dataOptions : dataReadOnlyOptions);
+								return row < topPartitionIds.length || col < leftPartitionIds.length ? headerOptions : ($scope.canEdit ? dataOptions : dataReadOnlyOptions);
 							}
 						});
 					}

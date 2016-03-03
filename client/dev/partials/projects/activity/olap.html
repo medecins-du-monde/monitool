@@ -32,8 +32,8 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-table fa-fw"></i></span>
 						<ui-select id="rows-input" multiple ng-model="planning.rows" name="rows" theme="bootstrap">
-							<ui-select-match placeholder="{{'project.select_rows'|translate}}">{{$item.name|translate}}</ui-select-match>
-							<ui-select-choices repeat="row.id as row in availableRows">{{row.name|translate}}</ui-select-choices>
+							<ui-select-match placeholder="{{'project.select_rows'|translate}}">{{('project.dimensions.' + $item.id)|translate}}</ui-select-match>
+							<ui-select-choices repeat="row.id as row in availableRows">{{('project.dimensions.' + row.id)|translate}}</ui-select-choices>
 						</ui-select>
 					</div>
 				</div>
@@ -45,8 +45,8 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-columns fa-fw"></i></span>
 						<ui-select id="cols-input" multiple ng-model="planning.cols" name="cols" theme="bootstrap">
-							<ui-select-match placeholder="{{'project.select_cols'|translate}}">{{$item.name|translate}}</ui-select-match>
-							<ui-select-choices repeat="col.id as col in availableCols">{{col.name|translate}}</ui-select-choices>
+							<ui-select-match placeholder="{{'project.select_cols'|translate}}">{{('project.dimensions.' + $item.id)|translate}}</ui-select-match>
+							<ui-select-choices repeat="col.id as col in availableCols">{{('project.dimensions.' + col.id)|translate}}</ui-select-choices>
 						</ui-select>
 					</div>
 				</div>
@@ -111,12 +111,13 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
 						<ui-select id="{{dimension.id}}-input" multiple ng-model="planning.filters[dimension.id]" name="{{dimension}}" theme="bootstrap">
-							<ui-select-match placeholder="{{'project.select_filters'|translate}}">{{$item.name}}</ui-select-match>
-							<ui-select-choices repeat="filter.id as filter in dimension.items">{{filter.name}}</ui-select-choices>
+							<ui-select-match placeholder="{{'project.select_filters'|translate}}">{{$item}}</ui-select-match>
+							<ui-select-choices repeat="filter in dimension.items">{{filter}}</ui-select-choices>
 						</ui-select>
 					</div>
 				</div>
 			</div>
+			
 		</form>
 	</div>
 </div>

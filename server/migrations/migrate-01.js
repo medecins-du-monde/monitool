@@ -2,6 +2,76 @@
 
 var nano = require('nano');
 
+
+var productSingle = function(a, b) {
+	var result = [], lengthA = a.length, lengthB = b.length;
+	var k = 0;
+
+	for (var i = 0; i < lengthA; ++i)
+		for (var j = 0; j < lengthB; ++j)
+			result[k++] = a[i].concat([b[j]]);
+	
+	return result;
+};
+
+/**
+ * Return the product of two or more arrays.
+ * in:  [[1,2],[3,4]]
+ * out: [[1,3],[1,4],[2,3],[2,4]]
+ */
+var product = function(list) {
+	if (list.length == 0)
+		return [];
+
+	var memo = list[0].map(function(el) { return [el]; });
+	for (var i = 1; i < list.length; ++i)
+		memo = productSingle(memo, list[i]);
+	
+	return memo;
+}
+
+/**
+ * Given a input.value hash, compute all possible sums.
+ * This is used for the agg data stats.
+ */
+var computeSums = function(values) {
+	var result = {};
+
+	for (var elementId in values) {
+		result[elementId] = {};
+
+		for (var partitionIds in values[elementId]) {
+			// now we need to create a key for each subset of the partition.
+			var splittedPartitionIds = partitionIds == '' ? [] : partitionIds.split('.'),
+				numSubsets = Math.pow(2, splittedPartitionIds.length);
+
+			for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
+				var subsetKey = splittedPartitionIds.filter(function(id, index) { return subsetIndex & (1 << index); }).join('.');
+
+				// if result was set as a string previously, skip
+				if (typeof result[elementId][subsetKey] === 'string')
+					continue
+
+				// if value is a string, skip as well
+				if (typeof values[elementId][partitionIds] === 'string') {
+					result[elementId][subsetKey] = values[elementId][partitionIds];
+					continue;
+				}
+
+				if (result[elementId][subsetKey] == undefined)
+					result[elementId][subsetKey] = 0; // initialize if needed
+
+				result[elementId][subsetKey] += values[elementId][partitionIds];
+			}
+		}
+	}
+
+	return result;
+};
+
+
+
+
 var old = nano('http://localhost:5984').use('monitool-prod-backup');
 var newDb = nano('http://localhost:5984').use('monitool');
 
@@ -184,8 +254,8 @@ old.list({include_docs: true}, function(error, result) {
 	// fix inputs
 	for (id in documents.input) {
 		var input = documents.input[id];
-
 		delete input._rev;
+
 
 		var newValues = {};
 		for (var key in input.values) {
@@ -201,7 +271,28 @@ old.list({include_docs: true}, function(error, result) {
 				newValues[elementId][partitions] = input.values[key];
 			}
 		}
-		input.values = newValues;
+
+		newValues = computeSums(newValues);
+		
+		var realNewValue = {};
+		var project = documents.project[input.project];
+		var form, element;
+		project.forms.forEach(function(f) { if (f.id == input.form) form = f;})
+
+		form.elements.forEach(function(e) {
+			var fields = product(e.partitions);
+
+			if (e.partitions.length)
+				realNewValue[e.id] = fields.map(function(partElements) {
+					if (newValues[e.id] == undefined)
+						return 0;
+
+					return newValues[e.id][partElements.map(function(pe) { return pe.id }).sort().join('.')] || 0;
+				});
+			else
+				realNewValue[e.id] = [newValues[e.id] ? newValues[e.id][''] || 0 : 0]
+		});
+		input.values = realNewValue;
 
 		documentsToKeep.push(input);
 	}

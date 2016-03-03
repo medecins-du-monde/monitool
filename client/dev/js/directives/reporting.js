@@ -143,7 +143,6 @@ angular.module('monitool.directives.reporting', [])
 			link: function($scope, element, attributes, controller) {
 
 				$scope.$watch('col', function(value) {
-
 					if (typeof value === "string") {
 						// element.html('<span style="font-size: 6px">' + value + '</span>');
 						element.html('<i class="fa fa-ban"></i>');
@@ -157,12 +156,13 @@ angular.module('monitool.directives.reporting', [])
 						// if baseline and target are available.
 						if ($scope.row.colorize && $scope.row.baseline !== null && $scope.row.target !== null) {
 							var progress = null;
+							var baseline = parseInt($scope.row.baseline), target = parseInt($scope.row.target);
 
 							// compute progress 
 							if ($scope.row.targetType === 'around_is_better')
-								progress = 1 - Math.abs(value - $scope.row.target) / ($scope.row.target - $scope.row.baseline);
+								progress = 1 - Math.abs(value - target) / (target - baseline);
 							else
-								progress = (value - $scope.row.baseline) / ($scope.row.target - $scope.row.baseline);
+								progress = (value - baseline) / (target - baseline);
 
 							// and apply color to field
 							if (progress < .333)
@@ -356,7 +356,7 @@ angular.module('monitool.directives.reporting', [])
 										var result = $scope.data;
 										var numEls = els.length;
 										for (var i =0 ; i < numEls; ++i)
-											result = result[els[i].id];
+											result = result[els[i]];
 										return result;
 									}
 									catch (e) {

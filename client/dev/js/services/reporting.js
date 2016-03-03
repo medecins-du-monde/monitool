@@ -62,74 +62,6 @@ angular
 				throw new Error('Invalid groupBy: ' + groupBy)
 		};
 
-
-		// OLAP cubes do not support dimensions that overlap, and we have one: groups.
-		// This function abstracts
-		this._queryCube = function(groups, cube, dimensionIds, filterValues) {
-			filterValues = angular.copy(filterValues);
-			dimensionIds = dimensionIds.slice()
-
-			// Replace filterValues.group by filterValues.entity
-			if (filterValues.group) {
-				var entityIds = {};
-				
-				groups.forEach(function(group) {
-					// we could also iterate on filterValues.group and array.find the real group. This is a bit unclear.
-					if (filterValues.group.indexOf(group.id) !== -1) 
-						group.members.forEach(function(entityId) {
-							entityIds[entityId] = true;
-						});
-				});
-
-				entityIds = Object.keys(entityIds);
-
-				if (!filterValues.entity)
-					filterValues.entity = entityIds;
-				else
-					filterValues.entity = filterValues.entity.filter(function(entity) { return entityIds.indexOf(entity) !== -1; });
-
-				delete filterValues.group;
-			}
-
-			var result;
-
-			// If user want to group by group, we need to cheat: use filters and merge result.
-			var groupIndex = dimensionIds.indexOf('group');
-
-			// The cheat only works when group is first in the list.
-			if (groupIndex == 0) {
-				dimensionIds.shift(); // remove 'group' dimension (we are will iterate manually).
-
-				result = {total: cube.query(dimensionIds, filterValues)};
-				groups.forEach(function(group) {
-					// clone filterValues
-					var filterValuesCpy = angular.copy(filterValues);
-
-					// intersect current filter with new constraint
-					if (!filterValuesCpy.entity)
-						filterValuesCpy.entity = group.members;
-					else
-						filterValuesCpy.entity = filterValuesCpy.entity.filter(function(entity) { return group.members.indexOf(entity) !== -1; });
-
-					result[group.id] = cube.query(dimensionIds, filterValuesCpy);
-				});
-			}
-			else if (groupIndex > 0) {
-				throw new Error('unsupported groupIndex > 1');
-			}
-			else if (dimensionIds.length == 1) {
-				result = cube.query(dimensionIds, filterValues);
-				var total = cube.query([], filterValues);
-				if (total !== undefined)
-					result.total = total;
-			}
-			else {
-				throw new Error('unsupported');
-			}
-
-			return result;
-		};
-
 		this._computeIndicator = function(groups, cubes, indicator, groupBy, filters) {
 			// Ask the olap cube to compute the components we need to compute the indicator.
 			// Like this: {'numerator': {'2010-01': 4, ...}, ...}
@@ -143,7 +75,9 @@ angular
 				for (k in filters) filter[k] = filters[k];
 				for (k in parameter.filter) filter[k] = parameter.filter[k];
 
-				components[key] = this._queryCube(groups, cubes[parameter.elementId], [groupBy], filter);
+				components[key] = cubes[parameter.elementId].query([groupBy], filter);
+				if (groupBy !== 'group' && components[key])
+					components[key].total = cubes[parameter.elementId].query([], filter);
 			}
 
 			// Inverse group and component key, to get scopes
@@ -169,7 +103,9 @@ angular
 		};
 
 		this._makeActivityRow = function(groups, cubes, indent, groupBy, filters, columns, element) {
-			var values = this._queryCube(groups, cubes[element.id], [groupBy], filters);
+			var values = cubes[element.id].query([groupBy], filters);
+			if (groupBy !== 'group' && values)
+				values.total = cubes[element.id].query([], filters);
 
 			return {
 				id: makeUUID(),
@@ -216,51 +152,68 @@ angular
 			project.forms.forEach(function(form) {
 				rows.push({type: 'header', text: form.name});
 				form.elements.forEach(function(element) {
-					var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, qFilters, columns, element);
-					row.id = element.id;
-					row.partitions = element.partitions.map(function(p, index) {
-						return {
-							index: index,
-							name: p.map(function(p) { return p.name.substring(0, 1).toLocaleUpperCase(); }).join('/'),
-							fullname: p.pluck('name').join(' / ')
-						}
-					});
-					rows.push(row);
-
-					if (splits[row.id] !== undefined) {
-						var partitionIndex = splits[row.id];
-						element.partitions[partitionIndex].forEach(function(part) {
-							// add filter
-							qFilters['partition' + partitionIndex] = [part.id];
-
-							var childRow = this._makeActivityRow(project.groups, cubes, 2, groupBy, qFilters, columns, element);
-							childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
-							childRow.name = part.name;
-							childRow.partitions = row.partitions.slice();
-							childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
-							rows.push(childRow)
-
-							if (splits[childRow.id] !== undefined) {
-								var childPartitionIndex = splits[childRow.id];
-
-								element.partitions[childPartitionIndex].forEach(function(subPart) {
-									// add filter
-									qFilters['partition' + childPartitionIndex] = [subPart.id];
-
-									var subChildRow = this._makeActivityRow(project.groups, cubes, 3, groupBy, qFilters, columns, element);
-									subChildRow.id = element.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
-									subChildRow.name = subPart.name;
-									rows.push(subChildRow);
-
-									// remove filter
-									delete qFilters['partition' + childPartitionIndex];
-								}, this);
+					try {
+						var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, qFilters, columns, element);
+						row.id = element.id;
+						row.partitions = element.partitions.map(function(p, index) {
+							return {
+								index: index,
+								name: p.map(function(p) { return p.name.substring(0, 1).toLocaleUpperCase(); }).join('/'),
+								fullname: p.pluck('name').join(' / ')
 							}
+						});
+						rows.push(row);
+						
+						if (splits[row.id] !== undefined) {
+							var partitionIndex = splits[row.id];
+							element.partitions[partitionIndex].forEach(function(part) {
+								// add filter
+								qFilters['partition' + partitionIndex] = [part.id];
 
-							// remove filter
-							delete qFilters['partition' + partitionIndex];
-						}, this);
+								try {
+									var childRow = this._makeActivityRow(project.groups, cubes, 2, groupBy, qFilters, columns, element);
+									childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
+									childRow.name = part.name;
+									childRow.partitions = row.partitions.slice();
+									childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
+									rows.push(childRow)
+
+									if (splits[childRow.id] !== undefined) {
+										var childPartitionIndex = splits[childRow.id];
+
+										element.partitions[childPartitionIndex].forEach(function(subPart) {
+											// add filter
+											qFilters['partition' + childPartitionIndex] = [subPart.id];
+
+											try {
+												var subChildRow = this._makeActivityRow(project.groups, cubes, 3, groupBy, qFilters, columns, element);
+												subChildRow.id = element.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
+												subChildRow.name = subPart.name;
+												rows.push(subChildRow);
+											}
+											catch (e) {
+												console.log('Skipping ', subPart.name);
+											}
+
+											// remove filter
+											delete qFilters['partition' + childPartitionIndex];
+										}, this);
+									}
+								}
+								catch (e) {
+									console.log('Skipping ', part.name);
+								}
+
+
+								// remove filter
+								delete qFilters['partition' + partitionIndex];
+							}, this);
+						}
 					}
+					catch (e) {
+						console.log('Skipping ', element.name);
+					}
+
 				}, this);
 			}, this);
 

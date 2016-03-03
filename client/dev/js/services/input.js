@@ -79,21 +79,32 @@ angular
 				form: form.id,
 				period: period,
 				entity: entityId,
-				values: {},
+				values: {}
 			});
 
-			input.sanitize(form);
+			form.elements.forEach(function(element) {
+				var numFields = 1;
+				element.partitions.forEach(function(partition) {
+					numFields *= partition.length;
+				});
+				
+				input.values[element.id] = new Array(numFields);
+				for (var i = 0; i < numFields; ++i)
+					input.values[element.id][i] = 0;
+			});
+
+			// input.sanitize(form);
 			return input;
 		};
 
 		/**
 		 * Factory with default value
 		 */
-		Input.makeFake = function(form) {
-			var input = new Input({form: form.id, values: {}});
-			input.sanitize(form);
-			return input;
-		};
+		// Input.makeFake = function(form) {
+		// 	var input = new Input({form: form.id, values: {}});
+		// 	// input.sanitize(form);
+		// 	return input;
+		// };
 
 		Input.fetchProjectStatus = function(project) {
 			return Input.query({mode: 'project_input_ids', projectId: project._id}).$promise.then(function(inputsDone) {
@@ -172,7 +183,7 @@ angular
 				formId: form.id,
 				period: period
 			}).$promise.then(function(result) {
-				result.forEach(function(input) { input.sanitize(form); });
+				// result.forEach(function(input) { input.sanitize(form); });
 
 				var currentInputId = [projectId, entityId, form.id, period].join(':');
 
@@ -252,92 +263,93 @@ angular
 				});
 
 				// ask each input to sanitize itself with the relevant form.
-				inputs.forEach(function(input) {
-					input.sanitize(formsById[input.form]);
-				});
+				// inputs.forEach(function(input) {
+				// 	input.sanitize(formsById[input.form]);
+				// });
 
 				return inputs;
 			});
 		};
 
+
 		/**
 		 * Change values to match a given form
 		 */
-		Input.prototype.sanitize = function(form) {
-			if (this.form !== form.id)
-				throw new Error('Invalid form');
+		// Input.prototype.sanitize = function(form) {
+		// 	if (this.form !== form.id)
+		// 		throw new Error('Invalid form');
 
-			var newValues = {},
-				sums = this.computeSums();
+		// 	var newValues = {},
+		// 		sums = this.computeSums();
 
-			var elements = form.elements, numElements = elements.length;
+		// 	var elements = form.elements, numElements = elements.length;
 
-			for (var j = 0; j < numElements; ++j) {
-				var element = elements[j];
+		// 	for (var j = 0; j < numElements; ++j) {
+		// 		var element = elements[j];
 
-				if (element.partitions.length === 0) {
-					if (sums[element.id])
-						newValues[element.id] = {'': sums[element.id][''] || 0};
-					else
-						newValues[element.id] = {'': 0};
-				}
-				else {
-					var partitions = itertools.product(element.partitions),
-						numPartitions = partitions.length;
+		// 		if (element.partitions.length === 0) {
+		// 			if (sums[element.id])
+		// 				newValues[element.id] = {'': sums[element.id][''] || 0};
+		// 			else
+		// 				newValues[element.id] = {'': 0};
+		// 		}
+		// 		else {
+		// 			var partitions = itertools.product(element.partitions),
+		// 				numPartitions = partitions.length;
 
-					newValues[element.id] = {};
-					for (var k = 0; k < numPartitions; ++k) {
-						var key = partitions[k].pluck('id').sort().join('.');
+		// 			newValues[element.id] = {};
+		// 			for (var k = 0; k < numPartitions; ++k) {
+		// 				var key = partitions[k].pluck('id').sort().join('.');
 						
-						if (sums[element.id])
-							newValues[element.id][key] = sums[element.id][key] || 0;
-						else
-							newValues[element.id][key] = 0;
-					}
-				}
-			}
+		// 				if (sums[element.id])
+		// 					newValues[element.id][key] = sums[element.id][key] || 0;
+		// 				else
+		// 					newValues[element.id][key] = 0;
+		// 			}
+		// 		}
+		// 	}
 
-			this.values = newValues;
-		};
+		// 	this.values = newValues;
+		// };
 
 
 		/**
 		 * Given a input.value hash, compute all possible sums.
 		 * This is used for the agg data stats.
 		 */
-		Input.prototype.computeSums = function() {
-			var result = {};
+		// Input.prototype.computeSums = function() {
+		// 	var result = {};
 
-			for (var elementId in this.values) {
-				result[elementId] = {};
+		// 	for (var elementId in this.values) {
+		// 		result[elementId] = {};
 
-				for (var partitionIds in this.values[elementId]) {
-					// now we need to create a key for each subset of the partition.
-					var splittedPartitionIds = partitionIds == '' ? [] : partitionIds.split('.'),
-						numSubsets = Math.pow(2, splittedPartitionIds.length);
+		// 		for (var partitionIds in this.values[elementId]) {
+		// 			// now we need to create a key for each subset of the partition.
+		// 			var splittedPartitionIds = partitionIds == '' ? [] : partitionIds.split('.'),
+		// 				numSubsets = Math.pow(2, splittedPartitionIds.length);
 
-					for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
-						var subsetKey = splittedPartitionIds.filter(function(id, index) { return subsetIndex & (1 << index); }).join('.');
+		// 			for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
+		// 				var subsetKey = splittedPartitionIds.filter(function(id, index) { return subsetIndex & (1 << index); }).join('.');
 
-						// if result was set as a string previously, skip
-						if (typeof result[elementId][subsetKey] === 'string')
-							continue
+		// 				// if result was set as a string previously, skip
+		// 				if (typeof result[elementId][subsetKey] === 'string')
+		// 					continue
 
-						// if value is a string, skip as well
-						if (typeof this.values[elementId][partitionIds] === 'string') {
-							result[elementId][subsetKey] = this.values[elementId][partitionIds];
-							continue;
-						}
+		// 				// if value is a string, skip as well
+		// 				if (typeof this.values[elementId][partitionIds] === 'string') {
+		// 					result[elementId][subsetKey] = this.values[elementId][partitionIds];
+		// 					continue;
+		// 				}
 
-						if (result[elementId][subsetKey] == undefined)
-							result[elementId][subsetKey] = 0; // initialize if needed
-						result[elementId][subsetKey] += this.values[elementId][partitionIds];
-					}
-				}
-			}
+		// 				if (result[elementId][subsetKey] == undefined)
+		// 					result[elementId][subsetKey] = 0; // initialize if needed
+		// 				result[elementId][subsetKey] += this.values[elementId][partitionIds];
+		// 			}
+		// 		}
+		// 	}
 
-			return result;
-		};
+		// 	return result;
+		// };
 
 		return Input;
 	});

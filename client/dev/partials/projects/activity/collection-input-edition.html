@@ -44,7 +44,12 @@
 		</label>
 
 		<div class="col-sm-10">
-			<input-grid partitions="partitions[element.id]" ng-model="currentInput.values[element.id]" offset="positions[element.id]"></input-grid>
+			{{partitions[element.id]}}
+
+			<input-grid ng-model="currentInput.values[element.id]"
+						partitions="element.partitions"
+						offset="positions[element.id]"
+						rotation="rotations[element.id]"></input-grid>
 		</div>
 	</div>
 </form>

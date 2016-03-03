@@ -16,65 +16,67 @@ describe('Olap', function() {
 		cube = new Olap.Cube(
 			'num_consultations',
 			[
-				new Olap.Dimension('gender', 'Gender', [
-					{id: 'male', name: "Male"},
-					{id: 'female', name: 'Female'},
-					{id: 'transgenre', name: 'Transgenre'}
-				], 'sum'),
-
-				new Olap.Dimension('place', 'Place', [
-					{id: 'paris', name: 'Paris'},
-					{id: 'madrid', name: 'Madrid'},
-					{id: 'london', name: 'London'},
-					{id: 'rome', name: 'Rome'}
-				], 'sum'),
-
-				new Olap.Dimension('age', 'Age', [
-					{id: '-15', name: '-15'},
-					{id: '+15-18', name: '+15-18'},
-					{id: '+18', name: '+18'}
-				], 'sum'),
-
-				new Olap.Dimension('pathology', 'Pathology', [
-					{id: 'hiv', name: 'HIV'},
-					{id: 'hbv', name: 'HBV'},
-					{id: 'other', name: 'Other'}
-				], 'sum')
+				new Olap.Dimension('gender', ['male', 'female'], 'sum'),
+				new Olap.Dimension('place', ['paris', 'madrid', 'london'], 'sum'),
+				new Olap.Dimension('age', ['minor', 'major'], 'sum'),
+				new Olap.Dimension('pathology', ['hiv', 'other'], 'sum')
 			],
+			[],
 			[
-				new Olap.ElementaryCube({gender: 'male', place: 'paris',  age: '-15', pathology: 'other'}, 1),
-				new Olap.ElementaryCube({gender: 'female', place: 'london', age: '+18', pathology: 'hiv'}, 4),
-				new Olap.ElementaryCube({gender: 'male', place: 'madrid', age: '+18', pathology: 'other'}, 2),
-				new Olap.ElementaryCube({gender: 'female', place: 'rome',   age: '+18', pathology: 'other'}, 8)
+				1,  // male    paris   minor  hiv
+				2,  // male    paris   minor  other
+				3,  // male    paris   major  hiv
+				4,  // male    paris   major  other
+				5,  // male    madrid  minor  hiv
+				6,  // male    madrid  minor  other
+				7,  // male    madrid  major  hiv
+				8,  // male    madrid  major  other
+				9,  // male    london  minor  hiv
+				10, // male    london  minor  other
+				11, // male    london  major  hiv
+				12, // male    london  major  other
+				13, // female  paris   minor  hiv
+				14, // female  paris   minor  other
+				15, // female  paris   major  hiv
+				16, // female  paris   major  other
+				17, // female  madrid  minor  hiv
+				18, // female  madrid  minor  other
+				19, // female  madrid  major  hiv
+				20, // female  madrid  major  other
+				21, // female  london  minor  hiv
+				22, // female  london  minor  other
+				23, // female  london  major  hiv
+				24  // female  london  major  other
 			]
 		);
 	});
 
 	it('should sum all cube', function() {
-		expect(cube.query()).toEqual(15);
+		var sum = 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + 23 + 24;
+
+		expect(cube.query([], {})).toEqual(sum);
+		expect(cube.query([], {gender: ["male", "female"]})).toEqual(sum);
 	});
 
 	it('should filter on one field', function() {
-		expect(cube.query(null, {gender: ["female"]})).toEqual(12);
-	});
-
-	it('should filter on one field, 2 values', function() {
-		expect(cube.query(null, {gender: ["male", "female"]})).toEqual(15);
+		expect(cube.query([], {gender: ["female"]})).toEqual(13 + 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + 23 + 24);
 	});
 
 	it('should filter on two fields, 1 value each', function() {
-		expect(cube.query(null, {gender: ["male"], place: ['paris']})).toEqual(1);
+		expect(cube.query([], {gender: ["male"], place: ['paris']})).toEqual(1 + 2 + 3 + 4);
 	});
 
 	it('should split by gender', function() {
-		expect(cube.query(['gender'])).toEqual({male: 3, female: 12, transgenre: 0})
+		expect(cube.query(['gender'], {})).toEqual({
+			male: 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12,
+			female: 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + 23 + 24
+		})
 	});
 
 	it('should split by gender and age', function() {
-		expect(cube.query(['gender', 'age'])).toEqual({
-			male: {'-15': 1, '+15-18': 0, '+18': 2},
-			female: {'-15': 0, '+15-18': 0, '+18': 12},
-			transgenre: {'-15': 0, '+15-18': 0, '+18': 0}
+		expect(cube.query(['gender', 'age'], {})).toEqual({
+			male: {'minor': 1 + 2 + 5 + 6 + 9 + 10, 'major': 3 + 4 + 7 + 8 + 11 + 12},
+			female: {'minor': 13 + 14 + 17 + 18 + 21 + 22, 'major': 23 + 15 + 16 + 19 + 20 + 24}
 		});
 	});
 
@@ -87,3 +89,6 @@ describe('Olap', function() {
 	});
 
 });
+
+
+
