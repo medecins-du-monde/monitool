@@ -52,7 +52,7 @@ var validate = validator({
 });
 
 var Input = module.exports = {
-	// list: Abstract.list.bind(this, 'input'),
+
 	get: Abstract.get.bind(this, 'input'),
 	delete: Abstract.delete.bind(this, 'input'),
 	set: Abstract.set.bind(this),

@@ -12,12 +12,10 @@
 angular
 	.module(
 		'monitool.services.olap',
-		[
-			'monitool.services.itertools'
-		]
+		[]
 	)
 
-	.factory('Olap', function(itertools) {
+	.factory('Olap', function() {
 
 		/**
 		 * id = "month"

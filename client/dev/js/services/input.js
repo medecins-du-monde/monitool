@@ -6,13 +6,12 @@ angular
 	.module(
 		'monitool.services.models.input',
 		[
-			'ngResource',
-			'monitool.services.itertools'
+			'ngResource'
 		]
 	)
 
 	// Define Input factory
-	.factory('Input', function($resource, $q, itertools) {
+	.factory('Input', function($resource, $q) {
 
 		// this has nothing to do on the root scope.
 		// => move it to a service and factorize with the similiar function in mtReporting
@@ -93,18 +92,8 @@ angular
 					input.values[element.id][i] = 0;
 			});
 
-			// input.sanitize(form);
 			return input;
 		};
-
-		/**
-		 * Factory with default value
-		 */
-		// Input.makeFake = function(form) {
-		// 	var input = new Input({form: form.id, values: {}});
-		// 	// input.sanitize(form);
-		// 	return input;
-		// };
 
 		Input.fetchProjectStatus = function(project) {
 			return Input.query({mode: 'project_input_ids', projectId: project._id}).$promise.then(function(inputsDone) {
@@ -262,94 +251,9 @@ angular
 					return formsById[input.form] && validInputIds[input._id];
 				});
 
-				// ask each input to sanitize itself with the relevant form.
-				// inputs.forEach(function(input) {
-				// 	input.sanitize(formsById[input.form]);
-				// });
-
 				return inputs;
 			});
 		};
-
-
-		/**
-		 * Change values to match a given form
-		 */
-		// Input.prototype.sanitize = function(form) {
-		// 	if (this.form !== form.id)
-		// 		throw new Error('Invalid form');
-
-		// 	var newValues = {},
-		// 		sums = this.computeSums();
-
-		// 	var elements = form.elements, numElements = elements.length;
-
-		// 	for (var j = 0; j < numElements; ++j) {
-		// 		var element = elements[j];
-
-		// 		if (element.partitions.length === 0) {
-		// 			if (sums[element.id])
-		// 				newValues[element.id] = {'': sums[element.id][''] || 0};
-		// 			else
-		// 				newValues[element.id] = {'': 0};
-		// 		}
-		// 		else {
-		// 			var partitions = itertools.product(element.partitions),
-		// 				numPartitions = partitions.length;
-
-		// 			newValues[element.id] = {};
-		// 			for (var k = 0; k < numPartitions; ++k) {
-		// 				var key = partitions[k].pluck('id').sort().join('.');
-						
-		// 				if (sums[element.id])
-		// 					newValues[element.id][key] = sums[element.id][key] || 0;
-		// 				else
-		// 					newValues[element.id][key] = 0;
-		// 			}
-		// 		}
-		// 	}
-
-		// 	this.values = newValues;
-		// };
-
-
-		/**
-		 * Given a input.value hash, compute all possible sums.
-		 * This is used for the agg data stats.
-		 */
-		// Input.prototype.computeSums = function() {
-		// 	var result = {};
-
-		// 	for (var elementId in this.values) {
-		// 		result[elementId] = {};
-
-		// 		for (var partitionIds in this.values[elementId]) {
-		// 			// now we need to create a key for each subset of the partition.
-		// 			var splittedPartitionIds = partitionIds == '' ? [] : partitionIds.split('.'),
-		// 				numSubsets = Math.pow(2, splittedPartitionIds.length);
-
-		// 			for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
-		// 				var subsetKey = splittedPartitionIds.filter(function(id, index) { return subsetIndex & (1 << index); }).join('.');
-
-		// 				// if result was set as a string previously, skip
-		// 				if (typeof result[elementId][subsetKey] === 'string')
-		// 					continue
-
-		// 				// if value is a string, skip as well
-		// 				if (typeof this.values[elementId][partitionIds] === 'string') {
-		// 					result[elementId][subsetKey] = this.values[elementId][partitionIds];
-		// 					continue;
-		// 				}
-
-		// 				if (result[elementId][subsetKey] == undefined)
-		// 					result[elementId][subsetKey] = 0; // initialize if needed
-		// 				result[elementId][subsetKey] += this.values[elementId][partitionIds];
-		// 			}
-		// 		}
-		// 	}
-
-		// 	return result;
-		// };
 
 		return Input;
 	});
