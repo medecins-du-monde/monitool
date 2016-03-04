@@ -349,7 +349,8 @@ angular
 						// Build new filter by concatenating elements.
 						var newFilter = [];
 						oldFilter.forEach(function(v) { Array.prototype.push.apply(newFilter, dimensionGroup.mapping[v]); });
-
+						newFilter.sort();
+						
 						// If there are duplicates, remove them.
 						var i = newFilter.length - 2;
 						while (i > 0) {
@@ -400,6 +401,6 @@ angular
 			});
 		};
 
-		return {Dimension: Dimension, Cube: Cube}
+		return {Dimension: Dimension, DimensionGroup: DimensionGroup, Cube: Cube}
 	});
 

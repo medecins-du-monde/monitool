@@ -21,7 +21,16 @@ describe('Olap', function() {
 				new Olap.Dimension('age', ['minor', 'major'], 'sum'),
 				new Olap.Dimension('pathology', ['hiv', 'other'], 'sum')
 			],
-			[],
+			[
+				new Olap.DimensionGroup(
+					'continent', 'place',
+					{
+						europe: ['paris', 'madrid', 'london'],
+						continental_europe: ['paris', 'madrid'],
+						islandic_europe: ['london']
+					}
+				)
+			],
 			[
 				1,  // male    paris   minor  hiv
 				2,  // male    paris   minor  other
@@ -81,14 +90,37 @@ describe('Olap', function() {
 	});
 
 	it('should split by gender and age and filter', function() {
-		expect(cube.query(['gender', 'age'], {pathology: "other"})).toEqual({
-			male: {'-15': 1, '+15-18': 0, '+18': 2},
-			female: {'-15': 0, '+15-18': 0, '+18': 8},
-			transgenre: {'-15': 0, '+15-18': 0, '+18': 0}
+		expect(cube.query(['gender', 'age'], {pathology: ["other"]})).toEqual({
+			male: {
+				minor: 2 + 6 + 10,
+				major: 4 + 8 + 12
+			},
+			female: {
+				minor: 14 + 18 + 22,
+				major: 16 + 20 + 24
+			}
 		});
 	});
 
-});
+	it('should work when filtering by groups', function() {
+		expect(cube.query([], {continent: ['europe']})).toEqual(
+			1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + 23 + 24
+		);
+	});
 
+	it('should work when filtering by overlaping groups', function() {
+		expect(cube.query([], {continent: ['europe', 'continental_europe']})).toEqual(
+			1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + 23 + 24
+		);
+	});
+
+	it('should work when grouping by overlaping group', function() {
+		expect(cube.query(['continent'], {})).toEqual({
+			europe: 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + 23 + 24,
+			continental_europe: 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20,
+			islandic_europe: 9 + 10 + 11 + 12 + 21 + 22 + 23 + 24
+		});
+	});
+});
 
 
