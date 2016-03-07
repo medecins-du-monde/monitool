@@ -305,10 +305,11 @@ function extractRelevantInformation(form) {
 			element.partitions.map(function(partition) {
 				return partition.map(function(partitionElement) {
 					return partitionElement.id;
-				})
+				});
 			})
 		];
-	});
+		// the order does not matter => we need to sort by id.
+	}).sort(function(el1, el2) { return el1[0].localeCompare(el2[0]); });
 }
 
 function updateInputs(oldForm, newForm, callback) {
