@@ -4,10 +4,7 @@ describe('Olap', function() {
 	// Load service before each test.
 	var Olap;
 	beforeEach(module('monitool.services.olap'));
-	beforeEach(inject(function(_Olap_) {
-		Olap = _Olap_;
-	}));
-
+	beforeEach(inject(function(_Olap_) { Olap = _Olap_; }));
 
 	var cube;
 
