@@ -6,6 +6,18 @@ function isEmpty(value) {
 
 angular.module('monitool.directives.form', [])
 
+	.directive('forbiddenValues', function() {
+		return {
+			require: 'ngModel',
+			link: function($scope, element, attributes, ngModelController) {
+				ngModelController.$validators.forbiddenValues = function(modelValue, viewValue) {
+					var values = $scope.$eval(attributes.forbiddenValues);
+					return values.indexOf(viewValue) === -1;
+				};
+			}
+		};
+	})
+
 	.directive('uiRequired', function() {
 		return {
 			require: 'ngModel',

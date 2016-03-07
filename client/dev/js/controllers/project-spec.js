@@ -84,7 +84,10 @@ angular.module('monitool.controllers.project.spec', [])
 				templateUrl: 'partials/projects/specification/user-modal.html',
 				size: 'lg',
 				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
-				resolve: {users: function() { return users; }, user: function() { return user; }}
+				resolve: {
+					users: function() { return users; },
+					user: function() { return user; }
+				}
 			}).result;
 
 			promise.then(function(newUser) {
@@ -119,6 +122,12 @@ angular.module('monitool.controllers.project.spec', [])
 			role: "owner",
 			entities: []
 		};
+
+		$scope.partners = $scope.project.users.filter(function(projectUser) {
+			return projectUser.type == 'partner' && projectUser.username !== $scope.user.username;
+		}).map(function(projectUser) {
+			return projectUser.username;
+		});
 
 		$scope.done = function() {
 			if ($scope.user.type == 'internal') {

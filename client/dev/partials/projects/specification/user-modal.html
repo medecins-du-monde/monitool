@@ -19,7 +19,7 @@
 						class="form-control"
 						ng-disabled="!isNew"
 						ng-model="user.id"
-						ng-options="u._id as u.name for (id, u) in availableUsers"
+						ng-options="u._id as u.name for u in availableUsers|orderBy:'name'"
 						required></select>
 			</div>
 		</div>
@@ -34,6 +34,7 @@
 					   class="form-control"
 					   ng-minlength="4"
 					   ng-pattern="/^[a-z\.\-]+$/"
+					   forbidden-values="partners"
 					   required>
 			</div>
 		</div>
