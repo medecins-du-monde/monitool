@@ -28,25 +28,19 @@ module.exports = {
 			}.toString()
 		},
 
-		inputs_by_entity_date: {
+		inputs_by_project_entity_date: {
 			map: function(doc) {
 				if (doc.type === 'input')
-					emit([doc.entity, doc.period]);
+					emit([doc.project, doc.entity, doc.period]);
 			}.toString()
 		},
 
-		inputs_by_form_date: {
+		inputs_by_project_form_date: {
 			map: function(doc) {
 				if (doc.type === 'input')
-					emit([doc.form, doc.period]);
-			}.toString()
-		},
-
-		report_by_project: {
-			map: function(doc) {
-				if (doc.type === 'report')
-					emit([doc.project, doc.date], doc.name);
+					emit([doc.project, doc.form, doc.period]);
 			}.toString()
 		}
 	}
 };
+

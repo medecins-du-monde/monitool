@@ -45,9 +45,7 @@ angular
 					sources: angular.copy(tran),
 					comments: angular.copy(tran),
 					operation: "waiting",
-					target: "higher_is_better",
-					unit: "%",
-					types: [], themes: [], formulas: {}
+					types: [], themes: []
 				});
 			else
 				return Indicator.get({id: id}).$promise;

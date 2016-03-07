@@ -6,65 +6,61 @@ var async     = require('async'),
 	database  = require('../database');
 
 var validate = validator({
-	"$schema": "http://json-schema.org/schema#",
-	"title": "Monitool indicator schema",
-	"type": "object",
-	"additionalProperties": true,
-	"required": [
-		// "_id", "type", "name", "unit", "types", "themes", "formulas"
+	$schema: "http://json-schema.org/schema#",
+	title: "Monitool indicator schema",
+	type: "object",
+	additionalProperties: false,
+	required: [
+		"_id", "type", "name", "standard", "sources", "comments", "operation", "types", "themes"
 	],
-	"properties": {
-		"_id":  { "$ref": "#/definitions/uuid" },
-		"_rev": { "$ref": "#/definitions/couchdb-revision" },
-		"type": { "type": "string", "pattern": "^indicator$" },
-
-		"name":       { "$ref": "#/definitions/translated_req" },
-		"standard":   { "$ref": "#/definitions/translated" },
-		"sources":    { "$ref": "#/definitions/translated" },
-		"comments":   { "$ref": "#/definitions/translated" },
-
-		"operation": { "type": "string", "enum": ["mandatory", "approved", "waiting", "forbidden"] },
-
-		"types": {
-			"type": "array",
-			"uniqueItems": true,
-			"items": { "$ref": "#/definitions/uuid" }
+	properties: {
+		_id:       { $ref: "#/definitions/uuid" },
+		_rev:      { $ref: "#/definitions/revision" },
+		comments:  { $ref: "#/definitions/translated" },
+		name:      { $ref: "#/definitions/translated_req" },
+		operation: { type: "string", enum: ["mandatory", "approved", "waiting"] },
+		sources:   { $ref: "#/definitions/translated" },
+		standard:  { $ref: "#/definitions/translated" },
+		type:      { type: "string", "pattern": "^indicator$" },
+		types: {
+			type: "array",
+			uniqueItems: true,
+			items: { "$ref": "#/definitions/uuid" }
 		},
-
-		"themes": {
-			"type": "array",
-			"uniqueItems": true,
-			"items": { "$ref": "#/definitions/uuid" }
+		themes: {
+			type: "array",
+			uniqueItems: true,
+			items: { "$ref": "#/definitions/uuid" }
 		}
 	},
-	"definitions": {
-		"translated_req": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"en": { "type": "string", "minLength": 1 },
-				"fr": { "type": "string", "minLength": 1 },
-				"es": { "type": "string", "minLength": 1 }
+	definitions: {
+		translated_req: {
+			type: "object",
+			additionalProperties: false,
+			properties: {
+				en: { type: "string", minLength: 1 },
+				fr: { type: "string", minLength: 1 },
+				es: { type: "string", minLength: 1 }
 			}
 		},
 
-		"translated": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"en": { "type": "string" },
-				"fr": { "type": "string" },
-				"es": { "type": "string" }
+		translated: {
+			type: "object",
+			additionalProperties: false,
+			properties: {
+				en: { type: "string" },
+				fr: { type: "string" },
+				es: { type: "string" }
 			}
 		},
 
-		"uuid": {
-			"type": "string",
-			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+		uuid: {
+			type: "string",
+			pattern: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
 		},
-		"couchdb-revision": {
-			"type": "string",
-			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
+		revision: {
+			type: "string",
+			pattern: "^[0-9]+\\-[0-9a-f]{32}$"
 		}
 	}
 });

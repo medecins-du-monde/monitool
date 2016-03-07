@@ -7,176 +7,251 @@ var async        = require('async'),
 	database     = require('../database');
 
 var validate = validator({
-	"$schema": "http://json-schema.org/schema#",
-	"title": "Monitool project schema",
-	"type": "object",
-	// "additionalProperties": false,
-	"additionalProperties": true,
+	$schema: "http://json-schema.org/schema#",
+	title: "Monitool project schema",
+	type: "object",
+	additionalProperties: false,
+	required: [ '_id', 'type', 'name', 'begin', 'end', 'entities', 'groups', 'forms', 'themes', 'logicalFrames', 'users'],
 
-	"required": [
-		// "_id", "type", "name", "begin", "end", "indicators", "dataCollection", "themes",
-		// "inputEntities", "inputGroups", "logicalFrame", "owners", "dataEntryOperators"
-	],
+	properties: {
+		_id: { $ref: "#/definitions/uuid" },
+		_rev: { $ref: "#/definitions/revision" },
+		type: { type: "string", pattern: "^project$" },
+		name: { type: "string", minLength: 1 },
+		begin: { type: "string", format: "date" },
+		end: { type: "string", format: "date" },
 
-	"properties": {
-		// "_id":   { "$ref": "#/definitions/uuid" },
-		// "_rev":  { "$ref": "#/definitions/couchdb-revision" },
-		// "type":  { "type": "string", "pattern": "^project$" },
-		// "name":  { "type": "string", "minLength": 1 },
-		// "begin": { "type": "string", "format": "date" },
-		// "end":   { "type": "string", "format": "date" },
+		entities: {
+			type: "array",
+			items: {
+				id: { $ref: "#/definitions/uuid" },
+				name: { type: "string", minLength: 1 },
+				start: { oneOf: [{type: 'null'}, { type: "string", format: "date" }]},
+				end: { oneOf: [{type: 'null'}, { type: "string", format: "date" }]}
+			}
+		},
+
+		groups: {
+			type: "array",
+			items: {
+				type: "object",
+				properties: {
+					id: { $ref: "#/definitions/uuid" },
+					name: { type: "string", minLength: 1 },
+					members: { type: "array", items: { $ref: "#/definitions/uuid" } }
+				}
+			}
+		},
+	
+		forms: {
+			type: "array",
+			items: {
+				type: "object",
+				additionalProperties: false,
+				required: ["id", "name", "collect", "periodicity", "start", "end", "elements"],
+				properties: {
+					id: { $ref: "#/definitions/uuid" },
+					name: { type: "string", minLength: 1 },
+					entities: { type: "array", items: { $ref: "#/definitions/uuid" } },
+					collect: { type: "string", enum: ["project", 'entity', 'some_entity'] },
+					periodicity: { type: "string", enum: ["day", "week", "month", "quarter", "year", "free"] },
+					start: { oneOf: [{type: 'null'}, { type: "string", format: "date" }]},
+					end: { oneOf: [{type: 'null'}, { type: "string", format: "date" }]},
+					elements: {
+						type: "array",
+						items: {
+							type: "object",
+							additionalProperties: false,
+							required: ['id', 'name', 'timeAgg', 'geoAgg', 'partitions'],
+							properties: {
+								id: { $ref: "#/definitions/uuid" },
+								name: { type: "string", minLength: 1 },
+								timeAgg: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
+								geoAgg: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
+								partitions: {
+									type: "array",
+									items: {
+										type: "array",
+										items: {
+											type: "object",
+											additionalProperties: false,
+											required: ['id', 'name'],
+											properties: {
+												id: { $ref: "#/definitions/uuid" },
+												name: { type: "string", minLength: 1 }
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		users: {
+			type: "array",
+			items: {
+				oneOf: [
+					{
+						type: "object",
+						additionalProperties: false,
+						required: ['type', 'id', 'role'],
+						properties: {
+							type: {type: 'string', pattern: "^internal$"},
+							id: {type: 'string', pattern: '^usr:[a-z\.]+$'},
+							role: {type: 'string', enum: ['owner', 'input_all', 'input', 'read']},
+							entities: {type: 'array', items: { $ref: "#/definitions/uuid" } }
+						}
+					},
+					{
+						type: "object",
+						additionalProperties: false,
+						required: ['name', 'password', 'role', 'type', 'username'],
+						properties: {
+							type: {type: 'string', pattern: "^partner$"},
+							name: {type: 'string', minLength: 1},
+							role: {type: 'string', enum: ['owner', 'input_all', 'input', 'read']},
+
+							username: {type: 'string', minLength: 1},
+							password: {
+								oneOf: [
+									{type: 'string', minLength: 6},
+									{type: "null"}
+								]
+							},
+
+							entities: {
+								type: 'array',
+								items: { $ref: "#/definitions/uuid" }
+							}
+						}
+					}
+				]
+			}
+		},
+
+		themes: {
+			type: "array",
+			uniqueItems: true,
+			items: { $ref: "#/definitions/uuid" }
+		},
 		
-		// "themes": {
-		// 	"type": "array",
-		// 	"uniqueItems": true,
-		// 	"items": {
-		// 		"$ref": "#/definitions/uuid"
-		// 	}
-		// },
-
-		// "indicators": {
-		// 	"type": "object",
-		// 	"patternProperties": {
-		// 		"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$": {
-		// 			"type": "object",
-		// 			"additionalProperties": false,
-		// 			"required": [
-		// 				"relevance", "inCharge", "source"
-		// 			],
-		// 			"properties": {
-		// 				"relevance": { "type": "string", "minLength": 1 },
-		// 				"source": { "type": "string", "minLength": 1 },
-		// 				"inCharge": { "type": "string", "minLength": 1 },
-		// 				"baseline": { "type": ["number", "null"] },
-		// 				"target": { "type": ["number", "null"] },
-		// 				"showRed": { "type": "number" },
-		// 				"showYellow": { "type": "number" },
-
-		// 				"formula": {},
-		// 				"variable": {},
-		// 				"filter": {},
-		// 				"parameters": {}
-
-		// 			}
-		// 		}
-		// 	}
-		// },
-
-		// "dataCollection": {
-		// 	"type": "array",
-		// 	"items": {
-		// 		"type": "object",
-		// 		"required": ["id", "name", "start", "end", "active", "useProjectStart", "useProjectEnd", "periodicity", "intermediaryDates"],
-		// 		"additionalProperties": false,
-		// 		"properties": {
-		// 			"id":    { "$ref": "#/definitions/uuid" },
-		// 			"name":  { "type": "string", "minLength": 1 },
-		// 			"start": { "type": "string", "format": "date" },
-		// 			"end":   { "type": "string", "format": "date" },
-					
-		// 			"active": { "type": "boolean" },
-		// 			"useProjectStart": { "type": "boolean" },
-		// 			"useProjectEnd": { "type": "boolean" },
-
-		// 			"periodicity": {
-		// 				"type": "string",
-		// 				"enum": ["day", "week", "month", "quarter", "year", "planned"]
-		// 			},
-
-		// 			"collect": {
-		// 				"type": "string",
-		// 				"enum": ["project", "entity"]
-		// 			},
-
-		// 			"intermediaryDates": {
-		// 				"type": "array",
-		// 				"items": { "type": "string", "format": "date" }
-		// 			},
-					
-		// 			"rawData": {}
-		// 		}
-		// 	}
-		// },
-		
-		// "inputEntities": {
-		// 	"type": "array",
-		// 	"items": {
-		// 		"id":   { "$ref": "#/definitions/uuid" },
-		// 		"name": { "type": "string", "minLength": 1 }	
-		// 	}
-		// },
-
-		// "inputGroups": {
-		// 	"type": "array",
-		// 	"items": {
-		// 		"type": "object",
-		// 		"properties": {
-		// 			"id":      { "$ref": "#/definitions/uuid" },
-		// 			"name":    { "type": "string", "minLength": 1 },
-		// 			"members": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
-		// 		}
-		// 	}
-		// },
-
-		// "logicalFrame": {
-		// 	"type": "object",
-		// 	"additionalProperties": false,
-		// 	"properties": {
-		// 		"goal": { "type": "string", "minLength": 1 },
-		// 		"purposes": {
-		// 			"type": "array",
-		// 			"items": {
-		// 				"type": "object",
-		// 				"additionalProperties": false,
-		// 				"properties": {
-		// 					"description": { "type": "string", "minLength": 1 },
-		// 					"assumptions": { "type": "string" },
-		// 					"outputs": {
-		// 						"type": "array",
-		// 						"items": {
-		// 							"type": "object",
-		// 							"additionalProperties": false,
-		// 							"properties": {
-		// 								"description": { "type": "string", "minLength": 1 },
-		// 								"assumptions": { "type": "string" },
-		// 								"activities": {
-		// 									"type": "array",
-		// 									"items": {
-		// 										"type": "object",
-		// 										"additionalProperties": false,
-		// 										"required": ["description"],
-		// 										"properties": {
-		// 											"description": { "type": "string", "minLength": 1 }
-		// 										}
-		// 									}
-		// 								},
-		// 								"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
-		// 							}
-		// 						}
-		// 					},
-		// 					"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
-		// 				}
-		// 			}
-		// 		},
-		// 		"indicators": { "type": "array", "items": { "$ref": "#/definitions/uuid" }}
-		// 	}
-		// },
-
-		// "owners":             { "$ref": "#/definitions/user-list" },
-		// "dataEntryOperators": { "$ref": "#/definitions/user-list" }
+		logicalFrames: {
+			type: 'array',
+			items: {
+				type: "object",
+				additionalProperties: false,
+				required: ['name', 'goal', 'indicators', 'purposes'],
+				properties: {
+					name: { type: "string" },
+					goal: { type: "string" },
+					indicators: {
+						type: "array",
+						items: { $ref: "#/definitions/planning" }
+					},
+					purposes: {
+						type: "array",
+						items: {
+							type: "object",
+							additionalProperties: false,
+							required: ['description', 'assumptions', 'indicators', 'outputs'],
+							properties: {
+								description: { type: "string" },
+								assumptions: { type: "string" },
+								indicators: {
+									type: "array",
+									items: { $ref: "#/definitions/planning" }
+								},
+								outputs: {
+									type: "array",
+									items: {
+										type: "object",
+										additionalProperties: false,
+										required: ['description', 'assumptions', 'activities', 'indicators'],
+										properties: {
+											description: { type: "string" },
+											assumptions: { type: "string" },
+											activities: {
+												type: "array",
+												items: {
+													type: "object",
+													additionalProperties: false,
+													required: ["description"],
+													properties: {
+														description: { type: "string"  }
+													}
+												}
+											},
+											indicators: {
+												type: "array",
+												items: { $ref: "#/definitions/planning" }
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	},
 
-	"definitions": {
-		"uuid": {
-			"type": "string",
-			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+	definitions: {
+		uuid: {
+			type: "string",
+			pattern: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
 		},
-		"couchdb-revision": {
-			"type": "string",
-			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
+		revision: {
+			type: "string",
+			pattern: "^[0-9]+\\-[0-9a-f]{32}$"
 		},
-		"user-list": {
-
+		planning: {
+			type: "object",
+			additionalProperties: false,
+			required: ["baseline", "target", "colorize", "display", "formula", "indicatorId", "parameters", "targetType", "unit"],
+			properties: {
+				baseline: {oneOf: [{type: 'null'}, {type: 'number'}]},
+				target: {oneOf: [{type: 'null'}, {type: 'number'}]},
+				colorize: {type: "boolean"},
+				display: {type: "string", minLength: 1},
+				formula: {type: "string", minLength: 1},
+				indicatorId: {$ref: "#/definitions/uuid"},
+				targetType: {
+					type: "string",
+					enum: ['lower_is_better', 'higher_is_better', 'around_is_better', 'non_relevant']
+				},
+				unit: {
+					type: "string",
+					enum: ["none", "%", "‰"]
+				},
+				parameters: {
+					type: "object",
+					additionalProperties: false,
+					patternProperties: {
+						".*": {
+							type: "object",
+							additionalProperties: false,
+							required: ["elementId", "filter"],
+							properties: {
+								elementId: {$ref: "#/definitions/uuid"},
+								filter: {
+									type: "object",
+									additionalProperties: false,
+									patternProperties: {
+										".*": {
+											type: "array",
+											items: {$ref: "#/definitions/uuid"}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 });
@@ -406,7 +481,7 @@ function hashPasswords(oldProject, newProject) {
 			if (newUser.password === null && oldUser !== null)
 				newUser.password = oldUser.password;
 			// compute hash
-			else if (newUser.password !== null)
+			else if (typeof newUser.password === 'string' && newUser.password.length >= 6)
 				newUser.password = passwordHash.generate(newUser.password);
 			else
 				throw new Error();
@@ -530,3 +605,4 @@ module.exports = {
 	}
 
 };
+

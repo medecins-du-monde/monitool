@@ -13,7 +13,7 @@ angular.module('monitool.controllers.project.spec', [])
 
 		$scope.deleteEntity = function(entityId) {
 			// Fetch this forms inputs.
-			Input.query({mode: "ids_by_entity", entityId: entityId}).$promise.then(function(inputIds) {
+			Input.query({mode: "ids_by_entity", projectId: project._id, entityId: entityId}).$promise.then(function(inputIds) {
 				var question = $filter('translate')('project.delete_entity', {num_inputs: inputIds.length}),
 					answer = $filter('translate')('project.delete_entity_answer', {num_inputs: inputIds.length});
 

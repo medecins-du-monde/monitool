@@ -7,63 +7,109 @@ var express     = require('express'),
 	User        = require('../models/authentication/user'),
 	Indicator   = require('../models/resources/indicator'),
 	Input       = require('../models/resources/input'),
-	Report      = require('../models/resources/report'),
 	Project     = require('../models/resources/project'),
 	Theme       = require('../models/resources/theme'),
 	Type        = require('../models/resources/type');
 
-var ModelsByName = {indicator: Indicator, input: Input, report: Report, project: Project, theme: Theme, type: Type, user: User},
+var ModelsByName = {indicator: Indicator, input: Input, project: Project, theme: Theme, type: Type, user: User},
 	bodyParser   = require('body-parser').json();
 
 
 // All routes here should be protected behind a bearer token
-var checkEditPermissions = function(user, modelName, modelId, callback) {
-	if (user.type !== 'user' && user.type !== 'partner')
-		callback('not_a_user');
+var checkEditPermissions = function(realUser, modelName, modelId, callback) {
+	// Only users and partner can access those resources (Clients need to inpersonate a user, and can only access oauth routes).
+	if (realUser.type !== 'user' && realUser.type !== 'partner')
+		return callback('not_a_user');
 
-	if (user.type === 'user' && user.roles.indexOf('_admin') !== -1)
-		// admins can do what they want
-		callback(null);
+	// Admins can do what they please
+	if (realUser.type === 'user' && realUser.roles.indexOf('_admin') !== -1)
+		return callback(null);
 
-	else if (modelName === "project")
+	// General case.
+	if (modelName === "project") {
 		// project permissions are located on the project itself
 		Project.get(modelId, function(error, project) {
-			if (error === 'not_found')
+			if (error === 'not_found') {
 				// check if the user is allowed to create projects
-				callback(user.roles.indexOf('project') === -1 ? 'missing_permission' : null);
-
+				if (realUser.roles.indexOf('project') === -1)
+					return callback('missing_permission');
+				else
+					return callback(null);
+			}
 			else if (error === 'type')
 				// user is crafting this query to see if it can overwrite a type with a project?
-				callback('uuid_must_be_unique_across_types');
+				return callback('uuid_must_be_unique_across_types');
 			
+			else if (error)
+				return callback('other_error');
+
 			else {
 				// check if the user is allowed to update this particular project
-				if (user.type == 'user') {
-					if (project.users.filter(function(u) { return u.role == 'owner' && u.id == user._id; }).length)
-						callback(null);
+				if (realUser.type == 'user') {
+					if (project.users.filter(function(u) { return u.type == 'internal' && u.role == 'owner' && u.id == realUser._id; }).length)
+						return callback(null);
 					else
-						callback('user_not_is_allowed_list');
+						return callback('user_not_is_allowed_list');
 				}
-				else if (user.type == 'partner') {
-					if (project.users.filter(function(u) { return u.role == 'owner' && u.username == user.username; }).length)
-						callback(null);
+				else if (realUser.type == 'partner') {
+					if (project.users.filter(function(u) { return u.type == 'partner' && u.role == 'owner' && u.username == realUser.username; }).length)
+						return callback(null);
 					else
-						callback('partner_not_is_allowed_list');
+						return callback('partner_not_is_allowed_list');
 				}
 			}
 		});
-
-	else if (["input", "report"].indexOf(modelName) !== -1) {
-		// FIXME! Security hole
-		callback(null)
 	}
 
-	else if (["indicator", "theme", "type"].indexOf(modelName) !== -1)
+	else if (modelName == "input") {
+		var id = modelId.split(':'), projectId = id[0], entityId = id[1];
+
+		Project.get(projectId, function(error, project) {
+			if (error)
+				return callback('could_not_retrieve_project');
+
+			// Retrieve projectUser from project.
+			var projectUsers, projectUser;
+			if (realUser.type == 'user')
+				projectUsers = project.users.filter(function(u) { return u.type == 'internal' && u.id == realUser._id; });
+			else if (realUser.type == 'partner')
+				projectUsers = project.users.filter(function(u) { return u.type == 'partner' && u.username == realUser.username; });
+			else
+				throw new Error('invalid user type');
+			projectUser = projectUsers.length ? projectUsers[0] : null;
+
+			// Check permissions.
+			if (projectUser) {
+				if (projectUser.role == 'owner' || projectUser.role == 'input_all')
+					return callback(null);
+				else if (projectUser.role == 'input' && projectUser.entities.indexOf(entityId) !== -1)
+					return callback(null);
+				else
+					return callback('not_allowed');
+			}
+			else
+				return callback('not_associated_with_project');
+		});
+	}
+
+	else if (["indicator", "theme", "type"].indexOf(modelName) !== -1) {
 		// users need a role for indicators
-		callback(user.roles.indexOf('indicator') === -1 ? 'missing_permission' : null);
+		if (realUser.type === 'user') {
+			if (realUser.roles.indexOf('indicator') === -1)
+				return callback('missing_permission');
+			else
+				return callback(null);
+		}
+		// partners are not allowed to change any of those resources.
+		else if (realUser.type === 'partner')
+			return callback('only_users');
+		
+		else
+			throw new Error('Invalid user type');
+	}
 
 	else
-		callback('missing_permission');
+		return callback('admins_only');
 };
 
 
@@ -93,8 +139,88 @@ module.exports = express.Router()
 		response.json(request.user || null);
 	})
 
+	///////////////////////////////////////////
+	// Special cases: projects and inputs
+	///////////////////////////////////////////
+	
+	// list projects
+	.get('/project', function(request, response) {
+		if (request.user.type == 'user')
+			Project.list(request.query, function(error, data) {
+				if (error)
+					response.json({error: true, message: error});
+				else
+					response.json(data);
+			});
 
-	.get('/:modelName(project|indicator|input|report|theme|type|user)', function(request, response) {
+		else if (request.user.type == 'partner')
+			Project.get(request.user.projectId, function(error, data) {
+				if (error)
+					response.json({error: true, message: error});
+				else
+					response.json([data]);
+			});
+
+		else
+			throw new Error();
+	})
+
+	// get projects
+	.get('/project/:id', function(request, response) {
+		if (request.user.type == 'partner' && request.params.id != request.user.projectId)
+			return response.status(404).json({error: true, message: "Not Found"});
+
+		Project.get(request.params.id, function(error, data) {
+			if (error) {
+				if (error === 'not_found')
+					return response.status(404).json({error: true, message: "Not Found"});
+				else
+					return response.status(500).json({error: true, message: "Server"});
+			}
+
+			response.json(data);
+		});
+	})
+
+	// list inputs
+	.get('/input', function(request, response) {
+		var options = request.query;
+		if (request.user.type == 'partner')
+			options.restrictProjectId = request.user.projectId;
+
+		Input.list(options, function(error, data) {
+			if (error)
+				response.json({error: true, message: error});
+			else {
+				response.json(data);
+			}
+		});
+	})
+
+	// get item
+	.get('/input/:id', function(request, response) {
+		var projectId = request.params.id.split(':')[0];
+		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
+			return response.status(404).json({error: true, message: "Not Found"});
+
+		Model.get(request.params.id, function(error, data) {
+			if (error) {
+				if (error === 'not_found')
+					return response.status(404).json({error: true, message: "Not Found"});
+				else
+					return response.status(500).json({error: true, message: "Server"});
+			}
+
+			response.json(data);
+		});
+	})
+
+	///////////////////////////////////////////
+	// General case
+	///////////////////////////////////////////
+
+	// list
+	.get('/:modelName(indicator|theme|type|user)', function(request, response) {
 		var Model = ModelsByName[request.params.modelName];
 
 		Model.list(request.query, function(error, data) {
@@ -105,7 +231,8 @@ module.exports = express.Router()
 		});
 	})
 
-	.get('/:modelName(project|indicator|input|report|theme|type|user)/:id', function(request, response) {
+	// get item
+	.get('/:modelName(indicator|theme|type|user)/:id', function(request, response) {
 		var Model = ModelsByName[request.params.modelName];
 
 		Model.get(request.params.id, function(error, data) {
@@ -153,7 +280,7 @@ module.exports = express.Router()
 	// 	});
 	// })
 
-	.put('/:modelName(indicator|project|input|report|theme|type|user)/:id', bodyParser, function(request, response) {
+	.put('/:modelName(indicator|project|input|theme|type|user)/:id', bodyParser, function(request, response) {
 		var modelName  = request.params.modelName,
 			ModelClass = ModelsByName[request.params.modelName],
 			newModel   = request.body;
@@ -186,7 +313,7 @@ module.exports = express.Router()
 		});
 	})
 
-	.delete('/:modelName(indicator|project|input|report|theme|type)/:id', bodyParser, function(request, response) {
+	.delete('/:modelName(indicator|project|input|theme|type)/:id', bodyParser, function(request, response) {
 		var modelName = request.params.modelName;
 
 		checkEditPermissions(request.user, modelName, request.params.id, function(error) {

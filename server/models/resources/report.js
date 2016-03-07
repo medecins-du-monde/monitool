@@ -5,9 +5,9 @@ var validator = require('is-my-json-valid'),
 	database  = require('../database');
 
 var validate = validator({
-	"$schema": "http://json-schema.org/schema#",
-	"title": "Monitool report schema",
-	"type": "object"
+	$schema: "http://json-schema.org/schema#",
+	title: "Monitool report schema",
+	type: "object"
 });
 
 var Report = module.exports = {

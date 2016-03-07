@@ -5,34 +5,34 @@ var validator = require('is-my-json-valid'),
 	database  = require('../database');
 
 var validate = validator({
-	"$schema": "http://json-schema.org/schema#",
-	"title": "Monitool type schema",
-	"type": "object",
-	"additionalProperties": false,
-	"required": [ "_id", "type", "name"	],
+	$schema: "http://json-schema.org/schema#",
+	title: "Monitool type schema",
+	type: "object",
+	additionalProperties: false,
+	required: [ "_id", "type", "name" ],
 
-	"properties": {
-		"_id":  { "$ref": "#/definitions/uuid" },
-		"_rev": { "$ref": "#/definitions/couchdb-revision" },
-		"type": { "type": "string", "pattern": "^type$" },
-		"name": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"en": { "type": "string", "minLength": 1 },
-				"fr": { "type": "string", "minLength": 1 },
-				"es": { "type": "string", "minLength": 1 }
+	properties: {
+		_id:  { $ref: "#/definitions/uuid" },
+		_rev: { $ref: "#/definitions/revision" },
+		type: { type: "string", pattern: "^type$" },
+		name: {
+			type: "object",
+			additionalProperties: false,
+			properties: {
+				en: { type: "string", minLength: 1 },
+				fr: { type: "string", minLength: 1 },
+				es: { type: "string", minLength: 1 }
 			}
 		}
 	},
-	"definitions": {
-		"uuid": {
-			"type": "string",
-			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+	definitions: {
+		uuid: {
+			type: "string",
+			pattern: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
 		},
-		"couchdb-revision": {
-			"type": "string",
-			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
+		revision: {
+			type: "string",
+			pattern: "^[0-9]+\\-[0-9a-f]{32}$"
 		}
 	}
 });

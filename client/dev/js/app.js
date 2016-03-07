@@ -319,8 +319,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						return form.id == $stateParams.formId;
 					});
 			},
-			formUsage: function(form, Input) {
-				return Input.query({mode: "ids_by_form", formId: form.id}).$promise;
+			formUsage: function(project, form, Input) {
+				return Input.query({mode: "ids_by_form", projectId: project._id, formId: form.id}).$promise;
 			}
 		}
 	});

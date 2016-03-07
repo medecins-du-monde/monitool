@@ -232,7 +232,7 @@ var FRENCH_TRANSLATION = {
 		choose: "Lier à un indicateur du catalogue",
 
 		fill_with_last_input: "Remplir avec les données de la saisie précédente",
-		date_due: "Date de rendu",
+		date_due: "Date",
 		show_finished: "Voir les saisies réalisées",
 		field_order: "Ordre",
 		field_distribution: "Distribution",
