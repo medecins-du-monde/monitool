@@ -5,7 +5,7 @@
 		<div class="form-group">
 			<label for="type-input" class="col-sm-3 control-label" translate="project.user_type"></label>
 			<div class="col-sm-9">
-				<select id="type-input" class="form-control" ng-model="user.type" required>
+				<select id="type-input" class="form-control" ng-model="user.type" required ng-disabled="!isNew">
 					<option value="internal" translate="project.user_types.internal"></option>
 					<option value="partner" translate="project.user_types.partner"></option>
 				</select>
@@ -17,16 +17,10 @@
 			<div class="col-sm-9">
 				<select id="user-input"
 						class="form-control"
+						ng-disabled="!isNew"
 						ng-model="user.id"
 						ng-options="u._id as u.name for (id, u) in availableUsers"
 						required></select>
-			</div>
-		</div>
-
-		<div class="form-group" ng-if="user.type == 'partner'">
-			<label for="fullname-input" class="col-sm-3 control-label" translate="project.user_fullname"></label>
-			<div class="col-sm-9">
-				<input id="fullname-input" type="text" ng-model="user.name" class="form-control" required>
 			</div>
 		</div>
 
@@ -36,10 +30,18 @@
 				<input id="login-input"
 					   type="text"
 					   ng-model="user.username"
+					   ng-disabled="!isNew"
 					   class="form-control"
 					   ng-minlength="4"
 					   ng-pattern="/^[a-z\.\-]+$/"
 					   required>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="user.type == 'partner'">
+			<label for="fullname-input" class="col-sm-3 control-label" translate="project.user_fullname"></label>
+			<div class="col-sm-9">
+				<input id="fullname-input" type="text" ng-model="user.name" class="form-control" required>
 			</div>
 		</div>
 
