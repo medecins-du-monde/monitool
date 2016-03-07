@@ -59,7 +59,7 @@ var files = {
 // Build
 //////////////////////////////////////////////////////////
 
-gulp.task('default', ['build', 'design-docs', 'update-database']);
+gulp.task('default', ['build', 'design-docs']);
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
 
 gulp.task('clean', function(cb) {
@@ -141,9 +141,5 @@ gulp.task('design-docs', function(callback) {
 			});
 		});
 	});
-});
-
-
-gulp.task('update-database', function() {
 });
 
