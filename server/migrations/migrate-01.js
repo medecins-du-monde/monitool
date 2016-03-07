@@ -149,6 +149,31 @@ old.list({include_docs: true}, function(error, result) {
 			delete form.sections;
 		});
 
+		var fixFilter = function(oldFilter, partitions) {
+			if (!Array.isArray(oldFilter))
+				throw new Error();
+			
+			if (oldFilter.length == 0)
+				return {};
+
+			var result = {};
+			var numOldFilters = oldFilter.length;
+
+			partitions.forEach(function(partition, index) {
+				result['partition' + index] = partition.filter(function(partitionElement) {
+					for (var i = 0; i < numOldFilters; ++i)
+						if (oldFilter[i].indexOf(partitionElement.id) !== -1)
+							return true;
+					return false;
+				}).map(function(pe) { return pe.id; });
+
+				if (result['partition' + index].length == partition.length)
+					delete result['partition' + index];
+			});
+
+			return result;
+		};
+
 		// Fix logical frame
 		var fixIndicator = function(indicatorId) {
 			var indicator = documents.indicator[indicatorId],
@@ -166,12 +191,26 @@ old.list({include_docs: true}, function(error, result) {
 				parameters: {}
 			};
 
+			var partitions;
+
 			// we leave the filters broken. Fixing by hand is going to be faster.
 			if (planning.formula) {
 				var formula = indicator.formulas[planning.formula];
 				newIndicator.formula = formula.expression;
 				for (var key in planning.parameters) {
-					newIndicator.parameters[key] = {elementId: planning.parameters[key].variable, filter: {}};
+					project.forms.forEach(function(form) {
+						form.elements.forEach(function(element) {
+							if (element.id == planning.parameters[key].variable)
+								partitions = element.partitions;
+						});
+					});
+
+
+					newIndicator.parameters[key] = {
+						elementId: planning.parameters[key].variable,
+						filter: fixFilter(planning.parameters[key].filter, partitions)
+					};
+
 					if (!planning.parameters[key].variable) {
 						console.log('invalid complex indicator...');
 						return null;
@@ -179,9 +218,19 @@ old.list({include_docs: true}, function(error, result) {
 				}
 			}
 			else if (planning.variable) {
+				project.forms.forEach(function(form) {
+					form.elements.forEach(function(element) {
+						if (element.id == planning.variable)
+							partitions = element.partitions;
+					});
+				});
+
 				newIndicator.formula = 'default';
 				newIndicator.parameters = {
-					'default': {elementId: planning.variable, filter: {}}
+					'default': {
+						elementId: planning.variable,
+						filter: fixFilter(planning.filter, partitions)
+					}
 				};
 			}
 			else {
