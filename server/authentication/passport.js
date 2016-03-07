@@ -6,6 +6,7 @@ var passport               = require('passport'),
 	LocalStrategy          = require('passport-local').Strategy,
 	OAuth2Strategy         = require('passport-oauth2'),
 	ClientPasswordStrategy = require('passport-oauth2-client-password'),
+	passwordHash           = require('password-hash'),
 	User                   = require('../models/authentication/user'),
 	Client                 = require('../models/authentication/client'),
 	AccessToken            = require('../models/authentication/access-token'),
@@ -165,14 +166,13 @@ passport.use('partner_local', new LocalStrategy(
 				return done(null, false);
 
 			var partner = data.rows[0].value;
-			if (partner.password !== password)
+			if (!passwordHash.verify(password, partner.password))
 				return done(null, false);
 
 			done(null, partner)
 		})
 	}
 ));
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Client log in, with passport or basic auth.

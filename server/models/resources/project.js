@@ -1,9 +1,10 @@
 "use strict";
 
-var validator = require('is-my-json-valid'),
-	async     = require('async'),
-	Abstract  = require('../abstract'),
-	database  = require('../database');
+var async        = require('async'),
+	validator    = require('is-my-json-valid'),
+	passwordHash = require('password-hash'),
+	Abstract     = require('../abstract'),
+	database     = require('../database');
 
 var validate = validator({
 	"$schema": "http://json-schema.org/schema#",
@@ -383,6 +384,36 @@ function removeUnlinkedInputs(mode, oldProject, newProject, removeFinishedCallba
 		);
 }
 
+function removePasswords(project) {
+	project.users.forEach(function(user) {
+		if (user.password)
+			user.password = null;
+	});
+}
+
+function hashPasswords(oldProject, newProject) {
+	newProject.users.forEach(function(newUser) {
+		if (newUser.type === 'partner') {
+			// retrieve old user.
+			var oldUser = null;
+			if (oldProject) {
+				var users = oldProject.users.filter(function(u) { return u.username == newUser.username})
+				if (users.length)
+					oldUser = users[0];
+			}
+
+			// copy hash
+			if (newUser.password === null && oldUser !== null)
+				newUser.password = oldUser.password;
+			// compute hash
+			else if (newUser.password !== null)
+				newUser.password = passwordHash.generate(newUser.password);
+			else
+				throw new Error();
+		}
+	});
+}
+
 
 module.exports = {
 
@@ -394,7 +425,49 @@ module.exports = {
 	_correctProjectInputs: correctProjectInputs,
 	_removeUnlinkedInputs: removeUnlinkedInputs,
 
-	get: Abstract.get.bind(this, 'project'),
+	list: function(options, callback) {
+		if (options.mode === 'indicator_reporting')
+			database.view(
+				'shortlists',
+				'projects_by_indicator',
+				{
+					key: options.indicatorId,
+					include_docs: true,
+					reduce: false
+				},
+				function(error, result) {
+					callback(
+						null,
+						result.rows.map(function(row) {
+							removePasswords(row.doc);
+							return row.doc;
+						})
+					);
+				}
+			);
+
+		else if (options.mode === 'list')
+			database.view('shortlists', 'projects_short', {}, function(error, result) {
+				callback(null, result.rows.map(function(row) { return row.value; }));
+			});
+
+		else
+			Abstract.list('project', options, function(error, projects) {
+				if (projects)
+					projects.forEach(removePasswords);
+
+				callback(error, projects);
+			});
+	},
+
+	get: function(id, callback) {
+		Abstract.get.call(this, 'project', id, function(error, project) {
+			if (project)
+				removePasswords(project);
+
+			callback(error, project);
+		});
+	},
 
 	delete: function(id, callback) {
 		var opts = {include_docs: true, startkey: [id], endkey: [id, {}]};
@@ -410,35 +483,30 @@ module.exports = {
 		});
 	},
 
-	list: function(options, callback) {
-		if (options.mode === 'indicator_reporting')
-			database.view('shortlists', 'projects_by_indicator', {key: options.indicatorId, include_docs: true, reduce: false}, function(error, result) {
-				callback(null, result.rows.map(function(row) { return row.doc; }));
-			});
-
-		else if (options.mode === 'list')
-			database.view('shortlists', 'projects_short', {}, function(error, result) {
-				callback(null, result.rows.map(function(row) { return row.value; }));
-			});
-
-		else
-			Abstract.list('project', options, callback);
-	},
-
 	set: function(newProject, callback) {
-
 		database.get(newProject._id, function(error, oldProject) {
 			if (oldProject)
 				removeUnlinkedInputs('entity', oldProject, newProject, function() {
 					removeUnlinkedInputs('form', oldProject, newProject, function() {
 						correctProjectInputs(oldProject, newProject, function() {
-							Abstract.set(newProject, callback);
+							hashPasswords(oldProject, newProject);
+							Abstract.set(newProject, function(error, result) {
+								removePasswords(newProject);
+
+								callback(error, result);
+							});
 						});
 					});
 				});
 			
-			else
-				Abstract.set(newProject, callback);
+			else {
+				hashPasswords(null, newProject);
+				Abstract.set(newProject, function(error, result) {
+					removePasswords(newProject);
+
+					callback(error, result);
+				});
+			}
 		});
 	},
 
