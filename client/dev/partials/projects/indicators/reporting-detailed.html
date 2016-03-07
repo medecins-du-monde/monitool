@@ -118,7 +118,7 @@
 	<tbody>
 		<tr ng-repeat="row in rows">
 			<td style="text-align: center">
-				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data'" />
+				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data' && row.cols" />
 			</td>
 
 			<th ng-if="row.type === 'header'" colspan="{{3 + cols.length}}" class="indent{{row.indent}}">{{row.text}}</th>
@@ -126,6 +126,7 @@
 				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
 			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" indicator-reporting-field></td>
+			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);"></td>
 		</tr>
 	</tbody>
 </table>

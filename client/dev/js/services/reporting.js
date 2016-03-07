@@ -103,22 +103,21 @@ angular
 		};
 
 		this._makeActivityRow = function(groups, cubes, indent, groupBy, filters, columns, element) {
-			var values = cubes[element.id].query([groupBy], filters);
-			if (groupBy !== 'group' && values)
-				values.total = cubes[element.id].query([], filters);
+			try {
+				var values = cubes[element.id].query([groupBy], filters);
+				if (groupBy !== 'group' && values)
+					values.total = cubes[element.id].query([], filters);
 
-			return {
-				id: makeUUID(),
-				name: element.name,
-				cols: columns.map(function(col) { return values[col.id]; }),
-				type: 'data',
-				indent: indent
-			};
+				var cols = columns.map(function(col) { return values[col.id]; });
+				return {id: makeUUID(), name: element.name, cols: cols, type: 'data', indent: indent};
+			}
+			catch (e) {
+				return {id: makeUUID(), name: element.name, type: 'data', indent: indent};
+			}
 		};
 
 		this._makeIndicatorRow = function(groups, cubes, indent, groupBy, filters, columns, indicator) {
-			var indicatorValues = this._computeIndicator(groups, cubes, indicator, groupBy, filters),
-				baseline = indicator.baseline,
+			var baseline = indicator.baseline,
 				target = indicator.target;
 
 			if (typeof baseline == 'number' && indicator.unit != 'none')
@@ -127,14 +126,27 @@ angular
 			if (typeof target == 'number' && indicator.unit != 'none')
 				target += indicator.unit;
 
-			return {
-				id: makeUUID(),
-				name: indicator.display, unit: indicator.unit, colorize: indicator.colorize,
-				baseline: baseline, target: target, targetType: indicator.targetType,
-				cols: columns.map(function(col) { return indicatorValues[col.id]; }),
-				type: 'data',
-				indent: indent
-			};
+			try {
+				var indicatorValues = this._computeIndicator(groups, cubes, indicator, groupBy, filters);
+
+				return {
+					id: makeUUID(),
+					name: indicator.display, unit: indicator.unit, colorize: indicator.colorize,
+					baseline: baseline, target: target, targetType: indicator.targetType,
+					cols: columns.map(function(col) { return indicatorValues[col.id]; }),
+					type: 'data',
+					indent: indent
+				};
+			}
+			catch (e) {
+				return {
+					id: makeUUID(),
+					name: indicator.display, unit: indicator.unit, colorize: indicator.colorize,
+					baseline: baseline, target: target, targetType: indicator.targetType,
+					type: 'data',
+					indent: indent
+				};
+			}
 		};
 
 		this.computeActivityReporting = function(cubes, project, groupBy, filters, splits) {
@@ -152,79 +164,60 @@ angular
 			project.forms.forEach(function(form) {
 				rows.push({type: 'header', text: form.name});
 				form.elements.forEach(function(element) {
-					try {
-						var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, qFilters, columns, element);
-						row.id = element.id;
-						row.partitions = element.partitions.map(function(p, index) {
-							return {
-								index: index,
-								name: p.map(function(p) { return p.name.substring(0, 1).toLocaleUpperCase(); }).join('/'),
-								fullname: p.pluck('name').join(' / ')
-							}
-						});
-						rows.push(row);
-						
-						if (splits[row.id] !== undefined) {
-							var partitionIndex = splits[row.id];
-							element.partitions[partitionIndex].forEach(function(part) {
-								// add filter
-								qFilters['partition' + partitionIndex] = [part.id];
-
-								try {
-									var childRow = this._makeActivityRow(project.groups, cubes, 2, groupBy, qFilters, columns, element);
-									childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
-									childRow.name = part.name;
-									childRow.partitions = row.partitions.slice();
-									childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
-									rows.push(childRow)
-
-									if (splits[childRow.id] !== undefined) {
-										var childPartitionIndex = splits[childRow.id];
-
-										element.partitions[childPartitionIndex].forEach(function(subPart) {
-											// add filter
-											qFilters['partition' + childPartitionIndex] = [subPart.id];
-
-											try {
-												var subChildRow = this._makeActivityRow(project.groups, cubes, 3, groupBy, qFilters, columns, element);
-												subChildRow.id = element.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
-												subChildRow.name = subPart.name;
-												rows.push(subChildRow);
-											}
-											catch (e) {
-												console.log('Skipping ', subPart.name);
-											}
-
-											// remove filter
-											delete qFilters['partition' + childPartitionIndex];
-										}, this);
-									}
-								}
-								catch (e) {
-									console.log('Skipping ', part.name);
-								}
-
-
-								// remove filter
-								delete qFilters['partition' + partitionIndex];
-							}, this);
+					var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, qFilters, columns, element);
+					row.id = element.id;
+					row.partitions = element.partitions.map(function(p, index) {
+						return {
+							index: index,
+							name: p.map(function(p) { return p.name.substring(0, 1).toLocaleUpperCase(); }).join('/'),
+							fullname: p.pluck('name').join(' / ')
 						}
-					}
-					catch (e) {
-						console.log('Skipping ', element.name);
-					}
+					});
+					rows.push(row);
+					
+					if (splits[row.id] !== undefined) {
+						var partitionIndex = splits[row.id];
+						element.partitions[partitionIndex].forEach(function(part) {
+							// add filter
+							qFilters['partition' + partitionIndex] = [part.id];
 
+							var childRow = this._makeActivityRow(project.groups, cubes, 2, groupBy, qFilters, columns, element);
+							childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
+							childRow.name = part.name;
+							childRow.partitions = row.partitions.slice();
+							childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
+							rows.push(childRow)
+
+							if (splits[childRow.id] !== undefined) {
+								var childPartitionIndex = splits[childRow.id];
+
+								element.partitions[childPartitionIndex].forEach(function(subPart) {
+									// add filter
+									qFilters['partition' + childPartitionIndex] = [subPart.id];
+
+									var subChildRow = this._makeActivityRow(project.groups, cubes, 3, groupBy, qFilters, columns, element);
+									subChildRow.id = element.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
+									subChildRow.name = subPart.name;
+									rows.push(subChildRow);
+
+									// remove filter
+									delete qFilters['partition' + childPartitionIndex];
+								}, this);
+							}
+
+							// remove filter
+							delete qFilters['partition' + partitionIndex];
+						}, this);
+					}
 				}, this);
 			}, this);
 
 			return rows;
 		};
 
-
 		this.computeDetailedActivityReporting = function(cubes, project, element, groupBy, filters) {
 			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project);
 			var rows = []
-
 
 			var row = this._makeActivityRow(project.groups, cubes, 0, groupBy, {}, columns, element)
 			row.name = $filter('translate')('project.full_project');

@@ -121,15 +121,12 @@
 	<tbody>
 		<tr ng-repeat="row in rows">
 			<td style="text-align: center">
-				<input id={{row.id}} type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data'" />
+				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data' && row.cols" />
 			</td>
 
-			<th ng-if="row.type === 'header'"
-				class="indent{{row.indent}}"
-				colspan="{{1 + cols.length}}">{{row.text}}</th>
+			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{1 + cols.length}}">{{row.text}}</th>
 
-			<td ng-if="row.type === 'data'"
-				class="indent{{row.indent}}">
+			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
 				
 				<label for="{{row.id}}">{{row.name}}</label>
 
@@ -144,7 +141,9 @@
 					</button>
 				</div>
 			</td>
+
 			<td ng-repeat="col in row.cols track by $index" activity-reporting-field></td>
+			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);"></td>
 		</tr>
 
 	</tbody>
