@@ -13,10 +13,6 @@ catch (e) {
 			username: process.env['couchdb.username'],
 			password: process.env['couchdb.password']
 		},
-		ping: {
-			active: process.env['ping.active'],
-			url: process.env['ping.url']
-		},
 		oauth: {
 			authUrl: process.env['oauth.authUrl'],
 			tokenUrl: process.env['oauth.tokenUrl'],

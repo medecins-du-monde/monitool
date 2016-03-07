@@ -40,12 +40,6 @@ express()
 	
 	.listen(config.port);
 
-
-// hack: avoid having iis kill the node process.
-if (config.ping && config.ping.active)
-	setInterval(request.get.bind(request), 10000, config.ping.url);
-
-
 // catch the uncaught errors that weren't wrapped in a domain or try catch statement
 // do not use this in modules, but only in applications, as otherwise we could have multiple of these bound
 process.on('uncaughtException', function(err) {
