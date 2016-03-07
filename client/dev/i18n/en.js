@@ -84,7 +84,7 @@ var ENGLISH_TRANSLATION = {
 		indicators_catalog: 'Indicators Catalog',
 		help: 'Help',
 		name: 'Name',
-		begin: 'Start',
+		start: 'Start',
 		end: 'End',
 
 		add: 'Add',
@@ -334,7 +334,7 @@ var ENGLISH_TRANSLATION = {
 		input_form: 'Input form',
 		data_collection: 'Data collection',
 		periodicity: "Periodicity",
-		begin: 'Use project start',
+		start: 'Use project start',
 		end: 'Use project end',
 
 		sumable: 'Summable',
@@ -389,7 +389,7 @@ var ENGLISH_TRANSLATION = {
 		purpose_short: 'Purpose',
 		output_short: 'Output',
 
-		begin_date: "Begin date",
+		start_date: "Begin date",
 		end_date: "End date",
 		name_ph: 'For Instance: [Laos] Primary health care',
 		add_indicator: 'Add an indicator',
@@ -510,8 +510,8 @@ var ENGLISH_TRANSLATION = {
 	},
 	form: {
 		mandatory: "This field is mandatory",
-		begin_lower_than_end: 'Begin date must be lower than end date',
-		end_greater_than_begin: 'End date must be greater than begin date'
+		start_lower_than_end: 'Begin date must be lower than end date',
+		end_greater_than_start: 'End date must be greater than start date'
 	}
 };
 

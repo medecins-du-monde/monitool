@@ -12,7 +12,7 @@ angular
 	// we will see how bad if performs on the wild.
 	.service('mtReporting', function($filter) {
 
-		this.getColumns = function(groupBy, begin, end, entityId, project) {
+		this.getColumns = function(groupBy, start, end, entityId, project) {
 			var type;
 			if (!entityId)
 				type = 'project';
@@ -22,11 +22,11 @@ angular
 				type = 'entity';
 
 			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1) {
-				var begin      = moment(begin).startOf(groupBy === 'week' ? 'isoWeek' : groupBy),
+				var start      = moment(start).startOf(groupBy === 'week' ? 'isoWeek' : groupBy),
 					end        = moment(end).endOf(groupBy === 'week' ? 'isoWeek' : groupBy),
 					dispFormat = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-MM-DD', 'day': 'YYYY-MM-DD'}[groupBy],
 					idFormat   = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-[W]WW', 'day': 'YYYY-MM-DD'}[groupBy],
-					current    = begin.clone(),
+					current    = start.clone(),
 					cols       = [];
 
 				while (current.isBefore(end) || current.isSame(end)) {
@@ -150,7 +150,7 @@ angular
 		};
 
 		this.computeActivityReporting = function(cubes, project, groupBy, filters, splits) {
-			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project);
+			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
 
 			// Computing too much. We could: qFilters[groupBy] = columns.pluck('id');
 			var qFilters = {};
@@ -216,7 +216,7 @@ angular
 		};
 
 		this.computeDetailedActivityReporting = function(cubes, project, element, groupBy, filters) {
-			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project);
+			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
 			var rows = []
 
 			var row = this._makeActivityRow(project.groups, cubes, 0, groupBy, {}, columns, element)
@@ -244,7 +244,7 @@ angular
 
 
 		this.computeReporting = function(cubes, project, logicalFrame, groupBy, filters) {
-			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project),
+			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project),
 				rows = [];
 
 			// Computing too much. We could: qFilters[groupBy] = columns.pluck('id');
@@ -269,7 +269,7 @@ angular
 		};
 
 		this.computeDetailedReporting = function(cubes, project, indicator, groupBy, filters) {
-			var columns = this.getColumns(groupBy, filters.begin, filters.end, filters.entityId, project);
+			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
 			var rows = []
 
 			var row = this._makeIndicatorRow(project.groups, cubes, 0, groupBy, {}, columns, indicator)

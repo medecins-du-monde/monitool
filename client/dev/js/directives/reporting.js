@@ -63,7 +63,7 @@ angular.module('monitool.directives.reporting', [])
 			link: function(scope, element, attributes) {
 				element.bind('click', function() {
 					var filename;
-					try { filename = [scope.query.project.name, scope.query.begin, scope.query.end].join('_') + '.png'; }
+					try { filename = [scope.query.project.name, scope.query.start, scope.query.end].join('_') + '.png'; }
 					catch (e) { filename = 'file.png'; }
 
 					var sourceSVG = document.querySelector("svg");

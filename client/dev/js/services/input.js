@@ -24,7 +24,7 @@ angular
 				if (entity) {
 					// FIXME spaghettis
 					if (!entity.start && !form.start)
-						current = moment(project.begin).startOf(period);
+						current = moment(project.start).startOf(period);
 					else if (!entity.start && form.start)
 						current = moment(form.start).startOf(period);
 					else if (entity.start && !form.start)
@@ -42,7 +42,7 @@ angular
 						end = moment.min(moment(entity.end), moment(form.end)).startOf(period);
 				}
 				else {
-					current = moment(form.start || project.begin).startOf(period),
+					current = moment(form.start || project.start).startOf(period),
 					end     = moment(form.end || project.end).endOf(period);
 				}
 

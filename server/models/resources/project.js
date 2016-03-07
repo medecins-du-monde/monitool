@@ -11,14 +11,14 @@ var validate = validator({
 	title: "Monitool project schema",
 	type: "object",
 	additionalProperties: false,
-	required: [ '_id', 'type', 'name', 'begin', 'end', 'entities', 'groups', 'forms', 'themes', 'logicalFrames', 'users'],
+	required: [ '_id', 'type', 'name', 'start', 'end', 'entities', 'groups', 'forms', 'themes', 'logicalFrames', 'users'],
 
 	properties: {
 		_id: { $ref: "#/definitions/uuid" },
 		_rev: { $ref: "#/definitions/revision" },
 		type: { type: "string", pattern: "^project$" },
 		name: { type: "string", minLength: 1 },
-		begin: { type: "string", format: "date" },
+		start: { type: "string", format: "date" },
 		end: { type: "string", format: "date" },
 
 		entities: {

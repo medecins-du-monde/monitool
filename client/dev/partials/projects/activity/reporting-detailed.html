@@ -25,16 +25,16 @@
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="form-group">
-				<label class="col-sm-2 control-label" translate="shared.begin"></label>
+				<label class="col-sm-2 control-label" translate="shared.start"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 						<input type="text" 
 							   datepicker-popup="longDate"
-							   name="begin"
-							   ng-model="filters.begin"
-							   is-open="beginDateOpen"
-							   ng-click = "beginDateOpen = true"
+							   name="start"
+							   ng-model="filters.start"
+							   is-open="startDateOpen"
+							   ng-click = "startDateOpen = true"
 							   required
 							   ng-max="filters.end"
 							   class="form-control input-sm" />
@@ -54,7 +54,7 @@
 							   ng-model="filters.end"
 							   is-open="endDateOpen"
 							   ng-click = "endDateOpen = true"
-							   ng-min="filters.begin"
+							   ng-min="filters.start"
 							   class="form-control input-sm"
 							   required />
 					</div>

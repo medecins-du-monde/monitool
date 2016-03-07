@@ -83,7 +83,7 @@ var FRENCH_TRANSLATION = {
 		indicators_catalog: 'Catalogue Indicateurs',
 		help: 'Aide',
 		name: 'Nom',
-		begin: 'Début',
+		start: 'Début',
 		end: 'Fin',
 
 		add: 'Ajouter',
@@ -391,7 +391,7 @@ var FRENCH_TRANSLATION = {
 		input_form: 'Planning de saisie',
 		data_collection: 'Collecte',
 		periodicity: "Périodicité",
-		begin: 'Début du projet',
+		start: 'Début du projet',
 		end: 'Fin du projet',
 
 		sumable: 'Sommable',
@@ -447,7 +447,7 @@ var FRENCH_TRANSLATION = {
 		purpose_short: 'OS',
 		output_short: 'R',
 
-		begin_date: "Date de lancement",
+		start_date: "Date de lancement",
 		end_date: "Date de fin",
 		name_ph: 'Exemple: Réduction des Risques Laos',
 		add_indicator: 'Ajouter un indicateur',
@@ -567,8 +567,8 @@ var FRENCH_TRANSLATION = {
 	},
 	form: {
 		mandatory: "Ce champ est obligatoire",
-		begin_lower_than_end: 'La date début de doit être inférieure à la date de fin',
-		end_greater_than_begin: 'La date de fin doit être supérieure à la date de début',
+		start_lower_than_end: 'La date début de doit être inférieure à la date de fin',
+		end_greater_than_start: 'La date de fin doit être supérieure à la date de début',
 	}
 };
 

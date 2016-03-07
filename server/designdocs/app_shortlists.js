@@ -82,7 +82,7 @@ module.exports = {
 					emit(doc._id, {
 						_id: doc._id,
 						name: doc.name,
-						begin: doc.begin, end: doc.end,
+						start: doc.start, end: doc.end,
 						users: doc.users.map(function(user) {
 							return {type: user.type, id: user.id, username: user.username, role: user.role};
 						}),

@@ -34,21 +34,21 @@
 		</div>
 
 		<div class="form-group" show-errors>
-			<label for="input-begin" class="col-sm-2 control-label" translate="project.begin_date"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.begin">
+			<label for="input-start" class="col-sm-2 control-label" translate="project.start_date"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.start">
 
 				<input type="text" 
 					   datepicker-popup="longDate"
-					   name="begin"
-					   ng-model="project.begin"
-					   is-open="beginDateOpen"
-					   ng-click = "beginDateOpen = true"
+					   name="start"
+					   ng-model="project.start"
+					   is-open="startDateOpen"
+					   ng-click = "startDateOpen = true"
 					   required
 					   ng-max="project.end"
 					   class="form-control" />
 
-				<p class="help-block" ng-if="projectForm.begin.$error.required" translate="form.mandatory"></p>
-				<p class="help-block" ng-if="projectForm.begin.$error.lowerThan" translate="form.begin_lower_than_end"></p>
+				<p class="help-block" ng-if="projectForm.start.$error.required" translate="form.mandatory"></p>
+				<p class="help-block" ng-if="projectForm.start.$error.lowerThan" translate="form.start_lower_than_end"></p>
 			</div>
 		</div>
 
@@ -63,11 +63,11 @@
 					   is-open="endDateOpen"
 					   ng-click = "endDateOpen = true"
 					   required
-					   ng-min="project.begin"
+					   ng-min="project.start"
 					   class="form-control" />
 
 				<p class="help-block" ng-if="projectForm.end.$error.required" translate="form.mandatory"></p>
-				<p class="help-block" ng-if="projectForm.end.$error.greaterThan" translate="form.end_greater_than_begin"></p>
+				<p class="help-block" ng-if="projectForm.end.$error.greaterThan" translate="form.end_greater_than_start"></p>
 			</div>
 		</div>
 

@@ -83,7 +83,7 @@ var SPANISH_TRANSLATION = {
 		indicators_catalog: 'Catálogo de indicadores',
 		help: 'Ayuda',
 		name: 'Nombre',
-		begin: 'Principio',
+		start: 'Principio',
 		end: 'Fin',
 
 		add: 'Añadir',
@@ -333,7 +333,7 @@ var SPANISH_TRANSLATION = {
 		input_form: 'Formulario',
 		data_collection: 'Recuperación de los datos',
 		periodicity: "Periodicidad",
-		begin: 'Principio del proyecto',
+		start: 'Principio del proyecto',
 		end: 'Fin del proyecto',
 
 		sumable: 'Somable',
@@ -388,7 +388,7 @@ var SPANISH_TRANSLATION = {
 		purpose_short: 'OS',
 		output_short: 'R',
 
-		begin_date: "Fecha de inicio",
+		start_date: "Fecha de inicio",
 		end_date: "Fecha de fin",
 		name_ph: 'Por ejemplo: [Laos] Reducción de riesgos',
 		add_indicator: 'Añadir un indicador',
@@ -508,8 +508,8 @@ var SPANISH_TRANSLATION = {
 	},
 	form: {
 		mandatory: "Este campo es obligatorio",
-		begin_lower_than_end: 'La fecha de inicio tiene que ser inferior a la de fin',
-		end_greater_than_begin: 'la fecha de fin tiene que ser superior a la de inicio',
+		start_lower_than_end: 'La fecha de inicio tiene que ser inferior a la de fin',
+		end_greater_than_start: 'la fecha de fin tiene que ser superior a la de inicio',
 	}
 };
 

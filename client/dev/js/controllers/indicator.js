@@ -80,19 +80,19 @@ angular
 
 		// Create default filter so that all inputs are used.
 		$scope.filters = {};
-		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.start = new Date('9999-01-01T00:00:00Z')
 		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.begin)
-				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period < $scope.filters.start)
+				$scope.filters.start = inputs[i].period;
 			if (inputs[i].period > $scope.filters.end)
 				$scope.filters.end = inputs[i].period;
 		}
 
 		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+		if (mtReporting.getColumns('month', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+		else if (mtReporting.getColumns('quarter', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'quarter';
 		else
 			$scope.groupBy = 'year';
@@ -105,7 +105,7 @@ angular
 
 		// when input list change, or regrouping is needed, compute table rows again.
 		$scope.$watchGroup(['filters', 'groupBy'], function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end);
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.start, $scope.filters.end);
 			$scope.rows = projects.map(function(project) {
 				var planning = null;
 				outerloop:

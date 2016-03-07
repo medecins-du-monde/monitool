@@ -20,7 +20,6 @@ module.exports = {
 	_id: '_design/reporting',
 
 	views: {
-
 		inputs_by_project_date: {
 			map: function(doc) {
 				if (doc.type === 'input')

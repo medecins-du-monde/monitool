@@ -19,7 +19,7 @@ angular
 				return new Project({
 					type: "project",
 					name: "",
-					begin: new Date(),
+					start: new Date(),
 					end: new Date(),
 					themes: [],
 					logicalFrames: [],

@@ -14,7 +14,7 @@
 		<thead>
 			<tr>
 				<th translate="project.entity_name"></th>
-				<th style="width: 200px" translate="project.begin"></th>
+				<th style="width: 200px" translate="project.start"></th>
 				<th style="width: 200px" translate="project.end"></th>				
 				<th style="width: 90px" acl-has-project-role="owner"></th>
 			</tr>
@@ -36,8 +36,8 @@
 						</div>
 					</ng-form>
 				</td>
-				<td acl-has-project-role="owner" acl-fallback="project.begin">
-					<optional-date ng-model="inputEntity.start" default="project.begin"></optional-date>
+				<td acl-has-project-role="owner" acl-fallback="project.start">
+					<optional-date ng-model="inputEntity.start" default="project.start"></optional-date>
 				</td>
 				<td acl-has-project-role="owner" acl-fallback="project.end">
 					<optional-date ng-model="inputEntity.end" default="project.end"></optional-date>

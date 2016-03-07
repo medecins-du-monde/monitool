@@ -67,7 +67,7 @@ var Input = module.exports = {
 				return callback(null, []);
 
 			// used for late inputs
-			opt = {startkey: [options.projectId, options.begin || null], endkey: [options.projectId, options.end || {}]};
+			opt = {startkey: [options.projectId, options.start || null], endkey: [options.projectId, options.end || {}]};
 			database.view('reporting', 'inputs_by_project_date', opt, function(error, result) {
 				if (result && result.rows)
 					callback(null, result.rows.map(function(item) { return item.id; }));
@@ -109,7 +109,7 @@ var Input = module.exports = {
 			if (options.restrictProjectId && options.restrictProjectId !== options.projectId)
 				return callback(null, []);
 			
-			opt = {startkey: [options.projectId, options.begin || null], endkey: [options.projectId, options.end || {}], include_docs: true};
+			opt = {startkey: [options.projectId, options.start || null], endkey: [options.projectId, options.end || {}], include_docs: true};
 			database.view('reporting', 'inputs_by_project_date', opt, function(error, result) {
 				if (result && result.rows)
 					callback(null, result.rows.map(function(item) { return item.doc; }));
@@ -153,7 +153,7 @@ var Input = module.exports = {
 		// default.
 		else {
 			if (options.restrictProjectId) {
-				opt = {startkey: [options.restrictProjectId, options.begin || null], endkey: [options.restrictProjectId, options.end || {}], include_docs: true};
+				opt = {startkey: [options.restrictProjectId, options.start || null], endkey: [options.restrictProjectId, options.end || {}], include_docs: true};
 
 				database.view('reporting', 'inputs_by_project_date', opt, function(error, result) {
 					if (result && result.rows)

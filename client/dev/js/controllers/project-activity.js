@@ -302,19 +302,19 @@ angular
 	.controller('ProjectActivityReportingController', function($scope, Olap, inputs, mtReporting) {
 		// Create default filter so that all inputs are used.
 		$scope.filters = {entityId: ""};
-		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.start = new Date('9999-01-01T00:00:00Z')
 		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.begin)
-				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period < $scope.filters.start)
+				$scope.filters.start = inputs[i].period;
 			if (inputs[i].period > $scope.filters.end)
 				$scope.filters.end = inputs[i].period;
 		}
 
 		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+		if (mtReporting.getColumns('month', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+		else if (mtReporting.getColumns('quarter', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'quarter';
 		else
 			$scope.groupBy = 'year';
@@ -334,7 +334,7 @@ angular
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
 		$scope.$watch('[filters, groupBy, splits]', function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project)
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.start, $scope.filters.end, $scope.filters.entityId, $scope.project)
 			$scope.rows = mtReporting.computeActivityReporting(cubes, $scope.project, $scope.groupBy, $scope.filters, $scope.splits);
 		}, true);
 	})
@@ -346,19 +346,19 @@ angular
 
 		// Create default filter so that all inputs are used.
 		$scope.filters = {};
-		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.start = new Date('9999-01-01T00:00:00Z')
 		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.begin)
-				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period < $scope.filters.start)
+				$scope.filters.start = inputs[i].period;
 			if (inputs[i].period > $scope.filters.end)
 				$scope.filters.end = inputs[i].period;
 		}
 
 		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+		if (mtReporting.getColumns('month', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+		else if (mtReporting.getColumns('quarter', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'quarter';
 		else
 			$scope.groupBy = 'year';
@@ -380,7 +380,7 @@ angular
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
 		$scope.$watchGroup(['element', 'filters', 'groupBy'], function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.start, $scope.filters.end)
 			$scope.rows = mtReporting.computeDetailedActivityReporting(cubes, $scope.project, $scope.element, $scope.groupBy, $scope.filters);
 		}, true);
 	})
@@ -405,11 +405,11 @@ angular
 		});
 
 		$scope.dates = {};
-		$scope.dates.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.dates.start = new Date('9999-01-01T00:00:00Z')
 		$scope.dates.end = new Date('0000-01-01T00:00:00Z');
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.dates.begin)
-				$scope.dates.begin = inputs[i].period;
+			if (inputs[i].period < $scope.dates.start)
+				$scope.dates.start = inputs[i].period;
 			if (inputs[i].period > $scope.dates.end)
 				$scope.dates.end = inputs[i].period;
 		}
@@ -442,20 +442,20 @@ angular
 
 		// when a date change, update related filters.
 		// This is also underperformant as hell, but no worst than the olap implementation.
-		$scope.$watch('[dates.begin,dates.end]', function() {
-			var begin = moment($scope.dates.begin), end = moment($scope.dates.end),
+		$scope.$watch('[dates.start,dates.end]', function() {
+			var start = moment($scope.dates.start), end = moment($scope.dates.end),
 				filters = {
-					year: {begin: begin.format('YYYY'), end: end.format('YYYY')},
-					quarter: {begin: begin.format('YYYY-[Q]Q'), end: end.format('YYYY-[Q]Q')},
-					month: {begin: begin.format('YYYY-MM'), end: end.format('YYYY-MM')},
-					week: {begin: begin.format('YYYY-[W]WW'), end: end.format('YYYY-[W]WW')},
-					day: {begin: begin.format('YYYY-MM-DD'), end: end.format('YYYY-MM-DD')}
+					year: {start: start.format('YYYY'), end: end.format('YYYY')},
+					quarter: {start: start.format('YYYY-[Q]Q'), end: end.format('YYYY-[Q]Q')},
+					month: {start: start.format('YYYY-MM'), end: end.format('YYYY-MM')},
+					week: {start: start.format('YYYY-[W]WW'), end: end.format('YYYY-[W]WW')},
+					day: {start: start.format('YYYY-MM-DD'), end: end.format('YYYY-MM-DD')}
 				};
 
 			for (var key in filters) {
 				var dimension = $scope.dimensions.find(function(dim) { return dim.id == key; });
 				$scope.planning.filters[key] = dimension.items.filter(function(el) {
-					return filters[key].begin <= el && el <= filters[key].end;
+					return filters[key].start <= el && el <= filters[key].end;
 				});
 			}
 		}, true)

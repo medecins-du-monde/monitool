@@ -239,19 +239,19 @@ angular.module('monitool.controllers.project.indicators', [])
 
 		// Create default filter so that all inputs are used.
 		$scope.filters = {entityId: ""};
-		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.start = new Date('9999-01-01T00:00:00Z')
 		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.begin)
-				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period < $scope.filters.start)
+				$scope.filters.start = inputs[i].period;
 			if (inputs[i].period > $scope.filters.end)
 				$scope.filters.end = inputs[i].period;
 		}
 
 		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+		if (mtReporting.getColumns('month', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+		else if (mtReporting.getColumns('quarter', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'quarter';
 		else
 			$scope.groupBy = 'year';
@@ -259,8 +259,8 @@ angular.module('monitool.controllers.project.indicators', [])
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
 		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['filters.begin', 'filters.end', 'filters.entityId', 'groupBy', 'currentLogframe'], function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end, $scope.filters.entityId, $scope.project);
+		$scope.$watchGroup(['filters.start', 'filters.end', 'filters.entityId', 'groupBy', 'currentLogframe'], function() {
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.start, $scope.filters.end, $scope.filters.entityId, $scope.project);
 			$scope.rows = mtReporting.computeReporting(cubes, $scope.project, $scope.currentLogframe, $scope.groupBy, $scope.filters);
 		});
 	})
@@ -271,19 +271,19 @@ angular.module('monitool.controllers.project.indicators', [])
 
 		// Create default filter so that all inputs are used.
 		$scope.filters = {entityId: ""};
-		$scope.filters.begin = new Date('9999-01-01T00:00:00Z')
+		$scope.filters.start = new Date('9999-01-01T00:00:00Z')
 		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.begin)
-				$scope.filters.begin = inputs[i].period;
+			if (inputs[i].period < $scope.filters.start)
+				$scope.filters.start = inputs[i].period;
 			if (inputs[i].period > $scope.filters.end)
 				$scope.filters.end = inputs[i].period;
 		}
 
 		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.begin, $scope.filters.end).length < 15)
+		if (mtReporting.getColumns('month', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.begin, $scope.filters.end).length < 15)
+		else if (mtReporting.getColumns('quarter', $scope.filters.start, $scope.filters.end).length < 15)
 			$scope.groupBy = 'quarter';
 		else
 			$scope.groupBy = 'year';
@@ -306,7 +306,7 @@ angular.module('monitool.controllers.project.indicators', [])
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
 		$scope.$watchGroup(['indicator', 'filters', 'groupBy'], function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.begin, $scope.filters.end)
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.start, $scope.filters.end)
 			$scope.rows = mtReporting.computeDetailedReporting(cubes, $scope.project, $scope.indicator, $scope.groupBy, $scope.filters);
 		}, true);
 	})
@@ -373,7 +373,7 @@ angular.module('monitool.controllers.project.indicators', [])
 	// .controller('ProjectReportingAnalysisDataSelectionController', function($scope, $modalInstance, mtReporting, indicatorsById) {
 	// 	$scope.query = {
 	// 		project: $scope.project,
-	// 		begin:   mtReporting.getDefaultStartDate($scope.project),
+	// 		start:   mtReporting.getDefaultStartDate($scope.project),
 	// 		end:     mtReporting.getDefaultEndDate($scope.project),
 	// 		groupBy: 'month', type: 'project', id: ''
 	// 	};
@@ -389,7 +389,7 @@ angular.module('monitool.controllers.project.indicators', [])
 	// 			return $scope.container.chosenIndicatorIds.indexOf(row.id) !== -1;
 	// 		});
 	// 		$scope.result.query = {
-	// 			begin: $scope.query.begin,
+	// 			start: $scope.query.start,
 	// 			end: $scope.query.end,
 	// 			groupBy: $scope.query.groupBy,
 	// 			type: $scope.query.type,
@@ -397,12 +397,12 @@ angular.module('monitool.controllers.project.indicators', [])
 	// 		};
 	// 	};
 
-	// 	// Update loaded inputs when query.begin or query.end changes.
+	// 	// Update loaded inputs when query.start or query.end changes.
 	// 	var inputsPromise = null;
 	// 	$scope.$watch('query', function(newQuery, oldQuery) {
 	// 		// if anything besides groupBy changes, we need to refetch.
 	// 		// FIXME: we could widely optimize this.
-	// 		if (!inputsPromise || oldQuery.begin !== newQuery.begin || oldQuery.end !== newQuery.end || oldQuery.id !== newQuery.id)
+	// 		if (!inputsPromise || oldQuery.start !== newQuery.start || oldQuery.end !== newQuery.end || oldQuery.id !== newQuery.id)
 	// 			inputsPromise = mtReporting.getPreprocessedInputs(newQuery);
 
 	// 		// Once input are ready (which will be immediate if we did not reload them) => refresh the scope

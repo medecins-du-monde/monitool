@@ -106,6 +106,9 @@ old.list({include_docs: true}, function(error, result) {
 
 		delete project._rev;
 
+		project.start = project.begin
+		delete project.begin;
+
 		// Fix entities
 		project.entities.forEach(function(entity) { entity.start = entity.end = null; });
 
