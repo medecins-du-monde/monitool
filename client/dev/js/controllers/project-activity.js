@@ -62,10 +62,6 @@ angular
 			target.push([]);
 		};
 
-		$scope.newPartitionElement = function(target) {
-			target.push({id: makeUUID(), name: ""});
-		};
-
 		$scope.remPartition = function(partition, target) {
 			target.splice(target.indexOf(partition), 1);
 		};

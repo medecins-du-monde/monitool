@@ -4,6 +4,10 @@ body {
   font-size: 12px;
 }
 
+td.ng-invalid { 
+  background-color: #faa;
+}
+
 .form-control {
   font-size: 12px;
   padding: 3px 6px;

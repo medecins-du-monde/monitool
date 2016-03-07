@@ -98,7 +98,7 @@
 			<tr ng-repeat="element in form.elements track by element.id">
 
 				<!-- variable name -->
-				<td mt-content-editable ng-model="element.name"></td>
+				<td mt-content-editable ng-model="element.name" required></td>
 				
 				<!-- variable aggregation -->
 				<td>
@@ -127,24 +127,13 @@
 
 				<!-- variable partitions -->
 				<td ng-repeat="partition in element.partitions">
-					<div class="input-group" ng-repeat="p in partition track by p.id" style="margin-bottom: 2px;">
-						<input class="form-control input-xs" ng-model="p.name" required>
-						<span class="input-group-addon" ng-click="remove(p, partition)">
-							<i class="fa fa-fw fa-times text-danger"></i>
-						</span>
-					</div>
-
-					<div class="input-group" style="margin-bottom: 2px;">
-						<input class="form-control input-xs" disabled>
-						<span class="input-group-addon" ng-click="newPartitionElement(partition)">
-							<i class="fa fa-fw fa-plus"></i>
-						</span>
-					</div>
+					<partition ng-model="partition"></partition>
 
 					<a class="btn btn-xs btn-danger btn-block"
 					   ng-click="remPartition(partition, element.partitions)"
 					   translate="project.remove_partition"></a>
-				</td>
+   				</td>
+
 				<td>
 					<a ng-click="newPartition(element.partitions)"
 					   class="btn btn-xs btn-default btn-block"
@@ -218,7 +207,6 @@
  			</tr>
 		</tbody>
 	</table>
-
 
 	<!-- form actions -->
 	<div acl-has-project-role="owner">

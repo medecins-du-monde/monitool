@@ -221,6 +221,53 @@ angular.module('monitool.directives.form', [])
 		}
 	})
 
+	.directive('partition', function() {
+		return {
+			restrict: 'E',
+			require: 'ngModel',
+			templateUrl: 'partials/_forms/partition.html',
+			scope: {},
+			link: function($scope, element, attributes, ngModelController) {
+
+				///////////////////
+				// User actions
+				///////////////////
+
+				$scope.newPartitionElement = function(target) {
+					target.push({id: makeUUID(), name: ""});
+				};
+
+				$scope.remove = function(item, target) {
+					var index = target.findIndex(function(arrItem) { return item.id === arrItem.id; });
+					if (index !== -1)
+						target.splice(index, 1)
+				};
+
+				///////////////////
+				// ngModelController handling
+				///////////////////
+				ngModelController.$render = function() {
+					$scope.partition = ngModelController.$viewValue;
+				};
+
+				$scope.$watch('partition', function(partition) {
+					ngModelController.$setViewValue(partition);
+					
+					// size valididy
+					ngModelController.$setValidity('size', partition.length >= 2);
+
+					// unicity validity
+					var numPartition = partition.length;
+					var names = {};
+					for (var i = 0; i < numPartition; ++i)
+						names[partition[i].name] = true;
+
+					ngModelController.$setValidity('unicity', Object.keys(names).length == numPartition);
+				}, true);
+			}
+		}
+	})
+
 	.directive('inputGrid', function(itertools) {
 			var headerOptions = {
 				readOnly: true,
