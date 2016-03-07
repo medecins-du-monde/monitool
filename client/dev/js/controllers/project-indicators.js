@@ -160,7 +160,7 @@ angular.module('monitool.controllers.project.indicators', [])
 			unit: 'none',
 			targetType: 'higher_is_better',
 			formula: "default",
-			parameters: {'default': {elementId: null, filter: null}}
+			parameters: {'default': {elementId: null, filter: {}}}
 		};
 		$scope.isNew = !planning;
 
@@ -212,10 +212,9 @@ angular.module('monitool.controllers.project.indicators', [])
 					}
 				}
 			}
-
 		}, true);
 
-		$scope.save   = function() {
+		$scope.save = function() {
 			formulaWatch();
 			paramWatch();
 

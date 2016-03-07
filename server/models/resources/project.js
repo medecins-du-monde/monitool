@@ -147,10 +147,7 @@ var validate = validator({
 				properties: {
 					name: { type: "string" },
 					goal: { type: "string" },
-					indicators: {
-						type: "array",
-						items: { $ref: "#/definitions/planning" }
-					},
+					indicators: { $ref: "#/definitions/indicators" },
 					purposes: {
 						type: "array",
 						items: {
@@ -160,10 +157,7 @@ var validate = validator({
 							properties: {
 								description: { type: "string" },
 								assumptions: { type: "string" },
-								indicators: {
-									type: "array",
-									items: { $ref: "#/definitions/planning" }
-								},
+								indicators: { $ref: "#/definitions/indicators" },
 								outputs: {
 									type: "array",
 									items: {
@@ -184,10 +178,7 @@ var validate = validator({
 													}
 												}
 											},
-											indicators: {
-												type: "array",
-												items: { $ref: "#/definitions/planning" }
-											}
+											indicators: { $ref: "#/definitions/indicators" }
 										}
 									}
 								}
@@ -208,42 +199,45 @@ var validate = validator({
 			type: "string",
 			pattern: "^[0-9]+\\-[0-9a-f]{32}$"
 		},
-		planning: {
-			type: "object",
-			additionalProperties: false,
-			required: ["baseline", "target", "colorize", "display", "formula", "indicatorId", "parameters", "targetType", "unit"],
-			properties: {
-				baseline: {oneOf: [{type: 'null'}, {type: 'number'}]},
-				target: {oneOf: [{type: 'null'}, {type: 'number'}]},
-				colorize: {type: "boolean"},
-				display: {type: "string", minLength: 1},
-				formula: {type: "string", minLength: 1},
-				indicatorId: {$ref: "#/definitions/uuid"},
-				targetType: {
-					type: "string",
-					enum: ['lower_is_better', 'higher_is_better', 'around_is_better', 'non_relevant']
-				},
-				unit: {
-					type: "string",
-					enum: ["none", "%", "‰"]
-				},
-				parameters: {
-					type: "object",
-					additionalProperties: false,
-					patternProperties: {
-						".*": {
-							type: "object",
-							additionalProperties: false,
-							required: ["elementId", "filter"],
-							properties: {
-								elementId: {$ref: "#/definitions/uuid"},
-								filter: {
-									type: "object",
-									additionalProperties: false,
-									patternProperties: {
-										".*": {
-											type: "array",
-											items: {$ref: "#/definitions/uuid"}
+		indicators: {
+			type: "array",
+			items: {
+				type: "object",
+				additionalProperties: false,
+				required: ["baseline", "target", "colorize", "display", "formula", "indicatorId", "parameters", "targetType", "unit"],
+				properties: {
+					baseline: {oneOf: [{type: 'null'}, {type: 'number'}]},
+					target: {oneOf: [{type: 'null'}, {type: 'number'}]},
+					colorize: {type: "boolean"},
+					display: {type: "string", minLength: 1},
+					formula: {type: "string", minLength: 1},
+					indicatorId: {oneOf: [{$ref: "#/definitions/uuid"}, {type: 'null'}]},
+					targetType: {
+						type: "string",
+						enum: ['lower_is_better', 'higher_is_better', 'around_is_better', 'non_relevant']
+					},
+					unit: {
+						type: "string",
+						enum: ["none", "%", "‰"]
+					},
+					parameters: {
+						type: "object",
+						additionalProperties: false,
+						patternProperties: {
+							".*": {
+								type: "object",
+								additionalProperties: false,
+								required: ["elementId", "filter"],
+								properties: {
+									elementId: {$ref: "#/definitions/uuid"},
+									filter: {
+										type: "object",
+										additionalProperties: false,
+										patternProperties: {
+											".*": {
+												type: "array",
+												items: {$ref: "#/definitions/uuid"}
+											}
 										}
 									}
 								}

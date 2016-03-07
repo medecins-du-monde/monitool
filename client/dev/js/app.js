@@ -311,7 +311,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 						collect: 'entity',
 						start: null,
 						end: null,
-						active: true,
 						elements: []
 					};
 				else
