@@ -124,8 +124,11 @@ app.config(function($httpProvider) {
 
 	$httpProvider.defaults.transformResponse.push(function(data) {
 		var parseDatesRec = function(model) {
-			if (typeof model === 'string' && model.match(/^\d\d\d\d\-\d\d\-\d\d$/))
-				return new Date(model);
+			if (typeof model === 'string' && model.match(/^\d\d\d\d\-\d\d\-\d\d$/)) {
+				// Using new Date('2010-01-01') <=> new Date('2010-01-01T00:00:00Z')
+				// => we want a date that works in current locale.
+				return new Date(model.substring(0, 4) * 1, model.substring(5, 7) - 1, model.substring(8, 10) * 1);
+			}
 
 			if (Array.isArray(model)) {
 				var numChildren = model.length;

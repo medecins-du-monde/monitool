@@ -111,13 +111,25 @@ angular
 		};
 	})
 
-	.controller('ProjectCollectionInputListController', function($scope, project, inputsStatus, Input) {
+	.controller('ProjectCollectionInputListController', function($scope, $state, project, inputsStatus, Input) {
 		var projectUser = project.users.find(function(u) {
 			return (
 				($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
 				($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username)
 			);
 		});
+
+		$scope.newInputDate = new Date();
+		$scope.addInput = function(entityId) {
+			$state.go(
+				'main.project.collection_input_edition',
+				{
+					period: moment($scope.newInputDate).format('YYYY-MM-DD'),
+					formId: $scope.selectedForm.id,
+					entityId: entityId
+				}
+			);
+		};
 
 		$scope.canEdit = {};
 		[{id: 'none'}].concat(project.entities).forEach(function(entity) {
@@ -142,22 +154,15 @@ angular
 		$scope.showFinished = !$scope.canEdit;
 
 		// show/hide columns
-		$scope.showProject = {};
-		$scope.showEntities = {};
+		$scope.showColumn = {};
 		$scope.numCols = {};
 		for (var formId in inputsStatus) {
-			$scope.showProject[formId] = false;
-			$scope.showEntities[formId] = false;
-
+			$scope.showColumn[formId] = {};
 			for (var strDate in inputsStatus[formId])
-				for (var entityId in inputsStatus[formId][strDate]) {
-					if (entityId == 'none')
-						$scope.showProject[formId] = true;
-					else
-						$scope.showEntities[formId] = true;
-				}
+				for (var entityId in inputsStatus[formId][strDate])
+					$scope.showColumn[formId][entityId] = true;
 
-			$scope.numCols[formId] = 1 + ($scope.showEntities[formId] ? project.entities.length : 0) + ($scope.showProject[formId] ? 1 : 0);
+			$scope.numCols[formId] = 1 + Object.keys($scope.showColumn[formId]).length;
 		}
 
 		// Remove the expected inputs for people that cannot edit.
