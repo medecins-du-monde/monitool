@@ -13,38 +13,47 @@ angular
 	// Define Input factory
 	.factory('Input', function($resource, $q) {
 
+		var _getBegin = function(entity, form, project) {
+			var formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
+
+			if (entity) {
+				if (!entity.start && !form.start)
+					return moment(project.start).startOf(formPeriodicity);
+				else if (!entity.start && form.start)
+					return moment(form.start).startOf(formPeriodicity);
+				else if (entity.start && !form.start)
+					return moment(entity.start).startOf(formPeriodicity);
+				else
+					return moment.max(moment(entity.start), moment(form.start)).startOf(formPeriodicity);
+			}
+			else
+				return moment(form.start || project.start).startOf(formPeriodicity);
+		};
+
+		var _getEnd = function(entity, form, project) {
+			var formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
+
+			if (entity) {
+				if (!entity.end && !form.end)
+					return moment(project.end).startOf(formPeriodicity);
+				else if (!entity.end && form.end)
+					return moment(form.end).startOf(formPeriodicity);
+				else if (entity.end && !form.end)
+					return moment(entity.end).startOf(formPeriodicity);
+				else
+					return moment.min(moment(entity.end), moment(form.end)).startOf(formPeriodicity);
+			}
+			else
+				return moment(form.end || project.end).endOf(formPeriodicity);
+		};
+
 		// this has nothing to do on the root scope.
 		// => move it to a service and factorize with the similiar function in mtReporting
 		var _getPeriods = function(entity, form, project) {
 			var periods;
 			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
-				var period = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
-
-				var current, end;
-				if (entity) {
-					// FIXME spaghettis
-					if (!entity.start && !form.start)
-						current = moment(project.start).startOf(period);
-					else if (!entity.start && form.start)
-						current = moment(form.start).startOf(period);
-					else if (entity.start && !form.start)
-						current = moment(entity.start).startOf(period);
-					else
-						current = moment.max(moment(entity.start), moment(form.start)).startOf(period);
-
-					if (!entity.end && !form.end)
-						end = moment(project.end).startOf(period);
-					else if (!entity.end && form.end)
-						end = moment(form.end).startOf(period);
-					else if (entity.end && !form.end)
-						end = moment(entity.end).startOf(period);
-					else
-						end = moment.min(moment(entity.end), moment(form.end)).startOf(period);
-				}
-				else {
-					current = moment(form.start || project.start).startOf(period),
-					end     = moment(form.end || project.end).endOf(period);
-				}
+				var current = _getBegin(entity, form, project),
+					end = _getEnd(entity, form, project);
 
 				if (end.isAfter()) // do not allow to go in the future
 					end = moment();
@@ -284,36 +293,12 @@ angular
 				return false;
 			}
 
-			var inputDate = moment(this.period),
-				formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
+			var inputDate = moment(this.period);
 
 			// an input needs to be on the timeframe of the form and associated entity.
 			if (form.periodicity !== 'free') {
-				var begin, end;
-
-				if (entity) {
-					if (!entity.start && !form.start)
-						begin = moment(project.start).startOf(formPeriodicity);
-					else if (!entity.start && form.start)
-						begin = moment(form.start).startOf(formPeriodicity);
-					else if (entity.start && !form.start)
-						begin = moment(entity.start).startOf(formPeriodicity);
-					else
-						begin = moment.max(moment(entity.start), moment(form.start)).startOf(formPeriodicity);
-
-					if (!entity.end && !form.end)
-						end = moment(project.end).startOf(formPeriodicity);
-					else if (!entity.end && form.end)
-						end = moment(form.end).startOf(formPeriodicity);
-					else if (entity.end && !form.end)
-						end = moment(entity.end).startOf(formPeriodicity);
-					else
-						end = moment.min(moment(entity.end), moment(form.end)).startOf(formPeriodicity);
-				}
-				else {
-					begin = moment(form.start || project.start).startOf(formPeriodicity),
-					end   = moment(form.end || project.end).endOf(formPeriodicity);
-				}
+				var begin = _getBegin(entity, form, project),
+					end   = _getEnd(entity, form, project);
 
 				if (inputDate.isBefore(begin) || inputDate.isAfter(end)) {
 					console.log("Dropping input:", this._id, '(input not in date range)');
@@ -323,7 +308,8 @@ angular
 
 			// an input needs to be collected the first day of its period.
 			if (form.periodicity !== 'free' && form.periodicity !== 'day') {
-				var wishedDate = inputDate.clone().startOf(formPeriodicity);
+				var formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity,
+					wishedDate = inputDate.clone().startOf(formPeriodicity);
 
 				if (!inputDate.isSame(wishedDate)) {
 					console.log("Dropping input:", this._id, '(date not first day in period)');
