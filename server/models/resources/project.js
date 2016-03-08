@@ -382,15 +382,19 @@ function extractRelevantInformation(form) {
 	}).sort(function(el1, el2) { return el1[0].localeCompare(el2[0]); });
 }
 
-function updateInputs(oldForm, newForm, callback) {
+function updateInputs(projectId, oldForm, newForm, callback) {
 	database.view(
 		'reporting',
-		'inputs_by_form_date',
-		{include_docs: true, startkey: [oldForm.id], endkey: [oldForm.id, {}]},
+		'inputs_by_project_form_date',
+		{include_docs: true, startkey: [projectId, oldForm.id], endkey: [projectId, oldForm.id, {}]},
 		function(error, result) {
-			var inputs = result.rows.map(function(row) { return row.doc; });
-			correctFormInputs(oldForm, newForm, inputs);
-			database.bulk({docs: inputs}, {}, callback);
+			if (result && result.length) {
+				var inputs = result.rows.map(function(row) { return row.doc; });
+				correctFormInputs(oldForm, newForm, inputs);
+				database.bulk({docs: inputs}, {}, callback);
+			}
+			else
+				return callback(null);
 		}
 	);
 }
@@ -412,7 +416,7 @@ function correctProjectInputs(oldProject, newProject, callback) {
 			JSON.stringify(extractRelevantInformation(newForm))) {
 
 			// we need to fetch all inputs and update them.
-			tasks.push(updateInputs.bind(null, oldForm, newForm));
+			tasks.push(updateInputs.bind(null, newProject._id, oldForm, newForm));
 		}
 	});
 
@@ -436,9 +440,9 @@ function removeUnlinkedInputs(mode, oldProject, newProject, removeFinishedCallba
 		async.map(
 			removedForms,
 			function(formId, cb) {
-				var opt = {include_docs: true, startkey: [formId], endkey: [formId, {}]};
+				var opt = {include_docs: true, startkey: [newProject._id, formId], endkey: [newProject._id, formId, {}]};
 
-				database.view('reporting', 'inputs_by_' + mode + '_date', opt, function(error, result) {
+				database.view('reporting', 'inputs_by_project_' + mode + '_date', opt, function(error, result) {
 					cb(null, result.rows.map(function(row) { return {_id: row.id, _rev: row.doc._rev, _deleted: true}; }));
 				});
 			},
