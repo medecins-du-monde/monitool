@@ -241,6 +241,9 @@ angular
 			$scope.positions[element.id]
 				= window.localStorage['input.position.' + element.id]
 				= ((($scope.positions[element.id] + offset) % numPositions) + numPositions) % numPositions;
+
+			if (typeof $scope.positions[element.id] != "number" || !isFinite($scope.positions[element.id]))
+				$scope.positions[element.id] = 0;
 		};
 
 		$scope.rotate = function(offset, element) {
@@ -248,6 +251,9 @@ angular
 			$scope.rotations[element.id]
 				= window.localStorage['input.rotation.' + element.id]
 				= ((($scope.rotations[element.id] + offset) % numPermutations) + numPermutations) % numPermutations;
+
+			if (typeof $scope.rotations[element.id] != "number" || !isFinite($scope.rotations[element.id]))
+				$scope.rotations[element.id] = 0;
 		};
 
 		form.elements.forEach(function(element) {
@@ -462,7 +468,7 @@ angular
 			var timeFields = ['year', 'quarter', 'month', 'week', 'day'],
 				timeUsedOnCols = timeFields.find(function(tf) { return $scope.planning.cols.indexOf(tf) !== -1; }),
 				timeUsedOnRows = timeFields.find(function(tf) { return $scope.planning.rows.indexOf(tf) !== -1; });
-			
+
 			$scope.availableCols = $scope.dimensions.filter(function(dimension) {
 				if (timeFields.indexOf(dimension.id) !== -1)
 					return timeUsedOnCols == dimension.id || (!timeUsedOnRows && !timeUsedOnCols);
