@@ -269,11 +269,11 @@ var FRENCH_TRANSLATION = {
 		select_filters: "Sélectionnez les partitions désirées",
 
 		collection_form_warning:
-			'<strong>Attention, en modifiant cette page vous risquez de perdre des données</strong><br/>' + 
+			'<strong>Attention, en modifiant cette page vous risquez de perdre des données.</strong><br/>' + 
 			'{{num_inputs}} saisies ont déjà été réalisées sur ce formulaire.' + 
-			'<ul>' + 
-			'	<li>Toute modification sur le planning (périodicité, dates) causera la suppression des saisies exclues du nouveau planning</li>' + 
-			'	<li>Toute modification sur la structure des données collectées sera répercutée sur toutes les saisies passées de ce formulaire</li>' + 
+			'<ul>' +
+			'	<li>Les modifications sur le planning (périodicité, dates) mettront de côté les saisies non concernées par le nouveau planning (sans perte de données)</li>' +
+			'	<li>Les modifications sur les variables auront des conséquence différentes selon le type de modification: référez-vous au guide d\'utilisation pour lister les différents cas de figures</li>' +
 			'</ul>',
 
 		sections: "Sections",
