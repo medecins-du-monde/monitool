@@ -59,7 +59,7 @@ angular
 		};
 
 		$scope.newPartition = function(target) {
-			target.push([]);
+			target.push([{id: makeUUID(), name: ""}, {id: makeUUID(), name: ""}]);
 		};
 
 		$scope.remPartition = function(partition, target) {
