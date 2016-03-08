@@ -17,8 +17,7 @@ angular.module('monitool.directives.projectLogframe', [])
 						{content: ""},
 						{content: "Intervention logic"},
 						{content: "Assumptions"},
-						{content: "Objectively verifiable indicators of achievement"},
-						{content: "Sources and means of verification"},
+						{content: "Objectively verifiable indicators of achievement"}
 					]];
 
 					if (logFrame.indicators.length) {
@@ -27,14 +26,10 @@ angular.module('monitool.directives.projectLogframe', [])
 							{content: logFrame.goal, rowspan: logFrame.indicators.length},
 							{content: "", rowspan: logFrame.indicators.length},
 							{content: logFrame.indicators[0].display},
-							{content: ''},
 						]);
 
-						logFrame.indicators.slice(1).forEach(function(indicatorId) {
-							tableRows.push([
-								{content: name(indicatorId)},
-								{content: source(indicatorId)},
-							]);
+						logFrame.indicators.slice(1).forEach(function(indicator) {
+							tableRows.push([{content: indicator.display}]);
 						});
 					}
 					else
@@ -43,7 +38,6 @@ angular.module('monitool.directives.projectLogframe', [])
 							{content: logFrame.goal},
 							{content: ""},
 							{content: ""},
-							{content: ""}
 						]);
 
 					var rowspan = 0, isFirst = true;
@@ -57,7 +51,6 @@ angular.module('monitool.directives.projectLogframe', [])
 								{content: purpose.description, rowspan: purpose.indicators.length},
 								{content: purpose.assumptions, rowspan: purpose.indicators.length},
 								{content: purpose.indicators[0].display},
-								{content: ''},
 							];
 
 							if (isFirst) {
@@ -78,7 +71,6 @@ angular.module('monitool.directives.projectLogframe', [])
 							var firstLine = [
 								{content: purpose.description},
 								{content: purpose.assumptions},
-								{content: ""},
 								{content: ""},
 							];
 
@@ -106,7 +98,6 @@ angular.module('monitool.directives.projectLogframe', [])
 									{content: output.description, rowspan: output.indicators.length},
 									{content: output.assumptions, rowspan: output.indicators.length},
 									{content: output.indicators[0].display},
-									{content: ''},
 								];
 
 								if (isFirst) {
@@ -117,15 +108,14 @@ angular.module('monitool.directives.projectLogframe', [])
 								tableRows.push(firstLine);
 
 								output.indicators.slice(1).forEach(function(indicator) {
-									tableRows.push([{content: indicator.display}, {content: ''}]);
+									tableRows.push([{content: indicator.display}]);
 								});
 							}
 							else {
 								var firstLine = [
 									{content: output.description},
 									{content: output.assumptions},
-									{content: ""},
-									{content: ""},
+									{content: ""}
 								];
 
 								if (isFirst) {
@@ -151,7 +141,7 @@ angular.module('monitool.directives.projectLogframe', [])
 						purpose.outputs.forEach(function(output) {
 							output.activities.forEach(function(activity) {
 								var firstLine = [
-									{content: activity.description, colspan: 4}
+									{content: activity.description, colspan: 3}
 								];
 
 								if (isFirst) {
