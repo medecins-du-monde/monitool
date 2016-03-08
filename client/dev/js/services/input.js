@@ -256,6 +256,9 @@ angular
 		};
 
 		Input.prototype.isOutOfSchedule = function(project) {
+			if (project._id !== this.project)
+				throw new Error();
+
 			var form    = project.forms.find(function(f) { return f.id == this.form; }.bind(this)),
 				entity  = project.entities.find(function(e) { return e.id == this.entity; }.bind(this));
 			
@@ -287,23 +290,30 @@ angular
 			// an input needs to be on the timeframe of the form and associated entity.
 			if (form.periodicity !== 'free') {
 				var begin, end;
-				if (!entity.start && !form.start)
-					begin = moment(project.start).startOf(formPeriodicity);
-				else if (!entity.start && form.start)
-					begin = moment(form.start).startOf(formPeriodicity);
-				else if (entity.start && !form.start)
-					begin = moment(entity.start).startOf(formPeriodicity);
-				else
-					begin = moment.max(moment(entity.start), moment(form.start)).startOf(formPeriodicity);
 
-				if (!entity.end && !form.end)
-					end = moment(project.end).startOf(formPeriodicity);
-				else if (!entity.end && form.end)
-					end = moment(form.end).startOf(formPeriodicity);
-				else if (entity.end && !form.end)
-					end = moment(entity.end).startOf(formPeriodicity);
-				else
-					end = moment.min(moment(entity.end), moment(form.end)).startOf(formPeriodicity);
+				if (entity) {
+					if (!entity.start && !form.start)
+						begin = moment(project.start).startOf(formPeriodicity);
+					else if (!entity.start && form.start)
+						begin = moment(form.start).startOf(formPeriodicity);
+					else if (entity.start && !form.start)
+						begin = moment(entity.start).startOf(formPeriodicity);
+					else
+						begin = moment.max(moment(entity.start), moment(form.start)).startOf(formPeriodicity);
+
+					if (!entity.end && !form.end)
+						end = moment(project.end).startOf(formPeriodicity);
+					else if (!entity.end && form.end)
+						end = moment(form.end).startOf(formPeriodicity);
+					else if (entity.end && !form.end)
+						end = moment(entity.end).startOf(formPeriodicity);
+					else
+						end = moment.min(moment(entity.end), moment(form.end)).startOf(formPeriodicity);
+				}
+				else {
+					begin = moment(form.start || project.start).startOf(formPeriodicity),
+					end   = moment(form.end || project.end).endOf(formPeriodicity);
+				}
 
 				if (inputDate.isBefore(begin) || inputDate.isAfter(end)) {
 					console.log("Dropping input:", this._id, '(input not in date range)');
