@@ -54,6 +54,13 @@ angular
 			});
 		}, true);
 
+		$scope.$watch('form.collect', function(collect) {
+			if (collect === 'some_entity' && !$scope.form.entities)
+				$scope.form.entities = [];
+			else if (collect !== 'some_entity' && $scope.form.entities)
+				delete $scope.form.entities;
+		});
+
 		$scope.newVariable = function() {
 			$scope.form.elements.push({id: makeUUID(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
 		};
