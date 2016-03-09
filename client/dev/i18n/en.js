@@ -63,7 +63,6 @@ var ENGLISH_TRANSLATION = {
 		clone: "Clone",
 		user_guide: "User guide",
 		home: "Home",
-
 		up: "Up",
 		down: "Down",
 		sum: "Sum",
@@ -174,8 +173,65 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		dimensions: {
+			day: "Days",
+			week: "Weeks",
+			month: "Months",
+			quarter: "Quarters",
+			year: "Years",
+			partition0: "Partition 0",
+			partition1: "Partition 1",
+			partition2: "Partition 2",
+			partition3: "Partition 3",
+			partition4: "Partition 4",
+			partition5: "Partition 5",
+			partition6: "Partition 6",
+			entity: "Input entity",
+			group: "Input group"
+		},
+		group: {
+			location: "Location",
+			partition: "Partitions",
+			time: "Dates"
+		},
+
+		please_enter_new_name: "Enter a name for the new project",
+		edit_user: "User edition",
+		update_user: "Update the user",
+		user_type: "Type",
+		user_types: {
+			internal: "MDM account",
+			partner: "Partner account"
+		},
+
+		user_role: "Role",
+		user_roles: {
+			owner: "Owner",
+			input_all: "Data entry",
+			input: "Limited data entry",
+			read: "Read-only"
+		},
+		user_fullname: "Full name",
+		user: "User",
+		username: "Login",
+		password: "Password",
+
+		link_indicator: "Link to an indicator in the catalog",
+		unlink_indicator: 'Unlink from the catalog',
+
+		parameter: "Parameter",
+		all_selected: "No filter",
+		create_logframe: "Add a logical frame",
+		reporting_compare_sites: "Compare locations",
+		unnamed_logframe: "Unnamed logical frame",
+
+		update_logframe: "Update the logical frame",
+		edit_indicator: "Edit indicator",
+		display: "Name",
+		display_ph: "ANC1 rate for the health centers",
+		choose: "Link to an indicator in the catalog",
+
 		fill_with_last_input: "Fill with last input",
-		date_due: "Date",
 		show_finished: "See all data entries",
 		field_order: "Order",
 		field_distribution: "Distribution",
@@ -215,8 +271,8 @@ var ENGLISH_TRANSLATION = {
 			'<strong>Take care, if you make changes to this page, you risk losing data</strong><br/>' + 
 			'{{num_inputs}} inputs were made with the form as it is.' + 
 			'<ul>' + 
-			'	<li>All modifications on the planning (periodicity, dates) will cause old inputs to be discarded</li>' + 
-			'	<li>All modifications on the structure will be echoed on former inputs</li>' + 
+			'	<li>Modifications on the planning (periodicity, dates) will cause old inputs to be put apart (with no data loss)</li>' + 
+			'	<li>Modifications on the data structure will have variable consequences: please refer to the user guide</li>' + 
 			'</ul>',
 
 		sections: "Sections",
@@ -353,6 +409,7 @@ var ENGLISH_TRANSLATION = {
 		},
 		collect: "Collect",
 		collects: {
+			some_entity: "Once for some input entities",
 			entity: "Once for each input entity",
 			project: "Once for the whole project"
 		},
@@ -428,7 +485,6 @@ var ENGLISH_TRANSLATION = {
 	},
 	indicator: {
 		cant_create: "You are not allowed to create new indicators",
-
 		name: "Name",
 		translate_from_fr: "Translate automatically from french",
 		translate_from_es: "Translate automatically from spanish",

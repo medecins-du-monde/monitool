@@ -173,8 +173,65 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		dimensions: {
+			day: "Días",
+			week: "Semanas",
+			month: "Meses",
+			quarter: "Trimestres",
+			year: "Años",
+			partition0: "Partición 0",
+			partition1: "Partición 1",
+			partition2: "Partición 2",
+			partition3: "Partición 3",
+			partition4: "Partición 4",
+			partition5: "Partición 5",
+			partition6: "Partición 6",
+			entity: "Lugar de actividad",
+			group: "Grupo de actividad"
+		},
+		group: {
+			location: "Lugar",
+			partition: "Particiones",
+			time: "Fechas"
+		},
+
+		please_enter_new_name: "Entre un nombre para el nuevo proyecto",
+		edit_user: "Editar usuario",
+		update_user: "Actualizar el usuario",
+		user_type: "Tipo",
+		user_types: {
+			internal: "Cuenta MDM",
+			partner: "Cuenta socio"
+		},
+
+		user_role: "Nivel de autorización",
+		user_roles: {
+			owner: "Proprietario",
+			input_all: "Entrada de datos",
+			input: "Entrada de datos limitada",
+			read: "Consultar"
+		},
+		user_fullname: "Nombre y apellido",
+		user: "Usuario",
+		username: "Nombre de usuario",
+		password: "Contraseña",
+
+		link_indicator: "Conectar con un indicador del catálogo",
+		unlink_indicator: 'Deconectar del catálogo',
+
+		parameter: "Parametro",
+		all_selected: "Sin filtro",
+		create_logframe: "Añadir un marco lógico",
+		reporting_compare_sites: "Comparar lugares",
+		unnamed_logframe: "Marco lógico sin nombre",
+
+		update_logframe: "Actualizar el marco lógico",
+		edit_indicator: "Editar usuario",
+		display: "Nombre",
+		display_ph: "Tasa de consultaciones prenatales en las estructuras de salud",
+		choose: "Conectar con un indicador del catálogo",
+
 		fill_with_last_input: "Rellenar con los datos de la última entrada",
-		date_due: "Fecha",
 		show_finished: "Ver todas las entradas",
 		field_order: "Orden",
 		field_distribution: "Distribución",
@@ -214,8 +271,8 @@ var SPANISH_TRANSLATION = {
 			'<strong>Cuidado, si hace cambios en esta página, perdera datos</strong><br/>' + 
 			'{{num_inputs}} entradas han sido realizadas en este formulario.' + 
 			'<ul>' + 
-			'	<li>Todo cambio sobre el calendario suprimira todas las entradas que no entren en las nuevas fechas</li>' + 
-			'	<li>Todo cambio sobre la estructura de datos sera efectiva en todas las entradas realizadas</li>' + 
+			'	<li>Los cambios sobre el calendario (periodicidad, fechas) pondra de lado todas las entradas que no entren en las nuevas fechas (sin perder los datos)</li>' + 
+			'	<li>Los cambios sobre la estructura de datos tendran consequencias diferentes según el tipo de cambio: lea la guía del usuario</li>' + 
 			'</ul>',
 
 		sections: "Apartados",
@@ -352,7 +409,8 @@ var SPANISH_TRANSLATION = {
 		},
 		collect: "Recuperar",
 		collects: {
-			entity: "Para cada lugar de actividad por separado",
+			some_entity: "Para algunos lugares de actividad",
+			entity: "Para cada lugar de actividad",
 			project: "Una vez para todo el proyecto"
 		},
 		
