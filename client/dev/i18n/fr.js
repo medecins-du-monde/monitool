@@ -65,15 +65,10 @@ var FRENCH_TRANSLATION = {
 		home: "Accueil",
 		up: "Monter d'un cran",
 		down: "Descendre d'un cran",
-		sum: "Total",
-		include: "Inclure",
-		toggle: "Changer",
-		toggle_all: "Changer tous",
 
 		date: "Date",
 		administrator: "Administrateur",
 
-		back_to_intranet: "Retourner sur l'intranet",
 		settings: "Paramètres",
 		projects: 'Projets',
 		project: 'Projet',
@@ -93,7 +88,6 @@ var FRENCH_TRANSLATION = {
 		edit: 'Modifier',
 		'delete': 'Supprimer',
 
-		view_stats: 'Voir les statistiques',
 		members: 'Membres',
 
 		day: 'Jour',
@@ -102,39 +96,22 @@ var FRENCH_TRANSLATION = {
 		quarter: "Trimestre",
 		year: "Année",
 		
-		done: 'Fait',
-		copy: 'Copier',
 		choose: 'Choisir',
-		edition: 'Édition',
 		cancel: 'Annuler',
 		logical_frames: 'Cadres logiques',
-		description: 'Description',
 		reporting: 'Statistiques',
 		reporting_general: 'Statistiques générales',
-		reporting_by_indicator: 'Statistiques par indicateur',
-		reporting_by_variable: 'Statistiques par variable',
 		reporting_analysis: "Analyse descriptive",
 		columns: "Colonnes",
 		colorize: 'Colorer',
 		display: 'Afficher',
-		values: 'Indicateurs cadre logique',
-		target_percentage: 'Avancement cadre logique',
-		plot: 'Grapher',
 		download_plot: 'Télécharger le graphique',
 		download_table: 'Télécharger le tableau',
-		unknown_indicator: "Indicateur inconnu",
-		active: "Actif",
 
-		choose_indicator: 'Choisissez un indicateur',
-		list: 'Liste',
 		logout: 'Déconnecter',
-		change_password: "Changer le mot de passe",
-		detach: "Déplacer vers supplémentaires",
 
 		sure_to_leave: 'Vous avez realisé des changements. Êtes-vous sûr de vouloir quitter sans sauvegarder?',
-		filter: "Filtre",
-		'export': "Export",
-		none: "Aucune"
+		filter: "Filtre"
 	},
 	menu: {
 		toggle_nav: "Voir le menu",
@@ -229,7 +206,6 @@ var FRENCH_TRANSLATION = {
 		edit_indicator: "Édition indicateur",
 		display: "Nom",
 		display_ph: "Taux de CPN1 au sein des structures de santés",
-		choose: "Lier à un indicateur du catalogue",
 
 		fill_with_last_input: "Remplir avec les données de la saisie précédente",
 		show_finished: "Voir les saisies réalisées",
@@ -250,11 +226,6 @@ var FRENCH_TRANSLATION = {
 		},
 		cols: "Colonnes",
 		rows: "Lignes",
-		partition0: "Partition 0",
-		partition1: "Partition 1",
-		partition2: "Partition 2",
-		partition3: "Partition 3",
-		partition4: "Partition 4",
 		entity: "Lieu de collecte",
 		select_cols: "Sélectionnez les colonnes",
 		select_rows: "Sélectionnez les lignes",
@@ -269,22 +240,18 @@ var FRENCH_TRANSLATION = {
 
 		collection_form_warning:
 			'<strong>Attention, en modifiant cette page vous risquez de perdre des données.</strong><br/>' + 
-			'{{num_inputs}} saisies ont déjà été réalisées sur ce formulaire.' + 
+			'{{num_inputs}} saisies ont déjà été réalisées sur cette source de données.' + 
 			'<ul>' +
 			'	<li>Les modifications sur le planning (périodicité, dates) mettront de côté les saisies non concernées par le nouveau planning (sans perte de données)</li>' +
 			'	<li>Les modifications sur les variables auront des conséquence différentes selon le type de modification: référez-vous au guide d\'utilisation pour lister les différents cas de figures</li>' +
 			'</ul>',
 
-		sections: "Sections",
-		variables: "Variables",
 		partitions: "Partitions",
 
 		add_variable: "Ajouter une variable",
 		remove_variable: "Supprimer la variable",
 		add_partition: "Ajouter une partition",
 		remove_partition: "Supprimer la partition",
-		add_partition_element: "Ajouter un élément",
-		remove_partition_element: "Supprimer l'élément",
 
 		aggregation: 'Agrégation',
 		different_geos: 'Sur des lieux différents',
@@ -297,22 +264,16 @@ var FRENCH_TRANSLATION = {
 		lowest: "Plus petite valeure",
 		last: "Dernière valeur",
 
-		section_up: "Monter la section d'un cran",
-		section_down: "Descendre la section d'un cran",
 		variable_up: "Monter la variable d'un cran",
 		variable_down: "Descendre la variable d'un cran",
-		remove_section: "Supprimer la section",
-		add_section: "Ajouter une section",
 
-		please_select_variable: "Selectionnez une variable",
-		no_partitions_available: "Pas de partitions disponibles",
 
 		collection_site_list: "Lieux de collecte",
-		collection_form_list: "Formulaires de collecte",
+		collection_form_list: "Sources de données",
 		collection_input_list: "Saisie",
 
 		collection_site: "Lieu de collecte",
-		collection_form: "Formulaire de collecte",
+		collection_form: "Source de données",
 
 		collection_form_planning: "Planning de saisie",
 		collection_form_structure: "Structure du formulaire",
@@ -326,30 +287,18 @@ var FRENCH_TRANSLATION = {
 		running: "Projets en cours",
 		finished: "Projets terminés",
 		noproject: "Aucun projet ne correspond à ce critère",
-		inputs: "Saisies",
 
-		last_input: "Dernière saisie: ",
 
-		value: "Valeur",
 		activity: "Activités",
 		activity_management: "Activités & Démographie",
 		variable: "Variable",
-		section: "Section",
 
-		unknown: "Inconnu",
-		color: "Couleur",
 
-		specs: "Spécifications",
 		result_management: "Objectifs & résultats",
-		additional_indicators: "Indicateurs supplémentaires",
-		no_additional_indicators: "Aucun indicateur supplémentaire n'a été défini",
 		no_purposes: "Aucun objectif spécifique n'a été défini",
 
-		input_form_list: "Liste des plannings de saisie",
-		indicator_distribution: "Distribution des indicateurs par planning de saisie et période",
-		add_new_indicator_to_form: "Ajouter un nouvel indicateur au formulaire",
 
-		form_name_ph: "ex: Collecte mensuelle pour les centres de santé",
+		form_name_ph: "ex: Données système national d'information sanitaire",
 
 		analysis: "Analyse",
 		analysis_insert_data: "Insérer des données",
@@ -364,10 +313,6 @@ var FRENCH_TRANSLATION = {
 		report_name_ph: "ex: Analyse descriptive mensuelle mai 2015",
 		no_reports: "Aucune analyse descriptive n'a encore été créé!",
 
-		source: "Source",
-		source_ph: "Ex: NHIS local",
-		in_charge: "Personne responsable",
-		in_charge_ph: "Ex: Infirmière projet",
 
 		missing_mandatory_indicators: "Indicateurs obligatoires manquants",
 		other_indicators: "Autres indicateurs",
@@ -378,26 +323,12 @@ var FRENCH_TRANSLATION = {
 		entity_name_placeholder: "ex: Centre de santé X, Hôpital X, ...",
 		group_name_placeholder: "ex: Hôpitaux régionaux, parti Nord du pays, ...",
 
-		logical_frame_tooltip: 'Décrit les objectifs, resultats attendus et activitées mises en oeuvre par le projet.',
-		input_entities_tooltip: 'Liste les Lieux de collecte du projet où sont collectés les indicateurs. Par exemple des hopitaux, centre de santé, villages...',
-		input_groups_tooltip: 'Permet de grouper les Lieux de collecte par catégories logiques.',
-		input_forms_tooltip: 'Déclaration des formulaires et du planning de saisie des indicateurs de suivi du projet.',
-		waiting_inputs_tooltip: '',
-		reporting_tooltip: '',
 
 		create: "Créer un nouveau projet",
-		input_forms: 'Plannings de saisie',
-		input_form: 'Planning de saisie',
-		data_collection: 'Collecte',
 		periodicity: "Périodicité",
 		start: 'Début du projet',
 		end: 'Fin du projet',
 
-		sumable: 'Sommable',
-		input_field: 'Champ de saisie',
-		value_source: 'Source de la valeur',
-		input_mode: 'Mode de saisie',
-		manual_input: 'Saisies manuelles',
 
 		periodicities: {
 			day: 'Tous les jours',
@@ -414,37 +345,22 @@ var FRENCH_TRANSLATION = {
 			project: "Une fois pour tout le projet"
 		},
 
-		add_intermediary: "Ajouter une saisie",
-		intermediary_periods: "Dates supplémentaires",
 
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',
 		no_input_groups: 'Aucun groupe d\'activité n\'a encore été créé!',
-		no_forms: 'Aucun formulaire n\'a encore été créé',
-		no_indicators: 'Aucun indicateur n\'est défini sur ce projet',
+		no_forms: 'Aucune source de données n\'a encore été créé',
 
-		waiting_inputs: 'Saisies en attente',
-		finished_inputs: 'Saisies réalisées',
-		invalid_inputs: 'Saisies hors planning',
 
-		no_inputs: 'Aucune saisie ne correspond à ce critère.',
 		input: 'Saisir',
 
-		relevance: 'Pertinence',
-		relevance_ph: 'Pourquoi collectez-vous cet indicateur?',
 		baseline: 'Baseline',
-		baseline_ph: 'Valeur de référence',
-		target_ph: 'Valeur à atteindre',
 		target: 'Cible',
-		general_data: 'Données générales',
 
 		goal: 'Objectif général',
-		goal_short: "OG",
 		intervention_logic: 'Logique d\'intervention',
 		intervention_logic_goal_ph: 'Description de la contribution du projet aux objectifs (impact) d\'une politique ou d\'un programme',
 		intervention_logic_purpose_ph: 'Description des avantages directs destinés au(x) groupe(s) cible(s)',
 		assumptions_purpose_ph: 'Facteurs externes susceptibles de compromettre l’atteinte de l’objectif',
-		purpose_short: 'OS',
-		output_short: 'R',
 
 		start_date: "Date de lancement",
 		end_date: "Date de fin",
@@ -456,8 +372,6 @@ var FRENCH_TRANSLATION = {
 		assumptions: 'Hypothèses',
 		output: "Résultat",
 		activities: 'Activités',
-		prerequisite: 'Prérequis',
-		activity_prereq_ph: 'Quels sont les prérequis pour mettre en place d\'activité?',
 		activity_desc_ph: 'Produit ou service tangibles apportés par le projet.',
 		output_assumptions_ph: 'Facteurs externes susceptibles de compromettre l’atteinte du résultat',
 		output_desc_ph: 'Produit ou service tangibles apportés par le projet.',
@@ -468,12 +382,8 @@ var FRENCH_TRANSLATION = {
 
 		users: "Utilisateurs",
 		owners: "Propriétaires",
-		dataEntryOperators: "Opérateurs de saisie",
 
-		move_up: "Monter",
-		move_down: "Descendre",
 
-		indicator_source: "Obtention",
 		you_are_owner: "Vous pouvez éditer ce projet",
 		you_are_editor: "Vous pouvez saisir sur ce projet",
 		you_are_not_owner: "Vous ne pouvez pas éditer ce projet",
@@ -481,7 +391,6 @@ var FRENCH_TRANSLATION = {
 
 		formula: "Formule",
 		link: "Lien: {{name}}",
-		links: "Liens"
 	},
 	indicator: {
 		cant_create: "Vous n'êtes pas autorisé à créer de nouveaux indicateurs",
@@ -494,8 +403,6 @@ var FRENCH_TRANSLATION = {
 		delete_formula: "Etes-vous sûr de vouloir supprimer cette formule? Cette décision affecte tous les projets qui l'utilisent.",
 
 		classification: "Classification",
-		is_unchanged: "Le bouton est vérouillé car auncune modication n'a eu lieu",
-		is_invalid: "Le bouton est vérouillé car le formulaire est invalide. Avez-vous rempli les noms et les éléments de la formule?",
 
 		is_mandatory: "Obligatoire - Doit être collecté pour tous les projets de même thématique",
 		is_approved: "Approuvé - Peut ou non être collecté sur les projets de même thématique",
@@ -505,7 +412,6 @@ var FRENCH_TRANSLATION = {
 
 		search: "Rechercher",
 		search_ph: "Rentrez au moins 3 caractères",
-		scope: "Portée",
 
 		standard: "Norme",
 		sources: "Sources",
@@ -513,7 +419,6 @@ var FRENCH_TRANSLATION = {
 		standard_ph: "À quelle norme appartient cet indicateur?",
 		sources_ph: "Quelles sont les sources possibles pour cet indicateur?",
 		comments_ph: "Dans quel cas est-il pertinent d'utiliser cet indicateur, et avec quelles limites?",
-		metadata: "Metadonnées",
 
 		target: "Relation à la cible",
 		higher_is_better: "Atteinte si la saisie est supérieure à la cible",
@@ -528,8 +433,6 @@ var FRENCH_TRANSLATION = {
 		
 		name_ph: 'Exemple: Part des dossiers patient bien remplis',
 		definition: 'Définition',
-		definition_ph: 'Exemple: Mesurer le niveau de formation du personnel médical qui rempli les dossiers patients. Sa mesure est facile sur des projets de petite dimension, à éviter dans un autre cadre.',
-		core: 'Recommandé',
 		unit: 'Unité',
 		other: 'Autre',
 		percent: 'Pour cent (%)',
@@ -538,20 +441,7 @@ var FRENCH_TRANSLATION = {
 		themes: 'Thématiques',
 		select_types: 'Sélectionnez un ou plusieurs types',
 		select_themes: 'Sélectionnez une ou plusieures thématiques',
-		categorization: 'Classement',
-		computation: 'Calcul',
-		sum_allowed: 'Sommable',
-		formula: 'Formule',
-		formulas: 'Formules',
-		formula_name_ph: 'Exemple: Pourcentage entre dossiers patient bien remplis et total',
-		formula_expression_ph: 'Exemple: 100 * a / b',
-		param_name_ph: "Exemple: Nombre de consultations prénatales",
-		add_formula: "Ajouter une formule",
-		parameter: 'Paramètre',
 
-		order_by: 'Trier par',
-		alphabetical_order: 'Ordre alphabétique',
-		num_inputs: 'Nombre de saisies',
 		num_projects: 'Nombre de projets',
 		create_new: 'Créer un nouvel indicateur',
 
@@ -559,10 +449,6 @@ var FRENCH_TRANSLATION = {
 		types_list: "Liste des types",
 		num_indicators: 'Nombre d\'indicateurs',
 		
-		new_type_name: "Nom du nouveau type",
-		new_theme_name: "Nom de la nouvelle thématique",
-		only_core: "Ne voir que les indicateurs recommandés",
-		is_external: "Cet indicateur provient d'une autre thématique",
 	},
 	form: {
 		mandatory: "Ce champ est obligatoire",

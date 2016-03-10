@@ -65,15 +65,10 @@ var ENGLISH_TRANSLATION = {
 		home: "Home",
 		up: "Up",
 		down: "Down",
-		sum: "Sum",
-		include: "Include",
-		toggle: "Toggle",
-		toggle_all: "Toggle all",
 
 		date: "Date",
 		administrator: "Administrator",
 
-		back_to_intranet: "Go back to intranet",
 		settings: "Settings",
 		projects: 'Projects',
 		project: 'Project',
@@ -93,7 +88,6 @@ var ENGLISH_TRANSLATION = {
 		edit: 'Edit',
 		'delete': 'Delete',
 
-		view_stats: 'Display reporting',
 		members: 'Members',
 
 		day: 'Day',
@@ -102,39 +96,22 @@ var ENGLISH_TRANSLATION = {
 		quarter: "Quarter",
 		year: "Year",
 		
-		done: 'Done',
-		copy: 'Copy',
 		choose: 'Choose',
-		edition: 'Edition',
 		cancel: 'Cancel',
 		logical_frames: 'Logical Frames',
-		description: 'Description',
 		reporting: 'Reporting',
 		reporting_general: 'General reporting',
-		reporting_by_indicator: 'By indicator reporting',
-		reporting_by_variable: 'By variable reporting',
 		reporting_analysis: 'Descriptive Analysis',
 		columns: "Columns",
 		colorize: 'Colorize',
 		display: 'Display',
-		values: 'Logframe indicators',
-		target_percentage: 'Logframe progress',
-		plot: 'Plot',
 		download_plot: 'Download plot',
 		download_table: 'Download table',
-		unknown_indicator: "Unknown indicator",
-		active: "Active",
 
-		choose_indicator: 'Choose an indicator',
-		list: 'List',
 		logout: 'Log Out',
-		change_password: "Change password",
-		detach: "Detach",
 
 		sure_to_leave: 'You made changes. Click OK to confirm that you want to leave without saving.',
-		filter: "Filter",
-		'export': "Export",
-		none: "None"
+		filter: "Filter"
 	},
 	menu: {
 		toggle_nav: "Toggle navigation",
@@ -229,7 +206,6 @@ var ENGLISH_TRANSLATION = {
 		edit_indicator: "Edit indicator",
 		display: "Name",
 		display_ph: "ANC1 rate for the health centers",
-		choose: "Link to an indicator in the catalog",
 
 		fill_with_last_input: "Fill with last input",
 		show_finished: "See all data entries",
@@ -250,11 +226,6 @@ var ENGLISH_TRANSLATION = {
 		},
 		cols: "Columns",
 		rows: "Rows",
-		partition0: "Partition 0",
-		partition1: "Partition 1",
-		partition2: "Partition 2",
-		partition3: "Partition 3",
-		partition4: "Partition 4",
 		entity: "Input entity",
 		select_cols: "Please select columns",
 		select_rows: "Please select rows",
@@ -275,16 +246,12 @@ var ENGLISH_TRANSLATION = {
 			'	<li>Modifications on the data structure will have variable consequences: please refer to the user guide</li>' + 
 			'</ul>',
 
-		sections: "Sections",
-		variables: "Variables",
 		partitions: "Partitions",
 
 		add_variable: "Add a variable",
 		remove_variable: "Remove this variable",
 		add_partition: "Add a partition",
 		remove_partition: "Remove this partition",
-		add_partition_element: "Add an element",
-		remove_partition_element: "Remove this element",
 
 		aggregation: "Aggregation",
 		different_geos: "On different places",
@@ -297,15 +264,9 @@ var ENGLISH_TRANSLATION = {
 		lowest: "Lowest",
 		last: "Last",
 
-		section_up: "Move up",
-		section_down: "Move down",
 		variable_up: "Move up",
 		variable_down: "Move down",
-		remove_section: "Remove this section",
-		add_section: "Add section",
 
-		please_select_variable: "Please select a variable",
-		no_partitions_available: "No partitions available",
 
 		collection_site_list: "Collection sites",
 		collection_form_list: "Collection forms",
@@ -326,28 +287,16 @@ var ENGLISH_TRANSLATION = {
 		running: "Running projects",
 		finished: "Finished projects",
 		noproject: "No projects match this criteria",
-		inputs: "Inputs",
 
-		last_input: "Last input: ",
 
-		value: "Value",
 		activity: "Activity",
 		activity_management: "Activities & Demography",
 		variable: "Variable",
-		section: "Section",
 
-		unknown: "Unknown",
-		color: "Color",
 
-		specs: "Specifications",
 		result_management: "Objectives & results",
-		additional_indicators: "Additional indicators",
-		no_additional_indicators: "No additional indicators were defined",
 		no_purposes: "No purposes were defined yet",
 
-		input_form_list: "Input form list",
-		indicator_distribution: "Indicators repartition by form and period",
-		add_new_indicator_to_form: "Add a new indicator to the form",
 
 		form_name_ph: "For instance: Monthly collection on health centers",
 
@@ -364,10 +313,6 @@ var ENGLISH_TRANSLATION = {
 		report_name_ph: "ex: Monthly descriptive analysis for may 2015",
 		no_reports: "No descriptive analysis has be created yet!",
 
-		source: "Source",
-		source_ph: "Ej: NHIS",
-		in_charge: "Person in charge",
-		in_charge_ph: "Ex: Project nurse",
 
 		missing_mandatory_indicators: "Missing mandatory indicators",
 		other_indicators: "Other indicators",
@@ -378,26 +323,12 @@ var ENGLISH_TRANSLATION = {
 		entity_name_placeholder: "For instance: Health center X, Hospital X, ...",
 		group_name_placeholder: "ex: Regional hospitals, North of the country, ...",
 
-		logical_frame_tooltip: 'Describe purpose, expected outputs and activities implemented by the project.',
-		input_entities_tooltip: 'List of input entities where indicators are collected. For instance hospitals, health centers, villages...',
-		input_groups_tooltip: 'Allow grouping input entities to generate reportings on those groups.',
-		input_forms_tooltip: 'Allow defining how the indicators are going to be entered into monitool (periodicity, ...).',
-		waiting_inputs_tooltip: '',
-		reporting_tooltip: '',
 
 		create: "Create new project",
-		input_forms: 'Input forms',
-		input_form: 'Input form',
-		data_collection: 'Data collection',
 		periodicity: "Periodicity",
 		start: 'Use project start',
 		end: 'Use project end',
 
-		sumable: 'Summable',
-		input_field: 'Input field',
-		value_source: 'Value source',
-		input_mode: 'Input mode',
-		manual_input: 'Manual input',
 
 		periodicities: {
 			day: "Every day",
@@ -414,37 +345,22 @@ var ENGLISH_TRANSLATION = {
 			project: "Once for the whole project"
 		},
 		
-		add_intermediary: "Add a date",
-		intermediary_periods: "Extra dates",
 
 		no_input_entities: 'No input entity was created yet!',
 		no_input_groups: 'No input group was created yet!',
 		no_forms: 'No form was created yet!',
-		no_indicators: 'This project does not follow any indicator',
 
-		waiting_inputs: 'Late inputs',
-		finished_inputs: 'Done inputs',
-		invalid_inputs: 'Out of calendar inputs',
 
-		no_inputs: 'No inputs match this criteria.',
 		input: 'Input now',
 
-		relevance: 'Relevance',
-		relevance_ph: 'Why are you collecting this indicator?',
 		baseline: 'Baseline',
-		baseline_ph: 'Reference value',
-		target_ph: 'Target value',
 		target: 'Targets',
-		general_data: 'General data',
 
 		goal: 'General objective',
-		goal_short: "General objective",
 		intervention_logic: 'Description',
 		intervention_logic_goal_ph: 'Describe the project\'s contribution on a program or policy',
 		intervention_logic_purpose_ph: 'Describe the tangible advantages that are provided to the beneficiaries',
 		assumptions_purpose_ph: 'External factors that could jeopardize reaching the specific objective',
-		purpose_short: 'Purpose',
-		output_short: 'Output',
 
 		start_date: "Begin date",
 		end_date: "End date",
@@ -456,8 +372,6 @@ var ENGLISH_TRANSLATION = {
 		assumptions: 'Assumptions',
 		output: "Result",
 		activities: 'Activities',
-		prerequisite: 'Prerequisite',
-		activity_prereq_ph: 'What are the prerequisites that have to be met before starting the activity?',
 		activity_desc_ph: 'Product or tangible service brought by the project',
 		output_assumptions_ph: 'External factors that could jeopardize reaching the result',
 		output_desc_ph: 'Product or tangible service brought by the project',
@@ -468,12 +382,8 @@ var ENGLISH_TRANSLATION = {
 
 		users: "Users",
 		owners: "Owners",
-		dataEntryOperators: "Data entry clerks",
 
-		move_up: "Move up",
-		move_down: "Move down",
 
-		indicator_source: "Acquisition",
 		you_are_owner: "You can edit this project",
 		you_are_editor: "You can input on this project",
 		you_are_not_owner: "You cannot edit this project",
@@ -481,7 +391,6 @@ var ENGLISH_TRANSLATION = {
 	
 		formula: "Formula: {{name}}",
 		link: "Link: {{name}}",
-		links: "Links"
 	},
 	indicator: {
 		cant_create: "You are not allowed to create new indicators",
@@ -494,8 +403,6 @@ var ENGLISH_TRANSLATION = {
 		delete_formula: "Are you sure that you wish to delete this formula? It will affect all projects using it.",
 
 		classification: "Classification",
-		is_unchanged: "Button is locked because the form content did not change since last save.",
-		is_invalid: "Button is locked because the form is invalid. Did you fill all names and formulas?",
 
 		is_mandatory: "Mandatory. Should be collected for all new projects of this thematic.",
 		is_approved: "Approved. Can be collected on new projects of this thematic.",
@@ -505,7 +412,6 @@ var ENGLISH_TRANSLATION = {
 
 		search: "Search",
 		search_ph: "Enter at least 3 characters",
-		scope: "Scope",
 
 		standard: "Standard",
 		sources: "Sources",
@@ -513,7 +419,6 @@ var ENGLISH_TRANSLATION = {
 		standard_ph: "Which standard is this indicator from?",
 		sources_ph: "Which sources are more common for this indicator?",
 		comments_ph: "When is it relevant to collect this indicator, and what are its limits?",
-		metadata: "Metadata",
 
 		target: "Relation with target",
 		higher_is_better: "Reached if input is higher than target",
@@ -527,9 +432,7 @@ var ENGLISH_TRANSLATION = {
 		operation: "Operation mode",
 
 		name_ph: 'For instance: Percentage of correctly filled medical records',
-		definition_ph: 'For instance: Mesure the staff formation level. This indicator is mesurable only on small projects and should be avoided otherwise',
 		definition: 'Definition',
-		core: 'Core',
 		unit: 'Unit',
 		other: 'Other',
 		percent: 'Percentage (%)',
@@ -538,20 +441,7 @@ var ENGLISH_TRANSLATION = {
 		themes: 'Thematics',
 		select_types: 'Select one or more types',
 		select_themes: 'Select one or more themes',
-		categorization: 'Categorization',
-		computation: 'Computation',
-		sum_allowed: 'Summable',
-		formula: 'Formula',
-		formulas: 'Formulas',
-		formula_name_ph: 'For instance: Percentage between correctly filled forms and total',
-		formula_expression_ph: 'For instance: 100 * a / b',
-		param_name_ph: "For instance: Number of prenatal consultations",
-		add_formula: "Add formula",
-		parameter: 'Parameter',
 
-		order_by: 'Order by',
-		alphabetical_order: 'Alphabetical order',
-		num_inputs: 'Number of inputs',
 		num_projects: 'Number of projects',
 		create_new: 'Create new indicator',
 
@@ -559,10 +449,6 @@ var ENGLISH_TRANSLATION = {
 		types_list: "Types list",
 		num_indicators: 'Number of indicators',
 		
-		new_type_name: "New type name",
-		new_theme_name: "New theme name",
-		only_core: "Only display core indicators",
-		is_external: "This indicator is from another thematic",
 	},
 	form: {
 		mandatory: "This field is mandatory",

@@ -65,15 +65,10 @@ var SPANISH_TRANSLATION = {
 		home: "Inicio",
 		up: "Subir",
 		down: "Bajar",
-		sum: "Suma",
-		include: "Incluir",
-		toggle: "Cambiar",
-		toggle_all: "Cambiar todos",
 
 		date: "Fecha",
 		administrator: "Administrador",
 
-		back_to_intranet: "Volver a la intranet",
 		settings: "Configuración",
 		projects: 'Proyectos',
 		project: 'Proyecto',
@@ -93,7 +88,6 @@ var SPANISH_TRANSLATION = {
 		edit: 'Modificar',
 		'delete': 'Suprimir',
 
-		view_stats: 'Ver las estadísticas',
 		members: 'Miembros',
 		
 		day: 'Dia',
@@ -102,39 +96,22 @@ var SPANISH_TRANSLATION = {
 		quarter: "Trimestre",
 		year: "Año",
 
-		done: 'Hecho',
-		copy: 'Copiar',
 		choose: 'Elegir',
-		edition: 'Edición',
 		cancel: 'Cancelar',
 		logical_frames: 'Marcos lógicos',
-		description: 'Descripción',
 		reporting: 'Estadísticas',
 		reporting_general: 'Estadísticas generales',
-		reporting_by_indicator: 'Estadísticas por indicador',
-		reporting_by_variable: 'Estadísticas por variable',
 		reporting_analysis: "Análisis descriptivo",
 		columns: "Columnas",
 		colorize: 'Colorear',
 		display: 'Mostrar',
-		values: 'Indicadores marco lógico',
-		target_percentage: 'Progreso marco lógico',
-		plot: 'Mostrar gráfico',
 		download_plot: 'Descargar el gráfico',
 		download_table: 'Descargar la tabla',
-		unknown_indicator: "Indicador no conocido",
-		active: "Activo",
 
-		choose_indicator: 'Elige un indicador',
-		list: 'Lista',
 		logout: 'Desconectar',
-		change_password: "Cambiar contraseña",
-		detach: "Desconectar",
 
 		sure_to_leave: 'Ha realizado cambios. ¿Esta seguro de querer cambiar de página sin salvar?',
-		filter: "Filtro",
-		'export': "Exportar",
-		none: "Ningúno"
+		filter: "Filtro"
 	},
 	menu: {
 		toggle_nav: "Ver el menu",
@@ -229,7 +206,6 @@ var SPANISH_TRANSLATION = {
 		edit_indicator: "Editar usuario",
 		display: "Nombre",
 		display_ph: "Tasa de consultaciones prenatales en las estructuras de salud",
-		choose: "Conectar con un indicador del catálogo",
 
 		fill_with_last_input: "Rellenar con los datos de la última entrada",
 		show_finished: "Ver todas las entradas",
@@ -250,11 +226,6 @@ var SPANISH_TRANSLATION = {
 		},
 		cols: "Columnas",
 		rows: "Linear",
-		partition0: "Partición 0",
-		partition1: "Partición 1",
-		partition2: "Partición 2",
-		partition3: "Partición 3",
-		partition4: "Partición 4",
 		entity: "Lugar de actividad",
 		select_cols: "Selecione las columnas",
 		select_rows: "Selecione las lineas",
@@ -275,16 +246,12 @@ var SPANISH_TRANSLATION = {
 			'	<li>Los cambios sobre la estructura de datos tendran consequencias diferentes según el tipo de cambio: lea la guía del usuario</li>' + 
 			'</ul>',
 
-		sections: "Apartados",
-		variables: "Variables",
 		partitions: "Particiones",
 
 		add_variable: "Añadir una variable",
 		remove_variable: "Quitar esta variable",
 		add_partition: "Añadir una partición",
 		remove_partition: "Quitar esta partición",
-		add_partition_element: "Añadir un elemento",
-		remove_partition_element: "Quitar este elemento",
 
 		aggregation: "Agregación",
 		different_geos: "Entre lugares diferentes",
@@ -297,15 +264,9 @@ var SPANISH_TRANSLATION = {
 		lowest: "Mas bajo",
 		last: "Último",
 
-		section_up: "Subir el apartado",
-		section_down: "Bajar el apartado",
 		variable_up: "Subir la variable",
 		variable_down: "Bajar la variable",
-		remove_section: "Quitar este apartado",
-		add_section: "Añadir una sección",
 
-		please_select_variable: "Seleccione una variable",
-		no_partitions_available: "Ningúna partición disponible",
 
 		collection_site_list: "Lugares de colecta",
 		collection_form_list: "Formularios de colecta",
@@ -326,28 +287,16 @@ var SPANISH_TRANSLATION = {
 		running: "Proyectos en progreso",
 		finished: "Proyectos terminados",
 		noproject: "Ningún proyecto corresponde a este criterio",
-		inputs: "Entradas",
 
-		last_input: "Última entrada: ",
 
-		value: "Valor",
 		activity: "Actividad",
 		activity_management: "Actividades y Demografía",
 		variable: "Variable",
-		section: "Apartado",
 
-		unknown: "Desconocido",
-		color: "Color",
 
-		specs: "Especificaciones",
 		result_management: "Objectivos & resultados",
-		additional_indicators: "Indicadores adicionales",
-		no_additional_indicators: "Ningun indicador adicional ha sido definido",
 		no_purposes: "Ningun objetivo específico ha sido definido",
 
-		input_form_list: "Lista de los formularios",
-		indicator_distribution: "Distribución de los indicadores por formulario y período",
-		add_new_indicator_to_form: "Añadir un nuevo indicator al formulario",
 
 		form_name_ph: "ej: Recuperación mensual en los centros de salud",
 
@@ -364,10 +313,6 @@ var SPANISH_TRANSLATION = {
 		report_name_ph: "ex: Análisis descriptivo mensual de mayo 2015",
 		no_reports: "Ningún analisis descriptivo ha sido creado!",
 
-		source: "Origen",
-		source_ph: "Ej: NHIS local",
-		in_charge: "Persona responsable",
-		in_charge_ph: "Ex: Enfermera del proyecto",
 
 		missing_mandatory_indicators: "Indicadores obligatorios",
 		other_indicators: "Otros indicadores",
@@ -378,26 +323,12 @@ var SPANISH_TRANSLATION = {
 		entity_name_placeholder: "ej: Centro de salud X, Hospital X, ...",
 		group_name_placeholder: "ej: Hospitales regionales, parte Norte del país, ...",
 
-		logical_frame_tooltip: 'Describe los objectivos, resultados esperados et actividades del proyecto.',
-		input_entities_tooltip: 'Lista de los lugares de actividad donde se collectan los indicadores. Por ejemplo hospitales, centros de salud, pueblos...',
-		input_groups_tooltip: 'Permite reunir lugares de actividad en categorias logicas.',
-		input_forms_tooltip: 'Contiene la declaración de los diferentes formularios que permiten collectar los indicadores.',
-		waiting_inputs_tooltip: '',
-		reporting_tooltip: '',
 
 		create: "Crear un nuevo proyecto",
-		input_forms: 'Formularios',
-		input_form: 'Formulario',
-		data_collection: 'Recuperación de los datos',
 		periodicity: "Periodicidad",
 		start: 'Principio del proyecto',
 		end: 'Fin del proyecto',
 
-		sumable: 'Somable',
-		input_field: 'Campo de entrada',
-		value_source: 'Origen del valor',
-		input_mode: 'Modo de entrada',
-		manual_input: 'Entrada manual',
 
 		periodicities: {
 			day: 'Diario',
@@ -414,37 +345,22 @@ var SPANISH_TRANSLATION = {
 			project: "Una vez para todo el proyecto"
 		},
 		
-		add_intermediary: "Añadir una fecha",
-		intermediary_periods: "Fechas adicionales",
 
 		no_input_entities: '¡Ningún lugar de actividad ha sido creado!',
 		no_input_groups: '¡Ningún grupo de actividad ha sido creado!',
 		no_forms: '¡Ningún formulario ha sido creado!',
-		no_indicators: 'Ningún indicador ha sido definido en este proyecto',
 
-		waiting_inputs: 'Entradas en espera',
-		finished_inputs: 'Entradas realizadas',
-		invalid_inputs: 'Entradas fuera de calendario',
 
-		no_inputs: 'Ninguna entrada corresponder a este criterio.',
 		input: 'Entrar datos',
 
-		relevance: 'Pertinencia',
-		relevance_ph: '¿Porqué quiere colectar este indicador?',
 		baseline: 'Valor de base',
-		baseline_ph: 'Valor de referencia',
-		target_ph: 'Valor del objetivo',
 		target: 'Objectivo',
-		general_data: 'Datos generales',
 
 		goal: 'Objectivo global',
-		goal_short: "OG",
 		intervention_logic: 'Logica de intervención',
 		intervention_logic_goal_ph: 'Descripción de la contribución del proyecto a los objectivos (impacto) de una política o de un programa',
 		intervention_logic_purpose_ph: 'Descripción de las ventajas directas destinadas a los beneficiarios',
 		assumptions_purpose_ph: 'Factores externos susceptibles de comprometer el alcanze del objetivo',
-		purpose_short: 'OS',
-		output_short: 'R',
 
 		start_date: "Fecha de inicio",
 		end_date: "Fecha de fin",
@@ -456,8 +372,6 @@ var SPANISH_TRANSLATION = {
 		assumptions: 'Hipotesis',
 		output: "Resultado",
 		activities: 'Actividades',
-		prerequisite: 'Requisito previo',
-		activity_prereq_ph: '¿Qué requisitos previos se deben verificar antes de poder empezar esta actividad?',
 		activity_desc_ph: 'Producto o servicio tangible aportado por el proyecto.',
 		output_assumptions_ph: 'Factores externos susceptibles de comprometer el alcanze del resultado',
 		output_desc_ph: 'Producto o servicio tangible aportado por el proyecto.',
@@ -468,12 +382,8 @@ var SPANISH_TRANSLATION = {
 
 		users: "Usuarios",
 		owners: "Proprietarios",
-		dataEntryOperators: "Capturistas",
 
-		move_up: "Subir",
-		move_down: "Bajar",
 
-		indicator_source: "Adquisición",
 		you_are_owner: "Puede editar este proyecto",
 		you_are_editor: "Puede entrar indicadores en este proyecto",
 		you_are_not_owner: "No puede editar este proyecto",
@@ -481,7 +391,6 @@ var SPANISH_TRANSLATION = {
 		
 		formula: "Formula: {{name}}",
 		link: "Vínculo: {{name}}",
-		links: "Vínculos"
 	},
 	indicator: {
 		cant_create: "No esta autorizado a crear nuevos indicadores",
@@ -494,8 +403,6 @@ var SPANISH_TRANSLATION = {
 		delete_formula: "¿Esta seguro que quiere suprimir esta formula? Afectara a todos los proyectos que la usan.",
 
 		classification: "Clasificación",
-		is_unchanged: "Ningun dato ha cambiado desde la última vez que ha salvado.",
-		is_invalid: "El formulario no es valido. ¿ha rellenado todos los nombre y elementos en las formulas?",
 
 		is_mandatory: "Obligatorio - Debe ser colectado por todos los proyectos de misma tématica",
 		is_approved: "Opcional - Puede o no ser colectado por proyecto de misma tématica",
@@ -505,7 +412,6 @@ var SPANISH_TRANSLATION = {
 
 		search: "Buscar",
 		search_ph: "Entre por lo menos 3 caracteres",
-		scope: "Perimetro",
 
 		standard: "Norma",
 		sources: "Origen",
@@ -513,7 +419,6 @@ var SPANISH_TRANSLATION = {
 		standard_ph: "¿A que norma pertenece este indicador?",
 		sources_ph: "¿Dónde se puede colectar este indicador?",
 		comments_ph: "¿En qué casos es pertinente usar este indicador, y con qué limites?",
-		metadata: "Metadatos",
 
 		target: "Relación con el objetivo",
 		higher_is_better: "Alcanzado si la entrada es superior al objetivo",
@@ -527,9 +432,7 @@ var SPANISH_TRANSLATION = {
 		operation: "Modo de operación",
 
 		name_ph: 'Por ejemplo: Porcentaje de fichas de paciente completas',
-		definition_ph: 'Por ejemplo: Medir el nivel de formación del personal medical que completa las fichas de pacientes. Medir este indicador es facil en proyectos pequeños, evitar usarlo en otras circunstancias.',
 		definition: 'Definición',
-		core: 'Recomendado',
 		unit: 'Unidad',
 		other: 'Otro',
 		percent: 'Porcentaje (%)',
@@ -538,20 +441,7 @@ var SPANISH_TRANSLATION = {
 		themes: 'Temáticas',
 		select_types: 'Selectione uno o varios tipos',
 		select_themes: 'Selectione una o varias tématicas',
-		categorization: 'Categorización',
-		computation: 'Cálculo',
-		sum_allowed: 'Somable',
-		formula: 'Formula',
-		formulas: 'Formulas',
-		formula_name_ph: 'Por ejemplo: Porcentaje entre fichas completas y total',
-		formula_expression_ph: 'Por ejemplo: 100 * a / b',
-		param_name_ph: "Por ejemplo: Número de consultaciones prenatales",
-		add_formula: "Añadir una formula",
-		parameter: 'Parametro',
 
-		order_by: 'Ordenar por',
-		alphabetical_order: 'Orden alfabético',
-		num_inputs: 'Número de entradas',
 		num_projects: 'Número de proyectos',
 		create_new: 'Crear un nuevo indicador',
 
@@ -559,10 +449,6 @@ var SPANISH_TRANSLATION = {
 		types_list: "Lista de tipos",
 		num_indicators: 'Número de indicadores',
 		
-		new_type_name: "Nombre del nuevo tipo",
-		new_theme_name: "Nombre de la nueva temática",
-		only_core: "Ver unicamente los indicadores recomendados",
-		is_external: "Este indicator viene de otra temática",
 	},
 	form: {
 		mandatory: "Este campo es obligatorio",
