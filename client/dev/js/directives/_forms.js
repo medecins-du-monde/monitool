@@ -264,7 +264,7 @@ angular.module('monitool.directives.form', [])
 
 				$scope.$watch('partition', function(partition) {
 					ngModelController.$setViewValue(partition);
-					
+
 					// size valididy
 					ngModelController.$setValidity('size', partition.length >= 2);
 
@@ -385,10 +385,8 @@ angular.module('monitool.directives.form', [])
 							return modelValue[fieldIndex];
 						});
 
-
 						return leftHeaderCols.concat(dataCols)
 					});
-
 
 					// FIXME: repare cheating.
 					partitions.forEach(function(partition, partitionIndex) {
@@ -462,10 +460,10 @@ angular.module('monitool.directives.form', [])
 
 					if (partitions.length == 0)
 						hotTable.updateSettings({ maxCols: 1, maxRows: 1, cells: function(row, col, prop) { return ($scope.canEdit ? dataOptions : dataReadOnlyOptions); }});
-					
+
 					else if (partitions.length == 1)
 						hotTable.updateSettings({ maxCols: 2, maxRows: partitions[0].length, cells: function(row, col, prop) { return col == 1 ? ($scope.canEdit ? dataOptions : dataReadOnlyOptions) : headerOptions; }});
-					
+
 					else {
 						// Split partitions in cols and rows.
 						var permutation      = computeNthPermutation(partitions.length, rotation),
@@ -487,17 +485,22 @@ angular.module('monitool.directives.form', [])
 					hotTable.loadData(ngModelController.$viewValue);
 				};
 
-				var afterChange = function(a, b) {
-					if (a && typeof a[0][3] !== 'number') {
-						try {
-							var value = Parser.evaluate(a[0][3], {});
-							hotTable.setDataAtCell(a[0][0], a[0][1], value);
+				var afterChange = function(changes, action) {
+					if (action != 'edit' && action != 'paste')
+						return
+
+					changes.forEach(function(change) {
+						var x   = change[0],
+							y   = change[1],
+							val = change[3];
+
+						if (typeof val != 'number') {
+							try { hotTable.setDataAtCell(x, y, Parser.evaluate(val, {})); }
+							catch (e) { }
 						}
-						catch (e) {}
-					}
-					else if (b == 'edit') {
-						ngModelController.$setViewValue(hotTable.getData());
-					}
+					});
+
+					ngModelController.$setViewValue(hotTable.getData());
 				};
 
 				// I have no idea why, but settings colWidths to any string keeps all columns the same width
@@ -510,8 +513,3 @@ angular.module('monitool.directives.form', [])
 			}
 		}
 	})
-
-
-
-
-
