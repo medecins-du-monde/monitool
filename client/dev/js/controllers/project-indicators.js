@@ -32,7 +32,7 @@ angular.module('monitool.controllers.project.indicators', [])
 
 		$scope.removePurpose = function(purpose) {
 			$scope.project.logicalFrames[$scope.logicalFrameIndex].purposes.splice(
-				$scope.project.logicalFrame.purposes.indexOf(purpose), 1
+				$scope.project.logicalFrames[$scope.logicalFrameIndex].purposes.indexOf(purpose), 1
 			);
 		};
 
