@@ -102,7 +102,7 @@ var validate = validator({
 							type: {type: 'string', pattern: "^internal$"},
 							id: {type: 'string', pattern: '^usr:[a-z\.]+$'},
 							role: {type: 'string', enum: ['owner', 'input_all', 'input', 'read']},
-							entities: {type: 'array', items: { $ref: "#/definitions/uuid" } }
+							entities: {type: 'array', items: { $ref: "#/definitions/uuid_or_none" } }
 						}
 					},
 					{
@@ -124,7 +124,7 @@ var validate = validator({
 
 							entities: {
 								type: 'array',
-								items: { $ref: "#/definitions/uuid" }
+								items: { $ref: "#/definitions/uuid_or_none" }
 							}
 						}
 					}
@@ -194,6 +194,10 @@ var validate = validator({
 		uuid: {
 			type: "string",
 			pattern: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+		},
+		uuid_or_none: {
+			type: "string",
+			pattern: "^(([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})|(none))$"
 		},
 		revision: {
 			type: "string",
