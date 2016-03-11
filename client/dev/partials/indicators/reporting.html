@@ -101,7 +101,7 @@
 	<tbody>
 		<tr ng-repeat="row in rows track by $index">
 			<td class="noprint" style="text-align: center">
-				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" />
+				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.cols" />
 			</td>
 			<td class="indent{{row.indent}}">
 				<label for="{{row.id}}">{{row.name}}</label>
@@ -109,6 +109,9 @@
 			<td>{{row.baseline}}</td>
 			<td>{{row.target}}</td>
 			<td ng-repeat="col in row.cols track by $index" indicator-reporting-field></td>
+			<td ng-if="!row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);"></td>
+
+
 		</tr>
 	</tbody>
 </table>
