@@ -62,7 +62,7 @@ angular
 				throw new Error('Invalid groupBy: ' + groupBy)
 		};
 
-		this._computeIndicator = function(groups, cubes, indicator, groupBy, filters) {
+		this._computeIndicator = function(cubes, indicator, groupBy, filters) {
 			// Ask the olap cube to compute the components we need to compute the indicator.
 			// Like this: {'numerator': {'2010-01': 4, ...}, ...}
 			var components = {};
@@ -102,7 +102,7 @@ angular
 			return result;
 		};
 
-		this._makeActivityRow = function(groups, cubes, indent, groupBy, filters, columns, element) {
+		this._makeActivityRow = function(cubes, indent, groupBy, filters, columns, element) {
 			try {
 				var values = cubes[element.id].query([groupBy], filters);
 				if (groupBy !== 'group' && values)
@@ -116,7 +116,7 @@ angular
 			}
 		};
 
-		this._makeIndicatorRow = function(groups, cubes, indent, groupBy, filters, columns, indicator) {
+		this._makeIndicatorRow = function(cubes, indent, groupBy, filters, columns, indicator) {
 			var baseline = indicator.baseline,
 				target = indicator.target;
 
@@ -127,7 +127,7 @@ angular
 				target += indicator.unit;
 
 			try {
-				var indicatorValues = this._computeIndicator(groups, cubes, indicator, groupBy, filters);
+				var indicatorValues = this._computeIndicator(cubes, indicator, groupBy, filters);
 
 				return {
 					id: makeUUID(),
@@ -149,6 +149,7 @@ angular
 			}
 		};
 
+		// FIXME this should be recursive to make code neater, and not limit ourselves to 2 levels.
 		this.computeActivityReporting = function(cubes, project, groupBy, filters, splits) {
 			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
 
@@ -164,7 +165,7 @@ angular
 			project.forms.forEach(function(form) {
 				rows.push({type: 'header', text: form.name});
 				form.elements.forEach(function(element) {
-					var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, qFilters, columns, element);
+					var row = this._makeActivityRow(cubes, 1, groupBy, qFilters, columns, element);
 					row.id = element.id;
 					row.partitions = element.partitions.map(function(p, index) {
 						return {
@@ -181,7 +182,7 @@ angular
 							// add filter
 							qFilters['partition' + partitionIndex] = [part.id];
 
-							var childRow = this._makeActivityRow(project.groups, cubes, 2, groupBy, qFilters, columns, element);
+							var childRow = this._makeActivityRow(cubes, 2, groupBy, qFilters, columns, element);
 							childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
 							childRow.name = part.name;
 							childRow.partitions = row.partitions.slice();
@@ -195,7 +196,7 @@ angular
 									// add filter
 									qFilters['partition' + childPartitionIndex] = [subPart.id];
 
-									var subChildRow = this._makeActivityRow(project.groups, cubes, 3, groupBy, qFilters, columns, element);
+									var subChildRow = this._makeActivityRow(cubes, 3, groupBy, qFilters, columns, element);
 									subChildRow.id = element.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
 									subChildRow.name = subPart.name;
 									rows.push(subChildRow);
@@ -219,14 +220,14 @@ angular
 			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
 			var rows = []
 
-			var row = this._makeActivityRow(project.groups, cubes, 0, groupBy, {}, columns, element)
+			var row = this._makeActivityRow(cubes, 0, groupBy, {}, columns, element)
 			row.name = $filter('translate')('project.full_project');
 
 			rows.push(row)
 			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
 			project.entities.forEach(function(entity) {
-				var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, {entity: [entity.id]}, columns, element);
+				var row = this._makeActivityRow(cubes, 1, groupBy, {entity: [entity.id]}, columns, element);
 				row.name = entity.name;
 				rows.push(row);
 			}, this);
@@ -234,7 +235,7 @@ angular
 			rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
 			project.groups.forEach(function(group) {
-				var row = this._makeActivityRow(project.groups, cubes, 1, groupBy, {entity: group.members}, columns, element);
+				var row = this._makeActivityRow(cubes, 1, groupBy, {entity: group.members}, columns, element);
 				row.name = group.name;
 				rows.push(row);
 			}, this);
@@ -255,13 +256,13 @@ angular
 				qFilters.group = [filters.entityId];
 
 			rows.push({type: 'header', text: logicalFrame.goal, indent: 0});
-			Array.prototype.push.apply(rows, logicalFrame.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 0, groupBy, qFilters, columns)));
+			Array.prototype.push.apply(rows, logicalFrame.indicators.map(this._makeIndicatorRow.bind(this, cubes, 0, groupBy, qFilters, columns)));
 			logicalFrame.purposes.forEach(function(purpose) {
 				rows.push({type: 'header', text: purpose.description, indent: 1});
-				Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 1, groupBy, qFilters, columns)));
+				Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, cubes, 1, groupBy, qFilters, columns)));
 				purpose.outputs.forEach(function(output) {
 					rows.push({type: 'header', text: output.description, indent: 2});
-					Array.prototype.push.apply(rows, output.indicators.map(this._makeIndicatorRow.bind(this, project.groups, cubes, 2, groupBy, qFilters, columns)));
+					Array.prototype.push.apply(rows, output.indicators.map(this._makeIndicatorRow.bind(this, cubes, 2, groupBy, qFilters, columns)));
 				}, this);
 			}, this);
 
@@ -272,14 +273,14 @@ angular
 			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
 			var rows = []
 
-			var row = this._makeIndicatorRow(project.groups, cubes, 0, groupBy, {}, columns, indicator)
+			var row = this._makeIndicatorRow(cubes, 0, groupBy, {}, columns, indicator)
 			row.name = $filter('translate')('project.full_project');
 
 			rows.push(row)
 			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
 			project.entities.forEach(function(entity) {
-				var row = this._makeIndicatorRow(project.groups, cubes, 1, groupBy, {entity: [entity.id]}, columns, indicator);
+				var row = this._makeIndicatorRow(cubes, 1, groupBy, {entity: [entity.id]}, columns, indicator);
 				row.name = entity.name;
 				rows.push(row);
 			}, this);
@@ -287,7 +288,7 @@ angular
 			rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
 			project.groups.forEach(function(group) {
-				var row = this._makeIndicatorRow(project.groups, cubes, 1, groupBy, {entity: group.members}, columns, indicator);
+				var row = this._makeIndicatorRow(cubes, 1, groupBy, {entity: group.members}, columns, indicator);
 				row.name = group.name;
 				rows.push(row);
 			}, this);

@@ -128,7 +128,6 @@ angular
 					}
 
 				var row = mtReporting._makeIndicatorRow(
-					project.groups,
 					cubes[project._id],
 					0,
 					$scope.groupBy,
