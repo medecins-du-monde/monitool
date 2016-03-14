@@ -150,6 +150,8 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		no_inputs: "Aucune saisie en attente",
+
 		dimensions: {
 			day: "Jours",
 			week: "Semaines",
@@ -222,6 +224,7 @@ var FRENCH_TRANSLATION = {
 			'outofschedule-read': "Afficher (Hors calendrier)",
 			'done-edit': "Modifier",
 			'expected-edit': "Saisir",
+			'expected-edit-new': "Saisir (nouvelle date)",
 			'outofschedule-edit': "Afficher (Hors calendrier)"
 		},
 		cols: "Colonnes",

@@ -119,13 +119,10 @@ angular
 	})
 
 	.controller('ProjectCollectionInputListController', function($scope, $state, project, inputsStatus, Input) {
-		var projectUser = project.users.find(function(u) {
-			return (
-				($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
-				($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username)
-			);
-		});
+		$scope.selectedForm = project.forms[0];
+		$scope.inputsStatus = inputsStatus;
 
+		// pass information needed for creating new inputs on free forms.
 		$scope.newInputDate = new Date();
 		$scope.addInput = function(entityId) {
 			$state.go(
@@ -138,81 +135,99 @@ angular
 			);
 		};
 
-		$scope.canEdit = {};
-		[{id: 'none'}].concat(project.entities).forEach(function(entity) {
-			if ($scope.userCtx.type == 'user' && $scope.userCtx.roles.indexOf('_admin') !== -1)
-				$scope.canEdit[entity.id] = true;
-			else if (!projectUser)
-				$scope.canEdit[entity.id] = false;
-			else {
-				var role = projectUser.role;
-				if (role == 'owner' || role == 'input_all')
-					$scope.canEdit[entity.id] = true;
-				else if (role == 'input')
-					$scope.canEdit[entity.id] = projectUser.entities.indexOf(entity.id) != -1;
-				else if (role == 'read')
-					$scope.canEdit[entity.id] = false;
-				else
-					throw new Error('invalid role');
-			}
-		});
+		// Retrieve or fake the project user.
+		var projectUser = null;
+		if ($scope.userCtx.type == 'user') {
+			if ($scope.userCtx.roles.indexOf('_admin') !== -1)
+				projectUser = {role: 'owner'};
+			else
+				projectUser = project.users.find(function(u) { return u.id == $scope.userCtx._id; });
+		} 
+		else if ($scope.userCtx.type == 'partner')
+			projectUser = project.users.find(function(u) { return u.username == $scope.userCtx.username });
 
-		$scope.selectedForm = project.forms[0];
-		$scope.showFinished = !$scope.canEdit;
+		// Write hash with metadata on columns to know if we need to display them.
+		$scope.displayInfo = {};
+		project.forms.forEach(function(form) {
+			$scope.displayInfo[form.id] = {};
+			$scope.displayInfo[form.id]._ = { displayFooterRow: false, numCols: 1 };
 
-		// show/hide columns
-		$scope.showColumn = {};
-		$scope.numCols = {};
-		for (var formId in inputsStatus) {
-			$scope.showColumn[formId] = {};
-			for (var strDate in inputsStatus[formId])
-				for (var entityId in inputsStatus[formId][strDate])
-					$scope.showColumn[formId][entityId] = true;
+			['none'].concat(project.entities.pluck('id')).forEach(function(columnId) {
+				//////////////////////
+				// List data that we need to decide if we will display this column and how.
+				//////////////////////
+				var hasExpectedInputs, hasPreviousInputs, isRelevantToForm, isAllowed;
 
-			$scope.numCols[formId] = 1 + Object.keys($scope.showColumn[formId]).length;
-		}
+				// Check inputsStatus to know if we had previous or expected inputs.
+				hasExpectedInputs = hasPreviousInputs = false;
+				for (var strDate in inputsStatus[form.id]) {
+					var inputStatus = inputsStatus[form.id][strDate][columnId];
+					if (inputStatus == 'done' || inputStatus == 'outofschedule')
+						hasPreviousInputs = true;
 
-		// Remove the expected inputs for people that cannot edit.
-		for (var formId in inputsStatus)
-			for (var strDate in inputsStatus[formId]) {
-				var isEmpty = true;
-				for (var entityId in inputsStatus[formId][strDate]) {
-					if (inputsStatus[formId][strDate][entityId] === 'expected' && !$scope.canEdit[entityId])
-						delete inputsStatus[formId][strDate][entityId];
-					else
-						isEmpty = false;
+					if (inputStatus == 'expected')
+						hasExpectedInputs = true;
 				}
 
-				if (isEmpty)
-					delete inputsStatus[formId][strDate];
-			}
+				// Check form definition to know which columns are relevant.
+				if (form.collect == 'project')
+					isRelevantToForm = columnId === 'none';
+				else if (form.collect == 'some_entity')
+					isRelevantToForm = columnId !== 'none' && form.entities.indexOf(columnId) !== -1;
+				else if (form.collect == 'entity')
+					isRelevantToForm = columnId !== 'none';
+				else
+					throw new Error('Invalid form.collect');
 
-		$scope.$watch('showFinished', function(showFinished) {
-			// Remove rows that are finished
-			if (showFinished) {
-				$scope.inputsStatus = inputsStatus;
-			}
-			else {
-				$scope.inputsStatus = angular.copy(inputsStatus);
+				// Check user permissions to know which columns can be modified.
+				if (!projectUser)
+					isAllowed = false;
+				else {
+					if (projectUser.role == 'owner' || projectUser.role == 'input_all')
+						isAllowed = true;
+					else if (projectUser.role == 'input')
+						isAllowed = projectUser.entities.indexOf(entity.id) != -1;
+					else if (projectUser.role == 'read')
+						isAllowed = false;
+					else
+						throw new Error('invalid projectUser role.');
+				}
 
-				for (var formId in $scope.inputsStatus)
-					for (var strDate in $scope.inputsStatus[formId]) {
-						var isAllDone = true;
+				//////////////////////
+				// Decide what to display
+				//////////////////////
 
-						if (typeof $scope.inputsStatus[formId][strDate] === 'string')
-							isAllDone = $scope.inputsStatus[formId][strDate] === 'done';
-						else
-							for (var entityId in $scope.inputsStatus[formId][strDate])
-								if ($scope.inputsStatus[formId][strDate][entityId] !== 'done') {
-									isAllDone = false;
-									break;
-								}
+				// Remove the expected inputs for people that cannot edit.
+				if (!isAllowed) {
+					for (var strDate in inputsStatus[form.id]) {
+						if (inputsStatus[form.id] &&
+							inputsStatus[form.id][strDate] &&
+							inputsStatus[form.id][strDate][columnId] === 'expected')
+							delete inputsStatus[form.id][strDate][columnId];
 
-						if (isAllDone)
-							delete $scope.inputsStatus[formId][strDate];
+						if (angular.equals(inputsStatus[form.id][strDate], {}))
+							delete inputsStatus[form.id][strDate];
 					}
-			}
+
+				}
+				if (angular.equals(inputsStatus[form.id], {}))
+					delete inputsStatus[form.id];
+
+				// Create entry in columns by form.
+				$scope.displayInfo[form.id][columnId] = {
+					displayColumn: hasPreviousInputs || isRelevantToForm,
+					canEdit: isAllowed && isRelevantToForm,
+					displayAddButton: form.periodicity == 'free' && isAllowed && isRelevantToForm
+				};
+
+				if ($scope.displayInfo[form.id][columnId].displayColumn)
+					$scope.displayInfo[form.id]._.numCols++;
+
+				if ($scope.displayInfo[form.id][columnId].displayAddButton)
+					$scope.displayInfo[form.id]._.displayFooterRow = true;
+			});
 		});
+
 	})
 
 	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, form, inputs) {

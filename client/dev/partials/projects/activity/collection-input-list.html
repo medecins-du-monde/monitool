@@ -6,11 +6,6 @@
 
 <doc-reminder pages="project.input"></doc-reminder>
 
-<p ng-if="canEdit">
-	<input type="checkbox" ng-model="$parent.showFinished" id="show-finished"/>
-	<label for="show-finished" translate="project.show_finished"></label>
-</p>
-
 <ul class="nav nav-tabs" role="tablist">
 	<li ng-repeat="form in project.forms" ng-class="{active: form.id == selectedForm.id}">
 		<a ng-click="$parent.selectedForm = form">
@@ -23,61 +18,73 @@
 
 <style> td { text-align: center; } td a { display: block; width: 100%;}</style>
 
-
 <div style="overflow: auto">
 
 	<table class="table table-bordered table-stripped table-condensed">
 		<thead>
 			<tr>
-				<th ng-style="{width: (100 / numCols[selectedForm.id]) + '%'}" translate="shared.date"></th>
-				<th ng-style="{width: (100 / numCols[selectedForm.id]) + '%'}" ng-if="showColumn[selectedForm.id].none" translate="shared.project"></th>
-				<th ng-style="{width: (100 / numCols[selectedForm.id]) + '%'}" ng-if="showColumn[selectedForm.id][entity.id]" ng-repeat="entity in project.entities">{{entity.name}}</th>
+				<th ng-style="{width: (100 / displayInfo[selectedForm.id]._.numCols) + '%'}"
+					translate="shared.date"></th>
+
+				<th ng-style="{width: (100 / displayInfo[selectedForm.id]._.numCols) + '%'}"
+					ng-if="displayInfo[selectedForm.id].none.displayColumn"
+					translate="shared.project"></th>
+
+				<th ng-style="{width: (100 / displayInfo[selectedForm.id]._.numCols) + '%'}"
+					ng-if="displayInfo[selectedForm.id][entity.id].displayColumn"
+					ng-repeat="entity in project.entities">{{entity.name}}</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="(date, status) in inputsStatus[selectedForm.id]">
 				<th>{{date}}</th>
-				<td ng-if="showColumn[selectedForm.id].none">
+				<td ng-if="displayInfo[selectedForm.id].none.displayColumn">
 					<a class="btn btn-xs"
 					   ng-class="{'btn-default': status.none === 'done', 'btn-primary': status.none === 'expected', 'btn-danger': status.none === 'outofschedule'}"
 					   ui-sref="main.project.collection_input_edition({period: date, formId: selectedForm.id, entityId: 'none'})"
 					   ng-if="status.none">
-						{{('project.input_status.' + status.none + (canEdit.none ? '-edit' : '-read')) | translate}}
+						{{('project.input_status.' + status.none + (displayInfo[selectedForm.id].none.canEdit ? '-edit' : '-read')) | translate}}
 					</a>
 				</td>
-				<td ng-if="showColumn[selectedForm.id][entity.id]" ng-repeat="entity in project.entities">
+				<td ng-if="displayInfo[selectedForm.id][entity.id].displayColumn" ng-repeat="entity in project.entities">
 					<a class="btn btn-xs"
 					   ng-class="{'btn-default': status[entity.id] === 'done', 'btn-primary': status[entity.id] === 'expected', 'btn-danger': status[entity.id] === 'outofschedule'}"
 					   ui-sref="main.project.collection_input_edition({period: date, formId: selectedForm.id, entityId: entity.id})"
 					   ng-if="status[entity.id]">
-						{{('project.input_status.' + status[entity.id] + (canEdit[entity.id] ? '-edit' : '-read')) | translate}}
+						{{('project.input_status.' + status[entity.id] + (displayInfo[selectedForm.id][entity.id].canEdit ? '-edit' : '-read')) | translate}}
 					</a>
 				</td>
 			</tr>
+
+			<tr ng-hide="inputsStatus[selectedForm.id]">
+				<td style="text-align: center" colspan="{{displayInfo[selectedForm.id]._.numCols}}" translate="project.no_inputs"></td>
+			</tr>
 		</tbody>
-		<tfoot ng-if="selectedForm.periodicity == 'free'">
+		<tfoot ng-if="displayInfo[selectedForm.id]._.displayFooterRow">
 			<tr>
 				<th>
-					<input type="text" 
+					<input type="text"
 						   datepicker-popup="longDate"
-						   name="date"
 						   ng-model="newInputDate"
 						   is-open="dateOpen"
-						   ng-click = "dateOpen = true"
+						   ng-click="dateOpen=true"
 						   required
 						   class="form-control" />
 				</th>
-				<td ng-if="showColumn[selectedForm.id].none">
-					<a class="btn btn-xs btn-primary" ng-click="addInput('none')">
-						{{('project.input_status.expected' + (canEdit.none ? '-edit' : '-read')) | translate}}
-					</a>
+				<td ng-if="displayInfo[selectedForm.id].none.displayColumn">
+					<a class="btn btn-xs btn-success"
+					   ng-click="addInput('none')"
+					   translate="project.input_status.expected-edit-new"
+					   ng-if="displayInfo[selectedForm.id].none.displayAddButton"></a>
 				</td>
-				<td ng-if="showColumn[selectedForm.id][entity.id]" ng-repeat="entity in project.entities">
-					<a class="btn btn-xs btn-primary" ng-click="addInput(entity.id)">
-						{{('project.input_status.expected' + (canEdit[entity.id] ? '-edit' : '-read')) | translate}}
-					</a>
+				<td ng-if="displayInfo[selectedForm.id][entity.id].displayColumn" ng-repeat="entity in project.entities">
+					<a class="btn btn-xs btn-success"
+					   ng-click="addInput(entity.id)"
+					   translate="project.input_status.expected-edit-new"
+					   ng-if="displayInfo[selectedForm.id][entity.id].displayAddButton"></a>
 				</td>
 			</tr>
 		</tfoot>
 	</table>
 </div>
+

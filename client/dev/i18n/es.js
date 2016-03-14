@@ -150,6 +150,8 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		no_inputs: "Ninguna entrada de datos en espera",
+
 		dimensions: {
 			day: "Días",
 			week: "Semanas",
@@ -222,6 +224,7 @@ var SPANISH_TRANSLATION = {
 			'outofschedule-read': "Consultar (fuera calendario)",
 			'done-edit': "Editar",
 			'expected-edit': "Crear",
+			'expected-edit-new': "Crear (nueva fecha)",
 			'outofschedule-edit': "Consultar (fuera calendario)"
 		},
 		cols: "Columnas",

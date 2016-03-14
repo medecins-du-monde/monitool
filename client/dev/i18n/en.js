@@ -150,6 +150,8 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		no_inputs: "You are all done. There are no expected outputs",
+
 		dimensions: {
 			day: "Days",
 			week: "Weeks",
@@ -222,6 +224,7 @@ var ENGLISH_TRANSLATION = {
 			'outofschedule-read': "Open (out of calendar)",
 			'done-edit': "Edit",
 			'expected-edit': "Create",
+			'expected-edit-new': "Create (new date)",
 			'outofschedule-edit': "Open (wrong date)"
 		},
 		cols: "Columns",
@@ -326,8 +329,8 @@ var ENGLISH_TRANSLATION = {
 
 		create: "Create new project",
 		periodicity: "Periodicity",
-		start: 'Use project start',
-		end: 'Use project end',
+		start: 'Project start',
+		end: 'Project end',
 
 
 		periodicities: {
@@ -377,8 +380,8 @@ var ENGLISH_TRANSLATION = {
 		output_desc_ph: 'Product or tangible service brought by the project',
 
 		add_activity: 'Add activity',
-		add_output: 'Add output',
-		add_purpose: 'Add purpose',
+		add_output: 'Add a new result',
+		add_purpose: 'Add a new specific objective',
 
 		users: "Users",
 		owners: "Owners",
