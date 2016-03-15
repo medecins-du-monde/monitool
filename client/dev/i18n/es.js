@@ -165,8 +165,8 @@ var SPANISH_TRANSLATION = {
 			partition4: "Partición 4",
 			partition5: "Partición 5",
 			partition6: "Partición 6",
-			entity: "Lugar de actividad",
-			group: "Grupo de actividad"
+			entity: "Lugar de colecta",
+			group: "Grupo de colecta"
 		},
 		group: {
 			location: "Lugar",
@@ -229,7 +229,7 @@ var SPANISH_TRANSLATION = {
 		},
 		cols: "Columnas",
 		rows: "Linear",
-		entity: "Lugar de actividad",
+		entity: "Lugar de colecta",
 		select_cols: "Selecione las columnas",
 		select_rows: "Selecione las lineas",
 		pivot_table: "Tabla dinámica",
@@ -243,7 +243,7 @@ var SPANISH_TRANSLATION = {
 
 		collection_form_warning: 
 			'<strong>Cuidado, si hace cambios en esta página, perdera datos</strong><br/>' + 
-			'{{num_inputs}} entradas han sido realizadas en este formulario.' + 
+			'{{num_inputs}} entradas han sido realizadas en esta fuente de datos.' + 
 			'<ul>' + 
 			'	<li>Los cambios sobre el calendario (periodicidad, fechas) pondra de lado todas las entradas que no entren en las nuevas fechas (sin perder los datos)</li>' + 
 			'	<li>Los cambios sobre la estructura de datos tendran consequencias diferentes según el tipo de cambio: lea la guía del usuario</li>' + 
@@ -272,19 +272,19 @@ var SPANISH_TRANSLATION = {
 
 
 		collection_site_list: "Lugares de colecta",
-		collection_form_list: "Formularios de colecta",
+		collection_form_list: "Fuentes de datos",
 		collection_input_list: "Entrada de datos",
 
 		collection_site: "Lugar de colecta",
-		collection_form: "Formulario de colecta",
+		collection_form: "Fuente de datos",
 
 		collection_form_planning: "Calendario",
 		collection_form_structure: "Estructura",
 
-		delete_form_easy: "¿Esta seguro que quiere suprimir este formulario de entrada?",
-		delete_form_hard: "Si suprime este formulario, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
+		delete_form_easy: "¿Esta seguro que quiere suprimir esta fuente de datos?",
+		delete_form_hard: "Si suprime esta fuente de datos, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
 		delete_form_hard_answer: "Suprimir las {{num_inputs}} entradas",
-		delete_entity: "Si suprime este lugar de actividad, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
+		delete_entity: "Si suprime este lugar de colecta, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
 		delete_entity_answer: "Suprimir las {{num_inputs}} entradas",
 
 		running: "Proyectos en progreso",
@@ -343,15 +343,15 @@ var SPANISH_TRANSLATION = {
 		},
 		collect: "Recuperar",
 		collects: {
-			some_entity: "Para algunos lugares de actividad",
-			entity: "Para cada lugar de actividad",
+			some_entity: "Para algunos lugares de colecta",
+			entity: "Para cada lugar de colecta",
 			project: "Una vez para todo el proyecto"
 		},
 		
 
-		no_input_entities: '¡Ningún lugar de actividad ha sido creado!',
-		no_input_groups: '¡Ningún grupo de actividad ha sido creado!',
-		no_forms: '¡Ningún formulario ha sido creado!',
+		no_input_entities: '¡Ningún lugar de colecta ha sido creado!',
+		no_input_groups: '¡Ningún grupo de colecta ha sido creado!',
+		no_forms: '¡Ningúna fuente de datos ha sido creada!',
 
 
 		input: 'Entrar datos',

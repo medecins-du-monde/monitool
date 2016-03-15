@@ -165,8 +165,8 @@ var ENGLISH_TRANSLATION = {
 			partition4: "Partition 4",
 			partition5: "Partition 5",
 			partition6: "Partition 6",
-			entity: "Input entity",
-			group: "Input group"
+			entity: "Collection site",
+			group: "Collection group"
 		},
 		group: {
 			location: "Location",
@@ -229,7 +229,7 @@ var ENGLISH_TRANSLATION = {
 		},
 		cols: "Columns",
 		rows: "Rows",
-		entity: "Input entity",
+		entity: "Collection site",
 		select_cols: "Please select columns",
 		select_rows: "Please select rows",
 		pivot_table: "Pivot table",
@@ -272,19 +272,19 @@ var ENGLISH_TRANSLATION = {
 
 
 		collection_site_list: "Collection sites",
-		collection_form_list: "Collection forms",
+		collection_form_list: "Data sources",
 		collection_input_list: "Input",
 
 		collection_site: "Collection site",
-		collection_form: "Collection form",
+		collection_form: "Data source",
 
 		collection_form_planning: "Calendar",
 		collection_form_structure: "Structure",
 
 		delete_form_easy: "Are you sure to delete this input form?",
-		delete_form_hard: "If you delete this input form, all linked entries will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
+		delete_form_hard: "If you delete this input form, all linked inputs will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
 		delete_form_hard_answer: "Delete the {{num_inputs}} inputs",
-		delete_entity: "If you delete this input entity, all linked entries will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
+		delete_entity: "If you delete this collection site, all linked inputs will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
 		delete_entity_answer: "Delete the {{num_inputs}} inputs",
 
 		running: "Running projects",
@@ -321,7 +321,7 @@ var ENGLISH_TRANSLATION = {
 		other_indicators: "Other indicators",
 		see_other_themes: "See all thematics",
 
-		entity_name: "Entity name",
+		entity_name: "Site name",
 		group_name: "Group name",
 		entity_name_placeholder: "For instance: Health center X, Hospital X, ...",
 		group_name_placeholder: "ex: Regional hospitals, North of the country, ...",
@@ -343,14 +343,14 @@ var ENGLISH_TRANSLATION = {
 		},
 		collect: "Collect",
 		collects: {
-			some_entity: "Once for some input entities",
-			entity: "Once for each input entity",
+			some_entity: "Once for some of the collection sites",
+			entity: "Once for each collection site",
 			project: "Once for the whole project"
 		},
 		
 
-		no_input_entities: 'No input entity was created yet!',
-		no_input_groups: 'No input group was created yet!',
+		no_input_entities: 'No collection site was created yet!',
+		no_input_groups: 'No collection group was created yet!',
 		no_forms: 'No form was created yet!',
 
 
