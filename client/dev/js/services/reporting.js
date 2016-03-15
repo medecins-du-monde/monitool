@@ -109,6 +109,7 @@ angular
 				var cube = cubes[element.id],
 					cubeFilters = this.createCubeFilter(cube, viewFilters);
 
+
 				// Query cube
 				var values = cube.query([groupBy], cubeFilters);
 				if (groupBy !== 'group' && values)
@@ -173,34 +174,20 @@ angular
 
 			for (var key in viewFilters) {
 				if (key === '_start') {
-					var start = moment(viewFilters._start),
-						startLimits = {
-							year: start.format('YYYY'), quarter: start.format('YYYY-[Q]Q'),
-							month: start.format('YYYY-MM'), week: start.format('YYYY-[W]WW'),
-							day: start.format('YYYY-MM-DD')
-						};
-
-					for (var dimensionId in startLimits)
-						cubeFilters[dimensionId] = cubeFilters[dimensionId].filter(function(dimItem) {
-							return startLimits[dimensionId] <= dimItem;
-						});
+					// _start => filter day
+					var start = moment(viewFilters._start).format('YYYY-MM-DD');
+					cubeFilters.day = cubeFilters.day.filter(function(dimItem) { return start <= dimItem; });
 				}
 
 				else if (key === '_end') {
-					var end = moment(viewFilters._end),
-						endLimits = {
-							year: end.format('YYYY'), quarter: end.format('YYYY-[Q]Q'),
-							month: end.format('YYYY-MM'), week: end.format('YYYY-[W]WW'),
-							day: end.format('YYYY-MM-DD')
-						};
-
-					for (var dimensionId in endLimits)
-						cubeFilters[dimensionId] = cubeFilters[dimensionId].filter(function(dimItem) {
-							return dimItem <= endLimits[dimensionId];
-						});
+					// _end => filter day
+					var end = moment(viewFilters._end).format('YYYY-MM-DD');
+					cubeFilters.day = cubeFilters.day.filter(function(dimItem) { return dimItem <= end; });
 				}
 
 				else if (key === '_location') {
+					// _location => filter either entity or group dimensions.
+					// Don't check if they exist in the cube, because we want an exception to be raised in _makeXxxRow() later on if they don't.
 					if (viewFilters._location.substring(0, 4) === 'ent_')
 						cubeFilters.entity = cubeFilters.entity.filter(function(dimItem) {
 							return dimItem == viewFilters._location.substring(4);
@@ -216,11 +203,13 @@ angular
 				}
 
 				else if (key.substring(0, 1) !== '_')
+					// Any other filter is OK, as long as it does not begin with an underscore.
 					cubeFilters[key] = cubeFilters[key].filter(function(dimItem) {
 						return viewFilters[key].indexOf(dimItem) !== -1;
 					});
 
 				else
+					// Other special keys are not allowed
 					throw new Error('Invalid filter key');
 			}
 
