@@ -254,7 +254,7 @@ angular
 							viewFilters['partition' + partitionIndex] = [part.id];
 
 							var childRow = this._makeActivityRow(cubes, 2, groupBy, viewFilters, columns, element);
-							childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
+							childRow.id = row.id + '.' + partitionIndex + '/' + part.id;
 							childRow.name = part.name;
 							childRow.partitions = row.partitions.slice();
 							childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
@@ -268,7 +268,7 @@ angular
 									viewFilters['partition' + childPartitionIndex] = [subPart.id];
 
 									var subChildRow = this._makeActivityRow(cubes, 3, groupBy, viewFilters, columns, element);
-									subChildRow.id = element.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
+									subChildRow.id = childRow.id + '.' + childPartitionIndex + '/' + subPart.id;
 									subChildRow.name = subPart.name;
 									rows.push(subChildRow);
 
@@ -291,30 +291,35 @@ angular
 			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project);
 			var rows = []
 
-			var row = this._makeActivityRow(cubes, 0, groupBy, viewFilters, columns, element)
-			row.name = $filter('translate')('project.full_project');
+			var row = this._makeActivityRow(cubes, 0, groupBy, viewFilters, columns, element);
+			row.id = 'all_project'; // Override default id so that graphs don't disapear when filtering or changing variables.
+			row.name = $filter('translate')('project.full_project'); // Replace default name (element name) by "Full project".
 
 			rows.push(row)
 			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
 			project.entities.forEach(function(entity) {
 				viewFilters.entity = [entity.id];
+				
 				var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
-				delete viewFilters.entity;
-
-				row.name = entity.name;
+				row.id = entity.id; // Override default id so that graphs don't disapear when filtering.
+				row.name = entity.name; // Replace default name by collection site name.
 				rows.push(row);
+
+				delete viewFilters.entity;
 			}, this);
 
 			rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
 			project.groups.forEach(function(group) {
 				viewFilters.group = [group.id];
+				
 				var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
-				delete viewFilters.group;
-
-				row.name = group.name;
+				row.id = group.id; // Override default id so that graphs don't disapear when filtering.
+				row.name = group.name; // Replace default name by group name.
 				rows.push(row);
+
+				delete viewFilters.group;
 			}, this);
 
 			return rows;
@@ -325,13 +330,30 @@ angular
 				rows = [];
 
 			rows.push({type: 'header', text: logicalFrame.goal, indent: 0});
-			Array.prototype.push.apply(rows, logicalFrame.indicators.map(this._makeIndicatorRow.bind(this, cubes, 0, groupBy, viewFilters, columns)));
-			logicalFrame.purposes.forEach(function(purpose) {
+
+			logicalFrame.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+				var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicatorPlanning);
+				row.id = 'go_' + indicatorIndex;
+				rows.push(row);
+			}, this);
+
+			logicalFrame.purposes.forEach(function(purpose, purposeIndex) {
 				rows.push({type: 'header', text: purpose.description, indent: 1});
-				Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, cubes, 1, groupBy, viewFilters, columns)));
-				purpose.outputs.forEach(function(output) {
+				
+				purpose.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+					var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicatorPlanning);
+					row.id = 'pp_' + purposeIndex + '.ind_' + indicatorIndex;
+					rows.push(row);
+				}, this);
+
+				purpose.outputs.forEach(function(output, outputIndex) {
 					rows.push({type: 'header', text: output.description, indent: 2});
-					Array.prototype.push.apply(rows, output.indicators.map(this._makeIndicatorRow.bind(this, cubes, 2, groupBy, viewFilters, columns)));
+					
+					output.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+						var row = this._makeIndicatorRow(cubes, 2, groupBy, viewFilters, columns, indicatorPlanning);
+						row.id = 'pp_' + purposeIndex + 'out_' + outputIndex + '.ind_' + indicatorIndex;
+						rows.push(row);
+					}, this);
 				}, this);
 			}, this);
 
@@ -343,31 +365,37 @@ angular
 			var rows = []
 
 			var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicator)
+			row.id = 'all_project'; // Override default id so that graphs don't disapear when filtering or changing variables.
 			row.name = $filter('translate')('project.full_project');
-
 			rows.push(row)
+
 			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
 			project.entities.forEach(function(entity) {
 				viewFilters.entity = [entity.id];
-				var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicator);
-				delete viewFilters.entity;
 
+				var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicator);
+				row.id = entity.id; // Override default id so that graphs don't disapear when filtering.
 				row.name = entity.name;
 				rows.push(row);
+
+				delete viewFilters.entity;
 			}, this);
 
 			rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
 			project.groups.forEach(function(group) {
 				viewFilters.group = [group.id];
+				
 				var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicator);
-				delete viewFilters.group;
-
+				row.id = group.id; // Override default id so that graphs don't disapear when filtering.
 				row.name = group.name;
 				rows.push(row);
+
+				delete viewFilters.group;
 			}, this);
 
 			return rows;
 		};
 	});
+
