@@ -367,45 +367,88 @@ angular
 
 
 	.controller('ProjectActivityDetailedReportingController', function($scope, $filter, Olap, inputs, mtReporting) {
-		var cubes = Olap.Cube.fromProject($scope.project, inputs);
-
-		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
 
-		// Create default filter so that all inputs are used.
-		$scope.filters = {_start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
-		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters._start)
-				$scope.filters._start = inputs[i].period;
-			if (inputs[i].period > $scope.filters._end)
-				$scope.filters._end = inputs[i].period;
-		}
+		////////////////////////////////////////////////////
+		// Initialization code.
+		////////////////////////////////////////////////////
 
-		// default group by
-		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
-			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters._start, $scope.filters._end).length < 15)
-			$scope.groupBy = 'quarter';
-		else
-			$scope.groupBy = 'year';
+		// Compute cubes for all elements, from all inputs.
+		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
-		// Create list of indicators to choose from, and set default value.
-		$scope.elements = [];
-		$scope.project.forms.forEach(function(form) {
+		// Create a hash that lists form elements by id. It will be used by: 
+		var elementsById = {};
+		$scope.project.forms.forEach(function(form) { 
 			form.elements.forEach(function(element) {
-				$scope.elements.push({
-					element: element,
-					name: element.name,
-					group: form.name
-				})
+				elementsById[element.id] = element;
 			});
 		});
 
-		$scope.element  = $scope.elements[0].element;
+		// Create array with ngOptions for the list of variables, and init select value.
+		$scope.elementOptions = [];
+		$scope.project.forms.forEach(function(form) {
+			form.elements.forEach(function(element) {
+				$scope.elementOptions.push({id: element.id, name: element.name, group: form.name, element: element});
+			});
+		});
+		$scope.wrap = {chosenElementId: $scope.elementOptions[0].id};
 
-		$scope.$watch('[filters, element, groupBy]', function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end)
-			$scope.rows = mtReporting.computeDetailedActivityReporting(cubes, $scope.project, $scope.element, $scope.groupBy, $scope.filters);
+		////////////////////////////////////////////////////
+		// Each time the element is changed, initialize the query object.
+		////////////////////////////////////////////////////
+
+		$scope.$watch('wrap.chosenElementId', function(elementId) {
+			var cube = cubes[elementId], element = elementsById[elementId];
+
+			////////////////////////////////////////
+			// Create default query for this elementId
+			////////////////////////////////////////
+
+			// retrieve first and last date.
+			var dimension   = cube._getDimension('day'),
+				startString = dimension.items[0],
+				endString   = dimension.items[dimension.items.length - 1],
+				startDate   = new Date(startString.substring(0, 4) * 1, startString.substring(5, 7) - 1, startString.substring(8, 10) * 1),
+				endDate     = new Date(endString.substring(0, 4) * 1, endString.substring(5, 7) - 1, endString.substring(8, 10) * 1);
+
+			// copy filled filters as default value.
+			var filters = {_start: startDate, _end: endDate};
+			cube.dimensions.forEach(function(dimension) {
+				if (dimension.id.substring(0, 'partition'.length) === 'partition')
+					filters[dimension.id] = dimension.items.slice();
+			});
+
+			// default group by
+			var groupBy;
+			if (mtReporting.getColumns('month', filters._start, filters._end).length < 15)
+				groupBy = 'month';
+			else if (mtReporting.getColumns('quarter', filters._start, filters._end).length < 15)
+				groupBy = 'quarter';
+			else
+				groupBy = 'year';
+
+			// make default query.
+			$scope.query = { elementId: elementId, filters: filters, groupBy: groupBy };
+
+			////////////////////////////////////////
+			// Create needed info to display controls on screen
+			////////////////////////////////////////
+
+			$scope.dimensions = element.partitions.map(function(partition, index) {
+				return {id: 'partition' + index, items: partition};
+			});
+		});
+
+		////////////////////////////////////////////////////
+		// The query object contains everything that is needed to compute the final table.
+		// When it changes, we need to update the results.
+		////////////////////////////////////////////////////
+		
+		$scope.$watch('query', function(query) {
+			var element = elementsById[query.elementId];
+
+			$scope.cols = mtReporting.getColumns($scope.query.groupBy, $scope.query.filters._start, $scope.query.filters._end);
+			$scope.rows = mtReporting.computeDetailedActivityReporting(cubes, $scope.project, element, $scope.query.groupBy, $scope.query.filters);
 		}, true);
 	})
 
@@ -443,8 +486,6 @@ angular
 		////////////////////////////////////////////////////
 
 		$scope.$watch('wrap.chosenElementId', function(elementId) {
-			console.log('create blank query')
-
 			var cube = cubes[elementId], element = elementsById[elementId];
 
 			////////////////////////////////////////
@@ -492,8 +533,6 @@ angular
 		////////////////////////////////////////////////////
 
 		$scope.$watch('[dimensions, query.colDimensions, query.rowDimensions]', function() {
-			console.log('update time selectors')
-
 			// update available rows and cols
 			var timeFields = ['year', 'quarter', 'month', 'week', 'day'],
 				timeUsedOnCols = timeFields.find(function(tf) { return $scope.query.colDimensions.indexOf(tf) !== -1; }),
@@ -520,8 +559,6 @@ angular
 		////////////////////////////////////////////////////
 		
 		$scope.$watch('query', function(query) {
-			console.log('update stats')
-
 			var cube = cubes[query.elementId];
 
 			////////////////////////////////////////

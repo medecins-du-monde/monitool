@@ -4,82 +4,117 @@
 	<li class="active" translate="project.reporting_compare_sites"></li>
 </ol>
 
+<doc-reminder pages="project.activity_followup"></doc-reminder>
+
 <form class="form-horizontal noprint" novalidate>
-	<div class="row">
-		<div class="col-sm-12">
-			<div class="form-group">
-				<label for="element-input" class="col-sm-1 control-label" translate="project.variable"></label>
+
+	<div class="panel panel-default">
+		<div class="panel-heading" ng-click="selectionOpen=!selectionOpen" style="cursor: pointer" ng-init="selectionOpen=true">
+			<i fa-open="selectionOpen"></i> 
+			<span translate="project.data_selection"></span>
+		</div>
+		<div class="panel-body" ng-if="selectionOpen">
+
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="form-group">
+						<label for="element-input" class="col-sm-1 control-label" translate="project.variable"></label>
+						<div class="col-sm-11">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
+								<select id="element-input"
+										class="form-control input-sm"
+										ng-model="wrap.chosenElementId"
+										ng-options="i.id as i.name group by i.group for i in elementOptions"></select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="form-group">
+						<label for="group-by-input" class="col-sm-1 control-label" translate="shared.columns"></label>
+						<div class="col-sm-11">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-columns fa-fw"></i></span>
+								<select class="form-control input-sm" id="group-by-input" ng-model="query.groupBy">
+									<option value="day" translate="shared.day"></option>
+									<option value="week" translate="shared.week"></option>
+									<option value="month" translate="shared.month"></option>
+									<option value="quarter" translate="shared.quarter"></option>
+									<option value="year" translate="shared.year"></option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading" ng-click="filterOpen=!filterOpen" style="cursor: pointer" ng-init="filterOpen=false">
+			<i fa-open="filterOpen"></i>
+			<span translate="project.filters"></span>
+		</div>
+		<div class="panel-body" ng-if="filterOpen">
+
+			<div class="row">
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" translate="shared.start"></label>
+						<div class="col-sm-10">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+								<input type="text" 
+									   datepicker-popup="longDate"
+									   name="start"
+									   ng-model="query.filters._start"
+									   is-open="startDateOpen"
+									   ng-click="startDateOpen=true"
+									   required
+									   ng-max="query.filters._end"
+									   class="form-control input-sm" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" translate="shared.end"></label>
+						<div class="col-sm-10">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+								<input type="text" 
+									   datepicker-popup="longDate"
+									   name="end"
+									   ng-model="query.filters._end"
+									   is-open="endDateOpen"
+									   ng-click="endDateOpen=true"
+									   ng-min="query.filters._start"
+									   class="form-control input-sm"
+									   required />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group" ng-repeat="dimension in dimensions">
+				<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{('project.dimensions.' + dimension.id)|translate}}</label>
 				<div class="col-sm-11">
 					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
-						<select id="element-input"
-								class="form-control input-sm"
-								ng-model="element"
-								ng-options="i.element as i.name group by i.group for i in elements"></select>
+						<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
+						<ui-select id="{{dimension.id}}-input" multiple ng-model="query.filters[dimension.id]" name="{{dimension}}" theme="bootstrap">
+							<ui-select-match placeholder="{{'project.select_filters'|translate}}">{{$item.name}}</ui-select-match>
+							<ui-select-choices repeat="filter.id as filter in dimension.items">{{filter.name}}</ui-select-choices>
+						</ui-select>
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
 
-	<div class="row">
-		<div class="col-sm-6">
-			<div class="form-group">
-				<label class="col-sm-2 control-label" translate="shared.start"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
-						<input type="text" 
-							   datepicker-popup="longDate"
-							   name="start"
-							   ng-model="filters._start"
-							   is-open="startDateOpen"
-							   ng-click="startDateOpen=true"
-							   required
-							   ng-max="filters._end"
-							   class="form-control input-sm" />
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-6">
-			<div class="form-group">
-				<label class="col-sm-2 control-label" translate="shared.end"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
-						<input type="text" 
-							   datepicker-popup="longDate"
-							   name="end"
-							   ng-model="filters._end"
-							   is-open="endDateOpen"
-							   ng-click = "endDateOpen = true"
-							   ng-min="filters._start"
-							   class="form-control input-sm"
-							   required />
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-sm-6">
-			<div class="form-group">
-				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
-				<div class="col-sm-10">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-columns fa-fw"></i></span>
-						<select class="form-control input-sm" id="group-by-input" ng-model="groupBy">
-							<option value="day" translate="shared.day"></option>
-							<option value="week" translate="shared.week"></option>
-							<option value="month" translate="shared.month"></option>
-							<option value="quarter" translate="shared.quarter"></option>
-							<option value="year" translate="shared.year"></option>
-						</select>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </form>
@@ -90,10 +125,7 @@
 </button>
 <div style="clear: both"></div>
 
-<reporting-graph-adapter
-	type="['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
-	rows="rows" cols="cols" plots="plots">
-</reporting-graph-adapter>
+<reporting-graph-adapter type="'line'" rows="rows" cols="cols" plots="plots"></reporting-graph-adapter>
 
 <div style="clear: both"></div>
 
