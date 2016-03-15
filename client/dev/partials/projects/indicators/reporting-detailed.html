@@ -37,11 +37,11 @@
 						<input type="text" 
 							   datepicker-popup="longDate"
 							   name="start"
-							   ng-model="filters.start"
+							   ng-model="filters._start"
 							   is-open="startDateOpen"
-							   ng-click = "startDateOpen = true"
+							   ng-click="startDateOpen=true"
 							   required
-							   ng-max="filters.end"
+							   ng-max="filters._end"
 							   class="form-control input-sm" />
 					</div>
 				</div>
@@ -56,10 +56,10 @@
 						<input type="text" 
 							   datepicker-popup="longDate"
 							   name="end"
-							   ng-model="filters.end"
+							   ng-model="filters._end"
 							   is-open="endDateOpen"
-							   ng-click = "endDateOpen = true"
-							   ng-min="filters.start"
+							   ng-click="endDateOpen=true"
+							   ng-min="filters._start"
 							   class="form-control input-sm"
 							   required />
 					</div>

@@ -23,11 +23,11 @@
 						<input type="text" 
 							   datepicker-popup="longDate"
 							   name="start"
-							   ng-model="filters.start"
+							   ng-model="filters._start"
 							   is-open="startDateOpen"
-							   ng-click = "startDateOpen = true"
+							   ng-click="startDateOpen=true"
 							   required
-							   ng-max="filters.end"
+							   ng-max="filters._end"
 							   class="form-control input-sm" />
 					</div>
 				</div>
@@ -42,10 +42,10 @@
 						<input type="text" 
 							   datepicker-popup="longDate"
 							   name="end"
-							   ng-model="filters.end"
+							   ng-model="filters._end"
 							   is-open="endDateOpen"
-							   ng-click = "endDateOpen = true"
-							   ng-min="filters.start"
+							   ng-click="endDateOpen=true"
+							   ng-min="filters._start"
 							   class="form-control input-sm"
 							   required />
 					</div>
@@ -80,13 +80,13 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
-						<select class="form-control input-sm" id="filter-by-input" ng-model="filters.entityId">
-							<option value="" translate="project.full_project"></option>
+						<select class="form-control input-sm" id="filter-by-input" ng-model="filters._location">
+							<option value="none" translate="project.full_project"></option>
 							<optgroup label="{{'project.collection_site_list'|translate}}">
-								<option ng-repeat="entity in project.entities" value="{{entity.id}}">{{entity.name}}</option>
+								<option ng-repeat="entity in project.entities" value="ent_{{entity.id}}">{{entity.name}}</option>
 							</optgroup>
 							<optgroup label="{{'project.groups'|translate}}">
-								<option ng-repeat="group in project.groups" value="{{group.id}}">{{group.name}}</option>
+								<option ng-repeat="group in project.groups" value="grp_{{group.id}}">{{group.name}}</option>
 							</optgroup>
 						</select>
 					</div>

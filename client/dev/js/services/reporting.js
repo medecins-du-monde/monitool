@@ -12,11 +12,11 @@ angular
 	// we will see how bad if performs on the wild.
 	.service('mtReporting', function($filter) {
 
-		this.getColumns = function(groupBy, start, end, entityId, project) {
+		this.getColumns = function(groupBy, start, end, location, project) {
 			var type;
-			if (!entityId)
+			if (!location || location == 'none')
 				type = 'project';
-			else if (project.groups.find(function(g) { return g.id === entityId }))
+			else if (project.groups.find(function(g) { return 'grp_' + g.id === location }))
 				type = 'group';
 			else
 				type = 'entity';
@@ -42,10 +42,10 @@ angular
 				if (type === 'project')
 					return project.entities.concat([{id:'total',name:'Total'}]);
 				else if (type === 'entity')
-					return project.entities.filter(function(e) { return e.id === entityId })
+					return project.entities.filter(function(e) { return 'ent_' + e.id === location })
 												.concat([{id:'total',name:'Total'}]);
 				else  if (type === 'group') {
-					var group = project.groups.find(function(g) { return g.id === entityId });
+					var group = project.groups.find(function(g) { return 'grp_' + g.id === location });
 					return project.entities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
 												.concat([{id:'total',name:'Total'}]);
 				}
@@ -54,30 +54,31 @@ angular
 				if (type === 'project')
 					return project.groups;
 				else if (type === 'entity')
-					return project.groups.filter(function(g) { return g.members.indexOf(entityId) !== -1 });
+					return project.groups.filter(function(g) { return g.members.indexOf(location.substring(4)) !== -1 });
 				else if (type === 'group')
-					return project.groups.filter(function(g) { return g.id === entityId });
+					return project.groups.filter(function(g) { return 'grp_' + g.id === location });
 			}
 			else
 				throw new Error('Invalid groupBy: ' + groupBy)
 		};
 
-		this._computeIndicator = function(cubes, indicator, groupBy, filters) {
+		this._computeIndicator = function(cubes, indicator, groupBy, viewFilters) {
 			// Ask the olap cube to compute the components we need to compute the indicator.
 			// Like this: {'numerator': {'2010-01': 4, ...}, ...}
 			var components = {};
 			for (var key in indicator.parameters) {
-				var parameter = indicator.parameters[key];
+				var parameter = indicator.parameters[key],
+					cube = cubes[parameter.elementId],
+					cubeFilter = this.createCubeFilter(cube, viewFilters);
 
 				// We should intersect filters of same dimension, but we know in advance that 
 				// having 2 filters of the same dim never happens.
-				var k, filter = {};
-				for (k in filters) filter[k] = filters[k];
-				for (k in parameter.filter) filter[k] = parameter.filter[k];
+				for (var k in parameter.filter)
+					cubeFilter[k] = parameter.filter[k];
 
-				components[key] = cubes[parameter.elementId].query([groupBy], filter);
+				components[key] = cube.query([groupBy], cubeFilter);
 				if (groupBy !== 'group' && components[key])
-					components[key].total = cubes[parameter.elementId].query([], filter);
+					components[key].total = cube.query([], cubeFilter);
 			}
 
 			// Inverse group and component key, to get scopes
@@ -102,11 +103,16 @@ angular
 			return result;
 		};
 
-		this._makeActivityRow = function(cubes, indent, groupBy, filters, columns, element) {
+		this._makeActivityRow = function(cubes, indent, groupBy, viewFilters, columns, element) {
 			try {
-				var values = cubes[element.id].query([groupBy], filters);
+				// Retrieve cube & create filter.
+				var cube = cubes[element.id],
+					cubeFilters = this.createCubeFilter(cube, viewFilters);
+
+				// Query cube
+				var values = cube.query([groupBy], cubeFilters);
 				if (groupBy !== 'group' && values)
-					values.total = cubes[element.id].query([], filters);
+					values.total = cube.query([], cubeFilters);
 
 				var cols = columns.map(function(col) { return values[col.id]; });
 				return {id: makeUUID(), name: element.name, cols: cols, type: 'data', indent: indent};
@@ -116,7 +122,7 @@ angular
 			}
 		};
 
-		this._makeIndicatorRow = function(cubes, indent, groupBy, filters, columns, indicator) {
+		this._makeIndicatorRow = function(cubes, indent, groupBy, viewFilters, columns, indicator) {
 			var baseline = indicator.baseline,
 				target = indicator.target;
 
@@ -127,7 +133,7 @@ angular
 				target += indicator.unit;
 
 			try {
-				var indicatorValues = this._computeIndicator(cubes, indicator, groupBy, filters);
+				var indicatorValues = this._computeIndicator(cubes, indicator, groupBy, viewFilters);
 
 				return {
 					id: makeUUID(),
@@ -149,23 +155,88 @@ angular
 			}
 		};
 
-		// FIXME this should be recursive to make code neater, and not limit ourselves to 2 levels.
-		this.computeActivityReporting = function(cubes, project, groupBy, filters, splits) {
-			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
 
-			// Computing too much. We could: qFilters[groupBy] = columns.pluck('id');
-			var qFilters = {};
-			if (filters.entityId && project.entities.pluck('id').indexOf(filters.entityId) != -1)
-				qFilters.entity = [filters.entityId];
-			else if (filters.entityId)
-				qFilters.group = [filters.entityId];
+		/**
+		 * For more convenience, we allow views to pass unordotox filters to us.
+		 * Those have the same format than regular filter ({dimension: [value1, value2]})
+		 * but also allow some special keys that are prefixed with underscores:
+		 *     _start: filters out everything before a given date
+		 *     _end: filters out everything after a given date
+		 *     _location: filters or everything outside of an entity or group (depending on the prefix).
+		 */
+		this.createCubeFilter = function(cube, viewFilters) {
+			// Create a filter that explicitely allows everything!
+			var cubeFilters = {};
+			cube.dimensions.concat(cube.dimensionGroups).forEach(function(dim) {
+				cubeFilters[dim.id] = dim.items;
+			});
+
+			for (var key in viewFilters) {
+				if (key === '_start') {
+					var start = moment(viewFilters._start),
+						startLimits = {
+							year: start.format('YYYY'), quarter: start.format('YYYY-[Q]Q'),
+							month: start.format('YYYY-MM'), week: start.format('YYYY-[W]WW'),
+							day: start.format('YYYY-MM-DD')
+						};
+
+					for (var dimensionId in startLimits)
+						cubeFilters[dimensionId] = cubeFilters[dimensionId].filter(function(dimItem) {
+							return startLimits[dimensionId] <= dimItem;
+						});
+				}
+
+				else if (key === '_end') {
+					var end = moment(viewFilters._end),
+						endLimits = {
+							year: end.format('YYYY'), quarter: end.format('YYYY-[Q]Q'),
+							month: end.format('YYYY-MM'), week: end.format('YYYY-[W]WW'),
+							day: end.format('YYYY-MM-DD')
+						};
+
+					for (var dimensionId in endLimits)
+						cubeFilters[dimensionId] = cubeFilters[dimensionId].filter(function(dimItem) {
+							return dimItem <= endLimits[dimensionId];
+						});
+				}
+
+				else if (key === '_location') {
+					if (viewFilters._location.substring(0, 4) === 'ent_')
+						cubeFilters.entity = cubeFilters.entity.filter(function(dimItem) {
+							return dimItem == viewFilters._location.substring(4);
+						});
+
+					else if (viewFilters._location.substring(0, 4) === 'grp_')
+						cubeFilters.group = cubeFilters.group.filter(function(dimItem) {
+							return dimItem == viewFilters._location.substring(4);
+						});
+
+					else if (viewFilters._location !== 'none')
+						throw new Error('Invalid _location');
+				}
+
+				else if (key.substring(0, 1) !== '_')
+					cubeFilters[key] = cubeFilters[key].filter(function(dimItem) {
+						return viewFilters[key].indexOf(dimItem) !== -1;
+					});
+
+				else
+					throw new Error('Invalid filter key');
+			}
+
+			return cubeFilters;
+		};
+
+		// FIXME this should be recursive to make code neater, and not limit ourselves to 2 levels.
+		this.computeActivityReporting = function(cubes, project, groupBy, viewFilters, splits) {
+			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project);
 
 			// Create rows.
 			var rows = [];
 			project.forms.forEach(function(form) {
 				rows.push({type: 'header', text: form.name});
 				form.elements.forEach(function(element) {
-					var row = this._makeActivityRow(cubes, 1, groupBy, qFilters, columns, element);
+					var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
 					row.id = element.id;
 					row.partitions = element.partitions.map(function(p, index) {
 						return {
@@ -180,9 +251,9 @@ angular
 						var partitionIndex = splits[row.id];
 						element.partitions[partitionIndex].forEach(function(part) {
 							// add filter
-							qFilters['partition' + partitionIndex] = [part.id];
+							viewFilters['partition' + partitionIndex] = [part.id];
 
-							var childRow = this._makeActivityRow(cubes, 2, groupBy, qFilters, columns, element);
+							var childRow = this._makeActivityRow(cubes, 2, groupBy, viewFilters, columns, element);
 							childRow.id = element.id + '.' + partitionIndex + '/' + part.id;
 							childRow.name = part.name;
 							childRow.partitions = row.partitions.slice();
@@ -194,20 +265,20 @@ angular
 
 								element.partitions[childPartitionIndex].forEach(function(subPart) {
 									// add filter
-									qFilters['partition' + childPartitionIndex] = [subPart.id];
+									viewFilters['partition' + childPartitionIndex] = [subPart.id];
 
-									var subChildRow = this._makeActivityRow(cubes, 3, groupBy, qFilters, columns, element);
+									var subChildRow = this._makeActivityRow(cubes, 3, groupBy, viewFilters, columns, element);
 									subChildRow.id = element.id + '.' + partitionIndex + '/' + part.id + '.' + childPartitionIndex + '/' + subPart.id;
 									subChildRow.name = subPart.name;
 									rows.push(subChildRow);
 
 									// remove filter
-									delete qFilters['partition' + childPartitionIndex];
+									delete viewFilters['partition' + childPartitionIndex];
 								}, this);
 							}
 
 							// remove filter
-							delete qFilters['partition' + partitionIndex];
+							delete viewFilters['partition' + partitionIndex];
 						}, this);
 					}
 				}, this);
@@ -216,18 +287,21 @@ angular
 			return rows;
 		};
 
-		this.computeDetailedActivityReporting = function(cubes, project, element, groupBy, filters) {
-			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
+		this.computeDetailedActivityReporting = function(cubes, project, element, groupBy, viewFilters) {
+			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project);
 			var rows = []
 
-			var row = this._makeActivityRow(cubes, 0, groupBy, {}, columns, element)
+			var row = this._makeActivityRow(cubes, 0, groupBy, viewFilters, columns, element)
 			row.name = $filter('translate')('project.full_project');
 
 			rows.push(row)
 			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
 			project.entities.forEach(function(entity) {
-				var row = this._makeActivityRow(cubes, 1, groupBy, {entity: [entity.id]}, columns, element);
+				viewFilters.entity = [entity.id];
+				var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
+				delete viewFilters.entity;
+
 				row.name = entity.name;
 				rows.push(row);
 			}, this);
@@ -235,7 +309,10 @@ angular
 			rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
 			project.groups.forEach(function(group) {
-				var row = this._makeActivityRow(cubes, 1, groupBy, {entity: group.members}, columns, element);
+				viewFilters.group = [group.id];
+				var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
+				delete viewFilters.group;
+
 				row.name = group.name;
 				rows.push(row);
 			}, this);
@@ -243,44 +320,39 @@ angular
 			return rows;
 		};
 
-
-		this.computeReporting = function(cubes, project, logicalFrame, groupBy, filters) {
-			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project),
+		this.computeReporting = function(cubes, project, logicalFrame, groupBy, viewFilters) {
+			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project),
 				rows = [];
 
-			// Computing too much. We could: qFilters[groupBy] = columns.pluck('id');
-			var qFilters = {};
-			if (filters.entityId && project.entities.pluck('id').indexOf(filters.entityId) != -1)
-				qFilters.entity = [filters.entityId];
-			else if (filters.entityId)
-				qFilters.group = [filters.entityId];
-
 			rows.push({type: 'header', text: logicalFrame.goal, indent: 0});
-			Array.prototype.push.apply(rows, logicalFrame.indicators.map(this._makeIndicatorRow.bind(this, cubes, 0, groupBy, qFilters, columns)));
+			Array.prototype.push.apply(rows, logicalFrame.indicators.map(this._makeIndicatorRow.bind(this, cubes, 0, groupBy, viewFilters, columns)));
 			logicalFrame.purposes.forEach(function(purpose) {
 				rows.push({type: 'header', text: purpose.description, indent: 1});
-				Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, cubes, 1, groupBy, qFilters, columns)));
+				Array.prototype.push.apply(rows, purpose.indicators.map(this._makeIndicatorRow.bind(this, cubes, 1, groupBy, viewFilters, columns)));
 				purpose.outputs.forEach(function(output) {
 					rows.push({type: 'header', text: output.description, indent: 2});
-					Array.prototype.push.apply(rows, output.indicators.map(this._makeIndicatorRow.bind(this, cubes, 2, groupBy, qFilters, columns)));
+					Array.prototype.push.apply(rows, output.indicators.map(this._makeIndicatorRow.bind(this, cubes, 2, groupBy, viewFilters, columns)));
 				}, this);
 			}, this);
 
 			return rows;
 		};
 
-		this.computeDetailedReporting = function(cubes, project, indicator, groupBy, filters) {
-			var columns = this.getColumns(groupBy, filters.start, filters.end, filters.entityId, project);
+		this.computeDetailedReporting = function(cubes, project, indicator, groupBy, viewFilters) {
+			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project);
 			var rows = []
 
-			var row = this._makeIndicatorRow(cubes, 0, groupBy, {}, columns, indicator)
+			var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicator)
 			row.name = $filter('translate')('project.full_project');
 
 			rows.push(row)
 			rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
 			project.entities.forEach(function(entity) {
-				var row = this._makeIndicatorRow(cubes, 1, groupBy, {entity: [entity.id]}, columns, indicator);
+				viewFilters.entity = [entity.id];
+				var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicator);
+				delete viewFilters.entity;
+
 				row.name = entity.name;
 				rows.push(row);
 			}, this);
@@ -288,7 +360,10 @@ angular
 			rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
 			project.groups.forEach(function(group) {
-				var row = this._makeIndicatorRow(cubes, 1, groupBy, {entity: group.members}, columns, indicator);
+				viewFilters.group = [group.id];
+				var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicator);
+				delete viewFilters.group;
+
 				row.name = group.name;
 				rows.push(row);
 			}, this);

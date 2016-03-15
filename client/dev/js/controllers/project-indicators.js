@@ -237,20 +237,18 @@ angular.module('monitool.controllers.project.indicators', [])
 		$scope.setLogicalFrame = function(lf) { $scope.currentLogframe = lf; };
 
 		// Create default filter so that all inputs are used.
-		$scope.filters = {entityId: ""};
-		$scope.filters.start = new Date('9999-01-01T00:00:00Z')
-		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
+		$scope.filters = {_location: "none", _start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.start)
-				$scope.filters.start = inputs[i].period;
-			if (inputs[i].period > $scope.filters.end)
-				$scope.filters.end = inputs[i].period;
+			if (inputs[i].period < $scope.filters._start)
+				$scope.filters._start = inputs[i].period;
+			if (inputs[i].period > $scope.filters._end)
+				$scope.filters._end = inputs[i].period;
 		}
 
 		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.start, $scope.filters.end).length < 15)
+		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
 			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.start, $scope.filters.end).length < 15)
+		else if (mtReporting.getColumns('quarter', $scope.filters._start, $scope.filters._end).length < 15)
 			$scope.groupBy = 'quarter';
 		else
 			$scope.groupBy = 'year';
@@ -258,31 +256,31 @@ angular.module('monitool.controllers.project.indicators', [])
 		var cubes = Olap.Cube.fromProject($scope.project, inputs);
 
 		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watchGroup(['filters.start', 'filters.end', 'filters.entityId', 'groupBy', 'currentLogframe'], function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.start, $scope.filters.end, $scope.filters.entityId, $scope.project);
+		$scope.$watchGroup(['filters._start', 'filters._end', 'filters._location', 'groupBy', 'currentLogframe'], function() {
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, $scope.filters._location, $scope.project);
 			$scope.rows = mtReporting.computeReporting(cubes, $scope.project, $scope.currentLogframe, $scope.groupBy, $scope.filters);
 		});
 	})
 
 	.controller('ProjectDetailedReportingController', function($scope, $filter, Olap, inputs, mtReporting) {
+		var cubes = Olap.Cube.fromProject($scope.project, inputs);
+
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
 
 		// Create default filter so that all inputs are used.
-		$scope.filters = {entityId: ""};
-		$scope.filters.start = new Date('9999-01-01T00:00:00Z')
-		$scope.filters.end = new Date('0000-01-01T00:00:00Z');
+		$scope.filters = {_location: "none", _start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
 		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters.start)
-				$scope.filters.start = inputs[i].period;
-			if (inputs[i].period > $scope.filters.end)
-				$scope.filters.end = inputs[i].period;
+			if (inputs[i].period < $scope.filters._start)
+				$scope.filters._start = inputs[i].period;
+			if (inputs[i].period > $scope.filters._end)
+				$scope.filters._end = inputs[i].period;
 		}
 
 		// default group by
-		if (mtReporting.getColumns('month', $scope.filters.start, $scope.filters.end).length < 15)
+		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
 			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters.start, $scope.filters.end).length < 15)
+		else if (mtReporting.getColumns('quarter', $scope.filters._start, $scope.filters._end).length < 15)
 			$scope.groupBy = 'quarter';
 		else
 			$scope.groupBy = 'year';
@@ -302,10 +300,8 @@ angular.module('monitool.controllers.project.indicators', [])
 
 		$scope.indicator = $scope.indicators[0].indicator;
 
-		var cubes = Olap.Cube.fromProject($scope.project, inputs);
-
-		$scope.$watchGroup(['indicator', 'filters', 'groupBy'], function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters.start, $scope.filters.end)
+		$scope.$watch('[indicator, filters, groupBy]', function() {
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end)
 			$scope.rows = mtReporting.computeDetailedReporting(cubes, $scope.project, $scope.indicator, $scope.groupBy, $scope.filters);
 		}, true);
 	})
