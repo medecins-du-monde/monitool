@@ -210,7 +210,7 @@ angular.module('monitool.directives.reporting', [])
 					$scope.data = {
 						cols: $scope.cols,
 						rows: angular.copy($scope.originalRows).filter(function(row) {
-							return $scope.plots[row.id];
+							return $scope.plots[row.id] && row.type == 'data' && row.cols;
 						})
 					};
 				}, true);
