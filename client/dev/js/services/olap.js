@@ -266,7 +266,7 @@ angular
 						result += tmp
 					}
 				}
-				result /= numIndexes;
+				result /= contributions;
 			}
 			else if (dimension.aggregation == 'highest') {
 				result = Math.MIN_VALUE;
