@@ -503,7 +503,7 @@ angular
 			var filters = {_start: startDate, _end: endDate};
 			cube.dimensions.concat(cube.dimensionGroups).forEach(function(dimension) {
 				if (['day', 'week', 'month', 'quarter', 'year'].indexOf(dimension.id) === -1)
-					filters[dimension.id] = dimension.items.slice();
+					filters[dimension.id] = [];
 			});
 
 			// make default query.
@@ -565,7 +565,12 @@ angular
 			// Query cube & postprocess for display
 			////////////////////////////////////////
 
-			var cubeFilters = mtReporting.createCubeFilter(cube, $scope.query.filters);
+			var filters = angular.copy($scope.query.filters);
+			for (var key in filters)
+				if (filters[key].length == 0)
+					delete filters[key];
+
+			var cubeFilters = mtReporting.createCubeFilter(cube, filters);
 
 			var makeRowCol = function(selectedDimId) {
 				var dimension = $scope.dimensions.find(function(dim) { return dim.id == selectedDimId; });

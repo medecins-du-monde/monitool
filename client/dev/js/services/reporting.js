@@ -109,7 +109,6 @@ angular
 				var cube = cubes[element.id],
 					cubeFilters = this.createCubeFilter(cube, viewFilters);
 
-
 				// Query cube
 				var values = cube.query([groupBy], cubeFilters);
 				if (groupBy !== 'group' && values)
@@ -167,46 +166,60 @@ angular
 		 */
 		this.createCubeFilter = function(cube, viewFilters) {
 			// Create a filter that explicitely allows everything!
-			var cubeFilters = {};
-			cube.dimensions.concat(cube.dimensionGroups).forEach(function(dim) {
-				cubeFilters[dim.id] = dim.items;
-			});
+			var cubeFilters = angular.copy(viewFilters);
 
-			for (var key in viewFilters) {
+			for (var key in cubeFilters) {
+				if (key.substring(0, 1) !== '_')
+					continue;
+
 				if (key === '_start') {
+					if (!cubeFilters.day)
+						cubeFilters.day = cube._getDimension('day').items;
+
 					// _start => filter day
 					var start = moment(viewFilters._start).format('YYYY-MM-DD');
 					cubeFilters.day = cubeFilters.day.filter(function(dimItem) { return start <= dimItem; });
+
+					delete cubeFilters._start;
 				}
 
 				else if (key === '_end') {
+					if (!cubeFilters.day)
+						cubeFilters.day = cube._getDimension('day').items;
+					
 					// _end => filter day
 					var end = moment(viewFilters._end).format('YYYY-MM-DD');
 					cubeFilters.day = cubeFilters.day.filter(function(dimItem) { return dimItem <= end; });
+
+					delete cubeFilters._end;
 				}
 
 				else if (key === '_location') {
 					// _location => filter either entity or group dimensions.
 					// Don't check if they exist in the cube, because we want an exception to be raised in _makeXxxRow() later on if they don't.
-					if (viewFilters._location.substring(0, 4) === 'ent_')
+					if (viewFilters._location.substring(0, 4) === 'ent_') {
+						if (!cubeFilters.entity)
+							cubeFilters.entity = cube._getDimension('entity').items;
+						
 						cubeFilters.entity = cubeFilters.entity.filter(function(dimItem) {
 							return dimItem == viewFilters._location.substring(4);
 						});
+					}
 
-					else if (viewFilters._location.substring(0, 4) === 'grp_')
+					else if (viewFilters._location.substring(0, 4) === 'grp_') {
+						if (!cubeFilters.group)
+							cubeFilters.group = cube._getDimension('group').items;
+
 						cubeFilters.group = cubeFilters.group.filter(function(dimItem) {
 							return dimItem == viewFilters._location.substring(4);
 						});
+					}
 
 					else if (viewFilters._location !== 'none')
 						throw new Error('Invalid _location');
-				}
 
-				else if (key.substring(0, 1) !== '_')
-					// Any other filter is OK, as long as it does not begin with an underscore.
-					cubeFilters[key] = cubeFilters[key].filter(function(dimItem) {
-						return viewFilters[key].indexOf(dimItem) !== -1;
-					});
+					delete cubeFilters._location;
+				}
 
 				else
 					// Other special keys are not allowed
