@@ -190,7 +190,7 @@ old.list({include_docs: true}, function(error, result) {
 				target: planning.target || null,
 				unit: indicator.unit == '' ? 'none' : indicator.unit,
 				targetType: indicator.target,
-				formula: null,
+				formula: 'default',
 				parameters: {}
 			};
 
@@ -214,9 +214,12 @@ old.list({include_docs: true}, function(error, result) {
 						filter: fixFilter(planning.parameters[key].filter, partitions)
 					};
 
-					if (!planning.parameters[key].variable) {
+					if (!newIndicator.parameters[key].elementId) {
+						newIndicator.parameters[key].elementId = null;
+						newIndicator.parameters[key].filter = {};
+
 						console.log('invalid complex indicator...');
-						return null;
+						// return null;
 					}
 				}
 			}
@@ -238,7 +241,8 @@ old.list({include_docs: true}, function(error, result) {
 			}
 			else {
 				console.log('invalid simple indicator...');
-				newIndicator = null;
+				// newIndicator = null;
+				newIndicator.parameters = {'default': {elementId: null, filter: {}}};
 			}
 
 			return newIndicator;

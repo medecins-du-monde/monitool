@@ -233,7 +233,7 @@ var validate = validator({
 								additionalProperties: false,
 								required: ["elementId", "filter"],
 								properties: {
-									elementId: {$ref: "#/definitions/uuid"},
+									elementId: {oneOf: [{$ref: "#/definitions/uuid"}, {type: 'null'}]},
 									filter: {
 										type: "object",
 										additionalProperties: false,
