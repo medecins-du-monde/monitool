@@ -44,7 +44,7 @@ angular
 					return moment.min(moment(entity.end), moment(form.end)).startOf(formPeriodicity);
 			}
 			else
-				return moment(form.end || project.end).endOf(formPeriodicity);
+				return moment(form.end || project.end).startOf(formPeriodicity);
 		};
 
 		// this has nothing to do on the root scope.
