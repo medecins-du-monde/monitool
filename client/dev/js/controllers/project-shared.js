@@ -162,10 +162,12 @@ angular.module('monitool.controllers.project.shared', [])
 					}
 				}
 
-			$scope.projectHasFormElements = false;
+			$scope.projectActivityReady = false;
 			project.forms.forEach(function(form) {
-				if (form.elements.length)
-					$scope.projectHasFormElements = true;
+				if (form.elements.length) {
+					if (project.entities.length || form.collect == 'project')
+						$scope.projectActivityReady = true;
+				}
 			});
 		}, true);
 

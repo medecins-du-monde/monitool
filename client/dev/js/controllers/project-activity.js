@@ -404,15 +404,21 @@ angular
 			// Create default query for this elementId
 			////////////////////////////////////////
 
-			// retrieve first and last date.
-			var dimension   = cube._getDimension('day'),
-				startString = dimension.items[0],
-				endString   = dimension.items[dimension.items.length - 1],
-				startDate   = new Date(startString.substring(0, 4) * 1, startString.substring(5, 7) - 1, startString.substring(8, 10) * 1),
-				endDate     = new Date(endString.substring(0, 4) * 1, endString.substring(5, 7) - 1, endString.substring(8, 10) * 1);
+			var filters;
+			if (cube.data.length != 0) {
+				// retrieve first and last date.
+				var dimension   = cube._getDimension('day'),
+					startString = dimension.items[0],
+					endString   = dimension.items[dimension.items.length - 1],
+					startDate   = new Date(startString.substring(0, 4) * 1, startString.substring(5, 7) - 1, startString.substring(8, 10) * 1),
+					endDate     = new Date(endString.substring(0, 4) * 1, endString.substring(5, 7) - 1, endString.substring(8, 10) * 1);
 
-			// copy filled filters as default value.
-			var filters = {_start: startDate, _end: endDate};
+				// copy filled filters as default value.
+				filters = {_start: startDate, _end: endDate};
+			}
+			else
+				filters = {_start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
+			
 			cube.dimensions.forEach(function(dimension) {
 				if (dimension.id.substring(0, 'partition'.length) === 'partition')
 					filters[dimension.id] = dimension.items.slice();
@@ -492,15 +498,21 @@ angular
 			// Create default query for this elementId
 			////////////////////////////////////////
 
-			// retrieve first and last date.
-			var dimension   = cube._getDimension('day'),
-				startString = dimension.items[0],
-				endString   = dimension.items[dimension.items.length - 1],
-				startDate   = new Date(startString.substring(0, 4) * 1, startString.substring(5, 7) - 1, startString.substring(8, 10) * 1),
-				endDate     = new Date(endString.substring(0, 4) * 1, endString.substring(5, 7) - 1, endString.substring(8, 10) * 1);
+			var filters;
+			if (cube.data.length != 0) {
+				// retrieve first and last date.
+				var dimension   = cube._getDimension('day'),
+					startString = dimension.items[0],
+					endString   = dimension.items[dimension.items.length - 1],
+					startDate   = new Date(startString.substring(0, 4) * 1, startString.substring(5, 7) - 1, startString.substring(8, 10) * 1),
+					endDate     = new Date(endString.substring(0, 4) * 1, endString.substring(5, 7) - 1, endString.substring(8, 10) * 1);
 
-			// copy filled filters as default value.
-			var filters = {_start: startDate, _end: endDate};
+				// copy filled filters as default value.
+				filters = {_start: startDate, _end: endDate};
+			}
+			else
+				filters = {_start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
+			
 			cube.dimensions.concat(cube.dimensionGroups).forEach(function(dimension) {
 				if (['day', 'week', 'month', 'quarter', 'year'].indexOf(dimension.id) === -1)
 					filters[dimension.id] = [];
