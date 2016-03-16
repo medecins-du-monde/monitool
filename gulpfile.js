@@ -59,7 +59,7 @@ var files = {
 // Build
 //////////////////////////////////////////////////////////
 
-gulp.task('default', ['build', 'design-docs']);
+gulp.task('default', ['build']);
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
 
 gulp.task('clean', function(cb) {
