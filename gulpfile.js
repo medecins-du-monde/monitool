@@ -6,7 +6,7 @@ var async         = require('async'),
 	templateCache = require('gulp-angular-templatecache'),
 	bower         = require('gulp-bower'),
 	concat        = require('gulp-concat'),
-	minifyCSS     = require('gulp-minify-css'),
+	cleanCSS      = require('gulp-clean-css'),
 	ngAnnotate    = require('gulp-ng-annotate'),
 	rename        = require('gulp-rename'),
 	replace       = require('gulp-replace'),
@@ -66,7 +66,7 @@ gulp.task('clean', function(cb) {
 	del(['client/build/**/*'], cb);
 });
 
-gulp.task('copy-static', function() {
+gulp.task('copy-static', ['bower'], function() {
 	gulp.src('client/dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/bower_components/fontawesome/fonts/*').pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/bower_components/bootstrap/fonts/*').pipe(gulp.dest('client/build'));
@@ -105,7 +105,7 @@ gulp.task('build-js', ['bower'], function() {
 gulp.task('build-css', ['bower'], function() {
 	var queue = new Queue({ objectMode: true });
 	queue.queue(gulp.src(files.css));
-	queue.queue(gulp.src('client/dev/css/**/*.css').pipe(minifyCSS()));
+	queue.queue(gulp.src('client/dev/css/**/*.css').pipe(cleanCSS()));
 
 	return queue.done()
 				.pipe(concat('monitool2.css'))
