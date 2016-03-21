@@ -208,7 +208,7 @@ angular
 
 					else if (viewFilters._location.substring(0, 4) === 'grp_') {
 						if (!cubeFilters.group)
-							cubeFilters.group = cube._getDimension('group').items;
+							cubeFilters.group = cube._getDimensionGroup('group').items;
 
 						cubeFilters.group = cubeFilters.group.filter(function(dimItem) {
 							return dimItem == viewFilters._location.substring(4);
