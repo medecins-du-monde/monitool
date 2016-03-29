@@ -88,26 +88,105 @@
 		<script type="text/javascript" src="js/services/reporting.js"></script>
 		<script type="text/javascript" src="js/services/string.js"></script>
 		<script type="text/javascript" src="js/services/olap.js"></script>
-
-		<script type="text/javascript" src="js/launcher.js"></script>
 	</head>
 	<body>
 		<div ui-view></div>
 
 		<div id="load-container">
 			<div id="load-content">
-				<img src="/img/logo_color.svg">
+				<img id="logo_img" src="/img/logo_color.svg">
 				
 				<div id="login_buttons" style="display: none">
 					<a href="/authentication/login" class="btn btn-primary btn-lg btn-block">Use MDM account</a>
+					<a id="partner_login_btn" href="#" class="btn btn-default btn-lg btn-block">Use partner account</a>
+				</div>
 
-					<form class="form-inline" style="margin-top: 5px" action="/authentication/login-partner" method="POST">
-						<input type="text" class="form-control input-lg" name="username" placeholder="Username" style="width: 187px">
-						<input type="password" class="form-control input-lg" name="password" placeholder="Password" style="width: 187px">
-						<button class="btn btn-default btn-lg">Use partner account</button>
+				<div id="partner_login" style="display: none">
+					<form class="form-horizontal well well-sm" action="/authentication/login-partner" method="POST">
+						<legend>Partner authentication</legend>
+						<div class="form-group">
+							<label for="username" class="col-sm-2 control-label">Username</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="username" name="username" placeholder="Username">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password" class="col-sm-2 control-label">Password</label>
+							<div class="col-sm-10">
+								<input type="password" class="form-control" id="password" name="password" placeholder="Password">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-6">
+								<button type="submit" class="btn btn-primary btn-block">Connect</button>
+							</div>
+							<div class="col-sm-6">
+								<a id="go_back_btn" class="btn btn-default btn-block">Go back</a>
+							</div>
+						</div>
 					</form>
 				</div>
+
+				<div id="server_down" style="display: none">
+					<h3>Server seems to be down</h3>
+					<h3>Please, try again later</h3>
+				</div>
+
 			</div>
 		</div>
+
+		<script type="text/javascript">
+			
+			function onAuthResponse(e) {
+				// User is logged on
+				if (authReq.status === 200) {
+					// Remove modal and change background color
+					document.body.style.backgroundColor = 'white';
+					var loader = document.getElementById('load-container');
+					loader.parentNode.removeChild(loader);
+
+					// Start angular application
+					window.user = JSON.parse(authReq.responseText);
+					angular.bootstrap(document, ['monitool.app']);
+				}
+				// User is not logged on
+				else if (authReq.status === 401)
+					// show login screen
+					document.getElementById('login_buttons').style.display = 'block';
+				else
+					// show error
+					document.getElementById('server_down').style.display = 'block';
+			}
+
+			function onParterLoginClicked(e) {
+				// rezize logo_img
+				document.getElementById('logo_img').style.width = '190px';
+
+				// hide login screen, show login form
+				document.getElementById('login_buttons').style.display = 'none';
+				document.getElementById('partner_login').style.display = 'block';
+				e.preventDefault();
+			}
+
+			function onGoBackClicked(e) {
+				// rezize logo_img
+				document.getElementById('logo_img').style.width = '250px';
+
+				// hide login screen, show login form
+				document.getElementById('login_buttons').style.display = 'block';
+				document.getElementById('partner_login').style.display = 'none';
+				e.preventDefault();
+			}
+
+			document.getElementById('partner_login_btn').addEventListener('click', onParterLoginClicked, false);
+			document.getElementById('go_back_btn').addEventListener('click', onGoBackClicked, false);
+
+			var authReq = new XMLHttpRequest();
+			authReq.addEventListener("load", onAuthResponse, false);
+			authReq.open('GET', '/resources/myself?' + Math.random().toString().substring(2));
+			authReq.send();
+
+		</script>
+
 	</body>
 </html>

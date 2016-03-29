@@ -432,6 +432,8 @@ ul:hover>.onrollover {
       
       #load-content img {
         width: 250px;
+        margin-bottom: 10px;
+        transition: width .2s;
       }
 
       #load-content .progress {
