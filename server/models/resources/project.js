@@ -100,7 +100,7 @@ var validate = validator({
 						required: ['type', 'id', 'role'],
 						properties: {
 							type: {type: 'string', pattern: "^internal$"},
-							id: {type: 'string', pattern: '^usr:[a-z\.]+$'},
+							id: {type: 'string', pattern: '^usr:[a-z0-9\.\-]+$'},
 							role: {type: 'string', enum: ['owner', 'input_all', 'input', 'read']},
 							entities: {type: 'array', items: { $ref: "#/definitions/uuid_or_none" } }
 						}
