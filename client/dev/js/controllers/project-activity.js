@@ -186,7 +186,7 @@ angular
 					if (projectUser.role == 'owner' || projectUser.role == 'input_all')
 						isAllowed = true;
 					else if (projectUser.role == 'input')
-						isAllowed = projectUser.entities.indexOf(entity.id) != -1;
+						isAllowed = projectUser.entities.indexOf(columnId) != -1;
 					else if (projectUser.role == 'read')
 						isAllowed = false;
 					else
