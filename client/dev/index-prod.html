@@ -44,6 +44,11 @@
 					</form>
 				</div>
 
+				<div id="ie_warning" style="display: none">
+					<h3>Monitool cannot be used with a legacy Internet Explorer version</h3>
+					<p>Please use either Chrome, Firefox, or a recent version of Internet Explorer.</p>
+				</div>
+				
 				<div id="server_down" style="display: none">
 					<h3>Server seems to be down</h3>
 					<h3>Please, try again later</h3>
@@ -61,6 +66,33 @@
 
 		<script type="text/javascript">
 			
+			// From http://stackoverflow.com/a/21712356/1897495
+			function getInternetExplorerVersion() {
+				var ua = window.navigator.userAgent;
+
+				var msie = ua.indexOf('MSIE ');
+				if (msie > 0) {
+					// IE 10 or older => return version number
+					return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+				}
+
+				var trident = ua.indexOf('Trident/');
+				if (trident > 0) {
+					// IE 11 => return version number
+					var rv = ua.indexOf('rv:');
+					return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+				}
+
+				var edge = ua.indexOf('Edge/');
+				if (edge > 0) {
+					// Edge (IE 12+) => return version number
+					return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+				}
+
+				// other browser
+				return false;
+			}
+
 			function onAuthLoaded(e) {
 				// User is logged on
 				if (authReq.status === 200) {
@@ -119,19 +151,26 @@
 				e.preventDefault();
 			}
 
-			document.getElementById('partner_login_btn').addEventListener('click', onParterLoginClicked, false);
-			document.getElementById('go_back_btn').addEventListener('click', onGoBackClicked, false);
+			var ieVersion = getInternetExplorerVersion();
 
-			// Configure AJAX requests
-			var appReq = new XMLHttpRequest();
-			appReq.addEventListener("progress", onAppProgress, false);
-			appReq.addEventListener("load", onAppLoaded, false);
-			appReq.open("GET", "/monitool2.js");
+			if (ieVersion !== false && ieVersion < 10) {
+				document.getElementById('ie_warning').style.display = 'block';
+			}
+			else {
+				document.getElementById('partner_login_btn').addEventListener('click', onParterLoginClicked, false);
+				document.getElementById('go_back_btn').addEventListener('click', onGoBackClicked, false);
 
-			var authReq = new XMLHttpRequest();
-			authReq.addEventListener("load", onAuthLoaded, false);
-			authReq.open('GET', '/resources/myself?' + Math.random().toString().substring(2));
-			authReq.send();
+				// Configure AJAX requests
+				var appReq = new XMLHttpRequest();
+				appReq.addEventListener("progress", onAppProgress, false);
+				appReq.addEventListener("load", onAppLoaded, false);
+				appReq.open("GET", "/monitool2.js");
+
+				var authReq = new XMLHttpRequest();
+				authReq.addEventListener("load", onAuthLoaded, false);
+				authReq.open('GET', '/resources/myself?' + Math.random().toString().substring(2));
+				authReq.send();
+			}
 
 		</script>
 	</body>
