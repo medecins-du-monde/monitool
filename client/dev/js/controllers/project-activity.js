@@ -123,12 +123,12 @@ angular
 		$scope.inputsStatus = inputsStatus;
 
 		// pass information needed for creating new inputs on free forms.
-		$scope.newInputDate = new Date();
+		$scope.newInputDate = {date: new Date()};
 		$scope.addInput = function(entityId) {
 			$state.go(
 				'main.project.collection_input_edition',
 				{
-					period: moment($scope.newInputDate).format('YYYY-MM-DD'),
+					period: moment($scope.newInputDate.date).format('YYYY-MM-DD'),
 					formId: $scope.selectedForm.id,
 					entityId: entityId
 				}
