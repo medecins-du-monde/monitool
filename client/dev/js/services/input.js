@@ -217,8 +217,6 @@ angular
 				formId: form.id,
 				period: period
 			}).$promise.then(function(result) {
-				// result.forEach(function(input) { input.sanitize(form); });
-
 				var currentInputId = [projectId, entityId, form.id, period].join(':');
 
 				// both where found
