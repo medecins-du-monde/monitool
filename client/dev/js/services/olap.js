@@ -152,20 +152,30 @@ angular
 					var period = moment(input.period).format('YYYY-MM-DD');
 
 					form.elements.forEach(function(element) {
-						var source = input.values[element.id],
-							numSources = source.length,
-							target = cubes[element.id].data;
-
-						// Compute location where this subtable should go.
+						// Compute location where this subtable should go, and length of data to copy.
 						var offset = days.indexOf(period); // FIXME slow & useless
+						var length = 1;
+
 						if (form.collect == 'entity' || form.collect == 'some_entity')
 							offset = offset * entities.length + entities.indexOf(input.entity);
 
-						element.partitions.forEach(function(partition) { offset *= partition.length; });
+						element.partitions.forEach(function(partition) {
+							offset *= partition.length;
+							length *= partition.length;
+						});
 
-						// Copy into destination table.
-						for (var i = 0; i < numSources; ++i)
-							target[offset + i] = source[i];
+						// Retrieve data from input, and copy (if valid).
+						var source = input.values[element.id];
+						if (source && source.length === length) {
+							var target = cubes[element.id].data;
+
+							// Copy into destination table.
+							for (var i = 0; i < length; ++i)
+								target[offset + i] = source[i];
+						}
+						else {
+							console.log("Skip variable", element.id, 'from', input._id);
+						}
 					});
 
 				});
