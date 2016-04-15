@@ -131,7 +131,7 @@ angular
 						dimensions.push(new Dimension('entity', entities, element.geoAgg));
 
 					element.partitions.forEach(function(partition, index) {
-						dimensions.push(new Dimension('partition' + index, partition.pluck('id'), 'sum'));
+						dimensions.push(new Dimension(partition.id, partition.elements.pluck('id'), partition.aggregation));
 					});
 
 					var dimensionGroups = [
@@ -143,6 +143,14 @@ angular
 
 					if (form.collect == 'entity' || form.collect == 'some_entity')
 						dimensionGroups.push(new DimensionGroup('group', 'entity', groups));
+
+					element.partitions.forEach(function(partition, index) {
+						if (partition.groups.length) {
+							var pgroups = {};
+							partition.groups.forEach(function(g) { pgroups[g.id] = g.members; });
+							dimensionGroups.push(new DimensionGroup(partition.id + '_g', partition.id, pgroups));
+						}
+					});
 
 					cubes[element.id] = new Cube(element.id, dimensions, dimensionGroups);
 				});
@@ -160,8 +168,8 @@ angular
 							offset = offset * entities.length + entities.indexOf(input.entity);
 
 						element.partitions.forEach(function(partition) {
-							offset *= partition.length;
-							length *= partition.length;
+							offset *= partition.elements.length;
+							length *= partition.elements.length;
 						});
 
 						// Retrieve data from input, and copy (if valid).
@@ -225,6 +233,84 @@ angular
 				else
 					filter[dimensionId] = oldFilter;
 			}
+
+			result._total = this.query(dimensionIds, filter);
+
+			dimensionIds.unshift(dimensionId);
+
+			return contributions ? result : undefined;
+		};
+
+		Cube.prototype.flatQuery = function(dimensionIds, filter) {
+			// End condition
+			if (dimensionIds.length == 0)
+				return this._query_total(filter);
+			
+			var dimensionId = dimensionIds.shift();
+
+			// search dimension
+			var dimension = this._getDimension(dimensionId) || this._getDimensionGroup(dimensionId);
+
+			// Build tree
+			var result = {};
+			var numDimensionItems = dimension.items.length;
+			var contributions = 0;
+			for (var dimensionItemId = 0; dimensionItemId < numDimensionItems; ++dimensionItemId) {
+				var dimensionItem = dimension.items[dimensionItemId];
+
+				// Intersect main filter with branch filter (branch filter is only one item, so it's easy to compute).
+				var oldFilter = filter[dimensionId];
+				if (!oldFilter || oldFilter.indexOf(dimensionItem) !== -1)
+					filter[dimensionId] = [dimensionItem];
+				else
+					// Either lines do the same. Continuing is a bit faster.
+					// filter[dimensionId] = [];
+					continue;
+				
+				// Compute branch of the result tree.
+				result[dimensionItem] = this.flatQuery(dimensionIds, filter);
+
+				// Remove if empty
+				if (result[dimensionItem] === undefined)
+					delete result[dimensionItem];
+				else
+					++contributions;
+
+				// Restore filter to its former value
+				if (oldFilter === undefined)
+					delete filter[dimensionId];
+				else
+					filter[dimensionId] = oldFilter;
+			}
+
+			this.dimensionGroups.forEach(function(dimensionGroup) {
+				if (dimensionGroup.childDimension !== dimension.id)
+					return;
+
+				var numDimensionItems = dimensionGroup.items.length;
+				// var contributions = 0;
+				for (var dimensionItemId = 0; dimensionItemId < numDimensionItems; ++dimensionItemId) {
+					var dimensionItem = dimensionGroup.items[dimensionItemId];
+
+					// Intersect main filter with branch filter (branch filter is only one item, so it's easy to compute).
+					var localFilter = angular.copy(filter);
+
+					// FIXME this is kinda wrong, because a filter on the group may already exists.
+					// this only works because we know that there are no such filter on the olap page.
+					localFilter[dimensionGroup.id] = [dimensionItem];
+					
+					// Compute branch of the result tree.
+					result[dimensionItem] = this.flatQuery(dimensionIds, localFilter);
+
+					// Remove if empty
+					if (result[dimensionItem] === undefined)
+						delete result[dimensionItem];
+					else
+						++contributions;
+				}
+			}, this);
+
+			result._total = this.flatQuery(dimensionIds, filter);
 
 			dimensionIds.unshift(dimensionId);
 

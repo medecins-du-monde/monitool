@@ -100,38 +100,10 @@ angular.module('monitool.directives.form', [])
 			});
 		};
 	})
-
-	// From https://docs.angularjs.org/guide/forms
-	.directive('mtContentEditable', function() {
-		return {
-			require: 'ngModel',
-			link: function($scope, element, attributes, controller) {
-				element.attr('contenteditable', true);
-
-				// view -> model
-				element.on('blur', function() {
-					$scope.$apply(function() {
-						var text = element.text()
-
-						if (!attributes.allowWhitespace)
-							text = text.replace(/\s+/g, " ")
-
-						element.html(text);
-						controller.$setViewValue(text);
-					});
-				});
-
-				// model -> view
-				controller.$render = function() {
-					element.html(controller.$viewValue);
-				};
-			}
-		};
-	})
 	
-	.directive('textarea', function() {
+	.directive('autoResize', function() {
 		return {
-			restrict: 'E',
+			restrict: 'A',
 			require: 'ngModel',
 			link: function($scope, element, attributes) {
 
@@ -145,6 +117,37 @@ angular.module('monitool.directives.form', [])
 				$scope.$watch(attributes.ngModel, function(newValue) {
 					resize();
 				});
+
+				element.on("blur", resize);
+				element.on("keyup", resize);
+				element.on("change", resize);
+			}
+		};
+	})
+
+	
+	.directive('fullHeight', function() {
+		return {
+			restrict: 'A',
+			require: 'ngModel',
+			link: function($scope, element, attributes) {
+
+				var resize = function() {
+					// Compute text height
+					element[0].style.height = '1px';
+					var textHeight = Math.max(24, element[0].scrollHeight + 3);
+
+					// Compute parent height
+					var parentHeight = element[0].parentNode.scrollHeight;
+					element[0].style.height = Math.max(textHeight, parentHeight) + "px";
+				};
+
+				$scope.$watch(attributes.ngModel, function(newValue, oldValue) {
+					if (oldValue != newValue)
+						resize();
+				});
+
+				setTimeout(resize, 0)
 
 				element.on("blur", resize);
 				element.on("keyup", resize);
@@ -232,53 +235,114 @@ angular.module('monitool.directives.form', [])
 			}
 		}
 	})
+	
+	.directive('partitionFilter', function() {
 
-	.directive('partition', function() {
+		var isSubset = function(superset, subset) {
+			return subset.filter(function(element) {
+				return superset.indexOf(element) !== -1;
+			}).length == subset.length;
+		};
+
+		var model2view = function(model, partition) {
+			if (model.length == partition.elements.length)
+				return ['all'];
+			
+			// retrieve all groups that are in the list.
+			var selectedGroups = partition.groups.filter(function(group) {
+				return isSubset(model, group.members);
+			});
+			var numSelectedGroups = selectedGroups.length;
+
+			var additionalElements = model.filter(function(partitionElementId) {
+				for (var i = 0; i < numSelectedGroups; ++i)
+					if (selectedGroups[i].members.indexOf(partitionElementId) !== -1)
+						return false;
+				return true;
+			});
+
+			return selectedGroups.pluck('id').concat(additionalElements);
+		};
+
+		var view2model = function(view, partition) {
+			var model = {};
+
+			view.forEach(function(id) {
+				if (id == 'all')
+					partition.elements.forEach(function(e) { model[e.id] = true; });
+				
+				else {
+					var group = partition.groups.find(function(g) { return g.id == id; });
+					if (group)
+						group.members.forEach(function(m) { model[m] = true; });
+					else
+						model[id] = true;
+				}
+			});
+
+			return Object.keys(model);
+		};
+
 		return {
-			restrict: 'E',
-			require: 'ngModel',
-			templateUrl: 'partials/_forms/partition.html',
-			scope: {},
+			restrict: "EA",
+			require: "ngModel",
+			scope: {}, // isolate scope
+			template: 
+				'<div class="input-group">' + 
+					'<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>' + 
+					'<ui-select id="{{id}}" name="{{id}}" multiple ng-model="container.partitionElementIds" theme="bootstrap">' +
+						'<ui-select-match placeholder="Aucun élément selectionné">{{$item.name}}</ui-select-match>' +
+						'<ui-select-choices repeat="filter.id as filter in selectableElements">' +
+							'<i class="fa fa-arrow-circle-right" ng-if="filter.id == \'all\'"></i> ' + 
+							'<i class="fa fa-arrow-circle-o-right" ng-if="filter.members"></i> ' + 
+							'{{filter.name}}' +
+						'</ui-select-choices>' +
+					'</ui-select>' +
+				'</div>',
+
 			link: function($scope, element, attributes, ngModelController) {
+				// the parameter need to be evaluated in the parent scope (because we use an isolated scope).
+				var partition = $scope.$parent.$eval(attributes.partition);
 
-				///////////////////
-				// User actions
-				///////////////////
+				var allSelectableElements = [{id: 'all', name: 'Tous les éléments'}].concat(partition.groups.concat(partition.elements));
 
-				$scope.newPartitionElement = function(target) {
-					target.push({id: makeUUID(), name: ""});
-				};
+				$scope.id = Math.random().toString().substring(2);
+				// $scope.selectableElements = allSelectableElements;
+				$scope.container = {};
+				
+				ngModelController.$formatters.push(function(modelValue) {
+					return model2view(modelValue, partition);
+				});
 
-				$scope.remove = function(item, target) {
-					var index = target.findIndex(function(arrItem) { return item.id === arrItem.id; });
-					if (index !== -1)
-						target.splice(index, 1)
-				};
+				ngModelController.$parsers.push(function(viewValue) {
+					return view2model(viewValue, partition);
+				});
 
-				///////////////////
-				// ngModelController handling
-				///////////////////
 				ngModelController.$render = function() {
-					$scope.partition = ngModelController.$viewValue;
+					$scope.container.partitionElementIds = ngModelController.$viewValue;
 				};
 
-				$scope.$watch('partition', function(partition) {
-					ngModelController.$setViewValue(partition);
+				$scope.$watch('container.partitionElementIds', function(partitionElementIds) {
+					$scope.container.partitionElementIds = model2view(view2model(partitionElementIds, partition), partition);
+					ngModelController.$setViewValue(partitionElementIds);
 
-					// size valididy
-					ngModelController.$setValidity('size', partition.length >= 2);
+					$scope.selectableElements = allSelectableElements.filter(function() {
+						return true;
+						/// FIXME
+					});
 
-					// unicity validity
-					var numPartition = partition.length;
-					var names = {};
-					for (var i = 0; i < numPartition; ++i)
-						names[partition[i].name] = true;
-
-					ngModelController.$setValidity('unicity', Object.keys(names).length == numPartition);
-				}, true);
+				}, true)
 			}
 		}
 	})
+
+
+	///////////////////////////
+	// FIXME
+	// This directive needs to be rewriten at once.
+	// It has survived changing multiple times how partitions works, by adding punctual patches
+	// but the same behaviour could be implemented in a way shorter/faster/more understandable way. 
+	///////////////////////////
 
 	.directive('inputGrid', function(itertools) {
 			var headerOptions = {
@@ -317,11 +381,11 @@ angular.module('monitool.directives.form', [])
 
 					// Special case, only one row.
 					if (partitions.length == 1)
-						return partitions[0].map(function(p, index) { return [p.name, modelValue[index]]; });
+						return partitions[0].elements.map(function(p, index) { return [p.name, modelValue[index]]; });
 
 					// FIXME: cheat
 					partitions.forEach(function(partition, partitionIndex) {
-						partition.forEach(function(partitionElement, partitionElementIndex) {
+						partition.elements.forEach(function(partitionElement, partitionElementIndex) {
 							partitionElement.partitionIndex = partitionIndex;
 							partitionElement.partitionElementIndex = partitionElementIndex;
 						});
@@ -332,16 +396,16 @@ angular.module('monitool.directives.form', [])
 						topPartitionIds  = permutation.slice(0, offset),
 						leftPartitionIds = permutation.slice(offset);
 
-					var totalCols = topPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].length; }, 1),
-						totalRows = leftPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].length; }, 1),
+					var totalCols = topPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].elements.length; }, 1),
+						totalRows = leftPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].elements.length; }, 1),
 						colspan   = totalCols, // current colspan is total number of columns.
 						numCols   = 1;
 
 					// Create top header rows.
 					var topHeaderRows = topPartitionIds.map(function(topPartitionId) {
 						// Adapt colspan and number of columns
-						colspan /= partitions[topPartitionId].length; 
-						numCols *= partitions[topPartitionId].length;
+						colspan /= partitions[topPartitionId].elements.length; 
+						numCols *= partitions[topPartitionId].elements.length;
 
 						var i, row = [];
 
@@ -351,7 +415,7 @@ angular.module('monitool.directives.form', [])
 
 						// push headers from the partition
 						for (var k = 0; k < numCols; ++k) {
-							row.push(partitions[topPartitionId][k % partitions[topPartitionId].length].name);
+							row.push(partitions[topPartitionId].elements[k % partitions[topPartitionId].elements.length].name);
 
 							for (i = 0; i < colspan - 1; ++i)
 								row.push('');
@@ -364,22 +428,22 @@ angular.module('monitool.directives.form', [])
 					var rowspans = [];
 					var rowspan = totalRows;
 					for (var i = 0; i < leftPartitionIds.length; ++i) {
-						rowspan /= partitions[leftPartitionIds[i]].length;
+						rowspan /= partitions[leftPartitionIds[i]].elements.length;
 						rowspans[i] = rowspan;
 					}
 
 					// Create data rows
-					var contentRows = itertools.product(leftPartitionIds.map(function(id) { return partitions[id]; })).map(function(curLeftPartitionElements, contentRowIndex) {
+					var contentRows = itertools.product(leftPartitionIds.map(function(id) { return partitions[id].elements; })).map(function(curLeftPartitionElements, contentRowIndex) {
 						var leftHeaderCols = curLeftPartitionElements.map(function(p, titleColIndex) {
 							return contentRowIndex % rowspans[titleColIndex] == 0 ? p.name : '';
 						});
 
-						var dataCols = itertools.product(topPartitionIds.map(function(id) { return partitions[id]; })).map(function(curTopPartitionElements) {
+						var dataCols = itertools.product(topPartitionIds.map(function(id) { return partitions[id].elements; })).map(function(curTopPartitionElements) {
 							var partitionElements = curLeftPartitionElements.concat(curTopPartitionElements).sort(function(pe1, pe2) { return pe1.partitionIndex - pe2.partitionIndex; });
 
 							var fieldIndex = 0;
 							partitionElements.forEach(function(pe) {
-								fieldIndex = fieldIndex * partitions[pe.partitionIndex].length + pe.partitionElementIndex;
+								fieldIndex = fieldIndex * partitions[pe.partitionIndex].elements.length + pe.partitionElementIndex;
 							});
 
 							return modelValue[fieldIndex];
@@ -390,7 +454,7 @@ angular.module('monitool.directives.form', [])
 
 					// FIXME: repare cheating.
 					partitions.forEach(function(partition, partitionIndex) {
-						partition.forEach(function(partitionElement, partitionElementIndex) {
+						partition.elements.forEach(function(partitionElement, partitionElementIndex) {
 							delete partitionElement.partitionIndex;
 							delete partitionElement.partitionElementIndex;
 						});
@@ -415,7 +479,7 @@ angular.module('monitool.directives.form', [])
 
 					// FIXME: cheat
 					partitions.forEach(function(partition, partitionIndex) {
-						partition.forEach(function(partitionElement, partitionElementIndex) {
+						partition.elements.forEach(function(partitionElement, partitionElementIndex) {
 							partitionElement.partitionIndex = partitionIndex;
 							partitionElement.partitionElementIndex = partitionElementIndex;
 						});
@@ -423,19 +487,19 @@ angular.module('monitool.directives.form', [])
 
 					// General case.
 					var numFields = 1;
-					partitions.forEach(function(partition) { numFields *= partition.length; });
+					partitions.forEach(function(partition) { numFields *= partition.elements.length; });
 
 					var modelValue       = new Array(numFields),
 						permutation      = computeNthPermutation(partitions.length, rotation),
-						topPartitions    = permutation.slice(0, offset).map(function(id) { return partitions[id]; }),
-						leftPartitions   = permutation.slice(offset).map(function(id) { return partitions[id]; });
+						topPartitions    = permutation.slice(0, offset).map(function(id) { return partitions[id].elements; }),
+						leftPartitions   = permutation.slice(offset).map(function(id) { return partitions[id].elements; });
 
 					itertools.product(leftPartitions).map(function(curLeftPartition, rowIndex) {
 						itertools.product(topPartitions).forEach(function(curTopPartition, colIndex) {
 							var partitionElements = curLeftPartition.concat(curTopPartition).sort(function(pe1, pe2) { return pe1.partitionIndex - pe2.partitionIndex; });
 							var fieldIndex = 0;
 							partitionElements.forEach(function(pe) {
-								fieldIndex = fieldIndex * partitions[pe.partitionIndex].length + pe.partitionElementIndex;
+								fieldIndex = fieldIndex * partitions[pe.partitionIndex].elements.length + pe.partitionElementIndex;
 							});
 
 							modelValue[fieldIndex] = viewValue[rowIndex + topPartitions.length][colIndex + leftPartitions.length];
@@ -444,7 +508,7 @@ angular.module('monitool.directives.form', [])
 
 					// FIXME: repare cheating.
 					partitions.forEach(function(partition, partitionIndex) {
-						partition.forEach(function(partitionElement, partitionElementIndex) {
+						partition.elements.forEach(function(partitionElement, partitionElementIndex) {
 							delete partitionElement.partitionIndex;
 							delete partitionElement.partitionElementIndex;
 						});
@@ -462,7 +526,7 @@ angular.module('monitool.directives.form', [])
 						hotTable.updateSettings({ maxCols: 1, maxRows: 1, cells: function(row, col, prop) { return ($scope.canEdit ? dataOptions : dataReadOnlyOptions); }});
 
 					else if (partitions.length == 1)
-						hotTable.updateSettings({ maxCols: 2, maxRows: partitions[0].length, cells: function(row, col, prop) { return col == 1 ? ($scope.canEdit ? dataOptions : dataReadOnlyOptions) : headerOptions; }});
+						hotTable.updateSettings({ maxCols: 2, maxRows: partitions[0].elements.length, cells: function(row, col, prop) { return col == 1 ? ($scope.canEdit ? dataOptions : dataReadOnlyOptions) : headerOptions; }});
 
 					else {
 						// Split partitions in cols and rows.
@@ -470,8 +534,8 @@ angular.module('monitool.directives.form', [])
 							topPartitionIds  = permutation.slice(0, offset),
 							leftPartitionIds = permutation.slice(offset);
 
-						var totalCols = topPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].length; }, 1),
-							totalRows = leftPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].length; }, 1);
+						var totalCols = topPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].elements.length; }, 1),
+							totalRows = leftPartitionIds.reduce(function(memo, partitionId) { return memo * partitions[partitionId].elements.length; }, 1);
 
 						hotTable.updateSettings({
 							maxCols: totalCols + leftPartitionIds.length,

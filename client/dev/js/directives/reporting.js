@@ -320,37 +320,37 @@ angular.module('monitool.directives.reporting', [])
 					var grid = {header: [], body: []};
 					
 					// Create header rows.
-					var totalCols = $scope.cols.reduce(function(memo, col) { return memo * col.items.length; }, 1),
+					var totalCols = $scope.cols.reduce(function(memo, col) { return memo * col.length; }, 1),
 						colspan = totalCols, // current colspan is total number of columns.
 						numCols = 1; // current numCols is 1.
 
 					for (var i = 0; i < $scope.cols.length; ++i) {
 						// adapt colspan and number of columns
-						colspan /= $scope.cols[i].items.length; 
-						numCols *= $scope.cols[i].items.length;
+						colspan /= $scope.cols[i].length; 
+						numCols *= $scope.cols[i].length;
 
 						// Create header row
 						var row = {colspan: colspan, cols: []};
 						for (var k = 0; k < numCols; ++k)
-							row.cols.push($scope.cols[i].items[k % $scope.cols[i].items.length]);
+							row.cols.push($scope.cols[i][k % $scope.cols[i].length]);
 
 						grid.header.push(row);
 					}
 
 					// Create data rows.
 					$scope.rowspans = [];
-					var rowspan = $scope.rows.reduce(function(memo, row) { return memo * row.items.length; }, 1);
+					var rowspan = $scope.rows.reduce(function(memo, row) { return memo * row.length; }, 1);
 					for (var i = 0; i < $scope.rows.length; ++i) {
-						rowspan /= $scope.rows[i].items.length;
+						rowspan /= $scope.rows[i].length;
 						$scope.rowspans[i] = rowspan;
 					}
 
-					itertools.product($scope.rows.pluck('items')).forEach(function(headers) {
+					itertools.product($scope.rows).forEach(function(headers) {
 						grid.body.push({
 							headerCols: headers,
 							dataCols:
 								itertools.product(
-									$scope.cols.pluck('items').concat(headers.map(function(a) { return [a]; }))
+									$scope.cols.concat(headers.map(function(a) { return [a]; }))
 								).map(function(els) {
 									try {
 										var result = $scope.data;

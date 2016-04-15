@@ -93,7 +93,7 @@ angular
 			form.elements.forEach(function(element) {
 				var numFields = 1;
 				element.partitions.forEach(function(partition) {
-					numFields *= partition.length;
+					numFields *= partition.elements.length;
 				});
 				
 				input.values[element.id] = new Array(numFields);

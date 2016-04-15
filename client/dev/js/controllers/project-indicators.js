@@ -140,13 +140,13 @@ angular.module('monitool.controllers.project.indicators', [])
 
 	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, mtFetch, planning) {
 		// Build possible variables and filters.
-		$scope.elements = []
-		$scope.filters = {};
+		$scope.selectElements = []
+		$scope.elementsById = {};
 
 		$scope.project.forms.forEach(function(form) {
 			form.elements.forEach(function(element) {
-				$scope.elements.push({id: element.id, name: element.name, group: form.name});
-				$scope.filters[element.id] = element;
+				$scope.selectElements.push({id: element.id, name: element.name, group: form.name});
+				$scope.elementsById[element.id] = element;
 			});
 		});
 
@@ -164,52 +164,47 @@ angular.module('monitool.controllers.project.indicators', [])
 		};
 		$scope.isNew = !planning;
 
-		// List all parameters
-		var parameters = {};
-		for (var key in $scope.planning.parameters)
-			parameters[key] = $scope.planning.parameters[key];
-
 		var formulaWatch = $scope.$watch('planning.formula', function(formula) {
 			var newSymbols, oldSymbols = Object.keys($scope.planning.parameters).sort();
 			try { newSymbols = Parser.parse($scope.planning.formula).variables().sort(); }
 			catch (e) { newSymbols = []; }
 
 			if (!angular.equals(newSymbols, oldSymbols)) {
+				var removedSymbols = oldSymbols.filter(function(s) { return newSymbols.indexOf(s) === -1; }),
+					addedSymbols   = newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; });
+
 				// Remove old symbols from formula
-				oldSymbols.filter(function(s) { return newSymbols.indexOf(s) === -1; }).forEach(function(s) {
-					parameters[s] = $scope.planning.parameters[s];
-					delete $scope.planning.parameters[s];
-				});
+				removedSymbols.forEach(function(s) { delete $scope.planning.parameters[s]; });
 
 				// Add new symbols to formula
-				newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; }).forEach(function(s) {
-					$scope.planning.parameters[s] = parameters[s] || {elementId: null, filter: {}};
+				addedSymbols.forEach(function(s) {
+					$scope.planning.parameters[s] = {elementId: null, filter: {}};
 				});
 			}
 		});
 
-		// that's a bit overkill
+		// Watch planning.parameters to ensure that filters are valid.
 		var paramWatch = $scope.$watch('planning.parameters', function() {
-			$scope.numParameters = 0;
+			for (var symbolName in $scope.planning.parameters) {
+				var parameter = $scope.planning.parameters[symbolName];
 
-			for (var key in $scope.planning.parameters) {
-				if ($scope.planning.parameters[key].elementId) {
-					var element = $scope.filters[$scope.planning.parameters[key].elementId],
-						filter  = $scope.planning.parameters[key].filter;
-					
-					$scope.numParameters = Math.max($scope.numParameters, element.partitions.length);
+				// Having a null elementId might always mean that filter is undefined...
+				if (!parameter.elementId)
+					parameter.filter = {};
 
-					for (var filterKey in filter) {
-						var partitionId = filterKey.substring('partition'.length);
+				else {
+					var partitions = $scope.elementsById[parameter.elementId].partitions,
+						numPartitions = partitions.length;
 
-						if (partitionId >= element.partitions.length)
-							delete filter[filterKey];
-						else {
-							filter[filterKey] = filter[filterKey].filter(function(partitionElement) {
-								return element.partitions[partitionId].find(function(p) { return p.id == partitionElement; });
-							});
-						}
-					}
+					// Remove partitions in the filter that are not from this element
+					for (var partitionId in parameter.filter)
+						if (!partitions.find(function(e) { return e.id == partitionId; }))
+							delete parameter.filter[partitionId];
+
+					// Add missing partitions
+					for (var i = 0; i < numPartitions; ++i)
+						if (!parameter.filter[partitions[i].id])
+							parameter.filter[partitions[i].id] = partitions[i].elements.pluck('id')
 				}
 			}
 		}, true);
@@ -218,10 +213,17 @@ angular.module('monitool.controllers.project.indicators', [])
 			formulaWatch();
 			paramWatch();
 
-			for (var key in $scope.planning.parameters)
-				for (var filterKey in $scope.planning.parameters[key].filter)
-					if ($scope.planning.parameters[key].filter[filterKey].length == 0)
-						delete $scope.planning.parameters[key].filter[filterKey];
+			for (var symbolName in $scope.planning.parameters) {
+				var parameter = $scope.planning.parameters[symbolName],
+					partitions = $scope.elementsById[parameter.elementId].partitions,
+					numPartitions = partitions.length;
+
+				for (var i = 0; i < numPartitions; ++i)
+					// Remove filters that include all elements to make the project's JSON smaller
+					// They will be restored when editing.
+					if (parameter.filter[partitions[i].id].length == partitions[i].elements.length)
+						delete parameter.filter[partitions[i].id];
+			}
 
 			$modalInstance.close($scope.planning);
 		};

@@ -87,9 +87,9 @@
 	<table class="table table-bordered table-condensed table-aggregated-data" acl-has-project-role="owner">
 		<thead>
 			<tr>
-				<th translate="project.variable" style="width: 15%"></th>
+				<th translate="project.variable" style="width: 20%"></th>
 				<th translate="project.aggregation" style="width: 15%"></th>
-				<th translate="project.partitions" colspan="{{maxPartitions + 1}}" style="width: 60%"></th>
+				<th translate="project.partitions" style="width: 55%"></th>
 				<th colspan="2" translate="project.actions" style="width: 10%"></th>
 			</tr>
 		</thead>
@@ -98,11 +98,13 @@
 			<tr ng-repeat="element in form.elements track by element.id">
 
 				<!-- variable name -->
-				<td mt-content-editable ng-model="element.name" required></td>
+				<td>
+					<textarea full-height type="text" ng-model="element.name" required class="form-control"></textarea>
+				</td>
 				
 				<!-- variable aggregation -->
 				<td>
-					{{'project.different_geos'|translate}}:
+					{{'project.different_geos'|translate}}:<br/>
 					<select ng-model="element.geoAgg">
 						<option value="none" translate="project.none"></option>
 						<option value="sum" translate="project.sum"></option>
@@ -110,11 +112,9 @@
 						<option value="highest" translate="project.highest"></option>
 						<option value="lowest" translate="project.lowest"></option>
 						<option value="last" translate="project.last"></option>
-					</select>
-					
-					<br/>
+					</select><br/>
 
-					{{'project.same_geos'|translate}}:
+					{{'project.same_geos'|translate}}:<br/>
 					<select ng-model="element.timeAgg">
 						<option value="none" translate="project.none"></option>
 						<option value="sum" translate="project.sum"></option>
@@ -126,25 +126,25 @@
 				</td>
 
 				<!-- variable partitions -->
-				<td ng-repeat="partition in element.partitions">
-					<partition ng-model="partition"></partition>
+				<td style="position: relative; padding-bottom: 23px; ">
+					<span translate="project.no_partitions" ng-if="element.partitions.length == 0"></span>
 
-					<a class="btn btn-xs btn-danger btn-block"
-					   ng-click="remPartition(partition, element.partitions)"
-					   translate="project.remove_partition"></a>
-   				</td>
+					<ul>
+						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
+							<a class="btn btn-xxs btn-default pull-right" ng-click="moreOptions(element, partition)" tooltip="Modifier">
+								<i class="fa fa-fw fa-pencil"></i>
+								<span translate="shared.edit"></span>
+							</a>
 
-				<td>
-					<a ng-click="newPartition(element.partitions)"
-					   class="btn btn-xs btn-default btn-block"
-					   translate="project.add_partition"></a>
+							<strong>{{partition.name}}</strong>: {{partition.elements|pluck:'name'|join:' / '}}
+						</li>
+					</ul>
+
+					<a ng-click="moreOptions(element)" class="btn btn-xxs btn-default" style="position: absolute; bottom: 4px; right: 3px">
+						<i class="fa fa-plus"></i>
+						<span translate="project.add_partition"></span>
+					</a>
 				</td>
-				<td colspan="{{maxPartitions - element.partitions.length}}"
-					ng-if="maxPartitions - element.partitions.length > 0"></td>
-
-				<!-- /!\  -->
-				<!-- we should check the $parent magic, or use ng-init -->
-				<!-- /!\  -->
 
 				<!-- variable actions -->
 				<td>
@@ -170,7 +170,10 @@
  			<!-- add new variable row --> 
 			<tr>
 				<td colspan="{{maxPartitions + 4}}" style="text-align: center">
-					<a ng-click="newVariable()" class="btn btn-xs btn-default" style="width: 100%" translate="project.add_variable"></a>
+					<a ng-click="newVariable()" class="btn btn-xs btn-default">
+						<i class="fa fa-plus"></i>
+						<span translate="project.add_variable"></span>
+					</a>
 				</td>
 			</tr>
 		</tbody>
@@ -182,7 +185,7 @@
 			<tr>
 				<th translate="project.variable" style="width: 15%"></th>
 				<th translate="project.aggregation" style="width: 15%"></th>
-				<th translate="project.partitions" colspan="{{maxPartitions}}" style="width: 70%" ng-if="maxPartitions != 0"></th>
+				<th translate="project.partitions" style="width: 70%" ng-if="maxPartitions != 0"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -196,14 +199,14 @@
 					<span>{{'project.' + element.timeAgg | translate}}</span>
 				</td>
 
-				<!-- variable partitions -->
-				<td ng-repeat="partition in element.partitions">
+				<td>
+					<span translate="project.no_partitions" ng-if="element.partitions.length == 0"></span>
 					<ul>
-						<li ng-repeat="p in partition track by p.id">{{p.name}}</li>
+						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
+							<strong>{{partition.name}}</strong>: {{partition.elements|pluck:'name'|join:' / '}}
+						</li>
 					</ul>
 				</td>
-				<td colspan="{{maxPartitions - element.partitions.length}}"
-					ng-if="maxPartitions - element.partitions.length > 0"></td>
  			</tr>
 		</tbody>
 	</table>

@@ -240,47 +240,56 @@ angular
 				form.elements.forEach(function(element) {
 					var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
 					row.id = element.id;
-					row.partitions = element.partitions.map(function(p, index) {
-						return {
-							index: index,
-							name: p.map(function(p) { return p.name.substring(0, 1).toLocaleUpperCase(); }).join('/'),
-							fullname: p.pluck('name').join(' / ')
-						}
-					});
+					row.partitions = element.partitions;
+					row.isGroup = false;
 					rows.push(row);
 					
 					if (splits[row.id] !== undefined) {
-						var partitionIndex = splits[row.id];
-						element.partitions[partitionIndex].forEach(function(part) {
-							// add filter
-							viewFilters['partition' + partitionIndex] = [part.id];
+						var partition = element.partitions.find(function(p) { return p.id == splits[row.id]; });
 
-							var childRow = this._makeActivityRow(cubes, 2, groupBy, viewFilters, columns, element);
-							childRow.id = row.id + '.' + partitionIndex + '/' + part.id;
-							childRow.name = part.name;
-							childRow.partitions = row.partitions.slice();
-							childRow.partitions.splice(partitionIndex, 1); // remove the already chosen partition
-							rows.push(childRow)
+						[partition.groups, partition.elements].forEach(function(elements) {
+							elements.forEach(function(partitionElement) {
+								var partitionId = partition.id + (partitionElement.members !== undefined ? '_g' : '');
 
-							if (splits[childRow.id] !== undefined) {
-								var childPartitionIndex = splits[childRow.id];
+								// add filter
+								viewFilters[partitionId] = [partitionElement.id];
 
-								element.partitions[childPartitionIndex].forEach(function(subPart) {
-									// add filter
-									viewFilters['partition' + childPartitionIndex] = [subPart.id];
+								var childRow = this._makeActivityRow(cubes, 2, groupBy, viewFilters, columns, element);
+								childRow.id = row.id + '.' + partitionId + '/' + partitionElement.id;
+								childRow.name = partitionElement.name;
+								childRow.partitions = row.partitions.slice();
+								childRow.isGroup = !!partitionElement.members;
 
-									var subChildRow = this._makeActivityRow(cubes, 3, groupBy, viewFilters, columns, element);
-									subChildRow.id = childRow.id + '.' + childPartitionIndex + '/' + subPart.id;
-									subChildRow.name = subPart.name;
-									rows.push(subChildRow);
+								// remove the partition that is already chosen on upper level.
+								childRow.partitions.splice(childRow.partitions.indexOf(partition), 1);
 
-									// remove filter
-									delete viewFilters['partition' + childPartitionIndex];
-								}, this);
-							}
+								rows.push(childRow)
 
-							// remove filter
-							delete viewFilters['partition' + partitionIndex];
+								if (splits[childRow.id] !== undefined) {
+									var childPartition = element.partitions.find(function(p) { return p.id == splits[childRow.id]; });
+
+									[childPartition.groups, childPartition.elements].forEach(function(elements) {
+										elements.forEach(function(subPartitionElement) {
+											var childPartitionId = childPartition.id + (subPartitionElement.members !== undefined ? '_g' : '');
+
+											// add filter
+											viewFilters[childPartitionId] = [subPartitionElement.id];
+
+											var subChildRow = this._makeActivityRow(cubes, 3, groupBy, viewFilters, columns, element);
+											subChildRow.id = childRow.id + '.' + childPartitionId + '/' + subPartitionElement.id;
+											subChildRow.name = subPartitionElement.name;
+											subChildRow.isGroup = !!subPartitionElement.members;
+											rows.push(subChildRow);
+
+											// remove filter
+											delete viewFilters[childPartitionId];
+										}, this);
+									}, this);
+								}
+
+								// remove filter
+								delete viewFilters[partitionId];
+							}, this);
 						}, this);
 					}
 				}, this);

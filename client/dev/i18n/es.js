@@ -60,6 +60,7 @@ var SPANISH_LOCALE = {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		apply: "Aplicar los cambios",
 		clone: "Clonar",
 		user_guide: "Guía del usuario",
 		home: "Inicio",
@@ -123,13 +124,10 @@ var SPANISH_TRANSLATION = {
 
 	help: {
 		block: {
-			general: "General",
-			indicators: "Catálogo de indicadores",
-			project: "Proyecto"
+			project: "Proyecto",
+			indicators: "Catálogo de indicadores"
 		},
 		page: {
-			presentation_general: "Presentación",
-			data_path: "Etapas de los datos",
 			create: "Crear un nuevo proyecto",
 			structure: "Estructurar los datos de seguimiento",
 			input: "Hacer una entrada de datos",
@@ -150,7 +148,20 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		partition_general: "General",
+		partition_general_placeholder: "ej: Edad",
+		partition_elements: "Elementos",
+		partition_name: "Nombre",
+		partition_name_placeholder: "ex: Menor de 12 años",
+		no_partition_elements: "Pulse \"Añadir\" para añadir un elemento en la partición",
+
+		partition_groups: "Groupos",
+		partition_group_name: "Nombre",
+		partition_group_name_placeholder: "ej: Menores de edad",
+		no_partition_groups: "Pulse \"Añadir\" para añadir un grupo en la partición",
+
 		no_inputs: "Ninguna entrada de datos en espera",
+		no_partitions: "Ninguna partición esta definida en esta variable",
 
 		dimensions: {
 			day: "Días",
@@ -158,13 +169,6 @@ var SPANISH_TRANSLATION = {
 			month: "Meses",
 			quarter: "Trimestres",
 			year: "Años",
-			partition0: "Partición 0",
-			partition1: "Partición 1",
-			partition2: "Partición 2",
-			partition3: "Partición 3",
-			partition4: "Partición 4",
-			partition5: "Partición 5",
-			partition6: "Partición 6",
 			entity: "Lugar de colecta",
 			group: "Grupo de colecta"
 		},

@@ -60,6 +60,7 @@ var ENGLISH_LOCALE = {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		apply: "Apply changes",
 		clone: "Clone",
 		user_guide: "User guide",
 		home: "Home",
@@ -123,13 +124,10 @@ var ENGLISH_TRANSLATION = {
 
 	help: {
 		block: {
-			general: "Overall",
-			indicators: "Indicators catalog",
-			project: "Project"
+			project: "Project",
+			indicators: "Indicators catalog"
 		},
 		page: {
-			presentation_general: "Presentation",
-			data_path: "Data path",
 			create: "Create a new project",
 			structure: "Give structure to activity data",
 			input: "Make a data input",
@@ -150,7 +148,20 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		partition_general: "General",
+		partition_general_placeholder: "ex: Age",
+		partition_elements: "Elements",
+		partition_name: "Name",
+		partition_name_placeholder: "ex: Less than 12 years old",
+		no_partition_elements: "Click \"Add\" to add a new element to the partition",
+
+		partition_groups: "Groups",
+		partition_group_name: "Name",
+		partition_group_name_placeholder: "ex: Minors",
+		no_partition_groups: "Click \"Add\" to add a new group to the partition",
+
 		no_inputs: "You are all done. There are no expected outputs",
+		no_partitions: "No partitions are defined on this variable",
 
 		dimensions: {
 			day: "Days",
@@ -158,13 +169,6 @@ var ENGLISH_TRANSLATION = {
 			month: "Months",
 			quarter: "Quarters",
 			year: "Years",
-			partition0: "Partition 0",
-			partition1: "Partition 1",
-			partition2: "Partition 2",
-			partition3: "Partition 3",
-			partition4: "Partition 4",
-			partition5: "Partition 5",
-			partition6: "Partition 6",
 			entity: "Collection site",
 			group: "Collection group"
 		},

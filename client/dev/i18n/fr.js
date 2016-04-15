@@ -60,6 +60,7 @@ var FRENCH_LOCALE = {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		apply: "Appliquer les modifications",
 		clone: "Cloner",
 		user_guide: "Guide d'utilisation",
 		home: "Accueil",
@@ -123,13 +124,10 @@ var FRENCH_TRANSLATION = {
 
 	help: {
 		block: {
-			general: "Général",
-			indicators: "Catalogue d'indicateurs",
-			project: "Projet"
+			project: "Projet",
+			indicators: "Catalogue d'indicateurs"
 		},
 		page: {
-			presentation_general: "Présentation",
-			data_path: "Chemin des données",
 			create: "Créer un nouveau projet",
 			structure: "Structurer des données d'activité",
 			input: "Réaliser une saisie",
@@ -150,7 +148,20 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		partition_general: "Général",
+		partition_general_placeholder: "ex: Tranches d'âge",
+		partition_elements: "Éléments",
+		partition_name: "Nom",
+		partition_name_placeholder: "ex: Moins de 12 ans",
+		no_partition_elements: "Appuyez sur \"Ajouter\" pour ajouter un élément à la partition",
+
+		partition_groups: "Groupes",
+		partition_group_name: "Nom",
+		partition_group_name_placeholder: "ex: Mineurs",
+		no_partition_groups: "Appuyez sur \"Ajouter\" pour ajouter un groupe à la partition",
+
 		no_inputs: "Aucune saisie en attente",
+		no_partitions: "Aucune partition n'est définie sur cette variable",
 
 		dimensions: {
 			day: "Jours",
@@ -158,13 +169,6 @@ var FRENCH_TRANSLATION = {
 			month: "Mois",
 			quarter: "Trimestres",
 			year: "Années",
-			partition0: "Partition 0",
-			partition1: "Partition 1",
-			partition2: "Partition 2",
-			partition3: "Partition 3",
-			partition4: "Partition 4",
-			partition5: "Partition 5",
-			partition6: "Partition 6",
 			entity: "Lieux de collecte",
 			group: "Groupe de collecte"
 		},

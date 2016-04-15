@@ -12,7 +12,10 @@
 			<th colspan="{{grid.body[0].headerCols.length}}"
 				rowspan="{{grid.header.length}}"
 				ng-if="$first"></th>
-			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}">{{col.name}}</th>
+			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}">
+				<i class="fa fa-arrow-circle-right" ng-if="col.members"></i>
+				{{col.name}}
+			</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -20,6 +23,8 @@
 			<th ng-repeat="headerCol in row.headerCols"
 				ng-if="$parent.$index % rowspans[$index] == 0"
 				rowspan="{{rowspans[$index]}}">
+				
+				<i class="fa fa-arrow-circle-right" ng-if="headerCol.members"></i>
 				{{headerCol.name}}
 			</th>
 			

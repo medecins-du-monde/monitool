@@ -519,85 +519,66 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/help/menu.html',
 	});
 
-	$stateProvider.state('main.help.presentation_general', {
-		controller: 'HelpController',
-		url: "/presentation_general",
-		templateUrl: 'partials/help/00-presentation_general.html'
-	});
-
-	$stateProvider.state('main.help.data_path', {
-		controller: 'HelpController',
-		url: "/data_path",
-		templateUrl: 'partials/help/01-data_path.html'
-	});
-
-	if (window.user.type == 'user') {
+	if (window.user.type == 'user')
 		$stateProvider.state('main.help.create', {
 			controller: 'HelpController',
 			url: "/create",
-			templateUrl: 'partials/help/02-create.html'
+			templateUrl: 'partials/help/01-create.html'
 		});
-	}
 
 	$stateProvider.state('main.help.structure', {
 		controller: 'HelpController',
 		url: "/structure",
-		templateUrl: 'partials/help/03-structure.html'
+		templateUrl: 'partials/help/02-structure.html'
 	});
 
 	$stateProvider.state('main.help.input', {
 		controller: 'HelpController',
 		url: "/input",
-		templateUrl: 'partials/help/04-input.html'
+		templateUrl: 'partials/help/03-input.html'
 	});
 
 	$stateProvider.state('main.help.activity_followup', {
 		controller: 'HelpController',
 		url: "/activity-followup",
-		templateUrl: 'partials/help/05-activity-followup.html'
+		templateUrl: 'partials/help/04-activity-followup.html'
 	});
 
 	$stateProvider.state('main.help.logical_frame', {
 		controller: 'HelpController',
 		url: "/logical-frame",
-		templateUrl: 'partials/help/06-logical-frame.html'
+		templateUrl: 'partials/help/05-logical-frame.html'
 	});
 
 	$stateProvider.state('main.help.objectives_results', {
 		controller: 'HelpController',
 		url: "/objectives-results",
-		templateUrl: 'partials/help/07-objectives-results.html'
+		templateUrl: 'partials/help/06-objectives-results.html'
 	});
 
 	$stateProvider.state('main.help.change_definition', {
 		controller: 'HelpController',
 		url: "/change-definition",
-		templateUrl: 'partials/help/08-change-definition.html'
+		templateUrl: 'partials/help/07-change-definition.html'
 	});
 
 	if (window.user.type == 'user') {
 		$stateProvider.state('main.help.indicator_usage', {
 			controller: 'HelpController',
 			url: "/indicator-usage",
-			templateUrl: 'partials/help/09-indicator-usage.html'
+			templateUrl: 'partials/help/08-indicator-usage.html'
 		});
 
 		$stateProvider.state('main.help.create_new_indicator', {
 			controller: 'HelpController',
 			url: "/create-new-indicator",
-			templateUrl: 'partials/help/10-create-new-indicator.html'
-		});
-
-		$stateProvider.state('main.help.merge_indicators', {
-			controller: 'HelpController',
-			url: "/merge-indicators",
-			templateUrl: 'partials/help/11-merge-indicators.html'
+			templateUrl: 'partials/help/09-create-new-indicator.html'
 		});
 
 		$stateProvider.state('main.help.indicator_reporting', {
 			controller: 'HelpController',
 			url: "/indicator-reporting",
-			templateUrl: 'partials/help/12-indicator-reporting.html'
+			templateUrl: 'partials/help/10-indicator-reporting.html'
 		});
 	}
 });

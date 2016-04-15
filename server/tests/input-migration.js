@@ -7,34 +7,30 @@ var oldForm = {
 	id: "formId",
 	elements: [
 		{
-			id: "elementId",
-			name: "Number of consultations",
+			id: "element1",
 			partitions: [
-				[{id: 'male'}, {id: 'female'}],
-				[{id: 'under_10'}, {id: 'between_10_and_15'}, {id: 'over_15'}],
-				[{id: 'something'}, {id: 'something_else'}]
+				{
+					id: "gender",
+					elements: [{id: 'male'}, {id: 'female'}],
+					aggregate: 'sum'
+				},
+				{
+					id: "age",
+					elements: [{id: 'under_10'}, {id: 'between_10_and_15'}, {id: 'over_15'}],
+					aggregate: 'sum'
+				},
+				{
+					id: "somth",
+					elements: [{id: 'something'}, {id: 'something_else'}],
+					aggregate: 'average'
+				}
 			]
+		},
+		{
+			id: "element2",
+			partitions: []
 		}
 	]
-};
-
-var oldInput = {
-	values: {
-		elementId: [
-			0,	// male		under_10			something
-			1,	// male		under_10			something_else
-			2,	// male		between_10_and_15	something
-			3,	// male		between_10_and_15	something_else
-			4,	// male		over_15				something
-			5,	// male		over_15				something_else
-			6,	// female	under_10			something
-			7,	// female	under_10			something_else
-			8,	// female	between_10_and_15	something
-			9,	// female	between_10_and_15	something_else
-			10,	// female	over_15				something
-			11	// female	over_15				something_else
-		]
-	}
 };
 
 
@@ -95,105 +91,300 @@ describe('Input Migration', function() {
 		assert.throws(Project._getPartitionElementIds.bind(null, partitions, 12));
 	});
 
+});
+
+describe('Input correction', function() {
+
+	var oldInputs = [
+		{
+			values: {
+				element1: [
+					0,	// male		under_10			something
+					1,	// male		under_10			something_else
+					2,	// male		between_10_and_15	something
+					3,	// male		between_10_and_15	something_else
+					4,	// male		over_15				something
+					5,	// male		over_15				something_else
+					6,	// female	under_10			something
+					7,	// female	under_10			something_else
+					8,	// female	between_10_and_15	something
+					9,	// female	between_10_and_15	something_else
+					10,	// female	over_15				something
+					11	// female	over_15				something_else
+				],
+				element2: [99]
+			}
+		}
+	];
+
 	it('correctInput should do nothing if the form was not updated', function() {
-		var inputs = JSON.parse(JSON.stringify([oldInput]));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
 		Project._correctFormInputs(oldForm, oldForm, inputs);
 
-		assert.deepEqual(inputs[0].values.elementId, oldInput.values.elementId);
+		assert.deepEqual(inputs, oldInputs);
 	});
 
-	it('correctInput should work when removing an element', function() {
-		var inputs  = JSON.parse(JSON.stringify([oldInput])),
-			newForm = JSON.parse(JSON.stringify(oldForm));
+	it('Inverting two elements should not change anything', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
 
-		// Remove the age partition
+		var tmp = newForm.elements[0];
+		newForm.elements[0] = newForm.elements[1];
+		newForm.elements[1] = tmp;
+
+		Project._correctFormInputs(oldForm, newForm, inputs);
+
+		assert.deepEqual(oldInputs, inputs);
+	});
+
+
+	it('Adding elements should create the new elements in new inputs', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
+
+		newForm.elements.push({id: 'element3', partitions: []});
+		newForm.elements.push({id: 'element4', partitions: [{id: 'gender', elements: [{id: 'male'}, {id: 'female'}]}]});
+		
+		Project._correctFormInputs(oldForm, newForm, inputs);
+
+		assert.deepEqual(inputs, [{
+			values: {
+				element1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+				element2: [99],
+				element3: [0],
+				element4: [0, 0]
+			}
+		}]);
+	});
+
+	it('Removing an element should remove that element from inputs', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
+
 		newForm.elements.splice(0, 1);
-
-		// Rewrite the inputs.
+		
 		Project._correctFormInputs(oldForm, newForm, inputs);
 
-		// Check result
-		assert.deepEqual(inputs[0].values, {});
+		assert.deepEqual(inputs, [{
+			values: {
+				element2: [99]
+			}
+		}])
 	});
 
-	it('correctInput should work when removing a partition', function() {
-		var inputs  = JSON.parse(JSON.stringify([oldInput])),
-			newForm = JSON.parse(JSON.stringify(oldForm));
+	it('Adding a partition should reset the whole field to zeros', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
 
-		// Remove the age partition
-		newForm.elements[0].partitions.splice(1, 1);
+		newForm.elements[0].partitions.push({id: "location", elements: [{id: 'madrid'}, {id: 'paris'}]});
 
-		// Rewrite the inputs.
 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-		// Check result
-		assert.deepEqual(
-			inputs[0].values.elementId,
-			[
-				0 + 2 + 4,	// male		something
-				1 + 3 + 5,	// male		something_else
-				6 + 8 + 10,	// female	something
-				7 + 9 + 11	// female	something_else
-			]
-		);
+		
+		assert.deepEqual(inputs, [{
+			values: {
+				element1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+				element2: [99]
+			}
+		}])
 	});
 
-	it('correctInput should work when removing a partition element', function() {
-		var inputs  = JSON.parse(JSON.stringify([oldInput])),
-			newForm = JSON.parse(JSON.stringify(oldForm));
+	it('Removing a partition should aggregate the values (sum).', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
 
-		// Remove men
-		newForm.elements[0].partitions[0].splice(0, 1);
+		newForm.elements[0].partitions.splice(0, 1);
 
-		// Rewrite the inputs.
 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-		// Check result
-		assert.deepEqual(
-			inputs[0].values.elementId,
-			[
-				6,	// female	under_10			something
-				7,	// female	under_10			something_else
-				8,	// female	between_10_and_15	something
-				9,	// female	between_10_and_15	something_else
-				10,	// female	over_15				something
-				11	// female	over_15				something_else
-			]
-		);
+		
+		assert.deepEqual(inputs, [{
+			values: {
+				element1: [6, 8, 10, 12, 14, 16],
+				element2: [99]
+			}
+		}]);
 	});
 
-	it('correctInput should work when adding an element', function() {
-		var inputs  = JSON.parse(JSON.stringify([oldInput])),
-			newForm = JSON.parse(JSON.stringify(oldForm));
+	it('Removing a partition should aggregate the values (average).', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
 
-		// Remove the age partition
-		newForm.elements.push({id: "elementId2", partitions: []});
+		newForm.elements[0].partitions.splice(2, 1);
 
-		// Rewrite the inputs.
 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-		// Check result
-		assert.deepEqual(inputs[0].values.elementId2, [0]);
+		
+		assert.deepEqual(inputs, [{
+			values: {
+				element1: [0.5, 2.5, 4.5, 6.5, 8.5, 10.5],
+				element2: [99]
+			}
+		}]);
 	});
 
+	it('Reordering a partition should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
+		
+		var tmp = newForm.elements[0].partitions[0];
+		newForm.elements[0].partitions[0] = newForm.elements[0].partitions[1];
+		newForm.elements[0].partitions[1] = tmp;
 
-	it('correctInput should reset the inputs to zero if the form is not upgradable (add partition)', function() {
-		var inputs = JSON.parse(JSON.stringify([oldInput])),
-			newForm = JSON.parse(JSON.stringify(oldForm));
-
-		// Add a new partition
-		newForm.elements[0].partitions.push([{id: 'new'}, {id: 'partition'}]);
-
-		// Rewrite the inputs.
 		Project._correctFormInputs(oldForm, newForm, inputs);
 
-		// Check result
-		assert.deepEqual(
-			inputs[0].values.elementId,
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // 24 zeros
-		);
+		assert.deepEqual(inputs, [{
+			values: {
+				element1: [0, 1, 6, 7, 2, 3, 8, 9, 4, 5, 10, 11],
+				element2: [99]
+			}
+		}]);
+	});
+
+	it('Adding a partition element should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
+
+		newForm.elements[0].partitions[0].elements.push({id: 'transexual'});
+		
+		Project._correctFormInputs(oldForm, newForm, inputs);
+
+		assert.deepEqual(inputs, [{
+			values: {
+				element1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0, 0, 0, 0, 0],
+				element2: [99]
+			}
+		}]);
+	});
+
+	it('Removing a partition element should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
+
+		newForm.elements[0].partitions[0].elements.splice(0, 1);
+		
+		Project._correctFormInputs(oldForm, newForm, inputs);
+
+		assert.deepEqual(inputs, [{
+			values: {
+				element1: [6, 7, 8, 9, 10, 11],
+				element2: [99]
+			}
+		}]);
+	});
+
+	it('Reordering a partition element should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		var inputs = JSON.parse(JSON.stringify(oldInputs));
+
+		var tmp = newForm.elements[0].partitions[0].elements[0];
+		newForm.elements[0].partitions[0].elements[0] = newForm.elements[0].partitions[0].elements[1];
+		newForm.elements[0].partitions[0].elements[1] = tmp;
+
+		Project._correctFormInputs(oldForm, newForm, inputs);
+
+		assert.deepEqual(inputs, [{
+			values: {
+				element1: [6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5],
+				element2: [99]
+			}
+		}]);
+	});
+});
+
+
+describe('Form comparison', function() {
+
+	var extractInfo = Project._extractRelevantInformation;
+
+	var oldForm = {
+		id: "formId",
+		elements: [
+			{
+				id: "element1",
+				partitions: [
+					{ id: "gender", elements: [{id: 'male'}, {id: 'female'}], groups: [] },
+					{ id: "age", elements: [{id: 'under_10'}, {id: 'between_10_and_15'}, {id: 'over_15'}], groups: [] },
+					{ id: "somth", elements: [{id: 'something'}, {id: 'something_else'}], groups: [] }
+				]
+			},
+			{
+				id: 'element2',
+				partitions: [
+					{ id: "gender", elements: [{id: 'male'}, {id: 'female'}], groups: [] }
+				]
+			}
+		]
+	};
+
+	it('Inverting two elements should not change anything', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		
+		var tmp = newForm.elements[0];
+		newForm.elements[0] = newForm.elements[1];
+		newForm.elements[1] = tmp;
+
+		assert.equal(extractInfo(oldForm), extractInfo(newForm));
+	});
+
+	it('Adding an element should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		newForm.elements.push({id: 'element3', partitions: []});
+		
+		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
+	});
+
+	it('Removing an element should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		newForm.elements.splice(0, 1);
+		
+		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
+	});
+
+	it('Adding a partition should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		newForm.elements[0].partitions.push({id: "location", elements: [{id: 'madrid'}, {id: 'paris'}]});
+		
+		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
+	});
+
+	it('Removing a partition should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		newForm.elements[0].partitions.splice(0, 1);
+		
+		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
+	});
+
+	it('Reordering a partition should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		
+		var tmp = newForm.elements[0].partitions[0];
+		newForm.elements[0].partitions[0] = newForm.elements[0].partitions[1];
+		newForm.elements[0].partitions[1] = tmp;
+
+		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
+	});
+
+	it('Adding a partition element should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		newForm.elements[0].partitions[0].elements.push({id: 'transexual'});
+		
+		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
+	});
+
+	it('Removing a partition element should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		newForm.elements[0].partitions[0].elements.splice(0, 1);
+		
+		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
+	});
+
+	it('Reordering a partition element should change the result', function() {
+		var newForm = JSON.parse(JSON.stringify(oldForm));
+		
+		var tmp = newForm.elements[0].partitions[0].elements[0];
+		newForm.elements[0].partitions[0].elements[0] = newForm.elements[0].partitions[0].elements[1];
+		newForm.elements[0].partitions[0].elements[1] = tmp;
+
+		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
 	});
 
 });
-
 

@@ -103,15 +103,9 @@
 			</div>
 
 			<div class="form-group" ng-repeat="dimension in dimensions">
-				<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{('project.dimensions.' + dimension.id)|translate}}</label>
+				<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{dimension.name}}</label>
 				<div class="col-sm-11">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
-						<ui-select id="{{dimension.id}}-input" multiple ng-model="query.filters[dimension.id]" name="{{dimension}}" theme="bootstrap">
-							<ui-select-match placeholder="{{'project.select_filters'|translate}}">{{$item.name}}</ui-select-match>
-							<ui-select-choices repeat="filter.id as filter in dimension.items">{{filter.name}}</ui-select-choices>
-						</ui-select>
-					</div>
+					<partition-filter ng-model="query.filters[dimension.id]" partition="dimension"></partition-filter>
 				</div>
 			</div>
 

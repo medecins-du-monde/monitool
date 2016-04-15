@@ -32,8 +32,8 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-table fa-fw"></i></span>
 						<ui-select id="rows-input" multiple ng-model="query.rowDimensions" name="rows" theme="bootstrap">
-							<ui-select-match placeholder="{{'project.select_rows'|translate}}">{{('project.dimensions.' + $item.id)|translate}}</ui-select-match>
-							<ui-select-choices group-by="'group'" repeat="row.id as row in availableRows">{{('project.dimensions.' + row.id)|translate}}</ui-select-choices>
+							<ui-select-match placeholder="{{'project.select_rows'|translate}}">{{$item.name|translate}}</ui-select-match>
+							<ui-select-choices group-by="'group'" repeat="row.id as row in availableRows">{{row.name|translate}}</ui-select-choices>
 						</ui-select>
 					</div>
 				</div>
@@ -45,8 +45,8 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-columns fa-fw"></i></span>
 						<ui-select id="cols-input" multiple ng-model="query.colDimensions" name="cols" theme="bootstrap">
-							<ui-select-match placeholder="{{'project.select_cols'|translate}}">{{('project.dimensions.' + $item.id)|translate}}</ui-select-match>
-							<ui-select-choices group-by="'group'" repeat="col.id as col in availableCols">{{('project.dimensions.' + col.id)|translate}}</ui-select-choices>
+							<ui-select-match placeholder="{{'project.select_cols'|translate}}">{{$item.name|translate}}</ui-select-match>
+							<ui-select-choices group-by="'group'" repeat="col.id as col in availableCols">{{col.name|translate}}</ui-select-choices>
 						</ui-select>
 					</div>
 				</div>
@@ -76,7 +76,7 @@
 									   name="start"
 									   ng-model="query.filters._start"
 									   is-open="startDateOpen"
-									   ng-click = "startDateOpen = true"
+									   ng-click="startDateOpen=true"
 									   required
 									   ng-max="query.filters._end"
 									   class="form-control input-sm" />
@@ -95,7 +95,7 @@
 									   name="end"
 									   ng-model="query.filters._end"
 									   is-open="endDateOpen"
-									   ng-click = "endDateOpen = true"
+									   ng-click="endDateOpen=true"
 									   ng-min="query.filters._start"
 									   class="form-control input-sm"
 									   required />
@@ -106,16 +106,11 @@
 			</div>
 
 			<div class="form-group" ng-repeat="dimension in dimensions" ng-if="dimension.id != 'day' && dimension.id != 'week' && dimension.id != 'month' && dimension.id != 'quarter' && dimension.id != 'year'">
-				<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{('project.dimensions.' + dimension.id)|translate}}</label>
+				<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{dimension.name|translate}}</label>
 				<div class="col-sm-11">
-					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
-						<ui-select id="{{dimension.id}}-input" multiple ng-model="query.filters[dimension.id]" name="{{dimension}}" theme="bootstrap">
-							<ui-select-match placeholder="{{'project.select_filters'|translate}}">{{$item.name}}</ui-select-match>
-							<ui-select-choices repeat="filter.id as filter in dimension.items">{{filter.name}}</ui-select-choices>
-						</ui-select>
-					</div>
-				</div>
+					
+					<partition-filter ng-model="query.filters[dimension.id]" partition="dimension"></partition-filter>
+ 				</div>
 			</div>
 			
 		</form>

@@ -127,19 +127,21 @@
 			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{1 + cols.length}}">{{row.text}}</th>
 
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
-				
-				<label for="{{row.id}}">{{row.name}}</label>
-
-				<div class="button-group pull-right">
-					<button class="btn btn-default btn-xs"
-							ng-repeat="p in row.partitions"
-							ng-class="{active:splits[row.id]==p.index}"
-							ng-click="onSplitClick(row.id, p.index)"
-							tooltip="{{p.fullname}}">
-						<i class="fa" ng-class="{'fa-plus-circle': splits[row.id]!=p.index,'fa-minus-circle': splits[row.id]==p.index,}"></i>
-						{{p.index + 1}}
-					</button>
+				<div class="pull-right">
+					<div class="btn-toolbar">
+						<div class="btn-group btn-group-xs">
+							<button ng-repeat="p in row.partitions"
+									class="btn btn-default"
+									ng-class="{active:splits[row.id] == p.id}"
+									ng-click="onSplitClick(row.id, p.id)">
+								{{p.name}}
+							</button>
+						</div>
+					</div>
 				</div>
+
+				<i class="fa fa-arrow-circle-right" ng-if="row.isGroup"></i>
+				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
 
 			<td ng-repeat="col in row.cols track by $index" activity-reporting-field></td>

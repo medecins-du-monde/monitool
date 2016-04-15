@@ -67,43 +67,35 @@
 		<table class="table table-bordered table-condensed table-stripped">
 			<thead>
 				<tr>
-					<th translate="project.parameter"></th>
-					<th translate="project.variable"></th>
-					<th translate="project.filters" colspan="{{numParameters}}" ng-if="numParameters != 0"></th>
+					<th style="width: 15%" translate="project.parameter"></th>
+					<th style="width: 30%" translate="project.variable"></th>
+					<th style="width: 55%" translate="project.filters"></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="(key, parameter) in planning.parameters">
 					<!-- parameter key (this one we edit in the formula) -->
-					<td style="width: 15%">{{key}}</td>
+					<td>{{key}}</td>
 
 					<!-- elementId -->
-					<td ng-style="{width: 85 / (numParameters + 1) + '%'}">
+					<td>
 						<select required
 								class="form-control"
 								ng-model="parameter.elementId"
-								ng-options="v.id as v.name group by v.group for v in elements"></select>
+								ng-options="v.id as v.name group by v.group for v in selectElements"></select>
 					</td>
-
-					<!-- partition filters -->
-					<td ng-if="parameter.elementId"
-						ng-style="{width: 85 / (numParameters + 1) + '%'}"
-						ng-repeat="(index, partition) in filters[parameter.elementId].partitions">
-
-						<ui-select multiple ng-model="parameter.filter['partition' + index]" theme="bootstrap" required>
-							<ui-select-match placeholder="{{'project.all_selected'|translate}}">{{$item.name}}</ui-select-match>
-							<ui-select-choices repeat="p.id as p in partition">{{p.name}}</ui-select-choices>
-						</ui-select>
+					<td>
+						<div class="row" ng-repeat="partition in elementsById[parameter.elementId].partitions" style="margin-bottom: 3px">
+							<div class="col-sm-2">
+								<div style="margin: 4px">
+									<strong>{{partition.name}}</strong>
+								</div>
+							</div>
+							<div class="col-sm-10">
+								<partition-filter ng-model="parameter.filter[partition.id]" partition="partition"></partition-filter>
+							</div>
+						</div>
 					</td>
-	
-					<!-- filler -->
-					<td ng-if="parameter.elementId && numParameters != filters[parameter.elementId].partitions.length"
-						ng-style="{width: (numParameters - filters[parameter.elementId].partitions.length) * 85 / (numParameters + 1) + '%'}"
-						colspan="{{numParameters - filters[parameter.elementId].partitions.length}}"></td>
-					
-					<td ng-if="!parameter.elementId && numParameters != 0"
-						ng-style="{width: numParameters * 85 / (numParameters + 1) + '%'}"
-						colspan="{{numParameters}}"></td>
 				</tr>
 			</tbody>
 		</table>

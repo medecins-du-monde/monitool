@@ -13,29 +13,6 @@
 	<div class="col-md-2 noprint">
 
 		<div class="panel-group">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title" translate="help.block.general"></h4>
-				</div>
-
-				<div class="panel-collapse">
-					<div class="list-group">
-						<a ui-sref="main.help.presentation_general" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('presentation_general')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('presentation_general') && $state.is('main.help.presentation_general')"></i>
-							<i class="fa fa-eye fa-fw"></i>
-							<span translate="help.page.presentation_general"></span>
-						</a>
-
-						<a ui-sref="main.help.data_path" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('data_path')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('data_path') && $state.is('main.help.data_path')"></i>
-							<i class="fa fa-sitemap fa-fw"></i>
-							<span translate="help.page.data_path"></span>
-						</a>
-					</div>
-				</div>
-			</div>
 
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -95,7 +72,6 @@
 					</div>
 				</div>
 			</div>
-	
 
 			<div class="panel panel-default" ng-if="userCtx.type == 'user'">
 				<div class="panel-heading">
@@ -117,13 +93,6 @@
 							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('create_new_indicator') && $state.is('main.help.create_new_indicator')"></i>
 							<i class="fa fa-plus fa-fw"></i>
 							<span translate="help.page.create_new_indicator"></span>
-						</a>
-
-						<a ui-sref="main.help.merge_indicators" ui-sref-active="active" class="list-group-item">
-							<i class="fa fa-check pull-right" style="margin-top: 2px" ng-if="isDocRead('merge_indicators')"></i>
-							<i class="fa fa-circle-o-notch fa-spin pull-right" style="margin-top: 2px" ng-if="!isDocRead('merge_indicators') && $state.is('main.help.merge_indicators')"></i>
-							<i class="fa fa-code-fork fa-fw"></i>
-							<span translate="help.page.merge_indicators"></span>
 						</a>
 
 						<a ui-sref="main.help.indicator_reporting" ui-sref-active="active" class="list-group-item">

@@ -50,7 +50,8 @@
 					<th>{{('indicator.'+field)|translate}}</th>
 					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator[field][code]|nl2br">
 						<div class="input-group">
-	 						<textarea class="form-control"
+	 						<textarea auto-resize
+	 								  class="form-control"
 									  name="{{field + '.' + code}}"
 									  ng-required="field == 'name'"
 									  ng-model="indicator[field][code]"

@@ -71,14 +71,41 @@ var validate = validator({
 								partitions: {
 									type: "array",
 									items: {
-										type: "array",
-										items: {
-											type: "object",
-											additionalProperties: false,
-											required: ['id', 'name'],
-											properties: {
-												id: { $ref: "#/definitions/uuid" },
-												name: { type: "string", minLength: 1 }
+										type: "object",
+										additionalProperties: false,
+										required: ['id', 'name', 'aggregation', 'elements', 'groups'],
+										properties: {
+											id: { $ref: "#/definitions/uuid" },
+											name: { type: "string", minLength: 1 },
+											aggregation: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
+											elements: {
+												type: "array",
+												items: {
+													type: "object",
+													additionalProperties: false,
+													required: ['id', 'name'],
+													properties: {
+														id: { $ref: "#/definitions/uuid" },
+														name: { type: "string", minLength: 1 }
+													}
+												}
+											},
+
+											groups: {
+												type: "array",
+												items: {
+													type: "object",
+													additionalProperties: false,
+													required: ['id', 'name', 'members'],
+													properties: {
+														id: { $ref: "#/definitions/uuid" },
+														name: { type: "string", minLength: 1 },
+														members: {
+															type: "array",
+															items: { $ref: "#/definitions/uuid" }
+														}
+													}
+												}
 											}
 										}
 									}
@@ -267,15 +294,15 @@ function getFieldIndex(partitions, partitionElementIds) {
 	var fieldIndex = 0;
 	for (var i = 0; i < numPartitions; ++i) {
 		// array find.
-		for (var index = 0; index < partitions[i].length; ++index)
-			if (partitions[i][index].id == partitionElementIds[i])
+		for (var index = 0; index < partitions[i].elements.length; ++index)
+			if (partitions[i].elements[index].id == partitionElementIds[i])
 				break;
 
-		if (index == partitions[i].length)
+		if (index == partitions[i].elements.length)
 			throw new Error('Invalid partitionElementId');
 
 		// compute field index.
-		fieldIndex = fieldIndex * partitions[i].length + index;
+		fieldIndex = fieldIndex * partitions[i].elements.length + index;
 	}
 
 	return fieldIndex;
@@ -293,8 +320,8 @@ function getPartitionElementIds(partitions, fieldIndex) {
 		throw new Error('Invalid field index (negative)')
 
 	for (var i = numPartitions - 1; i >= 0; --i) {
-		partitionElementIds[i] = partitions[i][fieldIndex % partitions[i].length].id;
-		fieldIndex = Math.floor(fieldIndex / partitions[i].length);
+		partitionElementIds[i] = partitions[i].elements[fieldIndex % partitions[i].elements.length].id;
+		fieldIndex = Math.floor(fieldIndex / partitions[i].elements.length);
 	}
 
 	if (fieldIndex !== 0)
@@ -309,13 +336,14 @@ function correctFormInputs(oldForm, newForm, inputs) {
 	newForm.elements.forEach(function(newElement) {
 		// Retrieve old form element
 		var oldElement = oldForm.elements.filter(function(el) { return el.id == newElement.id});
+		oldElement = oldElement.length ? oldElement[0] : null;
 
 		// Compute new form element size.
 		var newSize = 1;
-		newElement.partitions.forEach(function(partition) { newSize *= partition.length });
+		newElement.partitions.forEach(function(partition) { newSize *= partition.elements.length });
 
 		// if the form element did not exist before, fill with zeros.
-		if (oldElement.length == 0) {
+		if (!oldElement) {
 			inputs.forEach(function(input) {
 				input.values[newElement.id] = new Array(newSize);
 				for (var fieldIndex = 0; fieldIndex < newSize; ++fieldIndex)
@@ -324,7 +352,6 @@ function correctFormInputs(oldForm, newForm, inputs) {
 		}
 		// if the form element existed before, we rebuild the new value from the former one, or fill with zeros.
 		else {
-			oldElement = oldElement[0];
 			inputs.forEach(function(input) {
 				var decodedValues = {};
 
@@ -373,17 +400,23 @@ function correctFormInputs(oldForm, newForm, inputs) {
 // If some partition name changes, we do not need to update inputs.
 // we use only array (no hashmaps) to be sure that the JSON reprs will be the same.
 function extractRelevantInformation(form) {
-	return form.elements.map(function(element) {
-		return [
-			element.id,
-			element.partitions.map(function(partition) {
-				return partition.map(function(partitionElement) {
-					return partitionElement.id;
-				});
-			})
-		];
-		// the order does not matter => we need to sort by id.
-	}).sort(function(el1, el2) { return el1[0].localeCompare(el2[0]); });
+	return JSON.stringify(
+		form.elements.map(function(element) {
+			return [
+				element.id,
+				// the order of partitions matters => to not sort!
+				element.partitions.map(function(partition) {
+					// the order of partition elements matters => to not sort!
+					return [partition.id].concat(
+						partition.elements.map(function(partitionElement) {
+							return partitionElement.id;
+						})
+					);
+				})
+			];
+			// the order of elements does not matters => sort by id to avoid rewriting all inputs for nothing.
+		}).sort(function(el1, el2) { return el1[0].localeCompare(el2[0]); })
+	);
 }
 
 function updateInputs(projectId, oldForm, newForm, callback) {
@@ -416,9 +449,7 @@ function correctProjectInputs(oldProject, newProject, callback) {
 			return;
 
 		// compare to old and new
-		if (JSON.stringify(extractRelevantInformation(oldForm)) !==
-			JSON.stringify(extractRelevantInformation(newForm))) {
-
+		if (extractRelevantInformation(oldForm) !== extractRelevantInformation(newForm)) {
 			// we need to fetch all inputs and update them.
 			tasks.push(updateInputs.bind(null, newProject._id, oldForm, newForm));
 		}

@@ -13,7 +13,7 @@ angular
 
 	})
 
-	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, formUsage, form) {
+	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $modal, formUsage, form) {
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.formUsage = formUsage;
@@ -47,13 +47,6 @@ angular
 			}
 		});
 
-		$scope.$watch('form.elements', function(elements) {
-			$scope.maxPartitions = 0;
-			elements.forEach(function(element) {
-				$scope.maxPartitions = Math.max(element.partitions.length, $scope.maxPartitions);
-			});
-		}, true);
-
 		$scope.$watch('form.collect', function(collect) {
 			if (collect === 'some_entity' && !$scope.form.entities)
 				$scope.form.entities = [];
@@ -61,16 +54,26 @@ angular
 				delete $scope.form.entities;
 		});
 
+		$scope.moreOptions = function(element, initialPartition) {
+			var promise = $modal.open({
+				controller: 'PartitionEditionModalController',
+				templateUrl: 'partials/projects/activity/partition-modal.html',
+				size: 'lg',
+				resolve: { initialPartition: function() { return initialPartition; } }
+			}).result;
+
+			promise.then(function(partition) {
+				if (initialPartition && !partition)
+					element.partitions.splice(element.partitions.indexOf(initialPartition), 1);
+				else if (initialPartition && partition)
+					element.partitions[element.partitions.indexOf(initialPartition)] = partition;
+				else if (!initialPartition && partition)
+					element.partitions.push(partition);
+			});
+		};
+
 		$scope.newVariable = function() {
 			$scope.form.elements.push({id: makeUUID(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
-		};
-
-		$scope.newPartition = function(target) {
-			target.push([{id: makeUUID(), name: ""}, {id: makeUUID(), name: ""}]);
-		};
-
-		$scope.remPartition = function(partition, target) {
-			target.splice(target.indexOf(partition), 1);
 		};
 
 		$scope.upElement = function(index) {
@@ -110,11 +113,68 @@ angular
 		};
 
 		$scope.isUnchanged = function() {
+			// console.log('main isUnchanged', $scope.master, $scope.form)
 			return angular.equals($scope.master, $scope.form);
 		};
 
 		$scope.reset = function() {
 			$scope.form = angular.copy($scope.master);
+		};
+	})
+
+	.controller('PartitionEditionModalController', function($scope, $modalInstance, initialPartition) {
+		if (!initialPartition)
+			initialPartition = {
+				id: makeUUID(),
+				name: "",
+				elements: [{id: makeUUID(), name: ""}, {id: makeUUID(), name: ""}],
+				groups: [],
+				aggregation: "sum"
+			}
+
+		$scope.master = initialPartition;
+		$scope.partition = angular.copy(initialPartition);
+		
+		$scope.isUnchanged = function() {
+			return angular.equals($scope.master, $scope.partition);
+		};
+
+		$scope.save = function() {
+			$modalInstance.close($scope.partition);
+		};
+
+		$scope.reset = function() {
+			$scope.partition = angular.copy($scope.master);
+		};
+
+		$scope.createGroup = function() {
+			$scope.partition.groups.push({id: makeUUID(), name: '', members: []});
+		};
+
+		$scope.createPartitionElement = function() {
+			$scope.partition.elements.push({id: makeUUID(), name: ''});
+		};
+
+		$scope.deletePartitionElement = function(partitionElementId) {
+			$scope.partition.elements = $scope.partition.elements.filter(function(element) {
+				return element.id !== partitionElementId;
+			});
+		};
+
+		$scope.deleteGroup = function(partitionGroupId) {
+			$scope.partition.groups = $scope.partition.groups.filter(function(group) {
+				return group.id !== partitionGroupId;
+			});
+		};
+
+		$scope.up = function(index, list) {
+			var element = array.splice(index, 1);
+			array.splice(index - 1, 0, element[0]);
+		};
+
+		$scope.down = function(index, list) {
+			var element = array.splice(index, 1);
+			array.splice(index + 1, 0, element[0]);
 		};
 	})
 
@@ -346,9 +406,9 @@ angular
 			$scope.groupBy = 'year';
 
 		$scope.splits = {};
-		$scope.onSplitClick = function(rowId, index) {
-			if ($scope.splits[rowId] !== index)
-				$scope.splits[rowId] = index;
+		$scope.onSplitClick = function(rowId, partitionId) {
+			if ($scope.splits[rowId] !== partitionId)
+				$scope.splits[rowId] = partitionId;
 			else
 				delete $scope.splits[rowId];
 		};
@@ -420,7 +480,7 @@ angular
 				filters = {_start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
 			
 			cube.dimensions.forEach(function(dimension) {
-				if (dimension.id.substring(0, 'partition'.length) === 'partition')
+				if (dimension.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/))
 					filters[dimension.id] = dimension.items.slice();
 			});
 
@@ -440,9 +500,7 @@ angular
 			// Create needed info to display controls on screen
 			////////////////////////////////////////
 
-			$scope.dimensions = element.partitions.map(function(partition, index) {
-				return {id: 'partition' + index, items: partition};
-			});
+			$scope.dimensions = element.partitions;
 		});
 
 		////////////////////////////////////////////////////
@@ -513,31 +571,38 @@ angular
 			else
 				filters = {_start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
 			
-			cube.dimensions.concat(cube.dimensionGroups).forEach(function(dimension) {
-				if (['day', 'week', 'month', 'quarter', 'year'].indexOf(dimension.id) === -1)
-					filters[dimension.id] = [];
+			// Init all filters as full
+			cube.dimensions.forEach(function(dimension) {
+				if (dimension.id !== 'day')
+					filters[dimension.id] = dimension.items;
 			});
 
 			// make default query.
-			$scope.query = { elementId: elementId, colDimensions: [], rowDimensions: [], filters: filters };
+			$scope.query = { elementId: elementId, colDimensions: [], rowDimensions: ['month'], filters: filters };
 
 			////////////////////////////////////////
 			// Create needed info to display controls on screen
 			////////////////////////////////////////
 
-			$scope.dimensions = cube.dimensions.concat(cube.dimensionGroups).map(function(dimension) {
-				if (dimension.id == 'day' || dimension.id == 'week' || dimension.id == 'month' || dimension.id == 'quarter' || dimension.id == 'year')
-					return {id: dimension.id, group: $filter('translate')('project.group.time'), items: dimension.items.map(function(item) { return {id: item, name: item}; })};
-				else if (dimension.id == 'entity')
-					return {id: 'entity', group: $filter('translate')('project.group.location'), items: $scope.project.entities};
-				else if (dimension.id == 'group')
-					return {id: 'group', group: $filter('translate')('project.group.location'), items: $scope.project.groups};
-				else
-					return {id: dimension.id, group: $filter('translate')('project.group.partition'), items: element.partitions[parseInt(dimension.id.substring('partition'.length))]};
-			}).sort(function(a, b) { 
-				var order = ['day', 'week', 'month', 'quarter', 'year', 'entity', 'group', 'partition0', 'partition1', 'partition2', 'partition3', 'partition4', 'partition5', 'partition6'];
-				return order.indexOf(a.id) - order.indexOf(b.id);
-			});
+			$scope.dimensions = [];
+
+			// Add entity dimension
+			if (cube._getDimension('entity'))
+				$scope.dimensions.push(
+					{id: "entity", name: 'project.dimensions.entity', elements: $scope.project.entities, groups: $scope.project.groups}
+				);
+
+			// Add partitions
+			$scope.dimensions = $scope.dimensions.concat(element.partitions);
+
+			// Add time dimensions
+			$scope.dimensions.push(
+				{id: "day",     name: 'project.dimensions.day',     elements: cube._getDimension('day').items.map(function(i) { return {id: i, name: i}; }),          groups: []},
+				{id: "week",    name: 'project.dimensions.week',    elements: cube._getDimensionGroup('week').items.map(function(i) { return {id: i, name: i}; }),    groups: []},
+				{id: "month",   name: 'project.dimensions.month',   elements: cube._getDimensionGroup('month').items.map(function(i) { return {id: i, name: i}; }),   groups: []},
+				{id: "quarter", name: 'project.dimensions.quarter', elements: cube._getDimensionGroup('quarter').items.map(function(i) { return {id: i, name: i}; }), groups: []},
+				{id: "year",    name: 'project.dimensions.year',    elements: cube._getDimensionGroup('year').items.map(function(i) { return {id: i, name: i}; }),    groups: []}
+			);
 		});
 
 		////////////////////////////////////////////////////
@@ -571,31 +636,27 @@ angular
 		////////////////////////////////////////////////////
 		
 		$scope.$watch('query', function(query) {
-			var cube = cubes[query.elementId];
 
 			////////////////////////////////////////
 			// Query cube & postprocess for display
 			////////////////////////////////////////
 
-			var filters = angular.copy($scope.query.filters);
-			for (var key in filters)
-				if (filters[key].length == 0)
-					delete filters[key];
-
-			var cubeFilters = mtReporting.createCubeFilter(cube, filters);
+			var cube = cubes[query.elementId],
+				cubeDimensions = $scope.query.colDimensions.concat($scope.query.rowDimensions),
+				cubeFilters = mtReporting.createCubeFilter(cube, $scope.query.filters);
 
 			var makeRowCol = function(selectedDimId) {
 				var dimension = $scope.dimensions.find(function(dim) { return dim.id == selectedDimId; });
-				return {items: dimension.items.filter(function(dimItem) {
-					return !cubeFilters[dimension.id] || cubeFilters[dimension.id].indexOf(dimItem.id) !== -1;
-				})};
+
+				var rowcolInfo = [];
+				Array.prototype.push.apply(rowcolInfo, dimension.groups);
+				Array.prototype.push.apply(rowcolInfo, dimension.elements);
+				rowcolInfo.push({id: '_total', name: "Total", members: true}); // members:true, so that group icon is displayed
+				return rowcolInfo;
 			};
 
 			$scope.display = {
-				data: cubes[query.elementId].query(
-					$scope.query.colDimensions.concat($scope.query.rowDimensions),
-					cubeFilters
-				),
+				data: cube.flatQuery(cubeDimensions, cubeFilters),
 				cols: query.colDimensions.map(makeRowCol),
 				rows: query.rowDimensions.map(makeRowCol)
 			};
