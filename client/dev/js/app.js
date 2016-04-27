@@ -31,7 +31,6 @@ var app = angular.module('monitool.app', [
 	'ngCookies',
 	'ngResource',
 	'pascalprecht.translate',
-	// 'textAngular',
 	'ui.bootstrap',
 	'ui.bootstrap.showErrors',
 	'ui.router',
@@ -424,31 +423,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			}
 		}
 	});
-
-	// $stateProvider.state('main.project.reporting_analysis_list', {
-	// 	url: '/reporting-analysis-list',
-	// 	templateUrl: 'partials/projects/indicators/analysis-list.html',
-	// 	controller: 'ProjectReportingAnalysisListController',
-	// 	resolve: {
-	// 		reports: function(mtFetch, $stateParams) {
-	// 			return mtFetch.reports({mode: "dates_only", projectId: $stateParams.projectId});
-	// 		}
-	// 	}
-	// });
-
-	// $stateProvider.state('main.project.reporting_analysis', {
-	// 	url: '/reporting-analysis/:reportId',
-	// 	templateUrl: 'partials/projects/indicators/analysis.html',
-	// 	controller: 'ProjectReportingAnalysisController',
-	// 	resolve: {
-	// 		report: function(mtFetch, $stateParams) {
-	// 			var report = mtFetch.report($stateParams.reportId);
-	// 			if ($stateParams.reportId === 'new')
-	// 				report.project = $stateParams.projectId;
-	// 			return report;
-	// 		}
-	// 	}
-	// });
 
 	///////////////////////////
 	// Indicators
