@@ -92,6 +92,8 @@
 	<body>
 		<div ui-view></div>
 
+		<div id="version">Version 2.3</div>
+
 		<div id="load-container">
 			<div id="load-content">
 				<img id="logo_img" src="/img/logo_color.svg">
@@ -174,8 +176,8 @@
 				if (authReq.status === 200) {
 					// Remove modal and change background color
 					document.body.style.backgroundColor = 'white';
-					var loader = document.getElementById('load-container');
-					loader.parentNode.removeChild(loader);
+					document.body.removeChild(document.getElementById('load-container'));
+					document.body.removeChild(document.getElementById('version'));
 
 					// Start angular application
 					window.user = JSON.parse(authReq.responseText);

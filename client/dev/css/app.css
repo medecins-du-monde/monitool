@@ -440,3 +440,9 @@ ul:hover>.onrollover {
         width: 80%;
         margin: auto;
       }
+
+#version {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
