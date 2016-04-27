@@ -11,7 +11,7 @@
  */
 angular
 	.module(
-		'monitool.services.olap',
+		'monitool.services.statistics.olap',
 		[]
 	)
 

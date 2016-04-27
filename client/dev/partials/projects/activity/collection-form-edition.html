@@ -8,7 +8,7 @@
 <doc-reminder pages="project.structure,project.change_definition"></doc-reminder>
 
 <div class="alert alert-danger noprint" ng-if="formUsage.length" acl-has-project-role="owner">
-	 <span ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}"></span>
+	 <span ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}|unsafe"></span>
 </div>
 
 <form class="form-horizontal" role="form" name="formForm" novalidate>

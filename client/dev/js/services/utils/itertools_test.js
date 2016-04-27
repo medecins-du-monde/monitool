@@ -3,7 +3,7 @@ describe('itertools', function() {
 
 	// Load service before each test.
 	var itertools;
-	beforeEach(module("monitool.services.itertools"));
+	beforeEach(module("monitool.services.utils.itertools"));
 	beforeEach(inject(function(_itertools_) {
 		itertools = _itertools_;
 	}));

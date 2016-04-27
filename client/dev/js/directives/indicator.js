@@ -4,11 +4,11 @@ angular
 	.module(
 		'monitool.directives.indicatorForm',
 		[
-			'monitool.services.translate',
+			'monitool.services.statistics.parser'
 		]
 	)
 	
-	.directive('expression', function() {
+	.directive('expression', function(Parser) {
 		return {
 			restrict: 'A',
 			require: '?ngModel',

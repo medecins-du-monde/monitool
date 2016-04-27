@@ -13,7 +13,6 @@ var app = angular.module('monitool.app', [
 	'monitool.directives.acl',
 	'monitool.directives.form',
 	'monitool.directives.shared',
-	
 	'monitool.directives.indicatorForm',
 	'monitool.directives.projectLogframe',
 	'monitool.directives.reporting',
@@ -21,12 +20,22 @@ var app = angular.module('monitool.app', [
 	'monitool.filters.shared',
 	'monitool.filters.indicator',
 
-	'monitool.services.fetch',
-	'monitool.services.itertools',
-	'monitool.services.reporting',
-	'monitool.services.string',
+	'monitool.services.models.indicator',
 	'monitool.services.models.input',
-	
+	'monitool.services.models.project',
+	'monitool.services.models.theme',
+	'monitool.services.models.type',
+	'monitool.services.models.user',
+
+	'monitool.services.statistics.olap',
+	'monitool.services.statistics.parser',
+	'monitool.services.statistics.reporting',
+
+	'monitool.services.utils.itertools',
+	'monitool.services.utils.string',
+	'monitool.services.utils.translate',
+	'monitool.services.utils.uuid',
+
 	'angularMoment',
 	'ngCookies',
 	'ngResource',
@@ -180,8 +189,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			url: '/admin/users',
 			templateUrl: 'partials/admin/users.html',
 			resolve: {
-				users: function(mtFetch) {
-					return mtFetch.users();
+				users: function(User) {
+					return User.query().$promise;
 				}
 			}
 		});
@@ -191,8 +200,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			templateUrl: 'partials/admin/theme-type-list.html',
 			controller: 'ThemeTypeListController',
 			resolve: {
-				entities: function(mtFetch) {
-					return mtFetch.themes({with_counts: 1});
+				entities: function(Theme) {
+					return Theme.query({with_counts: 1}).$promise;
 				}
 			},
 			data: {
@@ -205,8 +214,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			templateUrl: 'partials/admin/theme-type-list.html',
 			controller: 'ThemeTypeListController',
 			resolve: {
-				entities: function(mtFetch) {
-					return mtFetch.types({with_counts: 1});
+				entities: function(Type) {
+					return Type.query({with_counts: 1}).$promise;
 				}
 			},
 			data: {
@@ -222,23 +231,23 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.home', {
 		url: '/home',
 		templateUrl: 'partials/home.html',
-		controller: 'HomeController',
-		resolve: {
-		}
+		controller: 'HomeController'
 	});
 
-
-	if (window.user.type == 'user') {
+	if (window.user.type == 'user')
 		$stateProvider.state('main.projects', {
 			url: '/projects',
 			templateUrl: 'partials/projects/list.html',
 			controller: 'ProjectListController',
 			resolve: {
-				projects: function(mtFetch) { return mtFetch.projects({mode: 'list'}); },
-				themes: function(mtFetch) { return mtFetch.themes({}); }
+				projects: function(Project) {
+					return Project.query({mode: 'list'}).$promise;
+				},
+				themes: function(Theme) {
+					return Theme.query().$promise;
+				}
 			}
 		});
-	}
 
 	$stateProvider.state('main.project', {
 		abstract: true,
@@ -246,15 +255,19 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectMenuController',
 		templateUrl: 'partials/projects/menu.html',
 		resolve: {
-			project: function(mtFetch, $rootScope, $stateParams) {
-				if ($rootScope.userCtx.type == 'user')
-					return mtFetch.project($stateParams.projectId);
+			project: function(Project, $rootScope, $stateParams, $q) {
+				var projectId = $rootScope.userCtx.type === 'user' ? $stateParams.projectId : $rootScope.userCtx.projectId;
+
+				if (!projectId || projectId === 'new') {
+					var project = new Project();
+					project.reset();
+					return $q.resolve(project);
+				}
 				else
-					return mtFetch.project($rootScope.userCtx.projectId);
+					return Project.get({id: projectId}).$promise;
 			}
 		}
 	});
-
 
 	///////////////////////////
 	// Project Specification
@@ -265,8 +278,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/specification/basics.html',
 		controller: 'ProjectBasicsController',
 		resolve: {
-			themes: function(mtFetch) {
-				return mtFetch.themes();
+			themes: function(Theme) {
+				return Theme.query().$promise;
 			}
 		}
 	});
@@ -277,14 +290,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectCollectionSiteListController'
 	});
 
-
 	$stateProvider.state('main.project.user_list', {
 		url: '/users',
 		templateUrl: 'partials/projects/specification/user-list.html',
 		controller: 'ProjectUserListController',
 		resolve: {
-			users: function(mtFetch) {
-				return mtFetch.users();
+			users: function(User) {
+				return User.query().$promise;
 			}
 		}
 	});
@@ -304,10 +316,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/activity/collection-form-edition.html',
 		controller: 'ProjectCollectionFormEditionController',
 		resolve: {
-			form: function($stateParams, project) {
+			form: function($stateParams, project, uuid) {
 				if ($stateParams.formId === 'new')
 					return {
-						id: makeUUID(),
+						id: uuid.v4(),
 						name: '',
 						periodicity: 'month', 
 						collect: 'entity',
@@ -433,7 +445,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
 		resolve: {
-			hierarchy: function(mtFetch) { return mtFetch.themes({mode: 'tree'}); }
+			hierarchy: function(Theme) {
+				return Theme.query({mode: 'tree'}).$promise;
+			}
 		}
 	});
 
@@ -447,8 +461,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			url: '/indicator/:indicatorId',
 			template: '<div ui-view></div>',
 			resolve: {
-				indicator: function(mtFetch, $stateParams) {
-					return mtFetch.indicator($stateParams.indicatorId);
+				indicator: function(Indicator, $q, $stateParams) {
+					var indicatorId = $stateParams.indicatorId;
+
+					if (!indicatorId || indicatorId === 'new') {
+						var indicator = new Indicator();
+						indicator.reset();
+						return $q.resolve(indicator);
+					}
+					else
+						return Indicator.get({id: indicatorId}).$promise;
 				}
 			}
 		});
@@ -458,11 +480,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			templateUrl: 'partials/indicators/edit.html',
 			controller: 'IndicatorEditController',
 			resolve: {
-				types: function(mtFetch) {
-					return mtFetch.types();
+				types: function(Type) {
+					return Type.query().$promise;
 				},
-				themes: function(mtFetch) {
-					return mtFetch.themes();
+				themes: function(Theme) {
+					return Theme.query().$promise;
 				}
 			}
 		});
@@ -472,8 +494,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			templateUrl: 'partials/indicators/reporting.html',
 			controller: 'IndicatorReportingController',
 			resolve: {
-				projects: function($stateParams, mtFetch) {
-					return mtFetch.projects({mode: "indicator_reporting", indicatorId: $stateParams.indicatorId});
+				projects: function($stateParams, Project) {
+					return Project.query({mode: "indicator_reporting", indicatorId: $stateParams.indicatorId}).$promise;
 				},
 				inputs: function(Input, projects) {
 					return Input.fetchForProjects(projects);
@@ -558,7 +580,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 });
 
 
-app.run(function($rootScope, $state, mtFetch) {
+app.run(function($rootScope, $state) {
 	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
 		console.log(error)
 		console.log(error.stack)

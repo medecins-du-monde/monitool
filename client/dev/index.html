@@ -10,7 +10,6 @@
 		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap-css-only/css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="bower_components/c3/c3.min.css" />
 		<link rel="stylesheet" type="text/css" href="bower_components/fontawesome/css/font-awesome.min.css" />
-		<!-- <link rel='stylesheet' type="text/css" href='bower_components/textAngular/src/textAngular.css'> -->
 		<link rel="stylesheet" type="text/css" href="bower_components/handsontable/dist/handsontable.full.css" />
 
 		<link rel="stylesheet" type="text/css" href="css/app.css" />
@@ -53,11 +52,10 @@
 		<script type="text/javascript" src="bower_components/d3/d3.min.js"></script>
 		<script type="text/javascript" src="bower_components/c3/c3.min.js"></script>
 
-		<!-- <script type="text/javascript" src="bower_components/textAngular/dist/textAngular-rangy.min.js"></script> -->
-		<script type="text/javascript" src="bower_components/textAngular/dist/textAngular-sanitize.min.js"></script>
-		<!-- <script type="text/javascript" src="bower_components/textAngular/dist/textAngular.min.js"></script> -->
-
 		<script type="text/javascript" src="bower_components/handsontable/dist/handsontable.full.min.js"></script>
+
+		<script type="text/javascript" src="js/polyfills/array.js"></script>
+		<script type="text/javascript" src="js/polyfills/math.js"></script>
 
 		<script type="text/javascript" src="js/app.js"></script>
 		<script type="text/javascript" src="js/controllers/project-shared.js"></script>
@@ -68,26 +66,34 @@
 		<script type="text/javascript" src="js/controllers/indicator.js"></script>
 		<script type="text/javascript" src="js/controllers/admin.js"></script>
 		<script type="text/javascript" src="js/controllers/helper.js"></script>
+
 		<script type="text/javascript" src="js/directives/_shared.js"></script>
 		<script type="text/javascript" src="js/directives/indicator.js"></script>
-		
 		<script type="text/javascript" src="js/directives/reporting.js"></script>
 		<script type="text/javascript" src="js/directives/_forms.js"></script>
 		<script type="text/javascript" src="js/directives/_acls.js"></script>
 		<script type="text/javascript" src="js/directives/project-logframe.js"></script>
-		<script type="text/javascript" src="js/polyfills.js"></script>
 
 		<script type="text/javascript" src="js/ui-bootstrap-tpls.min.js"></script>
 
 		<script type="text/javascript" src="js/filters/indicator.js"></script>
 		<script type="text/javascript" src="js/filters/shared.js"></script>
-		<script type="text/javascript" src="js/services/translate.js"></script>
-		<script type="text/javascript" src="js/services/fetch.js"></script>
-		<script type="text/javascript" src="js/services/input.js"></script>
-		<script type="text/javascript" src="js/services/itertools.js"></script>
-		<script type="text/javascript" src="js/services/reporting.js"></script>
-		<script type="text/javascript" src="js/services/string.js"></script>
-		<script type="text/javascript" src="js/services/olap.js"></script>
+
+		<script type="text/javascript" src="js/services/models/indicator.js"></script>
+		<script type="text/javascript" src="js/services/models/input.js"></script>
+		<script type="text/javascript" src="js/services/models/project.js"></script>
+		<script type="text/javascript" src="js/services/models/theme.js"></script>
+		<script type="text/javascript" src="js/services/models/type.js"></script>
+		<script type="text/javascript" src="js/services/models/user.js"></script>
+
+		<script type="text/javascript" src="js/services/statistics/reporting.js"></script>
+		<script type="text/javascript" src="js/services/statistics/olap.js"></script>
+		<script type="text/javascript" src="js/services/statistics/parser.js"></script>
+
+		<script type="text/javascript" src="js/services/utils/itertools.js"></script>
+		<script type="text/javascript" src="js/services/utils/string.js"></script>
+		<script type="text/javascript" src="js/services/utils/translate.js"></script>
+		<script type="text/javascript" src="js/services/utils/uuid.js"></script>
 	</head>
 	<body>
 		<div ui-view></div>

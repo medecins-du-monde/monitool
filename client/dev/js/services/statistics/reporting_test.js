@@ -3,7 +3,7 @@ describe('mtReporting', function() {
 
 	// Load service before each test.
 	var mtReporting, Input;
-	beforeEach(module("monitool.services.reporting"));
+	beforeEach(module("monitool.services.statistics.reporting"));
 	beforeEach(module("monitool.services.models.input"));
 
 	beforeEach(inject(function(_mtReporting_, _Input_) {
@@ -72,11 +72,6 @@ describe('mtReporting', function() {
 			})
 		];
 	});
-
-
-
-
-
 
 });
 

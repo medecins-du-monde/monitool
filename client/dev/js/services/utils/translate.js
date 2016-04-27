@@ -1,7 +1,7 @@
 "use strict";
 
 angular
-	.module('monitool.services.translate', [])
+	.module('monitool.services.utils.translate', [])
 
 	.service('googleTranslation', function($http) {
 		var CONFIG = {

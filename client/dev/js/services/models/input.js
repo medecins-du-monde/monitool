@@ -2,15 +2,7 @@
 
 angular
 	
-	// Define module
-	.module(
-		'monitool.services.models.input',
-		[
-			'ngResource'
-		]
-	)
-
-	// Define Input factory
+	.module('monitool.services.models.input', ['ngResource'])
 	.factory('Input', function($resource, $q) {
 
 		var _getBegin = function(entity, form, project) {

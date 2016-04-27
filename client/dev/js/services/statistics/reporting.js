@@ -4,13 +4,15 @@ angular
 
 	// Define module
 	.module(
-		'monitool.services.reporting',
-		[]
+		'monitool.services.statistics.reporting',
+		[
+			'monitool.services.statistics.parser'
+		]
 	)
 
 	// TODO profiling this piece of code for perfs could not hurt.
 	// we will see how bad if performs on the wild.
-	.service('mtReporting', function($filter) {
+	.service('mtReporting', function($filter, uuid, Parser) {
 
 		this.getColumns = function(groupBy, start, end, location, project) {
 			var type;
@@ -115,10 +117,10 @@ angular
 					values.total = cube.query([], cubeFilters);
 
 				var cols = columns.map(function(col) { return values[col.id]; });
-				return {id: makeUUID(), name: element.name, cols: cols, type: 'data', indent: indent};
+				return {id: uuid.v4(), name: element.name, cols: cols, type: 'data', indent: indent};
 			}
 			catch (e) {
-				return {id: makeUUID(), name: element.name, type: 'data', indent: indent};
+				return {id: uuid.v4(), name: element.name, type: 'data', indent: indent};
 			}
 		};
 
@@ -136,7 +138,7 @@ angular
 				var indicatorValues = this._computeIndicator(cubes, indicator, groupBy, viewFilters);
 
 				return {
-					id: makeUUID(),
+					id: uuid.v4(),
 					name: indicator.display, unit: indicator.unit, colorize: indicator.colorize,
 					baseline: baseline, target: target, targetType: indicator.targetType,
 					cols: columns.map(function(col) { return indicatorValues[col.id]; }),
@@ -146,7 +148,7 @@ angular
 			}
 			catch (e) {
 				return {
-					id: makeUUID(),
+					id: uuid.v4(),
 					name: indicator.display, unit: indicator.unit, colorize: indicator.colorize,
 					baseline: baseline, target: target, targetType: indicator.targetType,
 					type: 'data',

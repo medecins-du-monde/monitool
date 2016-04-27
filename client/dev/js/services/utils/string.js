@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module('monitool.services.string', [])
+angular.module('monitool.services.utils.string', [])
 	.factory('mtRemoveDiacritics', function() {
 
 		// http://stackoverflow.com/questions/990904/javascript-remove-accents-diacritics-in-strings

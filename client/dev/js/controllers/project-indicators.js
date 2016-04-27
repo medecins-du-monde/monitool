@@ -1,6 +1,12 @@
 "use strict";
 
-angular.module('monitool.controllers.project.indicators', [])
+angular
+	.module(
+		'monitool.controllers.project.indicators',
+		[
+			'monitool.services.statistics.parser',
+		]
+	)
 
 	.controller('ProjectLogicalFrameController', function($scope, $q, $modal) {
 		$scope.logicalFrameIndex = $scope.project.logicalFrames.length ? 0 : null;
@@ -82,7 +88,7 @@ angular.module('monitool.controllers.project.indicators', [])
 				size: 'lg',
 				scope: $scope,
 				resolve: {
-					hierarchy: function(mtFetch) { return mtFetch.themes({mode: 'tree'}); }
+					hierarchy: function(Theme) { return Theme.query({mode: 'tree'}); }
 				}
 			}).result;
 
@@ -108,15 +114,7 @@ angular.module('monitool.controllers.project.indicators', [])
 	.controller('ProjectIndicatorSelectionModalController', function($scope, $modalInstance, hierarchy) {
 		// Compute indicators that we have in at least one logical frame.
 		var projectIndicators = {};
-		$scope.project.logicalFrames.forEach(function(logicalFrame) {
-			logicalFrame.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
-			logicalFrame.purposes.forEach(function(purpose) {
-				purpose.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
-				purpose.outputs.forEach(function(output) {
-					output.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
-				});
-			});
-		});
+		$scope.project.getLinkedIndicatorIds().forEach(function(indicatorId) { projectIndicators[indicatorId] = true; });
 
 		// Compute indicators that are missing.
 		$scope.missingIndicators = {};
@@ -138,7 +136,7 @@ angular.module('monitool.controllers.project.indicators', [])
 		$scope.cancel = function() { $modalInstance.dismiss() };
 	})
 
-	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, mtFetch, planning) {
+	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, Parser, planning) {
 		// Build possible variables and filters.
 		$scope.selectElements = []
 		$scope.elementsById = {};

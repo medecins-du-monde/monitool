@@ -1,6 +1,12 @@
 "use strict";
 
-angular.module('monitool.controllers.admin', [])
+angular
+	.module(
+		'monitool.controllers.admin',
+		[
+			
+		]
+	)
 
 	.controller('UsersController', function($scope, users) {
 		$scope.$watch('userCtx', function(userCtx) {
@@ -46,7 +52,7 @@ angular.module('monitool.controllers.admin', [])
 		};
 	})
 
-	.controller('ThemeTypeListController', function($scope, $state, mtFetch, googleTranslation, entities) {
+	.controller('ThemeTypeListController', function($scope, $state, Theme, Type, uuid, googleTranslation, entities) {
 		entities.sort(function(entity1, entity2) {
 			return entity1.name[$scope.language].localeCompare(entity2.name[$scope.language]);
 		});
@@ -60,9 +66,9 @@ angular.module('monitool.controllers.admin', [])
 		};
 
 		$scope.create = function() {
-			var newEntity = mtFetch[$scope.entityType]();
+			var newEntity = $scope.entityType == 'theme' ? Theme() : Type();
 			newEntity.__isNew = true; // this will be removed on save.
-			newEntity._id = makeUUID()
+			newEntity._id = uuid.v4();
 
 			$scope.entities.push(newEntity);
 			$scope.master.push(angular.copy(newEntity));

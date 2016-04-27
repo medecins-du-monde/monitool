@@ -4,8 +4,7 @@ angular
 	.module(
 		'monitool.controllers.project.activity',
 		[
-			"monitool.services.olap",
-			"ngSanitize"
+			"monitool.services.statistics.olap"
 		]
 	)
 
@@ -13,7 +12,7 @@ angular
 
 	})
 
-	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $modal, formUsage, form) {
+	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $modal, formUsage, form, uuid) {
 		$scope.master = angular.copy(form);
 		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
 		$scope.formUsage = formUsage;
@@ -73,7 +72,7 @@ angular
 		};
 
 		$scope.newVariable = function() {
-			$scope.form.elements.push({id: makeUUID(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
+			$scope.form.elements.push({id: uuid.v4(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
 		};
 
 		$scope.upElement = function(index) {
@@ -122,12 +121,12 @@ angular
 		};
 	})
 
-	.controller('PartitionEditionModalController', function($scope, $modalInstance, initialPartition) {
+	.controller('PartitionEditionModalController', function($scope, $modalInstance, initialPartition, uuid) {
 		if (!initialPartition)
 			initialPartition = {
-				id: makeUUID(),
+				id: uuid.v4(),
 				name: "",
-				elements: [{id: makeUUID(), name: ""}, {id: makeUUID(), name: ""}],
+				elements: [{id: uuid.v4(), name: ""}, {id: uuid.v4(), name: ""}],
 				groups: [],
 				aggregation: "sum"
 			}
@@ -148,11 +147,11 @@ angular
 		};
 
 		$scope.createGroup = function() {
-			$scope.partition.groups.push({id: makeUUID(), name: '', members: []});
+			$scope.partition.groups.push({id: uuid.v4(), name: '', members: []});
 		};
 
 		$scope.createPartitionElement = function() {
-			$scope.partition.elements.push({id: makeUUID(), name: ''});
+			$scope.partition.elements.push({id: uuid.v4(), name: ''});
 		};
 
 		$scope.deletePartitionElement = function(partitionElementId) {
@@ -195,17 +194,6 @@ angular
 			);
 		};
 
-		// Retrieve or fake the project user.
-		var projectUser = null;
-		if ($scope.userCtx.type == 'user') {
-			if ($scope.userCtx.roles.indexOf('_admin') !== -1)
-				projectUser = {role: 'owner'};
-			else
-				projectUser = project.users.find(function(u) { return u.id == $scope.userCtx._id; });
-		} 
-		else if ($scope.userCtx.type == 'partner')
-			projectUser = project.users.find(function(u) { return u.username == $scope.userCtx.username });
-
 		// Write hash with metadata on columns to know if we need to display them.
 		$scope.displayInfo = {};
 		project.forms.forEach(function(form) {
@@ -240,18 +228,7 @@ angular
 					throw new Error('Invalid form.collect');
 
 				// Check user permissions to know which columns can be modified.
-				if (!projectUser)
-					isAllowed = false;
-				else {
-					if (projectUser.role == 'owner' || projectUser.role == 'input_all')
-						isAllowed = true;
-					else if (projectUser.role == 'input')
-						isAllowed = projectUser.entities.indexOf(columnId) != -1;
-					else if (projectUser.role == 'read')
-						isAllowed = false;
-					else
-						throw new Error('invalid projectUser role.');
-				}
+				isAllowed = project.canEditInputsOnEntity(columnId);
 
 				//////////////////////
 				// Decide what to display
@@ -298,25 +275,7 @@ angular
 		$scope.inputEntity   = $scope.project.entities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
 
 		// Can user edit this input?
-		var projectUser = $scope.project.users.find(function(u) {
-			return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) || ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
-		});
-
-		if ($scope.userCtx.type == 'user' && $scope.userCtx.roles.indexOf('_admin') !== -1)
-			$scope.canEdit = true;
-		else if (!projectUser)
-			$scope.canEdit = false;
-		else {
-			var role = projectUser.role;
-			if (role == 'owner' || role == 'input_all')
-				$scope.canEdit = true;
-			else if (role == 'input')
-				$scope.canEdit = projectUser.entities.indexOf($scope.currentInput.entity) != -1;
-			else if (role == 'read')
-				$scope.canEdit = false;
-			else
-				throw new Error('invalid role');
-		}
+		$scope.canEdit = $scope.project.canEditInputsOnEntity($scope.currentInput.entity);
 
 		// Handle rotations.
 		$scope.rotations  = {};

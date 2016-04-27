@@ -8,57 +8,29 @@ angular.module('monitool.controllers.project.spec', [])
 
 	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input, project) {
 		$scope.createEntity = function() {
-			$scope.project.entities.push({id: makeUUID(), name: '', start: null, end: null});
+			$scope.project.createEntity();
 		};
 
 		$scope.deleteEntity = function(entityId) {
 			// Fetch this forms inputs.
 			Input.query({mode: "ids_by_entity", projectId: project._id, entityId: entityId}).$promise.then(function(inputIds) {
 				var question = $filter('translate')('project.delete_entity', {num_inputs: inputIds.length}),
-					answer = $filter('translate')('project.delete_entity_answer', {num_inputs: inputIds.length});
+					answer   = $filter('translate')('project.delete_entity_answer', {num_inputs: inputIds.length});
 
 				var really = inputIds.length == 0 || (inputIds.length && window.prompt(question) == answer);
 
 				// If there are none, just confirm that the user wants to do this for real.
-				if (really) {
-					$scope.project.entities = $scope.project.entities.filter(function(e) { return e.id !== entityId; });
-					
-					$scope.project.groups.forEach(function(group) {
-						var index = group.members.indexOf(entityId);
-						if (index !== -1)
-							group.members.splice(index, 1);
-					});
-
-					$scope.project.users.forEach(function(user) {
-						if (user.role == 'input' && user.entities) {
-							var index = user.entities.indexOf(entityId);
-							if (index !== -1) {
-								user.entities.splice(index, 1);
-								if (user.entities.length == 0)
-									user.role = 'read';
-							}
-						}
-					});
-
-					$scope.project.forms.forEach(function(form) {
-						if (form.collect == 'some_entity') {
-							var index = form.entities.indexOf(entityId);
-							if (index !== -1)
-								form.entities.splice(index, 1);
-						}
-					});
-				}
+				if (really)
+					$scope.project.removeEntity(entityId);
 			});
 		};
 
 		$scope.createGroup = function() {
-			$scope.project.groups.push({id: makeUUID(), name: '', members: []});
+			$scope.project.createGroup();
 		};
 
-		$scope.deleteGroup = function(inputEntityId) {
-			$scope.project.groups = $scope.project.groups.filter(function(entity) {
-				return entity.id !== inputEntityId;
-			});
+		$scope.deleteGroup = function(groupId) {
+			$scope.project.removeGroup(groupId);
 		};
 
 		$scope.up = function(index, array) {

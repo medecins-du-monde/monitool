@@ -4,6 +4,10 @@
 
 angular.module('monitool.filters.shared', [])
 
+	.filter('unsafe', function($sce) {
+		return $sce.trustAsHtml;
+	})
+
 	.filter('translate_list', function($filter) {
 		return function(items) {
 			return items.map(function(i) {
@@ -15,7 +19,7 @@ angular.module('monitool.filters.shared', [])
 	.filter('join', function() {
 		return function(list, token) {
 			return (list||[]).join(token);
-		}
+		};
 	})
 
 	.filter('pluck', function() {

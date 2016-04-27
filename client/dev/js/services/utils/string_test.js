@@ -3,7 +3,7 @@ describe('mtRemoveDiacritics', function() {
 
 	// Load service before each test.
 	var mtRemoveDiacritics;
-	beforeEach(module("monitool.services.string"));
+	beforeEach(module("monitool.services.utils.string"));
 	beforeEach(inject(function(_mtRemoveDiacritics_) {
 		mtRemoveDiacritics = _mtRemoveDiacritics_;
 	}));

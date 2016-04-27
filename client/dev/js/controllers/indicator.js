@@ -5,7 +5,7 @@ angular
 	.module(
 		'monitool.controllers.indicator',
 		[
-			'monitool.services.translate',
+			'monitool.services.utils.translate',
 		]
 	)
 
@@ -14,7 +14,7 @@ angular
 		$scope.searchField = '';
 	})
 	
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, $filter, googleTranslation, indicator, types, themes) {
+	.controller('IndicatorEditController', function($state, $scope, $stateParams, $filter, googleTranslation, indicator, types, themes, uuid) {
 		$scope.translations = {fr: FRENCH_TRANSLATION, es: SPANISH_TRANSLATION, en: ENGLISH_TRANSLATION};
 		$scope.numLanguages = 3;
 		$scope.indicator = indicator;
@@ -35,7 +35,7 @@ angular
 		$scope.save = function() {
 			// create random id if new indicator
 			if ($stateParams.indicatorId === 'new')
-				$scope.indicator._id = makeUUID();
+				$scope.indicator._id = uuid.v4();
 
 			// persist
 			$scope.indicator.$save(function() {
@@ -105,26 +105,7 @@ angular
 		$scope.$watch('[filters, groupBy]', function() {
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end);
 			$scope.rows = projects.map(function(project) {
-				var planning = null;
-				outerloop:
-					for (var lfIndex = 0; lfIndex < project.logicalFrames.length; ++lfIndex) {
-						planning = project.logicalFrames[lfIndex].indicators.find(function(i) { return i.indicatorId === indicator._id; });
-						if (planning)
-							break outerloop;
-
-						for (var pIndex = 0; pIndex < project.logicalFrames[lfIndex].purposes.length; ++pIndex) {
-							planning = project.logicalFrames[lfIndex].purposes[pIndex].indicators.find(function(i) { return i.indicatorId === indicator._id; });
-							if (planning)
-								break outerloop;
-
-							for (var oIndex = 0; oIndex < project.logicalFrames[lfIndex].purposes[pIndex].outputs.length; ++oIndex) {
-								planning = project.logicalFrames[lfIndex].purposes[pIndex].outputs[oIndex].indicators.find(function(i) { return i.indicatorId === indicator._id; });
-								if (planning)
-									break outerloop;
-							}
-						}
-					}
-
+				var planning = project.getIndicatorPlanningById(indicator._id);
 				var row = mtReporting._makeIndicatorRow(
 					cubes[project._id],
 					0,

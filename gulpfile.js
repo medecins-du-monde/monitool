@@ -22,8 +22,6 @@ var files = {
 		'client/dev/bower_components/bootstrap-css-only/css/bootstrap.min.css',
 		'client/dev/bower_components/angular-ui-select/dist/select.min.css',
 		'client/dev/bower_components/c3/c3.min.css',
-		// 'client/dev/bower_components/textAngular/src/textAngular.css',
-
 		'client/dev/bower_components/handsontable/dist/handsontable.full.css',
 	],
 	js: [
@@ -34,8 +32,6 @@ var files = {
 		'client/dev/bower_components/angular-moment/angular-moment.min.js',
 		'client/dev/bower_components/angular-translate/angular-translate.min.js',
 		// 'client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-		// 'client/dev/js/ui-bootstrap-tpls-0.13.0-SNAPSHOT.min.js',
-		// 'client/dev/js/ui-bootstrap-override.min.js',
 		'client/dev/bower_components/angular-bootstrap-show-errors/src/showErrors.min.js',
 		'client/dev/bower_components/angular-ui-select/dist/select.min.js',
 		'client/dev/bower_components/angular-cookies/angular-cookies.min.js',
@@ -45,11 +41,7 @@ var files = {
 		'client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js',
 		'client/dev/bower_components/d3/d3.min.js',
 		'client/dev/bower_components/c3/c3.min.js',
-		// 'client/dev/bower_components/textAngular/dist/textAngular-rangy.min.js',
-		'client/dev/bower_components/textAngular/dist/textAngular-sanitize.min.js',
-		// 'client/dev/bower_components/textAngular/dist/textAngular.min.js',
 		'client/dev/bower_components/handsontable/dist/handsontable.full.min.js',
-
 		'client/dev/bower_components/Blob.js/Blob.js',
 		'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
 	]
