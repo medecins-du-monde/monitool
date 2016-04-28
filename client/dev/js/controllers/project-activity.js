@@ -53,6 +53,11 @@ angular
 				delete $scope.form.entities;
 		});
 
+		// Form is invalid if we don't have at least one element.
+		$scope.$watch('form.elements.length', function(length) {
+			$scope.dataSourceForm.$setValidity('elementsLength', length >= 1);
+		});
+
 		$scope.moreOptions = function(element, initialPartition) {
 			var promise = $modal.open({
 				controller: 'PartitionEditionModalController',
@@ -133,7 +138,11 @@ angular
 
 		$scope.master = initialPartition;
 		$scope.partition = angular.copy(initialPartition);
-		
+
+		$scope.$watch('partition.elements.length', function(length) {
+			$scope.partitionForm.$setValidity('elementLength', length >= 2);
+		});
+
 		$scope.isUnchanged = function() {
 			return angular.equals($scope.master, $scope.partition);
 		};

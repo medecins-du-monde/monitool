@@ -11,7 +11,7 @@
 	 <span ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}|unsafe"></span>
 </div>
 
-<form class="form-horizontal" role="form" name="formForm" novalidate>
+<form class="form-horizontal" role="form" name="dataSourceForm" novalidate>
 	
 	<legend translate="project.collection_form_planning"></legend>
 
@@ -26,7 +26,7 @@
 				   placeholder="{{'project.form_name_ph'|translate}}"
 				   required />
 			
-			<p class="help-block" ng-if="formForm.name.$error.required" translate="form.mandatory"></p>
+			<p class="help-block" ng-if="dataSourceForm.name.$error.required" translate="form.mandatory"></p>
 		</div>
 	</div>
 
@@ -214,7 +214,7 @@
 	<!-- form actions -->
 	<div acl-has-project-role="owner">
 		<br/>
-		<button ng-click="save()" ng-disabled="formForm.$invalid || isUnchanged()" class="btn btn-primary">
+		<button ng-click="save()" ng-disabled="dataSourceForm.$invalid || isUnchanged()" class="btn btn-primary">
 			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>
 		</button>
