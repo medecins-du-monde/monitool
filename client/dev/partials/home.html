@@ -64,8 +64,12 @@
 				<h4>First</h4>
 
 				<ul style= "margin-bottom: 10px">
-					<li>Read the <a ui-sref="main.help.create">user guide</a>.</li>
-					<li>Decide what data you want to track on your project in "Collection forms".</li>
+					<li>
+						Read the 
+						<a ui-sref="main.help.create" ng-if="userCtx.type == 'user'">user guide</a>
+						<a ui-sref="main.help.structure" ng-if="userCtx.type != 'user'">user guide</a>
+					</li>
+					<li>Decide what data you want to track on your project in "Collection forms"</li>
 					<li>Enter your logical frame and link your indicators to the forms</li>
 					<li>Make your first data entry and have a look at the generated reporting!</li>
 				</ul>
@@ -143,7 +147,11 @@
 				<h4>Pour commencer</h4>
 				
 				<ul style="margin-bottom: 10px">
-					<li>Lisez le <a ui-sref="main.help.create">guide d'utilisation de l'outil</a>.</li>
+					<li>
+						Lisez le 
+						<a ui-sref="main.help.create" ng-if="userCtx.type == 'user'">guide d'utilisation de l'outil</a>
+						<a ui-sref="main.help.structure" ng-if="userCtx.type != 'user'">guide d'utilisation de l'outil</a>
+					</li>
 					<li>Décidez des données que vous désirez suivre sur votre projet dans "Formulaires de collecte".</li>
 					<li>Saisissez votre cadre logique et liez vos indicateurs au données collectées précedement</li>
 					<li>Réalisez votre première saisie!</li>
@@ -160,69 +168,73 @@
 		<div class="row">
 			<div class="col-xs-4">
 				<h4>¿Por qué</h4>
-				<ul style="margin-bottom: 10px">. <li>
-					<strong>Aumentar la fiabilidad</strong><br/>
+				<ul style="margin-bottom: 10px">
+					<li>
+						<strong>Aumentar la fiabilidad</strong><br/>
 
-					<ul style="margin-bottom: 10px">
-						<li>Reducir la curva de aprendizaje necesaria para el analisis de datos</li>
-						<li>Hacer pruebas de coherencia para limitar los errores de entrada</li>
-						<li>Limitar los errores de formulas en indicadores: estan entradas previamente en la herramienta</li>
-					</ul>
-				</li>
-				<li>
-					<strong>Tomar distancia con los datos</strong><br/>
+						<ul style="margin-bottom: 10px">
+							<li>Reducir la curva de aprendizaje necesaria para el analisis de datos</li>
+							<li>Hacer pruebas de coherencia para limitar los errores de entrada</li>
+							<li>Limitar los errores de formulas en indicadores: estan entradas previamente en la herramienta</li>
+						</ul>
+					</li>
+					<li>
+						<strong>Tomar distancia con los datos</strong><br/>
 
-					<ul style="margin-bottom: 10px">
-						<li>A través del catálogo, fomentar proyectos geográficamente remotos a utilizar los mismos indicadores cuando miden magnitudes comparables.</li>
-						<li>Contar con mecanismos para comparar el valor de un indicador en un proyecto, con el mismo valor para todos los demás.</li>
-					</ul>
-				</li>
-				<li>
-					<strong>Facilitar la comunicación</strong><br/>
+						<ul style="margin-bottom: 10px">
+							<li>A través del catálogo, fomentar proyectos geográficamente remotos a utilizar los mismos indicadores cuando miden magnitudes comparables.</li>
+							<li>Contar con mecanismos para comparar el valor de un indicador en un proyecto, con el mismo valor para todos los demás.</li>
+						</ul>
+					</li>
+					<li>
+						<strong>Facilitar la comunicación</strong><br/>
 
-					<ul style="margin-bottom: 10px">
-						<li>Proporcionar acceso a los datos de los proyectos a servicios que estaban excluídos (gestión, comunicación, .. ).</li>
-						<li>Tener una versión única de los datos compartidos entre la sede y los terrenos</li>
-					</ul>
-				</li>
-			</ul>
-		</div>
-		<div class="col-xs-4">
-			<h4>Cuando</h4>
-			<p>Monitool tiene un papel durante cuatro etapas de un proyecto</p>
-			<ul style="margin-bottom: 10px">
-				<li>
-					<strong>Diseño del marco lógico</strong><br/>
+						<ul style="margin-bottom: 10px">
+							<li>Proporcionar acceso a los datos de los proyectos a servicios que estaban excluídos (gestión, comunicación, .. ).</li>
+							<li>Tener una versión única de los datos compartidos entre la sede y los terrenos</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div class="col-xs-4">
+				<h4>Cuando</h4>
+				<p>Monitool tiene un papel durante cuatro etapas de un proyecto</p>
+				<ul style="margin-bottom: 10px">
+					<li>
+						<strong>Diseño del marco lógico</strong><br/>
 
-					Con la provisión de los marcos lógicos de los demas proyectos, sus indicadores, valores de base y objectivos.
-				</li>
-				<li>
-					<strong>Creación de las herramientas de supervisión</strong><br/>
+						Con la provisión de los marcos lógicos de los demas proyectos, sus indicadores, valores de base y objectivos.
+					</li>
+					<li>
+						<strong>Creación de las herramientas de supervisión</strong><br/>
 
-					Ayuda a explicitar el camino seguido por los datos y a fijar plazos límite
-				</li>
-				<li>
-					<strong>Seguimiento</strong><br/>
+						Ayuda a explicitar el camino seguido por los datos y a fijar plazos límite
+					</li>
+					<li>
+						<strong>Seguimiento</strong><br/>
 
-					Cree gráficos y tablas con los datos mas la dia disponibles
-				</li>
-				<li>
-					<strong>Post-cierre</strong><br/>
+						Cree gráficos y tablas con los datos mas la dia disponibles
+					</li>
+					<li>
+						<strong>Post-cierre</strong><br/>
 
-					Sus proyectos son archivados y disponibles para referencias futuras!
-				</li>
-			</ul>
-		</div>
-		<div class="col-xs-4">
-			<h4>Para empezar</h4>
-			<ul style="margin-bottom: 10px">
-				<li>Lea la <a ui-sref="main.help.create">Guía del usuario</a></li>
-				<li>Decida qué datos desea seguir en "Formularios de colecta".</li>
-				<li>Entre su marco lógico y vincule sus indicadores a los datos recogidos previamente</li>
-				<li>Haga su primera entrada!</li>
-			</ul>
+						Sus proyectos son archivados y disponibles para referencias futuras!
+					</li>
+				</ul>
+			</div>
+			<div class="col-xs-4">
+				<h4>Para empezar</h4>
+				<ul style="margin-bottom: 10px">
+					<li>
+						Lea la
+						<a ui-sref="main.help.create" ng-if="userCtx.type == 'user'">Guía del usuario</a>
+						<a ui-sref="main.help.structure" ng-if="userCtx.type != 'user'">Guía del usuario</a>
+					</li>
+					<li>Decida qué datos desea seguir en "Formularios de colecta"</li>
+					<li>Entre su marco lógico y vincule sus indicadores a los datos recogidos previamente</li>
+					<li>Haga su primera entrada!</li>
+				</ul>
+			</div>
 		</div>
 	</div>
-
-
 </div>

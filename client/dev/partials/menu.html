@@ -50,7 +50,12 @@
 				</li>
 
 				<li ng-class="{active: $state.includes('main.help')}">
-					<a ui-sref="main.help.create">
+					<a ui-sref="main.help.create" ng-if="userCtx.type == 'user'">
+						<i class="fa fa-fw fa-question"></i>
+						<span translate="shared.user_guide"></span>
+					</a>
+
+					<a ui-sref="main.help.structure" ng-if="userCtx.type != 'user'">
 						<i class="fa fa-fw fa-question"></i>
 						<span translate="shared.user_guide"></span>
 					</a>

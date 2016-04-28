@@ -84,13 +84,13 @@
 	<legend translate="project.collection_form_structure"></legend>
 
 	<!-- Editable table -->
-	<table class="table table-bordered table-condensed table-aggregated-data" acl-has-project-role="owner">
+	<table class="table table-bordered table-condensed table-aggregated-data">
 		<thead>
 			<tr>
 				<th translate="project.variable" style="width: 20%"></th>
-				<th translate="project.aggregation" style="width: 15%"></th>
+				<th translate="project.aggregation" style="width: 15%" acl-has-project-role="owner"></th>
 				<th translate="project.partitions" style="width: 55%"></th>
-				<th colspan="2" translate="project.actions" style="width: 10%"></th>
+				<th translate="project.actions" style="width: 10%" acl-has-project-role="owner"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -98,12 +98,12 @@
 			<tr ng-repeat="element in form.elements track by element.id">
 
 				<!-- variable name -->
-				<td>
+				<td acl-has-project-role="owner" acl-fallback="element.name">
 					<textarea full-height type="text" ng-model="element.name" required class="form-control"></textarea>
 				</td>
 				
 				<!-- variable aggregation -->
-				<td>
+				<td acl-has-project-role="owner">
 					{{'project.different_geos'|translate}}:<br/>
 					<select ng-model="element.geoAgg">
 						<option value="none" translate="project.none"></option>
@@ -131,7 +131,7 @@
 
 					<ul>
 						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
-							<a class="btn btn-xxs btn-default pull-right" ng-click="moreOptions(element, partition)">
+							<a class="btn btn-xxs btn-default pull-right" ng-click="moreOptions(element, partition)" acl-has-project-role="owner">
 								<i class="fa fa-fw fa-pencil"></i>
 								<span translate="shared.edit"></span>
 							</a>
@@ -148,14 +148,14 @@
 						</li>
 					</ul>
 
-					<a ng-click="moreOptions(element)" class="btn btn-xxs btn-default" style="position: absolute; bottom: 4px; right: 3px">
+					<a ng-click="moreOptions(element)" class="btn btn-xxs btn-default" style="position: absolute; bottom: 4px; right: 3px" acl-has-project-role="owner">
 						<i class="fa fa-plus"></i>
 						<span translate="project.add_partition"></span>
 					</a>
 				</td>
 
 				<!-- variable actions -->
-				<td>
+				<td acl-has-project-role="owner">
 					<a ng-click="upElement($index, $parent.$parent.$index)"
 					   tooltip="{{'project.variable_up'|translate}}"
 					   ng-if="!$first">
@@ -176,46 +176,14 @@
  			</tr>
 
  			<!-- add new variable row --> 
-			<tr>
-				<td colspan="{{maxPartitions + 4}}" style="text-align: center">
+			<tr acl-has-project-role="owner">
+				<td colspan="4" style="text-align: center">
 					<a ng-click="newVariable()" class="btn btn-xs btn-default">
 						<i class="fa fa-plus"></i>
 						<span translate="project.add_variable"></span>
 					</a>
 				</td>
 			</tr>
-		</tbody>
-	</table>
-
-	<!-- Read Only table -->
-	<table class="table table-bordered table-condensed table-aggregated-data" acl-lacks-project-role="owner">
-		<thead>
-			<tr>
-				<th translate="project.variable" style="width: 15%"></th>
-				<th translate="project.aggregation" style="width: 15%"></th>
-				<th translate="project.partitions" style="width: 70%" ng-if="maxPartitions != 0"></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat="element in form.elements track by element.id">
-				<td>{{element.name}}</td>
-				<td>
-					{{'project.different_geos'|translate}}:
-					<span>{{'project.' + element.geoAgg | translate}}</span>
-					<br/>
-					{{'project.same_geos'|translate}}:
-					<span>{{'project.' + element.timeAgg | translate}}</span>
-				</td>
-
-				<td>
-					<span translate="project.no_partitions" ng-if="element.partitions.length == 0"></span>
-					<ul>
-						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
-							<strong>{{partition.name}}</strong>: {{partition.elements|pluck:'name'|join:' / '}}
-						</li>
-					</ul>
-				</td>
- 			</tr>
 		</tbody>
 	</table>
 
