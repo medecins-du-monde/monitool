@@ -40,7 +40,9 @@ angular
 			// persist
 			$scope.indicator.$save(function() {
 				$scope.master = angular.copy($scope.indicator);
-				$state.go('main.indicators');
+
+				if ($stateParams.indicatorId === 'new')
+					$state.go('main.indicator.edit', {indicatorId: $scope.indicator._id});
 			});
 		};
 

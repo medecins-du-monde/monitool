@@ -88,7 +88,7 @@ angular
 				size: 'lg',
 				scope: $scope,
 				resolve: {
-					hierarchy: function(Theme) { return Theme.query({mode: 'tree'}); }
+					hierarchy: function(Theme) { return Theme.query({mode: 'tree'}).$promise; }
 				}
 			}).result;
 

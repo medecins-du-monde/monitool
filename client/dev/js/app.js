@@ -261,7 +261,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				if (!projectId || projectId === 'new') {
 					var project = new Project();
 					project.reset();
-					return $q.resolve(project);
+					return $q.when(project);
 				}
 				else
 					return Project.get({id: projectId}).$promise;
@@ -467,7 +467,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					if (!indicatorId || indicatorId === 'new') {
 						var indicator = new Indicator();
 						indicator.reset();
-						return $q.resolve(indicator);
+						return $q.when(indicator);
 					}
 					else
 						return Indicator.get({id: indicatorId}).$promise;

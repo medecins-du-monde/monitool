@@ -2,7 +2,7 @@
 
 angular
 	.module('monitool.services.models.project', ['ngResource'])
-	.factory('Project', function($resource, $q, $rootScope) {
+	.factory('Project', function($resource, $q, $rootScope, uuid) {
 
 		var Project = $resource('/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
 

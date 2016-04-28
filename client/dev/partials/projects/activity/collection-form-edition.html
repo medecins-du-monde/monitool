@@ -131,12 +131,20 @@
 
 					<ul>
 						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
-							<a class="btn btn-xxs btn-default pull-right" ng-click="moreOptions(element, partition)" tooltip="Modifier">
+							<a class="btn btn-xxs btn-default pull-right" ng-click="moreOptions(element, partition)">
 								<i class="fa fa-fw fa-pencil"></i>
 								<span translate="shared.edit"></span>
 							</a>
 
-							<strong>{{partition.name}}</strong>: {{partition.elements|pluck:'name'|join:' / '}}
+							<strong>{{partition.name}}</strong>
+							
+							<span ng-repeat="group in partition.groups">
+								<span class="label label-info"><i class="fa fa-arrow-circle-right"></i> {{group.name}}</span>
+							</span>
+							
+							<span ng-repeat="element in partition.elements">
+								<span class="label label-default">{{element.name}}</span>
+							</span>
 						</li>
 					</ul>
 

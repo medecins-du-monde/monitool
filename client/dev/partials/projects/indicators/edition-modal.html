@@ -11,16 +11,6 @@
 		</div>
 
 		<div class="form-group">
-			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.colorize">
-				<input id="colorize-input"
-					   type="checkbox"
-					   ng-model="planning.colorize"
-					   ng-disabled="planning.baseline == null || planning.target == null" />
-			</div>
-		</div>
-
-		<div class="form-group">
 			<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
 				<optional-number ng-model="planning.baseline" default="0"></optional-number>
@@ -31,6 +21,16 @@
 			<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.target">
 				<optional-number ng-model="planning.target" default="100"></optional-number>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
+			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.colorize">
+				<input id="colorize-input"
+					   type="checkbox"
+					   ng-model="planning.colorize"
+					   ng-disabled="planning.baseline == null || planning.target == null" />
 			</div>
 		</div>
 

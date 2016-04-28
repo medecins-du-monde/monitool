@@ -365,6 +365,7 @@ function correctFormInputs(oldForm, newForm, inputs) {
 					for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
 						var subsetKey = peIds.filter(function(id, index) { return subsetIndex & (1 << index); }).join('.');
 
+						// FIXME this assumes that we sum data.
 						if (decodedValues[subsetKey] == undefined)
 							decodedValues[subsetKey] = 0;
 						decodedValues[subsetKey] += field || 0;
@@ -425,7 +426,7 @@ function updateInputs(projectId, oldForm, newForm, callback) {
 		'inputs_by_project_form_date',
 		{include_docs: true, startkey: [projectId, oldForm.id], endkey: [projectId, oldForm.id, {}]},
 		function(error, result) {
-			if (result && result.length) {
+			if (result && result.rows.length) {
 				var inputs = result.rows.map(function(row) { return row.doc; });
 				correctFormInputs(oldForm, newForm, inputs);
 				database.bulk({docs: inputs}, {}, callback);

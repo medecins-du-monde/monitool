@@ -293,17 +293,17 @@
 		</a>
 	</fieldset>
 
-	<div acl-has-project-role="owner">
-		<br/>
-		<a ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
-			<i class="fa fa-floppy-o"></i>
-			<span translate="shared.save"></span>
-		</a>
-
-		<a ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
-			<i class="fa fa-undo"></i>
-			<span translate="shared.remove_changes"></span>
-		</a>
-	</div>
 </form>
 
+<div acl-has-project-role="owner">
+	<br/>
+	<a ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</a>
+
+	<a ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</a>
+</div>

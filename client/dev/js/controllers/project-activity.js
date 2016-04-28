@@ -127,7 +127,8 @@ angular
 	})
 
 	.controller('PartitionEditionModalController', function($scope, $modalInstance, initialPartition, uuid) {
-		if (!initialPartition)
+		$scope.isNew = false;
+		if (!initialPartition) {
 			initialPartition = {
 				id: uuid.v4(),
 				name: "",
@@ -135,9 +136,17 @@ angular
 				groups: [],
 				aggregation: "sum"
 			}
+			$scope.isNew = true;
+		}
 
 		$scope.master = initialPartition;
 		$scope.partition = angular.copy(initialPartition);
+		$scope.useGroups = !!$scope.partition.groups.length;
+
+		$scope.$watch('useGroups', function(value) {
+			if (!value)
+				$scope.partition.groups = [];
+		});
 
 		$scope.$watch('partition.elements.length', function(length) {
 			$scope.partitionForm.$setValidity('elementLength', length >= 2);
@@ -153,10 +162,7 @@ angular
 
 		$scope.reset = function() {
 			$scope.partition = angular.copy($scope.master);
-		};
-
-		$scope.createGroup = function() {
-			$scope.partition.groups.push({id: uuid.v4(), name: '', members: []});
+			$scope.useGroups = !!$scope.partition.groups.length;
 		};
 
 		$scope.createPartitionElement = function() {
@@ -164,9 +170,21 @@ angular
 		};
 
 		$scope.deletePartitionElement = function(partitionElementId) {
+			// Remove from element list
 			$scope.partition.elements = $scope.partition.elements.filter(function(element) {
 				return element.id !== partitionElementId;
 			});
+
+			// Remove from all groups
+			$scope.partition.groups.forEach(function(group) {
+				group.members = group.members.filter(function(member) {
+					return member !== partitionElementId;
+				});
+			});
+		};
+
+		$scope.createGroup = function() {
+			$scope.partition.groups.push({id: uuid.v4(), name: '', members: []});
 		};
 
 		$scope.deleteGroup = function(partitionGroupId) {
@@ -175,14 +193,13 @@ angular
 			});
 		};
 
-		$scope.up = function(index, list) {
-			var element = array.splice(index, 1);
-			array.splice(index - 1, 0, element[0]);
+		$scope.move = function(index, list, direction) {
+			var element = list.splice(index, 1);
+			list.splice(index + direction, 0, element[0]);
 		};
 
-		$scope.down = function(index, list) {
-			var element = array.splice(index, 1);
-			array.splice(index + 1, 0, element[0]);
+		$scope.delete = function() {
+			$modalInstance.close(null);
 		};
 	})
 
