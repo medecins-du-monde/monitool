@@ -365,7 +365,7 @@ angular
 				result /= contributions;
 			}
 			else if (dimension.aggregation == 'highest') {
-				result = Math.MIN_VALUE;
+				result = -Number.MAX_VALUE;
 				for (var i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(allIndexes, offset + indexes[i]);
 					if (tmp !== undefined && tmp > result) {
@@ -375,7 +375,7 @@ angular
 				}
 			}
 			else if (dimension.aggregation == 'lowest') {
-				result = Math.MAX_VALUE;
+				result = Number.MAX_VALUE;
 				for (var i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(allIndexes, offset + indexes[i])
 					if (tmp !== undefined && tmp < result) {
