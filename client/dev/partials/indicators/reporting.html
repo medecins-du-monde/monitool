@@ -104,7 +104,8 @@
 				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.cols" />
 			</td>
 			<td class="indent{{row.indent}}">
-				<label for="{{row.id}}">{{row.name}}</label>
+				<label for="{{row.id}}">{{row.project}}</label><br/>
+				<small>{{row.name}}</small>
 			</td>
 			<td>{{row.baseline}}</td>
 			<td>{{row.target}}</td>

@@ -104,17 +104,16 @@ angular
 		// when input list change, or regrouping is needed, compute table rows again.
 		$scope.$watch('[filters, groupBy]', function() {
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end);
+
 			$scope.rows = projects.map(function(project) {
-				var planning = project.getIndicatorPlanningById(indicator._id);
-				var row = mtReporting._makeIndicatorRow(
-					cubes[project._id],
-					0,
-					$scope.groupBy,
-					$scope.filters,
-					$scope.cols,
-					planning
-				);
-				row.name = project.name;
+				// Compute row.
+				var cube     = cubes[project._id],
+					planning = project.getIndicatorPlanningById(indicator._id),
+					row      = mtReporting._makeIndicatorRow(cube, 0, $scope.groupBy, $scope.filters, $scope.cols, planning);
+
+				// Add extra field, with project name.
+				row.project = project.name;
+
 				return row;
 			});
 		}, true);
