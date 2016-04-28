@@ -267,7 +267,7 @@ var FRENCH_TRANSLATION = {
 		none: "Ne pas agréger",
 		sum: "Somme",
 		average: "Moyenne",
-		highest: "Plus grand valeure",
+		highest: "Plus grande valeure",
 		lowest: "Plus petite valeure",
 		last: "Dernière valeur",
 
