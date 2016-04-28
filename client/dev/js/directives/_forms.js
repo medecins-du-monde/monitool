@@ -392,7 +392,7 @@ angular.module('monitool.directives.form', [])
 					});
 
 					// General case.
-					var permutation      = computeNthPermutation(partitions.length, rotation),
+					var permutation      = itertools.computeNthPermutation(partitions.length, rotation),
 						topPartitionIds  = permutation.slice(0, offset),
 						leftPartitionIds = permutation.slice(offset);
 
@@ -490,7 +490,7 @@ angular.module('monitool.directives.form', [])
 					partitions.forEach(function(partition) { numFields *= partition.elements.length; });
 
 					var modelValue       = new Array(numFields),
-						permutation      = computeNthPermutation(partitions.length, rotation),
+						permutation      = itertools.computeNthPermutation(partitions.length, rotation),
 						topPartitions    = permutation.slice(0, offset).map(function(id) { return partitions[id].elements; }),
 						leftPartitions   = permutation.slice(offset).map(function(id) { return partitions[id].elements; });
 
@@ -530,7 +530,7 @@ angular.module('monitool.directives.form', [])
 
 					else {
 						// Split partitions in cols and rows.
-						var permutation      = computeNthPermutation(partitions.length, rotation),
+						var permutation      = itertools.computeNthPermutation(partitions.length, rotation),
 							topPartitionIds  = permutation.slice(0, offset),
 							leftPartitionIds = permutation.slice(offset);
 
