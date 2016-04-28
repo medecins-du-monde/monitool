@@ -39,11 +39,12 @@ old.list({include_docs: true}, function(error, result) {
 
 			element.partitions.forEach(function(partition) {
 				// console.log(partition)
-				length *= partition.length;
+				length *= partition.elements.length;
 			});
 
 			if (input.values[element.id] && input.values[element.id].length == length)
 				newValues[element.id] = input.values[element.id];
+
 			else if (!input.values[element.id]) {
 				console.log('missing variable', input._id);
 
@@ -54,7 +55,7 @@ old.list({include_docs: true}, function(error, result) {
 				needUpdate = true;
 			}
 			else {
-				console.log('wrong length');
+				console.log('wrong length', input.values[element.id].length, ' instead of ', length);
 
 				newValues[element.id] = [];
 				for (var i = 0; i < length; ++i)
@@ -64,10 +65,10 @@ old.list({include_docs: true}, function(error, result) {
 			}
 		});
 
-		// if (!needUpdate && Object.keys(newValues).length < Object.keys(input.values).length) {
-		// 	needUpdate = true;
-		// 	console.log('additional variables', input._id)
-		// }
+		if (!needUpdate && Object.keys(newValues).length < Object.keys(input.values).length) {
+			needUpdate = true;
+			console.log('additional variables', input._id)
+		}
 
 		if (needUpdate) {
 			// console.log(input)
@@ -84,9 +85,9 @@ old.list({include_docs: true}, function(error, result) {
 	console.log(docsToUpdate.length)
 
 
-	old.bulk({docs: docsToUpdate}, function(error, done) {
-		console.log(error);
-	});
+	// old.bulk({docs: docsToUpdate}, function(error, done) {
+	// 	console.log(error);
+	// });
 
 });
 
