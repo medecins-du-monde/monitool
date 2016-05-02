@@ -2,6 +2,6 @@
 
 angular
 	.module('monitool.services.models.user', ['ngResource'])
-	.factory('User', function($resource, $q, $rootScope) {
+	.factory('User', function($resource) {
 		return $resource('/resources/user/:id', { id: "@_id" }, { save: { method: "PUT" }});
 	});

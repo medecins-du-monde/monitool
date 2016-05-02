@@ -66,9 +66,10 @@ angular
 		};
 
 		$scope.create = function() {
-			var newEntity = $scope.entityType == 'theme' ? Theme() : Type();
+			var newEntity = $scope.entityType == 'theme' ? new Theme() : new Type();
 			newEntity.__isNew = true; // this will be removed on save.
 			newEntity._id = uuid.v4();
+			newEntity.reset();
 
 			$scope.entities.push(newEntity);
 			$scope.master.push(angular.copy(newEntity));

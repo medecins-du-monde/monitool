@@ -2,7 +2,7 @@
 
 angular
 	.module('monitool.services.models.indicator', ['ngResource'])
-	.factory('Indicator', function($resource, $q, $rootScope) {
+	.factory('Indicator', function($resource) {
 
 		var Indicator = $resource('/resources/indicator/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
