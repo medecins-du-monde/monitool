@@ -207,7 +207,7 @@ angular
 				for (var key in indicator.parameters) {
 					var param = indicator.parameters[key];
 
-					param.elementId = old2new[param.elementId];
+					param.elementId = old2new[param.elementId] || null;
 					var newFilter = {};
 					for (key in param.filter)
 						newFilter[old2new[key]] = param.filter[key].map(function(i) { return old2new[i]; });
