@@ -60,6 +60,7 @@ var FRENCH_LOCALE = {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		country: "Pays",
 		apply: "Appliquer les modifications",
 		clone: "Cloner",
 		user_guide: "Guide d'utilisation",
@@ -148,6 +149,8 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements. Ceux-ci seront perdus.",
+		no_logical_frame: "Aucun cadre logical n'a encore été créé sur ce projet.",
 		partition_general: "Général",
 		partition_general_placeholder: "ex: Tranches d'âge",
 		partition_elements: "Éléments",
@@ -261,8 +264,8 @@ var FRENCH_TRANSLATION = {
 		remove_partition: "Supprimer la partition",
 
 		aggregation: 'Agrégation',
-		different_geos: 'Sur des lieux différents',
-		same_geos: 'Sur un même lieu',
+		sites_agg: 'Sur les sites',
+		time_agg: 'Sur le temps',
 
 		none: "Ne pas agréger",
 		sum: "Somme",
@@ -355,6 +358,7 @@ var FRENCH_TRANSLATION = {
 
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',
 		no_input_groups: 'Aucun groupe d\'activité n\'a encore été créé!',
+		no_users: 'Aucun utilisateur n\'est ajouté au projet',
 		no_forms: 'Aucune source de données n\'a encore été créé',
 
 
@@ -371,7 +375,8 @@ var FRENCH_TRANSLATION = {
 
 		start_date: "Date de lancement",
 		end_date: "Date de fin",
-		name_ph: 'Exemple: Réduction des Risques Laos',
+		country_ph: "Exemple: RCA",
+		name_ph: 'Exemple: Accès a des soins de santé de qualité pour les populations touchées par la crise',
 		add_indicator: 'Ajouter un indicateur',
 
 		purpose: 'Objectif Spécifique',

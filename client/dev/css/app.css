@@ -326,6 +326,13 @@ ul:hover>.onrollover {
   .main-content { padding-top: 0; }
   .c3-tooltip-container { display: none !important; }
 
+
+  .htNumeric {
+    color:white !important;
+    font-size: 0;
+    
+  }
+
 }
 
 
@@ -445,4 +452,35 @@ ul:hover>.onrollover {
   position: absolute;
   bottom: 5px;
   right: 5px;
+}
+
+.handle {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+ul[ng-sortable] {
+  padding-left: 3px;
+  list-style-type: none;
+}
+
+.dragging ul[ng-sortable] {
+  min-height: 17px;
+}
+
+
+ul[ng-sortable] i.fa.fa-bars {
+  padding-right: 3px;
+}
+
+ul[ng-sortable] li *, i.fa.fa-bars {
+  cursor: pointer;
+}
+
+.sortable-ghost {
+  opacity: .3;
+}
+
+.sortable-label-list {
+  padding: 0 2px;
 }

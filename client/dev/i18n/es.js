@@ -60,6 +60,7 @@ var SPANISH_LOCALE = {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		country: "País",
 		apply: "Aplicar los cambios",
 		clone: "Clonar",
 		user_guide: "Guía del usuario",
@@ -148,6 +149,8 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		saving_failed: "Monitool no consiguio salvar los cambios. Se va a recargar la página",
+		no_logical_frame: "Ningún marco lógico has sido creado en este proyecto.",
 		partition_general: "General",
 		partition_general_placeholder: "ej: Edad",
 		partition_elements: "Elementos",
@@ -261,8 +264,8 @@ var SPANISH_TRANSLATION = {
 		remove_partition: "Quitar esta partición",
 
 		aggregation: "Agregación",
-		different_geos: "Entre lugares diferentes",
-		same_geos: "En un mismo lugar",
+		sites_agg: "Para lugares",
+		time_agg: "Para tiempo",
 
 		none: "No agregar",
 		sum: "Suma",
@@ -355,6 +358,7 @@ var SPANISH_TRANSLATION = {
 
 		no_input_entities: '¡Ningún lugar de colecta ha sido creado!',
 		no_input_groups: '¡Ningún grupo de colecta ha sido creado!',
+		no_users: '¡Ningún usuario ha sido añadido!',
 		no_forms: '¡Ningúna fuente de datos ha sido creada!',
 
 
@@ -371,7 +375,8 @@ var SPANISH_TRANSLATION = {
 
 		start_date: "Fecha de inicio",
 		end_date: "Fecha de fin",
-		name_ph: 'Por ejemplo: [Laos] Reducción de riesgos',
+		country_ph: 'Por ejemplo: República Centroafricana',
+		name_ph: 'Por ejemplo: Acceso a atención de calidad para las personas afectadas por la crisis',
 		add_indicator: 'Añadir un indicador',
 
 		purpose: 'Objectivo Específico',

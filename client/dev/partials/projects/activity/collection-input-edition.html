@@ -1,13 +1,13 @@
-<ol class="breadcrumb">
+<ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.save.basics" ng-bind="project.name"></a></li>
 	<li><a ui-sref="main.project.collection_input_list" translate="project.collection_input_list"></a></li>
 	<li class="active" ng-bind="form.name"></li>
 	<li class="active" ng-bind="inputEntity.name" ng-if="inputEntity"></li>
 	<li class="active" ng-bind="currentInput.period|amDateFormat:'YYYY-MM-DD'"></li>
 </ol>
 
-<doc-reminder pages="project.input"></doc-reminder>
+<doc-reminder pages="project.input" class="noprint"></doc-reminder>
 
 
 <form class="form-horizontal">
@@ -16,11 +16,11 @@
 		<label class="col-sm-2 control-label">
 			<a ng-click="currentInput.values[element.id] = lastInput.values[element.id]"
 			   tooltip="{{'project.fill_with_last_input' | translate}}"
-			   ng-if="lastInput"><i class="fa fa-clipboard"></i></a>
+			   ng-if="lastInput" class="noprint"><i class="fa fa-clipboard"></i></a>
 
 			{{element.name}}<br/>
 
-			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 1">
+			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 1" class="noprint">
 				<span style="font-weight: normal" translate="project.field_order"></span>
 				<div class="btn-group btn-group-xxs">
 					<a ng-click="rotate(-1, element)" class="btn btn-default"><i class="fa fa-caret-left"></i></a>
@@ -29,7 +29,7 @@
 				</div>
 			</div>
 
-			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 2">
+			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 2" class="noprint">
 				<span style="font-weight: normal" translate="project.field_distribution"></span>
 				<div class="btn-group btn-group-xxs">
 					<a ng-click="move(-1, element)" class="btn btn-default"><i class="fa fa-caret-left"></i></a>
@@ -54,7 +54,7 @@
 	</div>
 </form>
 
-<div ng-if="canEdit">
+<div ng-if="canEdit" class="noprint">
 	<a class="btn btn-primary" ng-click="save()">
 		<i class="fa fa-floppy-o"></i>
 		<span translate="shared.save"></span>

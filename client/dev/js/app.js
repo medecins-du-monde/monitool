@@ -39,6 +39,8 @@ var app = angular.module('monitool.app', [
 	'angularMoment',
 	'ngCookies',
 	'ngResource',
+	'ng-sortable',
+	
 	'pascalprecht.translate',
 	'ui.bootstrap',
 	'ui.bootstrap.showErrors',
@@ -256,24 +258,34 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/menu.html',
 		resolve: {
 			project: function(Project, $rootScope, $stateParams, $q) {
+				// If partner account, we retrieve the projectId from profile, else from URL.
 				var projectId = $rootScope.userCtx.type === 'user' ? $stateParams.projectId : $rootScope.userCtx.projectId;
 
-				if (!projectId || projectId === 'new') {
+				return Project.get({id: projectId}).$promise.catch(function(e) {
+					// Project creation
+					if (e.status !== 404)
+						return $q.reject(e);
+
 					var project = new Project();
+					project._id = projectId;
 					project.reset();
+					project.users.push({ type: "internal", id: $rootScope.userCtx._id, role: "owner" });
 					return $q.when(project);
-				}
-				else
-					return Project.get({id: projectId}).$promise;
+				});
 			}
 		}
 	});
 
+	$stateProvider.state('main.project.save', {
+		abstract: true,
+		templateUrl: 'partials/projects/menu-save.html'
+	});
+	
 	///////////////////////////
 	// Project Specification
 	///////////////////////////
 
-	$stateProvider.state('main.project.basics', {
+	$stateProvider.state('main.project.save.basics', {
 		url: '/basics',
 		templateUrl: 'partials/projects/specification/basics.html',
 		controller: 'ProjectBasicsController',
@@ -284,13 +296,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.collection_site_list', {
+	$stateProvider.state('main.project.save.collection_site_list', {
 		url: '/collection-site',
 		templateUrl: 'partials/projects/specification/collection-site-list.html',
 		controller: 'ProjectCollectionSiteListController'
 	});
 
-	$stateProvider.state('main.project.user_list', {
+	$stateProvider.state('main.project.save.user_list', {
 		url: '/users',
 		templateUrl: 'partials/projects/specification/user-list.html',
 		controller: 'ProjectUserListController',
@@ -305,35 +317,19 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Project Raw data
 	///////////////////////////
 
-	$stateProvider.state('main.project.collection_form_list', {
+	$stateProvider.state('main.project.save.collection_form_list', {
 		url: '/collection-form',
 		templateUrl: 'partials/projects/activity/collection-form-list.html',
 		controller: 'ProjectCollectionFormListController'
 	});
 
-	$stateProvider.state('main.project.collection_form_edition', {
+	$stateProvider.state('main.project.save.collection_form_edition', {
 		url: '/collection-form/:formId',
 		templateUrl: 'partials/projects/activity/collection-form-edition.html',
 		controller: 'ProjectCollectionFormEditionController',
 		resolve: {
-			form: function($stateParams, project, uuid) {
-				if ($stateParams.formId === 'new')
-					return {
-						id: uuid.v4(),
-						name: '',
-						periodicity: 'month', 
-						collect: 'entity',
-						start: null,
-						end: null,
-						elements: []
-					};
-				else
-					return project.forms.find(function(form) {
-						return form.id == $stateParams.formId;
-					});
-			},
-			formUsage: function(project, form, Input) {
-				return Input.query({mode: "ids_by_form", projectId: project._id, formId: form.id}).$promise;
+			formUsage: function($stateParams, project, Input) {
+				return Input.query({mode: "ids_by_form", projectId: project._id, formId: $stateParams.formId}).$promise;
 			}
 		}
 	});
@@ -402,16 +398,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Project Indicators
 	///////////////////////////
 
-	$stateProvider.state('main.project.logical_frame', {
+	$stateProvider.state('main.project.save.logical_frame', {
 		url: '/logical-frame',
 		templateUrl: 'partials/projects/indicators/logframe-edit.html',
 		controller: 'ProjectLogicalFrameController'
-	});
-
-	$stateProvider.state('main.project.indicator_selection', {
-		url: '/indicator-selection',
-		templateUrl: 'partials/projects/indicators/selection.html',
-		controller: 'ProjectIndicatorSelectionController'
 	});
 
 	$stateProvider.state('main.project.indicators_reporting', {
@@ -464,13 +454,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
 				indicator: function(Indicator, $q, $stateParams) {
 					var indicatorId = $stateParams.indicatorId;
 
-					if (!indicatorId || indicatorId === 'new') {
+					return Indicator.get({id: indicatorId}).$promise.catch(function(e) {
+						// Server error
+						if (e.status !== 404)
+							return $q.reject(e);
+
+						// Indicator creation
 						var indicator = new Indicator();
+						indicator._id = indicatorId;
 						indicator.reset();
 						return $q.when(indicator);
-					}
-					else
-						return Indicator.get({id: indicatorId}).$promise;
+					});
 				}
 			}
 		});

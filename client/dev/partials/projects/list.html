@@ -1,5 +1,5 @@
 
-<a class="btn btn-primary pull-right" ui-sref="main.project.basics({projectId: 'new'})" acl-has-role="project">
+<a class="btn btn-primary pull-right" ng-click="createProject()" acl-has-role="project">
 	<i class="fa fa-plus"></i>
 	<span translate="project.create"></span>
 </a>
@@ -12,14 +12,14 @@
 </div>
 
 <ul class="nav nav-tabs" role="tablist">
-	<li ng-class="{active:projects==myProjects}">
-		<a ng-click="projects=myProjects">{{'project.my_projects'|translate}}</a>
+	<li ng-class="{active:projects == myProjects}">
+		<a ng-click="projects = myProjects">{{'project.my_projects'|translate}}</a>
 	</li>
-	<li ng-class="{active:projects==runningProjects}">
-		<a ng-click="projects=runningProjects">{{'project.running'|translate}}</a>
+	<li ng-class="{active:projects == runningProjects}">
+		<a ng-click="projects = runningProjects">{{'project.running'|translate}}</a>
 	</li>
-	<li ng-class="{active:projects==finishedProjects}">
-		<a ng-click="projects=finishedProjects">{{'project.finished'|translate}}</a>
+	<li ng-class="{active:projects == finishedProjects}">
+		<a ng-click="projects = finishedProjects">{{'project.finished'|translate}}</a>
 	</li>
 </ul>
 
@@ -29,6 +29,7 @@
 	<thead>
 		<tr>
 			<th style="width: 55px"></th>
+			<th><a ng-click="pred='country';rev=!rev">{{'shared.country'|translate}}</a></th>
 			<th><a ng-click="pred='name';rev=!rev">{{'shared.name'|translate}}</a></th>
 			<th><a ng-click="pred='themes';rev=!rev">{{'indicator.themes'|translate}}</a></th>
 			<th style="width: 100px;"><a ng-click="pred='start';rev=!rev">{{'shared.start'|translate}}</a></th>
@@ -37,7 +38,7 @@
 	</thead>
 	<tbody>
 		<tr ng-if="projects.length == 0">
-			<td colspan="5" style="text-align: center" translate="project.noproject">
+			<td colspan="6" style="text-align: center" translate="project.noproject">
 		</tr>
 		<tr ng-repeat="project in projects|orderBy:pred:rev">
 			<td style="text-align: center">
@@ -56,9 +57,9 @@
 				<i class="fa fa-pencil fa-fw"
 				   tooltip="{{'project.you_are_not_editor'|translate}}"
 				   tooltip-placement="right" acl-lacks-project-role="input" acl-project="project" style="color: darkred"></i>
-
 			</td>
-			<td><a ui-sref="main.project.basics({projectId: project._id})">{{project.name}}</a></td>
+			<td>{{project.country}}</td>
+			<td><a ui-sref="main.project.save.basics({projectId: project._id})">{{project.name}}</a></td>
 			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
 			<td>{{project.start|amDateFormat:'YYYY-MM-DD'}}</td>
 			<td>{{project.end|amDateFormat:'YYYY-MM-DD'}}</td>

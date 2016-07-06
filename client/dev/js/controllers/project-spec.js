@@ -4,9 +4,23 @@ angular.module('monitool.controllers.project.spec', [])
 
 	.controller('ProjectBasicsController', function($scope, themes) {
 		$scope.themes = themes;
+
+		var unwatch = $scope.$watch('projectForm', function(projectForm) {
+			if (projectForm) {
+				$scope.formContainer.currentForm = projectForm;
+				unwatch();
+			}
+		});
 	})
 
 	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input, project) {
+		var unwatch = $scope.$watch('projectForm', function(projectForm) {
+			if (projectForm) {
+				$scope.formContainer.currentForm = projectForm;
+				unwatch();
+			}
+		});
+
 		$scope.createEntity = function() {
 			$scope.project.createEntity();
 		};
@@ -31,16 +45,6 @@ angular.module('monitool.controllers.project.spec', [])
 
 		$scope.deleteGroup = function(groupId) {
 			$scope.project.removeGroup(groupId);
-		};
-
-		$scope.up = function(index, array) {
-			var element = array.splice(index, 1);
-			array.splice(index - 1, 0, element[0]);
-		};
-
-		$scope.down = function(index, array) {
-			var element = array.splice(index, 1);
-			array.splice(index + 1, 0, element[0]);
 		};
 	})
 

@@ -1,0 +1,17 @@
+<div>
+	<div ui-view></div>
+
+	<div acl-has-project-role="owner" class="noprint" style="margin-bottom: 20px">
+		<a ng-disabled="!projectSavable || projectSaveRunning" class="btn btn-primary" ng-click="save()">
+			<i class="fa fa-floppy-o" ng-if="!projectSaveRunning"></i>
+			<i class="fa fa-circle-o-notch fa-spin" ng-if="projectSaveRunning"></i>
+
+			<span translate="shared.save"></span>
+		</a>
+
+		<a ng-click="reset()" ng-disabled="!projectChanged || projectSaveRunning" class="btn btn-default">
+			<i class="fa fa-undo"></i>
+			<span translate="shared.remove_changes"></span>
+		</a>
+	</div>
+</div>

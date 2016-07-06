@@ -44,6 +44,8 @@ var files = {
 		'client/dev/bower_components/handsontable/dist/handsontable.full.min.js',
 		'client/dev/bower_components/Blob.js/Blob.js',
 		'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
+		'client/dev/bower_components/Sortable/Sortable.min.js',
+		'client/dev/bower_components/Sortable/ng-sortable.js'
 	]
 };
 

@@ -6,7 +6,7 @@ angular.module(
 		'monitool.services.utils.uuid'
 	])
 
-	.controller('ProjectListController', function($scope, projects, themes) {
+	.controller('ProjectListController', function($scope, $state, projects, uuid, themes) {
 		$scope.themes = themes;
 		$scope.pred = 'name'; // default sorting predicate
 
@@ -23,15 +23,56 @@ angular.module(
 		});
 
 		$scope.projects = $scope.myProjects;
+
+		$scope.createProject = function() {
+			$state.go('main.project.save.basics', {projectId: uuid.v4()});
+		}
 	})
 
-	.controller('ProjectMenuController', function($scope, $state, $stateParams, $filter, project, uuid) {
-		if ($stateParams.projectId === 'new')
-			project.users.push({ type: "internal", id: $scope.userCtx._id, role: "owner" });
-		
-		$scope.master = angular.copy(project);
-		$scope.project = project;
-		
+	.controller('ProjectMenuController', function($scope, $state, $stateParams, $filter, $rootScope, project, uuid) {
+		$scope.master = angular.copy(project);	// Last saved version of the project, or empty one.
+		$scope.project = project;				// Current version of project.
+		$scope.projectSaveRunning = false;		// We are not currently saving.
+		$scope.formContainer = {currentForm: null};
+
+		// When master changes, update menu elements, and save flags
+		var masterWatch = $scope.$watch('master', function() {
+			$scope.projectHasIndicators = $scope.master.hasObjectiveReporting();
+			$scope.projectActivityReady = $scope.master.hasActivityReporting();
+		});
+
+		// When project changes, update save flags
+		var onProjectChange = function() {
+			$scope.projectChanged = !angular.equals($scope.master, $scope.project);
+
+			$scope.projectSavable = $scope.projectChanged;
+			if ($scope.formContainer.currentForm)
+				$scope.projectSavable = $scope.projectSavable && !$scope.formContainer.currentForm.$invalid;
+		};
+
+		var projectWatch = $scope.$watch('project', onProjectChange, true);
+		var formWatch = $scope.$watch('formContainer.currentForm', onProjectChange);
+
+		// Restore $scope.master to avoid unsaved changes from a given page to pollute changes to another one.
+		var pageChangeWatch = $scope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
+			// If project is currently saving, disable all links
+			if ($scope.projectSaveRunning) {
+				e.preventDefault();
+				return;
+			}
+
+			// If project is changed, warn user that changes will be lost.
+			if ($scope.projectChanged) {
+				// then ask the user if he meant it
+				if (window.confirm($filter('translate')('shared.sure_to_leave')))
+					$scope.reset();
+				else
+					e.preventDefault();
+			}
+
+			$scope.formContainer.currentForm = null;
+		});
+
 		$scope.cloneProject = function() {
 			var newName = window.prompt($filter('translate')('project.please_enter_new_name'));
 
@@ -48,10 +89,14 @@ angular.module(
 				answer    = translate('project.are_you_sure_to_delete_answer');
 
 			if (window.prompt(question) === answer) {
-				menuWatch();
+				// Remove all watchs before deleting, to avoid errors
+				masterWatch();
+				projectWatch();
 				pageChangeWatch();
 
+				// Delete project
 				project.$delete(function() {
+					// Go back to project list.
 					$state.go('main.projects');
 				});
 			}
@@ -59,43 +104,34 @@ angular.module(
 
 		// save, reset and isUnchanged are all defined here, because those are shared between all project views.
 		$scope.save = function() {
-			if ($stateParams.projectId === 'new')
-				$scope.project._id = uuid.v4();
+			// When button is disabled, do not execute action.
+			if (!$scope.projectSavable || $scope.projectSaveRunning)
+				return;
+
+			$scope.projectSaveRunning = true;
 
 			return $scope.project.$save().then(function() {
 				$scope.master = angular.copy($scope.project);
-				
-				if ($stateParams.projectId === 'new')
-					$state.go('main.project.basics', {projectId: $scope.project._id});
+				$scope.projectChanged = false;
+				$scope.projectSavable = false;
+				$scope.projectSaveRunning = false;
+
 			}).catch(function(error) {
-				$scope.error = error;
+				// Display message to tell user that it's not possible to save.
+				var translate = $filter('translate');
+				alert(translate('project.saving_failed'));
+
+				// reload page.
+				window.location.reload();
 			});
 		};
 
-		var menuWatch = $scope.$watch('project', function(project) {
-			$scope.projectHasIndicators = $scope.project.hasObjectiveReporting();
-			$scope.projectActivityReady = $scope.project.hasActivityReporting();
-		}, true);
-
 		$scope.reset = function() {
+			// When button is disabled, do not execute action.
+			if (!$scope.projectChanged || $scope.projectSaveRunning)
+				return;
+
+			// Clone last saved version of project.
 			$scope.project = angular.copy($scope.master);
 		};
-
-		$scope.isUnchanged = function() {
-			return angular.equals($scope.master, $scope.project);
-		};
-
-		// We restore $scope.master on $scope.project to avoid unsaved changes from a given tab to pollute changes to another one.
-		var pageChangeWatch = $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-			var pages = ['main.project.logical_frame', 'main.project.collection_site_list', 'main.project.basics', 'main.project.user_list'];
-
-			// if unsaved changes were made
-			if (pages.indexOf(fromState.name) !== -1 && !angular.equals($scope.master, $scope.project)) {
-				// then ask the user if he meant it
-				if (window.confirm($filter('translate')('shared.sure_to_leave')))
-					$scope.reset();
-				else
-					event.preventDefault();
-			}
-		});
 	})

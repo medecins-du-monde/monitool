@@ -7,6 +7,10 @@ Math.factorial = function(num) {
 	return rval;
 };
 
+Math.mod = function(a, b) {
+	return (a % b) % b;
+};
+
 Number.isNaN = Number.isNaN || function(value) {
  	return typeof value === "number" && isNaN(value);
 };

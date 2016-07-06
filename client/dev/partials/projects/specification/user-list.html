@@ -1,61 +1,51 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.save.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="project.users"></li>
 </ol>
 
 <doc-reminder pages="project.create"></doc-reminder>
 
-<form class="form-horizontal" role="form" name="usersForm" novalidate>
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th style="width: 30px" acl-has-project-role="owner"></th>
+			<th style="width: 30px" ></th>
+			<th translate="shared.name"></th>
+			<th translate="project.user_role"></th>
+			<th translate="project.collection_site_list"></th>
+		</tr>
+	</thead>
+	<tbody ng-if="project.users.length == 0">
+		<tr>
+			<td colspan="5" style="text-align: center" translate="project.no_users"></td>
+		</tr>
+	</tbody>
 
-	<table class="table table-bordered table-stripped table-condensed">
-		<thead>
-			<tr>
-				<th style="width: 10%">Organisation</th>
-				<th style="width: 20%">Nom</th>
-				<th style="width: 25%">Droits</th>
-				<th style="width: 40%">Lieux</th>
-				<th style="width: 15%" acl-has-project-role="owner"></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat="user in project.users">
-				<td style="text-align: center">
-					<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
-				</td>
-				<td>{{user.name || users[user.id].name}}</td>
-				<td>{{('project.user_roles.' + user.role)|translate}}</td>
-				<td>
-					{{user.entities|getObjects:availableEntities|pluck:'name'|translate_list|join:', '}}
-				</td>
-				<td acl-has-project-role="owner">
-					<a class="btn btn-default btn-xs" ng-click="editUser(user)">
-					   <i class="fa fa-pencil"></i> <span translate="shared.edit"></span>
-					</a>
-				</td>
-			</tr>
-		</tbody>
-		<tfoot acl-has-project-role="owner">
-			<tr>
-				<td colspan="5" style="text-align: center">
-					<a class="btn btn-default btn-xs" ng-click="editUser()">
-						<i class="fa fa-plus"></i>
-						<span translate="shared.add"></span>
-					</a>
-				</td>
-			</tr>
-		</tfoot>
-	</table>
+	<tbody ng-if="project.users.length != 0" ng-sortable="{handle: '.handle'}">
+		<tr ng-repeat="user in project.users">
+			<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
 
-	<div acl-has-project-role="owner">
-		<button ng-click="save()" ng-disabled="project.owners.length == 0 || isUnchanged()" class="btn btn-primary">
-			<i class="fa fa-floppy-o"></i>
-			<span translate="shared.save"></span>
-		</button>
-
-		<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
-			<i class="fa fa-undo"></i>
-			<span translate="shared.remove_changes"></span>
-		</button>
-	</div>
-</form>
+			<td style="text-align: center">
+				<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
+			</td>
+			<td>
+				<a ng-click="editUser(user)">{{user.name || users[user.id].name}}</a>
+			</td>
+			<td>{{('project.user_roles.' + user.role)|translate}}</td>
+			<td>
+				{{user.entities|getObjects:availableEntities|pluck:'name'|translate_list|join:', '}}
+			</td>
+		</tr>
+	</tbody>
+	<tfoot acl-has-project-role="owner">
+		<tr>
+			<td colspan="5" style="text-align: center">
+				<a class="btn btn-default btn-xs" ng-click="editUser()">
+					<i class="fa fa-plus"></i>
+					<span translate="shared.add"></span>
+				</a>
+			</td>
+		</tr>
+	</tfoot>
+</table>

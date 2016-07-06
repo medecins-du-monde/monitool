@@ -89,21 +89,20 @@
 
 	</fieldset>
 
-	<div class="pull-right" acl-has-role="indicator">
-		<a class="btn btn-primary"
-		   ng-disabled="indicatorForm.$invalid || isUnchanged()"
-		   ng-click="save()">
+	<div acl-has-role="indicator" class="noprint" style="margin-bottom: 20px">
+		<a ng-disabled="!indicatorSavable || indicatorSaveRunning" class="btn btn-primary" ng-click="save()">
+			<i class="fa fa-floppy-o" ng-if="!indicatorSaveRunning"></i>
+			<i class="fa fa-circle-o-notch fa-spin" ng-if="indicatorSaveRunning"></i>
 
-			<i class="fa fa-floppy-o"></i>
 			<span translate="shared.save"></span>
 		</a>
 
-		<a class="btn btn-default" ng-disabled="isUnchanged()" ng-click="reset()">
+		<a ng-click="reset()" ng-disabled="!indicatorChanged || indicatorSaveRunning" class="btn btn-default">
 			<i class="fa fa-undo"></i>
 			<span translate="shared.remove_changes"></span>
 		</a>
 
-		<a class="btn btn-danger" ng-if="!isNew" ng-click="delete()">
+		<a class="btn btn-danger" ng-if="indicator._rev" ng-click="delete()">
 			<i class="fa fa-trash"></i>
 			<span translate="shared.delete"></span>
 		</a> 

@@ -81,6 +81,7 @@ module.exports = {
 				if (doc.type === 'project')
 					emit(doc._id, {
 						_id: doc._id,
+						country: doc.country,
 						name: doc.name,
 						start: doc.start, end: doc.end,
 						users: doc.users.map(function(user) {

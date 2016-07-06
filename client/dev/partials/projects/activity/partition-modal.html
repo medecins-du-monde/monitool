@@ -36,15 +36,22 @@
 		<table class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
+					<th style="width: 30px"></th>
 					<th translate="project.partition_name"></th>
-					<th style="width: 90px"></th>
+					<th style="width: 30px"></th>
 				</tr>
 			</thead>
-			<tbody>
-				<tr ng-if="!partition.elements.length">
-					<td colspan="2" style="text-align: center" translate="project.no_partition_elements"></td>
+			
+			<tbody ng-if="partition.elements.length == 0">
+				<tr>
+					<td colspan="3" style="text-align: center" translate="project.no_partition_elements"></td>
 				</tr>
+			</tbody>
+
+			<tbody ng-if="partition.elements.length != 0" ng-sortable="{handle: '.handle'}">
 				<tr ng-repeat="partitionElement in partition.elements track by partitionElement.id">
+					<td class="handle"><i class="fa fa-bars"></i></td>
+
 					<td>
 						<ng-form name="center">
 							<div class="form-group" style="margin: 0">
@@ -59,13 +66,7 @@
 					</td>
 
 					<td style="text-align: right">
-						<a class="btn btn-default btn-sm" ng-click="move($index, partition.elements, -1)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
-							<i class="fa fa-caret-square-o-up"></i>
-						</a>
-						<a class="btn btn-default btn-sm" ng-click="move($index, partition.elements, 1)" ng-if="!$last" tooltip="{{'shared.down'|translate}}">
-							<i class="fa fa-caret-square-o-down"></i>
-						</a>
-						<a class="btn btn-danger btn-sm" ng-click="deletePartitionElement(partitionElement.id)" tooltip="{{'shared.delete'|translate}}">
+						<a class="btn btn-danger btn-sm" ng-click="deletePartitionElement(partitionElement.id)">
 							<i class="fa fa-remove"></i>
 						</a>
 					</td>
@@ -73,7 +74,7 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<td colspan="2" style="text-align: center">
+					<td colspan="3" style="text-align: center">
 						<a class="btn btn-default btn-xs" ng-click="createPartitionElement()">
 							<i class="fa fa-plus"></i>
 							<span translate="shared.add"></span>
@@ -88,16 +89,21 @@
 		<table class="table table-bordered table-stripped table-condensed" ng-if="useGroups">
 			<thead>
 				<tr>
-					<th style="width:300px" translate="project.partition_group_name"></th>
+					<th style="width: 30px"></th>
+					<th style="width: 300px" translate="project.partition_group_name"></th>
 					<th translate="shared.members"></th>
-					<th style="width: 90px;"></th>
+					<th style="width: 30px;"></th>
 				</tr>
 			</thead>
-			<tbody>
-				<tr ng-if="!partition.groups.length">
-					<td colspan="3" style="text-align: center" translate="project.no_partition_groups"></td>
+			<tbody ng-if="partition.groups.length == 0">
+				<tr>
+					<td colspan="4" style="text-align: center" translate="project.no_partition_groups"></td>
 				</tr>
+			</tbody>
+			<tbody ng-if="partition.groups.length != 0" ng-sortable="{handle: '.handle'}">
 				<tr ng-repeat="partitionGroup in partition.groups track by partitionGroup.id">
+					<td class="handle"><i class="fa fa-bars"></i></td>
+
 					<td>
 						<ng-form name="center">
 							<div class="form-group" style="margin: 0">
@@ -121,13 +127,7 @@
 					</td>
 
 					<td style="text-align: right">
-						<a class="btn btn-default btn-sm" ng-click="move($index, partition.groups, -1)" ng-if="!$first" tooltip="{{'shared.up'|translate}}">
-							<i class="fa fa-caret-square-o-up"></i>
-						</a>
-						<a class="btn btn-default btn-sm" ng-click="move($index, partition.groups, 1)" ng-if="!$last" tooltip="{{'shared.down'|translate}}">
-							<i class="fa fa-caret-square-o-down"></i>
-						</a>
-						<a class="btn btn-danger btn-sm" ng-click="deleteGroup(partitionGroup.id)" tooltip="{{'shared.delete'|translate}}">
+						<a class="btn btn-danger btn-sm" ng-click="deleteGroup(partitionGroup.id)">
 							<i class="fa fa-remove"></i>
 						</a>
 					</td>
@@ -135,7 +135,7 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<td colspan="3" style="text-align: center">
+					<td colspan="4" style="text-align: center">
 						<a class="btn btn-default btn-xs" ng-click="createGroup()">
 							<i class="fa fa-plus"></i>
 							<span translate="shared.add"></span>

@@ -1,6 +1,6 @@
+
 <div class="row">
 	<div class="col-md-2 noprint">
-
 		<div class="panel-group">
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -9,7 +9,7 @@
 
 				<div class="panel-collapse">
 					<div class="list-group">
-						<a ui-sref="main.project.basics"
+						<a ui-sref="main.project.save.basics"
 						   ui-sref-active="active"
 						   class="list-group-item">
 
@@ -17,11 +17,11 @@
 							<span translate="project.basics"></span>
 						</a>
 
-						<a ui-sref="main.project.collection_site_list"
+						<a ui-sref="main.project.save.collection_site_list"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id"
-						   disable-if="!project._id">
+						   eat-click-if="!project._rev"
+						   disable-if="!project._rev">
 
 							<span class="label label-default pull-right">{{project.entities.length}}</span>
 							<i class="fa fa-map-marker fa-fw"></i>
@@ -29,10 +29,10 @@
 
 						</a>
 
-						<a ui-sref="main.project.user_list"
+						<a ui-sref="main.project.save.user_list"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id" disable-if="!project._id">
+						   eat-click-if="!project._rev" disable-if="!project._rev">
 
 						   <span class="label label-default pull-right">{{project.users.length}}</span>
 							<i class="fa fa-user fa-fw"></i>
@@ -42,6 +42,8 @@
 				</div>
 			</div>
 
+			<div style="text-align: center"><i class="fa fa-angle-down"></i></div>
+
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title" translate="project.activity_management"></h4>
@@ -50,11 +52,11 @@
 				<div class="panel-collapse">
 					<div class="list-group">
 
-						<a ui-sref="main.project.collection_form_list"
+						<a ui-sref="main.project.save.collection_form_list"
 						   class="list-group-item"
-						   ng-class="{active: $state.is('main.project.collection_form_list') || $state.is('main.project.collection_form_edition')}"
-						   eat-click-if="!project._id"
-						   disable-if="!project._id">
+						   ng-class="{active: $state.is('main.project.save.collection_form_list') || $state.is('main.project.save.collection_form_edition')}"
+						   eat-click-if="!project._rev"
+						   disable-if="!project._rev">
 							
 							<span class="label label-default pull-right">{{project.forms.length}}</span>
 							<i class="fa fa-table fa-fw"></i>
@@ -65,8 +67,8 @@
 						<a ui-sref="main.project.collection_input_list"
 						   class="list-group-item"
 						   ng-class="{active: $state.is('main.project.collection_input_list') || $state.is('main.project.collection_input_edition')}"
-						   eat-click-if="!project._id || !projectActivityReady"
-						   disable-if="!project._id || !projectActivityReady">
+						   eat-click-if="!project._rev || !projectActivityReady"
+						   disable-if="!project._rev || !projectActivityReady">
 							
 							<i class="fa fa-pencil fa-fw"></i>
 							<span translate="project.collection_input_list"></span>
@@ -75,8 +77,8 @@
 						<a ui-sref="main.project.activity_reporting"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id || !projectActivityReady"
-						   disable-if="!project._id || !projectActivityReady">
+						   eat-click-if="!project._rev || !projectActivityReady"
+						   disable-if="!project._rev || !projectActivityReady">
 
 							<i class="fa fa-line-chart fa-fw"></i>
 							<span translate="shared.reporting_general"></span>
@@ -85,8 +87,8 @@
 						<a ui-sref="main.project.detailed_activity_reporting"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id || !projectActivityReady"
-						   disable-if="!project._id || !projectActivityReady">
+						   eat-click-if="!project._rev || !projectActivityReady"
+						   disable-if="!project._rev || !projectActivityReady">
 							<i class="fa fa-bar-chart fa-fw"></i>
 							<span translate="project.reporting_compare_sites"></span>
 						</a>
@@ -94,14 +96,16 @@
 						<a ui-sref="main.project.olap"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id || !projectActivityReady"
-						   disable-if="!project._id || !projectActivityReady">
+						   eat-click-if="!project._rev || !projectActivityReady"
+						   disable-if="!project._rev || !projectActivityReady">
 							<i class="fa fa-table fa-fw"></i>
 							<span translate="project.pivot_table"></span>
 						</a>
 					</div>
 				</div>
 			</div>
+
+			<div style="text-align: center"><i class="fa fa-angle-down"></i></div>
 
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -111,10 +115,10 @@
 				<div class="panel-collapse">
 					<div class="list-group">
 
-						<a ui-sref="main.project.logical_frame"
+						<a ui-sref="main.project.save.logical_frame"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id" disable-if="!project._id">
+						   eat-click-if="!project._rev" disable-if="!project._rev">
 
 							<span class="label label-default pull-right">{{project.logicalFrames.length}}</span>
 							<i class="fa fa-object-group fa-fw"></i>
@@ -124,8 +128,8 @@
 						<a ui-sref="main.project.indicators_reporting"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id || !projectHasIndicators"
-						   disable-if="!project._id || !projectHasIndicators">
+						   eat-click-if="!project._rev || !projectHasIndicators"
+						   disable-if="!project._rev || !projectHasIndicators">
 							<i class="fa fa-line-chart fa-fw"></i>
 							<span translate="shared.reporting_general"></span>
 						</a>
@@ -133,8 +137,8 @@
 						<a ui-sref="main.project.detailed_indicators_reporting"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._id || !projectHasIndicators"
-						   disable-if="!project._id || !projectHasIndicators">
+						   eat-click-if="!project._rev || !projectHasIndicators"
+						   disable-if="!project._rev || !projectHasIndicators">
 
 							<i class="fa fa-bar-chart fa-fw"></i>
 							<span translate="project.reporting_compare_sites"></span>
@@ -146,7 +150,7 @@
 			<div class="panel panel-default" ng-if="userCtx.type == 'user'">
 				<div class="panel-collapse">
 					<div class="list-group">
-						<a class="list-group-item list-group-item-info" ng-click="cloneProject()" eat-click-if="!project._id" disable-if="!project._id" acl-has-role="project">
+						<a class="list-group-item list-group-item-info" ng-click="cloneProject()" eat-click-if="!project._rev" disable-if="!project._rev" acl-has-role="project">
 							<i class="fa fa-clone fa-fw"></i>
 							<span translate="shared.clone"></span>
 						</a>
@@ -156,7 +160,7 @@
 							<span translate="shared.clone"></span>
 						</a>						
 
-						<a class="list-group-item list-group-item-danger" ng-click="deleteProject()" eat-click-if="!project._id" disable-if="!project._id" acl-has-project-role="owner">
+						<a class="list-group-item list-group-item-danger" ng-click="deleteProject()" eat-click-if="!project._rev" disable-if="!project._rev" acl-has-project-role="owner">
 							<i class="fa fa-trash fa-fw"></i>
 							<span translate="shared.delete"></span>
 						</a>

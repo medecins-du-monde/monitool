@@ -9,6 +9,48 @@ angular
 	)
 
 	.controller('ProjectLogicalFrameController', function($scope, $q, $modal) {
+
+		/////////////////////
+		// Allow purposes, outputs and indicators reordering. We need to hack around bugs
+		// in current Sortable plugin implementation.
+		// @see https://github.com/RubaXa/Sortable/issues/581
+		// @see https://github.com/RubaXa/Sortable/issues/722
+		/////////////////////
+
+		$scope.logframeSortOptions = {handle: '.logframe-handle'};
+		$scope.purposeSortOptions = {group:'purposes', handle: '.purpose-handle'};
+		$scope.outputSortOptions = {group:'outputs', handle: '.output-handle'};
+		$scope.indicatorsSortOptions = {
+			group:'indicators', 
+			handle: '.indicator-handle',
+			onStart: function() { document.body.classList.add('dragging'); },
+			onEnd: function() { document.body.classList.remove('dragging'); }
+		};
+
+		$scope.onSortableMouseEvent = function(group, enter) {
+			if (group == 'outputs')
+				$scope.purposeSortOptions.disabled = enter;
+			else if (group == 'indicators')
+				$scope.purposeSortOptions.disabled = $scope.outputSortOptions.disabled = enter;
+		}
+
+		/////////////////////
+		// Pass the form to the shared controller over it, to be able
+		// to enable and disable the save button.
+		/////////////////////
+		
+		var unwatch = $scope.$watch('projectForm', function(projectForm) {
+			if (projectForm) {
+				$scope.formContainer.currentForm = projectForm;
+				unwatch();
+			}
+		});
+		
+		/////////////////////
+		// To make the page faster, we only put one logical frame in the scope
+		// and change when the tabs on top are used.
+		/////////////////////
+
 		$scope.logicalFrameIndex = $scope.project.logicalFrames.length ? 0 : null;
 		
 		$scope.setLogicalFrame = function(index) {
@@ -30,35 +72,26 @@ angular
 			$scope.logicalFrameIndex = $scope.project.logicalFrames.length ? 0 : null;
 		};
 
-		// handle purpose add and remove
+		/////////////////////
+		// Create and remove elements from logical frame
+		/////////////////////
+		
 		$scope.addPurpose = function() {
 			$scope.project.logicalFrames[$scope.logicalFrameIndex].purposes.push({
 				description: "", assumptions: "", indicators: [], outputs: []});
 		};
 
-		$scope.removePurpose = function(purpose) {
-			$scope.project.logicalFrames[$scope.logicalFrameIndex].purposes.splice(
-				$scope.project.logicalFrames[$scope.logicalFrameIndex].purposes.indexOf(purpose), 1
-			);
-		};
-
-		// handle output add and remove
 		$scope.addOutput = function(purpose) {
 			purpose.outputs.push({
 				description: "", assumptions: "", indicators: [], activities: []});
 		};
 
-		$scope.removeOutput = function(output, purpose) {
-			purpose.outputs.splice(purpose.outputs.indexOf(output), 1);
-		};
-
-		// handle output add and remove
 		$scope.addActivity = function(output) {
 			output.activities.push({description: ""});
 		};
 
-		$scope.removeActivity = function(activity, output) {
-			output.activities.splice(output.activities.indexOf(activity), 1);
+		$scope.remove = function(element, list) {
+			list.splice(list.indexOf(element), 1);
 		};
 
 		// handle indicator add, edit and remove are handled in a modal window.
@@ -81,6 +114,17 @@ angular
 			});
 		};
 
+		// Watch reset button
+		$scope.$watch('project', function() {
+			if ($scope.project.logicalFrames.length == 0)
+				$scope.logicalFrameIndex = null;
+
+			else if (
+				($scope.logicalFrameIndex >= $scope.project.logicalFrames.length) ||
+				($scope.logicalFrameIndex == null && $scope.project.logicalFrames.length))
+				$scope.logicalFrameIndex = 0;
+		});
+
 		$scope.link = function(planning) {
 			var promise = $modal.open({
 				controller: 'ProjectIndicatorSelectionModalController',
@@ -99,15 +143,6 @@ angular
 
 		$scope.unlink = function(planning) {
 			planning.indicatorId = null;
-		};
-
-		$scope.reset = function() {
-			$scope.$parent.reset();
-
-			if ($scope.project.logicalFrames.length == 0)
-				$scope.logicalFrameIndex = null;
-			else if ($scope.logicalFrameIndex >= $scope.project.logicalFrames.length)
-				$scope.logicalFrameIndex = 0;
 		};
 	})
 

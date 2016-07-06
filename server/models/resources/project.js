@@ -17,6 +17,7 @@ var validate = validator({
 		_id: { $ref: "#/definitions/uuid" },
 		_rev: { $ref: "#/definitions/revision" },
 		type: { type: "string", pattern: "^project$" },
+		country: { type: "string", minLength: 1 },
 		name: { type: "string", minLength: 1 },
 		start: { type: "string", format: "date" },
 		end: { type: "string", format: "date" },
@@ -127,7 +128,7 @@ var validate = validator({
 						required: ['type', 'id', 'role'],
 						properties: {
 							type: {type: 'string', pattern: "^internal$"},
-							id: {type: 'string', pattern: '^usr:[a-z0-9\.\-]+$'},
+							id: {type: 'string', pattern: '^usr:[a-z0-9\\.\\-\\_]+$'},
 							role: {type: 'string', enum: ['owner', 'input_all', 'input', 'read']},
 							entities: {type: 'array', items: { $ref: "#/definitions/uuid_or_none" } }
 						}

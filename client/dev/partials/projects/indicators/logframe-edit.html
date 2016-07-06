@@ -1,23 +1,26 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.save.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="shared.logical_frames"></li>
 </ol>
 
 <doc-reminder pages="project.logical_frame"></doc-reminder>
 
-<ul class="nav nav-tabs">
-	<li ng-class="{active: logicalFrameIndex == index}" ng-repeat="(index, logframe) in project.logicalFrames">
-		<a ng-click="setLogicalFrame(index)">{{logframe.name||('project.unnamed_logframe'|translate)}}</a>
-	</li>
+<a ng-click="createLogicalFrame()" class="btn btn-primary pull-right" acl-has-project-role="owner">
+	<i class="fa fa-plus"></i>
+	{{'project.create_logframe'|translate}}
+</a>
 
-	<li acl-has-project-role="owner">
-		<a ng-click="createLogicalFrame()" class="btn-primary">
-			<i class="fa fa-plus"></i>
-			{{'project.create_logframe'|translate}}
+<ul class="nav nav-tabs" ng-sortable="logframeSortOptions" ng-if="project.logicalFrames.length">
+	<li ng-class="{active: logicalFrameIndex == index}" ng-repeat="(index, logframe) in project.logicalFrames">
+		<a ng-click="setLogicalFrame(index)">
+			<i class="fa fa-bars logframe-handle" acl-has-project-role="owner"></i>
+			{{logframe.name||('project.unnamed_logframe'|translate)}}
 		</a>
 	</li>
 </ul>
+
+<div ng-if="project.logicalFrames.length == 0" translate="project.no_logical_frame"></div>
 
 <br/>
 
@@ -69,15 +72,12 @@
 			<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 			<div class="col-sm-10">
 				<div class="form-control-static">
-					<ul>
+					<ul ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)">
 						<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">
-							{{indicator.display}}
-							
-							<span acl-has-project-role="owner">
-								<a class="btn btn-xxs btn-default" ng-click="editIndicator(indicator, project.logicalFrames[logicalFrameIndex].indicators)" tooltip="{{'shared.edit'|translate}}">
-									<i class="fa fa-pencil"></i>
-								</a>
+							<i class="fa fa-bars indicator-handle"></i>
+							<a ng-click="editIndicator(indicator, project.logicalFrames[logicalFrameIndex].indicators)">{{indicator.display}}</a>
 
+							<span acl-has-project-role="owner">
 								<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
 									<i class="fa fa-link"></i>
 								</a>
@@ -105,185 +105,189 @@
 		
 		<p ng-if="project.logicalFrames[logicalFrameIndex].purposes.length == 0" translate="project.no_purposes"></p>
 
-		<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrames[logicalFrameIndex].purposes">
+		<div ng-sortable="purposeSortOptions" ng-mouseenter="onSortableMouseEvent('purposes', true)" ng-mouseleave="onSortableMouseEvent('purposes', false)">
 
-			<div class="panel-heading">
-				<div class="panel-title">
-					<a class="btn btn-danger btn-xs pull-right" ng-click="removePurpose(purpose)" acl-has-project-role="owner">
-						<i class="fa fa-remove"></i>
-						<span translate="shared.delete"></span>
-					</a>
+			<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrames[logicalFrameIndex].purposes">
 
-					{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}
+				<div class="panel-heading">
+					<div class="panel-title">
+						<a class="btn btn-danger btn-xs pull-right"
+						   ng-click="remove(purpose, project.logicalFrames[logicalFrameIndex].purposes)"
+						   acl-has-project-role="owner">
+
+							<i class="fa fa-remove"></i>
+							<span translate="shared.delete"></span>
+						</a>
+
+						<i class="fa fa-bars purpose-handle"></i>
+
+						{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}
+					</div>
 				</div>
-			</div>
 
-			<div class="panel-body">
-				<ng-form name="purposeForm">
-					<div class="form-group" show-errors>
-						<label for="purpose-desc-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.purpose"></label>
-						<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.description">
-							<textarea auto-resize class="form-control"
-									  name="description"
-									  id="purpose-desc-{{purposeId}}-input"
-									  placeholder="{{'project.intervention_logic_purpose_ph'|translate}}"
-									  ng-model="purpose.description"></textarea>
+				<div class="panel-body">
+					<ng-form name="purposeForm">
+						<div class="form-group" show-errors>
+							<label for="purpose-desc-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.purpose"></label>
+							<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.description">
+								<textarea auto-resize class="form-control"
+										  name="description"
+										  id="purpose-desc-{{purposeId}}-input"
+										  placeholder="{{'project.intervention_logic_purpose_ph'|translate}}"
+										  ng-model="purpose.description"></textarea>
+							</div>
 						</div>
-					</div>
 
-					<div class="form-group" show-errors>
-						<label for="purpose-assum-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.assumptions"></label>
-						<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.assumptions">
-							<textarea auto-resize class="form-control"
-									  name="assumptions"
-									  id="purpose-assum-{{purposeId}}-input"
-									  placeholder="{{'project.assumptions_purpose_ph'|translate}}"
-									  ng-model="purpose.assumptions"></textarea>
+						<div class="form-group" show-errors>
+							<label for="purpose-assum-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.assumptions"></label>
+							<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.assumptions">
+								<textarea auto-resize class="form-control"
+										  name="assumptions"
+										  id="purpose-assum-{{purposeId}}-input"
+										  placeholder="{{'project.assumptions_purpose_ph'|translate}}"
+										  ng-model="purpose.assumptions"></textarea>
+							</div>
 						</div>
-					</div>
 
-					<div class="form-group">
-						<label class="col-sm-2 control-label" translate="shared.indicators"></label>
-						<div class="col-sm-10">
-							<div class="form-control-static">
-								<ul>
-									<li ng-repeat="indicator in purpose.indicators">
-										{{indicator.display}}
+						<div class="form-group">
+							<label class="col-sm-2 control-label" translate="shared.indicators"></label>
+							<div class="col-sm-10">
+								<div class="form-control-static">
+									<ul ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)">
+										<li ng-repeat="indicator in purpose.indicators">
+											<i class="fa fa-bars indicator-handle"></i>
+											<a ng-click="editIndicator(indicator, purpose.indicators)">{{indicator.display}}</a>
 
-										<span acl-has-project-role="owner">
-											<a class="btn btn-xxs btn-default" ng-click="editIndicator(indicator, purpose.indicators)" tooltip="{{'shared.edit'|translate}}">
-												<i class="fa fa-pencil"></i>
-											</a>
+											<span acl-has-project-role="owner">
+												<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
+													<i class="fa fa-link"></i>
+												</a>
 
-											<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
-												<i class="fa fa-link"></i>
-											</a>
+												<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
+													<i class="fa fa-unlink"></i>
+												</a>
+											</span>
+										</li>
+									</ul>
 
-											<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
-												<i class="fa fa-unlink"></i>
+									<p acl-has-project-role="owner">
+										<a class="btn btn-default" ng-click="editIndicator(null, purpose.indicators)">
+											<i class="fa fa-plus"></i>
+											{{"project.add_indicator"|translate}}
+										</a>
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<div ng-sortable="outputSortOptions" ng-mouseenter="onSortableMouseEvent('outputs', true)" ng-mouseleave="onSortableMouseEvent('outputs', false)">
+
+							<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs">
+								<div class="panel-heading">
+									<div class="panel-title">
+										<span class="pull-right">
+											<a class="btn btn-danger btn-xs" ng-click="remove(output, purpose.outputs)" acl-has-project-role="owner">
+												<i class="fa fa-remove"></i>
+												<span translate="shared.delete"></span>
 											</a>
 										</span>
-									</li>
-								</ul>
-
-								<p acl-has-project-role="owner">
-									<a class="btn btn-default" ng-click="editIndicator(null, purpose.indicators)">
-										<i class="fa fa-plus"></i>
-										{{"project.add_indicator"|translate}}
-									</a>
-								</p>
-							</div>
-						</div>
-					</div>
-
-					<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs">
-						<div class="panel-heading">
-							<div class="panel-title">
-								<span class="pull-right">
-									<a class="btn btn-danger btn-xs" ng-click="removeOutput(output, purpose)" acl-has-project-role="owner">
-										<i class="fa fa-remove"></i>
-										<span translate="shared.delete"></span>
-									</a>
-								</span>
-
-								{{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
-							</div>
-						</div>
-
-						<div class="panel-body">
-							<ng-form name="outputForm">
-								<div class="form-group" show-errors>
-									<label for="output-desc-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.output"></label>
-									<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.description">
-										<textarea auto-resize class="form-control"
-												  id="output-desc-{{purposeId}}-{{outputId}}-input"
-												  name="description"
-												  placeholder="{{'project.output_desc_ph'|translate}}"
-												  ng-model="output.description"></textarea>
+										<i class="fa fa-bars output-handle"></i>
+										{{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
 									</div>
 								</div>
 
-								<div class="form-group" show-errors>
-									<label for="output-assump-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.assumptions"></label>
-									<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.assumptions">
-										<textarea auto-resize class="form-control"
-												  id="output-assump-{{purposeId}}-{{outputId}}-input"
-												  name="assumptions"
-												  placeholder="{{'project.output_assumptions_ph'|translate}}"
-												  ng-model="output.assumptions"></textarea>
-									</div>
-								</div>
+								<div class="panel-body">
+									<ng-form name="outputForm">
+										<div class="form-group" show-errors>
+											<label for="output-desc-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.output"></label>
+											<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.description">
+												<textarea auto-resize class="form-control"
+														  id="output-desc-{{purposeId}}-{{outputId}}-input"
+														  name="description"
+														  placeholder="{{'project.output_desc_ph'|translate}}"
+														  ng-model="output.description"></textarea>
+											</div>
+										</div>
 
-								<div class="form-group">
-									<label class="col-sm-2 control-label" translate="shared.indicators"></label>
-									<div class="col-sm-10">
-										<div class="form-control-static">
-											<ul>
-												<li ng-repeat="indicator in output.indicators">
-													{{indicator.display}}
+										<div class="form-group" show-errors>
+											<label for="output-assump-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.assumptions"></label>
+											<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.assumptions">
+												<textarea auto-resize class="form-control"
+														  id="output-assump-{{purposeId}}-{{outputId}}-input"
+														  name="assumptions"
+														  placeholder="{{'project.output_assumptions_ph'|translate}}"
+														  ng-model="output.assumptions"></textarea>
+											</div>
+										</div>
 
-													<span acl-has-project-role="owner">
-														<a class="btn btn-xxs btn-default" ng-click="editIndicator(indicator, output.indicators)" tooltip="{{'shared.edit'|translate}}">
-															<i class="fa fa-pencil"></i>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" translate="shared.indicators"></label>
+											<div class="col-sm-10">
+												<div class="form-control-static">
+													<ul ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)">
+														<li ng-repeat="indicator in output.indicators">
+															<i class="fa fa-bars indicator-handle"></i>
+															<a ng-click="editIndicator(indicator, output.indicators)">{{indicator.display}}</a>
+
+															<span acl-has-project-role="owner">
+																<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
+																	<i class="fa fa-link"></i>
+																</a>
+
+																<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
+																	<i class="fa fa-unlink"></i>
+																</a>
+															</span>
+														</li>
+													</ul>
+
+													<p acl-has-project-role="owner">
+														<a class="btn btn-default" ng-click="editIndicator(null, output.indicators)">
+															<i class="fa fa-plus"></i>
+															{{"project.add_indicator"|translate}}
 														</a>
+													</p>
+												</div>
+											</div>
+										</div>
 
-														<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
-															<i class="fa fa-link"></i>
-														</a>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" translate="project.activities"></label>
+											<div class="col-sm-10" acl-has-project-role="owner">
+												<div class="input-group" style="margin-bottom: 5px;" ng-repeat="activity in output.activities">
+													<input type="text" class="form-control" name="activity"
+														   placeholder="{{'project.activity_desc_ph'|translate}}"
+														   ng-model="activity.description"/>
 
-														<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
-															<i class="fa fa-unlink"></i>
-														</a>
+													<span class="input-group-btn">
+														<a class="btn btn-danger" ng-click="remove(activity, output.activities)" translate="shared.remove">Retirer</a>
 													</span>
-												</li>
-											</ul>
+												</div>
 
-											<p acl-has-project-role="owner">
-												<a class="btn btn-default" ng-click="editIndicator(null, output.indicators)">
-													<i class="fa fa-plus"></i>
-													{{"project.add_indicator"|translate}}
-												</a>
-											</p>
+												<p class="form-control-static">
+													<a ng-click="addActivity(output)" class="btn btn-default">
+														<i class="fa fa-plus"></i>
+														{{"project.add_activity"|translate}}
+													</a>
+												</p>
+											</div>
+
+											<div class="col-sm-10" acl-lacks-project-role="owner">
+												<ul>
+													<li ng-repeat="activity in output.activities">{{activity.description}}</li>
+												</ul>
+											</div>
 										</div>
-									</div>
+									</ng-form>
 								</div>
-
-								<div class="form-group">
-									<label class="col-sm-2 control-label" translate="project.activities"></label>
-									<div class="col-sm-10" acl-has-project-role="owner">
-										<div class="input-group" style="margin-bottom: 5px;" ng-repeat="activity in output.activities">
-											<input type="text" class="form-control" name="activity"
-												   placeholder="{{'project.activity_desc_ph'|translate}}"
-												   ng-model="activity.description"/>
-
-											<span class="input-group-btn">
-												<a class="btn btn-danger" ng-click="removeActivity(activity, output)" translate="shared.remove">Retirer</a>
-											</span>
-										</div>
-
-										<p class="form-control-static">
-											<a ng-click="addActivity(output)" class="btn btn-default">
-												<i class="fa fa-plus"></i>
-												{{"project.add_activity"|translate}}
-											</a>
-										</p>
-									</div>
-
-									<div class="col-sm-10" acl-lacks-project-role="owner">
-										<ul>
-											<li ng-repeat="activity in output.activities">{{activity.description}}</li>
-										</ul>
-									</div>
-								</div>
-							</ng-form>
+							</div>
 						</div>
-					</div>
-					
-					<a class="btn btn-default" ng-click="addOutput(purpose)" acl-has-project-role="owner">
-						<i class="fa fa-plus"></i>
-						<span translate="project.add_output"></span>
-					</a>
-				</ng-form>
+						<a class="btn btn-default" ng-click="addOutput(purpose)" acl-has-project-role="owner">
+							<i class="fa fa-plus"></i>
+							<span translate="project.add_output"></span>
+						</a>
+					</ng-form>
+				</div>
 			</div>
 		</div>
 
@@ -295,15 +299,4 @@
 
 </form>
 
-<div acl-has-project-role="owner">
-	<br/>
-	<a ng-disabled="projectForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
-		<i class="fa fa-floppy-o"></i>
-		<span translate="shared.save"></span>
-	</a>
-
-	<a ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
-		<i class="fa fa-undo"></i>
-		<span translate="shared.remove_changes"></span>
-	</a>
-</div>
+<br/>

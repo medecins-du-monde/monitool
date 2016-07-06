@@ -60,6 +60,7 @@ var ENGLISH_LOCALE = {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		country: "Country",
 		apply: "Apply changes",
 		clone: "Clone",
 		user_guide: "User guide",
@@ -148,6 +149,9 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+
+		saving_failed: "Monitool was unable to save the project, your last changes will be lost",
+		no_logical_frame: "No logical frame was created yet for this project.",
 		partition_general: "General",
 		partition_general_placeholder: "ex: Age",
 		partition_elements: "Elements",
@@ -261,8 +265,8 @@ var ENGLISH_TRANSLATION = {
 		remove_partition: "Remove this partition",
 
 		aggregation: "Aggregation",
-		different_geos: "On different places",
-		same_geos: "On the same place",
+		sites_agg: "Over sites",
+		time_agg: "Over time",
 
 		none: "Do not aggregate",
 		sum: "Sum",
@@ -355,6 +359,7 @@ var ENGLISH_TRANSLATION = {
 
 		no_input_entities: 'No collection site was created yet!',
 		no_input_groups: 'No collection group was created yet!',
+		no_users: 'No user was added yet!',
 		no_forms: 'No form was created yet!',
 
 
@@ -371,8 +376,9 @@ var ENGLISH_TRANSLATION = {
 
 		start_date: "Begin date",
 		end_date: "End date",
-		name_ph: 'For Instance: [Laos] Primary health care',
-		add_indicator: 'Add an indicator',
+		country_ph: 'For instance: CAR',
+		name_ph: 'For Instance: Access to quality care for people affected by the crisis',
+		add_indicator: 'Add indicator',
 
 		purpose: 'Specific objective',
 		purposes: 'Specific objectives',

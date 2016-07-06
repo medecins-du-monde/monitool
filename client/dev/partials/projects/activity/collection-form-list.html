@@ -1,44 +1,43 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.save.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="project.collection_form_list"></li>
 </ol>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
+			<th acl-has-project-role="owner"></th>
 			<th translate="shared.name"></th>
 			<th translate="shared.start"></th>
 			<th translate="shared.end"></th>
 			<th translate="project.periodicity"></th>
 			<th translate="project.collect"></th>
-			<th></th>
 		</tr>
 	</thead>
-	<tbody>
-		<tr ng-if="project.forms.length == 0">
+	<tbody ng-if="project.forms.length == 0">
+		<tr>
 			<td colspan="7" style="text-align: center" translate="project.no_forms"></td>
 		</tr>
+	</tbody>
+	<tbody ng-if="project.forms.length != 0" ng-sortable="{handle: '.handle'}">
 		<tr ng-repeat="form in project.forms">
-			<td>{{form.name}}</td>
+			<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
+			<td>
+				<a ui-sref="main.project.save.collection_form_edition({formId: form.id})">
+					{{form.name}}
+				</a>
+			</td>
 			<td>{{(form.start || project.start) | amDateFormat: 'YYYY-MM-DD'}}</td>
 			<td>{{(form.end || project.end) | amDateFormat: 'YYYY-MM-DD'}}</td>
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>{{'project.collects.' + form.collect|translate}}</td>
-			<td>
-				<a class="btn btn-default btn-xs" ui-sref="main.project.collection_form_edition({formId: form.id})">
-					<i class="fa fa-pencil"></i>
-					<span translate="shared.edit" acl-has-project-role="owner"></span>
-					<span translate="shared.display" acl-lacks-project-role="owner"></span>
-				</a>
-			</td>
-		</tr>
+ 		</tr>
 	</tbody>
 	<tfoot acl-has-project-role="owner">
 		<tr>
-			<td colspan="8" style="text-align: center">
-				<a class="btn btn-default btn-xs"
-				   ui-sref="main.project.collection_form_edition({formId: 'new'})">
+			<td colspan="6" style="text-align: center">
+				<a class="btn btn-default btn-xs" ng-click="createForm()">
 					<i class="fa fa-plus"></i>
 					<span translate="shared.add"></span>
 				</a>
@@ -46,4 +45,3 @@
 		</tr>
 	</tfoot>
 </table>
-

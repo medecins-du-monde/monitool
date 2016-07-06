@@ -8,128 +8,128 @@ angular
 		]
 	)
 
-	.controller('ProjectCollectionFormListController', function() {
-
+	.controller('ProjectCollectionFormListController', function($scope, $state, uuid) {
+		$scope.createForm = function() {
+			var newForm = {id: uuid.v4(), name: '', periodicity: 'month', collect: 'entity', start: null, end: null, elements: []};
+			$scope.project.forms.push(newForm);
+			$state.go('main.project.save.collection_form_edition', {formId: newForm.id});
+		};
 	})
 
-	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $modal, formUsage, form, uuid) {
-		$scope.master = angular.copy(form);
-		$scope.form = angular.copy(form); // FIXME one of those copies looks useless.
-		$scope.formUsage = formUsage;
-		$scope.formIndex = $scope.project.forms.findIndex(function(f) { return f.id === form.id; });
+	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $modal, formUsage, uuid) {
 
-		$scope.delete = function() {
-			// Fetch this forms inputs.
+		/////////////////////
+		// Pass the form to the shared controller over it, to be able
+		// to enable and disable the save button.
+		/////////////////////
+		
+		var unwatchPassForm = $scope.$watch('dataSourceForm', function(dataSourceForm) {
+			if (dataSourceForm) {
+				$scope.formContainer.currentForm = dataSourceForm;
+				unwatchPassForm();
+			}
+		});
+		
+		/////////////////////
+		// Allow variables, partitions, elements and groups reordering.
+		// We need to hack around bugs in current Sortable plugin implementation.
+		// @see https://github.com/RubaXa/Sortable/issues/581
+		// @see https://github.com/RubaXa/Sortable/issues/722
+		/////////////////////
+		
+		$scope.variableSortOptions = {handle: '.variable-handle'};
+		$scope.partitionSortOptions = {handle: '.partition-handle'};
+		$scope.elementSortOptions = {};
+		$scope.groupSortOptions = {};
+
+		$scope.onSortableMouseEvent = function(group, enter) {
+			if (group == 'partition')
+				$scope.variableSortOptions.disabled = enter;
+			else if (group == 'element' || group == 'group')
+				$scope.variableSortOptions.disabled = $scope.partitionSortOptions.disabled = enter;
+		};
+
+		// Put the form index in the scope to be able to access it without searching each time.
+		$scope.currentFormIndex = $scope.project.forms.findIndex(function(f) { return f.id == $stateParams.formId; });
+
+		// The number of inputs is used to show a warning message to user if they risk loosing data.
+		$scope.numInputs = formUsage.length;
+
+		// The delete button ask for confirmation when data will be lost.
+		$scope.deleteForm = function() {
+			// Translate confirmation messages.
 			var easy_question = $filter('translate')('project.delete_form_easy'),
 				hard_question = $filter('translate')('project.delete_form_hard', {num_inputs: formUsage.length}),
 				answer = $filter('translate')('project.delete_form_hard_answer', {num_inputs: formUsage.length});
 
+			// Ask confirmation to user (simple confirmation if no inputs were entered, copy a string if inputs will be lost).
 			var really = (formUsage.length == 0 && window.confirm(easy_question))
 				|| (formUsage.length && window.prompt(hard_question) == answer);
 
-			// If there are none, just confirm that the user wants to do this for real.
+			// If user is OK with the data lost, remove the form, save and go back to the list of forms.
 			if (really) {
-				$scope.project.forms.splice($scope.formIndex, 1);
-				$scope.formIndex = -1;
-				$scope.$parent.save().then(function() {
-					$state.go('main.project.collection_form_list');
-				});
+				$scope.project.forms.splice($scope.project.forms.indexOf($scope.project.forms[$scope.currentFormIndex]), 1);
+				$scope.$parent.save().then(function() { $state.go('main.project.save.collection_form_list'); });
 			}
 		};
 
-		var pageChangeWatch = $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-			// if unsaved changes were made
-			if (!angular.equals($scope.master, $scope.form)) {
-				// then ask the user if he meant it
-				if (!window.confirm($filter('translate')('shared.sure_to_leave')))
-					event.preventDefault();
+		// Watch currentForm. If undefined, means that user clicked "cancel changes" on a new project.
+		var w1 = $scope.$watch('project.forms[currentFormIndex]', function(form) {
+			if (!form) {
+				w1(); w2(); w3();
+				$state.go('main.project.save.collection_form_list');
 			}
 		});
 
-		$scope.$watch('form.collect', function(collect) {
-			if (collect === 'some_entity' && !$scope.form.entities)
-				$scope.form.entities = [];
-			else if (collect !== 'some_entity' && $scope.form.entities)
-				delete $scope.form.entities;
+		// Watch currentForm.collect to empty the list of sites this form will be used in.
+		var w2 = $scope.$watch('project.forms[currentFormIndex].collect', function(collect) {
+			if (collect === 'some_entity' && !$scope.project.forms[$scope.currentFormIndex].entities)
+				$scope.project.forms[$scope.currentFormIndex].entities = [];
+			else if (collect !== 'some_entity' && $scope.project.forms[$scope.currentFormIndex].entities)
+				delete $scope.project.forms[$scope.currentFormIndex].entities;
 		});
 
-		// Form is invalid if we don't have at least one element.
-		$scope.$watch('form.elements.length', function(length) {
+		// Watch form to invalidate HTML form on some conditions
+		var w3 = $scope.$watch('project.forms[currentFormIndex].elements.length', function(length) {
+			// A datasource is valid only when containing one or more variables.
 			$scope.dataSourceForm.$setValidity('elementsLength', length >= 1);
 		});
 
-		$scope.moreOptions = function(element, initialPartition) {
-			var promise = $modal.open({
+		$scope.editPartition = function(elementId, partitionId) {
+			// Retrieve master and current partition
+			var currentElement = $scope.project.forms[$scope.currentFormIndex].elements.find(function(e) { return e.id === elementId; })
+			var currentPartition = currentElement.partitions.find(function(p) { return p.id === partitionId; });
+
+			$modal.open({
 				controller: 'PartitionEditionModalController',
 				templateUrl: 'partials/projects/activity/partition-modal.html',
 				size: 'lg',
-				resolve: { initialPartition: function() { return initialPartition; } }
-			}).result;
-
-			promise.then(function(partition) {
-				if (initialPartition && !partition)
-					element.partitions.splice(element.partitions.indexOf(initialPartition), 1);
-				else if (initialPartition && partition)
-					element.partitions[element.partitions.indexOf(initialPartition)] = partition;
-				else if (!initialPartition && partition)
-					element.partitions.push(partition);
+				resolve: { currentPartition: function() { return currentPartition; } }
+			}).result.then(function(updatedPartition) {
+				if (currentPartition && !updatedPartition)
+					currentElement.partitions.splice(currentElement.partitions.indexOf(currentPartition), 1);
+				else if (currentPartition && updatedPartition)
+					currentElement.partitions[currentElement.partitions.indexOf(currentPartition)] = updatedPartition;
+				else if (!currentPartition && updatedPartition)
+					currentElement.partitions.push(updatedPartition);
 			});
 		};
 
 		$scope.newVariable = function() {
-			$scope.form.elements.push({id: uuid.v4(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
+			$scope.project.forms[$scope.currentFormIndex].elements.push({id: uuid.v4(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
 		};
-
-		$scope.upElement = function(index) {
-			var element = $scope.form.elements[index];
-			$scope.form.elements.splice(index, 1);
-			$scope.form.elements.splice(index - 1, 0, element);
-		};
-
-		$scope.downElement = function(index) {
-			var element = $scope.form.elements[index];
-			$scope.form.elements.splice(index, 1);
-			$scope.form.elements.splice(index + 1, 0, element);
-		};
-
+		
 		$scope.remove = function(item, target) {
 			var index = target.findIndex(function(arrItem) { return item.id === arrItem.id; });
 			if (index !== -1)
 				target.splice(index, 1)
 		};
-
-		$scope.save = function() {
-			// replace or add the form in the project.
-			if ($scope.formIndex === -1) {
-				$scope.formIndex = $scope.project.forms.length
-				$scope.project.forms.push(angular.copy($scope.form));
-			}
-			else
-				$scope.project.forms[$scope.formIndex] = angular.copy($scope.form);
-
-			// call ProjectMenuController save method.
-			return $scope.$parent.save().then(function() {
-				$scope.master = angular.copy($scope.form);
-
-				if ($stateParams.formId === 'new')
-					$state.go('main.project.collection_form_edition', {formId: form.id});
-			});
-		};
-
-		$scope.isUnchanged = function() {
-			// console.log('main isUnchanged', $scope.master, $scope.form)
-			return angular.equals($scope.master, $scope.form);
-		};
-
-		$scope.reset = function() {
-			$scope.form = angular.copy($scope.master);
-		};
 	})
 
-	.controller('PartitionEditionModalController', function($scope, $modalInstance, initialPartition, uuid) {
+	.controller('PartitionEditionModalController', function($scope, $modalInstance, currentPartition, uuid) {
 		$scope.isNew = false;
-		if (!initialPartition) {
-			initialPartition = {
+		if (!currentPartition) {
+			currentPartition = {
 				id: uuid.v4(),
 				name: "",
 				elements: [{id: uuid.v4(), name: ""}, {id: uuid.v4(), name: ""}],
@@ -139,8 +139,8 @@ angular
 			$scope.isNew = true;
 		}
 
-		$scope.master = initialPartition;
-		$scope.partition = angular.copy(initialPartition);
+		$scope.master = currentPartition;
+		$scope.partition = angular.copy(currentPartition);
 		$scope.useGroups = !!$scope.partition.groups.length;
 
 		$scope.$watch('useGroups', function(value) {
@@ -191,11 +191,6 @@ angular
 			$scope.partition.groups = $scope.partition.groups.filter(function(group) {
 				return group.id !== partitionGroupId;
 			});
-		};
-
-		$scope.move = function(index, list, direction) {
-			var element = list.splice(index, 1);
-			list.splice(index + direction, 0, element[0]);
 		};
 
 		$scope.delete = function() {
