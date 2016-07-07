@@ -150,7 +150,7 @@ var FRENCH_TRANSLATION = {
 
 	project: {
 		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements. Ceux-ci seront perdus.",
-		no_logical_frame: "Aucun cadre logical n'a encore été créé sur ce projet.",
+		no_logical_frame: "Aucun cadre logique n'a encore été créé sur ce projet.",
 		partition_general: "Général",
 		partition_general_placeholder: "ex: Tranches d'âge",
 		partition_elements: "Éléments",
