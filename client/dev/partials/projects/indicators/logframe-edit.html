@@ -71,25 +71,30 @@
 		<div class="form-group">
 			<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 			<div class="col-sm-10">
-				<div class="form-control-static">
+
+				<div class="form-control-static" acl-lacks-project-role="owner">
+					<ul>
+						<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">{{indicator.display}}</li>
+					</ul>
+				</div>
+
+				<div class="form-control-static" acl-has-project-role="owner">
 					<ul ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)">
 						<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">
 							<i class="fa fa-bars indicator-handle"></i>
 							<a ng-click="editIndicator(indicator, project.logicalFrames[logicalFrameIndex].indicators)">{{indicator.display}}</a>
 
-							<span acl-has-project-role="owner">
-								<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
-									<i class="fa fa-link"></i>
-								</a>
+							<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
+								<i class="fa fa-link"></i>
+							</a>
 
-								<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
-									<i class="fa fa-unlink"></i>
-								</a>
-							</span>
+							<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
+								<i class="fa fa-unlink"></i>
+							</a>
 						</li>
 					</ul>
 
- 					<p acl-has-project-role="owner">
+ 					<p>
 						<a class="btn btn-default" ng-click="editIndicator(null, project.logicalFrames[logicalFrameIndex].indicators)">
 							<i class="fa fa-plus"></i>
 							{{"project.add_indicator"|translate}}
@@ -152,25 +157,40 @@
 						<div class="form-group">
 							<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 							<div class="col-sm-10">
-								<div class="form-control-static">
-									<ul ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)">
+								<div class="form-control-static" acl-lacks-project-role="owner">
+									<ul>
+										<li ng-repeat="indicator in purpose.indicators">{{indicator.display}}</li>
+									</ul>
+								</div>
+
+								<div class="form-control-static" acl-has-project-role="owner">
+									<ul ng-sortable="indicatorsSortOptions"
+										ng-mouseenter="onSortableMouseEvent('indicators', true)"
+										ng-mouseleave="onSortableMouseEvent('indicators', false)">
+
 										<li ng-repeat="indicator in purpose.indicators">
 											<i class="fa fa-bars indicator-handle"></i>
 											<a ng-click="editIndicator(indicator, purpose.indicators)">{{indicator.display}}</a>
 
-											<span acl-has-project-role="owner">
-												<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
-													<i class="fa fa-link"></i>
-												</a>
+											<a class="btn btn-xxs btn-default"
+											   ng-click="link(indicator)"
+											   ng-if="!indicator.indicatorId"
+											   tooltip="{{'project.link_indicator'|translate}}">
 
-												<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
-													<i class="fa fa-unlink"></i>
-												</a>
-											</span>
+											   <i class="fa fa-link"></i>
+											</a>
+
+											<a class="btn btn-xxs btn-default"
+											    ng-click="unlink(indicator)"
+											    ng-if="indicator.indicatorId"
+											    tooltip="{{'project.unlink_indicator'|translate}}">
+
+												<i class="fa fa-unlink"></i>
+											</a>
 										</li>
 									</ul>
 
-									<p acl-has-project-role="owner">
+									<p>
 										<a class="btn btn-default" ng-click="editIndicator(null, purpose.indicators)">
 											<i class="fa fa-plus"></i>
 											{{"project.add_indicator"|translate}}
@@ -223,25 +243,35 @@
 										<div class="form-group">
 											<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 											<div class="col-sm-10">
-												<div class="form-control-static">
-													<ul ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)">
+
+												<div class="form-control-static" acl-lacks-project-role="owner">
+													<ul>
+														<li ng-repeat="indicator in output.indicators">{{indicator.display}}</li>
+													</ul>
+	
+												</div>
+
+												<div class="form-control-static" acl-has-project-role="owner">
+												
+													<ul ng-sortable="indicatorsSortOptions"
+														ng-mouseenter="onSortableMouseEvent('indicators', true)"
+														ng-mouseleave="onSortableMouseEvent('indicators', false)">
+
 														<li ng-repeat="indicator in output.indicators">
 															<i class="fa fa-bars indicator-handle"></i>
 															<a ng-click="editIndicator(indicator, output.indicators)">{{indicator.display}}</a>
 
-															<span acl-has-project-role="owner">
-																<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
-																	<i class="fa fa-link"></i>
-																</a>
+															<a class="btn btn-xxs btn-default" ng-click="link(indicator)" ng-if="!indicator.indicatorId" tooltip="{{'project.link_indicator'|translate}}">
+																<i class="fa fa-link"></i>
+															</a>
 
-																<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
-																	<i class="fa fa-unlink"></i>
-																</a>
-															</span>
+															<a class="btn btn-xxs btn-default" ng-click="unlink(indicator)" ng-if="indicator.indicatorId" tooltip="{{'project.unlink_indicator'|translate}}">
+																<i class="fa fa-unlink"></i>
+															</a>
 														</li>
 													</ul>
 
-													<p acl-has-project-role="owner">
+													<p>
 														<a class="btn btn-default" ng-click="editIndicator(null, output.indicators)">
 															<i class="fa fa-plus"></i>
 															{{"project.add_indicator"|translate}}

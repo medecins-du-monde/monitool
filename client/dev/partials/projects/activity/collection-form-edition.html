@@ -131,15 +131,30 @@
 				<td style="position: relative; padding-bottom: 23px; ">
 					<span translate="project.no_partitions" ng-if="element.partitions.length == 0"></span>
 
-					<ul ng-sortable="partitionSortOptions"
+
+					<ul acl-lacks-project-role="owner">
+						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
+							<strong>{{partition.name}}</strong>
+
+							<span ng-repeat="group in partition.groups">
+								<span class="label label-info"><i class="fa fa-arrow-circle-right"></i> {{group.name}}</span>
+							</span>
+							
+							<span ng-repeat="element in partition.elements">
+								<span class="label label-default">{{element.name}}</span>
+							</span>
+						</li>
+					</ul>
+
+					<ul acl-has-project-role="owner"
+						ng-sortable="partitionSortOptions"
 					    ng-mouseenter="onSortableMouseEvent('partition', true)"
 					    ng-mouseleave="onSortableMouseEvent('partition', false)">
 
 						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
 
 							<a class="btn btn-xxs btn-default pull-right"
-							   ng-click="editPartition(element.id, partition.id)"
-							   acl-has-project-role="owner">
+							   ng-click="editPartition(element.id, partition.id)">
 
 								<i class="fa fa-fw fa-pencil"></i>
 								<span translate="shared.edit"></span>

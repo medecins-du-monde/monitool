@@ -30,7 +30,8 @@
 				<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
 			</td>
 			<td>
-				<a ng-click="editUser(user)">{{user.name || users[user.id].name}}</a>
+				<a ng-click="editUser(user)" acl-has-project-role="owner">{{user.name || users[user.id].name}}</a>
+				<span acl-lacks-project-role="owner">{{user.name || users[user.id].name}}</span>
 			</td>
 			<td>{{('project.user_roles.' + user.role)|translate}}</td>
 			<td>
