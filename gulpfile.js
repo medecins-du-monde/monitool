@@ -62,10 +62,10 @@ gulp.task('clean', function(cb) {
 
 gulp.task('copy-static', ['bower'], function() {
 	gulp.src('client/dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('client/build'));
+	gulp.src('client/dev/favicon.ico').pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/bower_components/fontawesome/fonts/*').pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/bower_components/bootstrap/fonts/*').pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/img/*').pipe(gulp.dest('client/build/img'));
-
 });
 
 gulp.task('build-js', ['bower'], function() {
