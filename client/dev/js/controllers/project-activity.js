@@ -16,7 +16,7 @@ angular
 		};
 	})
 
-	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $modal, formUsage, uuid) {
+	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $modal, $timeout, formUsage, uuid) {
 
 		/////////////////////
 		// Pass the form to the shared controller over it, to be able
@@ -68,8 +68,18 @@ angular
 
 			// If user is OK with the data lost, remove the form, save and go back to the list of forms.
 			if (really) {
-				$scope.project.forms.splice($scope.project.forms.indexOf($scope.project.forms[$scope.currentFormIndex]), 1);
-				$scope.$parent.save().then(function() { $state.go('main.project.save.collection_form_list'); });
+				// Kill the watches
+				w1(); w2(); w3();
+
+				// Remove the form
+				$scope.project.forms.splice($scope.currentFormIndex, 1);
+
+				// Give some time for the watches to update the flags
+				$timeout(function() {
+					$scope.$parent.save().then(function() {
+						$state.go('main.project.save.collection_form_list');
+					});
+				});
 			}
 		};
 
