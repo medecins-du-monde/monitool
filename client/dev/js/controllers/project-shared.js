@@ -132,6 +132,6 @@ angular.module(
 				return;
 
 			// Clone last saved version of project.
-			$scope.project = angular.copy($scope.master);
+			angular.copy($scope.master, $scope.project);
 		};
 	})
