@@ -52,15 +52,14 @@
 		<div class="form-group" show-errors>
 			<label for="input-start" class="col-sm-2 control-label" translate="project.start_date"></label>
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.start">
-
 				<input type="text" 
-					   datepicker-popup="longDate"
+					   uib-datepicker-popup="longDate"
 					   name="start"
 					   ng-model="project.start"
 					   is-open="startDateOpen"
-					   ng-click = "startDateOpen = true"
+					   ng-click="startDateOpen=true"
 					   required
-					   ng-max="project.end"
+					   datepicker-options="startDateOptions"
 					   class="form-control" />
 
 				<p class="help-block" ng-if="projectForm.start.$error.required" translate="form.mandatory"></p>
@@ -73,13 +72,13 @@
 			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.end">
 
 				<input type="text" 
-					   datepicker-popup="longDate"
+					   uib-datepicker-popup="longDate"
 					   name="end"
 					   ng-model="project.end"
 					   is-open="endDateOpen"
-					   ng-click = "endDateOpen = true"
+					   ng-click="endDateOpen=true"
 					   required
-					   ng-min="project.start"
+					   datepicker-options="endDateOptions"
 					   class="form-control" />
 
 				<p class="help-block" ng-if="projectForm.end.$error.required" translate="form.mandatory"></p>
@@ -88,5 +87,4 @@
 		</div>
 
  	</fieldset>
-
 </form>

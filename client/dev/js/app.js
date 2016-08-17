@@ -36,14 +36,12 @@ var app = angular.module('monitool.app', [
 	'monitool.services.utils.translate',
 	'monitool.services.utils.uuid',
 
-	'angularMoment',
 	'ngCookies',
 	'ngResource',
 	'ng-sortable',
 	
 	'pascalprecht.translate',
 	'ui.bootstrap',
-	'ui.bootstrap.showErrors',
 	'ui.router',
 	'ui.select',
 ]);
@@ -58,6 +56,7 @@ app.config(function($translateProvider) {
 
 	$translateProvider.useLocalStorage();
 	$translateProvider.preferredLanguage('fr');
+	$translateProvider.useSanitizeValueStrategy('escapeParameters');
 });
 
 
@@ -65,7 +64,7 @@ app.run(function($rootScope) {
 	$rootScope.userCtx = window.user;
 });
 
-app.run(function($translate, $locale, $rootScope) {
+app.run(function($translate, $rootScope, $locale) {
 	var langKey = $translate.use();
 	
 	$rootScope.languages = {fr: "french", en: "english", es: 'spanish'};
@@ -77,15 +76,17 @@ app.run(function($translate, $locale, $rootScope) {
 		angular.copy(SPANISH_LOCALE, $locale);
 	else
 		angular.copy(ENGLISH_LOCALE, $locale);
+
+	$rootScope.$broadcast('$localeChangeSuccess', langKey, $locale);
 });
 
 /**
  * Init datepicker modules
  */
-app.config(function(datepickerConfig, datepickerPopupConfig) {
-	datepickerConfig.showWeeks = false;
-	datepickerConfig.startingDay = 1;
-	datepickerPopupConfig.showButtonBar = false;
+app.config(function(uibDatepickerConfig, uibDatepickerPopupConfig) {
+	uibDatepickerConfig.showWeeks = false;
+	uibDatepickerConfig.startingDay = 1;
+	uibDatepickerPopupConfig.showButtonBar = false;
 });
 
 /**
@@ -168,7 +169,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	///////////////////////////
 	// states
 	///////////////////////////
-
 	
 	$stateProvider.state('main', {
 		abstract: true,

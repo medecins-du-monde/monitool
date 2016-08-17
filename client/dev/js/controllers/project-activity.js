@@ -16,7 +16,7 @@ angular
 		};
 	})
 
-	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $modal, $timeout, formUsage, uuid) {
+	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $uibModal, $timeout, formUsage, uuid) {
 
 		/////////////////////
 		// Pass the form to the shared controller over it, to be able
@@ -110,7 +110,7 @@ angular
 			var currentElement = $scope.project.forms[$scope.currentFormIndex].elements.find(function(e) { return e.id === elementId; })
 			var currentPartition = currentElement.partitions.find(function(p) { return p.id === partitionId; });
 
-			$modal.open({
+			$uibModal.open({
 				controller: 'PartitionEditionModalController',
 				templateUrl: 'partials/projects/activity/partition-modal.html',
 				size: 'lg',
@@ -136,7 +136,7 @@ angular
 		};
 	})
 
-	.controller('PartitionEditionModalController', function($scope, $modalInstance, currentPartition, uuid) {
+	.controller('PartitionEditionModalController', function($scope, $uibModalInstance, currentPartition, uuid) {
 		$scope.isNew = false;
 		if (!currentPartition) {
 			currentPartition = {
@@ -167,7 +167,7 @@ angular
 		};
 
 		$scope.save = function() {
-			$modalInstance.close($scope.partition);
+			$uibModalInstance.close($scope.partition);
 		};
 
 		$scope.reset = function() {
@@ -204,7 +204,7 @@ angular
 		};
 
 		$scope.delete = function() {
-			$modalInstance.close(null);
+			$uibModalInstance.close(null);
 		};
 	})
 

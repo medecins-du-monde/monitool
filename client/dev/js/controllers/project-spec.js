@@ -5,12 +5,18 @@ angular.module('monitool.controllers.project.spec', [])
 	.controller('ProjectBasicsController', function($scope, themes) {
 		$scope.themes = themes;
 
+		$scope.startDateOptions = {maxDate: $scope.project.end};
+		$scope.endDateOptions = {minDate: $scope.project.start};
+
+		// Pass form to parent controller for validation (a bit hacky)
 		var unwatch = $scope.$watch('projectForm', function(projectForm) {
 			if (projectForm) {
 				$scope.formContainer.currentForm = projectForm;
 				unwatch();
 			}
 		});
+
+
 	})
 
 	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input, project) {
@@ -48,14 +54,14 @@ angular.module('monitool.controllers.project.spec', [])
 		};
 	})
 
-	.controller('ProjectUserListController', function($scope, $modal, users) {
+	.controller('ProjectUserListController', function($scope, $uibModal, users) {
 		$scope.users = {};
 		users.forEach(function(user) { $scope.users[user._id] = user});
 		
 		$scope.availableEntities = [{id: 'none', name: 'shared.project'}].concat($scope.project.entities);
 
 		$scope.editUser = function(user) {
-			var promise = $modal.open({
+			var promise = $uibModal.open({
 				controller: 'ProjectUserModalController',
 				templateUrl: 'partials/projects/specification/user-modal.html',
 				size: 'lg',
@@ -77,7 +83,7 @@ angular.module('monitool.controllers.project.spec', [])
 		};
 	})
 
-	.controller('ProjectUserModalController', function($scope, $modalInstance, users, user) {
+	.controller('ProjectUserModalController', function($scope, $uibModalInstance, users, user) {
 		$scope.availableUsers = users.filter(function(availableUser) {
 			// user that is currently selected, if there is one.
 			if (user && availableUser._id == user.id)
@@ -116,9 +122,9 @@ angular.module('monitool.controllers.project.spec', [])
 			if ($scope.user.role != 'input')
 				delete $scope.user.entities;
 
-			$modalInstance.close($scope.user);
+			$uibModalInstance.close($scope.user);
 		};
 
-		$scope.delete = function() { $modalInstance.close(null); };
-		$scope.cancel = function() { $modalInstance.dismiss() };
+		$scope.delete = function() { $uibModalInstance.close(null); };
+		$scope.cancel = function() { $uibModalInstance.dismiss() };
 	});

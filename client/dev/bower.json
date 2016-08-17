@@ -1,7 +1,7 @@
 {
   "name": "monitool",
   "version": "0.0.0",
-  "homepage": "https://github.com/romain-gilliotte/monitool",
+  "homepage": "https://github.com/medecins-du-monde/monitool",
   "authors": [
     "Romain Gilliotte <romain.gilliotte@medecinsdumonde.net>"
   ],
@@ -15,28 +15,22 @@
     "tests"
   ],
   "dependencies": {
-    "Blob.js": "https://github.com/eligrey/Blob.js.git",
-    "FileSaver.js": "https://github.com/eligrey/FileSaver.js.git",
-    "canvas-toBlob.js": "~0.1.3",
-    "angular": "1.3.15",
-    "angular-bootstrap": "~0.12.1",
-    "angular-bootstrap-show-errors": "~2.3.0",
-    "angular-cookies": "~1.3.15",
-    "angular-moment": "~0.9.2",
-    "angular-resource": "~1.3.15",
-    "angular-translate-storage-local": "~2.6.1",
-    "angular-ui-select": "~0.11.2",
-    "angular-ui-router": "~0.2.13",
-    "bootstrap-css-only": "~3.3.4",
-    "c3": "~0.4.10",
-    "fontawesome": "~4.4.0",
-    "angular-mocks": "~1.4.3",
-    "handsontable": "~0.22.0",
-    "Sortable": "~1.4.2"
-  },
-  "resolutions": {
-    "angular": "1.3.15",
-    "angular-bootstrap-show-errors": "master",
-    "handsontable": "~0.22.0"
+    "angular": "~1.5.8",
+    "angular-resource": "~1.5.8",
+    "angular-cookies": "~1.5.8",
+    "Sortable": "~1.4.2",
+    "angular-translate": "~2.11.1",
+    "angular-bootstrap": "~2.0.2",
+    "angular-ui-router": "~0.3.1",
+    "angular-ui-select": "~0.19.1",
+    "angular-translate-storage-local": "~2.11.1",
+    "bootstrap-css-only": "~3.3.6",
+    "c3": "~0.4.11",
+    "handsontable": "~0.26.1",
+    "font-awesome": "~4.6.3",
+    "angular-i18n": "~1.5.8",
+    "canvas-to-Blob.js": "master",
+    "file-saver": "master",
+    "blob": "master"
   }
 }

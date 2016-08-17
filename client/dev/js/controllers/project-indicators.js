@@ -8,7 +8,7 @@ angular
 		]
 	)
 
-	.controller('ProjectLogicalFrameController', function($scope, $q, $modal) {
+	.controller('ProjectLogicalFrameController', function($scope, $q, $uibModal) {
 
 		/////////////////////
 		// Allow purposes, outputs and indicators reordering. We need to hack around bugs
@@ -96,7 +96,7 @@ angular
 
 		// handle indicator add, edit and remove are handled in a modal window.
 		$scope.editIndicator = function(planning, parent) {
-			var promise = $modal.open({
+			var promise = $uibModal.open({
 				controller: 'ProjectIndicatorEditionModalController',
 				templateUrl: 'partials/projects/indicators/edition-modal.html',
 				size: 'lg',
@@ -126,7 +126,7 @@ angular
 		});
 
 		$scope.link = function(planning) {
-			var promise = $modal.open({
+			var promise = $uibModal.open({
 				controller: 'ProjectIndicatorSelectionModalController',
 				templateUrl: 'partials/projects/indicators/selection-modal.html',
 				size: 'lg',
@@ -146,7 +146,7 @@ angular
 		};
 	})
 
-	.controller('ProjectIndicatorSelectionModalController', function($scope, $modalInstance, hierarchy) {
+	.controller('ProjectIndicatorSelectionModalController', function($scope, $uibModalInstance, hierarchy) {
 		// Compute indicators that we have in at least one logical frame.
 		var projectIndicators = {};
 		$scope.project.getLinkedIndicatorIds().forEach(function(indicatorId) { projectIndicators[indicatorId] = true; });
@@ -167,11 +167,11 @@ angular
 		$scope.hierarchy = hierarchy;
 		$scope.searchField = '';
 
-		$scope.choose = function(indicatorId) { $modalInstance.close(indicatorId); };
-		$scope.cancel = function() { $modalInstance.dismiss() };
+		$scope.choose = function(indicatorId) { $uibModalInstance.close(indicatorId); };
+		$scope.cancel = function() { $uibModalInstance.dismiss() };
 	})
 
-	.controller('ProjectIndicatorEditionModalController', function($scope, $modalInstance, Parser, planning) {
+	.controller('ProjectIndicatorEditionModalController', function($scope, $uibModalInstance, Parser, planning) {
 		// Build possible variables and filters.
 		$scope.selectElements = []
 		$scope.elementsById = {};
@@ -258,11 +258,11 @@ angular
 						delete parameter.filter[partitions[i].id];
 			}
 
-			$modalInstance.close($scope.planning);
+			$uibModalInstance.close($scope.planning);
 		};
 		
-		$scope.delete = function() { $modalInstance.close(null); };
-		$scope.cancel = function() { $modalInstance.dismiss(); };
+		$scope.delete = function() { $uibModalInstance.close(null); };
+		$scope.cancel = function() { $uibModalInstance.dismiss(); };
 	})
 
 	.controller('ProjectReportingController', function($scope, Olap, inputs, mtReporting) {

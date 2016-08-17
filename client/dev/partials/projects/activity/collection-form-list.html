@@ -28,8 +28,8 @@
 					{{form.name}}
 				</a>
 			</td>
-			<td>{{(form.start || project.start) | amDateFormat: 'YYYY-MM-DD'}}</td>
-			<td>{{(form.end || project.end) | amDateFormat: 'YYYY-MM-DD'}}</td>
+			<td>{{(form.start || project.start)|date}}</td>
+			<td>{{(form.end || project.end)|date}}</td>
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>{{'project.collects.' + form.collect|translate}}</td>
  		</tr>

@@ -61,9 +61,8 @@
 			<td>{{project.country}}</td>
 			<td><a ui-sref="main.project.save.basics({projectId: project._id})">{{project.name}}</a></td>
 			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
-			<td>{{project.start|amDateFormat:'YYYY-MM-DD'}}</td>
-			<td>{{project.end|amDateFormat:'YYYY-MM-DD'}}</td>
+			<td>{{project.start|date}}</td>
+			<td>{{project.end|date}}</td>
 		</tr>
 	</tbody>
 </table>
-
