@@ -2,68 +2,8 @@
 
 angular
 	
-	.module('monitool.services.models.input', ['ngResource'])
-	.factory('Input', function($resource, $q) {
-
-		var _getBegin = function(entity, form, project) {
-			var formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
-
-			if (entity) {
-				if (!entity.start && !form.start)
-					return moment.utc(project.start).startOf(formPeriodicity);
-				else if (!entity.start && form.start)
-					return moment.utc(form.start).startOf(formPeriodicity);
-				else if (entity.start && !form.start)
-					return moment.utc(entity.start).startOf(formPeriodicity);
-				else
-					return moment.max(moment.utc(entity.start), moment.utc(form.start)).startOf(formPeriodicity);
-			}
-			else
-				return moment.utc(form.start || project.start).startOf(formPeriodicity);
-		};
-
-		var _getEnd = function(entity, form, project) {
-			var formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
-
-			if (entity) {
-				if (!entity.end && !form.end)
-					return moment.utc(project.end).startOf(formPeriodicity);
-				else if (!entity.end && form.end)
-					return moment.utc(form.end).startOf(formPeriodicity);
-				else if (entity.end && !form.end)
-					return moment.utc(entity.end).startOf(formPeriodicity);
-				else
-					return moment.min(moment.utc(entity.end), moment.utc(form.end)).startOf(formPeriodicity);
-			}
-			else
-				return moment.utc(form.end || project.end).startOf(formPeriodicity);
-		};
-
-		// this has nothing to do on the root scope.
-		// => move it to a service and factorize with the similiar function in mtReporting
-		var _getPeriods = function(entity, form, project) {
-			var periods;
-			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
-				var current = _getBegin(entity, form, project),
-					end = _getEnd(entity, form, project);
-
-				if (end.isAfter()) // do not allow to go in the future
-					end = moment.utc();
-
-				periods = [];
-				while (current.isBefore(end)) {
-					periods.push(current.clone());
-					current.add(1, form.periodicity);
-				}
-			}
-			else if (form.periodicity === 'free') {
-				periods = [];
-			}
-			else
-				throw new Error(form.periodicity + ' is not a valid periodicity');
-
-			return periods;
-		};
+	.module('monitool.services.models.input', ['ngResource', 'monitool.services.utils.input-slots'])
+	.factory('Input', function($resource, $q, InputSlots) {
 
 		// Create $resource
 		var Input = $resource('/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
@@ -154,7 +94,7 @@ angular
 							form.entities.forEach(function(entityId) {
 								var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
 
-								_getPeriods(inputEntity, form, project).forEach(function(period) {
+								InputSlots.getListDate(project, inputEntity, form).forEach(function(period) {
 									var strPeriod = period.format('YYYY-MM-DD');
 
 									prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
@@ -168,7 +108,7 @@ angular
 						}
 						else if (form.collect === 'entity')
 							project.entities.forEach(function(inputEntity) {
-								_getPeriods(inputEntity, form, project).forEach(function(period) {
+								InputSlots.getListDate(project, inputEntity, form).forEach(function(period) {
 									var strPeriod = period.format('YYYY-MM-DD');
 
 									prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
@@ -181,7 +121,7 @@ angular
 							});
 						
 						else if (form.collect === 'project')
-							_getPeriods(null, form, project).forEach(function(period) {
+							InputSlots.getListDate(project, null, form).forEach(function(period) {
 								var strPeriod = period.format('YYYY-MM-DD');
 
 								prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
@@ -297,8 +237,8 @@ angular
 
 			// an input needs to be on the timeframe of the form and associated entity.
 			if (form.periodicity !== 'free') {
-				var begin = _getBegin(entity, form, project),
-					end   = _getEnd(entity, form, project);
+				var begin = InputSlots.getFirstDate(project, entity, form),
+					end   = InputSlots.getLastDate(project, entity, form);
 
 				if (inputDate.isBefore(begin) || inputDate.isAfter(end)) {
 					console.log("Dropping input:", this._id, '(input not in date range)');
