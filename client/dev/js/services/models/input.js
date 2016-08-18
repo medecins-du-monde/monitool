@@ -197,6 +197,16 @@ angular
 					}
 				});
 
+				// Sort periods alphabetically
+				project.forms.forEach(function(form) {
+					var periods = Object.keys(prj[form.id]);
+					periods.sort();
+
+					var newObj = {};
+					periods.forEach(function(period) { newObj[period] = prj[form.id][period]; })
+					prj[form.id] = newObj;
+				});
+
 				return prj;
 			});
 		};
