@@ -31,6 +31,7 @@
     "angular-i18n": "~1.5.8",
     "canvas-to-Blob.js": "master",
     "file-saver": "master",
-    "blob": "master"
+    "blob": "master",
+    "angular-mocks": "~1.5.8"
   }
 }
