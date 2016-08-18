@@ -18,32 +18,40 @@ var async         = require('async'),
 
 var files = {
 	css: [
-		'client/dev/bower_components/fontawesome/css/font-awesome.min.css',
+		'client/dev/bower_components/font-awesome/css/font-awesome.min.css',
 		'client/dev/bower_components/bootstrap-css-only/css/bootstrap.min.css',
 		'client/dev/bower_components/angular-ui-select/dist/select.min.css',
 		'client/dev/bower_components/c3/c3.min.css',
 		'client/dev/bower_components/handsontable/dist/handsontable.full.css',
 	],
 	js: [
+		// Basic functionalities (dates, maths, fsm)
 		'client/dev/bower_components/moment/min/moment.min.js',
-		'client/dev/bower_components/FileSaver.js/FileSaver.min.js',
-		'client/dev/bower_components/angular/angular.min.js',
+
+		// PNG generation
+		'client/dev/bower_components/blob/Blob.js',
+		'client/dev/bower_components/canvas-to-Blob.js/canvas-toBlob.js',
+		'client/dev/bower_components/file-saver/FileSaver.min.js',
+
+		// Angular
+		'client/dev/bower_components/angular/angular.js',
+		'client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
 		'client/dev/bower_components/angular-ui-router/release/angular-ui-router.min.js',
-		'client/dev/bower_components/angular-moment/angular-moment.min.js',
-		'client/dev/bower_components/angular-translate/angular-translate.min.js',
-		// 'client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-		'client/dev/bower_components/angular-bootstrap-show-errors/src/showErrors.min.js',
 		'client/dev/bower_components/angular-ui-select/dist/select.min.js',
 		'client/dev/bower_components/angular-cookies/angular-cookies.min.js',
 		'client/dev/bower_components/angular-resource/angular-resource.min.js',
 		'client/dev/bower_components/angular-translate/angular-translate.min.js',
 		'client/dev/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js',
 		'client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js',
+
+		// Graphs
 		'client/dev/bower_components/d3/d3.min.js',
 		'client/dev/bower_components/c3/c3.min.js',
+
+		// Excel
 		'client/dev/bower_components/handsontable/dist/handsontable.full.min.js',
-		'client/dev/bower_components/Blob.js/Blob.js',
-		'client/dev/bower_components/canvas-toBlob.js/canvas-toBlob.js',
+
+		// Sortable
 		'client/dev/bower_components/Sortable/Sortable.min.js',
 		'client/dev/bower_components/Sortable/ng-sortable.js'
 	]
@@ -63,7 +71,7 @@ gulp.task('clean', function(cb) {
 gulp.task('copy-static', ['bower'], function() {
 	gulp.src('client/dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/favicon.ico').pipe(gulp.dest('client/build'));
-	gulp.src('client/dev/bower_components/fontawesome/fonts/*').pipe(gulp.dest('client/build'));
+	gulp.src('client/dev/bower_components/font-awesome/fonts/*').pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/bower_components/bootstrap/fonts/*').pipe(gulp.dest('client/build'));
 	gulp.src('client/dev/img/*').pipe(gulp.dest('client/build/img'));
 });
