@@ -95,18 +95,14 @@ angular.module('monitool.services.utils.string', [])
 		];
 
 		var diacriticsMap = {};
-		for (var i=0; i < defaultDiacriticsRemovalap.length; i++){
+		for (var i = 0; i < defaultDiacriticsRemovalap.length; i++) {
 		    var letters = defaultDiacriticsRemovalap[i].letters.split("");
-		    for (var j=0; j < letters.length ; j++){
+		    for (var j = 0; j < letters.length; j++)
 		        diacriticsMap[letters[j]] = defaultDiacriticsRemovalap[i].base;
-		    }
 		}
 
-		// "what?" version ... http://jsperf.com/diacritics/12
-		return function removeDiacritics (str) {
-		    return str.replace(/[^\u0000-\u007E]/g, function(a){ 
-		       return diacriticsMap[a] || a; 
-		    });
-		}
-
+		// "what?" version... http://jsperf.com/diacritics/12
+		return function(str) {
+		    return str.replace(/[^\u0000-\u007E]/g, function(a) { return diacriticsMap[a] || a; });
+		};
 	});
