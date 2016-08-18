@@ -20,15 +20,7 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
-						<input type="text" 
-							   uib-datepicker-popup="longDate"
-							   name="start"
-							   ng-model="filters._start"
-							   is-open="startDateOpen"
-							   ng-click="startDateOpen=true"
-							   required
-							   ng-max="filters._end"
-							   class="form-control input-sm" />
+						<utc-datepicker ng-model="filters._start" />
 					</div>
 				</div>
 			</div>
@@ -39,15 +31,7 @@
 				<div class="col-sm-10">
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
-						<input type="text" 
-							   uib-datepicker-popup="longDate"
-							   name="end"
-							   ng-model="filters._end"
-							   is-open="endDateOpen"
-							   ng-click="endDateOpen=true"
-							   ng-min="filters._start"
-							   class="form-control input-sm"
-							   required />
+						<utc-datepicker ng-model="filters._end" />
 					</div>
 				</div>
 			</div>

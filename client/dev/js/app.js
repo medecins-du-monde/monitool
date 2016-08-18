@@ -104,7 +104,7 @@ app.config(function($httpProvider) {
 		var stringifyDates = function(model) {
 			// transform dates
 			if (Object.prototype.toString.call(model) === '[object Date]')
-				return moment(model).format('YYYY-MM-DD');
+				return moment.utc(model).format('YYYY-MM-DD');
 
 			// recurse
 			if (Array.isArray(model)) {
@@ -137,8 +137,8 @@ app.config(function($httpProvider) {
 		var parseDatesRec = function(model) {
 			if (typeof model === 'string' && model.match(/^\d\d\d\d\-\d\d\-\d\d$/)) {
 				// Using new Date('2010-01-01') <=> new Date('2010-01-01T00:00:00Z')
-				// => we want a date that works in current locale.
-				return new Date(model.substring(0, 4) * 1, model.substring(5, 7) - 1, model.substring(8, 10) * 1);
+				// => we want a date that works in UTC.
+				return new Date(model + 'T00:00:00Z');
 			}
 
 			if (Array.isArray(model)) {

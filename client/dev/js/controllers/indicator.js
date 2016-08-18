@@ -106,7 +106,7 @@ angular
 		$scope.plots = {};
 
 		// Create default filter so that all inputs are used.
-		$scope.filters = {_start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
+		$scope.filters = {_start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
 		for (var i = 0; i < inputs.length; ++i) {
 			if (inputs[i].period < $scope.filters._start)
 				$scope.filters._start = inputs[i].period;

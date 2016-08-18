@@ -97,7 +97,7 @@ angular
 				var days = {}; // dimension
 				var weeks = {}, months = {}, quarters = {}, years = {}; // dimensionGroups
 				inputs.forEach(function(i) {
-					var period = moment(i.period);
+					var period = moment.utc(i.period);
 					var day = period.format('YYYY-MM-DD'),
 						week = period.format('YYYY-[W]WW'),
 						month = period.format('YYYY-MM'),
@@ -157,7 +157,7 @@ angular
 
 				// Fill cubes
 				inputs.forEach(function(input) {
-					var period = moment(input.period).format('YYYY-MM-DD');
+					var period = moment.utc(input.period).format('YYYY-MM-DD');
 
 					form.elements.forEach(function(element) {
 						// Compute location where this subtable should go, and length of data to copy.

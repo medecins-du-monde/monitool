@@ -24,8 +24,8 @@ angular
 				type = 'entity';
 
 			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1) {
-				var start      = moment(start).startOf(groupBy === 'week' ? 'isoWeek' : groupBy),
-					end        = moment(end).endOf(groupBy === 'week' ? 'isoWeek' : groupBy),
+				var start      = moment.utc(start).startOf(groupBy === 'week' ? 'isoWeek' : groupBy),
+					end        = moment.utc(end).endOf(groupBy === 'week' ? 'isoWeek' : groupBy),
 					dispFormat = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-MM-DD', 'day': 'YYYY-MM-DD'}[groupBy],
 					idFormat   = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-[W]WW', 'day': 'YYYY-MM-DD'}[groupBy],
 					current    = start.clone(),
@@ -179,7 +179,7 @@ angular
 						cubeFilters.day = cube._getDimension('day').items;
 
 					// _start => filter day
-					var start = moment(viewFilters._start).format('YYYY-MM-DD');
+					var start = moment.utc(viewFilters._start).format('YYYY-MM-DD');
 					cubeFilters.day = cubeFilters.day.filter(function(dimItem) { return start <= dimItem; });
 
 					delete cubeFilters._start;
@@ -190,7 +190,7 @@ angular
 						cubeFilters.day = cube._getDimension('day').items;
 					
 					// _end => filter day
-					var end = moment(viewFilters._end).format('YYYY-MM-DD');
+					var end = moment.utc(viewFilters._end).format('YYYY-MM-DD');
 					cubeFilters.day = cubeFilters.day.filter(function(dimItem) { return dimItem <= end; });
 
 					delete cubeFilters._end;

@@ -63,13 +63,7 @@
 		<tfoot ng-if="displayInfo[selectedForm.id]._.displayFooterRow">
 			<tr>
 				<th>
-					<input type="text"
-						   uib-datepicker-popup="longDate"
-						   ng-model="newInputDate.date"
-						   is-open="dateOpen"
-						   ng-click="dateOpen=true"
-						   required
-						   class="form-control" />
+					<utc-datepicker ng-model="newInputDate.date" />
 				</th>
 				<td ng-if="displayInfo[selectedForm.id].none.displayColumn">
 					<a class="btn btn-xs btn-success"

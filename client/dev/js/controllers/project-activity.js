@@ -213,12 +213,13 @@ angular
 		$scope.inputsStatus = inputsStatus;
 
 		// pass information needed for creating new inputs on free forms.
-		$scope.newInputDate = {date: new Date()};
+		$scope.newInputDate = {date: new Date(Math.floor(Date.now() / 86400000) * 86400000)};
+		
 		$scope.addInput = function(entityId) {
 			$state.go(
 				'main.project.collection_input_edition',
 				{
-					period: moment($scope.newInputDate.date).format('YYYY-MM-DD'),
+					period: moment.utc($scope.newInputDate.date).format('YYYY-MM-DD'),
 					formId: $scope.selectedForm.id,
 					entityId: entityId
 				}
@@ -379,7 +380,7 @@ angular
 
 	.controller('ProjectActivityReportingController', function($scope, Olap, inputs, mtReporting) {
 		// Create default filter so that all inputs are used.
-		$scope.filters = {_location: "none", _start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
+		$scope.filters = {_location: "none", _start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
 		for (var i = 0; i < inputs.length; ++i) {
 			if (inputs[i].period < $scope.filters._start)
 				$scope.filters._start = inputs[i].period;
@@ -460,14 +461,14 @@ angular
 				var dimension   = cube._getDimension('day'),
 					startString = dimension.items[0],
 					endString   = dimension.items[dimension.items.length - 1],
-					startDate   = new Date(startString.substring(0, 4) * 1, startString.substring(5, 7) - 1, startString.substring(8, 10) * 1),
-					endDate     = new Date(endString.substring(0, 4) * 1, endString.substring(5, 7) - 1, endString.substring(8, 10) * 1);
+					startDate   = new Date(startString + 'T00:00:00Z'),
+					endDate     = new Date(endString + 'T00:00:00Z');
 
 				// copy filled filters as default value.
 				filters = {_start: startDate, _end: endDate};
 			}
 			else
-				filters = {_start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
+				filters = {_start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
 			
 			cube.dimensions.forEach(function(dimension) {
 				if (dimension.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/))
@@ -559,7 +560,7 @@ angular
 				filters = {_start: startDate, _end: endDate};
 			}
 			else
-				filters = {_start: new Date('9999-01-01'), _end: new Date('0000-01-01')};
+				filters = {_start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
 			
 			// Init all filters as full
 			cube.dimensions.forEach(function(dimension) {

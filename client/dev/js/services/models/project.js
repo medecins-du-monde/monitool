@@ -260,8 +260,8 @@ angular
 		Project.prototype.reset = function() {
 			this.type = "project";
 			this.name = "";
-			this.start = new Date();
-			this.end = new Date();
+			this.start = new Date(86400000 * Math.floor(Date.now() / 86400000));
+			this.end = new Date(86400000 * Math.floor(Date.now() / 86400000));
 			this.themes = [];
 			this.logicalFrames = [];
 			this.entities = [];

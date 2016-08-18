@@ -156,6 +156,35 @@ angular.module('monitool.directives.form', [])
 		};
 	})
 
+	// Work around bug in angular ui datepicker
+	// https://github.com/angular-ui/bootstrap/issues/6140
+	.directive('utcDatepicker', function() {
+		return {
+			restrict: 'E',
+			require: 'ngModel',
+			template: '<input type="text" uib-datepicker-popup="longDate" ng-model="localDate" is-open="dateOpen" ng-click="dateOpen=true" required datepicker-options="options" class="form-control" />',
+			scope: {},
+			link: function($scope, element, attributes, ngModelController) {
+
+				ngModelController.$formatters.push(function(modelValue) {
+					return new Date(modelValue.getTime() + modelValue.getTimezoneOffset() * 60 * 1000);
+				});
+
+				ngModelController.$parsers.push(function(viewValue) {
+					return new Date(viewValue.getTime() - viewValue.getTimezoneOffset() * 60 * 1000);
+				});
+
+				ngModelController.$render = function() {
+					$scope.localDate = ngModelController.$viewValue;
+				};
+
+				$scope.$watch('localDate', function(localDate) {
+					ngModelController.$setViewValue(localDate);
+				});
+			}
+		}
+	})
+
 	.directive('optionalDate', function() {
 		return {
 			restrict: 'E',
@@ -168,7 +197,11 @@ angular.module('monitool.directives.form', [])
 					if (modelValue === null)
 						return {specifyDate: false, chosenDate: $scope.default};
 					else
-						return {specifyDate: true, chosenDate: modelValue};
+						return {specifyDate: true, chosenDate: new Date(modelValue.getTime() + modelValue.getTimezoneOffset() * 60 * 1000)};
+				});
+
+				ngModelController.$parsers.push(function(viewValue) {
+					return viewValue.specifyDate ? new Date(viewValue.chosenDate.getTime() - viewValue.chosenDate.getTimezoneOffset() * 60 * 1000) : null;
 				});
 
 				// We render using more ng-models and bindings, which make it a bit strange.
@@ -187,10 +220,6 @@ angular.module('monitool.directives.form', [])
 						$scope.chosenDate = $scope.default;
 						ngModelController.$setViewValue({specifyDate: false, chosenDate: $scope.default});
 					}
-				});
-
-				ngModelController.$parsers.push(function(viewValue) {
-					return viewValue.specifyDate ? viewValue.chosenDate : null;
 				});
 			}
 		}

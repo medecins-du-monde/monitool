@@ -10,16 +10,16 @@ angular
 
 			if (entity) {
 				if (!entity.start && !form.start)
-					return moment(project.start).startOf(formPeriodicity);
+					return moment.utc(project.start).startOf(formPeriodicity);
 				else if (!entity.start && form.start)
-					return moment(form.start).startOf(formPeriodicity);
+					return moment.utc(form.start).startOf(formPeriodicity);
 				else if (entity.start && !form.start)
-					return moment(entity.start).startOf(formPeriodicity);
+					return moment.utc(entity.start).startOf(formPeriodicity);
 				else
-					return moment.max(moment(entity.start), moment(form.start)).startOf(formPeriodicity);
+					return moment.max(moment.utc(entity.start), moment.utc(form.start)).startOf(formPeriodicity);
 			}
 			else
-				return moment(form.start || project.start).startOf(formPeriodicity);
+				return moment.utc(form.start || project.start).startOf(formPeriodicity);
 		};
 
 		var _getEnd = function(entity, form, project) {
@@ -27,16 +27,16 @@ angular
 
 			if (entity) {
 				if (!entity.end && !form.end)
-					return moment(project.end).startOf(formPeriodicity);
+					return moment.utc(project.end).startOf(formPeriodicity);
 				else if (!entity.end && form.end)
-					return moment(form.end).startOf(formPeriodicity);
+					return moment.utc(form.end).startOf(formPeriodicity);
 				else if (entity.end && !form.end)
-					return moment(entity.end).startOf(formPeriodicity);
+					return moment.utc(entity.end).startOf(formPeriodicity);
 				else
-					return moment.min(moment(entity.end), moment(form.end)).startOf(formPeriodicity);
+					return moment.min(moment.utc(entity.end), moment.utc(form.end)).startOf(formPeriodicity);
 			}
 			else
-				return moment(form.end || project.end).startOf(formPeriodicity);
+				return moment.utc(form.end || project.end).startOf(formPeriodicity);
 		};
 
 		// this has nothing to do on the root scope.
@@ -48,7 +48,7 @@ angular
 					end = _getEnd(entity, form, project);
 
 				if (end.isAfter()) // do not allow to go in the future
-					end = moment();
+					end = moment.utc();
 
 				periods = [];
 				while (current.isBefore(end)) {
@@ -283,7 +283,7 @@ angular
 				return false;
 			}
 
-			var inputDate = moment(this.period);
+			var inputDate = moment.utc(this.period);
 
 			// an input needs to be on the timeframe of the form and associated entity.
 			if (form.periodicity !== 'free') {
