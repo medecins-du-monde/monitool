@@ -385,8 +385,14 @@ angular
 				}
 			}
 			else if (dimension.aggregation == 'last') {
-				result = this._query_rec(allIndexes, offset + indexes[indexes.length - 1]);
-				++contributions;
+				for (var i = numIndexes - 1; i >= 0; --i) {
+					tmp = this._query_rec(allIndexes, offset + indexes[i])
+					if (tmp !== undefined) {
+						result = tmp;
+						++contributions;
+						break; // first defined value is OK for us.
+					}
+				}
 			}
 
 			else if (dimension.aggregation == 'none') {
