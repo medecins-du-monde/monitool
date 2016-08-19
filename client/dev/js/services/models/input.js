@@ -8,34 +8,6 @@ angular
 		// Create $resource
 		var Input = $resource('/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
-		/**
-		 * Factory with default value
-		 */
-		Input.makeNew = function(projectId, form, period, entityId) {
-			var input = new Input({
-				_id: [projectId, entityId, form.id, period].join(':'),
-				type: "input",
-				project: projectId,
-				form: form.id,
-				period: period,
-				entity: entityId,
-				values: {}
-			});
-
-			form.elements.forEach(function(element) {
-				var numFields = 1;
-				element.partitions.forEach(function(partition) {
-					numFields *= partition.elements.length;
-				});
-				
-				input.values[element.id] = new Array(numFields);
-				for (var i = 0; i < numFields; ++i)
-					input.values[element.id][i] = 0;
-			});
-
-			return input;
-		};
-
 		Input.fetchProjectStatus = function(project) {
 			return Input.query({mode: 'project_input_ids', projectId: project._id}).$promise.then(function(inputsDone) {
 				var prj = {};
@@ -169,12 +141,23 @@ angular
 				else if (result.length === 1 && result[0]._id === currentInputId) 
 					return { current: result[0], previous: null, isNew: false };
 
+				var current = new Input({
+					_id: currentInputId, type: "input",
+					project: projectId, form: form.id, period: period, entity: entityId,
+					values: {}
+				});
+
+				form.elements.forEach(function(element) {
+					var numFields = 1;
+					element.partitions.forEach(function(partition) { numFields *= partition.elements.length; });
+					
+					current.values[element.id] = new Array(numFields);
+					for (var i = 0; i < numFields; ++i)
+						current.values[element.id][i] = 0;
+				});
+
 				// the current one was not found (and we may or not have found the previous one).
-				return {
-					current: Input.makeNew(projectId, form, period, entityId),
-					previous: result.length ? result[0] : null,
-					isNew: true
-				};
+				return {current: current, previous: result.length ? result[0] : null, isNew: true};
 			});
 		};
 
