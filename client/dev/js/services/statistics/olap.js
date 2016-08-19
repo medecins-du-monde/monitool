@@ -192,7 +192,7 @@ angular
 			return cubes;
 		};
 
-		Cube.prototype.query = function(dimensionIds, filter) {
+		Cube.prototype.query = function(dimensionIds, filter, withTotals) {
 			// End condition
 			if (dimensionIds.length == 0)
 				return this._query_total(filter);
@@ -234,7 +234,8 @@ angular
 					filter[dimensionId] = oldFilter;
 			}
 
-			result._total = this.query(dimensionIds, filter);
+			if (withTotals)
+				result._total = this.query(dimensionIds, filter);
 
 			dimensionIds.unshift(dimensionId);
 

@@ -36,20 +36,20 @@ angular
 					current.add(1, groupBy);
 				}
 
-				cols.push({id: 'total', name: 'Total'});
+				cols.push({id: '_total', name: 'Total'});
 
 				return cols;
 			}
 			else if (groupBy === 'entity') {
 				if (type === 'project')
-					return project.entities.concat([{id:'total',name:'Total'}]);
+					return project.entities.concat([{id: '_total', name: 'Total'}]);
 				else if (type === 'entity')
 					return project.entities.filter(function(e) { return 'ent_' + e.id === location })
-												.concat([{id:'total',name:'Total'}]);
+												.concat([{id: '_total', name: 'Total'}]);
 				else  if (type === 'group') {
 					var group = project.groups.find(function(g) { return 'grp_' + g.id === location });
 					return project.entities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
-												.concat([{id:'total',name:'Total'}]);
+												.concat([{id: '_total', name: 'Total'}]);
 				}
 			}
 			else if (groupBy === 'group') {
@@ -78,9 +78,7 @@ angular
 				for (var k in parameter.filter)
 					cubeFilter[k] = parameter.filter[k];
 
-				components[key] = cube.query([groupBy], cubeFilter);
-				if (groupBy !== 'group' && components[key])
-					components[key].total = cube.query([], cubeFilter);
+				components[key] = cube.query([groupBy], cubeFilter, true);
 			}
 
 			// Inverse group and component key, to get scopes
@@ -112,11 +110,9 @@ angular
 					cubeFilters = this.createCubeFilter(cube, viewFilters);
 
 				// Query cube
-				var values = cube.query([groupBy], cubeFilters);
-				if (groupBy !== 'group' && values)
-					values.total = cube.query([], cubeFilters);
+				var values = cube.query([groupBy], cubeFilters, true),
+					cols = columns.map(function(col) { return values[col.id]; });
 
-				var cols = columns.map(function(col) { return values[col.id]; });
 				return {id: uuid.v4(), name: element.name, cols: cols, type: 'data', indent: indent};
 			}
 			catch (e) {

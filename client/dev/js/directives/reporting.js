@@ -221,7 +221,7 @@ angular.module('monitool.directives.reporting', [])
 	.directive('reportingGraph', function($rootScope) {
 		// This helper function allow us to get the data without totals.
 		var getStatsWithoutTotal = function(stats) {
-			var totalIndex = stats.cols.findIndex(function(e) { return e.id === 'total' });
+			var totalIndex = stats.cols.findIndex(function(e) { return e.id === '_total' });
 
 			if (totalIndex !== -1) {
 				var newStats = angular.copy(stats);
