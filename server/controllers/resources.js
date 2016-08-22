@@ -203,7 +203,7 @@ module.exports = express.Router()
 		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
 			return response.status(404).json({error: true, message: "Not Found"});
 
-		Model.get(request.params.id, function(error, data) {
+		Input.get(request.params.id, function(error, data) {
 			if (error) {
 				if (error === 'not_found')
 					return response.status(404).json({error: true, message: "Not Found"});
