@@ -57,6 +57,57 @@ describe('Olap', function() {
 		);
 	});
 
+	describe("Build stage", function() {
+
+		it('should create a time Dimension from project', function() {
+
+		});
+
+		it('should create a time Dimension from inputs', function() {
+
+		});
+
+		it('should create a location Dimension from project', function() {
+
+		});
+
+		it('should create a location Dimension from form', function() {
+
+		});
+
+		it('should create a partition Dimension', function() {
+
+		});
+
+		it('should create a time DimensionGroup', function() {
+			var days = new Olap.Dimension('day', ['2010-01-01', '2010-01-02', '2010-01-03'], 'sum');
+			var months = Olap.DimensionGroup.createTime('month', days);
+
+			expect(months.mapping).toEqual({'2010-01': ['2010-01-01', '2010-01-02', '2010-01-03']});
+		})
+
+		it('should create a time DimensionGroup', function() {
+			var days = new Olap.Dimension('week', ['2010-W01', '2010-W31', '2011-W09'], 'sum');
+			var quarters = Olap.DimensionGroup.createTime('quarter', days);
+
+			expect(quarters.mapping).toEqual({
+				'2010-Q1': ['2010-W01'],
+				'2010-Q3': ['2010-W31'],
+				'2011-Q1': ['2011-W09']
+			});
+		});
+
+		it('should create a location DimensionGroup', function() {
+			// simple case
+		});
+
+		it('should create a location DimensionGroup', function() {
+			// empty / fail / etc
+		});
+
+	});
+
+
 	describe("Simple queries", function() {
 
 		it('should sum all cube', function() {
@@ -121,6 +172,10 @@ describe('Olap', function() {
 			});
 		});
 	});
+
+	
+
+
 });
 
 

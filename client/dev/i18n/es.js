@@ -220,6 +220,14 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		no_data: "Datos no disponibles",
+		not_available_by_entity: "Datos no disponibles por lugar de colecta",
+		not_available_by_group: "Datos no disponibles por grupo",
+		not_available_min_week: "Elija Agrégez au moins par semaine pour accéder à ces données",
+		not_available_min_month: "Agrégez au moins par mois pour accéder à ces données",
+		not_available_min_quarter: "Agrégez au moins par trimestre pour accéder à ces données",
+		not_available_min_year: "Agrégez au moins par an pour accéder à ces données",
+
 		saving_failed: "Monitool no consiguio salvar los cambios. Se va a recargar la página",
 		no_logical_frame: "Ningún marco lógico has sido creado en este proyecto.",
 		partition_general: "General",

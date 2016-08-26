@@ -66,9 +66,7 @@ angular
 							form.entities.forEach(function(entityId) {
 								var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
 
-								InputSlots.getListDate(project, inputEntity, form).forEach(function(period) {
-									var strPeriod = period.format('YYYY-MM-DD');
-
+								InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
 									prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
 
 									if (prj[form.id][strPeriod][inputEntity.id] == 'outofschedule')
@@ -80,9 +78,7 @@ angular
 						}
 						else if (form.collect === 'entity')
 							project.entities.forEach(function(inputEntity) {
-								InputSlots.getListDate(project, inputEntity, form).forEach(function(period) {
-									var strPeriod = period.format('YYYY-MM-DD');
-
+								InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
 									prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
 
 									if (prj[form.id][strPeriod][inputEntity.id] == 'outofschedule')
@@ -93,9 +89,7 @@ angular
 							});
 						
 						else if (form.collect === 'project')
-							InputSlots.getListDate(project, null, form).forEach(function(period) {
-								var strPeriod = period.format('YYYY-MM-DD');
-
+							InputSlots.getList(project, null, form).forEach(function(strPeriod) {
 								prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
 
 								if (prj[form.id][strPeriod].none == 'outofschedule')
@@ -216,28 +210,9 @@ angular
 				return false;
 			}
 
-			var inputDate = moment.utc(this.period);
-
-			// an input needs to be on the timeframe of the form and associated entity.
-			if (form.periodicity !== 'free') {
-				var begin = InputSlots.getFirstDate(project, entity, form),
-					end   = InputSlots.getLastDate(project, entity, form);
-
-				if (inputDate.isBefore(begin) || inputDate.isAfter(end)) {
-					console.log("Dropping input:", this._id, '(input not in date range)');
-					return false;
-				}
-			}
-
-			// an input needs to be collected the first day of its period.
-			if (form.periodicity !== 'free' && form.periodicity !== 'day') {
-				var formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity,
-					wishedDate = inputDate.clone().startOf(formPeriodicity);
-
-				if (!inputDate.isSame(wishedDate)) {
-					console.log("Dropping input:", this._id, '(date not first day in period)');
-					return false;
-				}
+			if (!InputSlots.isValid(project, entity, form, this.period)) {
+				console.log("Dropping input:", this._id, '(invalid slot)', this.period);
+				return false;
 			}
 
 			return true;

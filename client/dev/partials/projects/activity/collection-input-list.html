@@ -37,7 +37,7 @@
 		</thead>
 		<tbody>
 			<tr ng-repeat="(date, status) in inputsStatus[selectedForm.id]">
-				<th>{{date}}</th>
+				<th>{{date|formatSlot}}</th>
 				<td ng-if="displayInfo[selectedForm.id].none.displayColumn">
 					<a class="btn btn-xs"
 					   ng-class="{'btn-default': status.none === 'done', 'btn-primary': status.none === 'expected', 'btn-danger': status.none === 'outofschedule'}"

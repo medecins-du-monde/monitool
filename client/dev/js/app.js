@@ -147,8 +147,11 @@ app.config(function($httpProvider) {
 					model[i] = parseDatesRec(model[i]);
 			}
 			else if (typeof model === 'object' && model !== null) {
-				for (var key in model)
-					model[key] = parseDatesRec(model[key]);
+				for (var key in model) {
+					if (key !== 'period') {
+						model[key] = parseDatesRec(model[key]);
+					}
+				}
 			}
 
 			return model;

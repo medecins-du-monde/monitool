@@ -378,15 +378,13 @@ angular
 		});
 	})
 
-	.controller('ProjectActivityReportingController', function($scope, Olap, inputs, mtReporting) {
+	.controller('ProjectActivityReportingController', function($scope, Olap, InputSlots, inputs, mtReporting) {
 		// Create default filter so that all inputs are used.
-		$scope.filters = {_location: "none", _start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
-		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters._start)
-				$scope.filters._start = inputs[i].period;
-			if (inputs[i].period > $scope.filters._end)
-				$scope.filters._end = inputs[i].period;
-		}
+		$scope.filters = {
+			_location: "none",
+			_start: $scope.project.start,
+			_end: InputSlots.minDate([$scope.project.end, new Date()])
+		};
 
 		// default group by
 		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
@@ -417,7 +415,7 @@ angular
 	})
 
 
-	.controller('ProjectActivityDetailedReportingController', function($scope, $filter, Olap, inputs, mtReporting) {
+	.controller('ProjectActivityDetailedReportingController', function($scope, $filter, Olap, InputSlots, inputs, mtReporting) {
 		$scope.plots = {};
 
 		////////////////////////////////////////////////////
@@ -455,20 +453,10 @@ angular
 			// Create default query for this elementId
 			////////////////////////////////////////
 
-			var filters;
-			if (cube.data.length != 0) {
-				// retrieve first and last date.
-				var dimension   = cube._getDimension('day'),
-					startString = dimension.items[0],
-					endString   = dimension.items[dimension.items.length - 1],
-					startDate   = new Date(startString + 'T00:00:00Z'),
-					endDate     = new Date(endString + 'T00:00:00Z');
-
-				// copy filled filters as default value.
-				filters = {_start: startDate, _end: endDate};
-			}
-			else
-				filters = {_start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
+			var filters = {
+				_start: $scope.project.start,
+				_end: InputSlots.minDate([$scope.project.end, new Date()])
+			};
 			
 			cube.dimensions.forEach(function(dimension) {
 				if (dimension.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/))

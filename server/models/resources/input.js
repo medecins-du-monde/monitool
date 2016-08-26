@@ -16,22 +16,25 @@ var validate = validator({
 	properties: {
 		_id:     {
 			type: "string",
-			pattern: "^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:(([a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12})|none):[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}:\\d{4}-\\d{2}-\\d{2}$"
+			pattern: "^[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}:(([a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12})|none):[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}:\\d{4}(\\-((Q[1-4])|(W\\d{2})|(\\d{2}(\\-\\d{2})?)))?$"
 		},
 		_rev:    { "$ref": "#/definitions/revision" },
 		type:    { "type": "string", "pattern": "^input$" },
 		project: { "$ref": "#/definitions/uuid" },
 		entity:  {
 			type: "string",
-			pattern: "^([a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12})|none$"
+			pattern: "^([a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12})|none$"
 		},
 		form:    { "$ref": "#/definitions/uuid" },
-		period:  { "type": "string", "format": "date" },
+		period: {
+			"type": "string",
+			"pattern": "^\\d{4}(\\-((Q[1-4])|(W\\d{2})|(\\d{2}(\\-\\d{2})?)))?$"
+		},
 		values: {
 			type: "object",
 			additionalProperties: false,
 			patternProperties: {
-				"[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}": {
+				"[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}": {
 					type: "array",
 					items: { type: "number" },
 					minItems: 1
@@ -43,11 +46,11 @@ var validate = validator({
 	definitions: {
 		uuid: {
 			type: "string",
-			pattern: "^[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}$"
+			pattern: "^[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}$"
 		},
 		revision: {
 			type: "string",
-			pattern: "^[0-9]+\\-[0-9a-f]{32}$"
+			pattern: "^[\\d]+\\-[\\da-f]{32}$"
 		}
 	}
 });

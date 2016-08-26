@@ -12,10 +12,12 @@
 angular
 	.module(
 		'monitool.services.statistics.olap',
-		[]
+		[
+			'monitool.services.utils.input-slots'
+		]
 	)
 
-	.factory('Olap', function() {
+	.factory('Olap', function(InputSlots) {
 
 		/**
 		 * id = "month"
@@ -28,6 +30,40 @@ angular
 			this.aggregation = aggregation;
 		};
 
+		Dimension.createTime = function(project, form, element, inputs) {
+			var periods;
+
+			if (form.periodicity === 'free') {
+				periods = {};
+				inputs.forEach(function(input) { periods[input.period] = true; });
+				periods = Object.keys(periods);
+				periods.sort();
+
+				return new Dimension('day', periods, element.timeAgg);
+			}
+			else {
+				periods = InputSlots.getList(project, null, form);
+				return new Dimension(form.periodicity, periods, element.timeAgg);
+			}
+		};
+
+		Dimension.createLocation = function(project, form, element) {
+			var entities;
+			if (form.collect == 'some_entity')
+				entities = form.entities;
+			else if (form.collect == 'entity')
+				entities = project.entities.pluck('id');
+
+			if (!entities)
+				throw new Error('No location dimension');
+			else
+				return new Dimension('entity', entities, element.geoAgg);
+		};
+
+		Dimension.createPartition = function(partition) {
+			return new Dimension(partition.id, partition.elements.pluck('id'), partition.aggregation);
+		};
+
 		var DimensionGroup = function(id, childDimension, mapping) {
 			this.id = id;
 			this.childDimension = childDimension;
@@ -35,10 +71,65 @@ angular
 			this.mapping = mapping;
 		};
 
+		DimensionGroup.createTime = function(parent, dimension) {
+			// Constants. Should go in a configuration file somewhere.
+			var formats = {year: 'YYYY', quarter: 'YYYY-[Q]Q', month: 'YYYY-MM', week: 'YYYY-[W]WW', day: 'YYYY-MM-DD'};
+			var timeDimensions = Object.keys(formats);
+
+			// Check arguments
+			if (timeDimensions.indexOf(parent) === -1)
+				throw new Error(parent + ' is not a valid time dimension.');
+
+			if (timeDimensions.indexOf(dimension.id) === -1)
+				throw new Error(dimension.id + ' is not a valid time dimension');
+
+			if (timeDimensions.indexOf(parent) >= timeDimensions.indexOf(dimension.id))
+				throw new Error('Cannot compute ' + parent + ' from ' + dimension.id);
+
+			// Create DimensionGroup mapping from Dimension items.
+			var childFormat = formats[dimension.id], parentFormat = formats[parent];
+			var mapping = {};
+
+			dimension.items.forEach(function(childValue) {
+				var parentValue = moment.utc(childValue, childFormat).format(parentFormat);
+
+				mapping[parentValue] = mapping[parentValue] || [];
+				mapping[parentValue].push(childValue);
+			});
+
+			return new DimensionGroup(parent, dimension.id, mapping);
+		};
+
+		DimensionGroup.createLocation = function(project, form) {
+			var entities;
+			if (form.collect == 'some_entity')
+				entities = form.entities;
+			else if (form.collect == 'entity')
+				entities = project.entities.pluck('id');
+
+			var groups = {};
+			project.groups.forEach(function(group) {
+				groups[group.id] = group.members.filter(function(id) {
+					return entities.indexOf(id) !== -1;
+				});
+
+				if (groups[group.id].length === 0)
+					delete groups[group.id];
+			});
+
+			return new DimensionGroup('group', 'entity', groups);
+		};
+
+		DimensionGroup.createPartition = function(partition) {
+			var pgroups = {};
+			partition.groups.forEach(function(g) { pgroups[g.id] = g.members; });
+			return new DimensionGroup(partition.id + '_g', partition.id, pgroups);
+		};
+
 		/**
 		 * id = "a2b442c9-1dde-42dd-9a04-773818d75e71" (variableId from form)
 		 * dimensions = [Dimension(...), Dimension(...), Dimension(...), ...]
-		 * data = [ElementaryCube(...), ElementaryCube(...), ElementaryCube(...), ...]
+		 * data = [0, 1, 2, 3, ...]
 		 */
 		var Cube = function(id, dimensions, dimensionGroups, data) {
 			this.id = id;
@@ -46,35 +137,91 @@ angular
 			this.dimensionGroups = dimensionGroups;
 			this.data = data;
 
+			// Index dimensions and dimensionGroups by id
+			this.dimensionsById = {};
+			this.dimensionGroupsById = {};
+			this.dimensions.forEach(function(d) { this.dimensionsById[d.id] = d; }.bind(this));
+			this.dimensionGroups.forEach(function(d) { this.dimensionGroupsById[d.id] = d; }.bind(this));
+
 			// Check size.
 			var dataSize = 1;
 			dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
-			if (!data)
-				this.data = new Array(dataSize);
-			else if (data.length !== dataSize)
+			if (this.data.length !== dataSize)
 				throw new Error('Invalid data size');
 		};
 
-		Cube.prototype._getDimension = function(dimensionId) {
-			var dimension, numDimension = this.dimensions.length;
-			for (var dimensionIndex = 0; dimensionIndex < numDimension; ++dimensionIndex)
-				if (this.dimensions[dimensionIndex].id == dimensionId) {
-					dimension = this.dimensions[dimensionIndex];
-					break;
+		Cube.fromElement = function(project, form, element, inputs) {
+			////////////
+			// Build dimensions & groups
+			////////////
+			var dimensions = [], dimensionGroups = [];
+
+			// Time
+			dimensions.push(Dimension.createTime(project, form, element, inputs));
+			['week', 'month', 'quarter', 'year'].forEach(function(periodicity) {
+				// This will fail while indexOf(periodicity) < indexOf(form.periodicity)
+				try { dimensionGroups.push(DimensionGroup.createTime(periodicity, dimensions[0])); }
+				catch (e) {}
+			});
+			
+			// Location
+			if (form.collect == 'entity' || form.collect == 'some_entity') {
+				dimensions.push(Dimension.createLocation(project, form, element));
+				if (project.groups.length)
+					dimensionGroups.push(DimensionGroup.createLocation(project, form))
+			}
+
+			// Partitions
+			element.partitions.forEach(function(partition) {
+				dimensions.push(Dimension.createPartition(partition));
+				if (partition.groups.length)
+					dimensionGroups.push(DimensionGroup.createPartition(partition));
+			});
+
+			////////////
+			// Build data
+			////////////
+			var dataSize = 1;
+			dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
+
+			var data = new Int32Array(dataSize)
+			for (var i = 0; i < dataSize; ++i)
+				data[i] = -2147483648;
+
+			inputs.forEach(function(input) {
+				// Compute location where this subtable should go, and length of data to copy.
+				var offset = dimensions[0].items.indexOf(input.period),
+					length = 1; // Slow!
+
+				if (offset < 0)
+					console.log(offset)
+
+				if (form.collect == 'entity' || form.collect == 'some_entity') {
+					if (dimensions[1].items.indexOf(input.entity) < 0)
+						console.log('WTF')
+
+					offset = offset * dimensions[1].items.length + dimensions[1].items.indexOf(input.entity);
 				}
 
-			return dimension;
-		};
+				element.partitions.forEach(function(partition) {
+					offset *= partition.elements.length;
+					length *= partition.elements.length;
+				});
 
-		Cube.prototype._getDimensionGroup = function(dimensionGroupId) {
-			var dimensionGroup, numDimensionGroups = this.dimensionGroups.length;
-			for (var dimensionGroupIndex = 0; dimensionGroupIndex < numDimensionGroups; ++dimensionGroupIndex)
-				if (this.dimensionGroups[dimensionGroupIndex].id == dimensionGroupId) {
-					dimensionGroup = this.dimensionGroups[dimensionGroupIndex];
-					break;
+				// Retrieve data from input, and copy (if valid).
+				var source = input.values[element.id];
+				if (source && source.length === length) {
+					// Copy into destination table.
+					for (var i = 0; i < length; ++i)
+						data[offset + i] = source[i];
 				}
+				else {
+					console.log("Skip variable", element.id, 'from', input._id);
+				}
+			});
 
-			return dimensionGroup;
+			// Build and fill cube
+			return new Cube(element.id, dimensions, dimensionGroups, data);
 		};
 
 		Cube.fromProject = function(project, allInputs) {
@@ -86,106 +233,8 @@ angular
 			project.forms.forEach(function(form) {
 				var inputs = inputsByForm[form.id];
 				
-				// create entity dimension if relevant (once for the element).
-				var entities = null, groups = null;
-				if (form.collect == 'entity' || form.collect == 'some_entity') {
-					entities = project.entities.pluck('id');
-					groups = {};
-					project.groups.forEach(function(group) { groups[group.id] = group.members; });
-				}
-				
-				var days = {}; // dimension
-				var weeks = {}, months = {}, quarters = {}, years = {}; // dimensionGroups
-				inputs.forEach(function(i) {
-					var period = moment.utc(i.period);
-					var day = period.format('YYYY-MM-DD'),
-						week = period.format('YYYY-[W]WW'),
-						month = period.format('YYYY-MM'),
-						quarter = period.format('YYYY-[Q]Q'),
-						year = period.format('YYYY');
-
-					if (!weeks[week]) weeks[week] = {};
-					if (!months[month]) months[month] = {};
-					if (!quarters[quarter]) quarters[quarter] = {};
-					if (!years[year]) years[year] = {};
-
-					days[day] = true;
-					weeks[week][day] = true;
-					months[month][day] = true;
-					quarters[quarter][day] = true;
-					years[year][day] = true;
-				});
-
-				days = Object.keys(days);
-				for (var week in weeks) weeks[week] = Object.keys(weeks[week]);
-				for (var month in months) months[month] = Object.keys(months[month]);
-				for (var quarter in quarters) quarters[quarter] = Object.keys(quarters[quarter]);
-				for (var year in years) years[year] = Object.keys(years[year]);
-
-				// Create empty cubes
 				form.elements.forEach(function(element) {
-					// Create dimensions.
-					var dimensions = [];
-					dimensions.push(new Dimension('day', days, element.timeAgg));
-					if (form.collect == 'entity' || form.collect == 'some_entity')
-						dimensions.push(new Dimension('entity', entities, element.geoAgg));
-
-					element.partitions.forEach(function(partition, index) {
-						dimensions.push(new Dimension(partition.id, partition.elements.pluck('id'), partition.aggregation));
-					});
-
-					var dimensionGroups = [
-						new DimensionGroup('week', 'day', weeks),
-						new DimensionGroup('month', 'day', months),
-						new DimensionGroup('quarter', 'day', quarters),
-						new DimensionGroup('year', 'day', years)
-					];
-
-					if (form.collect == 'entity' || form.collect == 'some_entity')
-						dimensionGroups.push(new DimensionGroup('group', 'entity', groups));
-
-					element.partitions.forEach(function(partition, index) {
-						if (partition.groups.length) {
-							var pgroups = {};
-							partition.groups.forEach(function(g) { pgroups[g.id] = g.members; });
-							dimensionGroups.push(new DimensionGroup(partition.id + '_g', partition.id, pgroups));
-						}
-					});
-
-					cubes[element.id] = new Cube(element.id, dimensions, dimensionGroups);
-				});
-
-				// Fill cubes
-				inputs.forEach(function(input) {
-					var period = moment.utc(input.period).format('YYYY-MM-DD');
-
-					form.elements.forEach(function(element) {
-						// Compute location where this subtable should go, and length of data to copy.
-						var offset = days.indexOf(period); // FIXME slow & useless
-						var length = 1;
-
-						if (form.collect == 'entity' || form.collect == 'some_entity')
-							offset = offset * entities.length + entities.indexOf(input.entity);
-
-						element.partitions.forEach(function(partition) {
-							offset *= partition.elements.length;
-							length *= partition.elements.length;
-						});
-
-						// Retrieve data from input, and copy (if valid).
-						var source = input.values[element.id];
-						if (source && source.length === length) {
-							var target = cubes[element.id].data;
-
-							// Copy into destination table.
-							for (var i = 0; i < length; ++i)
-								target[offset + i] = source[i];
-						}
-						else {
-							console.log("Skip variable", element.id, 'from', input._id);
-						}
-					});
-
+					cubes[element.id] = Cube.fromElement(project, form, element, inputs);
 				});
 			});
 
@@ -200,7 +249,7 @@ angular
 			var dimensionId = dimensionIds.shift();
 
 			// search dimension
-			var dimension = this._getDimension(dimensionId) || this._getDimensionGroup(dimensionId);
+			var dimension = this.dimensionsById[dimensionId] || this.dimensionGroupsById[dimensionId];
 
 			// Build tree
 			var result = {};
@@ -250,7 +299,7 @@ angular
 			var dimensionId = dimensionIds.shift();
 
 			// search dimension
-			var dimension = this._getDimension(dimensionId) || this._getDimensionGroup(dimensionId);
+			var dimension = this.dimensionsById[dimensionId] || this.dimensionGroupsById[dimensionId];
 
 			// Build tree
 			var result = {};
@@ -325,14 +374,13 @@ angular
 			// rewrite the filter so that it contains only dimensions.
 			filter = this._remove_dimension_groups(filter);
 			filter = this._rewrite_as_indexes(filter);
-
 			return this._query_rec(filter, 0);
 		};
 
 		// FIXME we need to push/pop instead of shift/unshift (it's 10 times faster).
 		Cube.prototype._query_rec = function(allIndexes, offset) {
 			if (allIndexes.length == 0)
-				return this.data[offset];
+				return this.data[offset] == -2147483648 ? undefined : this.data[offset];
 
 			var dimension  = this.dimensions[this.dimensions.length - allIndexes.length],
 				indexes    = allIndexes.shift(),
@@ -430,7 +478,7 @@ angular
 			var newFilters = {};
 
 			for (var dimensionId in oldFilters) {
-				var dimension = this._getDimension(dimensionId),
+				var dimension = this.dimensionsById[dimensionId],
 					oldFilter = oldFilters[dimensionId];
 
 				// if the dimension exists, we have nothing to do.
@@ -445,7 +493,7 @@ angular
 				}
 				// the dimension does not exists.
 				else {
-					var dimensionGroup = this._getDimensionGroup(dimensionId);
+					var dimensionGroup = this.dimensionGroupsById[dimensionId];
 
 					// if it's a group, replace it.
 					if (dimensionGroup) {
@@ -484,20 +532,25 @@ angular
 			// We don't want to rewrite it into the _query_rec function, because it is
 			// more efficient to do it only once here, instead of many times on the rec function.
 			return this.dimensions.map(function(dimension) {
-				var i, result;
+				var i, result, size;
 
 				// No filter => filter is range(0, dimension.items.length)
 				if (!filter[dimension.id]) {
-					result = new Array(dimension.items.length);
-					for (i = 0; i < result.length; ++i)
+					size = dimension.items.length;
+					result = new Int32Array(size);
+					for (i = 0; i < size; ++i)
 						result[i] = i;
 				}
 				// Yes filter => map strings to ids in the real query.
 				else {
 					// Now we need to map our list of strings to indexes.
-					result = new Array(filter[dimension.id].length);
-					for (i = 0; i < result.length; ++i)
+					size = filter[dimension.id].length;
+					result = new Int32Array(size);
+					for (i = 0; i < size; ++i) {
 						result[i] = dimension.items.indexOf(filter[dimension.id][i]);
+						if (result[i] === -1)
+							throw new Error('Dimension item "' + filter[dimension.id][i] + '" was not found.');
+					}
 				}
 
 				return result;

@@ -277,6 +277,14 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		no_data: "Les données ne sont pas disponibles",
+		not_available_by_entity: "Ces données ne sont pas disponibles par lieu de collecte",
+		not_available_by_group: "Ces données ne sont pas disponibles par groupe",
+		not_available_min_week: "Agrégez au moins par semaine pour accéder à ces données",
+		not_available_min_month: "Agrégez au moins par mois pour accéder à ces données",
+		not_available_min_quarter: "Agrégez au moins par trimestre pour accéder à ces données",
+		not_available_min_year: "Agrégez au moins par an pour accéder à ces données",
+
 		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements. Ceux-ci seront perdus.",
 		no_logical_frame: "Aucun cadre logique n'a encore été créé sur ce projet.",
 		partition_general: "Général",

@@ -272,13 +272,7 @@ angular
 		$scope.setLogicalFrame = function(lf) { $scope.currentLogframe = lf; };
 
 		// Create default filter so that all inputs are used.
-		$scope.filters = {_location: "none", _start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
-		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters._start)
-				$scope.filters._start = inputs[i].period;
-			if (inputs[i].period > $scope.filters._end)
-				$scope.filters._end = inputs[i].period;
-		}
+		$scope.filters = {_location: "none", _start: $scope.project.start, _end: new Date()};
 
 		// default group by
 		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
@@ -304,13 +298,7 @@ angular
 		$scope.plots = {};
 
 		// Create default filter so that all inputs are used.
-		$scope.filters = {_location: "none", _start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
-		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters._start)
-				$scope.filters._start = inputs[i].period;
-			if (inputs[i].period > $scope.filters._end)
-				$scope.filters._end = inputs[i].period;
-		}
+		$scope.filters = {_location: "none", _start: $scope.project.start, _end: new Date()};
 
 		// default group by
 		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)

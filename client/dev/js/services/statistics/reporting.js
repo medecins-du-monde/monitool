@@ -12,7 +12,7 @@ angular
 
 	// TODO profiling this piece of code for perfs could not hurt.
 	// we will see how bad if performs on the wild.
-	.service('mtReporting', function($filter, uuid, Parser) {
+	.service('mtReporting', function($filter, uuid, Parser, InputSlots) {
 
 		this.getColumns = function(groupBy, start, end, location, project) {
 			var type;
@@ -24,21 +24,15 @@ angular
 				type = 'entity';
 
 			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1) {
-				var start      = moment.utc(start).startOf(groupBy === 'week' ? 'isoWeek' : groupBy),
-					end        = moment.utc(end).endOf(groupBy === 'week' ? 'isoWeek' : groupBy),
-					dispFormat = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-MM-DD', 'day': 'YYYY-MM-DD'}[groupBy],
-					idFormat   = {'year': 'YYYY', 'quarter': 'YYYY-[Q]Q', 'month': 'YYYY-MM', 'week': 'YYYY-[W]WW', 'day': 'YYYY-MM-DD'}[groupBy],
-					current    = start.clone(),
-					cols       = [];
+				var start = moment.utc(start).startOf(groupBy === 'week' ? 'isoWeek' : groupBy),
+					end   = moment.utc(end).endOf(groupBy === 'week' ? 'isoWeek' : groupBy),
+					slots = InputSlots.iterate(start, end, groupBy);
 
-				while (current.isBefore(end) || current.isSame(end)) {
-					cols.push({id: current.format(idFormat), name: current.format(dispFormat)});
-					current.add(1, groupBy);
-				}
+				slots.push('_total');
 
-				cols.push({id: '_total', name: 'Total'});
-
-				return cols;
+				return slots.map(function(slot) {
+					return {id: slot, name: $filter('formatSlot')(slot)};
+				});
 			}
 			else if (groupBy === 'entity') {
 				if (type === 'project')
@@ -104,20 +98,38 @@ angular
 		};
 
 		this._makeActivityRow = function(cubes, indent, groupBy, viewFilters, columns, element) {
-			try {
-				// Retrieve cube & create filter.
-				var cube = cubes[element.id],
-					cubeFilters = this.createCubeFilter(cube, viewFilters);
+			// Retrieve cube & create filter.
+			var cube = cubes[element.id],
+				row = {id: uuid.v4(), name: element.name, type: 'data', indent: indent};
 
-				// Query cube
-				var values = cube.query([groupBy], cubeFilters, true),
-					cols = columns.map(function(col) { return values[col.id]; });
+			// Handle invalid groupBy
+			if (groupBy == 'entity' && !cube.dimensionsById.entity)
+				row.message = 'project.not_available_by_entity';
 
-				return {id: uuid.v4(), name: element.name, cols: cols, type: 'data', indent: indent};
+			else if (groupBy == 'group' && !cube.dimensionsById.group)
+				row.message = 'project.not_available_by_group';
+
+			else if (!cube.dimensionsById[groupBy] && !cube.dimensionGroupsById[groupBy])
+				row.message = 'project.not_available_min_' + cube.dimensions[0].id;
+
+			else {
+				try {
+					var cubeFilters = this.createCubeFilter(cube, viewFilters);
+
+					try {
+						var values = cube.query([groupBy], cubeFilters, true);
+						row.cols = columns.map(function(col) { return values[col.id]; });
+					}
+					catch (e) {
+						row.message = 'project.no_data';
+					}
+				}
+				catch (e) {
+					row.message = 'project.not_available_by_entity';
+				}
 			}
-			catch (e) {
-				return {id: uuid.v4(), name: element.name, type: 'data', indent: indent};
-			}
+
+			return row;
 		};
 
 		this._makeIndicatorRow = function(cubes, indent, groupBy, viewFilters, columns, indicator) {
@@ -165,29 +177,34 @@ angular
 		this.createCubeFilter = function(cube, viewFilters) {
 			// Create a filter that explicitely allows everything!
 			var cubeFilters = angular.copy(viewFilters);
-
+			var formats = {year: 'YYYY', quarter: 'YYYY-[Q]Q', month: 'YYYY-MM', week: 'YYYY-[W]WW', day: 'YYYY-MM-DD'};
+			var timeDimension = cube.dimensions[0]; // hack. We do this because we know the internals of Cube.
+			
 			for (var key in cubeFilters) {
 				if (key.substring(0, 1) !== '_')
 					continue;
 
 				if (key === '_start') {
-					if (!cubeFilters.day)
-						cubeFilters.day = cube._getDimension('day').items;
-
+					if (!cubeFilters[timeDimension.id])
+						cubeFilters[timeDimension.id] = timeDimension.items;
 					// _start => filter day
-					var start = moment.utc(viewFilters._start).format('YYYY-MM-DD');
-					cubeFilters.day = cubeFilters.day.filter(function(dimItem) { return start <= dimItem; });
+					var start = moment.utc(viewFilters._start).startOf(timeDimension.id).format(formats[timeDimension.id]);
+
+					// This is O(n), but should not be. Can do O(logn)
+					cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(function(dimItem) { return start <= dimItem; });
 
 					delete cubeFilters._start;
 				}
 
 				else if (key === '_end') {
-					if (!cubeFilters.day)
-						cubeFilters.day = cube._getDimension('day').items;
-					
+					if (!cubeFilters[timeDimension.id])
+						cubeFilters[timeDimension.id] = timeDimension.items;
+
 					// _end => filter day
-					var end = moment.utc(viewFilters._end).format('YYYY-MM-DD');
-					cubeFilters.day = cubeFilters.day.filter(function(dimItem) { return dimItem <= end; });
+					var end = moment.utc(viewFilters._end).endOf(timeDimension.id).format(formats[timeDimension.id]);
+
+					// This is O(n), but should not be. Can do O(logn)
+					cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(function(dimItem) { return dimItem <= end; });
 
 					delete cubeFilters._end;
 				}
@@ -197,7 +214,7 @@ angular
 					// Don't check if they exist in the cube, because we want an exception to be raised in _makeXxxRow() later on if they don't.
 					if (viewFilters._location.substring(0, 4) === 'ent_') {
 						if (!cubeFilters.entity)
-							cubeFilters.entity = cube._getDimension('entity').items;
+							cubeFilters.entity = cube.dimensionsById.entity.items;
 						
 						cubeFilters.entity = cubeFilters.entity.filter(function(dimItem) {
 							return dimItem == viewFilters._location.substring(4);
@@ -206,7 +223,7 @@ angular
 
 					else if (viewFilters._location.substring(0, 4) === 'grp_') {
 						if (!cubeFilters.group)
-							cubeFilters.group = cube._getDimensionGroup('group').items;
+							cubeFilters.group = cube.dimensionGroupsById.group.items;
 
 						cubeFilters.group = cubeFilters.group.filter(function(dimItem) {
 							return dimItem == viewFilters._location.substring(4);

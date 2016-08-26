@@ -129,7 +129,7 @@
 			</td>
 
 			<td ng-repeat="col in row.cols track by $index" activity-reporting-field></td>
-			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);"></td>
+			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);">{{row.message|translate}}</td>
 		</tr>
 
 	</tbody>

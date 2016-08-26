@@ -3,86 +3,89 @@
 angular
 	.module('monitool.services.utils.input-slots', [])
 
-	.service('InputSlots', function() {
+	.factory('InputSlots', function() {
 		var formats = {year: 'YYYY', quarter: 'YYYY-[Q]Q', month: 'YYYY-MM', week: 'YYYY-[W]WW', day: 'YYYY-MM-DD'};
 
-		var getFirstDate = this.getFirstDate = function(project, entity, form) {
-			var formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
+		var InputSlots = {};
 
-			if (entity) {
-				if (!entity.start && !form.start)
-					return moment.utc(project.start).startOf(formPeriodicity);
-				else if (!entity.start && form.start)
-					return moment.utc(form.start).startOf(formPeriodicity);
-				else if (entity.start && !form.start)
-					return moment.utc(entity.start).startOf(formPeriodicity);
-				else
-					return moment.max(moment.utc(entity.start), moment.utc(form.start)).startOf(formPeriodicity);
-			}
-			else
-				return moment.utc(form.start || project.start).startOf(formPeriodicity);
+		InputSlots.minDate = function(dates) {
+			return dates.reduce(function(d, memo) { return !memo || memo > d ? d : memo; });
 		};
 
-		var getLastDate = this.getLastDate = function(project, entity, form) {
-			var formPeriodicity = form.periodicity === 'week' ? 'isoWeek' : form.periodicity;
-
-			if (entity) {
-				if (!entity.end && !form.end)
-					return moment.utc(project.end).startOf(formPeriodicity);
-				else if (!entity.end && form.end)
-					return moment.utc(form.end).startOf(formPeriodicity);
-				else if (entity.end && !form.end)
-					return moment.utc(entity.end).startOf(formPeriodicity);
-				else
-					return moment.min(moment.utc(entity.end), moment.utc(form.end)).startOf(formPeriodicity);
-			}
-			else
-				return moment.utc(form.end || project.end).startOf(formPeriodicity);
+		InputSlots.maxDate = function(dates) {
+			return dates.reduce(function(d, memo) { return !memo || memo < d ? d : memo; });
 		};
 
-		var getListDate = this.getListDate = function(project, entity, form) {
-			var periods;
+		InputSlots.iterate = function(begin, end, periodicity) {
+			var current = moment.utc(begin).startOf(periodicity == 'week' ? 'isoWeek' : periodicity),
+				end = moment.utc(end).endOf(periodicity == 'week' ? 'isoWeek' : periodicity);
 
-			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(form.periodicity) !== -1) {
-				var current = getFirstDate(project, entity, form),
-					end = getLastDate(project, entity, form);
+			if (end.isAfter()) // do not allow to go in the future
+				end = moment.utc();
 
-				if (end.isAfter()) // do not allow to go in the future
-					end = moment.utc();
-
-				periods = [];
-				while (current.isBefore(end)) {
-					periods.push(current.clone());
-					current.add(1, form.periodicity);
-				}
+			var periods = [];
+			while (current.isBefore(end)) {
+				periods.push(current.format(formats[periodicity]));
+				current.add(1, periodicity);
 			}
-			else if (form.periodicity === 'free') {
-				periods = [];
-			}
-			else
-				throw new Error(form.periodicity + ' is not a valid periodicity');
 
 			return periods;
 		};
 
-		var getFirst = this.getFirst = function(project, entity, form) {
-			return getFirstDate(project, entity, form).format(formats[form.periodicity]);
+		InputSlots.getList = function(project, entity, form) {
+			var start = InputSlots.maxDate([project.start, entity ? entity.start : null, form.start]),
+				end   = InputSlots.minDate([project.end, entity ? entity.end : null, form.end]),
+				list  = InputSlots.iterate(start, end, form.periodicity);
+
+			return list;
 		};
 
-		var getLast = this.getLast = function(project, entity, form) {
-			return getLastDate(project, entity, form).format(formats[form.periodicity]);
+		InputSlots.isValid = function(project, entity, form, slot) {
+			if (form.periodicity === 'free')
+				return !!slot.match(/^\d\d\d\d\-\d\d\-\d\d$/);
+			else
+				return InputSlots.getList(project, entity, form).indexOf(slot) !== -1;
 		};
 
-		var getList = this.getList = function(project, entity, form) {
-			return getListDate(project, entity, form).map(function(date) {
-				return date.format(formats[form.periodicity]);
-			});
-		};
+		return InputSlots;
 	})
 
-	.filter('formatSlot', function() {
+	.filter('formatSlot', function($rootScope, $locale, $filter) {
 		return function(slot) {
-			return slot;
+			if (slot == '_total')
+				return 'Total';
+
+			else {
+				var year = slot.match(/^\d{4}$/);
+				if (year)
+					return year;
+
+				else {
+					var quarter = slot.match(/^(\d{4})\-Q(\d)$/);
+					if (quarter) {
+						if ($rootScope.language == 'fr') {
+							var trim = {"1": "1er", "2": "2ème", "3": "3ème", "4": "4ème"}
+							return trim[quarter[2]] + ' trimestre ' + quarter[1];
+						}
+						else if ($rootScope.language == 'es') {
+							var trim = {"1": "Primer", "2": "Segundo", "3": "Tercero", "4": "Quarto"}
+							return trim[quarter[2]] + ' trimestre ' + quarter[1];
+						}
+						else
+							return slot;
+					}
+					else {
+						var month = slot.match(/^(\d{4})\-(\d{2})$/);
+						if (month)
+							return $locale.DATETIME_FORMATS.STANDALONEMONTH[month[2] - 1] + ' ' + month[1];
+						else
+							return $filter('date')(new Date(slot + 'T00:00:00Z'), 'mediumDate', 'utc');
+					}
+
+				}
+			}
+
+			return 'failed'
 		};
 	});
 
