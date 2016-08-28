@@ -461,7 +461,7 @@ angular
 		$scope.createForm = function() {
 			var newForm = {id: uuid.v4(), name: '', periodicity: 'month', collect: 'entity', start: null, end: null, elements: []};
 			$scope.project.forms.push(newForm);
-			$state.go('main.project.save.collection_form_edition', {formId: newForm.id});
+			$state.go('main.project.structure.collection_form_edition', {formId: newForm.id});
 		};
 	})
 
@@ -526,7 +526,7 @@ angular
 				// Give some time for the watches to update the flags
 				$timeout(function() {
 					$scope.$parent.save().then(function() {
-						$state.go('main.project.save.collection_form_list');
+						$state.go('main.project.structure.collection_form_list');
 					});
 				});
 			}
@@ -536,7 +536,7 @@ angular
 		var w1 = $scope.$watch('project.forms[currentFormIndex]', function(form) {
 			if (!form) {
 				w1(); w2(); w3();
-				$state.go('main.project.save.collection_form_list');
+				$state.go('main.project.structure.collection_form_list');
 			}
 		});
 

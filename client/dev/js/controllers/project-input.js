@@ -138,7 +138,7 @@ angular.module('monitool.controllers.project.input', [])
 
 		$scope.save = function() {
 			pageChangeWatch()
-			$scope.currentInput.$save(function() { $state.go('main.project.collection_input_list'); });
+			$scope.currentInput.$save(function() { $state.go('main.project.input.list'); });
 		};
 
 		$scope.reset = function() {
@@ -155,7 +155,7 @@ angular.module('monitool.controllers.project.input', [])
 			if (window.confirm(easy_question)) {
 				pageChangeWatch(); // remove the change page watch, because it will trigger otherwise.
 				$scope.currentInput.$delete(function() {
-					$state.go('main.project.collection_input_list');
+					$state.go('main.project.input.list');
 				});
 			}
 		};
