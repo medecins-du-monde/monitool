@@ -4,9 +4,9 @@ var nano = require('nano'),
 	uuid = require('node-uuid');
 
 
-var formats = {year: 'YYYY', quarter: 'YYYY-[Q]Q', month: 'YYYY-MM', week: 'YYYY-[W]WW', day: 'YYYY-MM-DD'};
+var formats = {year: 'YYYY', quarter: 'YYYY-[Q]Q', month: 'YYYY-MM', week: 'YYYY-[W]WW', day: 'YYYY-MM-DD', free: 'YYYY-MM-DD'};
 
-var db = nano('http://localhost:5984').use('monitool-final');
+var db = nano('http://localhost:5984').use('monitool-september');
 
 db.list({include_docs: true}, function(error, result) {
 
@@ -29,17 +29,19 @@ db.list({include_docs: true}, function(error, result) {
 				.forms.find(function(f) { return f.id === input.form; })
 				.periodicity;
 
+			documentsToKeep.push({_id: input._id, _rev: input._rev, _deleted: true});
+
 			input.period = moment.utc(input.period + 'T00:00:00Z').format(formats[periodicity]);
+			input._id = [input.project, input.entity, input.form, input.period].join(':');
+			delete input._rev;
+			documentsToKeep.push(input);
 		}
 		catch(e) {
-			console.log('deleting input')
-			input._deleted = true;
+			documentsToKeep.push({_id: input._id, _rev: input._rev, _deleted: true});
 		}
-
-		documentsToKeep.push(input);
 	}
 
-	// console.log(JSON.stringify(documentsToKeep, null, "\t"));
+	// console.log(documentsToKeep.map(JSON.stringify).join("\n\n"));
 
 	db.bulk({docs: documentsToKeep}, function(error, done) {
 		console.log(error);

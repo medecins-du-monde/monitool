@@ -1,0 +1,71 @@
+<ol class="breadcrumb">
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
+	<li class="active">{{form.name}}</li>
+</ol>
+
+<doc-reminder pages="project.input"></doc-reminder>
+
+<style> td { text-align: center; } td a { display: block; width: 100%;}</style>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th ng-style="{width: (100 / displayInfo._.numCols) + '%'}"
+				translate="shared.date"></th>
+
+			<th ng-style="{width: (100 / displayInfo._.numCols) + '%'}"
+				ng-if="displayInfo.none.displayColumn"
+				translate="shared.project"></th>
+
+			<th ng-style="{width: (100 / displayInfo._.numCols) + '%'}"
+				ng-if="displayInfo[entity.id].displayColumn"
+				ng-repeat="entity in project.entities">{{entity.name}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="(date, status) in inputsStatus">
+			<th>{{date|formatSlot}}</th>
+			<td ng-if="displayInfo.none.displayColumn">
+				<a class="btn btn-xs"
+				   ng-class="{'btn-default': status.none === 'done', 'btn-primary': status.none === 'expected', 'btn-danger': status.none === 'outofschedule'}"
+				   ui-sref="main.project.input.edit({period: date, entityId: 'none'})"
+				   ng-if="status.none">
+					{{('project.input_status.' + status.none + (displayInfo.none.canEdit ? '-edit' : '-read')) | translate}}
+				</a>
+			</td>
+			<td ng-if="displayInfo[entity.id].displayColumn" ng-repeat="entity in project.entities">
+				<a class="btn btn-xs"
+				   ng-class="{'btn-default': status[entity.id] === 'done', 'btn-primary': status[entity.id] === 'expected', 'btn-danger': status[entity.id] === 'outofschedule'}"
+				   ui-sref="main.project.input.edit({period: date, entityId: entity.id})"
+				   ng-if="status[entity.id]">
+					{{('project.input_status.' + status[entity.id] + (displayInfo[entity.id].canEdit ? '-edit' : '-read')) | translate}}
+				</a>
+			</td>
+		</tr>
+
+		<tr ng-hide="inputsStatus">
+			<td style="text-align: center" colspan="{{displayInfo._.numCols}}" translate="project.no_inputs"></td>
+		</tr>
+	</tbody>
+	<tfoot ng-if="displayInfo._.displayFooterRow">
+		<tr>
+			<th>
+				<utc-datepicker ng-model="newInputDate.date" />
+			</th>
+			<td ng-if="displayInfo.none.displayColumn">
+				<a class="btn btn-xs btn-success"
+				   ng-click="addInput('none')"
+				   translate="project.input_status.expected-edit-new"
+				   ng-if="displayInfo.none.displayAddButton"></a>
+			</td>
+			<td ng-if="displayInfo[entity.id].displayColumn" ng-repeat="entity in project.entities">
+				<a class="btn btn-xs btn-success"
+				   ng-click="addInput(entity.id)"
+				   translate="project.input_status.expected-edit-new"
+				   ng-if="displayInfo[entity.id].displayAddButton"></a>
+			</td>
+		</tr>
+	</tfoot>
+</table>
+

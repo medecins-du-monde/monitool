@@ -1,7 +1,6 @@
 "use strict";
 
 angular
-
 	.module(
 		'monitool.controllers.indicator',
 		[

@@ -59,7 +59,7 @@
 				   tooltip-placement="right" acl-lacks-project-role="input" acl-project="project" style="color: darkred"></i>
 			</td>
 			<td>{{project.country}}</td>
-			<td><a ui-sref="main.project.save.basics({projectId: project._id})">{{project.name}}</a></td>
+			<td><a ui-sref="main.project.structure.basics({projectId: project._id})">{{project.name}}</a></td>
 			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
 			<td>{{project.start|date}}</td>
 			<td>{{project.end|date}}</td>

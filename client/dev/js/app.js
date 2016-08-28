@@ -6,9 +6,9 @@ var app = angular.module('monitool.app', [
 	'monitool.controllers.helper',
 	'monitool.controllers.indicator',
 	'monitool.controllers.project.shared',
-	'monitool.controllers.project.activity',
-	'monitool.controllers.project.indicators',
-	'monitool.controllers.project.spec',
+	'monitool.controllers.project.structure',
+	'monitool.controllers.project.input',
+	'monitool.controllers.project.reporting',
 
 	'monitool.directives.acl',
 	'monitool.directives.form',
@@ -279,18 +279,18 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.save', {
-		abstract: true,
-		templateUrl: 'partials/projects/menu-save.html'
-	});
-	
 	///////////////////////////
-	// Project Specification
+	// Project Structure
 	///////////////////////////
 
-	$stateProvider.state('main.project.save.basics', {
+	$stateProvider.state('main.project.structure', {
+		abstract: true,
+		templateUrl: 'partials/projects/structure/menu.html'
+	});
+
+	$stateProvider.state('main.project.structure.basics', {
 		url: '/basics',
-		templateUrl: 'partials/projects/specification/basics.html',
+		templateUrl: 'partials/projects/structure/basics.html',
 		controller: 'ProjectBasicsController',
 		resolve: {
 			themes: function(Theme) {
@@ -299,15 +299,38 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.save.collection_site_list', {
-		url: '/collection-site',
-		templateUrl: 'partials/projects/specification/collection-site-list.html',
+	$stateProvider.state('main.project.structure.collection_site_list', {
+		url: '/site',
+		templateUrl: 'partials/projects/structure/collection-site-list.html',
 		controller: 'ProjectCollectionSiteListController'
 	});
 
-	$stateProvider.state('main.project.save.user_list', {
+	$stateProvider.state('main.project.structure.collection_form_list', {
+		url: '/data-source',
+		templateUrl: 'partials/projects/structure/collection-form-list.html',
+		controller: 'ProjectCollectionFormListController'
+	});
+
+	$stateProvider.state('main.project.structure.collection_form_edition', {
+		url: '/data-source/:formId',
+		templateUrl: 'partials/projects/structure/collection-form-edition.html',
+		controller: 'ProjectCollectionFormEditionController',
+		resolve: {
+			formUsage: function($stateParams, project, Input) {
+				return Input.query({mode: "ids_by_form", projectId: project._id, formId: $stateParams.formId}).$promise;
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.structure.logical_frame', {
+		url: '/logical-frame',
+		templateUrl: 'partials/projects/structure/logframe-edit.html',
+		controller: 'ProjectLogicalFrameController'
+	});
+
+	$stateProvider.state('main.project.structure.user_list', {
 		url: '/users',
-		templateUrl: 'partials/projects/specification/user-list.html',
+		templateUrl: 'partials/projects/structure/user-list.html',
 		controller: 'ProjectUserListController',
 		resolve: {
 			users: function(User) {
@@ -317,56 +340,51 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	///////////////////////////
-	// Project Raw data
+	// Project Input
 	///////////////////////////
 
-	$stateProvider.state('main.project.save.collection_form_list', {
-		url: '/collection-form',
-		templateUrl: 'partials/projects/activity/collection-form-list.html',
-		controller: 'ProjectCollectionFormListController'
-	});
 
-	$stateProvider.state('main.project.save.collection_form_edition', {
-		url: '/collection-form/:formId',
-		templateUrl: 'partials/projects/activity/collection-form-edition.html',
-		controller: 'ProjectCollectionFormEditionController',
+	$stateProvider.state('main.project.input', {
+		abstract: true,
+		url: '/input/:formId',
+		template: '<div ui-view></div>',
 		resolve: {
-			formUsage: function($stateParams, project, Input) {
-				return Input.query({mode: "ids_by_form", projectId: project._id, formId: $stateParams.formId}).$promise;
-			}
-		}
-	});
-
-	$stateProvider.state('main.project.collection_input_list', {
-		url: '/collection-input',
-		templateUrl: 'partials/projects/activity/collection-input-list.html',
-		controller: 'ProjectCollectionInputListController',
-		resolve: {
-			inputsStatus: function(Input, project) {
-				return Input.fetchProjectStatus(project);
-			}
-		}
-	});
-
-	$stateProvider.state('main.project.collection_input_edition', {
-		url: '/collection-input/:period/:formId/:entityId',
-		templateUrl: 'partials/projects/activity/collection-input-edition.html',
-		controller: 'ProjectCollectionInputEditionController',
-		resolve: {
-			inputs: function(Input, $stateParams, project) {
-				var form = project.forms.find(function(f) { return f.id == $stateParams.formId});
-				return Input.fetchLasts(project._id, $stateParams.entityId, form, $stateParams.period);
-			},
 			form: function($stateParams, project) {
 				return project.forms.find(function(form) { return form.id == $stateParams.formId; });
 			}
 		}
 	});
 
-	$stateProvider.state('main.project.activity_reporting', {
-		url: '/activity-reporting',
-		templateUrl: 'partials/projects/activity/reporting.html',
-		controller: 'ProjectActivityReportingController',
+	$stateProvider.state('main.project.input.list', {
+		url: '/list',
+		templateUrl: 'partials/projects/input/collection-input-list.html',
+		controller: 'ProjectCollectionInputListController',
+		resolve: {
+			inputsStatus: function(Input, project, form) {
+				return Input.fetchFormStatus(project, form.id);
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.input.edit', {
+		url: '/edit/:period/:entityId',
+		templateUrl: 'partials/projects/input/collection-input-edition.html',
+		controller: 'ProjectCollectionInputEditionController',
+		resolve: {
+			inputs: function(Input, $stateParams, project, form) {
+				return Input.fetchLasts(project._id, $stateParams.entityId, form, $stateParams.period);
+			}
+		}
+	});
+
+	///////////////////////////
+	// Project Reporting
+	///////////////////////////
+
+	$stateProvider.state('main.project.reporting', {
+		url: '/reporting',
+		templateUrl: 'partials/projects/reporting/reporting.html',
+		controller: 'ProjectReportingController',
 		resolve: {
 			inputs: function(Input, project) {
 				return Input.fetchForProject(project);
@@ -374,10 +392,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.detailed_activity_reporting', {
-		url: '/detailed-activity-reporting',
-		templateUrl: 'partials/projects/activity/reporting-detailed.html',
-		controller: 'ProjectActivityDetailedReportingController',
+	$stateProvider.state('main.project.detailed_reporting', {
+		url: '/detailed-reporting',
+		templateUrl: 'partials/projects/reporting/reporting-detailed.html',
+		controller: 'ProjectDetailedReportingController',
 		resolve: {
 			inputs: function(Input, project) {
 				return Input.fetchForProject(project);
@@ -387,8 +405,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.olap', {
 		url: '/olap',
-		templateUrl: 'partials/projects/activity/olap.html',
-		controller: 'ProjectActivityOlapController',
+		templateUrl: 'partials/projects/reporting/olap.html',
+		controller: 'ProjectOlapController',
 		resolve: {
 			inputs: function(Input, project) {
 				return Input.fetchForProject(project);
@@ -396,38 +414,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-
-	///////////////////////////
-	// Project Indicators
-	///////////////////////////
-
-	$stateProvider.state('main.project.save.logical_frame', {
-		url: '/logical-frame',
-		templateUrl: 'partials/projects/indicators/logframe-edit.html',
-		controller: 'ProjectLogicalFrameController'
-	});
-
-	$stateProvider.state('main.project.indicators_reporting', {
-		url: '/indicator-reporting',
-		templateUrl: 'partials/projects/indicators/reporting.html',
-		controller: 'ProjectReportingController',
-		resolve: {
-			inputs: function(Input, project) {
-				return Input.fetchForProject(project);
-			}
-		}
-	});
-
-	$stateProvider.state('main.project.detailed_indicators_reporting', {
-		url: '/detailed-indicator-reporting',
-		templateUrl: 'partials/projects/indicators/reporting-detailed.html',
-		controller: 'ProjectDetailedReportingController',
-		resolve: {
-			inputs: function(Input, project) {
-				return Input.fetchForProject(project);
-			}
-		}
-	});
 
 	///////////////////////////
 	// Indicators

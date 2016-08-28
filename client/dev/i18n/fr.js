@@ -541,6 +541,7 @@ var FRENCH_TRANSLATION = {
 		link: "Lien: {{name}}",
 	},
 	indicator: {
+		cross_cutting: "Indicateurs transversaux",
 		cant_create: "Vous n'êtes pas autorisé à créer de nouveaux indicateurs",
 		name: "Nom",
 		translate_from_fr: "Traduire automatiquement à partir du français",

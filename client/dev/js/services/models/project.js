@@ -6,6 +6,33 @@ angular
 
 		var Project = $resource('/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
+
+		/**
+		 * Retrieve all indicators and variables in list
+		 * eg: fill <select> on detailed reporting pages.
+		 */
+		Project.prototype.getAllIndicators = function() {
+			var elementOptions = [];
+			this.logicalFrames.forEach(function(logicalFrame, i0) {
+				var fn = function(i) { return {name: i.display, type: "indicator", group: "Logical frame: " + logicalFrame.name, indicator: i}; };
+				Array.prototype.push.apply(elementOptions, logicalFrame.indicators.map(fn));
+				logicalFrame.purposes.forEach(function(purpose, i1) {
+					Array.prototype.push.apply(elementOptions, purpose.indicators.map(fn));
+					purpose.outputs.forEach(function(output, i2) {
+						Array.prototype.push.apply(elementOptions, output.indicators.map(fn));
+					}, this);
+				}, this);
+			}, this);
+
+			this.forms.forEach(function(form) {
+				form.elements.forEach(function(element) {
+					elementOptions.push({name: element.name, type: "variable", group: "Data source: " + form.name, element: element});
+				});
+			});
+
+			return elementOptions;
+		};
+
 		
 		/**
 		 * Does it makes sense to display a link for activity reporting?

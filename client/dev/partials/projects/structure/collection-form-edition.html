@@ -1,7 +1,7 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.save.basics" ng-bind="project.name"></a></li>
-	<li><a ui-sref="main.project.save.collection_form_list" translate="project.collection_form_list"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.structure.collection_form_list" translate="project.collection_form_list"></a></li>
 	<li class="active">{{project.forms[currentFormIndex].name}}</li>
 </ol>
 

@@ -1,10 +1,10 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.save.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="project.reporting_compare_sites"></li>
 </ol>
 
-<doc-reminder pages="project.activity_followup"></doc-reminder>
+<doc-reminder pages="project.objectives_results"></doc-reminder>
 
 <form class="form-horizontal noprint" novalidate>
 
@@ -24,8 +24,8 @@
 								<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
 								<select id="element-input"
 										class="form-control input-sm"
-										ng-model="wrap.chosenElementId"
-										ng-options="i.id as i.name group by i.group for i in elementOptions"></select>
+										ng-model="wrap.chosenElement"
+										ng-options="i as i.name group by i.group for i in elementOptions"></select>
 							</div>
 						</div>
 					</div>
@@ -130,8 +130,10 @@
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
 				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
-			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" activity-reporting-field></td>
+			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" reporting-field></td>
 			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);">{{row.message|translate}}</td>
 		</tr>
 	</tbody>
 </table>
+
+

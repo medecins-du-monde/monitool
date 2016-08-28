@@ -1,6 +1,6 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.save.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="project.collection_form_list"></li>
 </ol>
 
@@ -24,7 +24,7 @@
 		<tr ng-repeat="form in project.forms">
 			<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
 			<td>
-				<a ui-sref="main.project.save.collection_form_edition({formId: form.id})">
+				<a ui-sref="main.project.structure.collection_form_edition({formId: form.id})">
 					{{form.name}}
 				</a>
 			</td>

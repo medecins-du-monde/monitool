@@ -493,6 +493,7 @@ var ENGLISH_TRANSLATION = {
 		link: "Link: {{name}}",
 	},
 	indicator: {
+		cross_cutting: "Cross-cutting indicators",
 		cant_create: "You are not allowed to create new indicators",
 		name: "Name",
 		translate_from_fr: "Translate automatically from french",

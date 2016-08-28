@@ -484,6 +484,7 @@ var SPANISH_TRANSLATION = {
 		link: "Vínculo: {{name}}",
 	},
 	indicator: {
+		cross_cutting: "Indicadores transversales",
 		cant_create: "No esta autorizado a crear nuevos indicadores",
 		name: "Nombre",
 		translate_from_fr: "Traducir automaticamente desde el francès",

@@ -64,23 +64,8 @@ var Input = module.exports = {
 	list: function(options, callback) {
 		var opt;
 
-		// all inputs ids from a project => list inputs done/not done.
-		if (options.mode === 'project_input_ids') {
-			if (options.restrictProjectId && options.restrictProjectId !== options.projectId)
-				return callback(null, []);
-
-			// used for late inputs
-			opt = {startkey: [options.projectId, options.start || null], endkey: [options.projectId, options.end || {}]};
-			database.view('reporting', 'inputs_by_project_date', opt, function(error, result) {
-				if (result && result.rows)
-					callback(null, result.rows.map(function(item) { return item.id; }));
-				else
-					callback(null, []);
-			});
-		}
-
 		// delete form => "does this form has inputs?"
-		else if (options.mode === 'ids_by_form') {
+		if (options.mode === 'ids_by_form') {
 			if (options.restrictProjectId && options.restrictProjectId !== options.projectId)
 				return callback(null, []);
 			

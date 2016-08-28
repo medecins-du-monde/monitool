@@ -100,7 +100,7 @@ angular
 		this._makeActivityRow = function(cubes, indent, groupBy, viewFilters, columns, element) {
 			// Retrieve cube & create filter.
 			var cube = cubes[element.id],
-				row = {id: uuid.v4(), name: element.name, type: 'data', indent: indent};
+				row = {id: uuid.v4(), name: element.name, type: 'data', indent: indent, unit: 'none'};
 
 			// Handle invalid groupBy
 			if (groupBy == 'entity' && !cube.dimensionsById.entity)
@@ -244,74 +244,109 @@ angular
 			return cubeFilters;
 		};
 
-		// FIXME this should be recursive to make code neater, and not limit ourselves to 2 levels.
-		this.computeActivityReporting = function(cubes, project, groupBy, viewFilters, splits) {
-			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project);
 
-			// Create rows.
-			var rows = [];
-			project.forms.forEach(function(form) {
-				rows.push({type: 'header', text: form.name});
-				form.elements.forEach(function(element) {
-					var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
-					row.id = element.id;
-					row.partitions = element.partitions;
-					row.isGroup = false;
+		this.computeReporting = function(cubes, project, logicalFrame, groupBy, viewFilters) {
+			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project),
+				rows = [];
+
+			if (logicalFrame.goal)
+				rows.push({type: 'header', text: logicalFrame.goal, indent: 0});
+
+			logicalFrame.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+				var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicatorPlanning);
+				row.id = 'go_' + indicatorIndex;
+				rows.push(row);
+			}, this);
+
+			logicalFrame.purposes.forEach(function(purpose, purposeIndex) {
+				rows.push({type: 'header', text: purpose.description, indent: 1});
+				
+				purpose.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+					var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicatorPlanning);
+					row.id = 'pp_' + purposeIndex + '.ind_' + indicatorIndex;
 					rows.push(row);
+				}, this);
+
+				purpose.outputs.forEach(function(output, outputIndex) {
+					rows.push({type: 'header', text: output.description, indent: 2});
 					
-					if (splits[row.id] !== undefined) {
-						var partition = element.partitions.find(function(p) { return p.id == splits[row.id]; });
-
-						[partition.groups, partition.elements].forEach(function(elements) {
-							elements.forEach(function(partitionElement) {
-								var partitionId = partition.id + (partitionElement.members !== undefined ? '_g' : '');
-
-								// add filter
-								viewFilters[partitionId] = [partitionElement.id];
-
-								var childRow = this._makeActivityRow(cubes, 2, groupBy, viewFilters, columns, element);
-								childRow.id = row.id + '.' + partitionId + '/' + partitionElement.id;
-								childRow.name = partitionElement.name;
-								childRow.partitions = row.partitions.slice();
-								childRow.isGroup = !!partitionElement.members;
-
-								// remove the partition that is already chosen on upper level.
-								childRow.partitions.splice(childRow.partitions.indexOf(partition), 1);
-
-								rows.push(childRow)
-
-								if (splits[childRow.id] !== undefined) {
-									var childPartition = element.partitions.find(function(p) { return p.id == splits[childRow.id]; });
-
-									[childPartition.groups, childPartition.elements].forEach(function(elements) {
-										elements.forEach(function(subPartitionElement) {
-											var childPartitionId = childPartition.id + (subPartitionElement.members !== undefined ? '_g' : '');
-
-											// add filter
-											viewFilters[childPartitionId] = [subPartitionElement.id];
-
-											var subChildRow = this._makeActivityRow(cubes, 3, groupBy, viewFilters, columns, element);
-											subChildRow.id = childRow.id + '.' + childPartitionId + '/' + subPartitionElement.id;
-											subChildRow.name = subPartitionElement.name;
-											subChildRow.isGroup = !!subPartitionElement.members;
-											rows.push(subChildRow);
-
-											// remove filter
-											delete viewFilters[childPartitionId];
-										}, this);
-									}, this);
-								}
-
-								// remove filter
-								delete viewFilters[partitionId];
-							}, this);
-						}, this);
-					}
+					output.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+						var row = this._makeIndicatorRow(cubes, 2, groupBy, viewFilters, columns, indicatorPlanning);
+						row.id = 'pp_' + purposeIndex + 'out_' + outputIndex + '.ind_' + indicatorIndex;
+						rows.push(row);
+					}, this);
 				}, this);
 			}, this);
 
 			return rows;
 		};
+
+		// FIXME this should be recursive to make code neater, and not limit ourselves to 2 levels.
+		this.computeActivityReporting = function(cubes, project, form, groupBy, viewFilters, splits) {
+			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project);
+
+			// Create rows.
+			var rows = [];
+			form.elements.forEach(function(element) {
+				var row = this._makeActivityRow(cubes, 0, groupBy, viewFilters, columns, element);
+				row.id = element.id;
+				row.partitions = element.partitions;
+				row.isGroup = false;
+				rows.push(row);
+				
+				if (splits[row.id] !== undefined) {
+					var partition = element.partitions.find(function(p) { return p.id == splits[row.id]; });
+
+					[partition.groups, partition.elements].forEach(function(elements) {
+						elements.forEach(function(partitionElement) {
+							var partitionId = partition.id + (partitionElement.members !== undefined ? '_g' : '');
+
+							// add filter
+							viewFilters[partitionId] = [partitionElement.id];
+
+							var childRow = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
+							childRow.id = row.id + '.' + partitionId + '/' + partitionElement.id;
+							childRow.name = partitionElement.name;
+							childRow.partitions = row.partitions.slice();
+							childRow.isGroup = !!partitionElement.members;
+
+							// remove the partition that is already chosen on upper level.
+							childRow.partitions.splice(childRow.partitions.indexOf(partition), 1);
+
+							rows.push(childRow)
+
+							if (splits[childRow.id] !== undefined) {
+								var childPartition = element.partitions.find(function(p) { return p.id == splits[childRow.id]; });
+
+								[childPartition.groups, childPartition.elements].forEach(function(elements) {
+									elements.forEach(function(subPartitionElement) {
+										var childPartitionId = childPartition.id + (subPartitionElement.members !== undefined ? '_g' : '');
+
+										// add filter
+										viewFilters[childPartitionId] = [subPartitionElement.id];
+
+										var subChildRow = this._makeActivityRow(cubes, 2, groupBy, viewFilters, columns, element);
+										subChildRow.id = childRow.id + '.' + childPartitionId + '/' + subPartitionElement.id;
+										subChildRow.name = subPartitionElement.name;
+										subChildRow.isGroup = !!subPartitionElement.members;
+										rows.push(subChildRow);
+
+										// remove filter
+										delete viewFilters[childPartitionId];
+									}, this);
+								}, this);
+							}
+
+							// remove filter
+							delete viewFilters[partitionId];
+						}, this);
+					}, this);
+				}
+			}, this);
+
+			return rows;
+		};
+
 
 		this.computeDetailedActivityReporting = function(cubes, project, element, groupBy, viewFilters) {
 			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project);
@@ -346,41 +381,6 @@ angular
 				rows.push(row);
 
 				delete viewFilters.group;
-			}, this);
-
-			return rows;
-		};
-
-		this.computeReporting = function(cubes, project, logicalFrame, groupBy, viewFilters) {
-			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project),
-				rows = [];
-
-			rows.push({type: 'header', text: logicalFrame.goal, indent: 0});
-
-			logicalFrame.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
-				var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicatorPlanning);
-				row.id = 'go_' + indicatorIndex;
-				rows.push(row);
-			}, this);
-
-			logicalFrame.purposes.forEach(function(purpose, purposeIndex) {
-				rows.push({type: 'header', text: purpose.description, indent: 1});
-				
-				purpose.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
-					var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicatorPlanning);
-					row.id = 'pp_' + purposeIndex + '.ind_' + indicatorIndex;
-					rows.push(row);
-				}, this);
-
-				purpose.outputs.forEach(function(output, outputIndex) {
-					rows.push({type: 'header', text: output.description, indent: 2});
-					
-					output.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
-						var row = this._makeIndicatorRow(cubes, 2, groupBy, viewFilters, columns, indicatorPlanning);
-						row.id = 'pp_' + purposeIndex + 'out_' + outputIndex + '.ind_' + indicatorIndex;
-						rows.push(row);
-					}, this);
-				}, this);
 			}, this);
 
 			return rows;

@@ -109,35 +109,7 @@ angular.module('monitool.directives.reporting', [])
 		};
 	})
 
-	.directive('activityReportingField', function() {
-		return {
-			scope: false,
-			link: function($scope, element, attributes, controller) {
-				$scope.$watch('col', function(value) {
-					if (typeof value === "string") {
-						// element.html('<span style="font-size: 6px">' + value + '</span>');
-						element.html('<i class="fa fa-ban"></i>');
-						element.css('background-color', '');
-					}
-					else if (Number.isNaN(value)) {
-						element.html('<i class="fa fa-exclamation-triangle"></i>');
-						element.css('background-color', '');
-					}
-					else if (typeof value === "number") {
-						// if baseline and target are available.
-						element.css('background-color', '');
-						element.html(Math.round(value));
-					}
-					else {
-						element.html('');
-						element.css('background-color', '#eee');
-					}
-				}, true);
-			}
-		}
-	})
-
-	.directive('indicatorReportingField', function() {
+	.directive('reportingField', function() {
 		return {
 			scope: false,
 			link: function($scope, element, attributes, controller) {
@@ -312,7 +284,7 @@ angular.module('monitool.directives.reporting', [])
 				data: '=',
 				filters: '='
 			},
-			templateUrl: "partials/projects/activity/_olap_grid.html",
+			templateUrl: "partials/projects/reporting/_olap_grid.html",
 
 			link: function($scope, element) {
 				$scope.$watch('[cols,rows,data,filters]', function() {

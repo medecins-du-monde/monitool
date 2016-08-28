@@ -8,8 +8,10 @@ angular
 		// Create $resource
 		var Input = $resource('/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
-		Input.fetchProjectStatus = function(project) {
-			return Input.query({mode: 'project_input_ids', projectId: project._id}).$promise.then(function(inputsDone) {
+		Input.fetchFormStatus = function(project, formId) {
+			var form = project.forms.find(function(f) {return f.id == formId; });
+
+			return Input.query({mode: 'ids_by_form', projectId: project._id, formId: formId}).$promise.then(function(inputsDone) {
 				var prj = {};
 
 				inputsDone.forEach(function(inputId) {
@@ -19,99 +21,92 @@ angular
 						formId        = splitted[2],
 						strPeriod     = splitted[3];
 
-					prj[formId] = prj[formId] || {};
-					prj[formId][strPeriod] = prj[formId][strPeriod] || {};
-					prj[formId][strPeriod][inputEntityId] = 'outofschedule';
+					prj[strPeriod] = prj[strPeriod] || {};
+					prj[strPeriod][inputEntityId] = 'outofschedule';
 				});
 
-				project.forms.forEach(function(form) {
-					prj[form.id] = prj[form.id] || {};
-
-					if (form.periodicity === 'free') {
-						// we expect all dates and centers where we have @ least one input
-						if (form.collect === 'some_entity') {
-							for (var strPeriod in prj[form.id]) {
-								form.entities.forEach(function(entityId) {
-									if (prj[form.id][strPeriod][entityId] == 'outofschedule')
-										prj[form.id][strPeriod][entityId] = 'done';
-									else
-										prj[form.id][strPeriod][entityId] = 'expected';
-								});
-							}
-						}
-						else if (form.collect === 'entity') {
-							for (var strPeriod in prj[form.id]) {
-								project.entities.forEach(function(entity) {
-									if (prj[form.id][strPeriod][entity.id] == 'outofschedule')
-										prj[form.id][strPeriod][entity.id] = 'done';
-									else
-										prj[form.id][strPeriod][entity.id] = 'expected';
-								});
-							}
-						}
-						else if (form.collect === 'project') {
-							for (var strPeriod in prj[form.id]) {
-								if (prj[form.id][strPeriod].none == 'outofschedule')
-									prj[form.id][strPeriod].none = 'done';
-								else
-									prj[form.id][strPeriod].none = 'expected';
-							}
-						}
-						else
-							throw new Error('Invalid form.collect value.');
-					}
-					else {
-						// we expect only the dates that are specified with the periodicity.
-						if (form.collect === 'some_entity') {
+				if (form.periodicity === 'free') {
+					// we expect all dates and centers where we have @ least one input
+					if (form.collect === 'some_entity') {
+						for (var strPeriod in prj) {
 							form.entities.forEach(function(entityId) {
-								var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
-
-								InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
-									prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
-
-									if (prj[form.id][strPeriod][inputEntity.id] == 'outofschedule')
-										prj[form.id][strPeriod][inputEntity.id] = 'done';
-									else
-										prj[form.id][strPeriod][inputEntity.id] = 'expected';
-								});
+								if (prj[strPeriod][entityId] == 'outofschedule')
+									prj[strPeriod][entityId] = 'done';
+								else
+									prj[strPeriod][entityId] = 'expected';
 							});
 						}
-						else if (form.collect === 'entity')
-							project.entities.forEach(function(inputEntity) {
-								InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
-									prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
-
-									if (prj[form.id][strPeriod][inputEntity.id] == 'outofschedule')
-										prj[form.id][strPeriod][inputEntity.id] = 'done';
-									else
-										prj[form.id][strPeriod][inputEntity.id] = 'expected';
-								});
-							});
-						
-						else if (form.collect === 'project')
-							InputSlots.getList(project, null, form).forEach(function(strPeriod) {
-								prj[form.id][strPeriod] = prj[form.id][strPeriod] || {}
-
-								if (prj[form.id][strPeriod].none == 'outofschedule')
-									prj[form.id][strPeriod].none = 'done';
-								else
-									prj[form.id][strPeriod].none = 'expected';
-							});
-						
-						else
-							throw new Error('Invalid form.collect value.');
 					}
-				});
+					else if (form.collect === 'entity') {
+						for (var strPeriod in prj) {
+							project.entities.forEach(function(entity) {
+								if (prj[strPeriod][entity.id] == 'outofschedule')
+									prj[strPeriod][entity.id] = 'done';
+								else
+									prj[strPeriod][entity.id] = 'expected';
+							});
+						}
+					}
+					else if (form.collect === 'project') {
+						for (var strPeriod in prj) {
+							if (prj[strPeriod].none == 'outofschedule')
+								prj[strPeriod].none = 'done';
+							else
+								prj[strPeriod].none = 'expected';
+						}
+					}
+					else
+						throw new Error('Invalid form.collect value.');
+				}
+				else {
+					// we expect only the dates that are specified with the periodicity.
+					if (form.collect === 'some_entity')
+						form.entities.forEach(function(entityId) {
+							var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
+
+							InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
+								prj[strPeriod] = prj[strPeriod] || {}
+
+								if (prj[strPeriod][inputEntity.id] == 'outofschedule')
+									prj[strPeriod][inputEntity.id] = 'done';
+								else
+									prj[strPeriod][inputEntity.id] = 'expected';
+							});
+						});
+					
+					else if (form.collect === 'entity')
+						project.entities.forEach(function(inputEntity) {
+							InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
+								prj[strPeriod] = prj[strPeriod] || {}
+
+								if (prj[strPeriod][inputEntity.id] == 'outofschedule')
+									prj[strPeriod][inputEntity.id] = 'done';
+								else
+									prj[strPeriod][inputEntity.id] = 'expected';
+							});
+						});
+					
+					else if (form.collect === 'project')
+						InputSlots.getList(project, null, form).forEach(function(strPeriod) {
+							prj[strPeriod] = prj[strPeriod] || {}
+
+							if (prj[strPeriod].none == 'outofschedule')
+								prj[strPeriod].none = 'done';
+							else
+								prj[strPeriod].none = 'expected';
+						});
+					
+					else
+						throw new Error('Invalid form.collect value.');
+				}
 
 				// Sort periods alphabetically
-				project.forms.forEach(function(form) {
-					var periods = Object.keys(prj[form.id]);
-					periods.sort();
+				var periods = Object.keys(prj);
+				periods.sort();
 
-					var newObj = {};
-					periods.forEach(function(period) { newObj[period] = prj[form.id][period]; })
-					prj[form.id] = newObj;
-				});
+				var newObj = {};
+				periods.forEach(function(period) { newObj[period] = prj[period]; })
+				prj = newObj;
 
 				return prj;
 			});

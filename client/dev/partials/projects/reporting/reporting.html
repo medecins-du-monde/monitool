@@ -1,17 +1,11 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.save.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="shared.reporting_general"></li>
 </ol>
 
-<doc-reminder pages="project.objectives_results"></doc-reminder>
+<doc-reminder pages="project.activity_followup"></doc-reminder>
 
-<ul class="nav nav-tabs">
-	<li ng-class="{active: currentLogframe==logframe}" ng-repeat="logframe in project.logicalFrames">
-		<a ng-click="setLogicalFrame(logframe)">{{logframe.name||('project.unnamed_logframe'|translate)}}</a>
-	</li>
-</ul>
-<br/>
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
 		<div class="col-sm-6">
@@ -19,7 +13,7 @@
 				<label for="indicator" class="col-sm-2 control-label" translate="shared.start"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 						<utc-datepicker ng-model="filters._start" />
 					</div>
 				</div>
@@ -30,7 +24,7 @@
 				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 						<utc-datepicker ng-model="filters._end" />
 					</div>
 				</div>
@@ -44,7 +38,7 @@
 				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-columns fa-fw"></i></span>
+						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
 						<select class="form-control input-sm" id="group-by-input" ng-model="groupBy">
 							<option value="day" translate="shared.day"></option>
 							<option value="week" translate="shared.week"></option>
@@ -58,12 +52,13 @@
 				</div>
 			</div>
 		</div>
+
 		<div class="col-sm-6">
 			<div class="form-group">
 				<label for="filter-by-input" class="col-sm-2 control-label" translate="shared.filter"></label>
 				<div class="col-sm-10">
 					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
+						<span class="input-group-addon"><i class="fa fa-filter"></i></span>
 						<select class="form-control input-sm" id="filter-by-input" ng-model="filters._location">
 							<option value="none" translate="project.full_project"></option>
 							<optgroup label="{{'project.collection_site_list'|translate}}">
@@ -77,9 +72,9 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
 </form>
+
 
 <button class="btn btn-primary btn-xs pull-right noprint" svg-save>
 	<i class="fa fa-download"></i>
@@ -102,27 +97,51 @@
 <table id="reporting" class="table table-bordered table-condensed">
 	<thead>
 		<tr>
-			<th style="width: 30px"></th>
+			<th style="width: 30px" class="noprint"></th>
+			<th style="width: 30px" class="noprint"></th>
 			<th translate="shared.name"></th>
-			<th translate="project.baseline"></th>
-			<th translate="project.target"></th>
 			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
-	<tbody>
- 		<tr ng-repeat="row in rows">
-			<td style="text-align: center">
+	<tbody ng-repeat="(blockIndex, block) in blocks">
+		<tr>
+			<td ng-class="{noprint: open[blockIndex]}" style="text-align: center" rowspan="{{open[blockIndex] ? block.rows.length + 1 : 1}}">
+				<button class="btn btn-xs btn-default" ng-click="open[blockIndex] = !open[blockIndex]">
+					<i class="fa fa-angle-double-up" ng-if="open[blockIndex]"></i>
+					<i class="fa fa-angle-double-down" ng-if="!open[blockIndex]"></i>
+				</button>
+			</td>
+			<th class="indent0" colspan="{{2 + cols.length}}">{{block.text}}</th>
+		</tr>
+		
+		<tr ng-repeat="row in block.rows">
+			<td class="noprint" style="text-align: center">
 				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data' && row.cols" />
 			</td>
 
-			<th ng-if="row.type === 'header'" colspan="{{3 + cols.length}}" class="indent{{row.indent}}">{{row.text}}</th>
+			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{1 + cols.length}}">{{row.text}}</th>
+
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
+				<div class="pull-right">
+					<div class="btn-toolbar">
+						<div class="btn-group btn-group-xs">
+							<button ng-repeat="p in row.partitions"
+									class="btn btn-default"
+									ng-class="{active:splits[row.id] == p.id}"
+									ng-click="onSplitClick(row.id, p.id)">
+								{{p.name}}
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<i class="fa fa-arrow-circle-right" ng-if="row.isGroup"></i>
 				<label for="{{row.id}}">{{row.name}}</label>
 			</td>
-			<td ng-if="row.type === 'data'">{{row.baseline}}</td>
-			<td ng-if="row.type === 'data'">{{row.target}}</td>
-			<td ng-if="row.type === 'data'" ng-repeat="col in row.cols track by $index" indicator-reporting-field></td>
-			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);"></td>
+
+			<td ng-repeat="col in row.cols track by $index" reporting-field></td>
+			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);">{{row.message|translate}}</td>
 		</tr>
+
 	</tbody>
 </table>
