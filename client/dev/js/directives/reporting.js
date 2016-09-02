@@ -147,7 +147,7 @@ angular.module('monitool.directives.reporting', [])
 						else
 							element.css('background-color', '');
 
-						if ($scope.row.unit == 'none')
+						if ($scope.row.unit == 'none' || !$scope.row.unit)
 							element.html(Math.round(value));
 						else
 							element.html(Math.round(value) + $scope.row.unit);

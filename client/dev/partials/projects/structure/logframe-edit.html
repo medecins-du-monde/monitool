@@ -1,39 +1,13 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
-	<li class="active" translate="shared.logical_frames"></li>
+	<li><a ui-sref="main.project.structure.logical_frame_list" translate="shared.logical_frames"></a></li>
+	<li class="active">{{project.logicalFrames[logicalFrameIndex].name}}</li>
 </ol>
-
-<doc-reminder pages="project.logical_frame"></doc-reminder>
-
-<a ng-click="createLogicalFrame()" class="btn btn-primary pull-right" acl-has-project-role="owner">
-	<i class="fa fa-plus"></i>
-	{{'project.create_logframe'|translate}}
-</a>
-
-<ul class="nav nav-tabs" ng-sortable="logframeSortOptions" ng-if="project.logicalFrames.length">
-	<li ng-class="{active: logicalFrameIndex == index}" ng-repeat="(index, logframe) in project.logicalFrames">
-		<a ng-click="setLogicalFrame(index)">
-			<i class="fa fa-bars logframe-handle" acl-has-project-role="owner"></i>
-			{{logframe.name||('project.unnamed_logframe'|translate)}}
-		</a>
-	</li>
-</ul>
-
-<div ng-if="project.logicalFrames.length == 0" translate="project.no_logical_frame"></div>
-
-<br/>
 
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate ng-if="logicalFrameIndex !== null">
 	<fieldset>
 		<legend>
-			<a class="btn btn-danger btn-xs pull-right noprint"
-			   ng-click="deleteLogicalFrame()"
-			   style="margin-bottom: 10px"
-			   acl-has-project-role="owner">
-				<i class="fa fa-times"></i>
-				<span translate="shared.delete"></span>
-			</a>
 			
 			<a class="btn btn-primary btn-xs pull-right noprint" log-frame-xls style="margin-bottom: 10px; margin-right: 5px">
 				<i class="fa fa-download"></i>
@@ -51,6 +25,7 @@
 						  class="form-control"
 						  name="nameDesc"
 						  id="logframe-name-input"
+						  required
 						  ng-model="project.logicalFrames[logicalFrameIndex].name"></textarea>
 			</div>
 		</div>
@@ -298,3 +273,11 @@
 </form>
 
 <br/>
+
+<div acl-has-project-role="owner" class="pull-right">
+	<button ng-click="deleteLogicalFrame()" ng-if="master.logicalFrames[logicalFrameIndex]" class="btn btn-danger">
+		<i class="fa fa-times"></i>
+		<span translate="shared.delete"></span>
+	</button>
+</div>
+

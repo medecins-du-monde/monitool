@@ -175,7 +175,7 @@ angular
 		$scope.editUser = function(user) {
 			var promise = $uibModal.open({
 				controller: 'ProjectUserModalController',
-				templateUrl: 'partials/projects/specification/user-modal.html',
+				templateUrl: 'partials/projects/structure/user-modal.html',
 				size: 'lg',
 				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
 				resolve: {
@@ -193,11 +193,84 @@ angular
 					$scope.project.users.splice($scope.project.users.indexOf(user), 1, newUser);
 			});
 		};
+
+		$scope.editIndicator = function(planning, parent) {
+			var promise = $uibModal.open({
+				controller: 'ProjectIndicatorEditionModalController',
+				templateUrl: 'partials/projects/structure/edition-modal.html',
+				size: 'lg',
+				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
+				resolve: {planning: function() { return planning; }}
+			}).result;
+
+			promise.then(function(newPlanning) {
+				if (planning && !newPlanning)
+					parent.splice(parent.indexOf(planning), 1);
+				else if (!planning && newPlanning)
+					parent.push(newPlanning);
+				else if (planning && newPlanning)
+					parent.splice(parent.indexOf(planning), 1, newPlanning);
+			});
+		};		
 	})
 
 
+	.controller('ProjectCrossCuttingController', function($scope, $q, $uibModal, indicators, themes) {
+		$scope.themes = themes.filter(function(t) { return $scope.project.themes.indexOf(t._id) !== -1; });
 
-	.controller('ProjectLogicalFrameController', function($scope, $q, $uibModal) {
+		var classes = ["label-primary", "label-success", "label-info", "label-warning", "label-danger"];
+		$scope.themes.forEach(function(theme, index) {
+			theme.class = classes[index % classes.length];
+		});
+
+		$scope.indicators = indicators;
+
+		// Remove all themes that are not related to this project
+		$scope.indicators.forEach(function(i) {
+			i.themes = i.themes.filter(function(t) { return $scope.project.themes.indexOf(t) !== -1; });
+		});
+
+		$scope.indicators = $scope.indicators.filter(function(i) {
+			return i.themes.length;
+		});
+
+		$scope.getName = function(a) { return a.name[$scope.language]; };
+
+		// handle indicator add, edit and remove are handled in a modal window.
+		$scope.editIndicator = function(indicatorId) {
+			var planning = $scope.project.crossCutting[indicatorId];
+			var promise = $uibModal.open({
+				controller: 'ProjectIndicatorEditionModalController',
+				templateUrl: 'partials/projects/structure/edition-modal-short.html',
+				size: 'lg',
+				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
+				resolve: {
+					planning: function() { return planning; },
+					indicator: function() { return indicators.find(function(i) { return i._id == indicatorId; }); }
+				}
+			}).result;
+
+			promise.then(function(newPlanning) {
+				if (planning && !newPlanning)
+					delete $scope.project.crossCutting[indicatorId];
+				else if (!planning && newPlanning)
+					$scope.project.crossCutting[indicatorId] = newPlanning;
+				else if (planning && newPlanning)
+					$scope.project.crossCutting[indicatorId] = newPlanning;
+			});
+		};
+	})
+
+	.controller('ProjectLogicalFrameListController', function($scope, $state) {
+		$scope.createLogicalFrame = function() {
+
+			var newLogicalFrame = {name: '', goal: '', indicators: [], purposes: []};
+			$scope.project.logicalFrames.push(newLogicalFrame);
+			$state.go('main.project.structure.logical_frame_edition', {index: $scope.project.logicalFrames.length - 1});
+		};
+	})
+
+	.controller('ProjectLogicalFrameEditController', function($scope, $q, $state, $stateParams, $filter, $timeout, $uibModal) {
 
 		/////////////////////
 		// Allow purposes, outputs and indicators reordering. We need to hack around bugs
@@ -206,7 +279,6 @@ angular
 		// @see https://github.com/RubaXa/Sortable/issues/722
 		/////////////////////
 
-		$scope.logframeSortOptions = {handle: '.logframe-handle'};
 		$scope.purposeSortOptions = {group:'purposes', handle: '.purpose-handle'};
 		$scope.outputSortOptions = {group:'outputs', handle: '.output-handle'};
 		$scope.indicatorsSortOptions = {
@@ -235,32 +307,8 @@ angular
 			}
 		});
 		
-		/////////////////////
-		// To make the page faster, we only put one logical frame in the scope
-		// and change when the tabs on top are used.
-		/////////////////////
-
-		$scope.logicalFrameIndex = $scope.project.logicalFrames.length ? 0 : null;
+		$scope.logicalFrameIndex = $stateParams.index;
 		
-		$scope.setLogicalFrame = function(index) {
-			$scope.logicalFrameIndex = index;
-		};
-
-		$scope.createLogicalFrame = function() {
-			$scope.project.logicalFrames.push({
-				name: '',
-				goal: '',
-				indicators: [],
-				purposes: []
-			});
-			$scope.logicalFrameIndex = $scope.project.logicalFrames.length - 1;
-		};
-
-		$scope.deleteLogicalFrame = function() {
-			$scope.project.logicalFrames.splice($scope.logicalFrameIndex, 1);
-			$scope.logicalFrameIndex = $scope.project.logicalFrames.length ? 0 : null;
-		};
-
 		/////////////////////
 		// Create and remove elements from logical frame
 		/////////////////////
@@ -290,7 +338,7 @@ angular
 				templateUrl: 'partials/projects/structure/edition-modal.html',
 				size: 'lg',
 				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
-				resolve: {planning: function() { return planning; }}
+				resolve: {planning: function() { return planning; }, indicator: function() { return null; }}
 			}).result;
 
 			promise.then(function(newPlanning) {
@@ -303,19 +351,38 @@ angular
 			});
 		};
 
-		// Watch reset button
-		$scope.$watch('project', function() {
-			if ($scope.project.logicalFrames.length == 0)
-				$scope.logicalFrameIndex = null;
-
-			else if (
-				($scope.logicalFrameIndex >= $scope.project.logicalFrames.length) ||
-				($scope.logicalFrameIndex == null && $scope.project.logicalFrames.length))
-				$scope.logicalFrameIndex = 0;
+		var w1 = $scope.$watch('project.logicalFrames[logicalFrameIndex]', function(form) {
+			if (!form) {
+				w1();
+				$state.go('main.project.structure.logical_frame_list');
+			}
 		});
+
+
+		$scope.deleteLogicalFrame = function() {
+			// Translate confirmation messages.
+			var easy_question = $filter('translate')('project.delete_logical_frame');
+
+			// Ask confirmation to user
+			if (window.confirm(easy_question)) {
+				// Kill the watches
+				w1();
+
+				// Remove the form
+				$scope.project.logicalFrames.splice($scope.logicalFrameIndex, 1);
+
+				// Give some time for the watches to update the flags
+				$timeout(function() {
+					$scope.$parent.save().then(function() {
+						$state.go('main.project.structure.logical_frame_list');
+					});
+				});
+			}
+		};
+
 	})
 
-	.controller('ProjectIndicatorEditionModalController', function($scope, $uibModalInstance, Parser, planning) {
+	.controller('ProjectIndicatorEditionModalController', function($scope, $uibModalInstance, Parser, planning, indicator) {
 		// Build possible variables and filters.
 		$scope.selectElements = []
 		$scope.elementsById = {};
@@ -328,17 +395,24 @@ angular
 		});
 
 		// Retrieve indicator array where we need to add or remove indicator ids.
-		$scope.planning = planning ? angular.copy(planning) : {
-			display: '',
-			indicatorId: null,
-			colorize: true,
-			baseline: null,
-			target: null,
-			unit: 'none',
-			targetType: 'higher_is_better',
-			formula: "default",
-			parameters: {'default': {elementId: null, filter: {}}}
-		};
+		$scope.indicator = indicator;
+		if (!indicator)
+			$scope.planning = planning ? angular.copy(planning) : {
+				display: '',
+				colorize: true,
+				baseline: null,
+				target: null,
+				unit: 'none',
+				targetType: 'higher_is_better',
+				formula: "a",
+				parameters: {'a': {elementId: null, filter: {}}}
+			};
+		else
+			$scope.planning = planning ? angular.copy(planning) : {
+				formula: "a",
+				parameters: {'a': {elementId: null, filter: {}}}
+			};
+
 		$scope.isNew = !planning;
 
 		var formulaWatch = $scope.$watch('planning.formula', function(formula) {
@@ -561,7 +635,7 @@ angular
 
 			$uibModal.open({
 				controller: 'PartitionEditionModalController',
-				templateUrl: 'partials/projects/activity/partition-modal.html',
+				templateUrl: 'partials/projects/structure/partition-modal.html',
 				size: 'lg',
 				resolve: { currentPartition: function() { return currentPartition; } }
 			}).result.then(function(updatedPartition) {

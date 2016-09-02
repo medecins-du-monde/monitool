@@ -39,6 +39,14 @@ module.exports = {
 				if (doc.type === 'input')
 					emit([doc.project, doc.form, doc.period]);
 			}.toString()
+		},
+
+		crosscutting: {
+			map: function(doc) {
+				if (doc.type === 'project')
+					for (var indicatorId in doc.crossCutting)
+						emit(indicatorId);
+			}.toString()
 		}
 	}
 };

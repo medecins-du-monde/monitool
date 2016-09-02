@@ -11,22 +11,16 @@ var validate = validator({
 	type: "object",
 	additionalProperties: false,
 	required: [
-		"_id", "type", "name", "standard", "sources", "comments", "operation", "types", "themes"
+		"_id", "type", "name", "standard", "sources", "comments", "themes"
 	],
 	properties: {
 		_id:       { $ref: "#/definitions/uuid" },
 		_rev:      { $ref: "#/definitions/revision" },
 		comments:  { $ref: "#/definitions/translated" },
 		name:      { $ref: "#/definitions/translated_req" },
-		operation: { type: "string", enum: ["mandatory", "approved", "waiting"] },
 		sources:   { $ref: "#/definitions/translated" },
 		standard:  { $ref: "#/definitions/translated" },
 		type:      { type: "string", "pattern": "^indicator$" },
-		types: {
-			type: "array",
-			uniqueItems: true,
-			items: { "$ref": "#/definitions/uuid" }
-		},
 		themes: {
 			type: "array",
 			uniqueItems: true,
@@ -78,30 +72,11 @@ var Indicator = module.exports = {
 		var options = {keys: [id], reduce: false, offset: 0, include_docs: true};
 
 		database.view('server', 'reverse_dependencies', options, function(error, result) {
-			var projects = result.rows.map(function(row) { return row.doc; })
+			var projects = result.rows
+				.map(function(row) { return row.doc; })
+				.filter(function(p) { return p.crossCutting[id]; });
 
-			projects.forEach(function(project) {
-				project.logicalFrames.forEach(function(logicalFrame) {
-					logicalFrame.indicators.forEach(function(indicator) {
-						if (indicator.indicatorId == id)
-							indicator.indicatorId = null;
-					});
-					
-					logicalFrame.purposes.forEach(function(purpose) {
-						purpose.indicators.forEach(function(indicator) {
-							if (indicator.indicatorId == id)
-								indicator.indicatorId = null;
-						});
-
-						purpose.outputs.forEach(function(output) {
-							output.indicators.forEach(function(indicator) {
-								if (indicator.indicatorId == id)
-									indicator.indicatorId = null;
-							});
-						});
-					});
-				});
-			});
+			projects.forEach(function(project) { delete project.crossCutting[id]; });
 
 			// save them all
 			database.bulk({docs: projects}, function() {

@@ -6,12 +6,11 @@ angular
 
 		var Project = $resource('/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
-
 		/**
 		 * Retrieve all indicators and variables in list
 		 * eg: fill <select> on detailed reporting pages.
 		 */
-		Project.prototype.getAllIndicators = function() {
+		Project.prototype.getAllIndicators = function(indicators) {
 			var elementOptions = [];
 			this.logicalFrames.forEach(function(logicalFrame, i0) {
 				var fn = function(i) { return {name: i.display, type: "indicator", group: "Logical frame: " + logicalFrame.name, indicator: i}; };
@@ -24,9 +23,19 @@ angular
 				}, this);
 			}, this);
 
+			for (var indicatorId in this.crossCutting) {
+				var indicator = indicators.find(function(i) { return i._id == indicatorId; });
+				elementOptions.push({
+					name: indicator.name[$rootScope.language],
+					type: "indicator",
+					group: "Cross-Cutting Indicators",
+					indicator: this.crossCutting[indicatorId]
+				});
+			}
+
 			this.forms.forEach(function(form) {
 				form.elements.forEach(function(element) {
-					elementOptions.push({name: element.name, type: "variable", group: "Data source: " + form.name, element: element});
+					elementOptions.push({name: element.name, type: "variable", group: "Data source: " + form.name, element: element, form: form});
 				});
 			});
 

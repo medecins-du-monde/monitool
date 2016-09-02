@@ -9,7 +9,7 @@ angular
 		]
 	)
 
-	.controller('ProjectReportingController', function($scope, Olap, inputs, mtReporting) {
+	.controller('ProjectReportingController', function($scope, Cube, cubes, mtReporting, indicators) {
 		// Create default filter so that all inputs are used.
 		$scope.filters = {_location: "none", _start: $scope.project.start, _end: $scope.project.end < new Date() ? $scope.project.end : new Date()};
 
@@ -32,12 +32,11 @@ angular
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
 
-		// when input list change, or regrouping is needed, compute table rows again.
-		var cubes = Olap.Cube.fromProject($scope.project, inputs);
-
 		$scope.blocks = $scope.project.logicalFrames.map(function(logicalFrame, index) {
 			return {text: "Logical frame: " + logicalFrame.name};
-		}).concat($scope.project.forms.map(function(form, index) {
+		})
+		.concat([{text: "Cross-Cutting Indicators"}])
+		.concat($scope.project.forms.map(function(form, index) {
 			return {text: "Data source: " + form.name};
 		}));
 		$scope.open = $scope.blocks.map(function(_, index) { return index == 0; });
@@ -46,39 +45,33 @@ angular
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, $scope.filters._location, $scope.project)
 
 			$scope.project.logicalFrames.forEach(function(logicalFrame, index) {
-				if ($scope.open[index])
-					$scope.blocks[index].rows = mtReporting.computeReporting(cubes, $scope.project, logicalFrame, $scope.groupBy, $scope.filters);
-				else
-					$scope.blocks[index].rows = null;
+				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeLogicalFrameReporting(cubes, $scope.project, logicalFrame, $scope.groupBy, $scope.filters) : null;
 			});
 
+			var index = $scope.project.logicalFrames.length
+			$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeCrossCuttingReporting(cubes, $scope.project, indicators, $scope.groupBy, $scope.filters) : null;
+
 			$scope.project.forms.forEach(function(form, index) {
-				index += $scope.project.logicalFrames.length;
-				if ($scope.open[index])
-					$scope.blocks[index].rows = mtReporting.computeActivityReporting(cubes, $scope.project, form, $scope.groupBy, $scope.filters, $scope.splits);
-				else
-					$scope.blocks[index].rows = null;
+				index += $scope.project.logicalFrames.length + 1;
+				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeDataSourceReporting(cubes, $scope.project, form, $scope.groupBy, $scope.filters, $scope.splits) : null;
 			});
 
 			// Work around graph bug
 			$scope.rows = [];
 			$scope.blocks.forEach(function(block) { if (block.rows) $scope.rows = $scope.rows.concat(block.rows); });
-
 		}, true);
+
 	})
 
-	.controller('ProjectDetailedReportingController', function($scope, $filter, Olap, inputs, mtReporting) {
+	.controller('ProjectDetailedReportingController', function($scope, $filter, cubes, mtReporting, indicators) {
 		$scope.plots = {};
 
 		////////////////////////////////////////////////////
 		// Initialization code.
 		////////////////////////////////////////////////////
 
-		// Compute cubes for all elements, from all inputs.
-		var cubes = Olap.Cube.fromProject($scope.project, inputs);
-
 		// Create array with ngOptions for the list of variables, and init select value.
-		$scope.elementOptions = $scope.project.getAllIndicators();
+		$scope.elementOptions = $scope.project.getAllIndicators(indicators);
 		$scope.wrap = {chosenElement: $scope.elementOptions[0]};
 
 		////////////////////////////////////////////////////
@@ -132,80 +125,77 @@ angular
 			$scope.cols = mtReporting.getColumns($scope.query.groupBy, $scope.query.filters._start, $scope.query.filters._end);
 
 			if (query.type == 'variable')
-				$scope.rows = mtReporting.computeDetailedActivityReporting(cubes, $scope.project, $scope.query.element, $scope.query.groupBy, $scope.query.filters);
+				$scope.rows = mtReporting.computeVariableReporting(cubes, $scope.project, $scope.query.element, $scope.query.groupBy, $scope.query.filters);
 			else
-				$scope.rows = mtReporting.computeDetailedReporting(cubes, $scope.project, $scope.query.indicator, $scope.query.groupBy, $scope.query.filters);
+				$scope.rows = mtReporting.computeIndicatorReporting(cubes, $scope.project, $scope.query.indicator, $scope.query.groupBy, $scope.query.filters);
 
 		}, true);
 	})
 
-	.controller('ProjectOlapController', function($scope, $filter, Olap, mtReporting, inputs) {
+	.controller('ProjectOlapController', function($scope, $filter, Cube, CompoundCube, mtReporting, cubes, indicators) {
 
 		////////////////////////////////////////////////////
 		// Initialization code.
 		////////////////////////////////////////////////////
 
 		// Compute cubes for all elements, from all inputs.
-		var cubes = Olap.Cube.fromProject($scope.project, inputs);
+		// var cubes = Cube.fromProject($scope.project, inputs);
 
 		// Create array with ngOptions for the list of variables, and init select value.
-		$scope.elementOptions = $scope.project.getAllIndicators();
-		$scope.wrap = {chosenElementId: $scope.elementOptions[0].id};
+		$scope.elementOptions = $scope.project.getAllIndicators(indicators);
+		$scope.wrap = {chosenElement: $scope.elementOptions[0]};
 
 		// init objects that we will need to render query controls in the ux.
-		$scope.query = {elementId: null, colDimensions: null, rowDimensions: null, filters: null};
+		$scope.query = {element: null, colDimensions: null, rowDimensions: null, filters: null};
 
 		////////////////////////////////////////////////////
 		// Each time the element is changed, initialize the query object.
 		////////////////////////////////////////////////////
 
-		$scope.$watch('wrap.chosenElementId', function(element) {
+		$scope.$watch('wrap.chosenElement', function(element) {
 
 			////////////////////////////////////////
 			// Create default query for this elementId
 			////////////////////////////////////////
 
 			var filters = {_start: $scope.project.start, _end: new Date() < $scope.project.end ? new Date() : $scope.project.end};
+			var cube;
+			if (element.type === 'variable')
+				cube = cubes[element.element.id];
+			else
+				cube = new CompoundCube(element.indicator, cubes);
 			
-			if (element.type === 'variable') {
-				var cube = cubes[element.id];
-				
-				// Init all filters as full
-				cube.dimensions.forEach(function(dimension) {
-					if (dimension.id !== 'day')
-						filters[dimension.id] = dimension.items;
-				});
+			// make default query.
+			$scope.query = {element: element, colDimensions: [], rowDimensions: [cube.dimensions[0].id], filters: filters};
+			$scope.dimensions = [];
+			
+			// Init all filters as full
+			cube.dimensions.forEach(function(dimension) {
+				if (['day', 'week', 'month', 'quarter', 'year'].indexOf(dimension.id) === -1)
+					filters[dimension.id] = dimension.items;
+			});
 
-				// make default query.
-				$scope.query = {elementId: elementId, colDimensions: [], rowDimensions: ['month'], filters: filters};
+			// Add entity dimension
+			if (cube.dimensionsById.entity) {
+				var entities = $scope.project.entities.filter(function(e) { return cube.dimensionsById.entity.items.indexOf(e.id) !== -1; }),
+					groups   = $scope.project.groups.filter(function(g) { return cube.dimensionGroupsById.group && cube.dimensionGroupsById.group.items.indexOf(g.id) !== -1; });
 
-				////////////////////////////////////////
-				// Create needed info to display controls on screen
-				////////////////////////////////////////
-				$scope.dimensions = [];
-
-				// Add entity dimension
-				if (cube.dimensionsById.entity)
-					$scope.dimensions.push(
-						{id: "entity", name: 'project.dimensions.entity', elements: $scope.project.entities, groups: $scope.project.groups}
-					);
-
-				// Add partitions
-				$scope.dimensions = $scope.dimensions.concat(element.partitions);
-			}
-			else {
-				// Add partitions
-				$scope.dimensions = [];
+				$scope.dimensions.push({id: "entity", name: 'project.dimensions.entity', elements: entities, groups: groups});
 			}
 
-			// Add time dimensions
-			$scope.dimensions.push(
-				{id: "day",     name: 'project.dimensions.day',     elements: cube._getDimension('day').items.map(function(i) { return {id: i, name: i}; }),          groups: []},
-				{id: "week",    name: 'project.dimensions.week',    elements: cube._getDimensionGroup('week').items.map(function(i) { return {id: i, name: i}; }),    groups: []},
-				{id: "month",   name: 'project.dimensions.month',   elements: cube._getDimensionGroup('month').items.map(function(i) { return {id: i, name: i}; }),   groups: []},
-				{id: "quarter", name: 'project.dimensions.quarter', elements: cube._getDimensionGroup('quarter').items.map(function(i) { return {id: i, name: i}; }), groups: []},
-				{id: "year",    name: 'project.dimensions.year',    elements: cube._getDimensionGroup('year').items.map(function(i) { return {id: i, name: i}; }),    groups: []}
-			);
+			// Add partitions
+			if (element.type === 'variable')
+				$scope.dimensions = $scope.dimensions.concat(element.element.partitions);
+
+			['day', 'week', 'month', 'quarter', 'year'].forEach(function(time) {
+				var dim = cube.dimensionsById[time] || cube.dimensionGroupsById[time];
+				if (dim)
+					$scope.dimensions.push({
+						id: time,
+						name: 'project.dimensions.' + time,
+						elements: dim.items.map(function(i) { return {id: i, name: i}; })
+					});
+			});
 		});
 
 		////////////////////////////////////////////////////
@@ -240,14 +230,6 @@ angular
 		
 		$scope.$watch('query', function(query) {
 
-			////////////////////////////////////////
-			// Query cube & postprocess for display
-			////////////////////////////////////////
-
-			var cube = cubes[query.elementId],
-				cubeDimensions = $scope.query.colDimensions.concat($scope.query.rowDimensions),
-				cubeFilters = mtReporting.createCubeFilter(cube, $scope.query.filters);
-
 			var makeRowCol = function(selectedDimId) {
 				var dimension = $scope.dimensions.find(function(dim) { return dim.id == selectedDimId; });
 
@@ -257,6 +239,18 @@ angular
 				rowcolInfo.push({id: '_total', name: "Total", members: true}); // members:true, so that group icon is displayed
 				return rowcolInfo;
 			};
+
+			////////////////////////////////////////
+			// Query cube & postprocess for display
+			////////////////////////////////////////
+			var cube;
+			if (query.element.type == 'variable')
+				cube = cubes[query.element.element.id];
+			else
+				cube = new CompoundCube(query.element.indicator, cubes);
+
+			var cubeDimensions = $scope.query.colDimensions.concat($scope.query.rowDimensions),
+				cubeFilters = mtReporting.createCubeFilter(cube, $scope.query.filters);
 
 			$scope.display = {
 				data: cube.flatQuery(cubeDimensions, cubeFilters),

@@ -400,8 +400,8 @@ var FRENCH_TRANSLATION = {
 		remove_partition: "Supprimer la partition",
 
 		aggregation: 'Agrégation',
-		sites_agg: 'Sur les sites',
-		time_agg: 'Sur le temps',
+		sites_agg: 'Entre lieux',
+		time_agg: 'Entre périodes',
 
 		none: "Ne pas agréger",
 		sum: "Somme",
@@ -539,6 +539,7 @@ var FRENCH_TRANSLATION = {
 
 		formula: "Formule",
 		link: "Lien: {{name}}",
+		collected: "Collecté"
 	},
 	indicator: {
 		cross_cutting: "Indicateurs transversaux",

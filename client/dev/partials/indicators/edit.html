@@ -3,91 +3,84 @@
 	<li class="active">{{indicator.name[language]}}</li>
 </ol>
 
-<doc-reminder pages="indicators.create_new_indicator,indicators.merge_indicators"></doc-reminder>
-
 <form class="form-horizontal" role="form" name="indicatorForm" novalidate>
-	<fieldset>
-		<legend translate="indicator.classification"></legend>
 
-		<div class="form-group">
-			<label for="input-themes" class="col-sm-2 control-label" translate="indicator.themes"></label>
-			<div class="col-sm-10">
-				<ui-select id="input-themes" multiple ng-model="indicator.themes" name="themes" theme="bootstrap" required acl-has-role="indicator">
-					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name[language]}}</ui-select-match>
-					<ui-select-choices repeat="theme._id as theme in themes">{{theme.name[language]}}</ui-select-choices>
-				</ui-select>
+	<table class="table table-stripped table-condensed table-bordered">
+		<thead>
+			<tr>
+				<th style="width: 10%"></th>
+				<th ng-repeat="(code, language) in languages" translate="{{'menu.' + language}}" style="width: 30%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th translate="indicator.themes"></th>
+				<td colspan="{{numLanguages}}">
+					<ui-select id="input-themes" multiple ng-model="indicator.themes" name="themes" theme="bootstrap" required acl-has-role="indicator">
+						<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name[language]}}</ui-select-match>
+						<ui-select-choices repeat="theme._id as theme in themes">{{theme.name[language]}}</ui-select-choices>
+					</ui-select>
 
-				<p class="form-control-static" acl-lacks-role="indicator">{{indicator.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</p>
-			</div>
-		</div>
+					<p class="form-control-static" acl-lacks-role="indicator">{{indicator.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</p>
+				</td>
+			</tr>			
+			<tr ng-repeat="field in ['name', 'standard', 'sources', 'comments']">
+				<th>{{('indicator.'+field)|translate}}</th>
+				<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator[field][code]|nl2br">
+					<div class="input-group">
+ 						<textarea auto-resize
+ 								  class="form-control"
+								  name="{{field + '.' + code}}"
+								  ng-required="field == 'name'"
+								  ng-model="indicator[field][code]"
+								  placeholder="{{translations[code].indicator[field + '_ph']}}"></textarea>
 
-		<div class="form-group">
-			<label for="input-types" class="col-sm-2 control-label" translate="indicator.types"></label>
+						<span class="input-group-addon">
+							<div dropdown>
+								<span id="single-button" dropdown-toggle>
+									<i class="fa fa-language"></i>
+								</span>
 
-			<div class="col-sm-10">
-				<ui-select id="input-types" multiple ng-model="indicator.types" name="types" theme="bootstrap" required acl-has-role="indicator">
-					<ui-select-match placeholder="{{'indicator.select_types'|translate}}">{{$item.name[language]}}</ui-select-match>
-					<ui-select-choices repeat="type._id as type in types">{{type.name[language]}}</ui-select-choices>
-				</ui-select>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="single-button">
+									<li ng-class="{disabled:!indicator[field][codeInner]}" role="menuitem" ng-repeat="(codeInner, languageInner) in languages" ng-if="code != codeInner">
+										<a ng-click="translate(field, code, codeInner)">{{('indicator.translate_from_' + codeInner)|translate}}</a>
+									</li>
+								</ul>
+							</div>
+						</span>
+					</div>
+				</td>
+			</tr>
 
-				<p class="form-control-static" acl-lacks-role="indicator">{{indicator.types|getObjects:types|pluck:'name'|pluck:language|join:', '}}</p>
-			</div>
-		</div>
 
-	</fieldset>
-	<fieldset>
-		<legend translate="indicator.definition"></legend>
+			<tr>
+				<th translate="indicator.target"></th>
+				<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.' + indicator.targetType)|translate">
 
-		<table class="table table-stripped table-condensed table-bordered">
-			<thead>
-				<tr>
-					<th style="width: 10%"></th>
-					<th ng-repeat="(code, language) in languages" translate="{{'menu.' + language}}" style="width: 30%"></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="field in ['name', 'standard', 'sources', 'comments']">
-					<th>{{('indicator.'+field)|translate}}</th>
-					<td ng-repeat="(code, language) in languages" acl-has-role="indicator" acl-fallback="indicator[field][code]|nl2br">
-						<div class="input-group">
-	 						<textarea auto-resize
-	 								  class="form-control"
-									  name="{{field + '.' + code}}"
-									  ng-required="field == 'name'"
-									  ng-model="indicator[field][code]"
-									  placeholder="{{translations[code].indicator[field + '_ph']}}"></textarea>
+					<select id="input-target" class="form-control" ng-model="indicator.targetType" required>
+						<option value="lower_is_better" translate="indicator.lower_is_better"></option>
+						<option value="higher_is_better" translate="indicator.higher_is_better"></option>
+						<option value="around_is_better" translate="indicator.around_is_better"></option>
+						<option value="non_relevant" translate="indicator.non_relevant"></option>
+					</select>
+				</td>
+			</tr>
 
-							<span class="input-group-addon">
-								<div dropdown>
-									<span id="single-button" dropdown-toggle>
-										<i class="fa fa-language"></i>
-									</span>
+			<tr>
+				<th translate="indicator.unit"></th>
+				<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.' + indicator.unit)|translate">
 
-									<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="single-button">
-										<li ng-class="{disabled:!indicator[field][codeInner]}" role="menuitem" ng-repeat="(codeInner, languageInner) in languages" ng-if="code != codeInner">
-											<a ng-click="translate(field, code, codeInner)">{{('indicator.translate_from_' + codeInner)|translate}}</a>
-										</li>
-									</ul>
-								</div>
-							</span>
-						</div>
+					<select id="input-unit" name="unit" ng-model="planning.unit" class="form-control" required>
+						<option value="none" translate="indicator.other"></option>
+						<option value="%" translate="indicator.percent"></option>
+						<option value="‰" translate="indicator.permille"></option>
+					</select>
 
-					</td>
-				</tr>
-				<tr>
-					<th translate="indicator.operation"></th>
-					<td colspan="{{numLanguages}}" acl-has-role="indicator" acl-fallback="('indicator.is_'+indicator.operation)|translate">
-						<select id="input-operation" class="form-control" ng-model="indicator.operation">
-							<option value="mandatory" translate="indicator.is_mandatory"></option>
-							<option value="approved" translate="indicator.is_approved"></option>
-							<option value="waiting" translate="indicator.is_waiting"></option>
-						</select>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-
-	</fieldset>
+				</td>
+			</tr>
+			
+		</tbody>
+	</table>
 
 	<div acl-has-role="indicator" class="noprint" style="margin-bottom: 20px">
 		<a ng-disabled="!indicatorSavable || indicatorSaveRunning" class="btn btn-primary" ng-click="save()">

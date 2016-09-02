@@ -2,24 +2,29 @@
 describe('Olap', function() {
 
 	// Load service before each test.
-	var Olap;
+	var Cube, CompoundCube, Dimension, DimensionGroup;
 	beforeEach(module('monitool.services.statistics.olap'));
-	beforeEach(inject(function(_Olap_) { Olap = _Olap_; }));
+	beforeEach(inject(function(_Cube_, _CompoundCube_, _Dimension_, _DimensionGroup_) {
+		Cube = _Cube_;
+		CompoundCube = _CompoundCube_;
+		Dimension = _Dimension_;
+		DimensionGroup = _DimensionGroup_;
+	}));
 
 	var cube;
 
 	// Define test cube (a very small one!)
 	beforeEach(function() {
-		cube = new Olap.Cube(
+		cube = new Cube(
 			'num_consultations',
 			[
-				new Olap.Dimension('gender', ['male', 'female'], 'sum'),
-				new Olap.Dimension('place', ['paris', 'madrid', 'london'], 'sum'),
-				new Olap.Dimension('age', ['minor', 'major'], 'sum'),
-				new Olap.Dimension('pathology', ['hiv', 'other'], 'sum')
+				new Dimension('gender', ['male', 'female'], 'sum'),
+				new Dimension('place', ['paris', 'madrid', 'london'], 'sum'),
+				new Dimension('age', ['minor', 'major'], 'sum'),
+				new Dimension('pathology', ['hiv', 'other'], 'sum')
 			],
 			[
-				new Olap.DimensionGroup(
+				new DimensionGroup(
 					'continent', 'place',
 					{
 						europe: ['paris', 'madrid', 'london'],
@@ -80,15 +85,15 @@ describe('Olap', function() {
 		});
 
 		it('should create a time DimensionGroup', function() {
-			var days = new Olap.Dimension('day', ['2010-01-01', '2010-01-02', '2010-01-03'], 'sum');
-			var months = Olap.DimensionGroup.createTime('month', days);
+			var days = new Dimension('day', ['2010-01-01', '2010-01-02', '2010-01-03'], 'sum');
+			var months = DimensionGroup.createTime('month', days);
 
 			expect(months.mapping).toEqual({'2010-01': ['2010-01-01', '2010-01-02', '2010-01-03']});
 		})
 
 		it('should create a time DimensionGroup', function() {
-			var days = new Olap.Dimension('week', ['2010-W01', '2010-W31', '2011-W09'], 'sum');
-			var quarters = Olap.DimensionGroup.createTime('quarter', days);
+			var days = new Dimension('week', ['2010-W01', '2010-W31', '2011-W09'], 'sum');
+			var quarters = DimensionGroup.createTime('quarter', days);
 
 			expect(quarters.mapping).toEqual({
 				'2010-Q1': ['2010-W01'],

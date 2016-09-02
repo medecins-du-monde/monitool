@@ -24,7 +24,6 @@ var app = angular.module('monitool.app', [
 	'monitool.services.models.input',
 	'monitool.services.models.project',
 	'monitool.services.models.theme',
-	'monitool.services.models.type',
 	'monitool.services.models.user',
 
 	'monitool.services.statistics.olap',
@@ -202,29 +201,12 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		
 		$stateProvider.state('main.admin.theme_list', {
 			url: '/admin/themes',
-			templateUrl: 'partials/admin/theme-type-list.html',
-			controller: 'ThemeTypeListController',
+			templateUrl: 'partials/admin/theme-list.html',
+			controller: 'ThemeListController',
 			resolve: {
 				entities: function(Theme) {
 					return Theme.query({with_counts: 1}).$promise;
 				}
-			},
-			data: {
-				entityType: 'theme'
-			}
-		});
-
-		$stateProvider.state('main.admin.type_list', {
-			url: '/admin/types',
-			templateUrl: 'partials/admin/theme-type-list.html',
-			controller: 'ThemeTypeListController',
-			resolve: {
-				entities: function(Type) {
-					return Type.query({with_counts: 1}).$promise;
-				}
-			},
-			data: {
-				entityType: 'type'
 			}
 		});
 	}
@@ -322,10 +304,30 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		}
 	});
 
-	$stateProvider.state('main.project.structure.logical_frame', {
+	$stateProvider.state('main.project.structure.cross_cutting', {
+		url: '/cross-cutting',
+		templateUrl: 'partials/projects/structure/cross-cutting.html',
+		controller: 'ProjectCrossCuttingController',
+		resolve: {
+			indicators: function(project, Indicator) {
+				return Indicator.query().$promise;
+			},
+			themes: function(Theme) {
+				return Theme.query().$promise;
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.structure.logical_frame_list', {
 		url: '/logical-frame',
+		templateUrl: 'partials/projects/structure/logframe-list.html',
+		controller: 'ProjectLogicalFrameListController'
+	});
+
+	$stateProvider.state('main.project.structure.logical_frame_edition', {
+		url: '/logical-frame/:index',
 		templateUrl: 'partials/projects/structure/logframe-edit.html',
-		controller: 'ProjectLogicalFrameController'
+		controller: 'ProjectLogicalFrameEditController'
 	});
 
 	$stateProvider.state('main.project.structure.user_list', {
@@ -382,36 +384,39 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	///////////////////////////
 
 	$stateProvider.state('main.project.reporting', {
+		abstract: true,
 		url: '/reporting',
+		template: '<div ui-view></div>',
+		resolve: {
+			indicators: function(Indicator, project) {
+				return Indicator.fetchForProject(project);
+			},
+			cubes: function(Cube, project) {
+				return Cube.fetchProject(project._id).then(function(cs) {
+					var byid = {};
+					cs.forEach(function(c) { byid[c.id] = c; });
+					return byid;
+				});
+			}
+		}
+	});
+
+	$stateProvider.state('main.project.reporting.general', {
+		url: '/general',
 		templateUrl: 'partials/projects/reporting/reporting.html',
 		controller: 'ProjectReportingController',
-		resolve: {
-			inputs: function(Input, project) {
-				return Input.fetchForProject(project);
-			}
-		}
 	});
 
-	$stateProvider.state('main.project.detailed_reporting', {
-		url: '/detailed-reporting',
+	$stateProvider.state('main.project.reporting.detailed', {
+		url: '/detailed',
 		templateUrl: 'partials/projects/reporting/reporting-detailed.html',
-		controller: 'ProjectDetailedReportingController',
-		resolve: {
-			inputs: function(Input, project) {
-				return Input.fetchForProject(project);
-			}
-		}
+		controller: 'ProjectDetailedReportingController'
 	});
 
-	$stateProvider.state('main.project.olap', {
+	$stateProvider.state('main.project.reporting.olap', {
 		url: '/olap',
 		templateUrl: 'partials/projects/reporting/olap.html',
-		controller: 'ProjectOlapController',
-		resolve: {
-			inputs: function(Input, project) {
-				return Input.fetchForProject(project);
-			}
-		}
+		controller: 'ProjectOlapController'
 	});
 
 
@@ -424,8 +429,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/indicators/list.html',
 		controller: 'IndicatorListController',
 		resolve: {
-			hierarchy: function(Theme) {
-				return Theme.query({mode: 'tree'}).$promise;
+			indicators: function(Indicator) {
+				return Indicator.query().$promise;
+			},
+			themes: function(Theme) {
+				return Theme.query({with_counts: 1}).$promise;
 			}
 		}
 	});
@@ -463,9 +471,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			templateUrl: 'partials/indicators/edit.html',
 			controller: 'IndicatorEditController',
 			resolve: {
-				types: function(Type) {
-					return Type.query().$promise;
-				},
 				themes: function(Theme) {
 					return Theme.query().$promise;
 				}
@@ -477,89 +482,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			templateUrl: 'partials/indicators/reporting.html',
 			controller: 'IndicatorReportingController',
 			resolve: {
-				projects: function($stateParams, Project) {
-					return Project.query({mode: "indicator_reporting", indicatorId: $stateParams.indicatorId}).$promise;
+				projects: function(Project,indicator) {
+					return Project.query({mode: 'crossCutting', indicatorId: indicator._id});
 				},
-				inputs: function(Input, projects) {
-					return Input.fetchForProjects(projects);
+				cubes: function(Cube, indicator) {
+					return Cube.fetchIndicator(indicator._id);
 				}
 			}
 		});
 	}
 
-	///////////////////////////
-	// Help
-	///////////////////////////
-
-	$stateProvider.state('main.help', {
-		abstract: true,
-		controller: 'HelpMenuController',
-		url: '/help',
-		templateUrl: 'partials/help/menu.html',
-	});
-
-	if (window.user.type == 'user')
-		$stateProvider.state('main.help.create', {
-			controller: 'HelpController',
-			url: "/create",
-			templateUrl: 'partials/help/01-create.html'
-		});
-
-	$stateProvider.state('main.help.structure', {
-		controller: 'HelpController',
-		url: "/structure",
-		templateUrl: 'partials/help/02-structure.html'
-	});
-
-	$stateProvider.state('main.help.input', {
-		controller: 'HelpController',
-		url: "/input",
-		templateUrl: 'partials/help/03-input.html'
-	});
-
-	$stateProvider.state('main.help.activity_followup', {
-		controller: 'HelpController',
-		url: "/activity-followup",
-		templateUrl: 'partials/help/04-activity-followup.html'
-	});
-
-	$stateProvider.state('main.help.logical_frame', {
-		controller: 'HelpController',
-		url: "/logical-frame",
-		templateUrl: 'partials/help/05-logical-frame.html'
-	});
-
-	$stateProvider.state('main.help.objectives_results', {
-		controller: 'HelpController',
-		url: "/objectives-results",
-		templateUrl: 'partials/help/06-objectives-results.html'
-	});
-
-	$stateProvider.state('main.help.change_definition', {
-		controller: 'HelpController',
-		url: "/change-definition",
-		templateUrl: 'partials/help/07-change-definition.html'
-	});
-
-	if (window.user.type == 'user') {
-		$stateProvider.state('main.help.indicator_usage', {
-			controller: 'HelpController',
-			url: "/indicator-usage",
-			templateUrl: 'partials/help/08-indicator-usage.html'
-		});
-
-		$stateProvider.state('main.help.create_new_indicator', {
-			controller: 'HelpController',
-			url: "/create-new-indicator",
-			templateUrl: 'partials/help/09-create-new-indicator.html'
-		});
-
-		$stateProvider.state('main.help.indicator_reporting', {
-			controller: 'HelpController',
-			url: "/indicator-reporting",
-			templateUrl: 'partials/help/10-indicator-reporting.html'
-		});
-	}
 });
 
 

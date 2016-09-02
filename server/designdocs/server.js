@@ -5,15 +5,6 @@ module.exports = {
 
 	views: {	
 
-		types_usage: {
-			map: function(doc) {
-				if (doc.type === 'indicator') {
-					doc.types.forEach(function(typeId) { emit(typeId); });
-				}
-			}.toString(),
-			reduce: '_count'
-		},
-
 		themes_usage: {
 			map: function(doc) {
 				if (doc.type === 'indicator' || doc.type === 'project')
@@ -27,7 +18,6 @@ module.exports = {
 			map: function(doc) {
 				if (doc.type === 'indicator') {
 					doc.themes.forEach(function(id) { emit(id, "indicator_on_theme"); });
-					doc.types.forEach(function(id) { emit(id, "indicator_on_type"); });
 				}
 				else if (doc.type === 'project') {
 					var users = doc.owners.concat(doc.dataEntryOperators).sort(),

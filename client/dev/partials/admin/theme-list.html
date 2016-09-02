@@ -1,15 +1,13 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.admin.users" translate>shared.settings</a></li>
-	<li class="active" translate ng-if="entityType === 'theme'">indicator.themes_list</li>
-	<li class="active" translate ng-if="entityType === 'type'">indicator.types_list</li>
+	<li><a ui-sref="main.admin.users" translate="shared.settings"></a></li>
+	<li class="active" translate="indicator.themes_list"></li>
 </ol>
 
 <table class="table table-stripped table-bordered table-condensed">
 	<thead>
 		<tr>
 			<th ng-repeat="(code, language) in languages">{{('menu.'+language)|translate}}</th>
-
-			<th style="width:80px" ng-if="entityType === 'theme'" translate="indicator.num_projects"></th>
+			<th style="width:80px" translate="indicator.num_projects"></th>
 			<th style="width:80px" translate="indicator.num_indicators"></th>
 			<th style="width:225px"></th>
 		</tr>
@@ -39,7 +37,7 @@
 					</div>
 				</ng-form>
 			</td>
-			<td ng-if="entityType === 'theme'">{{entity.__projectUsage || 0}}</td>
+			<td>{{entity.__projectUsage || 0}}</td>
 			<td>{{entity.__indicatorUsage || 0}}</td>
 			<td>
 				<a class="btn btn-primary btn-xs" ng-click="save(entityIndex)" ng-disabled="!entity.name || !hasChanged(entityIndex)">
@@ -54,7 +52,7 @@
 		</tr>
 		<tr>
 			<!-- should be len(languages + 3) -->
-			<td colspan="{{entityType === 'theme' ? 6 : 5}}" style="text-align: center">
+			<td colspan="6" style="text-align: center">
 				<a class="btn btn-default btn-xs" ng-click="create()">
 					<i class="fa fa-plus"></i>
 					<span translate="shared.add"></span>

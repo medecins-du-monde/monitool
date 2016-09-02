@@ -4,8 +4,6 @@
 	<li class="active" translate="project.pivot_table"></li>
 </ol>
 
-<doc-reminder pages="project.activity_followup"></doc-reminder>
-
 <div class="panel panel-default">
 	<div class="panel-heading" ng-click="selectionOpen=!selectionOpen" style="cursor: pointer" ng-init="selectionOpen=true">
 		<i fa-open="selectionOpen"></i> 
@@ -20,8 +18,8 @@
 						<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
 
 						<select class="form-control input-sm"
-								ng-model="wrap.chosenElementId"
-								ng-options="v.id as v.name group by v.group for v in elementOptions"></select>
+								ng-model="wrap.chosenElement"
+								ng-options="v as v.name group by v.group for v in elementOptions"></select>
 					</div>
 				</div>
 			</div>

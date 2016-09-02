@@ -1,0 +1,50 @@
+<ol class="breadcrumb">
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
+	<li class="active" translate="shared.logical_frames"></li>
+</ol>
+
+
+<div class="alert alert-info">
+	<p>Un cadre logique est un document qui décrit les objectifs d'un projet, les activités misent en oeuvre pour y parvenir, ainsi que les indicateurs qui permette de suivre l'avancement de chaque élément</p>
+
+	<p>Tous les indicateurs présents dans les cadres logiques doivent être calculables à partir des données décrites dans les sources de données</p>
+</div>
+
+<legend translate="shared.logical_frames"></legend>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th acl-has-project-role="owner"></th>
+			<th translate="shared.name"></th>
+			<th translate="project.goal"></th>
+		</tr>
+	</thead>
+	<tbody ng-if="project.logicalFrames.length == 0">
+		<tr>
+			<td colspan="3" style="text-align: center" translate="project.no_logical_frames"></td>
+		</tr>
+	</tbody>
+	<tbody ng-if="project.logicalFrames.length != 0" ng-sortable="{handle: '.handle'}">
+		<tr ng-repeat="(index, logicalFrame) in project.logicalFrames">
+			<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
+			<td>
+				<a ui-sref="main.project.structure.logical_frame_edition({index: index})">
+					{{logicalFrame.name}}
+				</a>
+			</td>
+			<td>{{logicalFrame.goal}}</td>
+ 		</tr>
+	</tbody>
+	<tfoot acl-has-project-role="owner">
+		<tr>
+			<td colspan="3" style="text-align: center">
+				<a class="btn btn-default btn-xs" ng-click="createLogicalFrame()">
+					<i class="fa fa-plus"></i>
+					<span translate="shared.add"></span>
+				</a>
+			</td>
+		</tr>
+	</tfoot>
+</table>

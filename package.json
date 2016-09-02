@@ -2,7 +2,6 @@
   "name": "Monitool",
   "description": "Indicator monitoring application for Medecins du Monde",
   "version": "2.2.1",
-
   "devDependencies": {
     "del": "x",
     "event-stream": "x",
@@ -35,6 +34,7 @@
     "express-session": "x",
     "is-my-json-valid": "x",
     "jade": "x",
+    "moment": "^2.14.1",
     "nano": "x",
     "oauth2orize": "x",
     "passport": "x",

@@ -58,7 +58,7 @@ angular
 			else {
 				var year = slot.match(/^\d{4}$/);
 				if (year)
-					return year;
+					return year[0];
 
 				else {
 					var quarter = slot.match(/^(\d{4})\-Q(\d)$/);

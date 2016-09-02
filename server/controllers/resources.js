@@ -8,10 +8,9 @@ var express     = require('express'),
 	Indicator   = require('../models/resources/indicator'),
 	Input       = require('../models/resources/input'),
 	Project     = require('../models/resources/project'),
-	Theme       = require('../models/resources/theme'),
-	Type        = require('../models/resources/type');
+	Theme       = require('../models/resources/theme');
 
-var ModelsByName = {indicator: Indicator, input: Input, project: Project, theme: Theme, type: Type, user: User},
+var ModelsByName = {indicator: Indicator, input: Input, project: Project, theme: Theme, user: User},
 	bodyParser   = require('body-parser').json();
 
 

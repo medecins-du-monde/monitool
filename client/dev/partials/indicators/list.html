@@ -1,5 +1,3 @@
-<doc-reminder pages="indicators.indicator_usage"></doc-reminder>
-
 <a class="btn btn-primary pull-right" ng-click="createIndicator()" acl-has-role="indicator">
 	<i class="fa fa-plus"></i>
 	<span translate="indicator.create_new"></span>
@@ -12,52 +10,32 @@
 	</a>
 </div>
 
-<div class="form-horizontal">
-	<div class="form-group">
-		<label for="search-input" class="col-sm-1" translate="indicator.search"></label>
-		<div class="col-sm-3">
-			<input id="search-input" type="text" ng-model="searchField" class="form-control input-sm" placeholder="{{'indicator.search_ph'|translate}}"/>
-		</div>
-	</div>
-</div>
+<br/>
+<br/>
 
-<div class="indicator-level-1" ng-repeat="theme in hierarchy|hierarchyFilter:searchField">
-	<div class="indicator-header" ng-click="theme.open=!theme.open">
-		<i fa-open="theme.open"></i>
-		{{theme.name[language] || ('indicator.no_theme'|translate)}}
-		<span class="badge pull-right" ng-bind="theme.children.length"></span>
-	</div>
+<table class="table table-condensed table-striped table-bordered">
+	<thead>
+		<tr>
+			<th translate="shared.name"></th>
+			<th style="width: 150px"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="indicator in indicators|orderBy:getName">
+			<td>
+				<a ui-sref="main.indicator.edit({indicatorId: indicator._id})">
+					{{indicator.name[language]}}
+				</a>
 
-	<div class="indicator-level-2" ng-repeat="type in theme.children" ng-if="theme.open">
-		<div class="indicator-header" ng-click="type.open=!type.open">
-			<i fa-open="type.open"></i>
-			{{type.name[language] || ('indicator.no_type'|translate)}}
-			<span class="badge pull-right" ng-bind="type.children.length"></span>
-		</div>
+				<span style="margin-left: 3px" class="label pull-right" ng-class="theme.class" ng-repeat="theme in indicator.themes|getObjects:themes">{{theme.name[language]}}</span>
+			</td>
+			<td style="text-align: center">
+				<a class="btn btn-default btn-xxs" ui-sref="main.indicator.reporting({indicatorId: indicator._id})">
+					<i class="fa fa-line-chart"></i>
+					Voir les statistiques
+				</a>
+			</td>
+		</tr>
+	</tbody>
+</table>
 
-		<div class="indicator-level-3" ng-repeat="indicator in type.children" ng-if="type.open">
-			<span class="pull-right">
-				
-				<span class="label label-default" tooltip="{{'indicator.num_collecting_projects'|translate}}">{{indicator.__usage}}</span>
-
-				<a class="btn btn-xs btn-default"
-				   ui-sref="main.indicator.reporting({indicatorId: indicator._id})"
-				   ng-if="indicator.__usage"
-				   translate="shared.reporting"></a>
-
-				<a class="btn btn-xs btn-default"
-				   ui-sref="main.indicator.edit({indicatorId: indicator._id})"
-				   acl-has-role="indicator"
-				   translate="shared.edit"></a>
-
-				<a class="btn btn-xs btn-default"
-				   ui-sref="main.indicator.edit({indicatorId: indicator._id})"
-				   acl-lacks-role="indicator"
-				   translate="shared.display"></a>
-			</span>
-
-			<indicator-operation indicator="indicator"></indicator-operation>
-			<span>{{indicator.name[language]}}</span>
-		</div>
-	</div>
-</div>

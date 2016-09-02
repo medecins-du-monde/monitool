@@ -1,0 +1,34 @@
+<ol class="breadcrumb noprint">
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
+	<li class="active" translate="indicator.cross_cutting"></li>
+</ol>
+
+<div class="alert alert-info">
+	Les indicateurs transversaux ...
+</div>
+
+<legend translate="indicator.cross_cutting"></legend>
+
+<table class="table table-bordered table-condensed table-stripped">
+	<thead>
+		<tr>
+			<th translate="project.collected" style="width: 50px"></th>
+			<th translate="shared.name"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="indicator in indicators|orderBy:getName">
+			<td style="text-align: center">
+				<i fa-boolean="project.crossCutting[indicator._id]"></i>
+			</td>
+			<td>
+				<a ng-click="editIndicator(indicator._id)">
+					{{indicator.name[language]}}
+				</a>
+
+				<span style="margin-left: 3px" class="label pull-right" ng-class="theme.class" ng-repeat="theme in indicator.themes|getObjects:themes">{{theme.name[language]}}</span>
+			</td>
+		</tr>
+	</tbody>
+</table>

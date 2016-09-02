@@ -343,8 +343,8 @@ var SPANISH_TRANSLATION = {
 		remove_partition: "Quitar esta partición",
 
 		aggregation: "Agregación",
-		sites_agg: "Para lugares",
-		time_agg: "Para tiempo",
+		sites_agg: "Entre lugares",
+		time_agg: "Entre periodos",
 
 		none: "No agregar",
 		sum: "Suma",
@@ -482,6 +482,7 @@ var SPANISH_TRANSLATION = {
 		
 		formula: "Formula: {{name}}",
 		link: "Vínculo: {{name}}",
+		collected: "Recuperado"
 	},
 	indicator: {
 		cross_cutting: "Indicadores transversales",

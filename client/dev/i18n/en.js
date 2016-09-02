@@ -491,6 +491,7 @@ var ENGLISH_TRANSLATION = {
 	
 		formula: "Formula: {{name}}",
 		link: "Link: {{name}}",
+		collected: 'Collected'
 	},
 	indicator: {
 		cross_cutting: "Cross-cutting indicators",

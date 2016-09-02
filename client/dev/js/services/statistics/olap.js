@@ -2,7 +2,8 @@
 
 /**
  * Incredibly ineficient OLAP cube implementation.
- * No cache, trees, contiguous buffers that could make this fast.
+ * No dynamic programming here to make it fast.
+ * 
  * It should be good enought for what we need but implement this properly if too slow
  * (or find an implementation on the internet).
  *
@@ -13,118 +14,12 @@ angular
 	.module(
 		'monitool.services.statistics.olap',
 		[
-			'monitool.services.utils.input-slots'
+			'monitool.services.utils.input-slots',
+			'monitool.services.statistics.parser'
 		]
 	)
 
-	.factory('Olap', function(InputSlots) {
-
-		/**
-		 * id = "month"
-		 * items = ["2010-01", "2010-02", ...]
-		 * aggregation = "sum"
-		 */
-		var Dimension = function(id, items, aggregation) {
-			this.id = id;
-			this.items = items;
-			this.aggregation = aggregation;
-		};
-
-		Dimension.createTime = function(project, form, element, inputs) {
-			var periods;
-
-			if (form.periodicity === 'free') {
-				periods = {};
-				inputs.forEach(function(input) { periods[input.period] = true; });
-				periods = Object.keys(periods);
-				periods.sort();
-
-				return new Dimension('day', periods, element.timeAgg);
-			}
-			else {
-				periods = InputSlots.getList(project, null, form);
-				return new Dimension(form.periodicity, periods, element.timeAgg);
-			}
-		};
-
-		Dimension.createLocation = function(project, form, element) {
-			var entities;
-			if (form.collect == 'some_entity')
-				entities = form.entities;
-			else if (form.collect == 'entity')
-				entities = project.entities.pluck('id');
-
-			if (!entities)
-				throw new Error('No location dimension');
-			else
-				return new Dimension('entity', entities, element.geoAgg);
-		};
-
-		Dimension.createPartition = function(partition) {
-			return new Dimension(partition.id, partition.elements.pluck('id'), partition.aggregation);
-		};
-
-		var DimensionGroup = function(id, childDimension, mapping) {
-			this.id = id;
-			this.childDimension = childDimension;
-			this.items = Object.keys(mapping);
-			this.mapping = mapping;
-		};
-
-		DimensionGroup.createTime = function(parent, dimension) {
-			// Constants. Should go in a configuration file somewhere.
-			var formats = {year: 'YYYY', quarter: 'YYYY-[Q]Q', month: 'YYYY-MM', week: 'YYYY-[W]WW', day: 'YYYY-MM-DD'};
-			var timeDimensions = Object.keys(formats);
-
-			// Check arguments
-			if (timeDimensions.indexOf(parent) === -1)
-				throw new Error(parent + ' is not a valid time dimension.');
-
-			if (timeDimensions.indexOf(dimension.id) === -1)
-				throw new Error(dimension.id + ' is not a valid time dimension');
-
-			if (timeDimensions.indexOf(parent) >= timeDimensions.indexOf(dimension.id))
-				throw new Error('Cannot compute ' + parent + ' from ' + dimension.id);
-
-			// Create DimensionGroup mapping from Dimension items.
-			var childFormat = formats[dimension.id], parentFormat = formats[parent];
-			var mapping = {};
-
-			dimension.items.forEach(function(childValue) {
-				var parentValue = moment.utc(childValue, childFormat).format(parentFormat);
-
-				mapping[parentValue] = mapping[parentValue] || [];
-				mapping[parentValue].push(childValue);
-			});
-
-			return new DimensionGroup(parent, dimension.id, mapping);
-		};
-
-		DimensionGroup.createLocation = function(project, form) {
-			var entities;
-			if (form.collect == 'some_entity')
-				entities = form.entities;
-			else if (form.collect == 'entity')
-				entities = project.entities.pluck('id');
-
-			var groups = {};
-			project.groups.forEach(function(group) {
-				groups[group.id] = group.members.filter(function(id) {
-					return entities.indexOf(id) !== -1;
-				});
-
-				if (groups[group.id].length === 0)
-					delete groups[group.id];
-			});
-
-			return new DimensionGroup('group', 'entity', groups);
-		};
-
-		DimensionGroup.createPartition = function(partition) {
-			var pgroups = {};
-			partition.groups.forEach(function(g) { pgroups[g.id] = g.members; });
-			return new DimensionGroup(partition.id + '_g', partition.id, pgroups);
-		};
+	.factory('Cube', function($http) {
 
 		/**
 		 * id = "a2b442c9-1dde-42dd-9a04-773818d75e71" (variableId from form)
@@ -141,7 +36,10 @@ angular
 			this.dimensionsById = {};
 			this.dimensionGroupsById = {};
 			this.dimensions.forEach(function(d) { this.dimensionsById[d.id] = d; }.bind(this));
-			this.dimensionGroups.forEach(function(d) { this.dimensionGroupsById[d.id] = d; }.bind(this));
+			this.dimensionGroups.forEach(function(d) {
+				d.items = Object.keys(d.mapping);
+				this.dimensionGroupsById[d.id] = d;
+			}.bind(this));
 
 			// Check size.
 			var dataSize = 1;
@@ -150,95 +48,27 @@ angular
 				throw new Error('Invalid data size');
 		};
 
-		Cube.fromElement = function(project, form, element, inputs) {
-			////////////
-			// Build dimensions & groups
-			////////////
-			var dimensions = [], dimensionGroups = [];
-
-			// Time
-			dimensions.push(Dimension.createTime(project, form, element, inputs));
-			['week', 'month', 'quarter', 'year'].forEach(function(periodicity) {
-				// This will fail while indexOf(periodicity) < indexOf(form.periodicity)
-				try { dimensionGroups.push(DimensionGroup.createTime(periodicity, dimensions[0])); }
-				catch (e) {}
+		Cube.fetchProject = function(projectId) {
+			return $http({url: '/reporting/project/' + projectId}).then(function(cubes) {
+				return cubes.data.map(function(c) {
+					return new Cube(c.id, c.dimensions, c.dimensionGroups, c.data);
+				})
 			});
-			
-			// Location
-			if (form.collect == 'entity' || form.collect == 'some_entity') {
-				dimensions.push(Dimension.createLocation(project, form, element));
-				if (project.groups.length)
-					dimensionGroups.push(DimensionGroup.createLocation(project, form))
-			}
-
-			// Partitions
-			element.partitions.forEach(function(partition) {
-				dimensions.push(Dimension.createPartition(partition));
-				if (partition.groups.length)
-					dimensionGroups.push(DimensionGroup.createPartition(partition));
-			});
-
-			////////////
-			// Build data
-			////////////
-			var dataSize = 1;
-			dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
-
-			var data = new Int32Array(dataSize)
-			for (var i = 0; i < dataSize; ++i)
-				data[i] = -2147483648;
-
-			inputs.forEach(function(input) {
-				// Compute location where this subtable should go, and length of data to copy.
-				var offset = dimensions[0].items.indexOf(input.period),
-					length = 1; // Slow!
-
-				if (offset < 0)
-					console.log(offset)
-
-				if (form.collect == 'entity' || form.collect == 'some_entity') {
-					if (dimensions[1].items.indexOf(input.entity) < 0)
-						console.log('WTF')
-
-					offset = offset * dimensions[1].items.length + dimensions[1].items.indexOf(input.entity);
-				}
-
-				element.partitions.forEach(function(partition) {
-					offset *= partition.elements.length;
-					length *= partition.elements.length;
-				});
-
-				// Retrieve data from input, and copy (if valid).
-				var source = input.values[element.id];
-				if (source && source.length === length) {
-					// Copy into destination table.
-					for (var i = 0; i < length; ++i)
-						data[offset + i] = source[i];
-				}
-				else {
-					console.log("Skip variable", element.id, 'from', input._id);
-				}
-			});
-
-			// Build and fill cube
-			return new Cube(element.id, dimensions, dimensionGroups, data);
 		};
 
-		Cube.fromProject = function(project, allInputs) {
-			var inputsByForm = {};
-			project.forms.forEach(function(form) { inputsByForm[form.id] = [] });
-			allInputs.forEach(function(input) { inputsByForm[input.form].push(input); });
+		Cube.fetchIndicator = function(indicatorId) {
+			return $http({url: '/reporting/indicator/' + indicatorId}).then(function(cubes) {
+				cubes = cubes.data
 
-			var cubes = {};
-			project.forms.forEach(function(form) {
-				var inputs = inputsByForm[form.id];
-				
-				form.elements.forEach(function(element) {
-					cubes[element.id] = Cube.fromElement(project, form, element, inputs);
-				});
+				var res = {};
+				for (var projectId in cubes) {
+					res[projectId] = cubes[projectId].map(function(c) {
+						return new Cube(c.id, c.dimensions, c.dimensionGroups, c.data);
+					});
+				}
+
+				return res;
 			});
-
-			return cubes;
 		};
 
 		Cube.prototype.query = function(dimensionIds, filter, withTotals) {
@@ -338,7 +168,7 @@ angular
 					return;
 
 				var numDimensionItems = dimensionGroup.items.length;
-				// var contributions = 0;
+				contributions = 0;
 				for (var dimensionItemId = 0; dimensionItemId < numDimensionItems; ++dimensionItemId) {
 					var dimensionItem = dimensionGroup.items[dimensionItemId];
 
@@ -369,6 +199,7 @@ angular
 
 		/**
 		 * filter = {year: ['2014'], partition1: ["2d31a636-1739-4b77-98a5-bf9b7a080626"]}
+		 * returns integers
 		 */
 		Cube.prototype._query_total = function(filter) {
 			// rewrite the filter so that it contains only dimensions.
@@ -557,6 +388,115 @@ angular
 			});
 		};
 
-		return {Dimension: Dimension, DimensionGroup: DimensionGroup, Cube: Cube}
-	});
+		return Cube;
+	})
+
+	.factory("CompoundCube", function(Cube, Parser) {
+		
+
+		var createDimension = function(dimensionId, childDimension, indicator, cubes) {
+			var itemsLists = [];
+
+			for (var key in indicator.parameters) {
+				var cube = cubes[indicator.parameters[key].elementId],
+					dimension = cube.dimensionsById[dimensionId] || cube.dimensionGroupsById[dimensionId];
+
+				itemsLists.push(dimension.items);
+			}
+
+			var items = itemsLists.reduce(function(memo, arr) {
+				return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
+			}, null);
+
+			items.sort();
+			
+			return {id: dimensionId, childDimension: childDimension, items: items};				
+		};
+
+		var CompoundCube = function(indicator, cubes) {
+			this.indicator = indicator;
+			this.cubes = cubes;
+			
+			this.dimensions = [];
+			this.dimensionGroups = [];
+
+			var dimensionIds = [];
+			for (var key in indicator.parameters) {
+				var cube = cubes[indicator.parameters[key].elementId],
+					dimensions = Object.keys(cube.dimensionsById).concat(Object.keys(cube.dimensionGroupsById));
+
+				dimensionIds.push(dimensions);
+			}
+
+			dimensionIds = dimensionIds.reduce(function(memo, arr) {
+				return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
+			}, null);
+
+			if (dimensionIds.indexOf('day') !== -1) {
+				this.dimensions.push(createDimension('day', undefined, indicator, cubes));
+				this.dimensionGroups.push(createDimension('week', 'day', indicator, cubes));
+				this.dimensionGroups.push(createDimension('month', 'day', indicator, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'day', indicator, cubes));
+				this.dimensionGroups.push(createDimension('year', 'day', indicator, cubes));
+			}
+			else if (dimensionIds.indexOf('week') !== -1) {
+				this.dimensions.push(createDimension('week', undefined, indicator, cubes));
+				this.dimensionGroups.push(createDimension('month', 'week', indicator, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'week', indicator, cubes));
+				this.dimensionGroups.push(createDimension('year', 'week', indicator, cubes));
+			}
+			else if (dimensionIds.indexOf('month') !== -1) {
+				this.dimensions.push(createDimension('month', undefined, indicator, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'month', indicator, cubes));
+				this.dimensionGroups.push(createDimension('year', 'month', indicator, cubes));
+			}
+			else if (dimensionIds.indexOf('quarter') !== -1) {
+				this.dimensions.push(createDimension('quarter', undefined, indicator, cubes));
+				this.dimensionGroups.push(createDimension('year', 'quarter', indicator, cubes));
+			}
+			else {
+				this.dimensions.push(createDimension('year', undefined, indicator, cubes));
+			}
+
+			if (dimensionIds.indexOf('entity') !== -1) {
+				this.dimensions.push(createDimension('entity', undefined, indicator, cubes));
+
+				if (dimensionIds.indexOf('group') !== -1)
+					this.dimensionGroups.push(createDimension('group', 'entity', indicator, cubes));
+			}
+
+			// Index dimensions and dimensionGroups by id
+			this.dimensionsById = {};
+			this.dimensionGroupsById = {};
+			this.dimensions.forEach(function(d) { this.dimensionsById[d.id] = d; }.bind(this));
+			this.dimensionGroups.forEach(function(d) { this.dimensionGroupsById[d.id] = d; }.bind(this));
+		};
+
+		CompoundCube.prototype.query = Cube.prototype.query;
+		
+		CompoundCube.prototype.flatQuery = Cube.prototype.flatQuery;
+
+		CompoundCube.prototype._query_total = function(filter) {
+			var localScope = {};
+
+			for (var key in this.indicator.parameters) {
+				var parameter = this.indicator.parameters[key],
+					cube = this.cubes[parameter.elementId];
+
+				var finalFilter = angular.copy(filter)
+				for (var key2 in parameter.filter) finalFilter[key2] = parameter.filter[key2];
+
+				localScope[key] = cube._query_total(finalFilter);
+			}
+
+			try {
+				return Parser.evaluate(this.indicator.formula, localScope);
+			}
+			catch (e) {
+				return 'INVALID_FORMULA';
+			}
+		};
+
+		return CompoundCube;
+	})
 

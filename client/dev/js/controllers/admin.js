@@ -52,21 +52,20 @@ angular
 		};
 	})
 
-	.controller('ThemeTypeListController', function($scope, $state, Theme, Type, uuid, googleTranslation, entities) {
+	.controller('ThemeListController', function($scope, $state, Theme, uuid, googleTranslation, entities) {
 		entities.sort(function(entity1, entity2) {
 			return entity1.name[$scope.language].localeCompare(entity2.name[$scope.language]);
 		});
 
 		$scope.entities = entities;
 		$scope.master = angular.copy(entities);
-		$scope.entityType = $state.current.data.entityType;
 
 		$scope.hasChanged = function(entityIndex) {
 			return !angular.equals($scope.entities[entityIndex], $scope.master[entityIndex]);
 		};
 
 		$scope.create = function() {
-			var newEntity = $scope.entityType == 'theme' ? new Theme() : new Type();
+			var newEntity = new Theme();
 			newEntity.__isNew = true; // this will be removed on save.
 			newEntity._id = uuid.v4();
 			newEntity.reset();

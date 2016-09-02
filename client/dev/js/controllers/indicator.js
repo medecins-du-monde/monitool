@@ -8,21 +8,27 @@ angular
 		]
 	)
 
-	.controller('IndicatorListController', function($scope, $state, hierarchy, uuid) {
-		$scope.hierarchy = hierarchy;
-		$scope.searchField = '';
+	.controller('IndicatorListController', function($scope, $state, indicators, themes, uuid) {
+		$scope.indicators = indicators;
+		$scope.themes = themes;
+
+		$scope.getName = function(a) { return a.name[$scope.language] };
+
+		var classes = ["label-primary", "label-success", "label-info", "label-warning", "label-danger"];
+		$scope.themes.forEach(function(theme, index) {
+			theme.class = classes[index % classes.length];
+		});
 
 		$scope.createIndicator = function() {
 			$state.go('main.indicator.edit', {indicatorId: uuid.v4()});
 		};
 	})
 	
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, $filter, googleTranslation, indicator, types, themes, uuid) {
+	.controller('IndicatorEditController', function($state, $scope, $stateParams, $filter, googleTranslation, indicator, themes, uuid) {
 		$scope.translations = {fr: FRENCH_TRANSLATION, es: SPANISH_TRANSLATION, en: ENGLISH_TRANSLATION};
 		$scope.numLanguages = Object.keys($scope.translations).length;
 		$scope.indicator = indicator;
 		$scope.master = angular.copy(indicator);
-		$scope.types = types;
 		$scope.themes = themes;
 
 		$scope.indicatorSaveRunning = false;
@@ -100,17 +106,16 @@ angular
 
 	})
 	
-	.controller('IndicatorReportingController', function($scope, Olap, mtReporting, indicator, projects, inputs) {
+	.controller('IndicatorReportingController', function($scope, Cube, mtReporting, indicator, projects, cubes) {
 		$scope.indicator = indicator;
+		$scope.open = {};
 		$scope.plots = {};
-
-		// Create default filter so that all inputs are used.
-		$scope.filters = {_start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
-		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].period < $scope.filters._start)
-				$scope.filters._start = inputs[i].period;
-			if (inputs[i].period > $scope.filters._end)
-				$scope.filters._end = inputs[i].period;
+		$scope.filters = {_location: "none", _start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
+		for (var i = 0; i < projects.length; ++i) {
+			if (projects[i].start < $scope.filters._start)
+				$scope.filters._start = projects[i].start;
+			if (projects[i].end > $scope.filters._end)
+				$scope.filters._end = projects[i].end;
 		}
 
 		// default group by
@@ -121,27 +126,27 @@ angular
 		else
 			$scope.groupBy = 'year';
 
-		var cubes = {};
-		projects.forEach(function(project) {
-			var projectInputs = inputs.filter(function(i) { return i.project == project._id; });
-			cubes[project._id] = Olap.Cube.fromProject(project, projectInputs);
+		$scope.blocks = projects.map(function(project) {
+			return {text: project.name + " (" + project.country + ')', project: project};
 		});
 
-		// when input list change, or regrouping is needed, compute table rows again.
-		$scope.$watch('[filters, groupBy]', function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end);
+		$scope.$watch('[filters, groupBy, splits, open]', function() {
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, null, null)
 
-			$scope.rows = projects.map(function(project) {
-				// Compute row.
-				var cube     = cubes[project._id],
-					planning = project.getIndicatorPlanningById(indicator._id),
-					row      = mtReporting._makeIndicatorRow(cube, 0, $scope.groupBy, $scope.filters, $scope.cols, planning);
+			$scope.blocks.forEach(function(block, index) {
+				var fakeInd = block.project.crossCutting[indicator._id];
+				var c = {};
+				cubes[projects[index]._id].forEach(function(a) { c[a.id] = a; });
 
-				// Add extra field, with project name.
-				row.project = project.name;
-
-				return row;
+				block.rows = $scope.open[index] ? 
+					mtReporting.computeIndicatorReporting(c, projects[index], fakeInd, $scope.groupBy, $scope.filters) :
+					null;
 			});
+
+			// Work around graph bug
+			$scope.rows = [];
+			$scope.blocks.forEach(function(block) { if (block.rows) $scope.rows = $scope.rows.concat(block.rows); });
 		}, true);
+
 	});
 

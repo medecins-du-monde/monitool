@@ -39,8 +39,8 @@
 							<span translate="project.collection_form_list"></span>
 						</a>
 
-						<a ui-sref="main.project.structure.logical_frame"
-						   ui-sref-active="active"
+						<a ui-sref="main.project.structure.logical_frame_list"
+						   ng-class="{active: $state.is('main.project.structure.logical_frame_list') || $state.is('main.project.structure.logical_frame_edition')}"
 						   class="list-group-item"
 						   eat-click-if="!project._rev" disable-if="!project._rev">
 
@@ -54,7 +54,7 @@
 						   class="list-group-item"
 						   eat-click-if="!project._rev" disable-if="!project._rev">
 
-							<span class="label label-default pull-right">{{project.crossCutting.length}}</span>
+							<span class="label label-default pull-right">{{project.crossCutting|length}}</span>
 							<i class="fa fa-share-alt fa-fw"></i>
 							<span translate="indicator.cross_cutting"></span>
 						</a>
@@ -103,7 +103,7 @@
 				<div class="panel-collapse">
 					<div class="list-group">
 
-						<a ui-sref="main.project.reporting"
+						<a ui-sref="main.project.reporting.general"
 						   ui-sref-active="active"
 						   class="list-group-item"
 						   eat-click-if="!project._rev || !projectActivityReady"
@@ -113,7 +113,7 @@
 							<span translate="shared.reporting_general"></span>
 						</a>
 						
-						<a ui-sref="main.project.detailed_reporting"
+						<a ui-sref="main.project.reporting.detailed"
 						   ui-sref-active="active"
 						   class="list-group-item"
 						   eat-click-if="!project._rev || !projectActivityReady"
@@ -122,7 +122,7 @@
 							<span translate="project.reporting_compare_sites"></span>
 						</a>
 
-						<a ui-sref="main.project.olap"
+						<a ui-sref="main.project.reporting.olap"
 						   ui-sref-active="active"
 						   class="list-group-item"
 						   eat-click-if="!project._rev || !projectActivityReady"

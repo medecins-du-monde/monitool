@@ -47,22 +47,6 @@ angular.module('monitool.directives.shared', [])
 		}
 	})
 
-	.directive('docReminder', function() {
-		return {
-			restrict: 'E',
-			templateUrl: 'partials/doc-reminder.html',
-			scope: { 'pages': '@' },
-			link: function($scope) {
-				$scope.unreadPages = [];
-				$scope.pages.split(',').forEach(function(page) {
-					var elts = page.split('.');
-					if (!window.localStorage['doc.' + elts[1]])
-						$scope.unreadPages.push({block: elts[0], page: elts[1]});
-				});
-			}
-		}
-	})
-
 	.directive('disableIf', function() {
 		return {
 			retrict: 'A',

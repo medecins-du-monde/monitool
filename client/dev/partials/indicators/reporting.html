@@ -4,8 +4,6 @@
 	<li class="active" translate="shared.reporting"></li>
 </ol>
 
-<doc-reminder pages="indicators.indicator_reporting"></doc-reminder>
-
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">
 		<div class="col-sm-6">
@@ -75,14 +73,56 @@
 <table id="reporting" class="table table-bordered table-condensed">
 	<thead>
 		<tr>
-			<th class="noprint"></th>
-			<th></th>
-			<th translate="project.baseline"></th>
-			<th translate="project.target"></th>
-			<th ng-repeat="col in cols track by col.id" ng-bind="col.name"></th>
+			<th style="width: 30px" class="noprint"></th>
+			<th style="width: 30px" class="noprint"></th>
+			<th translate="shared.name"></th>
+			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody ng-repeat="(blockIndex, block) in blocks">
+		<tr>
+			<td ng-class="{noprint: open[blockIndex]}" style="text-align: center" rowspan="{{open[blockIndex] ? block.rows.length + 1 : 1}}">
+				<button class="btn btn-xs btn-default" ng-click="open[blockIndex] = !open[blockIndex]">
+					<i class="fa fa-angle-double-up" ng-if="open[blockIndex]"></i>
+					<i class="fa fa-angle-double-down" ng-if="!open[blockIndex]"></i>
+				</button>
+			</td>
+			<th class="indent0" colspan="{{2 + cols.length}}">{{block.text}}</th>
+		</tr>
+		
+		<tr ng-repeat="row in block.rows">
+			<td class="noprint" style="text-align: center">
+				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data' && row.cols" />
+			</td>
+
+			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{1 + cols.length}}">{{row.text}}</th>
+
+			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
+				<div class="pull-right">
+					<div class="btn-toolbar">
+						<div class="btn-group btn-group-xs">
+							<button ng-repeat="p in row.partitions"
+									class="btn btn-default"
+									ng-class="{active:splits[row.id] == p.id}"
+									ng-click="onSplitClick(row.id, p.id)">
+								{{p.name}}
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<i class="fa fa-arrow-circle-right" ng-if="row.isGroup"></i>
+				<label for="{{row.id}}">{{row.name}}</label>
+			</td>
+
+			<td ng-repeat="col in row.cols track by $index" reporting-field></td>
+			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);">{{row.message|translate}}</td>
+		</tr>
+
+	</tbody>
+
+	
+<!-- 	<tbody>
 		<tr ng-repeat="row in rows track by $index">
 			<td class="noprint" style="text-align: center">
 				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.cols" />
@@ -98,6 +138,6 @@
 
 
 		</tr>
-	</tbody>
+	</tbody> -->
 </table>
 

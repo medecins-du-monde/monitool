@@ -215,6 +215,22 @@ var validate = validator({
 					}
 				}
 			}
+		},
+
+		crossCutting: {
+			type: "object",
+			additionalProperties: false,
+			patternProperties: {
+				"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$": {
+					type: "object",
+					additionalProperties: false,
+					required: ["formula", "parameters"],
+					properties: {
+						formula: {type: "string", minLength: 1},
+						parameters: { $ref: "#/definitions/parameter_list" }
+					}
+				}
+			}
 		}
 	},
 
@@ -236,14 +252,13 @@ var validate = validator({
 			items: {
 				type: "object",
 				additionalProperties: false,
-				required: ["baseline", "target", "colorize", "display", "formula", "indicatorId", "parameters", "targetType", "unit"],
+				required: ["baseline", "target", "colorize", "display", "formula", "parameters", "targetType", "unit"],
 				properties: {
 					baseline: {oneOf: [{type: 'null'}, {type: 'number'}]},
 					target: {oneOf: [{type: 'null'}, {type: 'number'}]},
 					colorize: {type: "boolean"},
 					display: {type: "string", minLength: 1},
 					formula: {type: "string", minLength: 1},
-					indicatorId: {oneOf: [{$ref: "#/definitions/uuid"}, {type: 'null'}]},
 					targetType: {
 						type: "string",
 						enum: ['lower_is_better', 'higher_is_better', 'around_is_better', 'non_relevant']
@@ -252,26 +267,28 @@ var validate = validator({
 						type: "string",
 						enum: ["none", "%", "‰"]
 					},
-					parameters: {
-						type: "object",
-						additionalProperties: false,
-						patternProperties: {
-							".*": {
-								type: "object",
-								additionalProperties: false,
-								required: ["elementId", "filter"],
-								properties: {
-									elementId: {oneOf: [{$ref: "#/definitions/uuid"}, {type: 'null'}]},
-									filter: {
-										type: "object",
-										additionalProperties: false,
-										patternProperties: {
-											".*": {
-												type: "array",
-												items: {$ref: "#/definitions/uuid"}
-											}
-										}
-									}
+					parameters: { $ref: "#/definitions/parameter_list" }
+				}
+			}
+		},
+
+		parameter_list: {
+			type: "object",
+			additionalProperties: false,
+			patternProperties: {
+				".*": {
+					type: "object",
+					additionalProperties: false,
+					required: ["elementId", "filter"],
+					properties: {
+						elementId: {oneOf: [{$ref: "#/definitions/uuid"}, {type: 'null'}]},
+						filter: {
+							type: "object",
+							additionalProperties: false,
+							patternProperties: {
+								".*": {
+									type: "array",
+									items: {$ref: "#/definitions/uuid"}
 								}
 							}
 						}
@@ -536,29 +553,33 @@ module.exports = {
 	_removeUnlinkedInputs: removeUnlinkedInputs,
 
 	list: function(options, callback) {
-		if (options.mode === 'indicator_reporting')
-			database.view(
-				'shortlists',
-				'projects_by_indicator',
-				{
-					key: options.indicatorId,
-					include_docs: true,
-					reduce: false
-				},
-				function(error, result) {
-					callback(
-						null,
-						result.rows.map(function(row) {
-							removePasswords(row.doc);
-							return row.doc;
-						})
-					);
-				}
-			);
-
-		else if (options.mode === 'list')
+		if (options.mode === 'list')
 			database.view('shortlists', 'projects_short', {}, function(error, result) {
 				callback(null, result.rows.map(function(row) { return row.value; }));
+			});
+
+		else if (options.mode === 'crossCutting')
+			database.view('reporting', 'crosscutting', {key: options.indicatorId, include_docs: true}, function(error, result) {
+				var projects = result.rows.map(function(row) { return row.doc; });
+
+				// strip down project
+				projects.forEach(function(project) {
+					var cc = {}
+					cc[options.indicatorId] = project.crossCutting[options.indicatorId];
+					project.crossCutting = cc;
+
+					var used = {};
+					for (var key in project.crossCutting[options.indicatorId].parameters)
+						used[project.crossCutting[options.indicatorId].parameters[key].elementId] = true;
+
+					delete project.logicalFrames;
+					delete project.users;
+					delete project.themes;
+					project.forms.forEach(function(f) { f.elements = f.elements.filter(function(element) { return used[element.id]; }); });
+					project.forms = project.forms.filter(function(f) { return f.elements.length; });
+				});
+
+				callback(null, projects);
 			});
 
 		else
