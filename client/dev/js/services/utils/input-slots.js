@@ -3,10 +3,107 @@
 angular
 	.module('monitool.services.utils.input-slots', [])
 
-	.factory('InputSlots', function() {
+	.factory('InputSlots', function($rootScope, $locale, $filter) {
 		var formats = {year: 'YYYY', quarter: 'YYYY-[Q]Q', month: 'YYYY-MM', week: 'YYYY-[W]WW', day: 'YYYY-MM-DD'};
 
 		var InputSlots = {};
+
+		InputSlots.slotToPeriodicity = function(slot) {
+			var regexps = [
+				/^_total$/,
+				/^\d{4}$/,
+				/^\d{4}\-Q\d$/,
+				/^\d{4}\-\d{2}$/,
+				/^\d{4}\-W\d{2}$/,
+				/^\d{4}\-\d{2}\-\d{2}$/
+				];
+
+			console.log(regexps)
+			var index = regexps.findIndex(function(regexp) { return slot.match(regexp); });
+
+			return index !== -1 ? ['total', 'year', 'quarter', 'month', 'week', 'day'][index] : null;
+		};
+
+		InputSlots.dateToSlot = function(date, periodicity) {
+			switch (periodicity) {
+				case 'year':
+					return date.getUTCFullYear().toString();
+
+				case 'quarter':
+					return date.getUTCFullYear().toString() + '-Q' + (1 + Math.floor(date.getUTCMonth() / 3)).toString();
+
+				case 'month':
+					return date.toISOString().substring(0, 7);
+
+				case 'week':
+					return date.getUTCISOWeekYear().toString() + '-W' + date.getUTCISOWeek().toString();
+
+				case 'day':
+					return date.toISOString().substring(0, 10);
+			}
+
+			throw new Error('Invalid periodicity.');
+		};
+
+		InputSlots.slotToDate = function(slot) {
+			switch (InputSlots.slotToPeriodicity(slot)) {
+				case 'year':
+					return new Date(slot + '-01-01T00:00:00Z');
+
+				case 'quarter':
+					var month = (slot.substring(7, 8) - 1) * 3 + 1;
+					if (month < 10)
+						month = '0' + month;
+
+					return new Date(slot.substring(0, 5) + month + '-01T00:00:00Z');
+
+				case 'month':
+					return new Date(slot + '-01T00:00:00Z');
+
+				case 'week':
+					// 
+
+					return 'coucou';
+
+				case 'day':
+					return new Date(slot + 'T00:00:00Z');
+			}
+
+			throw new Error("Invalid slot");
+		};
+
+		InputSlots.slotToFormat = function(slot) {
+			switch (InputSlots.slotToPeriodicity(slot)) {
+				case 'total':
+					return "Total";
+
+				case 'year':
+					return slot;
+
+				case 'quarter':
+					if ($rootScope.language == 'fr') {
+						var trim = {"1": "1er", "2": "2ème", "3": "3ème", "4": "4ème"}
+						return trim[slot.substring(6)] + ' trimestre ' + slot.substring(0, 4);
+					}
+					else if ($rootScope.language == 'es') {
+						var trim = {"1": "Primer", "2": "Segundo", "3": "Tercero", "4": "Quarto"}
+						return trim[slot.substring(6)] + ' trimestre ' + slot.substring(0, 4);
+					}
+					else
+						return slot;
+
+				case 'month':
+					return $locale.DATETIME_FORMATS.STANDALONEMONTH[slot.substring(5, 7) - 1] + ' ' + slot.substring(0, 4);
+
+				case 'week':
+					return slot;
+
+				case 'day':
+					return $filter('date')(new Date(slot + 'T00:00:00Z'), 'mediumDate', 'utc');
+			}
+
+			throw new Error();
+		};
 
 		InputSlots.minDate = function(dates) {
 			return dates.reduce(function(d, memo) { return !memo || memo > d ? d : memo; });
@@ -50,43 +147,8 @@ angular
 		return InputSlots;
 	})
 
-	.filter('formatSlot', function($rootScope, $locale, $filter) {
-		return function(slot) {
-			if (slot == '_total')
-				return 'Total';
-
-			else {
-				var year = slot.match(/^\d{4}$/);
-				if (year)
-					return year[0];
-
-				else {
-					var quarter = slot.match(/^(\d{4})\-Q(\d)$/);
-					if (quarter) {
-						if ($rootScope.language == 'fr') {
-							var trim = {"1": "1er", "2": "2ème", "3": "3ème", "4": "4ème"}
-							return trim[quarter[2]] + ' trimestre ' + quarter[1];
-						}
-						else if ($rootScope.language == 'es') {
-							var trim = {"1": "Primer", "2": "Segundo", "3": "Tercero", "4": "Quarto"}
-							return trim[quarter[2]] + ' trimestre ' + quarter[1];
-						}
-						else
-							return slot;
-					}
-					else {
-						var month = slot.match(/^(\d{4})\-(\d{2})$/);
-						if (month)
-							return $locale.DATETIME_FORMATS.STANDALONEMONTH[month[2] - 1] + ' ' + month[1];
-						else
-							return $filter('date')(new Date(slot + 'T00:00:00Z'), 'mediumDate', 'utc');
-					}
-
-				}
-			}
-
-			return 'failed'
-		};
+	.filter('formatSlot', function(InputSlots) {
+		return InputSlots.slotToFormat;
 	});
 
 

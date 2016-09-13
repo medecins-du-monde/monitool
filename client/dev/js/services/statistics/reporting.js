@@ -24,10 +24,7 @@ angular
 				type = 'entity';
 
 			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1) {
-				var start = moment.utc(start).startOf(groupBy === 'week' ? 'isoWeek' : groupBy),
-					end   = moment.utc(end).endOf(groupBy === 'week' ? 'isoWeek' : groupBy),
-					slots = InputSlots.iterate(start, end, groupBy);
-
+				var slots = InputSlots.iterate(start, end, groupBy);
 				slots.push('_total');
 
 				return slots.map(function(slot) {

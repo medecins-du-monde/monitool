@@ -25,9 +25,6 @@ var files = {
 		'client/dev/bower_components/handsontable/dist/handsontable.full.css',
 	],
 	js: [
-		// Basic functionalities (dates, maths, fsm)
-		'client/dev/bower_components/moment/min/moment.min.js',
-
 		// PNG generation
 		'client/dev/bower_components/blob/Blob.js',
 		'client/dev/bower_components/canvas-to-Blob.js/canvas-toBlob.js',

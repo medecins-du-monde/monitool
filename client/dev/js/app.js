@@ -103,7 +103,7 @@ app.config(function($httpProvider) {
 		var stringifyDates = function(model) {
 			// transform dates
 			if (Object.prototype.toString.call(model) === '[object Date]')
-				return moment.utc(model).format('YYYY-MM-DD');
+				return model.toISOString().substring(0, 10);
 
 			// recurse
 			if (Array.isArray(model)) {

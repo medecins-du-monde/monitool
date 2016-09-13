@@ -6,7 +6,7 @@ angular.module('monitool.filters.shared', [])
 
 	.filter('length', function() {
 		return function(obj) {
-			return Object.keys(obj).length;
+			return obj ? Object.keys(obj).length : 0;
 		};
 	})
 

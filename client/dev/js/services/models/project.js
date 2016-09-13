@@ -77,55 +77,6 @@ angular
 		};
 
 		/**
-		 * Retrieve the list of all linked indicator ids.
-		 */
-		Project.prototype.getLinkedIndicatorIds = function() {
-			var projectIndicators = {};
-			this.logicalFrames.forEach(function(logicalFrame) {
-				logicalFrame.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
-				logicalFrame.purposes.forEach(function(purpose) {
-					purpose.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
-					purpose.outputs.forEach(function(output) {
-						output.indicators.forEach(function(i) { i.indicatorId && (projectIndicators[i.indicatorId] = true); });
-					});
-				});
-			});
-
-			return Object.keys(projectIndicators);
-		};
-
-		/**
-		 * Retrieve indicator planning by indicatorId.
-		 */
-		Project.prototype.getIndicatorPlanningById = function(indicatorId) {
-			var planning;
-
-			for (var lfIndex = 0; lfIndex < this.logicalFrames.length; ++lfIndex) {
-				var logicalFrame = this.logicalFrames[lfIndex];
-				
-				planning = logicalFrame.indicators.find(function(i) { return i.indicatorId === indicatorId; });
-				if (planning)
-					return planning;
-
-				for (var pIndex = 0; pIndex < logicalFrame.purposes.length; ++pIndex) {
-					var purpose = logicalFrame.purposes[pIndex];
-
-					planning = purpose.indicators.find(function(i) { return i.indicatorId === indicatorId; });
-					if (planning)
-						return planning;
-
-					for (var oIndex = 0; oIndex < purpose.outputs.length; ++oIndex) {
-						planning = purpose.outputs[oIndex].indicators.find(function(i) { return i.indicatorId === indicatorId; });
-						if (planning)
-							return planning;
-					}
-				}
-			}
-
-			return null;
-		};
-
-		/**
 		 * Add an entity to the project.
 		 */
 		Project.prototype.createEntity = function() {

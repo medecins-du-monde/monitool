@@ -14,7 +14,7 @@ angular.module('monitool.controllers.project.input', [])
 			$state.go(
 				'main.project.input.edit',
 				{
-					period: moment.utc($scope.newInputDate.date).format('YYYY-MM-DD'),
+					period: $scope.newInputDate.date.toISOString().substring(0, 10),
 					formId: form.id,
 					entityId: entityId
 				}
