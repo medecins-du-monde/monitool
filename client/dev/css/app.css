@@ -484,3 +484,9 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 .sortable-label-list {
   padding: 0 2px;
 }
+
+
+.navbar-toggle {
+  padding: 4px;
+  margin: 3px;
+}
