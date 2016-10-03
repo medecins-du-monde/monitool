@@ -63,54 +63,14 @@ var validate = validator({
 						items: {
 							type: "object",
 							additionalProperties: false,
-							required: ['id', 'name', 'timeAgg', 'geoAgg', 'partitions'],
+							required: ['id', 'name', 'timeAgg', 'geoAgg', 'colPartitions', 'rowPartitions'],
 							properties: {
 								id: { $ref: "#/definitions/uuid" },
 								name: { type: "string", minLength: 1 },
 								timeAgg: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
 								geoAgg: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
-								partitions: {
-									type: "array",
-									items: {
-										type: "object",
-										additionalProperties: false,
-										required: ['id', 'name', 'aggregation', 'elements', 'groups'],
-										properties: {
-											id: { $ref: "#/definitions/uuid" },
-											name: { type: "string", minLength: 1 },
-											aggregation: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
-											elements: {
-												type: "array",
-												items: {
-													type: "object",
-													additionalProperties: false,
-													required: ['id', 'name'],
-													properties: {
-														id: { $ref: "#/definitions/uuid" },
-														name: { type: "string", minLength: 1 }
-													}
-												}
-											},
-
-											groups: {
-												type: "array",
-												items: {
-													type: "object",
-													additionalProperties: false,
-													required: ['id', 'name', 'members'],
-													properties: {
-														id: { $ref: "#/definitions/uuid" },
-														name: { type: "string", minLength: 1 },
-														members: {
-															type: "array",
-															items: { $ref: "#/definitions/uuid" }
-														}
-													}
-												}
-											}
-										}
-									}
-								}
+								colPartitions: { $ref: "#/definitions/partitions" },
+								rowPartitions: { $ref: "#/definitions/partitions" }
 							}
 						}
 					}
@@ -247,6 +207,50 @@ var validate = validator({
 			type: "string",
 			pattern: "^[0-9]+\\-[0-9a-f]{32}$"
 		},
+
+		partitions: {
+			type: "array",
+			items: {
+				type: "object",
+				additionalProperties: false,
+				required: ['id', 'name', 'aggregation', 'elements', 'groups'],
+				properties: {
+					id: { $ref: "#/definitions/uuid" },
+					name: { type: "string", minLength: 1 },
+					aggregation: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
+					elements: {
+						type: "array",
+						items: {
+							type: "object",
+							additionalProperties: false,
+							required: ['id', 'name'],
+							properties: {
+								id: { $ref: "#/definitions/uuid" },
+								name: { type: "string", minLength: 1 }
+							}
+						}
+					},
+
+					groups: {
+						type: "array",
+						items: {
+							type: "object",
+							additionalProperties: false,
+							required: ['id', 'name', 'members'],
+							properties: {
+								id: { $ref: "#/definitions/uuid" },
+								name: { type: "string", minLength: 1 },
+								members: {
+									type: "array",
+									items: { $ref: "#/definitions/uuid" }
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
 		indicators: {
 			type: "array",
 			items: {
@@ -356,9 +360,13 @@ function correctFormInputs(oldForm, newForm, inputs) {
 		var oldElement = oldForm.elements.filter(function(el) { return el.id == newElement.id});
 		oldElement = oldElement.length ? oldElement[0] : null;
 
+		// Create partitions from the 2 lists
+		var oldPartitions = oldElement ? oldElement.rowPartitions.concat(oldElement.colPartitions) : null;
+		var newPartitions = newElement.rowPartitions.concat(newElement.colPartitions);
+
 		// Compute new form element size.
 		var newSize = 1;
-		newElement.partitions.forEach(function(partition) { newSize *= partition.elements.length });
+		newPartitions.forEach(function(partition) { newSize *= partition.elements.length });
 
 		// if the form element did not exist before, fill with zeros.
 		if (!oldElement) {
@@ -376,7 +384,7 @@ function correctFormInputs(oldForm, newForm, inputs) {
 				// Iterate on all fields from old input.
 				input.values[oldElement.id].forEach(function(field, fieldIndex) {
 					// which partition does this field correspond to?
-					var peIds = getPartitionElementIds(oldElement.partitions, fieldIndex).sort();
+					var peIds = getPartitionElementIds(oldPartitions, fieldIndex).sort();
 
 					// compute all possibles partitions sums for this field.
 					var numSubsets = Math.pow(2, peIds.length);
@@ -397,7 +405,7 @@ function correctFormInputs(oldForm, newForm, inputs) {
 				for (var fieldIndex = 0; fieldIndex < newSize; ++fieldIndex) {
 					// now that we have our index and value, we have to guess from which partition elements
 					// they come from.
-					var key = getPartitionElementIds(newElement.partitions, fieldIndex).sort().join('.');
+					var key = getPartitionElementIds(newPartitions, fieldIndex).sort().join('.');
 					input.values[newElement.id][fieldIndex] = decodedValues[key] || 0;
 				}
 
@@ -421,18 +429,17 @@ function correctFormInputs(oldForm, newForm, inputs) {
 function extractRelevantInformation(form) {
 	return JSON.stringify(
 		form.elements.map(function(element) {
-			return [
-				element.id,
-				// the order of partitions matters => to not sort!
-				element.partitions.map(function(partition) {
-					// the order of partition elements matters => to not sort!
-					return [partition.id].concat(
-						partition.elements.map(function(partitionElement) {
-							return partitionElement.id;
-						})
-					);
-				})
-			];
+			// the order of partitions matters => to not sort!
+			var partitions = element.rowPartitions.concat(element.colPartitions).map(function(partition) {
+				// the order of partition elements matters => to not sort!
+				return [partition.id].concat(
+					partition.elements.map(function(partitionElement) {
+						return partitionElement.id;
+					})
+				);
+			});
+
+			return [element.id, partitions ];
 			// the order of elements does not matters => sort by id to avoid rewriting all inputs for nothing.
 		}).sort(function(el1, el2) { return el1[0].localeCompare(el2[0]); })
 	);

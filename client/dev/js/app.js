@@ -14,7 +14,7 @@ var app = angular.module('monitool.app', [
 	'monitool.directives.form',
 	'monitool.directives.shared',
 	'monitool.directives.indicatorForm',
-	'monitool.directives.projectLogframe',
+	'monitool.directives.pdfExport',
 	'monitool.directives.reporting',
 
 	'monitool.filters.shared',

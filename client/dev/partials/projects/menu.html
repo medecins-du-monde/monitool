@@ -77,6 +77,34 @@
 				</div>
 			</div>
 			
+			<div class="panel panel-default" acl-has-project-role="input">
+				<div class="panel-heading">
+					<h4 class="panel-title" translate="project.input"></h4>
+				</div>
+
+				<div class="panel-collapse">
+					<div class="list-group">
+
+						<a ui-sref="main.project.input.list({formId: form.id})"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   ng-repeat="form in master.forms"
+						   eat-click-if="!project._rev || !projectActivityReady"
+						   disable-if="!project._rev || !projectActivityReady">
+							<i class="fa fa-pencil fa-fw"></i>
+							<span>{{form.name}}</span>
+						</a>
+						
+
+						<a class="list-group-item" ng-if="!master.forms.length" disable-if="1">
+							<i class="fa fa-pencil fa-fw"></i>
+							<span translate="project.no_data_source"></span>
+						</a>
+
+					</div>
+				</div>
+			</div>
+			
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title" translate="shared.reporting"></h4>
@@ -116,33 +144,6 @@
 				</div>
 			</div>
 
-			<div class="panel panel-default" acl-has-project-role="input">
-				<div class="panel-heading">
-					<h4 class="panel-title" translate="project.input"></h4>
-				</div>
-
-				<div class="panel-collapse">
-					<div class="list-group">
-
-						<a ui-sref="main.project.input.list({formId: form.id})"
-						   ui-sref-active="active"
-						   class="list-group-item"
-						   ng-repeat="form in master.forms"
-						   eat-click-if="!project._rev || !projectActivityReady"
-						   disable-if="!project._rev || !projectActivityReady">
-							<i class="fa fa-pencil fa-fw"></i>
-							<span>{{form.name}}</span>
-						</a>
-						
-
-						<a class="list-group-item" ng-if="!master.forms.length" disable-if="1">
-							<i class="fa fa-pencil fa-fw"></i>
-							<span translate="project.no_data_source"></span>
-						</a>
-
-					</div>
-				</div>
-			</div>
 
 
 			<div class="panel panel-default" ng-if="userCtx.type == 'user'">

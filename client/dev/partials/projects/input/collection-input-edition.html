@@ -15,37 +15,14 @@
 			   ng-if="lastInput" class="noprint"><i class="fa fa-clipboard"></i></a>
 
 			{{element.name}}<br/>
-
-			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 1" class="noprint">
-				<span style="font-weight: normal" translate="project.field_order"></span>
-				<div class="btn-group btn-group-xxs">
-					<a ng-click="rotate(-1, element)" class="btn btn-default"><i class="fa fa-caret-left"></i></a>
-					<a class="btn btn-default" disabled>{{rotations[element.id] + 1}}</a>
-					<a ng-click="rotate(1, element)" class="btn btn-default"><i class="fa fa-caret-right"></i></a>
-				</div>
-			</div>
-
-			<div style="margin-bottom: 5px" ng-if="element.partitions.length > 2" class="noprint">
-				<span style="font-weight: normal" translate="project.field_distribution"></span>
-				<div class="btn-group btn-group-xxs">
-					<a ng-click="move(-1, element)" class="btn btn-default"><i class="fa fa-caret-left"></i></a>
-					<a class="btn btn-default" disabled>
-						C{{positions[element.id] + 1}}
-						L{{element.partitions.length - positions[element.id] - 1}}
-					</a>
-					<a ng-click="move(1, element)" class="btn btn-default"><i class="fa fa-caret-right"></i></a>
-				</div>
-			</div>
-
 		</label>
 
 		<div class="col-sm-10">
 			{{partitions[element.id]}}
 
 			<input-grid ng-model="currentInput.values[element.id]"
-						partitions="element.partitions"
-						offset="positions[element.id]"
-						rotation="rotations[element.id]"></input-grid>
+						col-partitions="element.colPartitions"
+						row-partitions="element.rowPartitions"></input-grid>
 		</div>
 	</div>
 </form>

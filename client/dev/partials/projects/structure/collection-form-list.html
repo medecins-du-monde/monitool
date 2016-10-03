@@ -18,11 +18,12 @@
 			<th translate="shared.end"></th>
 			<th translate="project.periodicity"></th>
 			<th translate="project.collect"></th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody ng-if="project.forms.length == 0">
 		<tr>
-			<td colspan="7" style="text-align: center" translate="project.no_forms"></td>
+			<td colspan="8" style="text-align: center" translate="project.no_forms"></td>
 		</tr>
 	</tbody>
 	<tbody ng-if="project.forms.length != 0" ng-sortable="{handle: '.handle'}">
@@ -41,11 +42,17 @@
 			
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>{{'project.collects.' + form.collect|translate}}</td>
+			<td>
+				<a class="btn btn-danger btn-xxs" pdf-export-source="form">
+					<i class="fa fa-file-pdf-o"></i>
+					<span translate="shared.download"></span>
+				</a>
+			</td>
  		</tr>
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="6" style="text-align: center">
+			<td colspan="8" style="text-align: center">
 				<a class="btn btn-default btn-xs" ng-click="createForm()">
 					<i class="fa fa-plus"></i>
 					<span translate="shared.add"></span>

@@ -101,41 +101,6 @@ angular.module('monitool.controllers.project.input', [])
 		// Can user edit this input?
 		$scope.canEdit = $scope.project.canEditInputsOnEntity($scope.currentInput.entity);
 
-		// Handle rotations.
-		$scope.rotations  = {};
-		$scope.positions  = {};
-
-		$scope.move = function(offset, element) {
-			var numPositions = element.partitions.length - 1;
-			$scope.positions[element.id]
-				= window.localStorage['input.position.' + element.id]
-				= ((($scope.positions[element.id] + offset) % numPositions) + numPositions) % numPositions;
-
-			if (typeof $scope.positions[element.id] != "number" || !isFinite($scope.positions[element.id]))
-				$scope.positions[element.id] = 0;
-		};
-
-		$scope.rotate = function(offset, element) {
-			var numPermutations = Math.factorial(element.partitions.length);
-			$scope.rotations[element.id]
-				= window.localStorage['input.rotation.' + element.id]
-				= ((($scope.rotations[element.id] + offset) % numPermutations) + numPermutations) % numPermutations;
-
-			if (typeof $scope.rotations[element.id] != "number" || !isFinite($scope.rotations[element.id]))
-				$scope.rotations[element.id] = 0;
-		};
-
-		form.elements.forEach(function(element) {
-			$scope.rotations[element.id] = (window.localStorage['input.rotation.' + element.id] % Math.factorial(element.partitions.length)) || 0
-			if (window.localStorage['input.position.' + element.id] != undefined)
-				$scope.positions[element.id] = window.localStorage['input.position.' + element.id] % (element.partitions.length - 1);
-			else
-				$scope.positions[element.id] = Math.floor(element.partitions.length / 2)
-
-			$scope.rotate(0, element);
-			$scope.move(0, element);
-		});
-
 		$scope.save = function() {
 			pageChangeWatch()
 			$scope.currentInput.$save(function() { $state.go('main.project.input.list'); });

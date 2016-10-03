@@ -87,23 +87,24 @@
 				<th style="width: 30px"></th>
 				<th style="min-width: 200px" translate="project.variable"></th>
 				<th translate="project.aggregation" style="width: 140px"></th>
-				<th translate="project.partitions"></th>
+				<th translate="project.partitions" colspan="2"></th>
 				<th style="width: 30px"></th>
 			</tr>
 		</thead>
-		<tbody ng-sortable="variableSortOptions" ng-mouseenter="onSortableMouseEvent('variable', true)" ng-mouseleave="onSortableMouseEvent('variable', false)">
-			<!-- variable row -->
-			<tr ng-repeat="element in project.forms[currentFormIndex].elements track by element.id">
+		<tbody ng-sortable="variableSortOptions">
 
-				<td class="handle variable-handle"><i class="fa fa-bars"></i></td>
+			<!-- variable row -->
+			<tr ng-repeat-start="element in project.forms[currentFormIndex].elements track by element.id">
+
+				<td rowspan="2" class="handle variable-handle"><i class="fa fa-bars"></i></td>
 
 				<!-- variable name -->
-				<td>
+				<td rowspan="2">
 					<textarea full-height type="text" ng-model="element.name" required class="form-control"></textarea>
 				</td>
 				
 				<!-- variable aggregation -->
-				<td>
+				<td rowspan="2">
 					{{'project.sites_agg'|translate}}<br/>
 					<select ng-model="element.geoAgg">
 						<option value="none" translate="project.none"></option>
@@ -126,17 +127,21 @@
 				</td>
 
 				<!-- variable partitions -->
+				<td style="text-align: center; vertical-align: middle">
+					<i class="fa fa-columns fa-rotate-270"></i>
+				</td>
+
 				<td style="position: relative; padding-bottom: 23px; ">
-					<span translate="project.no_partitions" ng-if="element.partitions.length == 0"></span>
+					<span translate="project.no_partitions" ng-if="element.rowPartitions.length == 0"></span>
 
-					<ul ng-sortable="partitionSortOptions"
-					    ng-mouseenter="onSortableMouseEvent('partition', true)"
-					    ng-mouseleave="onSortableMouseEvent('partition', false)">
+					<ul ng-sortable="{handle: '.partition-handle', group: element.id, onStart: dragStart, onEnd: dragEnd}"
+					    ng-mouseenter="onSortableMouseEvent(true)"
+					    ng-mouseleave="onSortableMouseEvent(false)">
 
-						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
+						<li ng-repeat="partition in element.rowPartitions" style="margin-bottom: 2px">
 
 							<a class="btn btn-xxs btn-default pull-right"
-							   ng-click="editPartition(element.id, partition.id)">
+							   ng-click="editPartition(element.rowPartitions, partition)">
 
 								<i class="fa fa-fw fa-pencil"></i>
 								<span translate="shared.edit"></span>
@@ -146,29 +151,17 @@
 
 							<strong>{{partition.name}}</strong>
 							
-							<span class="sortable-label-list"
-								  ng-sortable="groupSortOptions"
-								  ng-mouseenter="onSortableMouseEvent('group', true)"
-								  ng-mouseleave="onSortableMouseEvent('group', false)">
-
-								<span ng-repeat="group in partition.groups">
-									<span class="label label-info"><i class="fa fa-arrow-circle-right"></i> {{group.name}}</span>
-								</span>
+							<span ng-repeat="group in partition.groups">
+								<span class="label label-info"><i class="fa fa-arrow-circle-right"></i> {{group.name}}</span>
 							</span>
 							
-							<span class="sortable-label-list"
-								  ng-sortable="elementSortOptions"
-								  ng-mouseenter="onSortableMouseEvent('element', true)"
-								  ng-mouseleave="onSortableMouseEvent('element', false)">
-
-								<span ng-repeat="element in partition.elements">
-									<span class="label label-default">{{element.name}}</span>
-								</span>
+							<span ng-repeat="element in partition.elements">
+								<span class="label label-default">{{element.name}}</span>
 							</span>
 						</li>
 					</ul>
 
-					<a ng-click="editPartition(element.id, null)"
+					<a ng-click="editPartition(element.rowPartitions, null)"
 					   class="btn btn-xxs btn-default"
 					   style="position: absolute; bottom: 4px; right: 3px">
 						<i class="fa fa-plus"></i>
@@ -177,17 +170,62 @@
 				</td>
 
 				<!-- variable actions -->
-				<td>
+				<td rowspan="2">
 					<a class="btn btn-danger btn-sm" ng-click="remove(element, project.forms[currentFormIndex].elements)">
 						<i class="fa fa-remove"></i>
 					</a>
 				</td>
  			</tr>
+ 			<tr ng-repeat-end>
+				<td style="text-align: center; vertical-align: middle">
+					<i class="fa fa-columns"></i>
+				</td>
+
+				<td style="position: relative; padding-bottom: 23px; ">
+					<span translate="project.no_partitions" ng-if="element.colPartitions.length == 0"></span>
+
+
+					<ul ng-sortable="{handle: '.partition-handle', group: element.id, onStart: dragStart, onEnd: dragEnd}"
+					    ng-mouseenter="onSortableMouseEvent(true)"
+					    ng-mouseleave="onSortableMouseEvent(false)">
+
+						<li ng-repeat="partition in element.colPartitions" style="margin-bottom: 2px">
+
+							<a class="btn btn-xxs btn-default pull-right"
+							   ng-click="editPartition(element.colPartitions, partition)">
+
+								<i class="fa fa-fw fa-pencil"></i>
+								<span translate="shared.edit"></span>
+							</a>
+
+							<i class="fa fa-bars partition-handle"></i>
+
+							<strong>{{partition.name}}</strong>
+							
+							<span ng-repeat="group in partition.groups">
+								<span class="label label-info"><i class="fa fa-arrow-circle-right"></i> {{group.name}}</span>
+							</span>
+							
+							<span ng-repeat="element in partition.elements">
+								<span class="label label-default">{{element.name}}</span>
+							</span>
+						</li>
+					</ul>
+
+					<a ng-click="editPartition(element.colPartitions, null)"
+					   class="btn btn-xxs btn-default"
+					   style="position: absolute; bottom: 4px; right: 3px">
+						<i class="fa fa-plus"></i>
+						<span translate="project.add_partition"></span>
+					</a>
+				</td>
+
+ 			</tr>
 		</tbody>
 		<tfoot>
  			<!-- add new variable row --> 
 			<tr>
-				<td colspan="5" style="text-align: center">
+				<td colspan="6" style="text-align: center">
 					<a ng-click="newVariable()" class="btn btn-xs btn-default">
 						<i class="fa fa-plus"></i>
 						<span translate="project.add_variable"></span>

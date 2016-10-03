@@ -563,15 +563,12 @@ angular
 		/////////////////////
 		
 		$scope.variableSortOptions = {handle: '.variable-handle'};
-		$scope.partitionSortOptions = {handle: '.partition-handle'};
-		$scope.elementSortOptions = {};
-		$scope.groupSortOptions = {};
 
-		$scope.onSortableMouseEvent = function(group, enter) {
-			if (group == 'partition')
-				$scope.variableSortOptions.disabled = enter;
-			else if (group == 'element' || group == 'group')
-				$scope.variableSortOptions.disabled = $scope.partitionSortOptions.disabled = enter;
+		$scope.dragStart = function() { document.body.classList.add('dragging'); };
+		$scope.dragEnd = function() { document.body.classList.remove('dragging'); };
+
+		$scope.onSortableMouseEvent = function(enter) {
+			$scope.variableSortOptions.disabled = enter;
 		};
 
 		// Put the form index in the scope to be able to access it without searching each time.
@@ -630,11 +627,7 @@ angular
 			$scope.dataSourceForm.$setValidity('elementsLength', length >= 1);
 		});
 
-		$scope.editPartition = function(elementId, partitionId) {
-			// Retrieve master and current partition
-			var currentElement = $scope.project.forms[$scope.currentFormIndex].elements.find(function(e) { return e.id === elementId; })
-			var currentPartition = currentElement.partitions.find(function(p) { return p.id === partitionId; });
-
+		$scope.editPartition = function(currentList, currentPartition) {
 			$uibModal.open({
 				controller: 'PartitionEditionModalController',
 				templateUrl: 'partials/projects/structure/partition-modal.html',
@@ -642,16 +635,18 @@ angular
 				resolve: { currentPartition: function() { return currentPartition; } }
 			}).result.then(function(updatedPartition) {
 				if (currentPartition && !updatedPartition)
-					currentElement.partitions.splice(currentElement.partitions.indexOf(currentPartition), 1);
+					currentList.splice(currentList.indexOf(currentPartition), 1);
 				else if (currentPartition && updatedPartition)
-					currentElement.partitions[currentElement.partitions.indexOf(currentPartition)] = updatedPartition;
+					currentList[currentList.indexOf(currentPartition)] = updatedPartition;
 				else if (!currentPartition && updatedPartition)
-					currentElement.partitions.push(updatedPartition);
+					currentList.push(updatedPartition);
 			});
 		};
 
 		$scope.newVariable = function() {
-			$scope.project.forms[$scope.currentFormIndex].elements.push({id: uuid.v4(), name: "", partitions: [], geoAgg: 'sum', timeAgg: 'sum'});
+			$scope.project.forms[$scope.currentFormIndex].elements.push({
+				id: uuid.v4(), name: "", rowPartitions: [], colPartitions: [], geoAgg: 'sum', timeAgg: 'sum'
+			});
 		};
 		
 		$scope.remove = function(item, target) {
