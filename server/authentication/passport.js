@@ -83,7 +83,7 @@ var strategy = new OAuth2Strategy(
 			
 			User.get(userId, function(error, user) {
 				if (error) {
-					user = {_id: userId, type: 'user', name: profile.name, roles: []};
+					user = {_id: userId, type: 'user', name: profile.name, role: 'common'};
 					User.set(user, function(error, result) {
 						done(null, user);
 					});
