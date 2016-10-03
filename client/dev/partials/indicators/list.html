@@ -1,41 +1,30 @@
-<a class="btn btn-primary pull-right" ng-click="createIndicator()" acl-has-role="indicator">
-	<i class="fa fa-plus"></i>
-	<span translate="indicator.create_new"></span>
-</a>
 
-<div acl-lacks-role="indicator" class="pull-right" tooltip="{{'indicator.cant_create'|translate}}" tooltip-placement="left" style="cursor: not-allowed">
-	<a class="btn btn-primary disabled">
-		<i class="fa fa-plus"></i>
-		<span translate="indicator.create_new"></span>
-	</a>
+
+<ol class="breadcrumb">
+	<li class="active" translate="indicator.cross_cutting"></li>
+</ol>
+
+<div>
+	<div class="panel panel-default indicator-panel" ng-repeat="indicator in indicators|orderBy:getName">
+		<div class="panel-heading">
+			<div class="panel-title">{{indicator.name[language]}}</div>
+		</div>
+		<div class="panel-body">
+			<i class="fa fa-circle "
+			   tooltip="theme.name[language]"
+			   style="margin-right: 3px"
+			   ng-repeat="theme in indicator.themes|getObjects:themes"
+			   ng-class="theme.class">
+
+				{{theme.name[language]}}
+			</i>
+
+			<div>{{indicator.description[language]}}</div>
+			
+			<a ui-sref="main.indicator_reporting({indicatorId: indicator._id})" class="btn btn-xxs btn-default">
+				voir les statistiques
+			</a>
+	  </div>
+	</div>
 </div>
-
-<br/>
-<br/>
-
-<table class="table table-condensed table-striped table-bordered">
-	<thead>
-		<tr>
-			<th translate="shared.name"></th>
-			<th style="width: 150px"></th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-repeat="indicator in indicators|orderBy:getName">
-			<td>
-				<a ui-sref="main.indicator.edit({indicatorId: indicator._id})">
-					{{indicator.name[language]}}
-				</a>
-
-				<span style="margin-left: 3px" class="label pull-right" ng-class="theme.class" ng-repeat="theme in indicator.themes|getObjects:themes">{{theme.name[language]}}</span>
-			</td>
-			<td style="text-align: center">
-				<a class="btn btn-default btn-xxs" ui-sref="main.indicator.reporting({indicatorId: indicator._id})">
-					<i class="fa fa-line-chart"></i>
-					Voir les statistiques
-				</a>
-			</td>
-		</tr>
-	</tbody>
-</table>
 

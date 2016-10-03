@@ -1,63 +1,23 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.admin.users" translate="shared.settings"></a></li>
-	<li class="active" translate="indicator.themes_list"></li>
+	<li class="active" translate="theme.themes"></li>
 </ol>
 
-<table class="table table-stripped table-bordered table-condensed">
-	<thead>
-		<tr>
-			<th ng-repeat="(code, language) in languages">{{('menu.'+language)|translate}}</th>
-			<th style="width:80px" translate="indicator.num_projects"></th>
-			<th style="width:80px" translate="indicator.num_indicators"></th>
-			<th style="width:225px"></th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-repeat="(entityIndex, entity) in entities track by entity._id">
-			<td ng-repeat="(code, language) in languages">
-				<ng-form name="entityForm">
-					<div class="form-group" show-errors style="margin: 0">
-						<div class="input-group">
-							<input type="text" name="name" ng-model="entity.name[code]" class="form-control input-sm" required />
-	 						
-							<span class="input-group-addon">
-								<div dropdown>
-									<span id="single-button" dropdown-toggle>
-										<i class="fa fa-language"></i>
-									</span>
+<div class="alert alert-info" translate="theme.list_info"></div>
 
-									<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="single-button">
-										<li ng-class="{disabled:!entity.name[codeInner]}" role="menuitem" ng-repeat="(codeInner, languageInner) in languages" ng-if="code != codeInner">
-											<a ng-click="translate(entityIndex, code, codeInner)">{{('indicator.translate_from_' + codeInner)|translate}}</a>
-										</li>
-									</ul>
-								</div>
-							</span>
-						</div>
-					</div>
-				</ng-form>
-			</td>
-			<td>{{entity.__projectUsage || 0}}</td>
-			<td>{{entity.__indicatorUsage || 0}}</td>
-			<td>
-				<a class="btn btn-primary btn-xs" ng-click="save(entityIndex)" ng-disabled="!entity.name || !hasChanged(entityIndex)">
-					<i class="fa fa-floppy-o"></i>
-					<span translate="shared.save"></span>
-				</a>
-				<a class="btn btn-danger btn-xs" ng-disabled="entity.__projectUsage || entity.__indicatorUsage" ng-click="remove(entityIndex)">
-					<i class="fa fa-remove"></i>
-					<span translate="shared.delete"></span>
-				</a>
-			</td>
-		</tr>
-		<tr>
-			<!-- should be len(languages + 3) -->
-			<td colspan="6" style="text-align: center">
-				<a class="btn btn-default btn-xs" ng-click="create()">
-					<i class="fa fa-plus"></i>
-					<span translate="shared.add"></span>
-				</a>
-			</td>
-		</tr>
-	</tbody>
-</table>
+<div>
+	<div class="panel panel-primary indicator-panel">
+		<div class="panel-body">
+			<span translate="theme.new_theme"></span>
+
+			<a ng-click="create()" class="btn btn-xxs btn-primary" translate="theme.create_new"></a>
+	  </div>
+	</div><div class="panel panel-default indicator-panel" ng-repeat="theme in themes">
+		<div class="panel-body">
+			{{theme.name[language]}}
+
+			<a ng-click="edit(theme)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
+	  </div>
+	</div>
+</div>
+

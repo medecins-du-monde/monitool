@@ -4,7 +4,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="display-input" class="col-sm-2 control-label" translate="project.display"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.display">
+			<div class="col-sm-10">
 				<input class="form-control" id="display-input" name="display" ng-model="planning.display" placeholder="{{'project.display_ph'|translate}}" required />
 				<p class="help-block" ng-if="planningForm.display.$error.required" translate="form.mandatory"></p>
 			</div>
@@ -12,21 +12,21 @@
 
 		<div class="form-group">
 			<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.baseline">
+			<div class="col-sm-10">
 				<optional-number ng-model="planning.baseline" default="0"></optional-number>
 			</div>
 		</div>
 
 		<div class="form-group">
 			<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.target">
+			<div class="col-sm-10">
 				<optional-number ng-model="planning.target" default="100"></optional-number>
 			</div>
 		</div>
 
 		<div class="form-group">
 			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.colorize">
+			<div class="col-sm-10">
 				<input id="colorize-input"
 					   type="checkbox"
 					   ng-model="planning.colorize"
@@ -36,7 +36,7 @@
 
 		<div class="form-group">
 			<label for="targetType-input" class="col-sm-2 control-label" translate="indicator.target"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.targetType">
+			<div class="col-sm-10">
 				<select id="input-target" class="form-control" ng-model="planning.targetType" required>
 					<option value="lower_is_better" translate="indicator.lower_is_better"></option>
 					<option value="higher_is_better" translate="indicator.higher_is_better"></option>
@@ -48,7 +48,7 @@
 
 		<div class="form-group">
 			<label for="unit-input" class="col-sm-2 control-label" translate="indicator.unit"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.unit">
+			<div class="col-sm-10">
 				<select id="input-unit" name="unit" ng-model="planning.unit" class="form-control" required>
 					<option value="none" translate="indicator.other"></option>
 					<option value="%" translate="indicator.percent"></option>
@@ -59,7 +59,7 @@
 
 		<div class="form-group">
 			<label for="formula-input" class="col-sm-2 control-label" translate="project.formula"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="planning.formula">
+			<div class="col-sm-10">
 				<input expression id="colorize-input" class="form-control" ng-model="planning.formula" />
 			</div>
 		</div>
@@ -103,12 +103,12 @@
 </div>
 
 <div class="modal-footer">
-	<button ng-click="save()" ng-disabled="planningForm.$invalid" class="btn btn-primary" acl-has-project-role="owner">
+	<button ng-click="save()" ng-disabled="planningForm.$invalid" class="btn btn-primary">
 		<i class="fa fa-object-group"></i>
 		<span translate="project.update_logframe"></span>
 	</button>
 
-	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew" acl-has-project-role="owner">
+	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew">
 		<i class="fa fa-remove"></i>
 		<span translate="shared.delete"></span>
 	</button>

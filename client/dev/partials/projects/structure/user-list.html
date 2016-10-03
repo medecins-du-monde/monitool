@@ -1,22 +1,18 @@
-<ol class="breadcrumb">
+<ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
 	<li class="active" translate="project.users"></li>
 </ol>
 
-
-<div class="alert alert-info">
-	<p>Plusieurs types d'utilisateurs interviennent dans la mise en place et dans le suivi d'un projet: coordination, staff M&amp;E, opérateurs de saisie, partenaires, ...</p>
-	<p>Listez ici tous les utilisateurs qui doivent avoir accès au monitoring du projet.</p>
-</div>
+<div class="alert alert-info" translate="project.users_list_info"></div>
 
 <legend translate="project.users"></legend>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th style="width: 30px" acl-has-project-role="owner"></th>
-			<th style="width: 30px" ></th>
+			<th style="width: 30px"></th>
+			<th style="width: 30px"></th>
 			<th translate="shared.name"></th>
 			<th translate="project.user_role"></th>
 			<th translate="project.collection_site_list"></th>
@@ -30,14 +26,13 @@
 
 	<tbody ng-if="project.users.length != 0" ng-sortable="{handle: '.handle'}">
 		<tr ng-repeat="user in project.users">
-			<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
+			<td class="handle"><i class="fa fa-bars"></i></td>
 
 			<td style="text-align: center">
 				<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
 			</td>
 			<td>
-				<a ng-click="editUser(user)" acl-has-project-role="owner">{{user.name || users[user.id].name}}</a>
-				<span acl-lacks-project-role="owner">{{user.name || users[user.id].name}}</span>
+				<a ng-click="editUser(user)">{{user.name || users[user.id].name}}</a>
 			</td>
 			<td>{{('project.user_roles.' + user.role)|translate}}</td>
 			<td>
@@ -45,7 +40,7 @@
 			</td>
 		</tr>
 	</tbody>
-	<tfoot acl-has-project-role="owner">
+	<tfoot>
 		<tr>
 			<td colspan="5" style="text-align: center">
 				<a class="btn btn-default btn-xs" ng-click="editUser()">

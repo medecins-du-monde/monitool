@@ -61,25 +61,5 @@ module.exports = {
 					});
 			}.toString()
 		},
-
-		indicators_short: {
-			map: function(doc) {
-				if (doc.type === 'indicator')
-					emit(doc._id, {name: doc.name, standard: doc.standard});
-			}.toString()
-		},
-
-		themes_short: {
-			map: function(doc) {
-				if (doc.type === 'indicator')
-					doc.themes.forEach(function(themeId) {
-						emit(themeId, {usage: 1});
-					});
-				else if (doc.type === 'theme')
-					emit(doc._id, {name: doc.name});
-			}.toString(),
-			reduce: reduceTypeTheme
-		}
-
 	}
 };

@@ -5,6 +5,7 @@
 	</div>
 
 	<input type="text" 
+			ng-if="specifyDate"
 		   uib-datepicker-popup="longDate"
 		   name="start"
 		   ng-model="chosenDate"
@@ -13,4 +14,7 @@
 		   ng-disabled="!specifyDate"
 		   ng-required="specifyDate"
 		   class="form-control" />
+
+	<input type="text" ng-if="!specifyDate" value="{{message|translate}}" disabled class="form-control disabled" />
+
 </div>

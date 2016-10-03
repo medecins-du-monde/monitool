@@ -126,68 +126,18 @@ var FRENCH_LOCALE = (function() {
 })();
 
 
-
-
-// 	{
-// 	id: "fr-fr",
-// 	DATETIME_FORMATS: {
-// 		AMPMS: [ "AM", "PM" ],
-// 		DAY: [ "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi" ],
-// 		MONTH: [ "janvier", "f\u00e9vrier", "mars", "avril", "mai", "juin", "juillet", "ao\u00fbt", "septembre", "octobre", "novembre", "d\u00e9cembre" ],
-// 		SHORTDAY: [ "dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam." ],
-// 		SHORTMONTH: [ "janv.", "f\u00e9vr.", "mars", "avr.", "mai", "juin", "juil.", "ao\u00fbt", "sept.", "oct.", "nov.", "d\u00e9c." ],
-// 		fullDate: "EEEE d MMMM y",
-// 		longDate: "d MMMM y",
-// 		medium: "d MMM y HH:mm:ss",
-// 		mediumDate: "d MMM y",
-// 		mediumTime: "HH:mm:ss",
-// 		short: "dd/MM/y HH:mm",
-// 		shortDate: "dd/MM/y",
-// 		shortTime: "HH:mm"
-// 	},
-// 	NUMBER_FORMATS: {
-// 		CURRENCY_SYM: "\u20ac",
-// 		DECIMAL_SEP: ",",
-// 		GROUP_SEP: "\u00a0",
-// 		PATTERNS: [
-// 			{
-// 				gSize: 3,
-// 				lgSize: 3,
-// 				maxFrac: 3,
-// 				minFrac: 0,
-// 				minInt: 1,
-// 				negPre: "-",
-// 				negSuf: "",
-// 				posPre: "",
-// 				posSuf: ""
-// 			},
-// 			{
-// 				gSize: 3,
-// 				lgSize: 3,
-// 				maxFrac: 2,
-// 				minFrac: 2,
-// 				minInt: 1,
-// 				negPre: "-",
-// 				negSuf: "\u00a0\u00a4",
-// 				posPre: "",
-// 				posSuf: "\u00a0\u00a4"
-// 			}
-// 		]
-// 	},
-// 	"pluralCat": function(n, opt_precision) {
-// 		var i = n | 0;
-// 		if (i == 0 || i == 1)
-// 			return PLURAL_CATEGORY.ONE;
-		
-// 		return PLURAL_CATEGORY.OTHER;
-// 	}
-// };
-
-
-
-
 var FRENCH_TRANSLATION = {
 	shared: {
+		name_label_fr: "Nom (français)",
+		name_label_es: "Nom (espagnol)",
+		name_label_en: "Nom (anglais)",
+
+		description_label_fr: "Description (français)",
+		description_label_es: "Description (espagnol)",
+		description_label_en: "Description (anglais)",
+
+		description: "Description",
+
 		country: "Pays",
 		apply: "Appliquer les modifications",
 		clone: "Cloner",
@@ -197,7 +147,6 @@ var FRENCH_TRANSLATION = {
 		down: "Descendre d'un cran",
 
 		date: "Date",
-		administrator: "Administrateur",
 
 		settings: "Paramètres",
 		projects: 'Projets',
@@ -251,32 +200,14 @@ var FRENCH_TRANSLATION = {
 		english: "Anglais",
 	},
 
-	help: {
-		block: {
-			project: "Projet",
-			indicators: "Catalogue d'indicateurs"
-		},
-		page: {
-			create: "Créer un nouveau projet",
-			structure: "Structurer des données d'activité",
-			input: "Réaliser une saisie",
-			activity_followup: "Suivre des activités",
-			logical_frame: "Rentrer un cadre logique",
-			objectives_results: "Suivre des objectifs & résultats",
-			change_definition: "Modifier un projet en cours",
-			indicator_usage: "Utiliser le catalogue",
-			create_new_indicator: "Créer un indicateur",
-			merge_indicators: "Fusionner deux indicateurs",
-			indicator_reporting: "Suivre un indicateur en transversal"
-		},
-		reminder: {
-			have_you_read_single_pre: "Avez-vous lu la section",
-			have_you_read_single_post: "dans la documentation?",
-			have_you_read_multiple: "Avez-vous lu les sections suivantes dans la documentation?",
-		}
-	},
-
 	project: {
+		same_as_start: "Idem début du projet",
+		same_as_end: "Idem fin du projet",
+
+		specific_start: "Date de lancement spécifique",
+		specific_end: "Date de fin spécifique",
+
+		structure: "Structure",
 		no_data: "Les données ne sont pas disponibles",
 		not_available_by_entity: "Ces données ne sont pas disponibles par lieu de collecte",
 		not_available_by_group: "Ces données ne sont pas disponibles par groupe",
@@ -286,7 +217,7 @@ var FRENCH_TRANSLATION = {
 		not_available_min_year: "Agrégez au moins par an pour accéder à ces données",
 
 		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements. Ceux-ci seront perdus.",
-		no_logical_frame: "Aucun cadre logique n'a encore été créé sur ce projet.",
+		no_logical_frames: "Aucun cadre logique n'a encore été créé sur ce projet.",
 		partition_general: "Général",
 		partition_general_placeholder: "ex: Tranches d'âge",
 		partition_elements: "Éléments",
@@ -539,71 +470,159 @@ var FRENCH_TRANSLATION = {
 
 		formula: "Formule",
 		link: "Lien: {{name}}",
-		collected: "Collecté"
+		collected: "Collecté",
+
+		basics_info: 
+			"<p>Les données de bases de votre projet permettent de le classer parmi les autres. Une attention particulière doit être portée sur:</p>" + 
+			"<ul>" + 
+				"<li>Les thématiques, qui conditionneront les indicateurs transversaux à collecter</li>" + 
+				"<li>Les dates, qui conditionneront les calendriers de saisie</li>" + 
+			"</ul>",
+
+		collection_site_info:
+			"<p>Lorsqu'un projet réalise les même activités dans plusieurs lieux, celles-ci doivent pouvoir être suivi individuellements, par groupes, et tous ensembles.</p>" + 
+			"<p>Rentrez ici:</p>" + 
+			"<ul>" + 
+				"<li>La liste des lieux sur lesquels le projet travail (par exemple: liste des centres de santé)</li>" + 
+				"<li>Des groupements qui seront utilisé lors du suivi (par exemple: par région, ou type de structure)</li>" + 
+			"</ul>",
+
+		collection_form_list_info:
+			"<p>Les sources de données représentent les formulaires avec lesquelles les données nécessaires au suivi de projet sont collectés au niveau des activités</p>" + 
+			"<p>Les formulaires de saisie seront directement déduis de la description des sources de données. Afin de faciliter la saisie, les sources doivent correspondre à des outils réel utilisés sur le terrain.</p>",
+
+		logical_frame_list_info:
+			"<p>Un cadre logique est un document qui décrit les objectifs d'un projet, les activités misent en oeuvre pour y parvenir, ainsi que les indicateurs qui permette de suivre l'avancement de chaque élément</p>" + 
+			"<p>Tous les indicateurs présents dans les cadres logiques doivent être calculables à partir des données décrites dans les sources de données</p>",
+
+		cross_cutting_list_info:
+			"<p>Les indicateurs transversaux</p>",
+
+		users_list_info:
+			"Plusieurs types d'utilisateurs interviennent dans la mise en place et dans le suivi d'un projet: coordination, staff M&E, opérateurs de saisie, partenaires, ..." + 
+			"Listez ici tous les utilisateurs qui doivent avoir accès au monitoring du projet.",
+
+
 	},
-	indicator: {
-		cross_cutting: "Indicateurs transversaux",
-		cant_create: "Vous n'êtes pas autorisé à créer de nouveaux indicateurs",
-		name: "Nom",
-		translate_from_fr: "Traduire automatiquement à partir du français",
-		translate_from_es: "Traduire automatiquement à partir de l'espagnol",
-		translate_from_en: "Traduire automatiquement à partir de l'anglais",
 
-		delete_indicator: "Etes-vous sûr de vouloir supprimer cet indicateur? Cette décision affecte tous les projets qui l'utilisent.",
-		delete_formula: "Etes-vous sûr de vouloir supprimer cette formule? Cette décision affecte tous les projets qui l'utilisent.",
-
-		classification: "Classification",
-
-		is_mandatory: "Obligatoire - Doit être collecté pour tous les projets de même thématique",
-		is_approved: "Approuvé - Peut ou non être collecté sur les projets de même thématique",
-		is_waiting: "En attente - Le siège ne s'est pas prononcé sur la qualité de cet indicateur",
-		
-		num_collecting_projects: "Nombre de projets collectant cet indicateur",
-
-		search: "Rechercher",
-		search_ph: "Rentrez au moins 3 caractères",
-
-		standard: "Norme",
-		sources: "Sources",
-		comments: "Notes",
-		standard_ph: "À quelle norme appartient cet indicateur?",
-		sources_ph: "Quelles sont les sources possibles pour cet indicateur?",
-		comments_ph: "Dans quel cas est-il pertinent d'utiliser cet indicateur, et avec quelles limites?",
-
-		target: "Relation à la cible",
-		higher_is_better: "Atteinte si la saisie est supérieure à la cible",
-		lower_is_better: "Atteinte si la saisie est inférieure à la cible",
-		around_is_better: "Atteinte si la saisie est égale à la cible",
-		non_relevant: "Non pertinent",
-
-		no_theme: 'Sans thématique',
-		no_type: 'Sans type',
-
-		operation: "Mode d'opération",
-		
-		name_ph: 'Exemple: Part des dossiers patient bien remplis',
-		definition: 'Définition',
-		unit: 'Unité',
-		other: 'Autre',
-		percent: 'Pour cent (%)',
-		permille: 'Pour mille (‰)',
-		types: 'Types',
-		themes: 'Thématiques',
-		select_types: 'Sélectionnez un ou plusieurs types',
-		select_themes: 'Sélectionnez une ou plusieures thématiques',
-
-		num_projects: 'Nombre de projets',
-		create_new: 'Créer un nouvel indicateur',
-
-		themes_list: "Liste des thématiques",
-		types_list: "Liste des types",
-		num_indicators: 'Nombre d\'indicateurs',
-		
-	},
 	form: {
 		mandatory: "Ce champ est obligatoire",
 		start_lower_than_end: 'La date début de doit être inférieure à la date de fin',
 		end_greater_than_start: 'La date de fin doit être supérieure à la date de début',
+
+		help: {
+			show: "Afficher l'aide sur ce champ",
+			hide: "Cacher l'aide sur ce champ"
+		}
+	},
+	theme: {
+		new_theme: "Nouvelle thématique",
+		create_new: "Créer une thématique"
+	},
+	user: {
+		email: "Email",
+		fullname: "Nom",
+		role: "Rôle",
+		save: "Sauvegarder l'utilisateur",
+
+		list_info: 
+			"<p>Cette page contient la liste de tous les utilisateurs qui se sont connectés au moins une fois sur Monitool</p>" + 
+			"<p>Il n'est pas nécessaire de créer de comptes pour les nouveaux utilisateurs si ceux-ci possède un compte Médecins du Monde: après leur première connexion ils apparaitront automatiquement ici. Pour les utilisateurs hors MDM, il est possible de créer des comptes partenaires depuis l'interface de gestion des projets.</p>",
+
+		edit_info:
+			"<p>Vous pouvez ici éditer les permissions d'autres utilisateurs que vous sur le site. Cliquez sur \"Afficher l'aide sur ce champ\" pour avoir plus de détails sur les différents niveaux d'autorisation disponibles</p>",
+
+		roles_short: {
+			admin: "Administrateur",
+			project: "Création projets",
+			common: "Standard",
+		},
+
+		permissions: {
+			thematics: "Créer et éditer des thématiques",
+			cross_cutting: "Créer et éditer des indicateurs transversaux",
+			user_roles: "Éditer le rôle des autres utilisateurs",
+			own_all_projects: "Éditer la structure et les données de tous les projets",
+			create_projects: "Créer des projets",
+			edit_projects: "Éditer la structure et les données de certains projets",
+			see_reporting: "Voir les statistiques de tous les projets"
+		}
+	},
+
+	theme: {
+		list_info: 
+			"<p>Cette page contient la liste des thématiques traitées par l'ONG.</p>" +
+			"<p>Il est possible d'attribuer une ou plusieurs thématiques à chaque projet et indicateur transversal.</p>",
+
+		edit_info:
+			"",
+
+		themes: "Thématiques",
+		edit_title: "Édition thématique",
+		save: "Sauvegarder la thématique",
+
+		new_theme: "Nouvelle thématique",
+		create_new: "Créer une nouvelle thématique",
+
+		name_placeholder_fr: "ex: Santé Sexuelle et Reproductive",
+		name_placeholder_es: "ex: Salud Sexual y reproductiva",
+		name_placeholder_en: "ex: Sexual and Reproductive Health",
+
+		info: 
+			"<p>Rentrez ici le nom de la thématique dans toutes les langues utilisées par votre organisation.</p>" +
+			"<p>Si vous ne pouvez pas traduire vers toutes les langues:</p>" +
+			"<ol>" +
+				"<li>Remplissez les langues que vous pouvez</li>" +
+				"<li>Utilisez le bouton à gauche des champs pour une traduction automatique</li>" +
+			"</ol>"
+	},
+
+	indicator: {
+		new_indicator: "Nouvel indicateur",
+		create_new: 'Créer un nouvel indicateur',
+
+		cross_cutting: "Indicateurs transversaux",
+		select_themes: 'Sélectionnez une ou plusieures thématiques',
+
+		edit_title: "Édition indicateur",
+		themes_label: "Thématiques",
+		
+		target_label: "Relation à la cible",
+		targets: {
+			higher_is_better: "Atteinte si la saisie est supérieure à la cible",
+			lower_is_better: "Atteinte si la saisie est inférieure à la cible",
+			around_is_better: "Atteinte si la saisie est égale à la cible",
+			non_relevant: "Non pertinent"
+		},
+
+		unit_label: "Unité",
+		units: {
+			other: 'Autre',
+			percent: 'Pour cent (%)',
+			permille: 'Pour mille (‰)',
+		},
+
+		name_placeholder_fr: "Volume de formation",
+		name_placeholder_en: "Training volume",
+		name_placeholder_es: "Volumen de formación",
+
+		description_placeholder_fr: "On ne parle pas d'éducation pour la santé, mais de formation à du personnel soignant. On compte le nombre de participations et non pas le nombre de personnes différentes ayant participé à ces formations.",
+		description_placeholder_en: "We are not talking about health education, but training of medical staff. Count the number of entries and not the number of different people who attended these trainings.",
+		description_placeholder_es: "No se trata de educación para la salud, sino de formación para el personal sanitario. Se cuenta el número de participaciones y no el número de personas distintas que hayan participado.",
+
+		list_info: 
+			"<p>Cette page contient la liste de tous les indicateurs transversaux de l'ONG.<br/>La collecte de chaque indicateur est obligatoire pour les projets qui ont au moins une thématique en commun celui-ci.</p>" + 
+			"<p>Afin de permettre aux projets de planifier leur collecte, merci de ne pas changer régulièrement cette liste.</p>",
+
+		edit_info: 
+			"<p>Cette page vous permet de modifier la définition d'un indicateur transversal. Si vous réalisez des changements, attention de bien mettre à jour les champs dans toutes les langues.</p>" + 
+			"<p>Si vous ne pouvez pas traduire vers toutes les langues:</p>" +
+			"<ol>" +
+				"<li>Remplissez les langues que vous pouvez</li>" +
+				"<li>Utilisez le bouton à gauche des champs pour une traduction automatique</li>" +
+			"</ol>",
+
+		save: "Sauvegarder l'indicateur"
 	}
 };
 

@@ -8,105 +8,21 @@ angular
 		]
 	)
 
-	.controller('IndicatorListController', function($scope, $state, indicators, themes, uuid) {
+	.controller('IndicatorListController', function($scope, indicators, themes) {
 		$scope.indicators = indicators;
 		$scope.themes = themes;
 
+		// give a color to each theme
+		// give to indicators the color of the first theme
+		var classes = ["text-primary", "text-success", "text-info", "text-warning", "text-danger"];
+		$scope.themes.forEach(function(theme, index) { theme.class = classes[index % classes.length]; });
+
+		// allow to sort indicators by name, and still work on language change
 		$scope.getName = function(a) { return a.name[$scope.language] };
-
-		var classes = ["label-primary", "label-success", "label-info", "label-warning", "label-danger"];
-		$scope.themes.forEach(function(theme, index) {
-			theme.class = classes[index % classes.length];
-		});
-
-		$scope.createIndicator = function() {
-			$state.go('main.indicator.edit', {indicatorId: uuid.v4()});
-		};
 	})
-	
-	.controller('IndicatorEditController', function($state, $scope, $stateParams, $filter, googleTranslation, indicator, themes, uuid) {
-		$scope.translations = {fr: FRENCH_TRANSLATION, es: SPANISH_TRANSLATION, en: ENGLISH_TRANSLATION};
-		$scope.numLanguages = Object.keys($scope.translations).length;
-		$scope.indicator = indicator;
-		$scope.master = angular.copy(indicator);
+		
+	.controller('IndicatorReportingController', function($scope, Cube, mtReporting, indicator, projects, cubes, themes) {
 		$scope.themes = themes;
-
-		$scope.indicatorSaveRunning = false;
-
-		var indicatorWatch = $scope.$watch('indicator', function() {
-			$scope.indicatorChanged = !angular.equals($scope.master, $scope.indicator);
-			$scope.indicatorSavable = $scope.indicatorChanged && !$scope.indicatorForm.$invalid;
-		}, true);
-
-		var pageChangeWatch = $scope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
-			if ($scope.indicatorSaveRunning) {
-				e.preventDefault();	
-				return;
-			}
-
-			if ($scope.indicatorChanged) {
-				// then ask the user if he meant it
-				if (!window.confirm($filter('translate')('shared.sure_to_leave')))
-					e.preventDefault();
-			}
-		});
-
-		// Form actions
-		$scope.save = function() {
-			if (!$scope.indicatorSavable || $scope.indicatorSaveRunning)
-				return;
-
-			$scope.indicatorSaveRunning = true;
-
-			return $scope.indicator.$save().then(function() {
-				$scope.master = angular.copy($scope.indicator);
-				$scope.indicatorChanged = false;
-				$scope.indicatorSavable = false;
-				$scope.indicatorSaveRunning = false;
-			}).catch(function(error) {
-				// Display message to tell user that it's not possible to save.
-				var translate = $filter('translate');
-				alert(translate('project.saving_failed'));
-
-				// reload page.
-				window.location.reload();
-			});
-		};
-
-		$scope.translate = function(key, destLanguage, sourceLanguage) {
-			googleTranslation
-				.translate(indicator[key][sourceLanguage], destLanguage, sourceLanguage)
-				.then(function(result) {
-					indicator[key][destLanguage] = result;
-				});
-		};
-
-		$scope.reset = function() {
-			// When button is disabled, do not execute action.
-			if (!$scope.indicatorChanged || $scope.indicatorSaveRunning)
-				return;
-
-			$scope.indicator = angular.copy($scope.master);
-		};
-
-		$scope.delete = function() {
-			var question = $filter('translate')('indicator.delete_indicator');
-
-			if (window.confirm(question)) {
-				pageChangeWatch();
-				indicatorWatch();
-
-				$scope.indicatorSaveRunning = true;
-				indicator.$delete(function() {
-					$scope.indicatorSaveRunning = false;
-					$state.go('main.indicators');
-				});
-			}
-		};
-
-	})
-	
-	.controller('IndicatorReportingController', function($scope, Cube, mtReporting, indicator, projects, cubes) {
 		$scope.indicator = indicator;
 		$scope.open = {};
 		$scope.plots = {};

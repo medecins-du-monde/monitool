@@ -193,6 +193,8 @@ angular.module('monitool.directives.form', [])
 			scope: {default:'=default'},
 			link: function($scope, element, attributes, ngModelController) {
 
+				$scope.message = attributes.message;
+
 				ngModelController.$formatters.push(function(modelValue) {
 					if (modelValue === null)
 						return {specifyDate: false, chosenDate: $scope.default};

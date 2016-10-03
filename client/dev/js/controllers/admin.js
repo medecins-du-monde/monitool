@@ -8,95 +8,247 @@ angular
 		]
 	)
 
-	.controller('UsersController', function($scope, users) {
+	.controller('UserListController', function($scope, $uibModal, users) {
 		$scope.$watch('userCtx', function(userCtx) {
-			if (userCtx) {
-				$scope.users = users.filter(function(user) { return user._id !== userCtx._id; });
-				
-				$scope.users.forEach(function(user) {
-					user.__choices = {
-						_admin: user.roles.indexOf('_admin') !== -1,
-						project: user.roles.indexOf('project') !== -1,
-						indicator: user.roles.indexOf('indicator') !== -1
-					};
-				});
+			if (!userCtx)
+				return;
 
-				$scope.masters = angular.copy($scope.users);
-			}
+			$scope.users = users.filter(function(user) { return user._id !== userCtx._id; });
+			$scope.users.sort(function(a, b) { return a._id < b._id ? -1 : 1; });
 		});
 
-		$scope.save = function(index) {
-			var user = $scope.users[index];
+		$scope.edit = function(user) {
+			var backup = angular.copy(user);
+			var promise = $uibModal.open({
+				controller: 'UserEditModalController',
+				templateUrl: 'partials/admin/user-edit-modal.html',
+				size: 'lg',
+				scope: $scope,
+				resolve: { user: function() { return user; } }
+			}).result;
 
-			user.roles = [];
-			for (var role in user.__choices)
-				if (user.__choices[role])
-					user.roles.push(role);
-
-			user.$save(function(error) {
-				user.__choices = {
-					_admin: user.roles.indexOf('_admin') !== -1,
-					project: user.roles.indexOf('project') !== -1,
-					indicator: user.roles.indexOf('indicator') !== -1
-				};
-				$scope.masters[index] = angular.copy(user);
-			});
-		};
-
-		$scope.reset = function(index) {
-			$scope.users[index] = angular.copy($scope.masters[index]);
-		};
-
-		$scope.isUnchanged = function(index) {
-			return angular.equals($scope.masters[index], $scope.users[index]);
+			promise
+				.then(function() { user.$save(); })
+				.catch(function() { angular.copy(backup, user); })
 		};
 	})
 
-	.controller('ThemeListController', function($scope, $state, Theme, uuid, googleTranslation, entities) {
-		entities.sort(function(entity1, entity2) {
-			return entity1.name[$scope.language].localeCompare(entity2.name[$scope.language]);
-		});
+	.controller("UserEditModalController", function($scope, $uibModalInstance, user) {
+		$scope.user = user;
+		$scope.master = angular.copy(user);
 
-		$scope.entities = entities;
-		$scope.master = angular.copy(entities);
+		$scope.$watch('user', function() {
+			$scope.hasChanged = !angular.equals($scope.user, $scope.master);
+		}, true);
 
-		$scope.hasChanged = function(entityIndex) {
-			return !angular.equals($scope.entities[entityIndex], $scope.master[entityIndex]);
+		$scope.save = function() {
+			$uibModalInstance.close();
 		};
+
+		$scope.cancel = function() {
+			$uibModalInstance.dismiss();
+		};
+	})
+
+	.controller('ThemeListController', function($scope, $uibModal, Theme, uuid, themes) {
+		var sortThemes = function() {
+			$scope.themes.sort(function(a, b) {
+				return a.name[$scope.language].localeCompare(b.name[$scope.language]);
+			});
+		};
+
+		var createModal = function(theme, isNew) {
+			return $uibModal.open({
+				controller: 'ThemeEditModalController',
+				templateUrl: 'partials/admin/theme-edit-modal.html',
+				size: 'lg', scope: $scope,
+				resolve: {
+					theme: function() { return theme; },
+					isNew: function() { return isNew; }
+				}
+			}).result;			
+		};
+
+		$scope.themes = themes;
+		$scope.$watch('language', sortThemes);
 
 		$scope.create = function() {
-			var newEntity = new Theme();
-			newEntity.__isNew = true; // this will be removed on save.
-			newEntity._id = uuid.v4();
-			newEntity.reset();
+			var theme = new Theme();
+			theme._id = uuid.v4();
+			theme.reset();
 
-			$scope.entities.push(newEntity);
-			$scope.master.push(angular.copy(newEntity));
+			createModal(theme, true)
+				.then(function(action) {
+					if (action === '$save') {
+						$scope.themes.push(theme);
+						sortThemes();
+						theme.$save();
+					}
+				});
 		};
 
-		$scope.save = function(entityIndex) {
-			var entity = $scope.entities[entityIndex],
-				projectUsage = entity.__projectUsage,
-				indicatorUsage = entity.__indicatorUsage;
+		$scope.edit = function(theme) {
+			var backup = angular.copy(theme);
+			
+			createModal(theme, false)
+				.then(function(action) {
+					theme[action]();
+					if (action === '$save')
+						sortThemes();
+					
+					if (action === '$delete')
+						$scope.themes.splice($scope.themes.indexOf(theme), 1);
+				})
+				.catch(function() {
+					angular.copy(backup, theme);
+				})
+		};
+	})
 
-			entity.$save(function(error) {
-				entity.__projectUsage = projectUsage;
-				entity.__indicatorUsage = indicatorUsage;
-				$scope.master[entityIndex] = angular.copy(entity);
+	.controller('ThemeEditModalController', function($scope, $uibModalInstance, theme, isNew, googleTranslation) {
+		$scope.theme = theme;
+		$scope.isNew = isNew;
+		$scope.master = angular.copy(theme);
+
+		$scope.$watch('theme', function() {
+			$scope.hasChanged = !angular.equals($scope.theme, $scope.master);
+		}, true);
+
+		$scope.save = function() {
+			$uibModalInstance.close('$save');
+		};
+
+		$scope.delete = function() {
+			$uibModalInstance.close('$delete');
+		};
+
+		$scope.cancel = function() {
+			$uibModalInstance.dismiss();
+		};
+
+		$scope.autofill = function(writeLanguageCode) {
+			for (var readLanguageCode in $scope.languages) {
+				var input = $scope.theme.name[readLanguageCode];
+
+				if (readLanguageCode !== writeLanguageCode && input.length) {
+					googleTranslation.translate(input, writeLanguageCode, readLanguageCode).then(function(result) {
+						$scope.theme.name[writeLanguageCode] = result;
+					});
+
+					break;
+				}
+			}
+		}
+	})
+
+	.controller("AdminIndicatorListController", function($scope, $uibModal, Indicator, uuid, indicators, themes) {
+		$scope.indicators = indicators;
+		$scope.themes = themes;
+
+		// give a color to each theme
+		// give to indicators the color of the first theme
+		var classes = ["text-primary", "text-success", "text-info", "text-warning", "text-danger"];
+		$scope.themes.forEach(function(theme, index) { theme.class = classes[index % classes.length]; });
+
+		var sortIndicators = function() {
+			$scope.themes.sort(function(a, b) {
+				return a.name[$scope.language].localeCompare(b.name[$scope.language]);
+			});
+
+			$scope.indicators.sort(function(a, b) {
+				return a.name[$scope.language].localeCompare(b.name[$scope.language]);
 			});
 		};
+		sortIndicators();
 
-		$scope.remove = function(entityIndex) {
-			var entity = $scope.entities.splice(entityIndex, 1)[0];
-			$scope.master.splice(entityIndex, 1);
-
-			if (!entity.__isNew)
-				entity.$delete();
+		var createModal = function(indicator, isNew) {
+			return $uibModal.open({
+				controller: 'IndicatorEditModalController',
+				templateUrl: 'partials/admin/indicator-edit-modal.html',
+				size: 'lg', scope: $scope,
+				resolve: {
+					themes: function() { return themes; },
+					indicator: function() { return indicator; },
+					isNew: function() { return isNew; }
+				}
+			}).result;			
 		};
 
-		$scope.translate = function(index, destLanguage, sourceLanguage) {
-			googleTranslation.translate($scope.entities[index].name[sourceLanguage], destLanguage, sourceLanguage).then(function(result) {
-				$scope.entities[index].name[destLanguage] = result;
-			});
+		$scope.$watch('language', sortIndicators);
+
+		$scope.create = function() {
+			var indicator = new Indicator();
+			indicator._id = uuid.v4();
+			indicator.reset();
+
+			createModal(indicator, true)
+				.then(function(action) {
+					if (action === '$save') {
+						$scope.indicators.push(indicator);
+						sortIndicators();
+						indicator.$save();
+					}
+				});
+		};
+
+		$scope.edit = function(indicator) {
+			var backup = angular.copy(indicator);
+			
+			createModal(indicator, false)
+				.then(function(action) {
+					indicator[action]();
+					if (action === '$save')
+						sortIndicators();
+					
+					if (action === '$delete')
+						$scope.indicators.splice($scope.indicators.indexOf(indicator), 1);
+				})
+				.catch(function() {
+					angular.copy(backup, indicator);
+				})
+		};
+	})
+
+	.controller('IndicatorEditModalController', function($uibModalInstance, $scope, googleTranslation, indicator, themes, isNew) {
+		$scope.indicator = indicator;
+		$scope.master = angular.copy(indicator);
+		$scope.themes = themes;
+		$scope.isNew = isNew;
+
+		var indicatorWatch = $scope.$watch('indicator', function() {
+			$scope.indicatorChanged = !angular.equals($scope.master, $scope.indicator);
+			$scope.indicatorSavable = $scope.indicatorChanged && !$scope.indicatorForm.$invalid;
+		}, true);
+
+		// Form actions
+		$scope.save = function() {
+			if (!$scope.indicatorSavable)
+				return;
+
+			$uibModalInstance.close('$save');
+		};
+
+		$scope.translate = function(key, destLanguage) {
+			for (var sourceLanguage in $scope.languages) {
+				var source = indicator[key][sourceLanguage];
+
+				if (sourceLanguage != destLanguage && source && source.length) {
+					googleTranslation
+						.translate(source, destLanguage, sourceLanguage)
+						.then(function(result) {
+							indicator[key][destLanguage] = result;
+						});
+
+					break;
+				}
+			}
+		};
+
+		$scope.delete = function() {
+			$uibModalInstance.close('$delete');
+		};
+
+		$scope.cancel = function() {
+			$uibModalInstance.dismiss();
 		};
 	})

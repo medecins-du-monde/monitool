@@ -13,12 +13,10 @@ angular
 		Indicator.prototype.reset = function() {
 			this.type = "indicator";
 			this.name = {en: '', fr: '', es: ''};
-			this.standard = {en: '', fr: '', es: ''};
-			this.sources = {en: '', fr: '', es: ''};
-			this.comments = {en: '', fr: '', es: ''};
-			this.operation = 'waiting';
-			this.types = [];
+			this.description = {en: '', fr: '', es: ''};
 			this.themes = [];
+			this.unit = "%";
+			this.targetType = "higher_is_better";
 		};
 
 		return Indicator;

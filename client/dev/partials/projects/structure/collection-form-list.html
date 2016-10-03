@@ -4,18 +4,15 @@
 	<li class="active" translate="project.collection_form_list"></li>
 </ol>
 
-<div class="alert alert-info">
-	<p>Les sources de données représentent les formulaires avec lesquelles les données nécessaires au suivi de projet sont collectés au niveau des activités</p>
+<div class="alert alert-info" translate="project.collection_form_list_info"></div>
 
-	<p>Les formulaires de saisie seront directement déduis de la description des sources de données. Afin de faciliter la saisie, les sources doivent correspondre à des outils réel utilisés sur le terrain.</p>
-</div>
 <legend translate="project.collection_form_list"></legend>
 
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th acl-has-project-role="owner"></th>
+			<th></th>
 			<th translate="shared.name"></th>
 			<th translate="shared.start"></th>
 			<th translate="shared.end"></th>
@@ -30,19 +27,23 @@
 	</tbody>
 	<tbody ng-if="project.forms.length != 0" ng-sortable="{handle: '.handle'}">
 		<tr ng-repeat="form in project.forms">
-			<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
+			<td class="handle"><i class="fa fa-bars"></i></td>
 			<td>
 				<a ui-sref="main.project.structure.collection_form_edition({formId: form.id})">
 					{{form.name}}
 				</a>
 			</td>
-			<td>{{(form.start || project.start)|date}}</td>
-			<td>{{(form.end || project.end)|date}}</td>
+	
+			<td ng-if="form.start">{{form.start|date}}</td>
+			<td ng-if="!form.start" translate="project.same_as_start"></td>
+			<td ng-if="form.end">{{form.end|date}}</td>
+			<td ng-if="!form.end" translate="project.same_as_end"></td>
+			
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>{{'project.collects.' + form.collect|translate}}</td>
  		</tr>
 	</tbody>
-	<tfoot acl-has-project-role="owner">
+	<tfoot>
 		<tr>
 			<td colspan="6" style="text-align: center">
 				<a class="btn btn-default btn-xs" ng-click="createForm()">

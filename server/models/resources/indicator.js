@@ -11,21 +11,21 @@ var validate = validator({
 	type: "object",
 	additionalProperties: false,
 	required: [
-		"_id", "type", "name", "standard", "sources", "comments", "themes"
+		"_id", "type", "name", "description", "unit", "targetType", "themes"
 	],
 	properties: {
 		_id:       { $ref: "#/definitions/uuid" },
 		_rev:      { $ref: "#/definitions/revision" },
-		comments:  { $ref: "#/definitions/translated" },
+		description:  { $ref: "#/definitions/translated" },
 		name:      { $ref: "#/definitions/translated_req" },
-		sources:   { $ref: "#/definitions/translated" },
-		standard:  { $ref: "#/definitions/translated" },
 		type:      { type: "string", "pattern": "^indicator$" },
 		themes: {
 			type: "array",
 			uniqueItems: true,
 			items: { "$ref": "#/definitions/uuid" }
-		}
+		},
+		unit: { type: "string", "enum": ["none", "%", "‰"]},
+		targetType: {type: "string", "enum": ["lower_is_better", "higher_is_better", "around_is_better", "non_relevant"]}
 	},
 	definitions: {
 		translated_req: {

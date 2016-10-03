@@ -1,8 +1,20 @@
 <ol class="breadcrumb">
-	<li><a ui-sref="main.indicators" translate="shared.indicators"></a></li>
-	<li><a ui-sref="main.indicator.edit" ng-bind="indicator.name[language]"></a></li>
-	<li class="active" translate="shared.reporting"></li>
+	<li><a ui-sref="main.indicators" translate="indicator.cross_cutting"></a></li>
+	<li class="active">{{indicator.name[language]}}</li>
 </ol>
+
+<div class="alert alert-info">
+	<dl>
+		<dt translate="shared.name"></dt>
+		<dd>{{indicator.name[language]}}</dd>
+
+		<dt translate="shared.description" ng-if="indicator.description[language]"></dt>
+		<dd ng-if="indicator.description[language]">{{indicator.description[language]}}</dd>
+
+		<dt translate="theme.themes"></dt>
+		<dd>{{indicator.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</dd>
+	</dl>
+</div>
 
 <form class="form-horizontal noprint" novalidate>
 	<div class="row">

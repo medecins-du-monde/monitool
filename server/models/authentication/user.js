@@ -8,7 +8,7 @@ var validate = validator({
 	"title": "Monitool user schema",
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["_id", "type", "name", "roles"],
+	"required": ["_id", "type", "name", "role"],
 
 	"properties": {
 		"_id":  {
@@ -18,12 +18,9 @@ var validate = validator({
 		"_rev": { "$ref": "#/definitions/couchdb-revision" },
 		"type": { "type": "string", "pattern": "^user$" },
 		"name": { "type": "string", "minLength": 3 },
-		"roles": {
-			"type": "array",
-			"items": {
-				"type": "string",
-				"enum": ["_admin", "indicator", "project"]
-			}
+		"role": {
+			"type": "string",
+			"enum": ["admin", "project", "common"]
 		}
 
 	},

@@ -7,6 +7,7 @@
 
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate ng-if="logicalFrameIndex !== null">
 	<fieldset>
+
 		<legend>
 			
 			<a class="btn btn-primary btn-xs pull-right noprint" log-frame-xls style="margin-bottom: 10px; margin-right: 5px">
@@ -20,7 +21,7 @@
 		<div class="form-group" show-errors>
 			<label for="logframe-name-input" class="col-sm-2 control-label" translate="shared.name"></label>
 
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.logicalFrames[logicalFrameIndex].name">
+			<div class="col-sm-10">
 				<textarea auto-resize
 						  class="form-control"
 						  name="nameDesc"
@@ -33,7 +34,7 @@
 		<div class="form-group" show-errors>
 			<label for="logframe-goal-input" class="col-sm-2 control-label" translate="project.goal"></label>
 
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.logicalFrames[logicalFrameIndex].goal">
+			<div class="col-sm-10">
 				<textarea auto-resize
 						  class="form-control"
 						  name="goalDesc"
@@ -47,13 +48,7 @@
 			<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 			<div class="col-sm-10">
 
-				<div class="form-control-static" acl-lacks-project-role="owner">
-					<ul>
-						<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">{{indicator.display}}</li>
-					</ul>
-				</div>
-
-				<div class="form-control-static" acl-has-project-role="owner">
+				<div class="form-control-static">
 					<ul ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)">
 						<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">
 							<i class="fa fa-bars indicator-handle"></i>
@@ -84,8 +79,7 @@
 				<div class="panel-heading">
 					<div class="panel-title">
 						<a class="btn btn-danger btn-xs pull-right"
-						   ng-click="remove(purpose, project.logicalFrames[logicalFrameIndex].purposes)"
-						   acl-has-project-role="owner">
+						   ng-click="remove(purpose, project.logicalFrames[logicalFrameIndex].purposes)">
 
 							<i class="fa fa-remove"></i>
 							<span translate="shared.delete"></span>
@@ -101,7 +95,7 @@
 					<ng-form name="purposeForm">
 						<div class="form-group" show-errors>
 							<label for="purpose-desc-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.purpose"></label>
-							<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.description">
+							<div class="col-sm-10">
 								<textarea auto-resize class="form-control"
 										  name="description"
 										  id="purpose-desc-{{purposeId}}-input"
@@ -112,7 +106,7 @@
 
 						<div class="form-group" show-errors>
 							<label for="purpose-assum-{{purposeId}}-input" class="col-sm-2 control-label" translate="project.assumptions"></label>
-							<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="purpose.assumptions">
+							<div class="col-sm-10">
 								<textarea auto-resize class="form-control"
 										  name="assumptions"
 										  id="purpose-assum-{{purposeId}}-input"
@@ -124,13 +118,8 @@
 						<div class="form-group">
 							<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 							<div class="col-sm-10">
-								<div class="form-control-static" acl-lacks-project-role="owner">
-									<ul>
-										<li ng-repeat="indicator in purpose.indicators">{{indicator.display}}</li>
-									</ul>
-								</div>
 
-								<div class="form-control-static" acl-has-project-role="owner">
+								<div class="form-control-static">
 									<ul ng-sortable="indicatorsSortOptions"
 										ng-mouseenter="onSortableMouseEvent('indicators', true)"
 										ng-mouseleave="onSortableMouseEvent('indicators', false)">
@@ -157,7 +146,7 @@
 								<div class="panel-heading">
 									<div class="panel-title">
 										<span class="pull-right">
-											<a class="btn btn-danger btn-xs" ng-click="remove(output, purpose.outputs)" acl-has-project-role="owner">
+											<a class="btn btn-danger btn-xs" ng-click="remove(output, purpose.outputs)">
 												<i class="fa fa-remove"></i>
 												<span translate="shared.delete"></span>
 											</a>
@@ -171,7 +160,7 @@
 									<ng-form name="outputForm">
 										<div class="form-group" show-errors>
 											<label for="output-desc-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.output"></label>
-											<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.description">
+											<div class="col-sm-10">
 												<textarea auto-resize class="form-control"
 														  id="output-desc-{{purposeId}}-{{outputId}}-input"
 														  name="description"
@@ -182,7 +171,7 @@
 
 										<div class="form-group" show-errors>
 											<label for="output-assump-{{purposeId}}-{{outputId}}-input" class="col-sm-2 control-label" translate="project.assumptions"></label>
-											<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="output.assumptions">
+											<div class="col-sm-10">
 												<textarea auto-resize class="form-control"
 														  id="output-assump-{{purposeId}}-{{outputId}}-input"
 														  name="assumptions"
@@ -194,15 +183,7 @@
 										<div class="form-group">
 											<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 											<div class="col-sm-10">
-
-												<div class="form-control-static" acl-lacks-project-role="owner">
-													<ul>
-														<li ng-repeat="indicator in output.indicators">{{indicator.display}}</li>
-													</ul>
-	
-												</div>
-
-												<div class="form-control-static" acl-has-project-role="owner">
+												<div class="form-control-static">
 												
 													<ul ng-sortable="indicatorsSortOptions"
 														ng-mouseenter="onSortableMouseEvent('indicators', true)"
@@ -226,7 +207,7 @@
 
 										<div class="form-group">
 											<label class="col-sm-2 control-label" translate="project.activities"></label>
-											<div class="col-sm-10" acl-has-project-role="owner">
+											<div class="col-sm-10">
 												<div class="input-group" style="margin-bottom: 5px;" ng-repeat="activity in output.activities">
 													<input type="text" class="form-control" name="activity"
 														   placeholder="{{'project.activity_desc_ph'|translate}}"
@@ -244,18 +225,12 @@
 													</a>
 												</p>
 											</div>
-
-											<div class="col-sm-10" acl-lacks-project-role="owner">
-												<ul>
-													<li ng-repeat="activity in output.activities">{{activity.description}}</li>
-												</ul>
-											</div>
 										</div>
 									</ng-form>
 								</div>
 							</div>
 						</div>
-						<a class="btn btn-default" ng-click="addOutput(purpose)" acl-has-project-role="owner">
+						<a class="btn btn-default" ng-click="addOutput(purpose)">
 							<i class="fa fa-plus"></i>
 							<span translate="project.add_output"></span>
 						</a>
@@ -264,7 +239,7 @@
 			</div>
 		</div>
 
-		<a class="btn btn-default" ng-click="addPurpose()" acl-has-project-role="owner">
+		<a class="btn btn-default" ng-click="addPurpose()">
 			<i class="fa fa-plus"></i>
 			<span translate="project.add_purpose"></span>
 		</a>
@@ -274,7 +249,7 @@
 
 <br/>
 
-<div acl-has-project-role="owner" class="pull-right">
+<div class="pull-right">
 	<button ng-click="deleteLogicalFrame()" ng-if="master.logicalFrames[logicalFrameIndex]" class="btn btn-danger">
 		<i class="fa fa-times"></i>
 		<span translate="shared.delete"></span>

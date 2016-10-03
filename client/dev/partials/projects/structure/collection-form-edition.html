@@ -5,7 +5,7 @@
 	<li class="active">{{project.forms[currentFormIndex].name}}</li>
 </ol>
 
-<div class="alert alert-danger noprint" ng-if="formUsage.length" acl-has-project-role="owner">
+<div class="alert alert-danger noprint" ng-if="formUsage.length">
 	 <span ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}|unsafe"></span>
 </div>
 
@@ -14,7 +14,7 @@
 	
 	<div class="form-group" show-errors>
 		<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
-		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.forms[currentFormIndex].name">
+		<div class="col-sm-10">
 			<input type="text"
 				   class="form-control"
 				   id="input-name"
@@ -29,7 +29,7 @@
 
 	<div class="form-group">
 		<label for="collect-input" class="col-sm-2 control-label" translate="project.collect"></label>
-		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.collects.' + project.forms[currentFormIndex].collect) | translate">
+		<div class="col-sm-10">
 			<select class="form-control" name="collect" id="collect-input" ng-model="project.forms[currentFormIndex].collect">
 				<option value="some_entity" translate="project.collects.some_entity"></option>
 				<option value="entity" translate="project.collects.entity"></option>
@@ -40,7 +40,7 @@
 
 	<div class="form-group" ng-if="project.forms[currentFormIndex].collect == 'some_entity'">
 		<label for="entities-input" class="col-sm-2 control-label" translate="project.collection_site_list"></label>
-		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.forms[currentFormIndex].entities | getObjects:project.entities | pluck:'name' | join:', '">
+		<div class="col-sm-10">
 			<ui-select multiple ng-model="project.forms[currentFormIndex].entities" theme="bootstrap" ui-required="true">
 				<ui-select-match placeholder="">{{$item.name|translate}}</ui-select-match>
 				<ui-select-choices repeat="entity.id as entity in project.entities">
@@ -52,7 +52,7 @@
 
 	<div class="form-group">
 		<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
-		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="('project.periodicities.' + project.forms[currentFormIndex].periodicity) | translate">
+		<div class="col-sm-10">
 			<select class="form-control" name="periodicity" id="periodicity-input" ng-model="project.forms[currentFormIndex].periodicity">
 				<option value="day" translate="project.periodicities.day"></option>
 				<option value="week" translate="project.periodicities.week"></option>
@@ -65,16 +65,16 @@
 	</div>
 
 	<div class="form-group" ng-if="project.forms[currentFormIndex].periodicity !== 'free'">
-		<label for="periodicity" class="col-sm-2 control-label" translate="shared.start"></label>
-		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="(project.forms[currentFormIndex].start || project.start)|date">
-			<optional-date ng-model="project.forms[currentFormIndex].start" default="project.start"></optional-date>
+		<label for="periodicity" class="col-sm-2 control-label" translate="project.specific_start"></label>
+		<div class="col-sm-10">
+			<optional-date ng-model="project.forms[currentFormIndex].start" default="project.start" message="project.same_as_start"></optional-date>
 		</div>
 	</div>
 
 	<div class="form-group" ng-if="project.forms[currentFormIndex].periodicity !== 'free'">
-		<label for="periodicity" class="col-sm-2 control-label" translate="shared.end"></label>
-		<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="(project.forms[currentFormIndex].end || project.end)|date">
-			<optional-date ng-model="project.forms[currentFormIndex].end" default="project.end"></optional-date>
+		<label for="periodicity" class="col-sm-2 control-label" translate="project.specific_end"></label>
+		<div class="col-sm-10">
+			<optional-date ng-model="project.forms[currentFormIndex].end" default="project.end" message="project.same_as_end"></optional-date>
 		</div>
 	</div>
 
@@ -84,26 +84,26 @@
 	<table class="table table-bordered table-condensed table-aggregated-data">
 		<thead>
 			<tr>
-				<th style="width: 30px" acl-has-project-role="owner"></th>
-				<th translate="project.variable"></th>
-				<th translate="project.aggregation" style="width: 140px" acl-has-project-role="owner"></th>
+				<th style="width: 30px"></th>
+				<th style="min-width: 200px" translate="project.variable"></th>
+				<th translate="project.aggregation" style="width: 140px"></th>
 				<th translate="project.partitions"></th>
-				<th style="width: 30px" acl-has-project-role="owner"></th>
+				<th style="width: 30px"></th>
 			</tr>
 		</thead>
 		<tbody ng-sortable="variableSortOptions" ng-mouseenter="onSortableMouseEvent('variable', true)" ng-mouseleave="onSortableMouseEvent('variable', false)">
 			<!-- variable row -->
 			<tr ng-repeat="element in project.forms[currentFormIndex].elements track by element.id">
 
-				<td class="handle variable-handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
+				<td class="handle variable-handle"><i class="fa fa-bars"></i></td>
 
 				<!-- variable name -->
-				<td acl-has-project-role="owner" acl-fallback="element.name">
+				<td>
 					<textarea full-height type="text" ng-model="element.name" required class="form-control"></textarea>
 				</td>
 				
 				<!-- variable aggregation -->
-				<td acl-has-project-role="owner">
+				<td>
 					{{'project.sites_agg'|translate}}<br/>
 					<select ng-model="element.geoAgg">
 						<option value="none" translate="project.none"></option>
@@ -129,23 +129,7 @@
 				<td style="position: relative; padding-bottom: 23px; ">
 					<span translate="project.no_partitions" ng-if="element.partitions.length == 0"></span>
 
-
-					<ul acl-lacks-project-role="owner">
-						<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
-							<strong>{{partition.name}}</strong>
-
-							<span ng-repeat="group in partition.groups">
-								<span class="label label-info"><i class="fa fa-arrow-circle-right"></i> {{group.name}}</span>
-							</span>
-							
-							<span ng-repeat="element in partition.elements">
-								<span class="label label-default">{{element.name}}</span>
-							</span>
-						</li>
-					</ul>
-
-					<ul acl-has-project-role="owner"
-						ng-sortable="partitionSortOptions"
+					<ul ng-sortable="partitionSortOptions"
 					    ng-mouseenter="onSortableMouseEvent('partition', true)"
 					    ng-mouseleave="onSortableMouseEvent('partition', false)">
 
@@ -186,16 +170,14 @@
 
 					<a ng-click="editPartition(element.id, null)"
 					   class="btn btn-xxs btn-default"
-					   style="position: absolute; bottom: 4px; right: 3px"
-					   acl-has-project-role="owner">
-
+					   style="position: absolute; bottom: 4px; right: 3px">
 						<i class="fa fa-plus"></i>
 						<span translate="project.add_partition"></span>
 					</a>
 				</td>
 
 				<!-- variable actions -->
-				<td acl-has-project-role="owner">
+				<td>
 					<a class="btn btn-danger btn-sm" ng-click="remove(element, project.forms[currentFormIndex].elements)">
 						<i class="fa fa-remove"></i>
 					</a>
@@ -204,7 +186,7 @@
 		</tbody>
 		<tfoot>
  			<!-- add new variable row --> 
-			<tr acl-has-project-role="owner">
+			<tr>
 				<td colspan="5" style="text-align: center">
 					<a ng-click="newVariable()" class="btn btn-xs btn-default">
 						<i class="fa fa-plus"></i>
@@ -216,7 +198,7 @@
 	</table>
 </form>
 
-<div acl-has-project-role="owner" class="pull-right">
+<div class="pull-right">
 	<button ng-click="deleteForm()" ng-if="master.forms[currentFormIndex]" class="btn btn-danger">
 		<i class="fa fa-times"></i>
 		<span translate="shared.delete"></span>

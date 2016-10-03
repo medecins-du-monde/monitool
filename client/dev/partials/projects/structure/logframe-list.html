@@ -4,42 +4,44 @@
 	<li class="active" translate="shared.logical_frames"></li>
 </ol>
 
-
-<div class="alert alert-info">
-	<p>Un cadre logique est un document qui décrit les objectifs d'un projet, les activités misent en oeuvre pour y parvenir, ainsi que les indicateurs qui permette de suivre l'avancement de chaque élément</p>
-
-	<p>Tous les indicateurs présents dans les cadres logiques doivent être calculables à partir des données décrites dans les sources de données</p>
-</div>
+<div class="alert alert-info" translate="project.logical_frame_list_info"></div>
 
 <legend translate="shared.logical_frames"></legend>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th acl-has-project-role="owner"></th>
+			<th></th>
 			<th translate="shared.name"></th>
 			<th translate="project.goal"></th>
+			<th style="width: 150px"></th>
 		</tr>
 	</thead>
 	<tbody ng-if="project.logicalFrames.length == 0">
 		<tr>
-			<td colspan="3" style="text-align: center" translate="project.no_logical_frames"></td>
+			<td colspan="4" style="text-align: center" translate="project.no_logical_frames"></td>
 		</tr>
 	</tbody>
 	<tbody ng-if="project.logicalFrames.length != 0" ng-sortable="{handle: '.handle'}">
 		<tr ng-repeat="(index, logicalFrame) in project.logicalFrames">
-			<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
+			<td class="handle"><i class="fa fa-bars"></i></td>
 			<td>
 				<a ui-sref="main.project.structure.logical_frame_edition({index: index})">
 					{{logicalFrame.name}}
 				</a>
 			</td>
 			<td>{{logicalFrame.goal}}</td>
+			<td style="text-align: center">
+				<a class="btn btn-success btn-xxs" log-frame-xls log-frame="logicalFrame">
+					<i class="fa fa-file-excel-o"></i>
+					<span translate="shared.download_table"></span>
+				</a>
+			</td>
  		</tr>
 	</tbody>
-	<tfoot acl-has-project-role="owner">
+	<tfoot>
 		<tr>
-			<td colspan="3" style="text-align: center">
+			<td colspan="4" style="text-align: center">
 				<a class="btn btn-default btn-xs" ng-click="createLogicalFrame()">
 					<i class="fa fa-plus"></i>
 					<span translate="shared.add"></span>

@@ -189,9 +189,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		});
 
 		$stateProvider.state('main.admin.users', {
-			controller: 'UsersController',
+			controller: 'UserListController',
 			url: '/admin/users',
-			templateUrl: 'partials/admin/users.html',
+			templateUrl: 'partials/admin/user-list.html',
 			resolve: {
 				users: function(User) {
 					return User.query().$promise;
@@ -204,8 +204,22 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			templateUrl: 'partials/admin/theme-list.html',
 			controller: 'ThemeListController',
 			resolve: {
-				entities: function(Theme) {
-					return Theme.query({with_counts: 1}).$promise;
+				themes: function(Theme) {
+					return Theme.query().$promise;
+				}
+			}
+		});
+
+		$stateProvider.state('main.admin.indicator_list', {
+			url: '/admin/indicators',
+			templateUrl: 'partials/admin/indicator-list.html',
+			controller: 'AdminIndicatorListController',
+			resolve: {
+				indicators: function(Indicator) {
+					return Indicator.query().$promise;
+				},
+				themes: function(Theme) {
+					return Theme.query().$promise;
 				}
 			}
 		});
@@ -424,65 +438,39 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	// Indicators
 	///////////////////////////
 	
-	$stateProvider.state('main.indicators', {
-		url: '/indicators',
-		templateUrl: 'partials/indicators/list.html',
-		controller: 'IndicatorListController',
-		resolve: {
-			indicators: function(Indicator) {
-				return Indicator.query().$promise;
-			},
-			themes: function(Theme) {
-				return Theme.query({with_counts: 1}).$promise;
-			}
-		}
-	});
 
 	///////////////////////////
 	// Indicator
 	///////////////////////////
 
 	if (window.user.type == 'user') {
-		$stateProvider.state('main.indicator', {
-			abstract: true,
-			url: '/indicator/:indicatorId',
-			template: '<div ui-view></div>',
+
+		$stateProvider.state('main.indicators', {
+			url: '/indicators',
+			templateUrl: 'partials/indicators/list.html',
+			controller: 'IndicatorListController',
 			resolve: {
-				indicator: function(Indicator, $q, $stateParams) {
-					var indicatorId = $stateParams.indicatorId;
-
-					return Indicator.get({id: indicatorId}).$promise.catch(function(e) {
-						// Server error
-						if (e.status !== 404)
-							return $q.reject(e);
-
-						// Indicator creation
-						var indicator = new Indicator();
-						indicator._id = indicatorId;
-						indicator.reset();
-						return $q.when(indicator);
-					});
-				}
-			}
-		});
-
-		$stateProvider.state('main.indicator.edit', {
-			url: '/edit',
-			templateUrl: 'partials/indicators/edit.html',
-			controller: 'IndicatorEditController',
-			resolve: {
+				indicators: function(Indicator) {
+					return Indicator.query().$promise;
+				},
 				themes: function(Theme) {
 					return Theme.query().$promise;
 				}
 			}
 		});
 
-		$stateProvider.state('main.indicator.reporting', {
-			url: '/reporting',
+		$stateProvider.state('main.indicator_reporting', {
+			url: '/indicator/:indicatorId',
 			templateUrl: 'partials/indicators/reporting.html',
 			controller: 'IndicatorReportingController',
 			resolve: {
-				projects: function(Project,indicator) {
+				themes: function(Theme) {
+					return Theme.query().$promise;
+				},
+				indicator: function(Indicator, $q, $stateParams) {
+					return Indicator.get({id: $stateParams.indicatorId}).$promise;
+				},
+				projects: function(Project, indicator) {
 					return Project.query({mode: 'crossCutting', indicatorId: indicator._id});
 				},
 				cubes: function(Cube, indicator) {

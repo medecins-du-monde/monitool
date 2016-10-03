@@ -2,15 +2,33 @@
 
 angular.module('monitool.directives.projectLogframe', [])
 	
+
+	.directive('logFramePDF', function($rootScope) {
+		return {
+			restrict: "AE",
+			scope: false,
+			scope: {logFrame:'='},
+			link: function($scope, element) {
+				element.on('click', function() {
+
+					
+
+				});
+			}
+		}
+	})
+
+
 	.directive('logFrameXls', function($rootScope) {
 		return {
 			restrict: "AE",
 			scope: false,
+			scope: {logFrame:'='},
 			link: function($scope, element) {
 				element.on('click', function() {
 
 				// $scope.$watch('project.logicalFrame', function(logFrame) {
-					var logFrame = $scope.project.logicalFrames[$scope.logicalFrameIndex];
+					var logFrame = $scope.logFrame;//project.logicalFrames[$scope.logicalFrameIndex];
 					var tableRows;
 
 					tableRows = [[
@@ -153,6 +171,8 @@ angular.module('monitool.directives.projectLogframe', [])
 							});
 						});
 					});
+
+					console.log(tableRows)
 
 
 					var html = ''

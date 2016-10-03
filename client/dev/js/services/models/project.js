@@ -225,7 +225,7 @@ angular
 						   (user.type == 'partner' && u.username == user.username);
 				});
 
-			if (user.type == 'user' && user.roles.indexOf('_admin') !== -1)
+			if (user.type == 'user' && user.role === 'admin')
 				return true;
 
 			else if (!projectUser)

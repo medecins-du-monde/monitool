@@ -21,7 +21,7 @@ var checkEditPermissions = function(realUser, modelName, modelId, callback) {
 		return callback('not_a_user');
 
 	// Admins can do what they please
-	if (realUser.type === 'user' && realUser.roles.indexOf('_admin') !== -1)
+	if (realUser.type === 'user' && realUser.role === 'admin')
 		return callback(null);
 
 	// General case.
@@ -30,7 +30,7 @@ var checkEditPermissions = function(realUser, modelName, modelId, callback) {
 		Project.get(modelId, function(error, project) {
 			if (error === 'not_found') {
 				// check if the user is allowed to create projects
-				if (realUser.roles.indexOf('project') === -1)
+				if (realUser.role === 'project')
 					return callback('missing_permission');
 				else
 					return callback(null);
@@ -89,22 +89,6 @@ var checkEditPermissions = function(realUser, modelName, modelId, callback) {
 			else
 				return callback('not_associated_with_project');
 		});
-	}
-
-	else if (["indicator", "theme", "type"].indexOf(modelName) !== -1) {
-		// users need a role for indicators
-		if (realUser.type === 'user') {
-			if (realUser.roles.indexOf('indicator') === -1)
-				return callback('missing_permission');
-			else
-				return callback(null);
-		}
-		// partners are not allowed to change any of those resources.
-		else if (realUser.type === 'partner')
-			return callback('only_users');
-		
-		else
-			throw new Error('Invalid user type');
 	}
 
 	else

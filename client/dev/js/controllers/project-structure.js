@@ -13,6 +13,8 @@ angular
 		$scope.projectSaveRunning = false;		// We are not currently saving.
 		$scope.formContainer = {currentForm: null};
 
+		$scope.showStructure = !project._rev;
+
 		// When master changes, update menu elements, and save flags
 		var masterWatch = $scope.$watch('master', function() {
 			$scope.projectHasIndicators = $scope.master.hasObjectiveReporting();

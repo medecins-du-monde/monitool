@@ -4,17 +4,7 @@
 	<li class="active" translate="project.basics"></li>
 </ol>
 
-<div class="alert alert-info">
-	<p>
-		Les données de bases de votre projet permettent de le classer parmi les autres.
-		Une attention particulière doit être portée sur:
-	</p>
-
-	<ul>
-		<li>Les thématiques, qui conditionneront les indicateurs transversaux à collecter</li>
-		<li>Les dates, qui conditionneront les calendriers de saisie</li>
-	</ul>
-</div>
+<div class="alert alert-info" translate="project.basics_info"></div>
 
 <legend translate="project.basics"></legend>
 
@@ -23,7 +13,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-country" class="col-sm-2 control-label" translate="shared.country"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.country">
+			<div class="col-sm-10">
 				<input id="input-country"
 					   type="text"
 					   class="form-control"
@@ -38,7 +28,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.name">
+			<div class="col-sm-10">
 				<input id="input-name"
 					   type="text"
 					   class="form-control"
@@ -52,20 +42,18 @@
 		</div>
 
 		<div class="form-group">
-			<label for="input-themes" class="col-sm-2 control-label" translate="indicator.themes"></label>
+			<label for="input-themes" class="col-sm-2 control-label" translate="theme.themes"></label>
 			<div class="col-sm-10">
-				<ui-select id="input-themes" multiple ng-model="project.themes" name="themes" theme="bootstrap" required acl-has-project-role="owner">
+				<ui-select id="input-themes" multiple ng-model="project.themes" name="themes" theme="bootstrap" required>
 					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name[language]}}</ui-select-match>
 					<ui-select-choices repeat="theme._id as theme in themes">{{theme.name[language]}}</ui-select-choices>
 				</ui-select>
-
-				<p class="form-control-static" acl-lacks-project-role="owner">{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</p>
 			</div>
 		</div>
 
 		<div class="form-group" show-errors>
 			<label for="input-start" class="col-sm-2 control-label" translate="project.start_date"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.start">
+			<div class="col-sm-10">
 
 				<utc-datepicker ng-model="project.start" />
 
@@ -76,8 +64,7 @@
 
 		<div class="form-group" show-errors>
 			<label for="input-end" class="col-sm-2 control-label" translate="project.end_date"></label>
-			<div class="col-sm-10" acl-has-project-role="owner" acl-fallback="project.end">
-
+			<div class="col-sm-10">
 				<utc-datepicker ng-model="project.end" />
 
 				<p class="help-block" ng-if="projectForm.end.$error.required" translate="form.mandatory"></p>

@@ -1,0 +1,112 @@
+<div class="modal-body">
+
+	<form class="form-horizontal" role="form" name="userForm" novalidate>
+		<legend translate="project.edit_user"></legend>
+
+		<div class="alert alert-info" translate="user.edit_info"></div>
+
+		<div class="form-group">
+			<label for="email-input" class="col-sm-2 control-label" translate="user.email"></label>
+			<div class="col-sm-10">
+				<p class="form-control-static">
+					{{user._id.substring(4)}}@medecinsdumonde.net
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="fullname-input" class="col-sm-2 control-label" translate="user.fullname"></label>
+			<div class="col-sm-10">
+				<p class="form-control-static">{{user.name}}</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="role-input" class="col-sm-2 control-label" translate="user.role"></label>
+			<div class="col-sm-10">
+				<select id="role-input" class="form-control" ng-model="user.role" required>
+					<option value="admin" translate="user.roles_short.admin"></option>
+					<option value="project" translate="user.roles_short.project"></option>
+					<option value="common" translate="user.roles_short.common"></option>
+				</select>
+
+				<a ng-click="toogleTable=!toogleTable" class="pull-right">
+					<i class="fa fa-info"></i>
+					<span ng-if="!toogleTable" translate="form.help.show"></span>
+					<span ng-if="toogleTable" translate="form.help.hide"></span>
+				</a>
+				
+				<div ng-show="toogleTable">
+					<br/><br/>
+					
+					<table class="table table-bordered table-stripped table-condensed">
+						<thead>
+							<tr>
+								<th></th>
+								<th translate="user.roles_short.admin" style="width: 100px"></th>
+								<th translate="user.roles_short.project" style="width: 100px"></th>
+								<th translate="user.roles_short.common" style="width: 100px"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td translate="user.permissions.edit_projects">owed</td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+							</tr>
+							<tr>
+								<td translate="user.permissions.see_reporting"></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+							</tr>
+							<tr>
+								<td translate="user.permissions.create_projects"></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+							</tr>
+							<tr>
+								<td translate="user.permissions.thematics"></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+							</tr>
+							<tr>
+								<td translate="user.permissions.cross_cutting"></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+							</tr>
+							<tr>
+								<td translate="user.permissions.user_roles"></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+							</tr>
+							<tr>
+								<td translate="user.permissions.own_all_projects"></td>
+								<td><i class="fa fa-check" style="color: green"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+								<td><i class="fa fa-times" style="color: red"></i></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button ng-click="save()" ng-disabled="userForm.$invalid || !hasChanged" class="btn btn-primary">
+		<i class="fa fa-object-group"></i>
+		<span translate="user.save"></span>
+	</button>
+
+	<button ng-click="cancel()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.cancel"></span>
+	</button>
+</div>

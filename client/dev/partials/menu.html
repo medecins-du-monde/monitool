@@ -36,14 +36,14 @@
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator')}" ng-if="userCtx.type == 'user'">
+				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator_reporting')}" ng-if="userCtx.type == 'user'">
 					<a ui-sref="main.indicators">
 						<i class="fa fa-fw fa-book"></i>
 						<span translate="indicator.cross_cutting"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.admin')}" ng-if="userCtx.type == 'user'" acl-has-role="_admin">
+				<li ng-class="{active: $state.includes('main.admin')}" ng-if="userCtx.type == 'user' && userCtx.role == 'admin'">
 					<a ui-sref="main.admin.users">
 						<i class="fa fa-fw fa-cogs"></i>
 						<span translate="shared.settings"></span>

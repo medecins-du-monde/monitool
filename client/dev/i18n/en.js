@@ -555,7 +555,36 @@ var ENGLISH_TRANSLATION = {
 	form: {
 		mandatory: "This field is mandatory",
 		start_lower_than_end: 'Begin date must be lower than end date',
-		end_greater_than_start: 'End date must be greater than start date'
+		end_greater_than_start: 'End date must be greater than start date',
+
+		help: {
+			show: "Show help for this field",
+			hide: "Hide help for this field"
+		}
+	},
+
+	user: {
+		email: "Email",
+		fullname: "Name",
+		role: "Role",
+		save: "Save user",
+		
+		roles_short: {
+			admin: "Administrator",
+			project: "Project creation",
+			common: "Common",
+		},
+
+		permissions: {
+			thematics: "Create and edit thematics",
+			cross_cutting: "Create and edit cross-cutting indicators",
+			user_roles: "Edit other users roles",
+			own_all_projects: "Edit all projects structure and data",
+			create_projects: "Create projects",
+			edit_projects: "Edit projects' structure and data where explicitely all",
+			see_reporting: "See all project's reporting"
+		}
 	}
+
 };
 

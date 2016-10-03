@@ -48,7 +48,7 @@ angular.module('monitool.directives.acl', [])
 
 			var isAllowed = false;
 			if (userCtx.type == 'user') {
-				if (userCtx.roles.indexOf('_admin') !== -1)
+				if (userCtx.role == 'admin')
 					isAllowed = true;
 				else {
 					var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
@@ -77,19 +77,15 @@ angular.module('monitool.directives.acl', [])
 		};
 	})
 
-	.directive('aclHasRole', function($rootScope, _makeReadOnly) {
+
+	.directive('aclHasAdministration', function($rootScope, _makeReadOnly) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
 					if (!userCtx)
 						return;
 
-					var roles = userCtx.roles || [],
-						isAllowed =
-							userCtx.type == 'user' && // partners cannot do anything
-							(roles.indexOf(attributes.aclHasRole) !== -1 || roles.indexOf('_admin') !== -1);
-
-					if (!isAllowed)
+					if (userCtx.type !== 'user' || userCtx.role !== 'admin')
 						_makeReadOnly(scope, element, attributes);
 
 					unwatch();
@@ -97,6 +93,56 @@ angular.module('monitool.directives.acl', [])
 			}
 		}
 	})
+
+	.directive('aclLacksAdministration', function($rootScope, _makeReadOnly) {
+		return {
+			link: function(scope, element, attributes) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
+					if (!userCtx)
+						return;
+
+					if (userCtx.type === 'user' && userCtx.role === 'admin')
+						_makeReadOnly(scope, element, attributes);
+
+					unwatch();
+				});
+			}
+		}
+	})
+
+
+	.directive('aclHasProjectCreation', function($rootScope, _makeReadOnly) {
+		return {
+			link: function(scope, element, attributes) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
+					if (!userCtx)
+						return;
+
+					if (userCtx.type !== 'user' || userCtx.role === 'common')
+						_makeReadOnly(scope, element, attributes);
+
+					unwatch();
+				});
+			}
+		}
+	})
+
+	.directive('aclLacksProjectCreation', function($rootScope, _makeReadOnly) {
+		return {
+			link: function(scope, element, attributes) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
+					if (!userCtx)
+						return;
+
+					if (userCtx.type === 'user' && userCtx.role !== 'common')
+						_makeReadOnly(scope, element, attributes);
+
+					unwatch();
+				});
+			}
+		}
+	})
+
 	.directive('aclHasProjectRole', function($rootScope, _makeReadOnly, _isAllowedProject) {
 		return {
 			link: function(scope, element, attributes) {
@@ -106,26 +152,6 @@ angular.module('monitool.directives.acl', [])
 
 					var isAllowed = _isAllowedProject(userCtx, scope, element, attributes);
 					if (!isAllowed)
-						_makeReadOnly(scope, element, attributes);
-
-					unwatch();
-				});
-			}
-		}
-	})
-	.directive('aclLacksRole', function($rootScope, _makeReadOnly) {
-		return {
-			link: function(scope, element, attributes) {
-				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
-					if (!userCtx)
-						return;
-
-					var roles = userCtx.roles || [],
-						isForbidden = 
-							userCtx.type != 'user' || // partners cannot do anything
-							(roles.indexOf(attributes.aclLacksRole) === -1 && roles.indexOf('_admin') === -1);
-
-					if (!isForbidden)
 						_makeReadOnly(scope, element, attributes);
 
 					unwatch();

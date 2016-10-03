@@ -5,14 +5,7 @@
 </ol>
 
 
-<div class="alert alert-info">
-	<p>Lorsqu'un projet réalise les même activités dans plusieurs lieux, celles-ci doivent pouvoir être suivi individuellements, par groupes, et tous ensembles.</p>
-	<p>Rentrez ici:</p>
-	<ul>
-		<li>La liste des lieux sur lesquels le projet travail (par exemple: liste des centres de santé)</li>
-		<li>Des groupements qui seront utilisé lors du suivi (par exemple: par région, ou type de structure)</li>
-	</ul> 
-</div>
+<div class="alert alert-info" translate="project.collection_site_info"></div>
 
 <form name="projectForm" novalidate>
 	
@@ -21,11 +14,11 @@
 	<table class="table table-bordered table-stripped table-condensed">
 		<thead>
 			<tr>
-				<th style="width: 30px" acl-has-project-role="owner"></th>
+				<th style="width: 30px"></th>
 				<th translate="project.entity_name"></th>
-				<th style="width: 200px" translate="project.start"></th>
-				<th style="width: 200px" translate="project.end"></th>				
-				<th style="width: 30px" acl-has-project-role="owner"></th>
+				<th style="width: 200px" translate="project.specific_start"></th>
+				<th style="width: 200px" translate="project.specific_end"></th>				
+				<th style="width: 30px"></th>
 			</tr>
 		</thead>
 		<tbody ng-if="project.entities.length == 0">
@@ -35,9 +28,9 @@
 		</tbody>
 		<tbody ng-if="project.entities.length != 0" ng-sortable="{handle: '.handle'}">
 			<tr ng-repeat="inputEntity in project.entities track by inputEntity.id">
-				<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
+				<td class="handle"><i class="fa fa-bars"></i></td>
 
-				<td acl-has-project-role="owner" acl-fallback="inputEntity.name">
+				<td>
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
 							<input type="text"
@@ -49,20 +42,20 @@
 						</div>
 					</ng-form>
 				</td>
-				<td acl-has-project-role="owner" acl-fallback="project.start">
-					<optional-date ng-model="inputEntity.start" default="project.start"></optional-date>
+				<td>
+					<optional-date ng-model="inputEntity.start" default="project.start" message="project.same_as_start"></optional-date>
 				</td>
-				<td acl-has-project-role="owner" acl-fallback="project.end">
-					<optional-date ng-model="inputEntity.end" default="project.end"></optional-date>
+				<td>
+					<optional-date ng-model="inputEntity.end" default="project.end" message="project.same_as_end"></optional-date>
 				</td>
-				<td style="text-align: right" acl-has-project-role="owner">
+				<td style="text-align: right">
 					<a class="btn btn-danger btn-sm" ng-click="deleteEntity(inputEntity.id)">
 						<i class="fa fa-remove"></i>
 					</a>
 				</td>
 			</tr>
 		</tbody>
-		<tfoot acl-has-project-role="owner">
+		<tfoot>
 			<tr>
 				<td colspan="5" style="text-align: center">
 					<a class="btn btn-default btn-xs" ng-click="createEntity()">
@@ -79,10 +72,10 @@
 	<table class="table table-bordered table-stripped table-condensed">
 		<thead>
 			<tr>
-				<th style="width: 30px" acl-has-project-role="owner"></th>
+				<th style="width: 30px"></th>
 				<th style="width: 300px" translate="project.group_name"></th>
 				<th translate="shared.members"></th>
-				<th style="width: 30px;" acl-has-project-role="owner"></th>
+				<th style="width: 30px;"></th>
 			</tr>
 		</thead>
 		<tbody ng-if="project.groups.length == 0">
@@ -92,9 +85,9 @@
 		</tbody>
 		<tbody ng-if="project.groups.length != 0" ng-sortable="{handle: '.handle'}">
 			<tr ng-repeat="inputGroup in project.groups track by inputGroup.id">
-				<td class="handle" acl-has-project-role="owner"><i class="fa fa-bars"></i></td>
+				<td class="handle"><i class="fa fa-bars"></i></td>
 
-				<td acl-has-project-role="owner" acl-fallback="inputGroup.name">
+				<td>
 					<ng-form name="center">
 						<div class="form-group" show-errors style="margin: 0">
 							<input type="text"
@@ -107,7 +100,7 @@
 					</ng-form>
 				</td>
 				
-				<td acl-has-project-role="owner" acl-fallback="inputGroup.members | getObjects:project.entities | pluck:'name' | join:', '">
+				<td>
 					<ui-select multiple ng-model="inputGroup.members" theme="bootstrap">
 						<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
 						<ui-select-choices repeat="inputEntity.id as inputEntity in project.entities">
@@ -116,14 +109,14 @@
 					</ui-select>
 				</td>
 
-				<td style="text-align: right" acl-has-project-role="owner">
-					<a class="btn btn-danger btn-sm" ng-click="deleteGroup(inputGroup.id)" tooltip="{{'shared.delete'|translate}}">
+				<td style="text-align: right">
+					<a class="btn btn-danger btn-sm" ng-click="deleteGroup(inputGroup.id)">
 						<i class="fa fa-remove"></i>
 					</a>
 				</td>
 			</tr>
 		</tbody>
-		<tfoot acl-has-project-role="owner">
+		<tfoot>
 			<tr>
 				<td colspan="4" style="text-align: center">
 					<a class="btn btn-default btn-xs" ng-click="createGroup()">
