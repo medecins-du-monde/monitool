@@ -1,7 +1,12 @@
 {
+	"port": 80,
 	"couchdb": {
-		"url": "http://user:pass@localhost:5984",
-		"bucket": "monitool"
+		"url": "",
+		"bucket": "",
+		"host": "",
+		"sessionBucket": "",
+		"username": "",
+		"password": ""
 	},
 	"oauth": {
 		"authUrl": "",
