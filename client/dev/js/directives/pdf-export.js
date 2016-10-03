@@ -68,54 +68,33 @@ angular
 		var elementToDocDefinition = function(element) {
 			var body, widths;
 
-			// if (element.colPartitions.length == 0 && element.rowPartitions.length == 0) {
-			// 	body = [[' ']];
-			// 	widths = ['*'];
-			// }
-			
-			// else if (element.colPartitions.length == 0 && element.rowPartitions.length == 1) {
-			// 	body = element.rowPartitions[0].elements.map(function(e) { return [e.name, '']; });
-			// 	widths = ['auto', '*'];
-			// }
+			var topRows = makeRows(element.colPartitions),
+				bodyRows = transpose(makeRows(element.rowPartitions));
 
-			// else if (element.colPartitions.length == 1 && element.rowPartitions.length == 0) {
-			// 	body = [
-			// 		element.colPartitions[0].elements.map(function(e) { return e.name; }),
-			// 		element.colPartitions[0].elements.map(function(e) { return ' '; })
-			// 	]
+			if (!bodyRows.length)
+				bodyRows.push([])
 
-			// 	widths = element.colPartitions[0].elements.map(function(e) { return '*'; });
-			// }
-			
-			// else {
-				var topRows = makeRows(element.colPartitions),
-					bodyRows = transpose(makeRows(element.rowPartitions));
+			var dataColsPerRow = topRows.length ? topRows[0].length : 1;
 
-				if (!bodyRows.length)
-					bodyRows.push([])
+			// Add empty data fields to bodyRows
+			bodyRows.forEach(function(bodyRow) {
+				for (var i = 0; i < dataColsPerRow; ++i)
+					bodyRow.push(' ');
+			});
 
-				var dataColsPerRow = topRows.length ? topRows[0].length : 1;
-
-				// Add empty data fields to bodyRows
-				bodyRows.forEach(function(bodyRow) {
-					for (var i = 0; i < dataColsPerRow; ++i)
-						bodyRow.push(' ');
-				});
-
-				// Add empty field in the top-left corner for topRows
-				topRows.forEach(function(topRow, index) {
-					for (var i = 0; i < element.rowPartitions.length; ++i)
-						topRow.unshift('');
-				});
-
-				body = topRows.concat(bodyRows);
-
-				widths = [];
+			// Add empty field in the top-left corner for topRows
+			topRows.forEach(function(topRow, index) {
 				for (var i = 0; i < element.rowPartitions.length; ++i)
-					widths.push('auto');
-				for (var j = 0; j < dataColsPerRow; ++j)
-					widths.push('*');
-			// }
+					topRow.unshift('');
+			});
+
+			body = topRows.concat(bodyRows);
+
+			widths = [];
+			for (var i = 0; i < element.rowPartitions.length; ++i)
+				widths.push('auto');
+			for (var j = 0; j < dataColsPerRow; ++j)
+				widths.push('*');
 
 			return  [
 				{style: "variableName", text: element.name},
