@@ -51,7 +51,7 @@
 				<div class="form-control-static">
 					<ul ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)">
 						<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">
-							<i class="fa fa-bars indicator-handle"></i>
+							<i class="fa fa-sort fa-fw indicator-handle"></i>
 							<a ng-click="editIndicator(indicator, project.logicalFrames[logicalFrameIndex].indicators)">{{indicator.display}}</a>
 						</li>
 					</ul>
@@ -85,7 +85,7 @@
 							<span translate="shared.delete"></span>
 						</a>
 
-						<i class="fa fa-bars purpose-handle"></i>
+						<i class="fa fa-sort fa-fw purpose-handle"></i>
 
 						{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}
 					</div>
@@ -125,7 +125,7 @@
 										ng-mouseleave="onSortableMouseEvent('indicators', false)">
 
 										<li ng-repeat="indicator in purpose.indicators">
-											<i class="fa fa-bars indicator-handle"></i>
+											<i class="fa fa-sort fa-fw indicator-handle"></i>
 											<a ng-click="editIndicator(indicator, purpose.indicators)">{{indicator.display}}</a>
 										</li>
 									</ul>
@@ -151,7 +151,7 @@
 												<span translate="shared.delete"></span>
 											</a>
 										</span>
-										<i class="fa fa-bars output-handle"></i>
+										<i class="fa fa-sort fa-fw output-handle"></i>
 										{{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
 									</div>
 								</div>
@@ -190,7 +190,7 @@
 														ng-mouseleave="onSortableMouseEvent('indicators', false)">
 
 														<li ng-repeat="indicator in output.indicators">
-															<i class="fa fa-bars indicator-handle"></i>
+															<i class="fa fa-sort fa-fw indicator-handle"></i>
 															<a ng-click="editIndicator(indicator, output.indicators)">{{indicator.display}}</a>
 														</li>
 													</ul>

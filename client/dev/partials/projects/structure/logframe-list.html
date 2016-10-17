@@ -24,7 +24,7 @@
 	</tbody>
 	<tbody ng-if="project.logicalFrames.length != 0" ng-sortable="{handle: '.handle'}">
 		<tr ng-repeat="(index, logicalFrame) in project.logicalFrames">
-			<td class="handle"><i class="fa fa-bars"></i></td>
+			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 			<td>
 				<a ui-sref="main.project.structure.logical_frame_edition({index: index})">
 					{{logicalFrame.name}}

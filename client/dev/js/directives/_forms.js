@@ -266,7 +266,49 @@ angular.module('monitool.directives.form', [])
 			}
 		}
 	})
-	
+		
+	.directive('partitionOrder', function(itertools) {
+		return {
+			restrict: "EA",
+			// require: "ngModel",
+			scope: {
+				partitions: '='
+			},
+			templateUrl: "partials/_forms/partition-order.html",
+			link: function(scope, element, attributes, ngModelController) {
+				scope.$watch('partitions', function(partitions) {
+					if (!partitions) return;
+
+					scope.partitionOrders = [];
+
+					for (var numColumns = 0; numColumns <= partitions.length; ++numColumns) {
+						var numPermutations = Math.factorial(partitions.length);
+
+						for (var permutationId = 0; permutationId < numPermutations; ++permutationId) {
+							var permutation = itertools.computeNthPermutation(partitions.length, permutationId);
+
+							var titles = permutation.map(function(i) {
+								return { name: partitions[i].name, numChildren: partitions[i].elements.length };
+							});
+							var acc = 1;
+							titles.forEach(function(title, index) {
+								if (index != 0)
+									title.numChildren = titles[index - 1].numChildren + 'x' + title.numChildren;
+							});
+
+							scope.partitionOrders.push({
+								headerRows: titles.slice(0, numColumns),
+								leftCols: titles.slice(numColumns),
+								size: 
+							});
+						}
+					}
+
+				}, true);
+			}
+		};
+	})
+
 	.directive('partitionFilter', function() {
 
 		var isSubset = function(superset, subset) {

@@ -15,6 +15,11 @@
 	<div class="form-group" show-errors>
 		<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
 		<div class="col-sm-10">
+			<span class="help-block" style="margin-bottom: 2px">
+				<i class="fa fa-info-circle"></i>
+				Comment s'apelle la source de laquelle vous voulez extraire des données? Par exemple: "Dossier patient informatisé", "Registre des centre de santé", "Rapport du système national d'information sanitaire", ...
+			</span>
+
 			<input type="text"
 				   class="form-control"
 				   id="input-name"
@@ -30,6 +35,12 @@
 	<div class="form-group">
 		<label for="collect-input" class="col-sm-2 control-label" translate="project.collect"></label>
 		<div class="col-sm-10">
+
+			<span class="help-block" style="margin-bottom: 2px">
+				<i class="fa fa-info-circle"></i>
+				Parmi les structures identifiées dans "Lieux de collecte", lesquelles font remonter cette source de donnée?
+			</span>
+
 			<select class="form-control" name="collect" id="collect-input" ng-model="project.forms[currentFormIndex].collect">
 				<option value="some_entity" translate="project.collects.some_entity"></option>
 				<option value="entity" translate="project.collects.entity"></option>
@@ -39,10 +50,10 @@
 	</div>
 
 	<div class="form-group" ng-if="project.forms[currentFormIndex].collect == 'some_entity'">
-		<label for="entities-input" class="col-sm-2 control-label" translate="project.collection_site_list"></label>
+		<label for="entities-input" class="col-sm-2 control-label"></label>
 		<div class="col-sm-10">
 			<ui-select multiple ng-model="project.forms[currentFormIndex].entities" theme="bootstrap" ui-required="true">
-				<ui-select-match placeholder="">{{$item.name|translate}}</ui-select-match>
+				<ui-select-match placeholder="Choisir les structures pour lesquelles cette source de données s'applique">{{$item.name|translate}}</ui-select-match>
 				<ui-select-choices repeat="entity.id as entity in project.entities">
 					{{entity.name|translate}}
 				</ui-select-choices>
@@ -53,6 +64,11 @@
 	<div class="form-group">
 		<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
 		<div class="col-sm-10">
+			<span class="help-block" style="margin-bottom: 2px">
+				<i class="fa fa-info-circle"></i>
+				À quelle fréquence ces données remontent-elles? Attention, cette fréquence est complétement decorrelée de la fréquence à laquelle le projet doit fournir du reporting.
+			</span>
+
 			<select class="form-control" name="periodicity" id="periodicity-input" ng-model="project.forms[currentFormIndex].periodicity">
 				<option value="day" translate="project.periodicities.day"></option>
 				<option value="week" translate="project.periodicities.week"></option>
@@ -80,160 +96,135 @@
 
 	<legend translate="project.collection_form_structure"></legend>
 
-	<!-- Editable table -->
-	<table class="table table-bordered table-condensed table-aggregated-data">
-		<thead>
-			<tr>
-				<th style="width: 30px"></th>
-				<th style="min-width: 200px" translate="project.variable"></th>
-				<th translate="project.aggregation" style="width: 140px"></th>
-				<th translate="project.partitions" colspan="2"></th>
-				<th style="width: 30px"></th>
-			</tr>
-		</thead>
-		<tbody ng-sortable="variableSortOptions">
+	<div ng-sortable="{handle: '.variable-handle'}">
+		<div class="panel panel-info" ng-repeat="(index, element) in project.forms[currentFormIndex].elements">
+			<div class="panel-heading">
 
-			<!-- variable row -->
-			<tr ng-repeat-start="element in project.forms[currentFormIndex].elements track by element.id">
+				<div class="pull-right">
+					<a href="#" class="btn btn-xxs btn-default variable-handle">
+						<i class="fa fa-sort fa-fw"></i>
+						Restez appuyé pour glisser déposer
+					</a>
 
-				<td rowspan="2" class="handle variable-handle"><i class="fa fa-bars"></i></td>
+					<a href="#" class="btn btn-xxs btn-danger">
+						<i class="fa fa-times"></i>
+						Supprimer cette variable
+					</a>
+				</div>
 
-				<!-- variable name -->
-				<td rowspan="2">
-					<textarea full-height type="text" ng-model="element.name" required class="form-control"></textarea>
-				</td>
+				<div class="panel-title">
+					<strong>Variable {{index + 1}}:</strong> {{element.name}}
+				</div>
+			</div>
+
+			<div class="panel-body">
+				<div class="form-group">
+					<label for="" class="col-sm-2 control-label">Que mesurez-vous?</label>
+					<div class="col-sm-10">
+						<span class="help-block" style="margin-bottom: 2px">
+							<i class="fa fa-info-circle"></i>
+							Nommez la variable que vous voulez extraire de/du <code>{{project.forms[currentFormIndex].name}}</code>. Par exemple "Nombre de diagnostics effectués".
+						</span>
+
+						<input type="text" class="form-control" ng-model="element.name" placeholder="ex: Nombre de diagnostics effectués">
+					</div>
+				</div>
 				
-				<!-- variable aggregation -->
-				<td rowspan="2">
-					{{'project.sites_agg'|translate}}<br/>
-					<select ng-model="element.geoAgg">
-						<option value="none" translate="project.none"></option>
-						<option value="sum" translate="project.sum"></option>
-						<option value="average" translate="project.average"></option>
-						<option value="highest" translate="project.highest"></option>
-						<option value="lowest" translate="project.lowest"></option>
-						<option value="last" translate="project.last"></option>
-					</select><br/>
+				<div class="form-group">
+					<label for="" class="col-sm-2 control-label">Comment grouper les<br/>valeurs de plusieurs sites</label>
+					<div class="col-sm-10 form-control-static">
 
-					{{'project.time_agg'|translate}}<br/>
-					<select ng-model="element.timeAgg">
-						<option value="none" translate="project.none"></option>
-						<option value="sum" translate="project.sum"></option>
-						<option value="average" translate="project.average"></option>
-						<option value="highest" translate="project.highest"></option>
-						<option value="lowest" translate="project.lowest"></option>
-						<option value="last" translate="project.last"></option>
-					</select>
-				</td>
+						<span class="help-block" style="margin-bottom: 2px">
+							<i class="fa fa-info-circle"></i>
+							Dans un projet avec deux sites, si <code>{{element.name}}</code> vaut 10 pour un site, et 20 pour l'autre, que vaut-il pour le projet?
+						</span>
 
-				<!-- variable partitions -->
-				<td style="text-align: center; vertical-align: middle">
-					<i class="fa fa-columns fa-rotate-270"></i>
-				</td>
+						<select name="" id="" class="form-control">
+							<option value="">30 (la somme des valeurs)</option>
+							<option value="">15 (la moyenne des valeurs)</option>
+							<option value="">10 (la plus petite valeur)</option>
+							<option value="">20 (la plus grande valeur)</option>
+							<option value="">Impossible de faire ce calcul</option>
+						</select>
+					</div>
+				</div>
 
-				<td style="position: relative; padding-bottom: 23px; ">
-					<span translate="project.no_partitions" ng-if="element.rowPartitions.length == 0"></span>
+				<div class="form-group">
+					<label for="" class="col-sm-2 control-label">Comment grouper les<br/>valeurs de plusieurs périodes</label>
+					<div class="col-sm-10 form-control-static">
+						<span class="help-block" style="margin-bottom: 2px">
+							<i class="fa fa-info-circle"></i>
+							Dans un projet qui collecte mensuellement, si
+							<code>{{element.name}}</code> vaut 10 en janvier, et 20 en
+							février et 30 en mars que vaut-il pour le premier trimestre?
+						</span>
 
-					<ul ng-sortable="{handle: '.partition-handle', group: element.id, onStart: dragStart, onEnd: dragEnd}"
-					    ng-mouseenter="onSortableMouseEvent(true)"
-					    ng-mouseleave="onSortableMouseEvent(false)">
+						<select name="" id="" class="form-control">
+							<option value="">60 (la somme des valeurs)</option>
+							<option value="">20 (la moyenne des valeurs)</option>
+							<option value="">10 (la plus petite valeur)</option>
+							<option value="">30 (la plus grande valeur)</option>
+							<option value="">30 (la dernière valeur)</option>
+							<option value="">Impossible de faire ce calcul</option>
+						</select>
 
-						<li ng-repeat="partition in element.rowPartitions" style="margin-bottom: 2px">
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label for="" class="col-sm-2 control-label">Quelles sont les désagrégations à utiliser sur cette variable?</label>
+					
+					<div class="col-sm-10 form-control-static">
+						<span class="help-block" style="margin-bottom: 2px">
+							<i class="fa fa-info-circle"></i>
+							Veut-t'on être capable de différencier <code>{{element.name}}</code> par age, sexe, prise en charge, motif de consultation, pathologie, tranche horaire, reférencement effectif, ...?
+						</span>
 
-							<a class="btn btn-xxs btn-default pull-right"
-							   ng-click="editPartition(element.rowPartitions, partition)">
+						<div class="well" style="padding: 5px;">
+							<ul style="list-style-type: none; padding-left: 5px">
+								<li ng-if="element.rowPartitions.length == 0">
+									Aucune partition disponible sur cette variable
+								</li>
 
-								<i class="fa fa-fw fa-pencil"></i>
-								<span translate="shared.edit"></span>
+								<li ng-repeat="partition in element.rowPartitions" style="margin-bottom: 2px">
+
+									<a ng-click="editPartition(element.rowPartitions, partition)">
+
+										<i class="fa fa-pencil"></i>
+										<strong>{{partition.name}}</strong>
+										({{partition.elements|pluck:"name"|join:", "}})
+									</a>
+								</li>
+							</ul>
+
+							<a ng-click="editPartition(element.rowPartitions, null)" class="btn btn-xxs btn-default">
+								<i class="fa fa-plus"></i>
+								<span translate="project.add_partition"></span>
 							</a>
+						</div>
+					</div>
+				</div>
 
-							<i class="fa fa-bars partition-handle"></i>
+				<div class="form-group">
+					<label for="" class="col-sm-2 control-label">
+						Comment afficher le tableau de saisie de cette variable dans les formulaires?
+					</label>
 
-							<strong>{{partition.name}}</strong>
-							
-							<span ng-repeat="group in partition.groups">
-								<span class="label label-info"><i class="fa fa-arrow-circle-right"></i> {{group.name}}</span>
-							</span>
-							
-							<span ng-repeat="element in partition.elements">
-								<span class="label label-default">{{element.name}}</span>
-							</span>
-						</li>
-					</ul>
+					<div class="col-sm-10 form-control-static">
 
-					<a ng-click="editPartition(element.rowPartitions, null)"
-					   class="btn btn-xxs btn-default"
-					   style="position: absolute; bottom: 4px; right: 3px">
-						<i class="fa fa-plus"></i>
-						<span translate="project.add_partition"></span>
-					</a>
-				</td>
+						<span class="help-block" style="margin-bottom: 2px">
+							<i class="fa fa-info-circle"></i>
+							Cette disposition sera utilisée pour les formulaires de saisie en ligne, et pour les versions PDF à imprimer.
+						</span>
 
-				<!-- variable actions -->
-				<td rowspan="2">
-					<a class="btn btn-danger btn-sm" ng-click="remove(element, project.forms[currentFormIndex].elements)">
-						<i class="fa fa-remove"></i>
-					</a>
-				</td>
- 			</tr>
- 			<tr ng-repeat-end>
-				<td style="text-align: center; vertical-align: middle">
-					<i class="fa fa-columns"></i>
-				</td>
+						<partition-order partitions="element.rowPartitions"></partition-order>
+					</div>
+				</div>
 
-				<td style="position: relative; padding-bottom: 23px; ">
-					<span translate="project.no_partitions" ng-if="element.colPartitions.length == 0"></span>
+			</div>
+		</div>
+	</div>
 
-
-					<ul ng-sortable="{handle: '.partition-handle', group: element.id, onStart: dragStart, onEnd: dragEnd}"
-					    ng-mouseenter="onSortableMouseEvent(true)"
-					    ng-mouseleave="onSortableMouseEvent(false)">
-
-						<li ng-repeat="partition in element.colPartitions" style="margin-bottom: 2px">
-
-							<a class="btn btn-xxs btn-default pull-right"
-							   ng-click="editPartition(element.colPartitions, partition)">
-
-								<i class="fa fa-fw fa-pencil"></i>
-								<span translate="shared.edit"></span>
-							</a>
-
-							<i class="fa fa-bars partition-handle"></i>
-
-							<strong>{{partition.name}}</strong>
-							
-							<span ng-repeat="group in partition.groups">
-								<span class="label label-info"><i class="fa fa-arrow-circle-right"></i> {{group.name}}</span>
-							</span>
-							
-							<span ng-repeat="element in partition.elements">
-								<span class="label label-default">{{element.name}}</span>
-							</span>
-						</li>
-					</ul>
-
-					<a ng-click="editPartition(element.colPartitions, null)"
-					   class="btn btn-xxs btn-default"
-					   style="position: absolute; bottom: 4px; right: 3px">
-						<i class="fa fa-plus"></i>
-						<span translate="project.add_partition"></span>
-					</a>
-				</td>
-
- 			</tr>
-		</tbody>
-		<tfoot>
- 			<!-- add new variable row --> 
-			<tr>
-				<td colspan="6" style="text-align: center">
-					<a ng-click="newVariable()" class="btn btn-xs btn-default">
-						<i class="fa fa-plus"></i>
-						<span translate="project.add_variable"></span>
-					</a>
-				</td>
-			</tr>
-		</tfoot>
-	</table>
 </form>
 
 <div class="pull-right">

@@ -1,0 +1,22 @@
+
+<div class="well" style="text-align: center; padding: 5px; float: left; margin-right: 15px" ng-repeat="partitionOrder in partitionOrders">
+	<table class="table table-bordered" style="background-color: #ccc;">
+		<thead>
+			<tr ng-repeat="headerRow in partitionOrder.headerRows">
+				<td style="border-color: #aaa;" ng-repeat="leftCol in partitionOrder.leftCols"></td>
+				<td style="border-color: #aaa;">
+					<strong>{{headerRow.name}}</strong> ({{headerRow.numChildren}} cols)
+				</td>
+			</tr>
+		</thead>
+		<tr>
+			<td style="border-color: #aaa;" ng-repeat="leftCol in partitionOrder.leftCols">
+				<strong>{{leftCol.name}}</strong> ({{leftCol.numChildren}} rows)
+			</td>
+			<td style="border-color: #aaa; background-color: white; color: black">Données</td>
+		</tr>
+	</table>
+
+	<input type="radio" name="{{element.id}}" />
+</div>
+

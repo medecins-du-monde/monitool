@@ -197,14 +197,14 @@ textarea {
 
 
 
-.form-group .help-block {
+/*.form-group .help-block {
   display: none;
 }
 
 .form-group.has-error .help-block {
   display: block;
 }
-
+*/
 .invert.input-group .form-control {
 	border-radius: 4px;
 	border-top-left-radius: 0;

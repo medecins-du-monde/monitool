@@ -50,7 +50,7 @@
 
 			<tbody ng-if="partition.elements.length != 0" ng-sortable="{handle: '.handle'}">
 				<tr ng-repeat="partitionElement in partition.elements track by partitionElement.id">
-					<td class="handle"><i class="fa fa-bars"></i></td>
+					<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 
 					<td>
 						<ng-form name="center">
@@ -102,7 +102,7 @@
 			</tbody>
 			<tbody ng-if="partition.groups.length != 0" ng-sortable="{handle: '.handle'}">
 				<tr ng-repeat="partitionGroup in partition.groups track by partitionGroup.id">
-					<td class="handle"><i class="fa fa-bars"></i></td>
+					<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 
 					<td>
 						<ng-form name="center">

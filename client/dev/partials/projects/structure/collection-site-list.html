@@ -28,7 +28,7 @@
 		</tbody>
 		<tbody ng-if="project.entities.length != 0" ng-sortable="{handle: '.handle'}">
 			<tr ng-repeat="inputEntity in project.entities track by inputEntity.id">
-				<td class="handle"><i class="fa fa-bars"></i></td>
+				<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 
 				<td>
 					<ng-form name="center">
@@ -85,7 +85,7 @@
 		</tbody>
 		<tbody ng-if="project.groups.length != 0" ng-sortable="{handle: '.handle'}">
 			<tr ng-repeat="inputGroup in project.groups track by inputGroup.id">
-				<td class="handle"><i class="fa fa-bars"></i></td>
+				<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 
 				<td>
 					<ng-form name="center">
