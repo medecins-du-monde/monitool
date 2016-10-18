@@ -268,15 +268,7 @@ angular.module('monitool.directives.form', [])
 	})
 	
 
-	.directive('partitionDistribution', function() {
-
-		var range = function(num) {
-			var integerRange = [];
-			for (var i = 0; i < num; ++i)
-				integerRange.push(i);
-			return integerRange;
-		};
-
+	.directive('partitionDistribution', function(itertools) {
 		return {
 			restrict: "EA",
 			require: "ngModel",
@@ -311,7 +303,6 @@ angular.module('monitool.directives.form', [])
 					scope.tables = [];
 
 					for (var numColumns = 0; numColumns <= numPartitions; ++numColumns) {
-						var index = 0;
 						scope.tables.push({
 							// numColumns will be the value for each radio.
 							numColumns: numColumns,
@@ -320,13 +311,11 @@ angular.module('monitool.directives.form', [])
 							uniqueIdentifier: 'i_' + Math.random().toString().slice(2),
 
 							// rows and cols for this table.
-							headerRows: range(numColumns).map(function(columnId) { index++; return { name: index }; }),
-							leftCols: range(numPartitions - numColumns).map(function(columnId) { index++; return { name: index }; })
+							headerRows: itertools.range(0, numColumns),
+							leftCols: itertools.range(0, numPartitions - numColumns)
 						});
 					}
 				});
-
-
 			}
 		};
 	})
@@ -341,66 +330,90 @@ angular.module('monitool.directives.form', [])
 			},
 			templateUrl: "partials/_forms/partition-order.html",
 			link: function(scope, element, attributes, ngModelController) {
-				scope.uniqueIdentifier = 'i_' + Math.random().toString().slice(2);
+				// Tell the template about the table layout
+				scope.$watch('distribution', function() {
+					scope.table = {
+						// rows and cols for this table.
+						headerRows: itertools.range(0, scope.distribution),
+						leftCols: itertools.range(scope.distribution, scope.partitions.length)
+					};
+				})
 
 				// We need to use a container for the distribution value because we use it inside a ng-repeat which have its own scope
-				scope.container = {}
+				scope.orderedPartitions = scope.partitions.slice();
 
-				// To render the ngModelController, we just pass the distribution value to the scope.
-				ngModelController.$render = function() {
-					scope.container.order = ngModelController.$viewValue;
-				};
+				// We do not allow values to be present 2 times in the list.
+				scope.$watchCollection('orderedPartitions', function(after, before) {
+					// update the size value
+					var width = 1, height = 1;
+					scope.table.headerRows.forEach(function(index) { width *= scope.orderedPartitions[index].elements.length; });
+					scope.table.leftCols.forEach(function(index) { height *= scope.orderedPartitions[index].elements.length; });
+					scope.size = width + ' x ' + height;
 
-				// When the chosen distribution changes, we tell the ngModelController
-				scope.$watch('container.order', function(d) {
-					ngModelController.$setViewValue(d);
+					// Did last change cause a duplicate?
+					var hasDuplicates = false,
+						duplicates = {};
+
+					for (var index = 0; index < scope.partitions.length; ++index)
+						if (duplicates[after[index].id]) {
+							hasDuplicates = true;
+							break;
+						}
+						else
+							duplicates[after[index].id] = true;
+
+					// If we have duplicates it means the change was made by human action
+					if (hasDuplicates) {
+						// Remove the duplicate
+						var changedIndex = 0
+						for (; changedIndex < scope.partitions.length; ++changedIndex)
+							if (after[changedIndex] !== before[changedIndex])
+								break;
+
+						var oldIndex = before.indexOf(after[changedIndex]);
+
+						scope.orderedPartitions[oldIndex] = before[changedIndex];
+
+						// tell ngModelController that the viewValue changed
+						ngModelController.$setViewValue(scope.orderedPartitions.slice());
+					}
 				});
 
-				// At start and on any change on the partitions...
-				scope.$watch('[partitions, distribution]', function() {
+				// To render the ngModelController, we just pass the orderedPartitions to the scope.
+				ngModelController.$render = function() {
+					scope.orderedPartitions = ngModelController.$viewValue.slice();
+				};
+
+				ngModelController.$parsers.push(function(viewValue) {
+					// FIXME bruteforcing this instead of doing proper math is O(scary)
+					// It Should be fast enough in practice as we have never seen more than 5 partitions (5! = 120 permutations)
 					var numPermutations = Math.factorial(scope.partitions.length);
-
-					// ... check that order is valid
-					if (scope.order >= numPermutations)
-						scope.order = 0;
-
-					// ... redraw the tables
-					scope.partitionOrders = [];
 
 					for (var permutationId = 0; permutationId < numPermutations; ++permutationId) {
 						var permutation = itertools.computeNthPermutation(scope.partitions.length, permutationId);
 
-						var titles = permutation.map(function(i) {
-							return { name: scope.partitions[i].name, numChildren: scope.partitions[i].elements.length };
-						});
-						
-						var table = {
-							permutationId: permutationId,
-							uniqueIdentifier: 'i_' + Math.random().toString().slice(2),
-							headerRows: titles.slice(0, scope.distribution),
-							leftCols: titles.slice(scope.distribution)
-						};
+						// compare array
+						for (var i = 0; i < scope.partitions.length; ++i)
+							if (permutation[i] !== scope.partitions.indexOf(scope.orderedPartitions[i]))
+								break;
 
-						// compute widths/heights of each column
-						table.headerRows.forEach(function(title, index) {
-							title.totalChildren = (index != 0 ? table.headerRows[index - 1].totalChildren + 'x' : '') + title.numChildren;
-						});
-						table.leftCols.forEach(function(title, index) {
-							title.totalChildren = (index != 0 ? table.leftCols[index - 1].totalChildren + 'x' : '') + title.numChildren;
-						});
-
-						// compute total width/height
-						var finalWidth = table.headerRows.reduce(function(memo, el) { return memo * el.numChildren; }, 1);
-						var finalHeight = table.leftCols.reduce(function(memo, el) { return memo * el.numChildren; }, 1);
-						table.size = finalWidth + 'x' + finalHeight;
-
-						scope.partitionOrders.push(table);
+						// we have a match
+						if (i == scope.partitions.length)
+							return permutationId;
 					}
 
-				}, true);
+					throw new Exception('Permutation was not found. Should not happen.');
+				});
+
+				ngModelController.$formatters.push(function(modelValue) {
+					var permutation = itertools.computeNthPermutation(scope.partitions.length, modelValue);
+
+					return permutation.map(function(index) { return scope.partitions[index]; });
+				});
 			}
 		};
 	})
+
 
 	.directive('partitionFilter', function() {
 

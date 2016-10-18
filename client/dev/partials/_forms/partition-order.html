@@ -1,28 +1,16 @@
-
-<label for="{{partitionOrder.uniqueIdentifier}}" class="partition-table-item" ng-repeat="partitionOrder in partitionOrders">
-	Taille du tableau à remplir: {{partitionOrder.size}}
-
-	<table class="table table-bordered">
-		<thead>
-			<tr ng-repeat="headerRow in partitionOrder.headerRows">
-				<td ng-repeat="leftCol in partitionOrder.leftCols"></td>
-				<td>
-					<strong>{{headerRow.name}}</strong> ({{headerRow.totalChildren}})
-				</td>
-			</tr>
-		</thead>
-		<tr>
-			<td ng-repeat="leftCol in partitionOrder.leftCols">
-				<strong>{{leftCol.name}}</strong> ({{leftCol.totalChildren}})
+<table class="partition-order">
+	<thead>
+		<tr ng-repeat="headerRow in table.headerRows">
+			<td ng-repeat="leftCol in table.leftCols"></td>
+			<td>
+				<select ng-model="orderedPartitions[headerRow]" ng-options="p as (p.name + ' (' + p.elements.length + ')') for p in partitions"></select>
 			</td>
-			<td class="data-field">Données</td>
 		</tr>
-	</table>
-
-	<input type="radio"
-		   name="{{uniqueIdentifier}}"
-		   id="{{partitionOrder.uniqueIdentifier}}"
-		   ng-model="container.order"
-		   ng-value="partitionOrder.permutationId" />
-
-</label>
+	</thead>
+	<tr>
+		<td ng-repeat="leftCol in table.leftCols">
+			<select ng-model="orderedPartitions[leftCol]" ng-options="p as (p.name + ' (' + p.elements.length + ')') for p in partitions"></select>
+		</td>
+		<td class="data-field">Données ({{size}})</td>
+	</tr>
+</table>

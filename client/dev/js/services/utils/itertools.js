@@ -15,6 +15,13 @@ angular
 			return result;
 		};
 		
+		this.range = function(start, end) {
+			var integerRange = [];
+			for (var i = start; i < end; ++i)
+				integerRange.push(i);
+			return integerRange;
+		};
+
 		/**
 		 * Return the product of two or more arrays.
 		 * in:  [[1,2],[3,4]]

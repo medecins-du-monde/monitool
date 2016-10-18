@@ -572,7 +572,8 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   min-height: 20px;
   padding: 19px;
   margin-bottom: 20px;
-  background-color: #f5f5f5;
+  background-color: white;
+  background-color: #fcfcfc;
   border: 1px solid #e3e3e3;
   border-radius: 4px;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
@@ -580,22 +581,42 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 
   /* from doc */
   text-align: center;
-  padding: 5px; float:
-  left; margin-right: 15px;
+  padding: 5px;
+  /*float: left;*/
+  vertical-align: middle;
+  margin-right: 15px;
   font-weight: normal !important;
 }
 
 .partition-table-item table {
-  background-color: #ccc;
-  border-color: #aaa !important;
+  background-color: #e8e8e8;
+  color: #444;
+  border-color: #ccc !important;
 }
 
 .partition-table-item table td {
-  border-color: #aaa !important;
+  border-color: #ccc !important;
   border-bottom-width: 1px !important;
   padding: 4px 8px !important;
 }
 
 .partition-table-item table td.data-field {
+  background-color: white;
+}
+
+.partition-order {
+  border: 1px solid #ccc;
+  background-color: #e8e8e8;
+  color: #444;
+}
+
+.partition-order td {
+  border: 1px solid #ccc;
+  padding: 4px 8px;  
+}
+
+.partition-order td.data-field {
+  border: 1px solid #ccc;
+  padding: 4px 8px;  
   background-color: white;
 }
