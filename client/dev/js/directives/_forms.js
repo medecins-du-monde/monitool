@@ -266,42 +266,135 @@ angular.module('monitool.directives.form', [])
 			}
 		}
 	})
-		
+	
+
+	.directive('partitionDistribution', function() {
+
+		var range = function(num) {
+			var integerRange = [];
+			for (var i = 0; i < num; ++i)
+				integerRange.push(i);
+			return integerRange;
+		};
+
+		return {
+			restrict: "EA",
+			require: "ngModel",
+			scope: {
+				numPartitions: '='
+			},
+			templateUrl: "partials/_forms/partition-distribution.html",
+			link: function(scope, element, attributes, ngModelController) {
+				// This unique identifier used for the radio name. This is the same for all radios.
+				scope.uniqueIdentifier = 'i_' + Math.random().toString().slice(2);
+
+				// We need to use a container for the distribution value because we use it inside a ng-repeat which have its own scope
+				scope.container = {}
+
+				// To render the ngModelController, we just pass the distribution value to the scope.
+				ngModelController.$render = function() {
+					scope.container.distribution = ngModelController.$viewValue;
+				};
+
+				// When the chosen distribution changes, we tell the ngModelController
+				scope.$watch('container.distribution', function(d) {
+					ngModelController.$setViewValue(d);
+				});
+
+				// At start and when numPartitions changes...
+				scope.$watch("numPartitions", function(numPartitions) {
+					// ... we check that current distribution is valid.
+					if (scope.container.distribution > numPartitions)
+						scope.container.distribution = 0;
+
+					// ... we redraw the tables when the user changes the number of partitions.
+					scope.tables = [];
+
+					for (var numColumns = 0; numColumns <= numPartitions; ++numColumns) {
+						var index = 0;
+						scope.tables.push({
+							// numColumns will be the value for each radio.
+							numColumns: numColumns,
+
+							// Unique identifier used for each radio. This is to match the label with each radio.
+							uniqueIdentifier: 'i_' + Math.random().toString().slice(2),
+
+							// rows and cols for this table.
+							headerRows: range(numColumns).map(function(columnId) { index++; return { name: index }; }),
+							leftCols: range(numPartitions - numColumns).map(function(columnId) { index++; return { name: index }; })
+						});
+					}
+				});
+
+
+			}
+		};
+	})
+
 	.directive('partitionOrder', function(itertools) {
 		return {
 			restrict: "EA",
-			// require: "ngModel",
+			require: "ngModel",
 			scope: {
-				partitions: '='
+				partitions: '=',
+				distribution: '='
 			},
 			templateUrl: "partials/_forms/partition-order.html",
 			link: function(scope, element, attributes, ngModelController) {
-				scope.$watch('partitions', function(partitions) {
-					if (!partitions) return;
+				scope.uniqueIdentifier = 'i_' + Math.random().toString().slice(2);
 
+				// We need to use a container for the distribution value because we use it inside a ng-repeat which have its own scope
+				scope.container = {}
+
+				// To render the ngModelController, we just pass the distribution value to the scope.
+				ngModelController.$render = function() {
+					scope.container.order = ngModelController.$viewValue;
+				};
+
+				// When the chosen distribution changes, we tell the ngModelController
+				scope.$watch('container.order', function(d) {
+					ngModelController.$setViewValue(d);
+				});
+
+				// At start and on any change on the partitions...
+				scope.$watch('[partitions, distribution]', function() {
+					var numPermutations = Math.factorial(scope.partitions.length);
+
+					// ... check that order is valid
+					if (scope.order >= numPermutations)
+						scope.order = 0;
+
+					// ... redraw the tables
 					scope.partitionOrders = [];
 
-					for (var numColumns = 0; numColumns <= partitions.length; ++numColumns) {
-						var numPermutations = Math.factorial(partitions.length);
+					for (var permutationId = 0; permutationId < numPermutations; ++permutationId) {
+						var permutation = itertools.computeNthPermutation(scope.partitions.length, permutationId);
 
-						for (var permutationId = 0; permutationId < numPermutations; ++permutationId) {
-							var permutation = itertools.computeNthPermutation(partitions.length, permutationId);
+						var titles = permutation.map(function(i) {
+							return { name: scope.partitions[i].name, numChildren: scope.partitions[i].elements.length };
+						});
+						
+						var table = {
+							permutationId: permutationId,
+							uniqueIdentifier: 'i_' + Math.random().toString().slice(2),
+							headerRows: titles.slice(0, scope.distribution),
+							leftCols: titles.slice(scope.distribution)
+						};
 
-							var titles = permutation.map(function(i) {
-								return { name: partitions[i].name, numChildren: partitions[i].elements.length };
-							});
-							var acc = 1;
-							titles.forEach(function(title, index) {
-								if (index != 0)
-									title.numChildren = titles[index - 1].numChildren + 'x' + title.numChildren;
-							});
+						// compute widths/heights of each column
+						table.headerRows.forEach(function(title, index) {
+							title.totalChildren = (index != 0 ? table.headerRows[index - 1].totalChildren + 'x' : '') + title.numChildren;
+						});
+						table.leftCols.forEach(function(title, index) {
+							title.totalChildren = (index != 0 ? table.leftCols[index - 1].totalChildren + 'x' : '') + title.numChildren;
+						});
 
-							scope.partitionOrders.push({
-								headerRows: titles.slice(0, numColumns),
-								leftCols: titles.slice(numColumns),
-								size: 
-							});
-						}
+						// compute total width/height
+						var finalWidth = table.headerRows.reduce(function(memo, el) { return memo * el.numChildren; }, 1);
+						var finalHeight = table.leftCols.reduce(function(memo, el) { return memo * el.numChildren; }, 1);
+						table.size = finalWidth + 'x' + finalHeight;
+
+						scope.partitionOrders.push(table);
 					}
 
 				}, true);
@@ -434,19 +527,21 @@ angular.module('monitool.directives.form', [])
 			require: 'ngModel',
 			template: "<div></div>",
 			link: function($scope, element, attributes, ngModelController) {
-				$scope.$watchGroup([attributes.rotation, attributes.offset], function(newValue, oldValue) {
+
+				/* the hack is no longer needed because distribution and order cannot change at runtime anymore */
+				// $scope.$watchGroup([attributes.order, attributes.distribution], function(newValue, oldValue) {
 					// When the partition definition changes, we need to trigger a full parse + redraw.
 					// The AngularJS API is missing the method so we use a side-effect to do it.
 					// 
 					// http://stackoverflow.com/questions/25436691/trigger-ng-model-formatters-to-run-programatically
 
-					ngModelController.$modelValue = "ⓗⓤⓖⓔ ⓗⓐⓒⓚ"
-				});
+				// 	ngModelController.$modelValue = "ⓗⓤⓖⓔ ⓗⓐⓒⓚ"
+				// });
 
 				ngModelController.$formatters.push(function(modelValue) {
 					var partitions = $scope.$eval(attributes.partitions),
-						offset     = $scope.$eval(attributes.offset) + 1,
-						rotation   = $scope.$eval(attributes.rotation);
+						offset     = $scope.$eval(attributes.distribution) + 1,
+						rotation   = $scope.$eval(attributes.order);
 
 					// Special case, only one field.
 					if (partitions.length == 0)
@@ -538,8 +633,8 @@ angular.module('monitool.directives.form', [])
 
 				ngModelController.$parsers.push(function(viewValue) {
 					var partitions = $scope.$eval(attributes.partitions),
-						offset     = $scope.$eval(attributes.offset) + 1,
-						rotation   = $scope.$eval(attributes.rotation);
+						offset     = $scope.$eval(attributes.distribution) + 1,
+						rotation   = $scope.$eval(attributes.order);
 
 					// Special case, only one field.
 					if (partitions.length == 0)
@@ -592,8 +687,8 @@ angular.module('monitool.directives.form', [])
 
 				ngModelController.$render = function() {
 					var partitions = $scope.$eval(attributes.partitions),
-						offset     = $scope.$eval(attributes.offset) + 1,
-						rotation   = $scope.$eval(attributes.rotation);
+						offset     = $scope.$eval(attributes.distribution) + 1,
+						rotation   = $scope.$eval(attributes.order);
 
 					if (partitions.length == 0)
 						hotTable.updateSettings({ maxCols: 1, maxRows: 1, cells: function(row, col, prop) { return ($scope.canEdit ? dataOptions : dataReadOnlyOptions); }});

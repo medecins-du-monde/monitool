@@ -68,8 +68,11 @@ angular
 		var elementToDocDefinition = function(element) {
 			var body, widths;
 
-			var topRows = makeRows(element.colPartitions),
-				bodyRows = transpose(makeRows(element.rowPartitions));
+			var colPartitions = element.partitions.slice(0, element.distribution),
+				rowPartitions = element.partitions.slice(element.distribution);
+
+			var topRows = makeRows(colPartitions),
+				bodyRows = transpose(makeRows(rowPartitions));
 
 			if (!bodyRows.length)
 				bodyRows.push([])
@@ -84,14 +87,14 @@ angular
 
 			// Add empty field in the top-left corner for topRows
 			topRows.forEach(function(topRow, index) {
-				for (var i = 0; i < element.rowPartitions.length; ++i)
+				for (var i = 0; i < rowPartitions.length; ++i)
 					topRow.unshift('');
 			});
 
 			body = topRows.concat(bodyRows);
 
 			widths = [];
-			for (var i = 0; i < element.rowPartitions.length; ++i)
+			for (var i = 0; i < rowPartitions.length; ++i)
 				widths.push('auto');
 			for (var j = 0; j < dataColsPerRow; ++j)
 				widths.push('*');
@@ -100,7 +103,7 @@ angular
 				{style: "variableName", text: element.name},
 				{
 					table: {
-						headerRows: element.colPartitions.length,
+						headerRows: colPartitions.length,
 						widths: widths,
 						body: body
 					}

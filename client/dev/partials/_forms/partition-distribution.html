@@ -1,19 +1,16 @@
-
-<label for="{{partitionOrder.uniqueIdentifier}}" class="partition-table-item" ng-repeat="partitionOrder in partitionOrders">
-	Taille du tableau à remplir: {{partitionOrder.size}}
-
+<label for="{{partitionOrder.uniqueIdentifier}}" class="partition-table-item" ng-repeat="partitionOrder in tables">
 	<table class="table table-bordered">
 		<thead>
 			<tr ng-repeat="headerRow in partitionOrder.headerRows">
 				<td ng-repeat="leftCol in partitionOrder.leftCols"></td>
 				<td>
-					<strong>{{headerRow.name}}</strong> ({{headerRow.totalChildren}})
+					<strong>Intitulé</strong>
 				</td>
 			</tr>
 		</thead>
 		<tr>
 			<td ng-repeat="leftCol in partitionOrder.leftCols">
-				<strong>{{leftCol.name}}</strong> ({{leftCol.totalChildren}})
+				<strong>Intitulé</strong>
 			</td>
 			<td class="data-field">Données</td>
 		</tr>
@@ -22,7 +19,7 @@
 	<input type="radio"
 		   name="{{uniqueIdentifier}}"
 		   id="{{partitionOrder.uniqueIdentifier}}"
-		   ng-model="container.order"
-		   ng-value="partitionOrder.permutationId" />
+		   ng-model="container.distribution"
+		   ng-value="partitionOrder.numColumns" />
 
 </label>

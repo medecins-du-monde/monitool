@@ -138,7 +138,7 @@ angular
 
 				form.elements.forEach(function(element) {
 					var numFields = 1;
-					element.rowPartitions.concat(element.colPartitions).forEach(function(partition) { numFields *= partition.elements.length; });
+					element.partitions.forEach(function(partition) { numFields *= partition.elements.length; });
 					
 					current.values[element.id] = new Array(numFields);
 					for (var i = 0; i < numFields; ++i)

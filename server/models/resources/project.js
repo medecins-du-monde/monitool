@@ -63,14 +63,15 @@ var validate = validator({
 						items: {
 							type: "object",
 							additionalProperties: false,
-							required: ['id', 'name', 'timeAgg', 'geoAgg', 'colPartitions', 'rowPartitions'],
+							required: ['id', 'name', 'timeAgg', 'geoAgg', 'partitions', 'order', 'distribution'],
 							properties: {
 								id: { $ref: "#/definitions/uuid" },
 								name: { type: "string", minLength: 1 },
 								timeAgg: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
 								geoAgg: { type: "string", enum: ["none", "sum", "average", "highest", "lowest", "last"] },
-								colPartitions: { $ref: "#/definitions/partitions" },
-								rowPartitions: { $ref: "#/definitions/partitions" }
+								partitions: { $ref: "#/definitions/partitions" },
+								order: { type: "number" },
+								distribution: { type: "number" }
 							}
 						}
 					}
@@ -361,8 +362,8 @@ function correctFormInputs(oldForm, newForm, inputs) {
 		oldElement = oldElement.length ? oldElement[0] : null;
 
 		// Create partitions from the 2 lists
-		var oldPartitions = oldElement ? oldElement.rowPartitions.concat(oldElement.colPartitions) : null;
-		var newPartitions = newElement.rowPartitions.concat(newElement.colPartitions);
+		var oldPartitions = oldElement ? oldElement.partitions : null;
+		var newPartitions = newElement.partitions;
 
 		// Compute new form element size.
 		var newSize = 1;
@@ -430,7 +431,7 @@ function extractRelevantInformation(form) {
 	return JSON.stringify(
 		form.elements.map(function(element) {
 			// the order of partitions matters => to not sort!
-			var partitions = element.rowPartitions.concat(element.colPartitions).map(function(partition) {
+			var partitions = element.partitions.map(function(partition) {
 				// the order of partition elements matters => to not sort!
 				return [partition.id].concat(
 					partition.elements.map(function(partitionElement) {

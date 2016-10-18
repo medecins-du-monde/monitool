@@ -182,13 +182,13 @@
 
 						<div class="well" style="padding: 5px;">
 							<ul style="list-style-type: none; padding-left: 5px">
-								<li ng-if="element.rowPartitions.length == 0">
+								<li ng-if="element.partitions.length == 0">
 									Aucune partition disponible sur cette variable
 								</li>
 
-								<li ng-repeat="partition in element.rowPartitions" style="margin-bottom: 2px">
+								<li ng-repeat="partition in element.partitions" style="margin-bottom: 2px">
 
-									<a ng-click="editPartition(element.rowPartitions, partition)">
+									<a ng-click="editPartition(element.partitions, partition)">
 
 										<i class="fa fa-pencil"></i>
 										<strong>{{partition.name}}</strong>
@@ -197,7 +197,7 @@
 								</li>
 							</ul>
 
-							<a ng-click="editPartition(element.rowPartitions, null)" class="btn btn-xxs btn-default">
+							<a ng-click="editPartition(element.partitions, null)" class="btn btn-xxs btn-default">
 								<i class="fa fa-plus"></i>
 								<span translate="project.add_partition"></span>
 							</a>
@@ -205,9 +205,24 @@
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" ng-if="element.partitions.length > 0">
 					<label for="" class="col-sm-2 control-label">
-						Comment afficher le tableau de saisie de cette variable dans les formulaires?
+						Où placer les intitulés des désagrégations dans les formulaires?
+					</label>
+
+					<div class="col-sm-10 form-control-static">
+						<span class="help-block" style="margin-bottom: 2px">
+							<i class="fa fa-info-circle"></i>
+							Cette disposition sera utilisée pour les formulaires de saisie en ligne, et pour les versions PDF à imprimer.
+						</span>
+
+						<partition-distribution ng-model="element.distribution" num-partitions="element.partitions.length"></partition-distribution>
+					</div>
+				</div>
+
+				<div class="form-group" ng-if="element.partitions.length > 1">
+					<label for="" class="col-sm-2 control-label">
+						Dans quel ordre placer les intitulés des désagrégations dans les formulaires?
 					</label>
 
 					<div class="col-sm-10 form-control-static">
@@ -217,7 +232,7 @@
 							Cette disposition sera utilisée pour les formulaires de saisie en ligne, et pour les versions PDF à imprimer.
 						</span>
 
-						<partition-order partitions="element.rowPartitions"></partition-order>
+						<partition-order ng-model="element.order" partitions="element.partitions" distribution="element.distribution"></partition-order>
 					</div>
 				</div>
 

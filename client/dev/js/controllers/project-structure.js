@@ -645,7 +645,7 @@ angular
 
 		$scope.newVariable = function() {
 			$scope.project.forms[$scope.currentFormIndex].elements.push({
-				id: uuid.v4(), name: "", rowPartitions: [], colPartitions: [], geoAgg: 'sum', timeAgg: 'sum'
+				id: uuid.v4(), name: "", partitions: [], order: 0, distribution: 0, geoAgg: 'sum', timeAgg: 'sum'
 			});
 		};
 		

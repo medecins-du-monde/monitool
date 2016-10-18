@@ -224,7 +224,7 @@ function _arrayBufferToBase64(ab) {
 			}
 
 			// Partitions
-			element.rowPartitions.concat(element.colPartitions).forEach(function(partition) {
+			element.partitions.forEach(function(partition) {
 				dimensions.push(Dimension.createPartition(partition));
 				if (partition.groups.length)
 					dimensionGroups.push(DimensionGroup.createPartition(partition));
@@ -255,7 +255,7 @@ function _arrayBufferToBase64(ab) {
 					offset = offset * dimensions[1].items.length + dimensions[1].items.indexOf(input.entity);
 				}
 
-				element.rowPartitions.concat(element.colPartitions).forEach(function(partition) {
+				element.partitions.forEach(function(partition) {
 					offset *= partition.elements.length;
 					length *= partition.elements.length;
 				});

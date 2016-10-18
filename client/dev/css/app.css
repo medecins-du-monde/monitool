@@ -564,3 +564,38 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   right: 10px;
 }
 
+
+
+
+.partition-table-item {
+  /* from well */
+  min-height: 20px;
+  padding: 19px;
+  margin-bottom: 20px;
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+
+  /* from doc */
+  text-align: center;
+  padding: 5px; float:
+  left; margin-right: 15px;
+  font-weight: normal !important;
+}
+
+.partition-table-item table {
+  background-color: #ccc;
+  border-color: #aaa !important;
+}
+
+.partition-table-item table td {
+  border-color: #aaa !important;
+  border-bottom-width: 1px !important;
+  padding: 4px 8px !important;
+}
+
+.partition-table-item table td.data-field {
+  background-color: white;
+}

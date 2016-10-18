@@ -21,8 +21,9 @@
 			{{partitions[element.id]}}
 
 			<input-grid ng-model="currentInput.values[element.id]"
-						col-partitions="element.colPartitions"
-						row-partitions="element.rowPartitions"></input-grid>
+						partitions="element.partitions"
+						distribution="element.distribution"
+						order="element.order"></input-grid>
 		</div>
 	</div>
 </form>
