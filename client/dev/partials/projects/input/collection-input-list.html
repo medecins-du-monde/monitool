@@ -1,10 +1,30 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
-	<li class="active">{{form.name}}</li>
+	<li><a ui-sref="main.project.structure.basics">{{project.name|maxLength:50}}></a></li>
+	<li class="active">{{form.name|maxLength:50}}</li>
 </ol>
 
 <style> td { text-align: center; } td a { display: block; width: 100%;}</style>
+
+<div class="alert alert-info" >
+
+	<div class="pull-right" style="text-align: right">
+		<a pdf-export-source="form" format="portrait" class="btn btn-default pdf-export" style="margin-bottom: 5px; display: inline-block">
+			<i class="fa fa-file-pdf-o"></i>
+			<span translate="project.download_portrait"></span>
+		</a><br/><a pdf-export-source="form" format="landscape" class="btn btn-default pdf-export">
+			<i class="fa fa-file-pdf-o fa-rotate-270"></i>
+			<span translate="project.download_landscape"></span>
+		</a>
+	</div>
+
+
+	<span translate="project.input_list_info" translate-values="{name: form.name}"></span>
+</div>
+
+
+
+<legend>{{form.name}}</legend>
 
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>

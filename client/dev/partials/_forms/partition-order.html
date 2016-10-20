@@ -11,6 +11,6 @@
 		<td ng-repeat="leftCol in table.leftCols">
 			<select ng-model="orderedPartitions[leftCol]" ng-options="p as (p.name + ' (' + p.elements.length + ')') for p in partitions"></select>
 		</td>
-		<td class="data-field">Données ({{size}})</td>
+		<td class="data-field">{{'project.data'|translate}} ({{size}})</td>
 	</tr>
 </table>

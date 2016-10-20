@@ -4,8 +4,8 @@
 		<div class="panel-group">
 
 			<div class="panel panel-default" acl-has-project-role="owner">
-				<div class="panel-heading">
-					<button class="btn btn-default btn-xxs pull-right" style="margin-top: -1px" ng-click="showStructure=!showStructure">
+				<div class="panel-heading"  ng-click="showStructure=!showStructure">
+					<button class="btn btn-default btn-xxs pull-right" style="margin-top: -1px">
 						<i class="fa fa-angle-double-down" ng-if="!showStructure"></i>
 						<i class="fa fa-angle-double-up" ng-if="showStructure"></i>
 					</button>
@@ -18,7 +18,7 @@
 						   ui-sref-active="active"
 						   class="list-group-item">
 
-							<i class="fa fa-info-circle fa-fw"></i>
+							<i class="fa fa-object-group fa-fw"></i>
 							<span translate="project.basics"></span>
 						</a>
 

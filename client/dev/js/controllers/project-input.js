@@ -101,6 +101,10 @@ angular.module('monitool.controllers.project.input', [])
 		// Can user edit this input?
 		$scope.canEdit = $scope.project.canEditInputsOnEntity($scope.currentInput.entity);
 
+		$scope.copy = function() {
+			angular.copy($scope.lastInput.values, $scope.currentInput.values);
+		};
+
 		$scope.save = function() {
 			pageChangeWatch()
 			$scope.currentInput.$save(function() { $state.go('main.project.input.list'); });

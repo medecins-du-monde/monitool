@@ -18,7 +18,6 @@ angular
 				/^\d{4}\-\d{2}\-\d{2}$/
 				];
 
-			console.log(regexps)
 			var index = regexps.findIndex(function(regexp) { return slot.match(regexp); });
 
 			return index !== -1 ? ['total', 'year', 'quarter', 'month', 'week', 'day'][index] : null;

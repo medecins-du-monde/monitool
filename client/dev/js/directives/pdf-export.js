@@ -4,7 +4,7 @@ angular
 
 	.module('monitool.directives.pdfExport', [])
 	
-	.directive('pdfExportSource', function() {
+	.directive('pdfExportSource', function(itertools) {
 
 		var makeRows = function(partitions) {
 			var totalCols = partitions.reduce(function(memo, tp) { return memo * tp.elements.length; }, 1),
@@ -39,40 +39,18 @@ angular
 			return body;
 		};
 
-		var transpose = function(rows) {
-			if (rows.length === 0)
-				return [];
-
-			var result = new Array(rows[0].length);
-
-			for (var x = 0; x < rows[0].length; ++x) {
-				result[x] = new Array(rows.length);
-
-				for (var y = 0; y < rows.length; ++y) {
-					result[x][y] = angular.copy(rows[y][x]);
-
-					if (result[x][y].colSpan) {
-						result[x][y].rowSpan = result[x][y].colSpan;
-						delete result[x][y].colSpan;
-					}
-					else if (result[x][y].rowSpan) {
-						result[x][y].colSpan = result[x][y].rowSpan;
-						delete result[x][y].rowSpan;
-					}
-				}
-			}
-
-			return result;
-		};
 
 		var elementToDocDefinition = function(element) {
+			var permutation = itertools.computeNthPermutation(element.partitions.length, element.order),
+				partitions = permutation.map(function(index) { return element.partitions[index]; });
+
 			var body, widths;
 
-			var colPartitions = element.partitions.slice(0, element.distribution),
-				rowPartitions = element.partitions.slice(element.distribution);
+			var colPartitions = partitions.slice(element.distribution),
+				rowPartitions = partitions.slice(0, element.distribution);
 
 			var topRows = makeRows(colPartitions),
-				bodyRows = transpose(makeRows(rowPartitions));
+				bodyRows = itertools.transpose2D(makeRows(rowPartitions));
 
 			if (!bodyRows.length)
 				bodyRows.push([])
@@ -111,33 +89,30 @@ angular
 			];
 		};
 
-		var dataSourceToDocDefinition = function(source) {
+		var dataSourceToDocDefinition = function(source, format) {
 			return {
 				pageSize: "A4",
-				pageOrientation: "portrait",
+				pageOrientation: format,
 
 				content: [
-					{image: "logo", width: 80, absolutePosition: {x:480, y:15}},
+					{image: "logo", width: 80, absolutePosition: {x: format == 'portrait' ? 480 : 720, y:15}},
 					{text: source.name, style: 'header'},
 					{text: "Information génerales", style: "header2"},
 					{style: "variableName", text: "Lieu de collecte"},
 					{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
 					{style: "variableName", text: "Période couverte"},
 					{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
-
+					{style: "variableName", text: "Information collectée par"},
+					{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
 					{text: "Données", style: "header2"}
 				].concat(source.elements.map(elementToDocDefinition)),
 
 				styles: {
-					// image: {
-					// 	alignment: 'right',
-					// 	// margin: [0, 0, 0, 0]
-					// },
 					header: {
 						fontSize: 22,
 						bold: true,
 						alignment: 'center',
-						margin: [0, 0, 0, 0]
+						margin: [100, 0, 100, 0]
 					},
 					header2: {
 						fontSize: 18,
@@ -201,8 +176,7 @@ angular
 			},
 			link: function(scope, element, attributes) {
 				element.bind('click', function(e) {
-					var docDef = dataSourceToDocDefinition(scope.form);
-					console.log(docDef);
+					var docDef = dataSourceToDocDefinition(scope.form, attributes.format || 'portrait');
 					pdfMake.createPdf(angular.copy(docDef)).open();
 				});
 			}

@@ -152,21 +152,10 @@ var validate = validator({
 									items: {
 										type: "object",
 										additionalProperties: false,
-										required: ['description', 'assumptions', 'activities', 'indicators'],
+										required: ['description', 'assumptions', 'indicators'],
 										properties: {
 											description: { type: "string" },
 											assumptions: { type: "string" },
-											activities: {
-												type: "array",
-												items: {
-													type: "object",
-													additionalProperties: false,
-													required: ["description"],
-													properties: {
-														description: { type: "string"  }
-													}
-												}
-											},
 											indicators: { $ref: "#/definitions/indicators" }
 										}
 									}

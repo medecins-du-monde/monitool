@@ -1,0 +1,54 @@
+
+<select class="form-control" ng-model="computationType">
+	<option value="percentage">Pourcentage</option>
+	<option value="permille">Pour mille</option>
+	<option value="copy">Copier une valeur</option>
+	<option value="formula">Formule personalisée</option>
+</select>
+
+<table class="table table-bordered table-condensed table-stripped" style="margin-top: 10px">
+	<thead>
+		<tr>
+			<th style="width: 15%" translate="project.parameter"></th>
+			<th style="width: 30%" translate="project.variable"></th>
+			<th style="width: 55%" translate="project.partitions"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-if="computation.type === 'formula'">
+			<td colspan="3">
+				<input expression class="form-control" ng-model="computation.formula" />
+			</td>
+		</tr>
+		<tr ng-repeat="(key, parameter) in computation.parameters">
+			<!-- parameter key (this one we edit in the formula) -->
+			<td>
+				<span ng-if="computation.type !== 'formula'">
+					{{('project.formula.' + key)|translate}}
+				</span>
+				<span ng-if="computation.type === 'formula'">{{key}}</span>
+			</td>
+
+			<!-- elementId -->
+			<td>
+				<select required
+						class="form-control"
+						ng-model="parameter.elementId"
+						ng-options="v.id as v.name group by v.group for v in selectElements"></select>
+			</td>
+			<td>
+				<div class="row" ng-repeat="partition in elementsById[parameter.elementId].partitions" style="margin-bottom: 3px">
+					<div class="col-sm-2">
+						<div style="margin: 4px">
+							<strong>{{partition.name}}</strong>
+						</div>
+					</div>
+					<div class="col-sm-10">
+						<partition-filter ng-model="parameter.filter[partition.id]" partition="partition"></partition-filter>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+

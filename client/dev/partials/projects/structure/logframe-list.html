@@ -1,6 +1,6 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name|maxLength:50"></a></li>
 	<li class="active" translate="shared.logical_frames"></li>
 </ol>
 
@@ -11,15 +11,14 @@
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th></th>
+			<th style="width: 30px;"></th>
 			<th translate="shared.name"></th>
 			<th translate="project.goal"></th>
-			<th style="width: 150px"></th>
 		</tr>
 	</thead>
 	<tbody ng-if="project.logicalFrames.length == 0">
 		<tr>
-			<td colspan="4" style="text-align: center" translate="project.no_logical_frames"></td>
+			<td colspan="3" style="text-align: center" translate="project.no_logical_frames"></td>
 		</tr>
 	</tbody>
 	<tbody ng-if="project.logicalFrames.length != 0" ng-sortable="{handle: '.handle'}">
@@ -31,17 +30,11 @@
 				</a>
 			</td>
 			<td>{{logicalFrame.goal}}</td>
-			<td style="text-align: center">
-				<a class="btn btn-success btn-xxs" log-frame-xls log-frame="logicalFrame">
-					<i class="fa fa-file-excel-o"></i>
-					<span translate="shared.download_table"></span>
-				</a>
-			</td>
  		</tr>
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="4" style="text-align: center">
+			<td colspan="3" style="text-align: center">
 				<a class="btn btn-default btn-xs" ng-click="createLogicalFrame()">
 					<i class="fa fa-plus"></i>
 					<span translate="shared.add"></span>

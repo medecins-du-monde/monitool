@@ -9,6 +9,11 @@
 					<option value="internal" translate="project.user_types.internal"></option>
 					<option value="partner" translate="project.user_types.partner"></option>
 				</select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_type'|translate}}
+				</p>
 			</div>
 		</div>
 
@@ -21,6 +26,11 @@
 						ng-model="user.id"
 						ng-options="u._id as u.name for u in availableUsers|orderBy:'name'"
 						required></select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_user'|translate}}
+				</p>
 			</div>
 		</div>
 
@@ -36,6 +46,11 @@
 					   ng-pattern="/^[a-z\.\-]+$/"
 					   forbidden-values="partners"
 					   required>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_username'|translate}}
+				</p>
 			</div>
 		</div>
 
@@ -43,6 +58,10 @@
 			<label for="fullname-input" class="col-sm-3 control-label" translate="project.user_fullname"></label>
 			<div class="col-sm-9">
 				<input id="fullname-input" type="text" ng-model="user.name" class="form-control" required>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_fullname'|translate}}
+				</p>
 			</div>
 		</div>
 
@@ -55,6 +74,11 @@
 					   class="form-control"
 					   ng-minlength="6"
 					   ng-required="isNew">
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_password'|translate}}
+				</p>
 			</div>
 		</div>
 
@@ -67,6 +91,11 @@
 					<option value="input" translate="project.user_roles.input"></option>
 					<option value="read" translate="project.user_roles.read"></option>
 				</select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_role'|translate}}
+				</p>
 			</div>
 		</div>
 
@@ -79,6 +108,11 @@
 						{{entity.name|translate}}
 					</ui-select-choices>
 				</ui-select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_sites'|translate}}
+				</p>
 			</div>
 		</div>
 	</form>

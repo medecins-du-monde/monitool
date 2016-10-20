@@ -101,8 +101,9 @@ angular
 				var translate = $filter('translate');
 				alert(translate('project.saving_failed'));
 
+				$scope.projectSaveRunning = false;
 				// reload page.
-				window.location.reload();
+				// window.location.reload();
 			});
 		};
 
@@ -195,25 +196,6 @@ angular
 					$scope.project.users.splice($scope.project.users.indexOf(user), 1, newUser);
 			});
 		};
-
-		$scope.editIndicator = function(planning, parent) {
-			var promise = $uibModal.open({
-				controller: 'ProjectIndicatorEditionModalController',
-				templateUrl: 'partials/projects/structure/edition-modal.html',
-				size: 'lg',
-				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
-				resolve: {planning: function() { return planning; }}
-			}).result;
-
-			promise.then(function(newPlanning) {
-				if (planning && !newPlanning)
-					parent.splice(parent.indexOf(planning), 1);
-				else if (!planning && newPlanning)
-					parent.push(newPlanning);
-				else if (planning && newPlanning)
-					parent.splice(parent.indexOf(planning), 1, newPlanning);
-			});
-		};		
 	})
 
 
@@ -322,11 +304,7 @@ angular
 
 		$scope.addOutput = function(purpose) {
 			purpose.outputs.push({
-				description: "", assumptions: "", indicators: [], activities: []});
-		};
-
-		$scope.addActivity = function(output) {
-			output.activities.push({description: ""});
+				description: "", assumptions: "", indicators: []});
 		};
 
 		$scope.remove = function(element, list) {
@@ -360,7 +338,6 @@ angular
 			}
 		});
 
-
 		$scope.deleteLogicalFrame = function() {
 			// Translate confirmation messages.
 			var easy_question = $filter('translate')('project.delete_logical_frame');
@@ -381,103 +358,23 @@ angular
 				});
 			}
 		};
-
 	})
 
 	.controller('ProjectIndicatorEditionModalController', function($scope, $uibModalInstance, Parser, planning, indicator) {
-		// Build possible variables and filters.
-		$scope.selectElements = []
-		$scope.elementsById = {};
-
-		$scope.project.forms.forEach(function(form) {
-			form.elements.forEach(function(element) {
-				$scope.selectElements.push({id: element.id, name: element.name, group: form.name});
-				$scope.elementsById[element.id] = element;
-			});
-		});
-
-		// Retrieve indicator array where we need to add or remove indicator ids.
 		$scope.indicator = indicator;
-		if (!indicator)
-			$scope.planning = planning ? angular.copy(planning) : {
-				display: '',
-				colorize: true,
-				baseline: null,
-				target: null,
-				unit: 'none',
-				targetType: 'higher_is_better',
-				formula: "a",
-				parameters: {'a': {elementId: null, filter: {}}}
-			};
-		else
-			$scope.planning = planning ? angular.copy(planning) : {
-				formula: "a",
-				parameters: {'a': {elementId: null, filter: {}}}
-			};
+		$scope.planning = planning ? angular.copy(planning) : {
+			display: '',
+			colorize: true,
+			baseline: null,
+			target: null,
+			unit: 'none',
+			targetType: 'higher_is_better',
+			computation: {}
+		};
 
 		$scope.isNew = !planning;
 
-		var formulaWatch = $scope.$watch('planning.formula', function(formula) {
-			var newSymbols, oldSymbols = Object.keys($scope.planning.parameters).sort();
-			try { newSymbols = Parser.parse($scope.planning.formula).variables().sort(); }
-			catch (e) { newSymbols = []; }
-
-			if (!angular.equals(newSymbols, oldSymbols)) {
-				var removedSymbols = oldSymbols.filter(function(s) { return newSymbols.indexOf(s) === -1; }),
-					addedSymbols   = newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; });
-
-				// Remove old symbols from formula
-				removedSymbols.forEach(function(s) { delete $scope.planning.parameters[s]; });
-
-				// Add new symbols to formula
-				addedSymbols.forEach(function(s) {
-					$scope.planning.parameters[s] = {elementId: null, filter: {}};
-				});
-			}
-		});
-
-		// Watch planning.parameters to ensure that filters are valid.
-		var paramWatch = $scope.$watch('planning.parameters', function() {
-			for (var symbolName in $scope.planning.parameters) {
-				var parameter = $scope.planning.parameters[symbolName];
-
-				// Having a null elementId might always mean that filter is undefined...
-				if (!parameter.elementId)
-					parameter.filter = {};
-
-				else {
-					var partitions = $scope.elementsById[parameter.elementId].partitions,
-						numPartitions = partitions.length;
-
-					// Remove partitions in the filter that are not from this element
-					for (var partitionId in parameter.filter)
-						if (!partitions.find(function(e) { return e.id == partitionId; }))
-							delete parameter.filter[partitionId];
-
-					// Add missing partitions
-					for (var i = 0; i < numPartitions; ++i)
-						if (!parameter.filter[partitions[i].id])
-							parameter.filter[partitions[i].id] = partitions[i].elements.pluck('id')
-				}
-			}
-		}, true);
-
 		$scope.save = function() {
-			formulaWatch();
-			paramWatch();
-
-			for (var symbolName in $scope.planning.parameters) {
-				var parameter = $scope.planning.parameters[symbolName],
-					partitions = $scope.elementsById[parameter.elementId].partitions,
-					numPartitions = partitions.length;
-
-				for (var i = 0; i < numPartitions; ++i)
-					// Remove filters that include all elements to make the project's JSON smaller
-					// They will be restored when editing.
-					if (parameter.filter[partitions[i].id].length == partitions[i].elements.length)
-						delete parameter.filter[partitions[i].id];
-			}
-
 			$uibModalInstance.close($scope.planning);
 		};
 		
@@ -555,22 +452,6 @@ angular
 			}
 		});
 		
-		/////////////////////
-		// Allow variables, partitions, elements and groups reordering.
-		// We need to hack around bugs in current Sortable plugin implementation.
-		// @see https://github.com/RubaXa/Sortable/issues/581
-		// @see https://github.com/RubaXa/Sortable/issues/722
-		/////////////////////
-		
-		$scope.variableSortOptions = {handle: '.variable-handle'};
-
-		$scope.dragStart = function() { document.body.classList.add('dragging'); };
-		$scope.dragEnd = function() { document.body.classList.remove('dragging'); };
-
-		$scope.onSortableMouseEvent = function(enter) {
-			$scope.variableSortOptions.disabled = enter;
-		};
-
 		// Put the form index in the scope to be able to access it without searching each time.
 		$scope.currentFormIndex = $scope.project.forms.findIndex(function(f) { return f.id == $stateParams.formId; });
 

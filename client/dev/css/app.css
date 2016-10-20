@@ -620,3 +620,13 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   padding: 4px 8px;  
   background-color: white;
 }
+
+.fa-sort {
+  cursor: pointer;
+}
+
+.pdf-export {
+  width: 180px;
+}
+
+

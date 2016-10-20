@@ -11,14 +11,14 @@ var app = angular.module('monitool.app', [
 	'monitool.controllers.project.reporting',
 
 	'monitool.directives.acl',
-	'monitool.directives.form',
+	'monitool.directives.formControls',
+	'monitool.directives.formHelpers',
+	'monitool.directives.formValidators',
 	'monitool.directives.shared',
-	'monitool.directives.indicatorForm',
 	'monitool.directives.pdfExport',
 	'monitool.directives.reporting',
 
 	'monitool.filters.shared',
-	'monitool.filters.indicator',
 
 	'monitool.services.models.indicator',
 	'monitool.services.models.input',

@@ -6,7 +6,8 @@
 			<label for="display-input" class="col-sm-2 control-label" translate="project.display"></label>
 			<div class="col-sm-10">
 				<input class="form-control" id="display-input" name="display" ng-model="planning.display" placeholder="{{'project.display_ph'|translate}}" required />
-				<p class="help-block" ng-if="planningForm.display.$error.required" translate="form.mandatory"></p>
+				
+				<!-- <p class="help-block" ng-if="planningForm.display.$error.required" translate="form.mandatory"></p> -->
 			</div>
 		</div>
 
@@ -24,17 +25,14 @@
 			</div>
 		</div>
 
-		<div class="form-group">
+		<div class="form-group" ng-show="planning.baseline !== null && planning.target !== null">
 			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
 			<div class="col-sm-10">
-				<input id="colorize-input"
-					   type="checkbox"
-					   ng-model="planning.colorize"
-					   ng-disabled="planning.baseline == null || planning.target == null" />
+				<input id="colorize-input" type="checkbox" ng-model="planning.colorize" />
 			</div>
 		</div>
 
-		<div class="form-group">
+		<div class="form-group" ng-show="planning.baseline !== null && planning.target !== null">
 			<label for="targetType-input" class="col-sm-2 control-label" translate="indicator.target"></label>
 			<div class="col-sm-10">
 				<select id="input-target" class="form-control" ng-model="planning.targetType" required>
@@ -47,58 +45,12 @@
 		</div>
 
 		<div class="form-group">
-			<label for="unit-input" class="col-sm-2 control-label" translate="indicator.unit"></label>
+			<label for="computation-input" class="col-sm-2 control-label" translate="indicator.computation"></label>
 			<div class="col-sm-10">
-				<select id="input-unit" name="unit" ng-model="planning.unit" class="form-control" required>
-					<option value="none" translate="indicator.other"></option>
-					<option value="%" translate="indicator.percent"></option>
-					<option value="‰" translate="indicator.permille"></option>
-				</select>
+				<indicator-computation forms="project.forms" ng-model="indicator.computation"></indicator-computation>
 			</div>
 		</div>
-
-		<div class="form-group">
-			<label for="formula-input" class="col-sm-2 control-label" translate="project.formula"></label>
-			<div class="col-sm-10">
-				<input expression id="colorize-input" class="form-control" ng-model="planning.formula" />
-			</div>
-		</div>
-
-		<table class="table table-bordered table-condensed table-stripped">
-			<thead>
-				<tr>
-					<th style="width: 15%" translate="project.parameter"></th>
-					<th style="width: 30%" translate="project.variable"></th>
-					<th style="width: 55%" translate="project.filters"></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="(key, parameter) in planning.parameters">
-					<!-- parameter key (this one we edit in the formula) -->
-					<td>{{key}}</td>
-
-					<!-- elementId -->
-					<td>
-						<select required
-								class="form-control"
-								ng-model="parameter.elementId"
-								ng-options="v.id as v.name group by v.group for v in selectElements"></select>
-					</td>
-					<td>
-						<div class="row" ng-repeat="partition in elementsById[parameter.elementId].partitions" style="margin-bottom: 3px">
-							<div class="col-sm-2">
-								<div style="margin: 4px">
-									<strong>{{partition.name}}</strong>
-								</div>
-							</div>
-							<div class="col-sm-10">
-								<partition-filter ng-model="parameter.filter[partition.id]" partition="partition"></partition-filter>
-							</div>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+	
 	</form>
 </div>
 

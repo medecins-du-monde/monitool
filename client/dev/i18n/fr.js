@@ -121,7 +121,7 @@ var FRENCH_LOCALE = (function() {
   },
   "id": "fr",
   "localeID": "fr",
-  "pluralCat": function(n, opt_precision) {  var i = n | 0;  if (i == 0 || i == 1) {    return PLURAL_CATEGORY.ONE;  }  return PLURAL_CATEGORY.OTHER;}
+  "pluralCat": function(n, opt_precision) {  var i = n | 0;  if (i == 0 || i == 1) { return PLURAL_CATEGORY.ONE;  }  return PLURAL_CATEGORY.OTHER;}
 }
 })();
 
@@ -231,6 +231,7 @@ var FRENCH_TRANSLATION = {
 		no_partition_groups: "Appuyez sur \"Ajouter\" pour ajouter un groupe à la partition",
 
 		no_inputs: "Aucune saisie en attente",
+		no_variable: "Aucune variable n'est définie sur cette source de données. Cliquez sur \"Ajouter une variable\" pour en créer une!",
 		no_partitions: "Aucune partition n'est définie sur cette variable",
 
 		dimensions: {
@@ -260,8 +261,8 @@ var FRENCH_TRANSLATION = {
 		user_role: "Rôle",
 		user_roles: {
 			owner: "Propriétaire",
-			input_all: "Saisisseur",
-			input: "Saisisseur limité",
+			input_all: "Saisisseur pour tous les lieux de collecte",
+			input: "Saisisseur pour certains les lieux de collecte",
 			read: "Consultation uniquement"
 		},
 		user_fullname: "Nom complet",
@@ -283,7 +284,6 @@ var FRENCH_TRANSLATION = {
 		display: "Nom",
 		display_ph: "Taux de CPN1 au sein des structures de santés",
 
-		fill_with_last_input: "Remplir avec les données de la saisie précédente",
 		show_finished: "Voir les saisies réalisées",
 		field_order: "Ordre",
 		field_distribution: "Distribution",
@@ -330,20 +330,17 @@ var FRENCH_TRANSLATION = {
 		add_partition: "Ajouter une partition",
 		remove_partition: "Supprimer la partition",
 
-		aggregation: 'Agrégation',
-		sites_agg: 'Entre lieux',
-		time_agg: 'Entre périodes',
+		aggregation: {
+			sum: "Faire une somme",
+			average: "Faire une moyenne",
+			highest: "Prendre la plus grande valeure",
+			lowest: "Prendre la plus petite valeure",
+			last: "Prendre la dernière valeur",
+			none: "Il n'est pas possible de faire ce calcul"
+		},
 
-		none: "Ne pas agréger",
-		sum: "Somme",
-		average: "Moyenne",
-		highest: "Plus grande valeure",
-		lowest: "Plus petite valeure",
-		last: "Dernière valeur",
-
-		variable_up: "Monter la variable d'un cran",
-		variable_down: "Descendre la variable d'un cran",
-
+		collection_site: "Lieu de collecte",
+		covered_period: "Période couverte",
 
 		collection_site_list: "Lieux de collecte",
 		collection_form_list: "Sources de données",
@@ -370,10 +367,8 @@ var FRENCH_TRANSLATION = {
 		activity_management: "Activités & Démographie",
 		variable: "Variable",
 
-
 		result_management: "Objectifs & résultats",
 		no_purposes: "Aucun objectif spécifique n'a été défini",
-
 
 		form_name_ph: "ex: Données système national d'information sanitaire",
 
@@ -406,7 +401,6 @@ var FRENCH_TRANSLATION = {
 		start: 'Début du projet',
 		end: 'Fin du projet',
 
-
 		periodicities: {
 			day: 'Tous les jours',
 			week: 'Toutes les semaines',
@@ -418,16 +412,14 @@ var FRENCH_TRANSLATION = {
 		collect: "Collecter",
 		collects: {
 			some_entity: "Pour certains lieux de collecte",
-			entity: "Pour chaque lieu de collecte",
+			entity: "Pour tous les lieux de collecte",
 			project: "Une fois pour tout le projet"
 		},
-
 
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',
 		no_input_groups: 'Aucun groupe d\'activité n\'a encore été créé!',
 		no_users: 'Aucun utilisateur n\'est ajouté au projet',
 		no_forms: 'Aucune source de données n\'a encore été créé',
-
 
 		input: 'Saisir',
 
@@ -436,9 +428,6 @@ var FRENCH_TRANSLATION = {
 
 		goal: 'Objectif général',
 		intervention_logic: 'Logique d\'intervention',
-		intervention_logic_goal_ph: 'Description de la contribution du projet aux objectifs (impact) d\'une politique ou d\'un programme',
-		intervention_logic_purpose_ph: 'Description des avantages directs destinés au(x) groupe(s) cible(s)',
-		assumptions_purpose_ph: 'Facteurs externes susceptibles de compromettre l’atteinte de l’objectif',
 
 		start_date: "Date de lancement",
 		end_date: "Date de fin",
@@ -451,12 +440,26 @@ var FRENCH_TRANSLATION = {
 		assumptions: 'Hypothèses',
 		output: "Résultat",
 		activities: 'Activités',
-		activity_desc_ph: 'Produit ou service tangibles apportés par le projet.',
-		output_assumptions_ph: 'Facteurs externes susceptibles de compromettre l’atteinte du résultat',
-		output_desc_ph: 'Produit ou service tangibles apportés par le projet.',
 
-		add_activity: 'Ajouter une activité',
-		add_output: 'Ajouter un résultat attendu',
+
+		intervention_logic_goal_ph: 'ex: Réduire la mortalité et la morbidité des populations affectées par la crise',
+		intervention_logic_purpose_ph: 'ex: Améliorer l\'accès aux soins des populations affectées par la crise dans les districts de Bimbo et Begoua',
+		output_desc_ph: 'ex: Améliorer la qualité des soins de première ligne des centres de santé de Bimbo et Begoua',
+		assumptions_purpose_ph: '',
+		output_assumptions_ph: '',
+		logframe_ph_name: "ex: ECHO",
+
+		logframe_help_name: "Nommez ce cadre logique de façon à l'identifier facilement. Par exemple avec le nom du bailleur auquel il est destiné",
+		logframe_help_goal: "Description de la contribution du projet aux objectifs (impact) d\'une politique ou d\'un programme",
+		logframe_help_goal_indicators: "Rentrez ici les indicateurs permettant de mesurer l'objectif géneral",
+		logframe_help_purpose_desc: "Description des avantages directs destinés au(x) groupe(s) cible(s)",
+		logframe_help_purpose_assumptions: "Facteurs externes susceptibles de compromettre l’atteinte de l’objectif",
+		logframe_help_purpose_indicators: "Rentrez ici les indicateurs permettant de mesurer l'objectif spécifique",
+		logframe_help_output_desc: "Produit ou service tangibles apportés par le projet.",
+		logframe_help_output_assumptions: "Facteurs externes susceptibles de compromettre l’atteinte du résultat",
+		logframe_help_output_indicators: "Rentrez ici les indicateurs permettant de mesurer le résultat",
+
+		add_output: 'Ajouter un résultat',
 		add_purpose: 'Ajouter un objectif spécifique',
 
 		users: "Utilisateurs",
@@ -472,24 +475,50 @@ var FRENCH_TRANSLATION = {
 		link: "Lien: {{name}}",
 		collected: "Collecté",
 
-		basics_info: 
-			"<p>Les données de bases de votre projet permettent de le classer parmi les autres. Une attention particulière doit être portée sur:</p>" + 
-			"<ul>" + 
-				"<li>Les thématiques, qui conditionneront les indicateurs transversaux à collecter</li>" + 
-				"<li>Les dates, qui conditionneront les calendriers de saisie</li>" + 
-			"</ul>",
+		basics_info: "<p>Les données de bases de votre projet permettent de le classer parmi les autres.</p>",
+		basics_help_country: "Dans quel pays le projet se déroule-t'il? S'il s'agit d'un projet régional, entrez le nom de la région.",
+		basics_help_name: "Le nom permet de retrouver le projet dans Monitool. Choisissez un nom suffisament informatif, ou copiez l'objectif général du projet.",
+		basics_help_thematics: "Le choix des thématiques conditionne les indicateurs transversaux que vous devrez collecter au sein de votre projet.",
+		basics_help_begin: "La date de début représente le moment où le projet commence à collecter des données (généralement, le début des activités)",
+		basics_help_end: "La date de fin représente le moment où le projet finale sa collecte de données. Si cette date n'est pas connu à l'avance, rentrer une date lointaine dans le futur.",
 
 		collection_site_info:
 			"<p>Lorsqu'un projet réalise les même activités dans plusieurs lieux, celles-ci doivent pouvoir être suivi individuellements, par groupes, et tous ensembles.</p>" + 
 			"<p>Rentrez ici:</p>" + 
 			"<ul>" + 
-				"<li>La liste des lieux sur lesquels le projet travail (par exemple: liste des centres de santé)</li>" + 
+				"<li>La liste des lieux sur lesquels le projet travaille (par exemple: liste des centres de santé)</li>" + 
 				"<li>Des groupements qui seront utilisé lors du suivi (par exemple: par région, ou type de structure)</li>" + 
 			"</ul>",
 
+		users_list_info:
+			"<p>Plusieurs types d'utilisateurs interviennent dans la mise en place et dans le suivi d'un projet: coordination, staff M&E, opérateurs de saisie, partenaires, ...</p>" + 
+			"<p>Listez ici tous les utilisateurs qui doivent avoir accès au monitoring de ce projet.</p>",
+
+		user_help_type: "Choisissez \"Compte MDM\" si l'utilisateur possède une adresse email xxx@medecinsdumonde.net, et compte partenaire sinon.",
+		user_help_user: "De quel utilisateur MDM s'agit-il? Si l'utilisateur que vous voulez ajouter n'est pas disponible dans la liste, demandez lui de se connecter à Monitool une première fois.",
+		user_help_username: "Cet identifiant permettra à l'utilisateur de se connecter. Les adresses emails ne sont pas acceptés comme identifiant (utiliser par exemple: \"nom.prenom\", ou \"fonction.pays\"",
+		user_help_fullname: "Rentrez ici le nom complet de la personne qui va utiliser ce compte.",
+		user_help_password: "Le mot de passe doit avoir 6 caractères au minimum. Ne pas utiliser la même valeur que l'identifiant",
+		user_help_role: "Ce champs determine les modifications que pourra réaliser cet utilisateur sur le projet: les propriétaires peuvent changer la structure du projet, les saisisseurs, uniquement rentrer des données.",
+		user_help_sites: "Sur quels lieux de collecte cet utilisateur pourra-t'il saisir des données?",
+
 		collection_form_list_info:
-			"<p>Les sources de données représentent les formulaires avec lesquelles les données nécessaires au suivi de projet sont collectés au niveau des activités</p>" + 
-			"<p>Les formulaires de saisie seront directement déduis de la description des sources de données. Afin de faciliter la saisie, les sources doivent correspondre à des outils réel utilisés sur le terrain.</p>",
+			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont présentes</p>" + 
+			"<p>Au sein de monitool, on ne décrira pas l'intégralité des données existantes, mais uniquement la partie qui va être extraite pour le suivi du projet</p>" + 
+			"<p>Afin de faciliter l'organisation de la saisie, les sources doivent correspondre à des outils réel utilisés sur le terrain.</p>",
+
+		collection_edit_help_name: "Comment s'apelle la source de laquelle vous voulez extraire des données? Par exemple: \"Dossier patient informatisé\", \"Registre des centre de santé\", \"Rapport du système national d'information sanitaire\", ...",
+		collection_edit_help_sites: "Parmi les structures identifiées dans \"Lieux de collecte\", lesquelles font remonter cette source de donnée?",
+		collection_edit_help_periodicity: "À quelle fréquence ces données remontent-elles? Attention, cette fréquence est complétement decorrelée de la fréquence à laquelle le projet doit fournir du reporting.",
+		collection_edit_help_start: "Si cette source de données est plus récente que le début du projet, indiquez la date de début, sinon laisser la valeur par défaut",
+		collection_edit_help_end: "Si cette source de données finira avant la fin du projet, ou à été remplacée, indiquez le ici",
+
+		collection_edit_help_varname: "Nommez la variable que vous voulez extraire de/du <code>{{name}}</code>. Par exemple \"Nombre de diagnostics effectués\".",
+		collection_edit_help_geoagg: "Dans un projet avec deux sites, si <code>{{name}}</code> vaut 10 pour un site, et 20 pour l'autre, que vaut-il pour le projet?",
+		collection_edit_help_timeagg: "Dans un projet qui collecte mensuellement, si <code>{{name}}</code> vaut 10 en janvier, et 20 en février et 30 en mars que vaut-il pour le premier trimestre?",
+		collection_edit_help_partition: "Veut-t'on être capable de différencier <code>{{name}}</code> par age, sexe, prise en charge, motif de consultation, pathologie, tranche horaire, reférencement effectif, ...?",
+		collection_edit_help_distribution: "Si vous desirez imprimer des formulaires en A4, préférez placer les intitulés sur la gauche des tableaux, afin de limiter leur largeur.",
+		collection_edit_help_order: "Dans quel ordre voulez vous placer vos désagrégations dans les différentes lignes et colonnes?",
 
 		logical_frame_list_info:
 			"<p>Un cadre logique est un document qui décrit les objectifs d'un projet, les activités misent en oeuvre pour y parvenir, ainsi que les indicateurs qui permette de suivre l'avancement de chaque élément</p>" + 
@@ -498,11 +527,34 @@ var FRENCH_TRANSLATION = {
 		cross_cutting_list_info:
 			"<p>Les indicateurs transversaux</p>",
 
-		users_list_info:
-			"Plusieurs types d'utilisateurs interviennent dans la mise en place et dans le suivi d'un projet: coordination, staff M&E, opérateurs de saisie, partenaires, ..." + 
-			"Listez ici tous les utilisateurs qui doivent avoir accès au monitoring du projet.",
+		input_list_info:
+			"<p>Ce planning de saisie liste toutes les saisies qui ont été programmées pour la source de données \"{{name}}\"</p>" +
+			"<p>Afin de limiter les erreurs de saisie, il est préférable de la réaliser au plus près du lieu d'où sont extraites les données, directement sur monitool.</p>" + 
+			"<p>Si ce n'est pas possible, il est possible de télécharger une version PDF à imprimer du formulaire.</p>",
 
+		download_portrait: "Télécharger PDF (portrait)",
+		download_landscape: "Télécharger PDF (paysage)",
 
+		press_to_drag: "Restez appuyé pour glisser déposer",
+		titles: "Intitulés",
+		data: "Données",
+		general_informations: "Informations génerales",
+		fill_with_last_input: "Remplir avec les données de la période précédente",
+		
+		variable_name_label: "Que mesurez-vous?",
+		variable_name_ph: "ex: Nombre de diagnostics effectués",
+		site_agg_label: "Comment grouper les saisies entre sites?",
+		time_agg_label: "Comment grouper les valeurs de plusieurs périodes",
+		partitions_label: "Quelles sont les désagrégations à utiliser sur cette variable?",
+		distribution_label: "Où placer les intitulés des désagrégations dans les formulaires?",
+		order_label: "Dans quel ordre placer les intitulés des désagrégations dans les formulaires?",
+		no_indicator: "Aucun indicateur n'est défini. Cliquez sur \"Ajouter un indicateur\"",
+		delete_form: "Supprimer la source de données",
+		delete_logical_frame: "Supprimer le cadre logique",
+		delete_purpose: "Supprimer l'objectif spécifique",
+		delete_result: "Supprimer le résultat",
+
+		
 	},
 
 	form: {
@@ -582,7 +634,7 @@ var FRENCH_TRANSLATION = {
 		create_new: 'Créer un nouvel indicateur',
 
 		cross_cutting: "Indicateurs transversaux",
-		select_themes: 'Sélectionnez une ou plusieures thématiques',
+		select_themes: 'ex: Soins de santé primaire',
 
 		edit_title: "Édition indicateur",
 		themes_label: "Thématiques",

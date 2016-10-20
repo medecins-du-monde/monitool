@@ -1,0 +1,11 @@
+<div class="input-group">
+	<span class="input-group-addon"><i class="fa fa-filter fa-fw"></i></span>
+	<ui-select id="{{id}}" name="{{id}}" multiple ng-model="container.partitionElementIds" theme="bootstrap">
+		<ui-select-match placeholder="Aucun élément selectionné">{{$item.name}}</ui-select-match>
+		<ui-select-choices repeat="filter.id as filter in selectableElements">
+			<i class="fa fa-arrow-circle-right" ng-if="filter.id == \'all\'"></i>
+			<i class="fa fa-arrow-circle-o-right" ng-if="filter.members"></i>
+			{{filter.name}}
+		</ui-select-choices>
+	</ui-select>
+</div>

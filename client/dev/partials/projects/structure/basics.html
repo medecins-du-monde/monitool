@@ -1,6 +1,6 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li class="active">{{project.name}}</li>
+	<li class="active">{{project.name|maxLength:50}}</li>
 	<li class="active" translate="project.basics"></li>
 </ol>
 
@@ -22,7 +22,15 @@
 					   placeholder="{{'project.country_ph'|translate}}"
 					   required />
 				
-				<p class="help-block" ng-if="projectForm.country.$error.required" translate="form.mandatory"></p>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.basics_help_country'|translate}}
+				</p>
+
+				<!-- <p class="help-block" ng-if="projectForm.country.$error.required">
+					<i class="fa fa-exclamation-triangle"></i>
+					{{'form.mandatory'|translate}}
+				</p> -->
 			</div>
 		</div>
 
@@ -36,18 +44,31 @@
 					   ng-model="project.name"
 					   placeholder="{{'project.name_ph'|translate}}"
 					   required />
-				
-				<p class="help-block" ng-if="projectForm.name.$error.required" translate="form.mandatory"></p>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.basics_help_name'|translate}}
+				</p>
+
+				<!-- <p class="help-block" ng-if="projectForm.name.$error.required">
+					<i class="fa fa-exclamation-triangle"></i>
+					{{'form.mandatory'|translate}}
+				</p> -->
 			</div>
 		</div>
 
 		<div class="form-group">
 			<label for="input-themes" class="col-sm-2 control-label" translate="theme.themes"></label>
 			<div class="col-sm-10">
-				<ui-select id="input-themes" multiple ng-model="project.themes" name="themes" theme="bootstrap" required>
+				<ui-select id="input-themes" multiple ng-model="project.themes" name="themes" theme="bootstrap">
 					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name[language]}}</ui-select-match>
 					<ui-select-choices repeat="theme._id as theme in themes">{{theme.name[language]}}</ui-select-choices>
 				</ui-select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.basics_help_thematics'|translate}}
+				</p>
 			</div>
 		</div>
 
@@ -55,20 +76,34 @@
 			<label for="input-start" class="col-sm-2 control-label" translate="project.start_date"></label>
 			<div class="col-sm-10">
 
-				<utc-datepicker ng-model="project.start" />
+				<utc-datepicker ng-model="project.start"></utc-datepicker>
 
-				<p class="help-block" ng-if="projectForm.start.$error.required" translate="form.mandatory"></p>
-				<p class="help-block" ng-if="projectForm.start.$error.lowerThan" translate="form.start_lower_than_end"></p>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.basics_help_begin'|translate}}
+				</p>
+
+				<!-- <p class="help-block" ng-if="projectForm.start.$error.lowerThan">
+					<i class="fa fa-exclamation-triangle"></i>
+					{{"form.start_lower_than_end"|translate}}
+				</p> -->
 			</div>
 		</div>
 
 		<div class="form-group" show-errors>
 			<label for="input-end" class="col-sm-2 control-label" translate="project.end_date"></label>
 			<div class="col-sm-10">
-				<utc-datepicker ng-model="project.end" />
+				<utc-datepicker ng-model="project.end"></utc-datepicker>
 
-				<p class="help-block" ng-if="projectForm.end.$error.required" translate="form.mandatory"></p>
-				<p class="help-block" ng-if="projectForm.end.$error.greaterThan" translate="form.end_greater_than_start"></p>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.basics_help_end'|translate}}
+				</p>
+
+				<!-- <p class="help-block" ng-if="projectForm.end.$error.greaterThan">
+					<i class="fa fa-exclamation-triangle"></i>
+					{{"form.end_greater_than_start"|translate}}
+				</p> -->
 			</div>
 		</div>
 

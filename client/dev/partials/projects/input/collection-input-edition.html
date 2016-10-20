@@ -1,29 +1,44 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name"></a></li>
-	<li><a ui-sref="main.project.input.list">{{form.name}}</a></li>
-	<li class="active" ng-bind="inputEntity.name" ng-if="inputEntity"></li>
-	<li class="active" ng-bind="currentInput.period|date"></li>
+	<li><a ui-sref="main.project.structure.basics">{{project.name|maxLength:50}}</a></li>
+	<li><a ui-sref="main.project.input.list">{{form.name|maxLength:50}}</a></li>
+	<li class="active" ng-if="inputEntity">{{inputEntity.name|maxLength:50}}</li>
+	<li class="active">{{currentInput.period|formatSlot}}</li>
 </ol>
 
 <form class="form-horizontal">
+	<legend translate="project.general_informations"></legend>
 	
-	<div class="form-group" ng-repeat="element in form.elements">
-		<label class="col-sm-2 control-label">
-			<a ng-click="currentInput.values[element.id] = lastInput.values[element.id]"
-			   tooltip="{{'project.fill_with_last_input' | translate}}"
-			   ng-if="lastInput" class="noprint"><i class="fa fa-clipboard"></i></a>
-
-			{{element.name}}<br/>
-		</label>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" translate="project.collection_site"></label>
 
 		<div class="col-sm-10">
-			{{partitions[element.id]}}
+			<input class="form-control disabled" disabled ng-value="inputEntity.name" />
+		</div>
+	</div>
 
-			<input-grid ng-model="currentInput.values[element.id]"
-						partitions="element.partitions"
-						distribution="element.distribution"
-						order="element.order"></input-grid>
+	<div class="form-group">
+		<label class="col-sm-2 control-label" translate="project.covered_period"></label>
+
+		<div class="col-sm-10">
+			<input class="form-control disabled" disabled ng-value="currentInput.period|formatSlot" />
+		</div>
+	</div>
+
+	<legend>
+		<a ng-if="lastInput" ng-click="copy()" class="btn btn-default btn-xs noprint pull-right">
+			<i class="fa fa-magic"></i>
+			{{'project.fill_with_last_input'|translate}}
+		</a>
+
+		{{'project.data'|translate}}
+	</legend>
+
+	<div class="form-group" ng-repeat="element in form.elements">
+		<label class="col-sm-2 control-label">{{element.name}}</label>
+
+		<div class="col-sm-10">
+			<input-grid ng-model="currentInput.values[element.id]" element="element"></input-grid>
 		</div>
 	</div>
 </form>

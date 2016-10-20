@@ -4,15 +4,15 @@
 			<tr ng-repeat="headerRow in partitionOrder.headerRows">
 				<td ng-repeat="leftCol in partitionOrder.leftCols"></td>
 				<td>
-					<strong>Intitulé</strong>
+					<strong translate="project.titles"></strong>
 				</td>
 			</tr>
 		</thead>
 		<tr>
 			<td ng-repeat="leftCol in partitionOrder.leftCols">
-				<strong>Intitulé</strong>
+				<strong translate="project.titles"></strong>
 			</td>
-			<td class="data-field">Données</td>
+			<td class="data-field" translate="project.data"></td>
 		</tr>
 	</table>
 
@@ -20,6 +20,6 @@
 		   name="{{uniqueIdentifier}}"
 		   id="{{partitionOrder.uniqueIdentifier}}"
 		   ng-model="container.distribution"
-		   ng-value="partitionOrder.numColumns" />
+		   ng-value="partitionOrder.distribution" />
 
 </label>
