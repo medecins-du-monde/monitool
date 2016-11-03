@@ -1,12 +1,31 @@
 
-<select class="form-control" ng-model="computationType">
-	<option value="percentage">Pourcentage</option>
-	<option value="permille">Pour mille</option>
-	<option value="copy">Copier une valeur</option>
-	<option value="formula">Formule personalisée</option>
+<select class="form-control" ng-model="computation.type">
+	<option value="unavailable" translate="project.computations.unavailable"></option>
+	<option value="fixed" translate="project.computations.fixed"></option>
+	<option value="copy" translate="project.computations.copy"></option>
+	<option value="percentage" translate="project.computations.percentage"></option>
+	<option value="permille" translate="project.computations.permille"></option>
+	<option value="formula" translate="project.computations.formula"></option>
 </select>
 
-<table class="table table-bordered table-condensed table-stripped" style="margin-top: 10px">
+
+<input type="text"
+	   class="form-control"
+	   ng-if="computation.type === 'fixed'"
+	   style="margin-top: 3px"
+	   ng-model="computation.formula"
+	   ng-pattern="'\\d+'"
+	   placeholder="{{'project.indicator_ph_fixed'|translate}}" />
+
+<p class="help-block">
+	<i class="fa fa-info-circle"></i>
+	<span translate="project.indicator_help_computation"></span>
+</p>
+
+<table class="table table-bordered table-condensed table-stripped"
+	   style="margin-top: 10px"
+	   ng-if="computation.type !== 'unavailable' && computation.type !== 'fixed'">
+
 	<thead>
 		<tr>
 			<th style="width: 15%" translate="project.parameter"></th>
@@ -23,9 +42,7 @@
 		<tr ng-repeat="(key, parameter) in computation.parameters">
 			<!-- parameter key (this one we edit in the formula) -->
 			<td>
-				<span ng-if="computation.type !== 'formula'">
-					{{('project.formula.' + key)|translate}}
-				</span>
+				<span ng-if="computation.type !== 'formula'">{{('project.formula.' + key)|translate}}</span>
 				<span ng-if="computation.type === 'formula'">{{key}}</span>
 			</td>
 
@@ -35,19 +52,24 @@
 						class="form-control"
 						ng-model="parameter.elementId"
 						ng-options="v.id as v.name group by v.group for v in selectElements"></select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.which_variable"></span>
+				</p>
 			</td>
-			<td>
-				<div class="row" ng-repeat="partition in elementsById[parameter.elementId].partitions" style="margin-bottom: 3px">
-					<div class="col-sm-2">
-						<div style="margin: 4px">
-							<strong>{{partition.name}}</strong>
-						</div>
-					</div>
-					<div class="col-sm-10">
-						<partition-filter ng-model="parameter.filter[partition.id]" partition="partition"></partition-filter>
-					</div>
-				</div>
+
+			<td ng-show="elementsById[parameter.elementId].partitions.length">
+				<partitions-filter ng-model="parameter.filter" element="elementsById[parameter.elementId]"></partitions-filter>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.which_partitions"></span>
+				</p>
 			</td>
+
+			<td ng-hide="elementsById[parameter.elementId].partitions.length"
+				style="background-color: #f3f3f3"></td>
 		</tr>
 	</tbody>
 </table>

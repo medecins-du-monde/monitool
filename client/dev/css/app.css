@@ -464,9 +464,11 @@ ul[ng-sortable] {
   list-style-type: none;
 }
 
-.dragging ul[ng-sortable] {
-  min-height: 17px;
+.dragging .drag-destination {
+  min-height: 25px;
 }
+
+
 
 
 ul[ng-sortable] i.fa.fa-bars {
@@ -512,7 +514,7 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   }
 
   .indicator-panel:nth-child(3n+1) {
-    margin: 0;
+    margin-left: 0;
   }
 }
 
@@ -523,7 +525,7 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   }
 
   .indicator-panel:nth-child(4n+1) {
-    margin: 0;
+    margin-left: 0;
   }
 }
 
@@ -535,7 +537,7 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   }
 
   .indicator-panel:nth-child(5n+1) {
-    margin: 0;
+    margin-left: 0;
   }
 }
 
@@ -546,7 +548,7 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   }
 
   .indicator-panel:nth-child(6n+1) {
-    margin: 0;
+    margin-left: 0;
   }
 }
 

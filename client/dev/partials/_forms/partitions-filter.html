@@ -1,0 +1,11 @@
+
+<div class="row" ng-repeat="partition in element.partitions" style="margin-bottom: 3px">
+	<div class="col-sm-2">
+		<div style="margin: 4px">
+			<strong>{{partition.name}}</strong>
+		</div>
+	</div>
+	<div class="col-sm-10">
+		<partition-filter ng-model="filter[partition.id]" partition="partition"></partition-filter>
+	</div>
+</div>

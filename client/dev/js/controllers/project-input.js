@@ -2,104 +2,57 @@
 
 angular.module('monitool.controllers.project.input', [])
 
-	.controller('ProjectCollectionInputListController', function($scope, $state, form, project, inputsStatus, Input) {
-		$scope.formId = form.id;
-		$scope.form=form;
+	.controller('ProjectCollectionInputListController', function($scope, $state, $stateParams, itertools, inputsStatus, Input) {
+		$scope.form = $scope.masterProject.forms.find(function(f) { return f.id == $stateParams.formId; });
+
+		//////
+		// Create planning.
+		//////
 		$scope.inputsStatus = inputsStatus;
 
+		if ($scope.form.collect == 'project')
+			$scope.columns = [{id: 'none', name: "shared.project"}];
+		else if ($scope.form.collect == 'some_entity')
+			$scope.columns = $scope.masterProject.entities.filter(function(e) { return $scope.form.entities.indexOf(e.id) !== -1; });
+		else if ($scope.form.collect == 'entity')
+			$scope.columns = $scope.masterProject.entities;
+
+		// => restrict columns depending on user permissions
+		if ($scope.userCtx.role !== 'admin') {
+			var projectUser = $scope.masterProject.users.find(function(u) {
+				return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
+					   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
+			});
+
+			if (projectUser.role === 'input')
+				$scope.columns = $scope.columns.filter(function(column) {
+					return projectUser.entities.indexOf(column.id) !== -1;
+				});
+		}
+
+		$scope.displayFooter = $scope.form.periodicity === 'free';
+
+		//////
 		// pass information needed for creating new inputs on free forms.
+		//////
+
 		$scope.newInputDate = {date: new Date(Math.floor(Date.now() / 86400000) * 86400000)};
 		
 		$scope.addInput = function(entityId) {
-			$state.go(
-				'main.project.input.edit',
-				{
-					period: $scope.newInputDate.date.toISOString().substring(0, 10),
-					formId: form.id,
-					entityId: entityId
-				}
-			);
+			var period = $scope.newInputDate.date.toISOString().substring(0, 10);
+			$state.go('main.project.input.edit', {period: period, formId: $scope.form.id, entityId: entityId});
 		};
-
-		// Write hash with metadata on columns to know if we need to display them.
-		$scope.displayInfo = {};
-		$scope.displayInfo._ = { displayFooterRow: false, numCols: 1 };
-
-		['none'].concat(project.entities.pluck('id')).forEach(function(columnId) {
-			//////////////////////
-			// List data that we need to decide if we will display this column and how.
-			//////////////////////
-			var hasExpectedInputs, hasPreviousInputs, isRelevantToForm, isAllowed;
-
-			// Check inputsStatus to know if we had previous or expected inputs.
-			hasExpectedInputs = hasPreviousInputs = false;
-			for (var strDate in inputsStatus) {
-				var inputStatus = inputsStatus[strDate][columnId];
-				if (inputStatus == 'done' || inputStatus == 'outofschedule')
-					hasPreviousInputs = true;
-
-				if (inputStatus == 'expected')
-					hasExpectedInputs = true;
-			}
-
-			// Check form definition to know which columns are relevant.
-			if (form.collect == 'project')
-				isRelevantToForm = columnId === 'none';
-			else if (form.collect == 'some_entity')
-				isRelevantToForm = columnId !== 'none' && form.entities.indexOf(columnId) !== -1;
-			else if (form.collect == 'entity')
-				isRelevantToForm = columnId !== 'none';
-			else
-				throw new Error('Invalid form.collect');
-
-			// Check user permissions to know which columns can be modified.
-			isAllowed = project.canEditInputsOnEntity(columnId);
-
-			//////////////////////
-			// Decide what to display
-			//////////////////////
-
-			// Remove the expected inputs for people that cannot edit.
-			if (!isAllowed) {
-				for (var strDate in inputsStatus) {
-					if (inputsStatus &&
-						inputsStatus[strDate] &&
-						inputsStatus[strDate][columnId] === 'expected')
-						delete inputsStatus[strDate][columnId];
-
-					if (angular.equals(inputsStatus[strDate], {}))
-						delete inputsStatus[strDate];
-				}
-
-			}
-			// if (angular.equals(inputsStatus, {}))
-			// 	delete inputsStatus;
-
-			// Create entry in columns by form.
-			$scope.displayInfo[columnId] = {
-				displayColumn: hasPreviousInputs || isRelevantToForm,
-				canEdit: isAllowed && isRelevantToForm,
-				displayAddButton: form.periodicity == 'free' && isAllowed && isRelevantToForm
-			};
-
-			if ($scope.displayInfo[columnId].displayColumn)
-				$scope.displayInfo._.numCols++;
-
-			if ($scope.displayInfo[columnId].displayAddButton)
-				$scope.displayInfo._.displayFooterRow = true;
-		});
 	})
 
-	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, form, inputs) {
-		$scope.form          = form;
+	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, $stateParams, inputs) {
+		$scope.form = $scope.masterProject.forms.find(function(f) { return f.id == $stateParams.formId; });
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
 		$scope.lastInput     = inputs.previous;
 		$scope.master        = angular.copy($scope.currentInput)
-		$scope.inputEntity   = $scope.project.entities.find(function(entity) { return entity.id == $scope.currentInput.entity; });
-
-		// Can user edit this input?
-		$scope.canEdit = $scope.project.canEditInputsOnEntity($scope.currentInput.entity);
+		
+		var entity   = $scope.masterProject.entities.find(function(e) { return e.id == $scope.currentInput.entity; });
+		$scope.inputEntityName = entity ? entity.name : 'shared.project';
 
 		$scope.copy = function() {
 			angular.copy($scope.lastInput.values, $scope.currentInput.values);
@@ -111,7 +64,7 @@ angular.module('monitool.controllers.project.input', [])
 		};
 
 		$scope.reset = function() {
-			$scope.currentInput = angular.copy($scope.master);
+			angular.copy($scope.master, $scope.currentInput);
 		};
 
 		$scope.isUnchanged = function() {
@@ -119,7 +72,7 @@ angular.module('monitool.controllers.project.input', [])
 		};
 
 		$scope.delete = function() {
-			var easy_question = $filter('translate')('project.delete_form_easy');
+			var easy_question = $filter('translate')('project.delete_input');
 
 			if (window.confirm(easy_question)) {
 				pageChangeWatch(); // remove the change page watch, because it will trigger otherwise.

@@ -1,8 +1,8 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics">{{project.name|maxLength:50}}</a></li>
+	<li><a ui-sref="main.project.structure.basics">{{editableProject.name|maxLength:50}}</a></li>
 	<li><a ui-sref="main.project.structure.collection_form_list" translate="project.collection_form_list"></a></li>
-	<li class="active">{{project.forms[currentFormIndex].name|maxLength:50}}</li>
+	<li class="active">{{editableProject.forms[currentFormIndex].name|maxLength:50}}</li>
 </ol>
 
 <div class="alert alert-danger noprint" ng-if="formUsage.length">
@@ -20,7 +20,7 @@
 				   class="form-control"
 				   id="input-name"
 				   name="name"
-				   ng-model="project.forms[currentFormIndex].name"
+				   ng-model="editableProject.forms[currentFormIndex].name"
 				   placeholder="{{'project.form_name_ph'|translate}}"
 				   required />
 			
@@ -35,7 +35,7 @@
 	<div class="form-group">
 		<label for="collect-input" class="col-sm-2 control-label" translate="project.collect"></label>
 		<div class="col-sm-10">
-			<select class="form-control" name="collect" id="collect-input" ng-model="project.forms[currentFormIndex].collect">
+			<select class="form-control" name="collect" id="collect-input" ng-model="editableProject.forms[currentFormIndex].collect">
 				<option value="some_entity" translate="project.collects.some_entity"></option>
 				<option value="entity" translate="project.collects.entity"></option>
 				<option value="project" translate="project.collects.project"></option>
@@ -43,14 +43,12 @@
 		</div>
 	</div>
 
-	<div class="form-group" ng-if="project.forms[currentFormIndex].collect == 'some_entity'">
+	<div class="form-group" ng-if="editableProject.forms[currentFormIndex].collect == 'some_entity'">
 		<label for="entities-input" class="col-sm-2 control-label"></label>
 		<div class="col-sm-10">
-			<ui-select multiple ng-model="project.forms[currentFormIndex].entities" theme="bootstrap" ui-required="true">
-				<ui-select-match placeholder="Choisir les structures pour lesquelles cette source de données s'applique">{{$item.name|translate}}</ui-select-match>
-				<ui-select-choices repeat="entity.id as entity in project.entities">
-					{{entity.name|translate}}
-				</ui-select-choices>
+			<ui-select multiple ng-model="editableProject.forms[currentFormIndex].entities" theme="bootstrap" ui-required="true">
+				<ui-select-match placeholder="{{'project.choose_sites_for_form'|translate}}">{{$item.name|translate}}</ui-select-match>
+				<ui-select-choices repeat="entity.id as entity in editableProject.entities">{{entity.name|translate}}</ui-select-choices>
 			</ui-select>
 		</div>
 	</div>
@@ -68,7 +66,7 @@
 	<div class="form-group">
 		<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
 		<div class="col-sm-10">
-			<select class="form-control" name="periodicity" id="periodicity-input" ng-model="project.forms[currentFormIndex].periodicity">
+			<select class="form-control" name="periodicity" id="periodicity-input" ng-model="editableProject.forms[currentFormIndex].periodicity">
 				<option value="day" translate="project.periodicities.day"></option>
 				<option value="week" translate="project.periodicities.week"></option>
 				<option value="month" translate="project.periodicities.month"></option>
@@ -84,10 +82,10 @@
 		</div>
 	</div>
 
-	<div class="form-group" ng-if="project.forms[currentFormIndex].periodicity !== 'free'">
+	<div class="form-group" ng-if="editableProject.forms[currentFormIndex].periodicity !== 'free'">
 		<label for="periodicity" class="col-sm-2 control-label" translate="project.specific_start"></label>
 		<div class="col-sm-10">
-			<optional-date ng-model="project.forms[currentFormIndex].start" default="project.start" message="project.same_as_start"></optional-date>
+			<optional-date ng-model="editableProject.forms[currentFormIndex].start" default="editableProject.start" message="project.same_as_start"></optional-date>
 
 			<span class="help-block">
 				<i class="fa fa-info-circle"></i>
@@ -96,10 +94,10 @@
 		</div>
 	</div>
 
-	<div class="form-group" ng-if="project.forms[currentFormIndex].periodicity !== 'free'">
+	<div class="form-group" ng-if="editableProject.forms[currentFormIndex].periodicity !== 'free'">
 		<label for="periodicity" class="col-sm-2 control-label" translate="project.specific_end"></label>
 		<div class="col-sm-10">
-			<optional-date ng-model="project.forms[currentFormIndex].end" default="project.end" message="project.same_as_end"></optional-date>
+			<optional-date ng-model="editableProject.forms[currentFormIndex].end" default="editableProject.end" message="project.same_as_end"></optional-date>
 
 			<span class="help-block">
 				<i class="fa fa-info-circle"></i>
@@ -110,10 +108,10 @@
 
 	<legend translate="project.collection_form_structure"></legend>
 
-	<div ng-if="project.forms[currentFormIndex].elements.length === 0" translate="project.no_variable"></div>
+	<div ng-if="editableProject.forms[currentFormIndex].elements.length === 0" translate="project.no_variable"></div>
 
 	<div ng-sortable="{handle: '.variable-handle'}">
-		<div class="panel panel-info" ng-repeat="(index, element) in project.forms[currentFormIndex].elements">
+		<div class="panel panel-info" ng-repeat="(index, element) in editableProject.forms[currentFormIndex].elements">
 			<div class="panel-heading">
 				<div class="pull-right">
 					<a class="btn btn-xxs btn-default variable-handle">
@@ -121,7 +119,7 @@
 						{{'project.press_to_drag'|translate}}
 					</a>
 
-					<a class="btn btn-xxs btn-danger" ng-click="remove(element, project.forms[currentFormIndex].elements)">
+					<a class="btn btn-xxs btn-danger" ng-click="remove(element, editableProject.forms[currentFormIndex].elements)">
 						<i class="fa fa-times"></i>
 						{{'project.remove_variable'|translate}}
 					</a>
@@ -140,7 +138,7 @@
 
 						<span class="help-block">
 							<i class="fa fa-info-circle"></i>
-							<span translate="project.collection_edit_help_varname" translate-values="{name: project.forms[currentFormIndex].name}"></span>
+							<span translate="project.collection_edit_help_varname" translate-values="{name: editableProject.forms[currentFormIndex].name}"></span>
 						</span>
 					</div>
 				</div>
@@ -252,7 +250,7 @@
 </form>
 
 <div class="pull-right">
-	<button ng-click="deleteForm()" ng-if="master.forms[currentFormIndex]" class="btn btn-danger">
+	<button ng-click="deleteForm()" ng-if="masterProject.forms[currentFormIndex]" class="btn btn-danger">
 		<i class="fa fa-times"></i>
 		<span translate="project.delete_form"></span>
 	</button>

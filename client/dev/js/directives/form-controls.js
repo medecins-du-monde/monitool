@@ -80,7 +80,8 @@ angular.module('monitool.directives.formControls', [])
 			templateUrl: 'partials/_forms/optional-number.html',
 			scope: {default:'=default'},
 			link: function(scope, element, attributes, ngModelController) {
-
+				scope.message = attributes.message;
+				
 				ngModelController.$formatters.push(function(modelValue) {
 					if (modelValue === null)
 						return {specifyValue: false, chosenValue: scope.default};
@@ -266,143 +267,6 @@ angular.module('monitool.directives.formControls', [])
 				});
 			}
 		};
-	})
-
-
-	.directive('partitionFilter', function(itertools) {
-
-		// @FIXME This was also there.
-		// scope.elementsById = {};
-
-		// scope.forms.forEach(function(form) {
-		// 	form.elements.forEach(function(element) {
-		// 		scope.elementsById[element.id] = element;
-		// 	});
-		// });
-
-		// @FIXME Why the fuck did I not do that inside partition-filter directive?
-		// it's trying to remove filter that are full, but why there?
-
-		// for (var symbolName in $scope.planning.parameters) {
-		// 	var parameter = $scope.planning.parameters[symbolName],
-		// 		partitions = $scope.elementsById[parameter.elementId].partitions,
-		// 		numPartitions = partitions.length;
-
-		// 	for (var i = 0; i < numPartitions; ++i)
-		// 		// Remove filters that include all elements to make the project's JSON smaller
-		// 		// They will be restored when editing.
-		// 		if (parameter.filter[partitions[i].id].length == partitions[i].elements.length)
-		// 			delete parameter.filter[partitions[i].id];
-		// }
-
-
-		// @FIXME same as before, why the fuck is that in the indicatorComputation directive?
-		// This only plays with filters.
-
-		// Watch computation.parameters to ensure that filters are valid.
-		// var paramWatch = scope.$watch('computation.parameters', function() {
-		// 	for (var symbolName in scope.computation.parameters) {
-		// 		var parameter = scope.computation.parameters[symbolName];
-
-		// 		// Having a null elementId might always mean that filter is undefined...
-		// 		if (!parameter.elementId)
-		// 			parameter.filter = {};
-
-		// 		else {
-		// 			var partitions = scope.elementsById[parameter.elementId].partitions,
-		// 				numPartitions = partitions.length;
-
-		// 			// Remove partitions in the filter that are not from this element
-		// 			for (var partitionId in parameter.filter)
-		// 				if (!partitions.find(function(e) { return e.id == partitionId; }))
-		// 					delete parameter.filter[partitionId];
-
-		// 			// Add missing partitions
-		// 			for (var i = 0; i < numPartitions; ++i)
-		// 				if (!parameter.filter[partitions[i].id])
-		// 					parameter.filter[partitions[i].id] = partitions[i].elements.pluck('id')
-		// 		}
-		// 	}
-		// }, true);
-
-		var model2view = function(model, partition) {
-			if (model.length == partition.elements.length)
-				return ['all'];
-			
-			// retrieve all groups that are in the list.
-			var selectedGroups = partition.groups.filter(function(group) {
-				return itertools.isSubset(model, group.members);
-			});
-			var numSelectedGroups = selectedGroups.length;
-
-			var additionalElements = model.filter(function(partitionElementId) {
-				for (var i = 0; i < numSelectedGroups; ++i)
-					if (selectedGroups[i].members.indexOf(partitionElementId) !== -1)
-						return false;
-				return true;
-			});
-
-			return selectedGroups.pluck('id').concat(additionalElements);
-		};
-
-		var view2model = function(view, partition) {
-			var model = {};
-
-			view.forEach(function(id) {
-				if (id == 'all')
-					partition.elements.forEach(function(e) { model[e.id] = true; });
-				
-				else {
-					var group = partition.groups.find(function(g) { return g.id == id; });
-					if (group)
-						group.members.forEach(function(m) { model[m] = true; });
-					else
-						model[id] = true;
-				}
-			});
-
-			return Object.keys(model);
-		};
-
-		return {
-			restrict: "E",
-			require: "ngModel",
-			scope: {}, // isolate scope
-			templateUrl: 'partials/_forms/partition-filter.html',
-			link: function(scope, element, attributes, ngModelController) {
-				// the parameter need to be evaluated in the parent scope (because we use an isolated scope).
-				var partition = scope.$parent.$eval(attributes.partition);
-
-				var allSelectableElements = [{id: 'all', name: 'Tous les éléments'}].concat(partition.groups.concat(partition.elements));
-
-				scope.id = Math.random().toString().substring(2);
-				// scope.selectableElements = allSelectableElements;
-				scope.container = {};
-				
-				ngModelController.$formatters.push(function(modelValue) {
-					return model2view(modelValue, partition);
-				});
-
-				ngModelController.$parsers.push(function(viewValue) {
-					return view2model(viewValue, partition);
-				});
-
-				ngModelController.$render = function() {
-					scope.container.partitionElementIds = ngModelController.$viewValue;
-				};
-
-				scope.$watch('container.partitionElementIds', function(partitionElementIds) {
-					scope.container.partitionElementIds = model2view(view2model(partitionElementIds, partition), partition);
-					ngModelController.$setViewValue(partitionElementIds);
-
-					scope.selectableElements = allSelectableElements.filter(function() {
-						return true;
-						/// FIXME
-					});
-
-				}, true)
-			}
-		}
 	})
 
 	.directive('inputGrid', function(itertools, Parser) {
@@ -625,6 +489,10 @@ angular.module('monitool.directives.formControls', [])
 
 	.directive('indicatorComputation', function(itertools, Parser) {
 
+		var PERCENTAGE_FORMULA = '100 * numerator / denominator',
+			PERMILLE_FORMULA   = '1000 * numerator / denominator',
+			COPY_FORMULA       = 'copied_value';
+
 		return {
 			restrict: 'E',
 			require: 'ngModel',
@@ -633,52 +501,20 @@ angular.module('monitool.directives.formControls', [])
 				forms: '='
 			},
 			link: function(scope, element, attributes, ngModelController) {
-
-				ngModelController.$parsers.push(function(modelValue) {
-					// Discover type of indicator from the formula.
-					var type;
-					if (modelValue.formula === '100 * numerator / denominator + "%"')
-						type = 'percentage';
-					else if (modelValue.formula === '1000 * numerator / denominator + "‰"')
-						type = 'permille';
-					else if (modelValue.formula === 'copied_value')
-						type = 'copy';
-					else
-						type = 'formula';
-
-					// Return both.
-					return {type: type, modelValue: modelValue};
-				});
-
-				ngModelController.$formatters.push(function(viewValue) {
-					return viewValue.modelValue;
-				});
-
-				ngModelController.$render = function() {
-					$scope.computationType = viewValue.type;
-					$scope.computation = viewValue.modelValue;
-				};
-
-				scope.$watch('computationType', function(computationType) {
-					if (computationType === 'percentage')
-						scope.computation.formula = '100 * numerator / denominator + "%"';
-					else if (computationType === 'permille')
-						scope.computation.formula = '1000 * numerator / denominator + "‰"';
-					else if (computationType === 'copy')
-						scope.computation.formula = 'copied_value';
-				});
-
-				// Build possible variables and filters.
-				scope.selectElements = []
+				scope.selectElements = [];
+				scope.elementsById = {};
 				scope.forms.forEach(function(form) {
 					form.elements.forEach(function(element) {
-						scope.selectElements.push({id: element.id, name: element.name, group: form.name});
+						scope.elementsById[element.id] = element; // Use to find partition on view
+						scope.selectElements.push({id: element.id, name: element.name, group: form.name}); // Used by selectbox
 					});
 				});
-				
-				var formulaWatch = scope.$watch('computation.formula', function(formula) {
-					var newSymbols, oldSymbols = Object.keys(scope.computation.parameters).sort();
-					try { newSymbols = Parser.parse(scope.computation.formula).variables().sort(); }
+
+				var formulaWatch; // The watch will be set by 
+				var onFormulaChange = function(formula) {
+					// Create and remove items in computation.parameters hash, when the formula changes.
+					var newSymbols, oldSymbols = Object.keys(scope.computation.parameters);
+					try { newSymbols = Parser.parse(scope.computation.formula).variables(); }
 					catch (e) { newSymbols = []; }
 
 					if (!angular.equals(newSymbols, oldSymbols)) {
@@ -693,8 +529,210 @@ angular.module('monitool.directives.formControls', [])
 							scope.computation.parameters[s] = {elementId: null, filter: {}};
 						});
 					}
+				};
+
+				ngModelController.$render = function() {
+					scope.computation = ngModelController.$viewValue;
+
+					// we set the watch once the model is passed to the directive.
+					if (!formulaWatch)
+						formulaWatch = scope.$watch('computation.formula', onFormulaChange);
+				};
+
+				ngModelController.$parsers.push(function(viewValue) {
+					if (scope.computation.type === 'unavailable')
+						return null;
+					
+					else if (scope.computation.type === 'fixed')
+						return {formula: scope.computation.formula, parameters: {}};
+					
+					else
+						return {formula: scope.computation.formula, parameters: scope.computation.parameters};
 				});
 
+				ngModelController.$formatters.push(function(modelValue) {
+					// Guess formula type with the content.
+					if (modelValue === null)
+						return {type: 'unavailable', formula: '', parameters: {}};
+					
+					else if (!isNaN(modelValue.formula))
+						return {type: 'fixed', formula: modelValue.formula, parameters: {}};
+					
+					else if (modelValue.formula === COPY_FORMULA)
+						return {type: 'copy', formula: COPY_FORMULA, parameters: modelValue.parameters};
+					
+					else if (modelValue.formula === PERCENTAGE_FORMULA)
+						return {type: 'percentage', formula: PERCENTAGE_FORMULA, parameters: modelValue.parameters};
+					
+					else if (modelValue.formula === PERMILLE_FORMULA)
+						return {type: 'permille', formula: PERMILLE_FORMULA, parameters: modelValue.parameters};
+					
+					else
+						return {type: 'formula', formula: modelValue.formula, parameters: modelValue.parameters};
+				});
+
+				scope.$watch('computation', function() {
+					ngModelController.$setViewValue(angular.copy(scope.computation));
+				}, true);
+
+				// when computation type is manually changed, update the formula.
+				scope.$watch('computation.type', function() {
+					// change fixed formula only if it is needed.
+					if (scope.computation.type === 'fixed' && isNaN(scope.computation.formula))
+						scope.computation.formula = '0';
+
+					else if (scope.computation.type === 'copy')
+						scope.computation.formula = COPY_FORMULA;
+					
+					else if (scope.computation.type === 'percentage')
+						scope.computation.formula = PERCENTAGE_FORMULA;
+
+					else if (scope.computation.type === 'permille')
+						scope.computation.formula = PERMILLE_FORMULA;
+				});
 			}
 		};
-	});
+	})
+
+	.directive('partitionsFilter', function() {
+
+		return {
+			restrict: 'E',
+			require: "ngModel",
+			scope: { element: '=' },
+			templateUrl: 'partials/_forms/partitions-filter.html',
+
+			link: function(scope, element, attributes, ngModelController) {
+
+				scope.$watch('element', function(element, oldElement) {
+					if (element === undefined || element === null)
+						scope.filter = {};
+					
+					else if (element !== oldElement) {
+						scope.filter = {};
+
+						element.partitions.forEach(function(partition) {
+							scope.filter[partition.id] = partition.elements.pluck('id');
+						});
+					}
+				});
+
+				ngModelController.$parsers.push(function(viewValue) {
+					var modelValue = {};
+
+					if (scope.element)
+						scope.element.partitions.forEach(function(partition) {
+							if (viewValue[partition.id].length !== partition.elements.length)
+								modelValue[partition.id] = viewValue[partition.id];
+						});
+
+					return modelValue;
+				});
+
+				ngModelController.$formatters.push(function(modelValue) {
+					var viewValue = {};
+
+					if (scope.element)
+						scope.element.partitions.forEach(function(partition) {
+							if (modelValue[partition.id])
+								viewValue[partition.id] = modelValue[partition.id];
+							else
+								viewValue[partition.id] = partition.elements.pluck('id');
+						});
+
+					return viewValue;
+				});
+
+				ngModelController.$render = function() {
+					scope.filter = ngModelController.$viewValue;
+				};
+
+				scope.$watch('filter', function() {
+					ngModelController.$setViewValue(angular.copy(scope.filter));
+				}, true)
+			}
+		}
+	})
+
+
+	.directive('partitionFilter', function(itertools) {
+
+		var model2view = function(model, partition) {
+			if (model.length == partition.elements.length)
+				return ['all'];
+			
+			// retrieve all groups that are in the list.
+			var selectedGroups = partition.groups.filter(function(group) {
+				return itertools.isSubset(model, group.members);
+			});
+			var numSelectedGroups = selectedGroups.length;
+
+			var additionalElements = model.filter(function(partitionElementId) {
+				for (var i = 0; i < numSelectedGroups; ++i)
+					if (selectedGroups[i].members.indexOf(partitionElementId) !== -1)
+						return false;
+				return true;
+			});
+
+			return selectedGroups.pluck('id').concat(additionalElements);
+		};
+
+		var view2model = function(view, partition) {
+			var model = {};
+
+			view.forEach(function(id) {
+				if (id == 'all')
+					partition.elements.forEach(function(e) { model[e.id] = true; });
+				
+				else {
+					var group = partition.groups.find(function(g) { return g.id == id; });
+					if (group)
+						group.members.forEach(function(m) { model[m] = true; });
+					else
+						model[id] = true;
+				}
+			});
+
+			return Object.keys(model);
+		};
+
+		return {
+			restrict: "E",
+			require: "ngModel",
+			scope: {
+				partition: '='
+			},
+			templateUrl: 'partials/_forms/partition-filter.html',
+			link: function(scope, element, attributes, ngModelController) {
+				scope.container = {};
+
+				scope.$watch('partition', function(partition, oldPartition) {
+					scope.selectableElements = [{id: 'all', name: 'Tous les éléments'}].concat(partition.groups).concat(partition.elements);
+					
+					if (oldPartition !== partition)
+						scope.container.selectedElements = ['all'];
+				});
+				
+				ngModelController.$formatters.push(function(modelValue) {
+					return model2view(modelValue, scope.partition);
+				});
+
+				ngModelController.$parsers.push(function(viewValue) {
+					return view2model(viewValue, scope.partition);
+				});
+
+				ngModelController.$render = function() {
+					scope.container.selectedElements = ngModelController.$viewValue;
+				};
+
+				scope.$watch('container.selectedElements', function(selectedElements) {
+					if (selectedElements.length === 2 && selectedElements[0] === 'all')
+						scope.container.selectedElements = [selectedElements[1]];
+					else
+						scope.container.selectedElements = model2view(view2model(selectedElements, scope.partition), scope.partition);
+
+					ngModelController.$setViewValue(selectedElements);
+				}, true)
+			}
+		}
+	})

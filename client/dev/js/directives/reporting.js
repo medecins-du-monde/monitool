@@ -115,26 +115,25 @@ angular.module('monitool.directives.reporting', [])
 			link: function($scope, element, attributes, controller) {
 
 				$scope.$watch('col', function(value) {
-					if (typeof value === "string") {
-						// element.html('<span style="font-size: 6px">' + value + '</span>');
-						element.html('<i class="fa fa-ban"></i>');
+					if (value === undefined) {
+						element.html('');
+						element.css('background-color', '#eee');
+					}
+					else if (typeof value === "string") {
+						element.html('<i class="fa fa-ban" title="' + value + '"></i>');
 						element.css('background-color', '');
 					}
 					else if (Number.isNaN(value)) {
-						element.html('<i class="fa fa-exclamation-triangle"></i>');
+						element.html('<i class="fa fa-exclamation-triangle" title="NaN"></i>');
 						element.css('background-color', '');
 					}
 					else if (typeof value === "number") {
 						// if baseline and target are available.
 						if ($scope.row.colorize && $scope.row.baseline !== null && $scope.row.target !== null) {
-							var progress = null;
 							var baseline = parseInt($scope.row.baseline), target = parseInt($scope.row.target);
 
 							// compute progress 
-							if ($scope.row.targetType === 'around_is_better')
-								progress = 1 - Math.abs(value - target) / (target - baseline);
-							else
-								progress = (value - baseline) / (target - baseline);
+							var progress = (value - baseline) / (target - baseline);
 
 							// and apply color to field
 							if (progress < .333)
@@ -147,14 +146,11 @@ angular.module('monitool.directives.reporting', [])
 						else
 							element.css('background-color', '');
 
-						if ($scope.row.unit == 'none' || !$scope.row.unit)
-							element.html(Math.round(value));
-						else
-							element.html(Math.round(value) + $scope.row.unit);
+						element.html(Math.round(value));
 					}
 					else {
-						element.html('');
-						element.css('background-color', '#eee');
+						element.html('<i class="fa fa-interrogation" title="' + value + '"></i>');
+						element.css('background-color', '');
 					}
 				}, true);
 			}
@@ -263,17 +259,6 @@ angular.module('monitool.directives.reporting', [])
 			}
 		}
 	})
-
-	.directive('reportPreview', function() {
-		return {
-			restrict: 'AE',
-			templateUrl: 'partials/projects/reporting/preview.html',
-			scope: {
-				"result": "=data"
-			}
-		}
-	})
-
 
 	.directive('olapGrid', function(itertools) {
 		return {

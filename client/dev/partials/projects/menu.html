@@ -4,15 +4,17 @@
 		<div class="panel-group">
 
 			<div class="panel panel-default" acl-has-project-role="owner">
-				<div class="panel-heading"  ng-click="showStructure=!showStructure">
-					<button class="btn btn-default btn-xxs pull-right" style="margin-top: -1px">
-						<i class="fa fa-angle-double-down" ng-if="!showStructure"></i>
-						<i class="fa fa-angle-double-up" ng-if="showStructure"></i>
+				<div class="panel-heading" ng-click="structureSwitchVisibility()">
+					
+					<button class="btn btn-default btn-xxs pull-right" style="margin-top: -1px" disable-if="!isStructureFoldable()">
+						<i class="fa fa-angle-double-down" ng-if="!isStructureVisible()"></i>
+						<i class="fa fa-angle-double-up" ng-if="isStructureVisible()"></i>
 					</button>
+
 					<h4 class="panel-title" translate="project.structure"></h4>
 				</div>
 
-				<div class="panel-collapse" ng-show="showStructure">
+				<div class="panel-collapse" ng-show="isStructureVisible()">
 					<div class="list-group">
 						<a ui-sref="main.project.structure.basics"
 						   ui-sref-active="active"
@@ -25,10 +27,9 @@
 						<a ui-sref="main.project.structure.collection_site_list"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._rev"
-						   disable-if="!project._rev">
+						   disable-if="!masterProject._rev">
 
-							<span class="label label-default pull-right">{{master.entities.length}}</span>
+							<span class="label label-default pull-right">{{masterProject.entities.length}}</span>
 							<i class="fa fa-map-marker fa-fw"></i>
 							<span translate="project.collection_site_list"></span>
 						</a>
@@ -36,9 +37,9 @@
 						<a ui-sref="main.project.structure.user_list"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._rev" disable-if="!project._rev">
+						   disable-if="!masterProject._rev">
 
-						   <span class="label label-default pull-right">{{master.users.length}}</span>
+						   <span class="label label-default pull-right">{{masterProject.users.length}}</span>
 							<i class="fa fa-user fa-fw"></i>
 							<span translate="project.users"></span>
 						</a>
@@ -46,10 +47,9 @@
 						<a ui-sref="main.project.structure.collection_form_list"
 						   class="list-group-item"
 						   ng-class="{active: $state.is('main.project.structure.collection_form_list') || $state.is('main.project.structure.collection_form_edition')}"
-						   eat-click-if="!project._rev"
-						   disable-if="!project._rev">
+						   disable-if="!masterProject._rev">
 							
-							<span class="label label-default pull-right">{{master.forms.length}}</span>
+							<span class="label label-default pull-right">{{masterProject.forms.length}}</span>
 							<i class="fa fa-sign-in fa-fw"></i>
 							<span translate="project.collection_form_list"></span>
 						</a>
@@ -57,9 +57,9 @@
 						<a ui-sref="main.project.structure.logical_frame_list"
 						   ng-class="{active: $state.is('main.project.structure.logical_frame_list') || $state.is('main.project.structure.logical_frame_edition')}"
 						   class="list-group-item"
-						   eat-click-if="!project._rev" disable-if="!project._rev">
+						   disable-if="!masterProject._rev">
 
-							<span class="label label-default pull-right">{{master.logicalFrames.length}}</span>
+							<span class="label label-default pull-right">{{masterProject.logicalFrames.length}}</span>
 							<i class="fa fa-sign-out fa-fw"></i>
 							<span translate="shared.logical_frames"></span>
 						</a>
@@ -67,9 +67,9 @@
 						<a ui-sref="main.project.structure.cross_cutting"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._rev" disable-if="!project._rev">
+						   disable-if="!masterProject._rev">
 
-							<span class="label label-default pull-right">{{master.crossCutting|length}}</span>
+							<span class="label label-default pull-right">{{masterProject.crossCutting|length}}</span>
 							<i class="fa fa-sign-out fa-fw"></i>
 							<span translate="indicator.cross_cutting"></span>
 						</a>
@@ -88,15 +88,15 @@
 						<a ui-sref="main.project.input.list({formId: form.id})"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   ng-repeat="form in master.forms"
-						   eat-click-if="!project._rev || !projectActivityReady"
-						   disable-if="!project._rev || !projectActivityReady">
+						   acl-has-input-form="form.id"
+						   ng-repeat="form in masterProject.forms"
+						   disable-if="!projectReadyForReporting">
 							<i class="fa fa-pencil fa-fw"></i>
 							<span>{{form.name}}</span>
 						</a>
 						
 
-						<a class="list-group-item" ng-if="!master.forms.length" disable-if="1">
+						<a class="list-group-item" ng-if="!masterProject.forms.length" disable-if="1">
 							<i class="fa fa-pencil fa-fw"></i>
 							<span translate="project.no_data_source"></span>
 						</a>
@@ -116,8 +116,7 @@
 						<a ui-sref="main.project.reporting.general"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._rev || !projectActivityReady"
-						   disable-if="!project._rev || !projectActivityReady">
+						   disable-if="!projectReadyForReporting">
 
 							<i class="fa fa-line-chart fa-fw"></i>
 							<span translate="shared.reporting_general"></span>
@@ -126,8 +125,7 @@
 						<a ui-sref="main.project.reporting.detailed"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._rev || !projectActivityReady"
-						   disable-if="!project._rev || !projectActivityReady">
+						   disable-if="!projectReadyForReporting">
 							<i class="fa fa-bar-chart fa-fw"></i>
 							<span translate="project.reporting_compare_sites"></span>
 						</a>
@@ -135,8 +133,7 @@
 						<a ui-sref="main.project.reporting.olap"
 						   ui-sref-active="active"
 						   class="list-group-item"
-						   eat-click-if="!project._rev || !projectActivityReady"
-						   disable-if="!project._rev || !projectActivityReady">
+						   disable-if="!projectReadyForReporting">
 							<i class="fa fa-table fa-fw"></i>
 							<span translate="project.pivot_table"></span>
 						</a>
@@ -144,22 +141,20 @@
 				</div>
 			</div>
 
-
-
 			<div class="panel panel-default" ng-if="userCtx.type == 'user'">
 				<div class="panel-collapse">
 					<div class="list-group">
-						<a class="list-group-item list-group-item-info" ng-click="cloneProject()" eat-click-if="!project._rev" disable-if="!project._rev" acl-has-project-creation>
+						<a class="list-group-item list-group-item-info" ng-click="cloneProject()" disable-if="!masterProject._rev" acl-has-project-creation>
 							<i class="fa fa-clone fa-fw"></i>
 							<span translate="shared.clone"></span>
 						</a>
 
-						<a class="list-group-item list-group-item-info" disable-if="1" acl-lacks-project-creation>
+						<a class="list-group-item list-group-item-info" disable-if="1" acl-lacks-project-creation style="cursor: not-allowed">
 							<i class="fa fa-clone fa-fw"></i>
 							<span translate="shared.clone"></span>
 						</a>						
 
-						<a class="list-group-item list-group-item-danger" ng-click="deleteProject()" eat-click-if="!project._rev" disable-if="!project._rev" acl-has-project-role="owner">
+						<a class="list-group-item list-group-item-danger" ng-click="deleteProject()" disable-if="!masterProject._rev" acl-has-project-role="owner">
 							<i class="fa fa-trash fa-fw"></i>
 							<span translate="shared.delete"></span>
 						</a>

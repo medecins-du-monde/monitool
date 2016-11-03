@@ -1,8 +1,8 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name|maxLength:50"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="editableProject.name|maxLength:50"></a></li>
 	<li><a ui-sref="main.project.structure.logical_frame_list" translate="shared.logical_frames"></a></li>
-	<li class="active">{{project.logicalFrames[logicalFrameIndex].name|maxLength:50}}</li>
+	<li class="active">{{editableProject.logicalFrames[logicalFrameIndex].name|maxLength:50}}</li>
 </ol>
 
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate ng-if="logicalFrameIndex !== null">
@@ -21,7 +21,7 @@
 						  id="logframe-name-input"
 						  placeholder="{{'project.logframe_ph_name'|translate}}"
 						  required
-						  ng-model="project.logicalFrames[logicalFrameIndex].name"></textarea>
+						  ng-model="editableProject.logicalFrames[logicalFrameIndex].name"></textarea>
 
 				<span class="help-block">
 					<i class="fa fa-info-circle"></i>
@@ -39,7 +39,7 @@
 						  name="goalDesc"
 						  id="logframe-goal-input"
 						  placeholder="{{'project.intervention_logic_goal_ph'|translate}}"
-						  ng-model="project.logicalFrames[logicalFrameIndex].goal"></textarea>
+						  ng-model="editableProject.logicalFrames[logicalFrameIndex].goal"></textarea>
 
 				<span class="help-block">
 					<i class="fa fa-info-circle"></i>
@@ -51,33 +51,46 @@
 		<div class="form-group">
 			<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 			<div class="col-sm-10">
-
 				<div class="form-control-static">
-					<div class="well" style="padding: 5px;">
-						<ul ng-sortable="indicatorsSortOptions"
-							ng-mouseenter="onSortableMouseEvent('indicators', true)"
-							ng-mouseleave="onSortableMouseEvent('indicators', false)">
-							
-							<li ng-if="project.logicalFrames[logicalFrameIndex].indicators.length == 0" translate="project.no_indicator"></li>
-							
-							<li ng-repeat="indicator in project.logicalFrames[logicalFrameIndex].indicators">
-								<i class="fa fa-sort fa-fw indicator-handle"></i>
-								<a ng-click="editIndicator(indicator, project.logicalFrames[logicalFrameIndex].indicators)">{{indicator.display}}</a>
-							</li>
-						</ul>
+					<div class="drag-destination" ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)"><div class="panel panel-default indicator-panel" ng-repeat="indicator in editableProject.logicalFrames[logicalFrameIndex].indicators">
+						<div class="panel-heading">
+							<i class="fa fa-arrows fa-fw indicator-handle"></i>
+							{{indicator.display}}
+						</div>
+						
+						<div class="panel-body" style="padding-bottom: 10px">
+							<strong>{{'project.baseline'|translate}}:</strong> {{indicator.baseline != null ? indicator.baseline : '?'}}<br/>
+							<strong>{{'project.target'|translate}}:</strong> {{indicator.target != null ? indicator.target : '?'}}<br/>
+							<p>
+								<strong>{{'project.computation'|translate}}:</strong>
+								<span class="text-danger" ng-if="!indicator.computation">
+									{{'project.indicator_is_not_computed'|translate}}
+									<i class="fa fa-unlink" ></i>
+								</span>
+								<span class="text-success" ng-if="indicator.computation">
+									{{'project.indicator_is_computed'|translate}}
+									<i class="fa fa-link" ></i>
+								</span>
+							</p>
+							<button class="btn btn-xxs btn-default" style="width: 100%; display: block" ng-click="editIndicator(indicator, editableProject.logicalFrames[logicalFrameIndex].indicators)">
+								<i class="fa fa-pencil"></i>
+								{{'shared.edit'|translate}}
+							</button>
+						</div>
+					</div></div>
 
-						<p>
-							<a class="btn btn-default btn-xxs" ng-click="editIndicator(null, project.logicalFrames[logicalFrameIndex].indicators)">
-								<i class="fa fa-plus"></i>
-								{{"project.add_indicator"|translate}}
-							</a>
-						</p>
-					</div>
+					<p>
+						<a class="btn btn-default btn-sm" ng-click="editIndicator(null, editableProject.logicalFrames[logicalFrameIndex].indicators)">
+							<i class="fa fa-plus"></i>
+							{{"project.add_indicator"|translate}}
+						</a>
+					</p>
 
-					<span class="help-block" style="margin-top: -15px">
+					<span class="help-block">
 						<i class="fa fa-info-circle"></i>
 						<span translate="project.logframe_help_goal_indicators"></span>
 					</span>
+
 				</div>
 			</div>
 		</div>
@@ -86,16 +99,16 @@
 	<fieldset>
 		<legend translate="project.purposes"></legend>
 		
-		<p ng-if="project.logicalFrames[logicalFrameIndex].purposes.length == 0" translate="project.no_purposes"></p>
+		<p ng-if="editableProject.logicalFrames[logicalFrameIndex].purposes.length == 0" translate="project.no_purposes"></p>
 
 		<div ng-sortable="purposeSortOptions" ng-mouseenter="onSortableMouseEvent('purposes', true)" ng-mouseleave="onSortableMouseEvent('purposes', false)">
 
-			<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in project.logicalFrames[logicalFrameIndex].purposes">
+			<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in editableProject.logicalFrames[logicalFrameIndex].purposes">
 
 				<div class="panel-heading">
 					<div class="panel-title">
 						<a class="btn btn-danger btn-xs pull-right"
-						   ng-click="remove(purpose, project.logicalFrames[logicalFrameIndex].purposes)">
+						   ng-click="remove(purpose, editableProject.logicalFrames[logicalFrameIndex].purposes)">
 
 							<i class="fa fa-remove"></i>
 							<span translate="project.delete_purpose"></span>
@@ -145,28 +158,42 @@
 							<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 							<div class="col-sm-10">
 								<div class="form-control-static">
-									<div class="well" style="padding: 5px;">
-										<ul ng-sortable="indicatorsSortOptions"
-											ng-mouseenter="onSortableMouseEvent('indicators', true)"
-											ng-mouseleave="onSortableMouseEvent('indicators', false)">
-											
-											<li ng-if="purpose.indicators.length == 0" translate="project.no_indicator"></li>
-											
-											<li ng-repeat="indicator in purpose.indicators">
-												<i class="fa fa-sort fa-fw indicator-handle"></i>
-												<a ng-click="editIndicator(indicator, purpose.indicators)">{{indicator.display}}</a>
-											</li>
-										</ul>
 
-										<p>
-											<a class="btn btn-default btn-xxs" ng-click="editIndicator(null, purpose.indicators)">
-												<i class="fa fa-plus"></i>
-												{{"project.add_indicator"|translate}}
-											</a>
-										</p>
-									</div>
+									<div class="drag-destination" ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)"><div class="panel panel-default indicator-panel" ng-repeat="indicator in purpose.indicators">
+										<div class="panel-heading">
+											<i class="fa fa-arrows fa-fw indicator-handle"></i>
+											{{indicator.display}}
+										</div>
+										
+										<div class="panel-body" style="padding-bottom: 10px">
+											<strong>{{'project.baseline'|translate}}:</strong> {{indicator.baseline != null ? indicator.baseline : '?'}}<br/>
+											<strong>{{'project.target'|translate}}:</strong> {{indicator.target != null ? indicator.target : '?'}}<br/>
+											<p>
+												<strong>{{'project.computation'|translate}}:</strong>
+												<span class="text-danger" ng-if="!indicator.computation">
+													{{'project.indicator_is_not_computed'|translate}}
+													<i class="fa fa-unlink" ></i>
+												</span>
+												<span class="text-success" ng-if="indicator.computation">
+													{{'project.indicator_is_computed'|translate}}
+													<i class="fa fa-link" ></i>
+												</span>
+											</p>
+											<button class="btn btn-xxs btn-default" style="width: 100%; display: block" ng-click="editIndicator(indicator, purpose.indicators)">
+												<i class="fa fa-pencil"></i>
+												{{'shared.edit'|translate}}
+											</button>
+										</div>
+									</div></div>
 
-									<span class="help-block" style="margin-top: -15px">
+									<p>
+										<a class="btn btn-default btn-sm" ng-click="editIndicator(null, purpose.indicators)">
+											<i class="fa fa-plus"></i>
+											{{"project.add_indicator"|translate}}
+										</a>
+									</p>
+
+									<span class="help-block">
 										<i class="fa fa-info-circle"></i>
 										<span translate="project.logframe_help_purpose_indicators"></span>
 									</span>
@@ -228,28 +255,42 @@
 											<label class="col-sm-2 control-label" translate="shared.indicators"></label>
 											<div class="col-sm-10">
 												<div class="form-control-static">
-													<div class="well" style="padding: 5px;">
-														<ul ng-sortable="indicatorsSortOptions"
-															ng-mouseenter="onSortableMouseEvent('indicators', true)"
-															ng-mouseleave="onSortableMouseEvent('indicators', false)">
-															
-															<li ng-if="output.indicators.length == 0" translate="project.no_indicator"></li>
-															
-															<li ng-repeat="indicator in output.indicators">
-																<i class="fa fa-sort fa-fw indicator-handle"></i>
-																<a ng-click="editIndicator(indicator, output.indicators)">{{indicator.display}}</a>
-															</li>
-														</ul>
 
-														<p>
-															<a class="btn btn-default btn-xxs" ng-click="editIndicator(null, output.indicators)">
-																<i class="fa fa-plus"></i>
-																{{"project.add_indicator"|translate}}
-															</a>
-														</p>
-													</div>
+													<div class="drag-destination" ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)"><div class="panel panel-default indicator-panel" ng-repeat="indicator in output.indicators">
+														<div class="panel-heading">
+															<i class="fa fa-arrows fa-fw indicator-handle"></i>
+															{{indicator.display}}
+														</div>
+														
+														<div class="panel-body" style="padding-bottom: 10px">
+															<strong>{{'project.baseline'|translate}}:</strong> {{indicator.baseline != null ? indicator.baseline : '?'}}<br/>
+															<strong>{{'project.target'|translate}}:</strong> {{indicator.target != null ? indicator.target : '?'}}<br/>
+															<p>
+																<strong>{{'project.computation'|translate}}:</strong>
+																<span class="text-danger" ng-if="!indicator.computation">
+																	{{'project.indicator_is_not_computed'|translate}}
+																	<i class="fa fa-unlink" ></i>
+																</span>
+																<span class="text-success" ng-if="indicator.computation">
+																	{{'project.indicator_is_computed'|translate}}
+																	<i class="fa fa-link" ></i>
+																</span>
+															</p>
+															<button class="btn btn-xxs btn-default" style="width: 100%; display: block" ng-click="editIndicator(indicator, output.indicators)">
+																<i class="fa fa-pencil"></i>
+																{{'shared.edit'|translate}}
+															</button>
+														</div>
+													</div></div>
 
-													<span class="help-block" style="margin-top: -15px">
+													<p>
+														<a class="btn btn-default btn-sm" ng-click="editIndicator(null, output.indicators)">
+															<i class="fa fa-plus"></i>
+															{{"project.add_indicator"|translate}}
+														</a>
+													</p>
+
+													<span class="help-block">
 														<i class="fa fa-info-circle"></i>
 														<span translate="project.logframe_help_output_indicators"></span>
 													</span>
@@ -280,7 +321,7 @@
 <br/>
 
 <div class="pull-right">
-	<button ng-click="deleteLogicalFrame()" ng-if="master.logicalFrames[logicalFrameIndex]" class="btn btn-danger">
+	<button ng-click="deleteLogicalFrame()" ng-if="masterProject.logicalFrames[logicalFrameIndex]" class="btn btn-danger">
 		<i class="fa fa-times"></i>
 		<span translate="project.delete_logical_frame"></span>
 	</button>

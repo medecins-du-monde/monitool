@@ -1,12 +1,19 @@
 
 <div class="input-group">
-	<div class="input-group-addon">
+	<div class="input-group-addon" style="vertical-align: middle;">
 		<input type="checkbox" ng-model="specifyValue" />
 	</div>
 
 	<input type="number"
 		   ng-model="chosenValue"
-		   ng-disabled="!specifyValue"
-		   ng-required="specifyValue"
+		   ng-if="specifyValue"
+		   required
 		   class="form-control" />
+
+	<input type="text"
+		   ng-if="!specifyValue"
+		   value="{{message|translate}}"
+		   disabled
+		   class="form-control disabled" />
+
 </div>

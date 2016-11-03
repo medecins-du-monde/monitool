@@ -1,6 +1,6 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name|maxLength:50"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="masterProject.name|maxLength:50"></a></li>
 	<li class="active" translate="project.users"></li>
 </ol>
 
@@ -18,14 +18,14 @@
 			<th translate="project.collection_site_list"></th>
 		</tr>
 	</thead>
-	<tbody ng-if="project.users.length == 0">
+	<tbody ng-if="editableProject.users.length == 0">
 		<tr>
 			<td colspan="5" style="text-align: center" translate="project.no_users"></td>
 		</tr>
 	</tbody>
 
-	<tbody ng-if="project.users.length != 0" ng-sortable="{handle: '.handle'}">
-		<tr ng-repeat="user in project.users">
+	<tbody ng-if="editableProject.users.length != 0" ng-sortable="{handle: '.handle'}">
+		<tr ng-repeat="user in editableProject.users">
 			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 
 			<td style="text-align: center">

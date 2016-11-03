@@ -1,27 +1,45 @@
 <div class="modal-body">
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
-		<legend translate="project.edit_indicator"></legend>
+		<legend translate="project.edit_indicator" ng-if="!indicator"></legend>
+		<legend ng-if="indicator">{{indicator.name[language]}}</legend>
 
-		<div class="form-group" show-errors>
+		<div class="form-group" ng-if="!indicator">
 			<label for="display-input" class="col-sm-2 control-label" translate="project.display"></label>
 			<div class="col-sm-10">
-				<input class="form-control" id="display-input" name="display" ng-model="planning.display" placeholder="{{'project.display_ph'|translate}}" required />
-				
-				<!-- <p class="help-block" ng-if="planningForm.display.$error.required" translate="form.mandatory"></p> -->
+
+				<input id="display-input"
+					   class="form-control"
+					   name="display"
+					   ng-model="planning.display"
+					   placeholder="{{'project.display_ph'|translate}}"
+					   required />
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_display"></span>
+				</p>
 			</div>
 		</div>
 
 		<div class="form-group">
 			<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
 			<div class="col-sm-10">
-				<optional-number ng-model="planning.baseline" default="0"></optional-number>
+				<optional-number ng-model="planning.baseline" default="0" message="project.value_unknown"></optional-number>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_baseline"></span>
+				</p>
 			</div>
 		</div>
 
 		<div class="form-group">
 			<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
 			<div class="col-sm-10">
-				<optional-number ng-model="planning.target" default="100"></optional-number>
+				<optional-number ng-model="planning.target" default="100" message="project.value_unknown"></optional-number>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_target"></span>
+				</p>
 			</div>
 		</div>
 
@@ -29,28 +47,19 @@
 			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
 			<div class="col-sm-10">
 				<input id="colorize-input" type="checkbox" ng-model="planning.colorize" />
-			</div>
-		</div>
-
-		<div class="form-group" ng-show="planning.baseline !== null && planning.target !== null">
-			<label for="targetType-input" class="col-sm-2 control-label" translate="indicator.target"></label>
-			<div class="col-sm-10">
-				<select id="input-target" class="form-control" ng-model="planning.targetType" required>
-					<option value="lower_is_better" translate="indicator.lower_is_better"></option>
-					<option value="higher_is_better" translate="indicator.higher_is_better"></option>
-					<option value="around_is_better" translate="indicator.around_is_better"></option>
-					<option value="non_relevant" translate="indicator.non_relevant"></option>
-				</select>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_colorize"></span>
+				</p>
 			</div>
 		</div>
 
 		<div class="form-group">
-			<label for="computation-input" class="col-sm-2 control-label" translate="indicator.computation"></label>
+			<label for="computation-input" class="col-sm-2 control-label" translate="project.computation"></label>
 			<div class="col-sm-10">
-				<indicator-computation forms="project.forms" ng-model="indicator.computation"></indicator-computation>
+				<indicator-computation forms="editableProject.forms" ng-model="planning.computation"></indicator-computation>
 			</div>
 		</div>
-	
 	</form>
 </div>
 

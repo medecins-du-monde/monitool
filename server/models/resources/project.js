@@ -11,7 +11,7 @@ var validate = validator({
 	title: "Monitool project schema",
 	type: "object",
 	additionalProperties: false,
-	required: [ '_id', 'type', 'name', 'start', 'end', 'entities', 'groups', 'forms', 'themes', 'logicalFrames', 'users'],
+	required: [ '_id', 'type', 'name', 'themes', 'start', 'end', 'entities', 'groups', 'forms', 'crossCutting', 'logicalFrames', 'users'],
 
 	properties: {
 		_id: { $ref: "#/definitions/uuid" },
@@ -172,13 +172,7 @@ var validate = validator({
 			additionalProperties: false,
 			patternProperties: {
 				"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$": {
-					type: "object",
-					additionalProperties: false,
-					required: ["formula", "parameters"],
-					properties: {
-						formula: {type: "string", minLength: 1},
-						parameters: { $ref: "#/definitions/parameter_list" }
-					}
+					$ref: "#/definitions/cc_indicator"
 				}
 			}
 		}
@@ -241,54 +235,78 @@ var validate = validator({
 			}
 		},
 
-		indicators: {
-			type: "array",
-			items: {
-				type: "object",
-				additionalProperties: false,
-				required: ["baseline", "target", "colorize", "display", "formula", "parameters", "targetType", "unit"],
-				properties: {
-					baseline: {oneOf: [{type: 'null'}, {type: 'number'}]},
-					target: {oneOf: [{type: 'null'}, {type: 'number'}]},
-					colorize: {type: "boolean"},
-					display: {type: "string", minLength: 1},
-					formula: {type: "string", minLength: 1},
-					targetType: {
-						type: "string",
-						enum: ['lower_is_better', 'higher_is_better', 'around_is_better', 'non_relevant']
-					},
-					unit: {
-						type: "string",
-						enum: ["none", "%", "‰"]
-					},
-					parameters: { $ref: "#/definitions/parameter_list" }
-				}
-			}
-		},
+		computation: {
 
-		parameter_list: {
-			type: "object",
-			additionalProperties: false,
-			patternProperties: {
-				".*": {
+			oneOf: [
+				{
 					type: "object",
 					additionalProperties: false,
-					required: ["elementId", "filter"],
+					required: ["formula", "parameters"],
 					properties: {
-						elementId: {oneOf: [{$ref: "#/definitions/uuid"}, {type: 'null'}]},
-						filter: {
+
+						formula: {
+							type: "string",
+							minLength: 1
+						},
+
+						parameters: {
 							type: "object",
 							additionalProperties: false,
 							patternProperties: {
 								".*": {
-									type: "array",
-									items: {$ref: "#/definitions/uuid"}
+									type: "object",
+									additionalProperties: false,
+									required: ["elementId", "filter"],
+									properties: {
+										elementId: {$ref: "#/definitions/uuid"},
+										filter: {
+											type: "object",
+											additionalProperties: false,
+											patternProperties: {
+												".*": {
+													type: "array",
+													items: {$ref: "#/definitions/uuid"}
+												}
+											}
+										}
+									}
 								}
 							}
 						}
-					}
-				}
+					}	
+				},
+				{type: 'null'}
+			]
+		},
+
+		indicator: {
+			type: "object",
+			additionalProperties: false,
+			required: ["baseline", "target", "colorize", "display", "computation"],
+			properties: {
+				display: {type: "string", minLength: 1},
+				baseline: {oneOf: [{type: 'null'}, {type: 'number'}]},
+				target: {oneOf: [{type: 'null'}, {type: 'number'}]},
+				colorize: {type: "boolean"},
+				computation: { $ref: "#/definitions/computation" }
 			}
+		},
+
+		cc_indicator: {
+			type: "object",
+			additionalProperties: false,
+			required: ["baseline", "target", "colorize", "computation"],
+			properties: {
+				baseline: {oneOf: [{type: 'null'}, {type: 'number'}]},
+				target: {oneOf: [{type: 'null'}, {type: 'number'}]},
+				colorize: {type: "boolean"},
+				computation: { $ref: "#/definitions/computation" }
+			}
+		},
+
+		indicators: {
+			type: "array",
+			items: { $ref: "#/definitions/indicator" }
 		}
 	}
 });

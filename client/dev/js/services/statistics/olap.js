@@ -205,7 +205,12 @@ angular
 			// rewrite the filter so that it contains only dimensions.
 			filter = this._remove_dimension_groups(filter);
 			filter = this._rewrite_as_indexes(filter);
-			return this._query_rec(filter, 0);
+			try {
+				return this._query_rec(filter, 0);
+			}
+			catch (e) {
+				return e.message;
+			}
 		};
 
 		// FIXME we need to push/pop instead of shift/unshift (it's 10 times faster).
@@ -283,12 +288,13 @@ angular
 						++contributions;
 					}
 				}
+
 				if (contributions > 1)
-					result = NaN;
+					throw new Error('AGGREGATION_FORBIDDEN');
 			}
 
 			else
-				throw new Error('Invalid mode: ' + dimension.aggregation);
+				throw new Error('INVALID_AGGREGATION_MODE');
 
 			if (contributions == 0)
 				result = undefined;
@@ -394,11 +400,11 @@ angular
 	.factory("CompoundCube", function(Cube, Parser) {
 		
 
-		var createDimension = function(dimensionId, childDimension, indicator, cubes) {
+		var createDimension = function(dimensionId, childDimension, computation, cubes) {
 			var itemsLists = [];
 
-			for (var key in indicator.parameters) {
-				var cube = cubes[indicator.parameters[key].elementId],
+			for (var key in computation.parameters) {
+				var cube = cubes[computation.parameters[key].elementId],
 					dimension = cube.dimensionsById[dimensionId] || cube.dimensionGroupsById[dimensionId];
 
 				itemsLists.push(dimension.items);
@@ -406,63 +412,66 @@ angular
 
 			var items = itemsLists.reduce(function(memo, arr) {
 				return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
-			}, null);
+			}, null) || [];
 
 			items.sort();
 			
 			return {id: dimensionId, childDimension: childDimension, items: items};				
 		};
 
-		var CompoundCube = function(indicator, cubes) {
-			this.indicator = indicator;
+		var CompoundCube = function(computation, cubes) {
+			this.computation = computation;
 			this.cubes = cubes;
 			
 			this.dimensions = [];
 			this.dimensionGroups = [];
 
+			// retrieve all dimensions and groups for parameters of computation
 			var dimensionIds = [];
-			for (var key in indicator.parameters) {
-				var cube = cubes[indicator.parameters[key].elementId],
+			for (var key in computation.parameters) {
+				var cube = cubes[computation.parameters[key].elementId],
 					dimensions = Object.keys(cube.dimensionsById).concat(Object.keys(cube.dimensionGroupsById));
 
 				dimensionIds.push(dimensions);
 			}
 
+			// intersect them to know which dimensions we have left
 			dimensionIds = dimensionIds.reduce(function(memo, arr) {
 				return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
-			}, null);
+			}, null) || [];
 
+			// create fake dimensions and groups to mimic the intersection.
 			if (dimensionIds.indexOf('day') !== -1) {
-				this.dimensions.push(createDimension('day', undefined, indicator, cubes));
-				this.dimensionGroups.push(createDimension('week', 'day', indicator, cubes));
-				this.dimensionGroups.push(createDimension('month', 'day', indicator, cubes));
-				this.dimensionGroups.push(createDimension('quarter', 'day', indicator, cubes));
-				this.dimensionGroups.push(createDimension('year', 'day', indicator, cubes));
+				this.dimensions.push(createDimension('day', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('week', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('month', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'day', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('week') !== -1) {
-				this.dimensions.push(createDimension('week', undefined, indicator, cubes));
-				this.dimensionGroups.push(createDimension('month', 'week', indicator, cubes));
-				this.dimensionGroups.push(createDimension('quarter', 'week', indicator, cubes));
-				this.dimensionGroups.push(createDimension('year', 'week', indicator, cubes));
+				this.dimensions.push(createDimension('week', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('month', 'week', computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'week', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'week', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('month') !== -1) {
-				this.dimensions.push(createDimension('month', undefined, indicator, cubes));
-				this.dimensionGroups.push(createDimension('quarter', 'month', indicator, cubes));
-				this.dimensionGroups.push(createDimension('year', 'month', indicator, cubes));
+				this.dimensions.push(createDimension('month', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'month', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'month', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('quarter') !== -1) {
-				this.dimensions.push(createDimension('quarter', undefined, indicator, cubes));
-				this.dimensionGroups.push(createDimension('year', 'quarter', indicator, cubes));
+				this.dimensions.push(createDimension('quarter', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'quarter', computation, cubes));
 			}
 			else {
-				this.dimensions.push(createDimension('year', undefined, indicator, cubes));
+				this.dimensions.push(createDimension('year', undefined, computation, cubes));
 			}
 
 			if (dimensionIds.indexOf('entity') !== -1) {
-				this.dimensions.push(createDimension('entity', undefined, indicator, cubes));
+				this.dimensions.push(createDimension('entity', undefined, computation, cubes));
 
 				if (dimensionIds.indexOf('group') !== -1)
-					this.dimensionGroups.push(createDimension('group', 'entity', indicator, cubes));
+					this.dimensionGroups.push(createDimension('group', 'entity', computation, cubes));
 			}
 
 			// Index dimensions and dimensionGroups by id
@@ -479,20 +488,26 @@ angular
 		CompoundCube.prototype._query_total = function(filter) {
 			var localScope = {};
 
-			for (var key in this.indicator.parameters) {
-				var parameter = this.indicator.parameters[key],
+			for (var key in this.computation.parameters) {
+				var parameter = this.computation.parameters[key],
 					cube = this.cubes[parameter.elementId];
 
 				var finalFilter = angular.copy(filter)
-				for (var key2 in parameter.filter) finalFilter[key2] = parameter.filter[key2];
+				for (var key2 in parameter.filter)
+					finalFilter[key2] = parameter.filter[key2];
 
 				localScope[key] = cube._query_total(finalFilter);
+				if (typeof localScope[key] !== 'number') // undefined, 'AGGREGATION_FORBIDDEN', 'INVALID_AGGREGATION_MODE'
+					return localScope[key];
 			}
 
+			console.log(this.computation)
+
 			try {
-				return Parser.evaluate(this.indicator.formula, localScope);
+				return Parser.evaluate(this.computation.formula, localScope);
 			}
 			catch (e) {
+				console.log(e)
 				return 'INVALID_FORMULA';
 			}
 		};

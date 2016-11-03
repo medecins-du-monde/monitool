@@ -40,7 +40,6 @@ old.list({include_docs: true}, function(error, result) {
 		if (indicator.comments) {
 
 			indicator.unit = 'none';
-			indicator.targetType = 'higher_is_better';
 			indicator.description = indicator.comments;
 
 			delete indicator.source;

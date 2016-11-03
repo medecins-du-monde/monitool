@@ -11,7 +11,7 @@ var validate = validator({
 	type: "object",
 	additionalProperties: false,
 	required: [
-		"_id", "type", "name", "description", "unit", "targetType", "themes"
+		"_id", "type", "name", "description", "themes"
 	],
 	properties: {
 		_id:       { $ref: "#/definitions/uuid" },
@@ -23,9 +23,7 @@ var validate = validator({
 			type: "array",
 			uniqueItems: true,
 			items: { "$ref": "#/definitions/uuid" }
-		},
-		unit: { type: "string", "enum": ["none", "%", "‰"]},
-		targetType: {type: "string", "enum": ["lower_is_better", "higher_is_better", "around_is_better", "non_relevant"]}
+		}
 	},
 	definitions: {
 		translated_req: {

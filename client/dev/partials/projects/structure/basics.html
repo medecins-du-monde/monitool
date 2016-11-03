@@ -1,6 +1,6 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li class="active">{{project.name|maxLength:50}}</li>
+	<li class="active">{{editableProject.name|maxLength:50}}</li>
 	<li class="active" translate="project.basics"></li>
 </ol>
 
@@ -18,7 +18,7 @@
 					   type="text"
 					   class="form-control"
 					   name="country"
-					   ng-model="project.country"
+					   ng-model="editableProject.country"
 					   placeholder="{{'project.country_ph'|translate}}"
 					   required />
 				
@@ -41,7 +41,7 @@
 					   type="text"
 					   class="form-control"
 					   name="name"
-					   ng-model="project.name"
+					   ng-model="editableProject.name"
 					   placeholder="{{'project.name_ph'|translate}}"
 					   required />
 
@@ -60,7 +60,7 @@
 		<div class="form-group">
 			<label for="input-themes" class="col-sm-2 control-label" translate="theme.themes"></label>
 			<div class="col-sm-10">
-				<ui-select id="input-themes" multiple ng-model="project.themes" name="themes" theme="bootstrap">
+				<ui-select id="input-themes" multiple ng-model="editableProject.themes" name="themes" theme="bootstrap">
 					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name[language]}}</ui-select-match>
 					<ui-select-choices repeat="theme._id as theme in themes">{{theme.name[language]}}</ui-select-choices>
 				</ui-select>
@@ -76,7 +76,7 @@
 			<label for="input-start" class="col-sm-2 control-label" translate="project.start_date"></label>
 			<div class="col-sm-10">
 
-				<utc-datepicker ng-model="project.start"></utc-datepicker>
+				<utc-datepicker ng-model="editableProject.start"></utc-datepicker>
 
 				<p class="help-block">
 					<i class="fa fa-info-circle"></i>
@@ -93,7 +93,7 @@
 		<div class="form-group" show-errors>
 			<label for="input-end" class="col-sm-2 control-label" translate="project.end_date"></label>
 			<div class="col-sm-10">
-				<utc-datepicker ng-model="project.end"></utc-datepicker>
+				<utc-datepicker ng-model="editableProject.end"></utc-datepicker>
 
 				<p class="help-block">
 					<i class="fa fa-info-circle"></i>

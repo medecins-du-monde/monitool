@@ -281,6 +281,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 	$stateProvider.state('main.project.structure', {
 		abstract: true,
+		controller: 'ProjectEditController',
 		templateUrl: 'partials/projects/structure/menu.html'
 	});
 
@@ -296,9 +297,20 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	});
 
 	$stateProvider.state('main.project.structure.collection_site_list', {
-		url: '/site',
+		url: '/sites',
 		templateUrl: 'partials/projects/structure/collection-site-list.html',
 		controller: 'ProjectCollectionSiteListController'
+	});
+
+	$stateProvider.state('main.project.structure.user_list', {
+		url: '/users',
+		templateUrl: 'partials/projects/structure/user-list.html',
+		controller: 'ProjectUserListController',
+		resolve: {
+			users: function(User) {
+				return User.query().$promise;
+			}
+		}
 	});
 
 	$stateProvider.state('main.project.structure.collection_form_list', {
@@ -344,16 +356,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectLogicalFrameEditController'
 	});
 
-	$stateProvider.state('main.project.structure.user_list', {
-		url: '/users',
-		templateUrl: 'partials/projects/structure/user-list.html',
-		controller: 'ProjectUserListController',
-		resolve: {
-			users: function(User) {
-				return User.query().$promise;
-			}
-		}
-	});
+
 
 	///////////////////////////
 	// Project Input
@@ -365,9 +368,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/input/:formId',
 		template: '<div ui-view></div>',
 		resolve: {
-			form: function($stateParams, project) {
-				return project.forms.find(function(form) { return form.id == $stateParams.formId; });
-			}
+			// form: function($stateParams, project) {
+			// 	return project.forms.find(function(form) { return form.id == $stateParams.formId; });
+			// }
 		}
 	});
 
@@ -376,8 +379,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/input/collection-input-list.html',
 		controller: 'ProjectCollectionInputListController',
 		resolve: {
-			inputsStatus: function(Input, project, form) {
-				return Input.fetchFormStatus(project, form.id);
+			inputsStatus: function(Input, project, $stateParams) {
+				return Input.fetchFormStatus(project, $stateParams.formId);
 			}
 		}
 	});
@@ -387,8 +390,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/input/collection-input-edition.html',
 		controller: 'ProjectCollectionInputEditionController',
 		resolve: {
-			inputs: function(Input, $stateParams, project, form) {
-				return Input.fetchLasts(project._id, $stateParams.entityId, form, $stateParams.period);
+			inputs: function(Input, $stateParams, project) {
+				return Input.fetchLasts(project, $stateParams.entityId, $stateParams.formId, $stateParams.period);
 			}
 		}
 	});
@@ -485,6 +488,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 app.run(function($rootScope, $state) {
 	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+		if (error.status === 401) {
+			alert("Session has expired, you need to log in again");
+			window.location.reload();
+		}
+
 		console.log(error)
 		console.log(error.stack)
 	});

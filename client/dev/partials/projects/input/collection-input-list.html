@@ -1,6 +1,6 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics">{{project.name|maxLength:50}}></a></li>
+	<li><a ui-sref="main.project.structure.basics">{{masterProject.name|maxLength:50}}</a></li>
 	<li class="active">{{form.name|maxLength:50}}</li>
 </ol>
 
@@ -18,7 +18,6 @@
 		</a>
 	</div>
 
-
 	<span translate="project.input_list_info" translate-values="{name: form.name}"></span>
 </div>
 
@@ -29,59 +28,39 @@
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th ng-style="{width: (100 / displayInfo._.numCols) + '%'}"
-				translate="shared.date"></th>
-
-			<th ng-style="{width: (100 / displayInfo._.numCols) + '%'}"
-				ng-if="displayInfo.none.displayColumn"
-				translate="shared.project"></th>
-
-			<th ng-style="{width: (100 / displayInfo._.numCols) + '%'}"
-				ng-if="displayInfo[entity.id].displayColumn"
-				ng-repeat="entity in project.entities">{{entity.name}}</th>
+			<th ng-style="{width: (100 / displayInfo._.numCols) + '%'}" translate="shared.date"></th>
+			<th ng-style="{width: (100 / (columns.length + 1)) + '%'}"
+				ng-repeat="col in columns">
+				{{col.name|translate}}
+			</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="(date, status) in inputsStatus">
 			<th>{{date|formatSlot}}</th>
-			<td ng-if="displayInfo.none.displayColumn">
+
+			<td ng-repeat="col in columns">
 				<a class="btn btn-xs"
-				   ng-class="{'btn-default': status.none === 'done', 'btn-primary': status.none === 'expected', 'btn-danger': status.none === 'outofschedule'}"
-				   ui-sref="main.project.input.edit({period: date, entityId: 'none'})"
-				   ng-if="status.none">
-					{{('project.input_status.' + status.none + (displayInfo.none.canEdit ? '-edit' : '-read')) | translate}}
-				</a>
-			</td>
-			<td ng-if="displayInfo[entity.id].displayColumn" ng-repeat="entity in project.entities">
-				<a class="btn btn-xs"
-				   ng-class="{'btn-default': status[entity.id] === 'done', 'btn-primary': status[entity.id] === 'expected', 'btn-danger': status[entity.id] === 'outofschedule'}"
-				   ui-sref="main.project.input.edit({period: date, entityId: entity.id})"
-				   ng-if="status[entity.id]">
-					{{('project.input_status.' + status[entity.id] + (displayInfo[entity.id].canEdit ? '-edit' : '-read')) | translate}}
+				   ng-class="{'btn-default': status[col.id] === 'done', 'btn-primary': status[col.id] === 'expected', 'btn-danger': status[col.id] === 'outofschedule'}"
+				   ui-sref="main.project.input.edit({period: date, entityId: col.id})"
+				   ng-if="status[col.id]">
+					{{('project.input_status.' + status[col.id]) | translate}}
 				</a>
 			</td>
 		</tr>
 
 		<tr ng-hide="inputsStatus">
-			<td style="text-align: center" colspan="{{displayInfo._.numCols}}" translate="project.no_inputs"></td>
+			<td style="text-align: center" colspan="{{columns.length + 1}}" translate="project.no_inputs"></td>
 		</tr>
 	</tbody>
-	<tfoot ng-if="displayInfo._.displayFooterRow">
+	<tfoot ng-if="displayFooter">
 		<tr>
 			<th>
-				<utc-datepicker ng-model="newInputDate.date" />
+				<utc-datepicker ng-model="newInputDate.date"></utc-datepicker>
 			</th>
-			<td ng-if="displayInfo.none.displayColumn">
-				<a class="btn btn-xs btn-success"
-				   ng-click="addInput('none')"
-				   translate="project.input_status.expected-edit-new"
-				   ng-if="displayInfo.none.displayAddButton"></a>
-			</td>
-			<td ng-if="displayInfo[entity.id].displayColumn" ng-repeat="entity in project.entities">
-				<a class="btn btn-xs btn-success"
-				   ng-click="addInput(entity.id)"
-				   translate="project.input_status.expected-edit-new"
-				   ng-if="displayInfo[entity.id].displayAddButton"></a>
+
+			<td ng-repeat="col in columns">
+				<a class="btn btn-xs btn-success" ng-click="addInput(col.id)" translate="project.input_status.expected-new"></a>
 			</td>
 		</tr>
 	</tfoot>

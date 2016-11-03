@@ -11,7 +11,7 @@ angular
 
 	.controller('ProjectReportingController', function($scope, Cube, cubes, mtReporting, indicators) {
 		// Create default filter so that all inputs are used.
-		$scope.filters = {_location: "none", _start: $scope.project.start, _end: $scope.project.end < new Date() ? $scope.project.end : new Date()};
+		$scope.filters = {_location: "none", _start: $scope.masterProject.start, _end: $scope.masterProject.end < new Date() ? $scope.masterProject.end : new Date()};
 
 		// default group by
 		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
@@ -32,28 +32,28 @@ angular
 		// This hash allows to select indicators for plotting. It is used by directives.
 		$scope.plots = {};
 
-		$scope.blocks = $scope.project.logicalFrames.map(function(logicalFrame, index) {
+		$scope.blocks = $scope.masterProject.logicalFrames.map(function(logicalFrame, index) {
 			return {text: "Logical frame: " + logicalFrame.name};
 		})
 		.concat([{text: "Cross-Cutting Indicators"}])
-		.concat($scope.project.forms.map(function(form, index) {
+		.concat($scope.masterProject.forms.map(function(form, index) {
 			return {text: "Data source: " + form.name};
 		}));
 		$scope.open = $scope.blocks.map(function(_, index) { return index == 0; });
 
 		$scope.$watch('[filters, groupBy, splits, open]', function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, $scope.filters._location, $scope.project)
+			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, $scope.filters._location, $scope.masterProject)
 
-			$scope.project.logicalFrames.forEach(function(logicalFrame, index) {
-				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeLogicalFrameReporting(cubes, $scope.project, logicalFrame, $scope.groupBy, $scope.filters) : null;
+			$scope.masterProject.logicalFrames.forEach(function(logicalFrame, index) {
+				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeLogicalFrameReporting(cubes, $scope.masterProject, logicalFrame, $scope.groupBy, $scope.filters) : null;
 			});
 
-			var index = $scope.project.logicalFrames.length
-			$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeCrossCuttingReporting(cubes, $scope.project, indicators, $scope.groupBy, $scope.filters) : null;
+			var index = $scope.masterProject.logicalFrames.length
+			$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeCrossCuttingReporting(cubes, $scope.masterProject, indicators, $scope.groupBy, $scope.filters) : null;
 
-			$scope.project.forms.forEach(function(form, index) {
-				index += $scope.project.logicalFrames.length + 1;
-				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeDataSourceReporting(cubes, $scope.project, form, $scope.groupBy, $scope.filters, $scope.splits) : null;
+			$scope.masterProject.forms.forEach(function(form, index) {
+				index += $scope.masterProject.logicalFrames.length + 1;
+				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeDataSourceReporting(cubes, $scope.masterProject, form, $scope.groupBy, $scope.filters, $scope.splits) : null;
 			});
 
 			// Work around graph bug
@@ -71,7 +71,7 @@ angular
 		////////////////////////////////////////////////////
 
 		// Create array with ngOptions for the list of variables, and init select value.
-		$scope.elementOptions = $scope.project.getAllIndicators(indicators);
+		$scope.elementOptions = $scope.masterProject.getAllIndicators(indicators);
 		$scope.wrap = {chosenElement: $scope.elementOptions[0]};
 
 		////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ angular
 			// Create default query for this elementId
 			////////////////////////////////////////
 
-			var filters = {_start: $scope.project.start, _end: new Date() < $scope.project.end ? new Date() : $scope.project.end};
+			var filters = {_start: $scope.masterProject.start, _end: new Date() < $scope.masterProject.end ? new Date() : $scope.masterProject.end};
 
 			// default group by
 			var groupBy;
@@ -125,9 +125,9 @@ angular
 			$scope.cols = mtReporting.getColumns($scope.query.groupBy, $scope.query.filters._start, $scope.query.filters._end);
 
 			if (query.type == 'variable')
-				$scope.rows = mtReporting.computeVariableReporting(cubes, $scope.project, $scope.query.element, $scope.query.groupBy, $scope.query.filters);
+				$scope.rows = mtReporting.computeVariableReporting(cubes, $scope.masterProject, $scope.query.element, $scope.query.groupBy, $scope.query.filters);
 			else
-				$scope.rows = mtReporting.computeIndicatorReporting(cubes, $scope.project, $scope.query.indicator, $scope.query.groupBy, $scope.query.filters);
+				$scope.rows = mtReporting.computeIndicatorReporting(cubes, $scope.masterProject, $scope.query.indicator, $scope.query.groupBy, $scope.query.filters);
 
 		}, true);
 	})
@@ -139,10 +139,10 @@ angular
 		////////////////////////////////////////////////////
 
 		// Compute cubes for all elements, from all inputs.
-		// var cubes = Cube.fromProject($scope.project, inputs);
+		// var cubes = Cube.fromProject($scope.masterProject, inputs);
 
 		// Create array with ngOptions for the list of variables, and init select value.
-		$scope.elementOptions = $scope.project.getAllIndicators(indicators);
+		$scope.elementOptions = $scope.masterProject.getAllIndicators(indicators);
 		$scope.wrap = {chosenElement: $scope.elementOptions[0]};
 
 		// init objects that we will need to render query controls in the ux.
@@ -158,12 +158,12 @@ angular
 			// Create default query for this elementId
 			////////////////////////////////////////
 
-			var filters = {_start: $scope.project.start, _end: new Date() < $scope.project.end ? new Date() : $scope.project.end};
+			var filters = {_start: $scope.masterProject.start, _end: new Date() < $scope.masterProject.end ? new Date() : $scope.masterProject.end};
 			var cube;
 			if (element.type === 'variable')
 				cube = cubes[element.element.id];
 			else
-				cube = new CompoundCube(element.indicator, cubes);
+				cube = new CompoundCube(element.indicator.computation, cubes);
 			
 			// make default query.
 			$scope.query = {element: element, colDimensions: [], rowDimensions: [cube.dimensions[0].id], filters: filters};
@@ -177,8 +177,8 @@ angular
 
 			// Add entity dimension
 			if (cube.dimensionsById.entity) {
-				var entities = $scope.project.entities.filter(function(e) { return cube.dimensionsById.entity.items.indexOf(e.id) !== -1; }),
-					groups   = $scope.project.groups.filter(function(g) { return cube.dimensionGroupsById.group && cube.dimensionGroupsById.group.items.indexOf(g.id) !== -1; });
+				var entities = $scope.masterProject.entities.filter(function(e) { return cube.dimensionsById.entity.items.indexOf(e.id) !== -1; }),
+					groups   = $scope.masterProject.groups.filter(function(g) { return cube.dimensionGroupsById.group && cube.dimensionGroupsById.group.items.indexOf(g.id) !== -1; });
 
 				$scope.dimensions.push({id: "entity", name: 'project.dimensions.entity', elements: entities, groups: groups});
 			}
@@ -247,7 +247,7 @@ angular
 			if (query.element.type == 'variable')
 				cube = cubes[query.element.element.id];
 			else
-				cube = new CompoundCube(query.element.indicator, cubes);
+				cube = new CompoundCube(query.element.indicator.computation, cubes);
 
 			var cubeDimensions = $scope.query.colDimensions.concat($scope.query.rowDimensions),
 				cubeFilters = mtReporting.createCubeFilter(cube, $scope.query.filters);

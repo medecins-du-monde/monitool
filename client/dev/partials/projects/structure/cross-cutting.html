@@ -1,111 +1,44 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name|maxLength:50"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="masterProject.name|maxLength:50"></a></li>
 	<li class="active" translate="indicator.cross_cutting"></li>
 </ol>
 
 <div class="alert alert-info" translate="project.cross_cutting_list_info"></div>
 
-<legend>Indicateurs transversaux multi-thématiques</legend>
+<div ng-repeat="theme in themes">
+	<legend ng-if="theme.definition">{{theme.definition.name[language]}}</legend>
+	<legend ng-if="!theme.definition" translate="project.multi_theme_indicator"></legend>
 
-<div>
-	<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">Acteurs communautaires sensibilisés au référencement</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-link" style="color: green"></i>
-			Cet indicateur est lié aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
-		</div>
-	</div>
+	<div>
+		<div class="panel panel-default indicator-panel"
+			 ng-repeat="indicator in theme.indicators|orderBy:getName">
 
-	<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">File active annuelle</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-unlink" style="color: red"></i>
-			Veuillez lier cet indicateur aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
-		</div>
-	</div>
+			<div class="panel-heading">
+				{{indicator.name[language]}}
+			</div>
+			
+			<div class="panel-body" style="padding-bottom: 10px">
+				<strong>{{'project.baseline'|translate}}:</strong> {{editableProject.crossCutting[indicator._id].baseline != null ? editableProject.crossCutting[indicator._id].baseline : '?'}}<br/>
+				<strong>{{'project.target'|translate}}:</strong> {{editableProject.crossCutting[indicator._id].target != null ? editableProject.crossCutting[indicator._id].target : '?'}}<br/>
 
-	<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">File active ARV annuelle</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-unlink" style="color: red"></i>
-			Veuillez lier cet indicateur aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
-		</div>
-	</div>
-	<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">Acteurs communautaires sensibilisés au référencement</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-link" style="color: green"></i>
-			Cet indicateur est lié aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
+				<strong>{{'project.computation'|translate}}:</strong>
+				<span class="text-danger" ng-if="!editableProject.crossCutting[indicator._id].computation">
+					{{'project.indicator_is_not_computed'|translate}}
+					<i class="fa fa-unlink" ></i>
+				</span>
+				<span class="text-success" ng-if="editableProject.crossCutting[indicator._id].computation">
+					{{'project.indicator_is_computed'|translate}}
+					<i class="fa fa-link" ></i>
+				</span>
+
+				<button class="btn btn-xxs btn-default" style="width: 100%; display: block" ng-click="editIndicator(indicator._id)">
+					<i class="fa fa-pencil"></i>
+					{{'shared.edit'|translate}}
+				</button>
+			</div>
 		</div>
 	</div>
 
-	<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">File active annuelle</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-unlink" style="color: red"></i>
-			Veuillez lier cet indicateur aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
-		</div>
-	</div>
-
-	<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">File active ARV annuelle</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-unlink" style="color: red"></i>
-			Veuillez lier cet indicateur aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
-		</div>
-	</div>
-		<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">Acteurs communautaires sensibilisés au référencement</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-link" style="color: green"></i>
-			Cet indicateur est lié aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
-		</div>
-	</div>
-
-	<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">File active annuelle</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-unlink" style="color: red"></i>
-			Veuillez lier cet indicateur aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
-		</div>
-	</div>
-
-	<div class="panel panel-default indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title">File active ARV annuelle</div>
-		</div>
-		<div class="panel-body">
-			<i class="fa fa-unlink" style="color: red"></i>
-			Veuillez lier cet indicateur aux sources de données
-			<a class="btn btn-xxs btn-default">Éditer la liaison</a>
-		</div>
-	</div>
+	<br/>
 </div>
-
-<legend>Indicateurs transversaux SSR</legend>
-

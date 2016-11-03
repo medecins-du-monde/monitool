@@ -40,41 +40,93 @@ angular.module('monitool.directives.acl', [])
 	.service('_isAllowedProject', function() {
 
 		return function(userCtx, scope, element, attributes) {
-			var project = scope.project || scope.$eval(attributes.aclProject),
-				role    = attributes.aclHasProjectRole || attributes.aclLacksProjectRole;
+			// FIXME: shouldn't this be the other way around? $eval(attr) || defaultValue
+			var project = scope.masterProject || scope.$eval(attributes.aclProject),
+				askedRole    = attributes.aclHasProjectRole || attributes.aclLacksProjectRole;
 
-			if (role !== 'owner' && role !== 'input')
+			if (askedRole !== 'owner' && askedRole !== 'input')
 				throw new Error("acl-has-project-role must be called with either 'owner' or 'input'");
 
-			var isAllowed = false;
-			if (userCtx.type == 'user') {
-				if (userCtx.role == 'admin')
-					isAllowed = true;
-				else {
+			if (askedRole === 'owner') {
+				if (userCtx.type === 'user') {
 					var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
-					if (internalUser) {
-						if (role == 'owner' && internalUser.role == 'owner')
-							isAllowed = true;
-						else if (role == 'input' && (internalUser.role == 'owner' || internalUser.role == 'input' || internalUser.role == 'input_all'))
-							isAllowed = true;
-					}
+					return userCtx.role === 'admin' || internalUser.role === 'owner';
 				}
+
+				else if (userCtx.type === 'partner')
+					return userCtx.projectId === project._id && userCtx.role === 'owner';
+				
+				else
+					throw new Error('Invalid userCtx.type value');
 			}
-			else if (userCtx.type == 'partner') {
-				// we know that this is the right project already, because partner as no
-				// routes to reach other projects, but just in case.
-				if (userCtx.projectId == project._id) {
-					if (role == 'owner' && userCtx.role == 'owner')
-						isAllowed = true;
-					else if (role == 'input' && (userCtx.role == 'owner' || userCtx.role == 'input' || internalUser.role == 'input_all'))
-						isAllowed = true;
+			else if (askedRole === 'input') {
+				if (userCtx.type === 'user') {
+					var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
+					return userCtx.role === 'admin' || ['owner', 'input', 'input_all'].indexOf(internalUser.role) !== -1;
 				}
+
+				else if (userCtx.type === 'partner')
+					return userCtx.projectId === project._id && ['owner', 'input', 'input_all'].indexOf(userCtx.role) !== -1;
+
+				else
+					throw new Error('Invalid userCtx.type value');
 			}
 			else
-				throw new Error('invalid user type');
-			
-			return isAllowed;	
+				throw new Error('Invaldi asked role');
 		};
+	})
+
+	.service('_isAllowedForm', function() {
+		return function(userCtx, scope, element, attributes) {
+			var project = scope.masterProject || scope.$eval(attributes.aclProject),
+				askedFormId = scope.$eval(attributes.aclHasInputForm) || scope.$eval(attributes.aclLacksInputForm);
+
+			if (userCtx.type === 'user') {
+				var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
+				return userCtx.role === 'admin' || project.canInputForm(internalUser, askedFormId);
+			}
+			else if (userCtx.type === 'partner') {
+				return project.canInputForm(userCtx, askedFormId)
+			}
+			else
+				throw new Error('Invalid userCtx.type value');
+
+			return project.canInputForm()
+		};
+	})
+
+	.directive('aclHasInputForm', function($rootScope, _makeReadOnly, _isAllowedForm) {
+		return {
+			link: function(scope, element, attributes) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
+					if (!userCtx)
+						return;
+
+					var isAllowed = _isAllowedForm(userCtx, scope, element, attributes);
+					if (!isAllowed)
+						_makeReadOnly(scope, element, attributes);
+					
+					unwatch();
+				});
+			}
+		}
+	})
+
+	.directive('aclLacksInputForm', function($rootScope, _makeReadOnly, _isAllowedForm) {
+		return {
+			link: function(scope, element, attributes) {
+				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
+					if (!userCtx)
+						return;
+
+					var isAllowed = _isAllowedForm(userCtx, scope, element, attributes);
+					if (isAllowed)
+						_makeReadOnly(scope, element, attributes);
+					
+					unwatch();
+				});
+			}
+		}
 	})
 
 
@@ -159,6 +211,7 @@ angular.module('monitool.directives.acl', [])
 			}
 		}
 	})
+
 	.directive('aclLacksProjectRole', function($rootScope, _makeReadOnly, _isAllowedProject) {
 		return {
 			link: function(scope, element, attributes) {

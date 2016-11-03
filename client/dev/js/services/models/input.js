@@ -112,15 +112,17 @@ angular
 			});
 		};
 
-		Input.fetchLasts = function(projectId, entityId, form, period) {
+		Input.fetchLasts = function(project, entityId, formId, period) {
+			var form = project.forms.find(function(f) { return f.id == formId; });
+
 			return Input.query({
 				mode: "current+last",
-				projectId: projectId,
+				projectId: project._id,
 				entityId: entityId,
-				formId: form.id,
+				formId: formId,
 				period: period
 			}).$promise.then(function(result) {
-				var currentInputId = [projectId, entityId, form.id, period].join(':');
+				var currentInputId = [project._id, entityId, formId, period].join(':');
 
 				// both where found
 				if (result.length === 2) 
@@ -132,7 +134,7 @@ angular
 
 				var current = new Input({
 					_id: currentInputId, type: "input",
-					project: projectId, form: form.id, period: period, entity: entityId,
+					project: project._id, form: formId, period: period, entity: entityId,
 					values: {}
 				});
 

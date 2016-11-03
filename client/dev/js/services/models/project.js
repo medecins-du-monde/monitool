@@ -2,7 +2,7 @@
 
 angular
 	.module('monitool.services.models.project', ['ngResource'])
-	.factory('Project', function($resource, $q, $rootScope, uuid) {
+	.factory('Project', function($resource, $q, $rootScope, uuid, itertools) {
 
 		var Project = $resource('/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
@@ -43,38 +43,26 @@ angular
 		};
 
 		
+		
 		/**
-		 * Does it makes sense to display a link for activity reporting?
+		 * Does it makes sense to display links for input and reporting?
 		 */
-		Project.prototype.hasActivityReporting = function() {
-			for (var formIndex = 0; formIndex < this.forms.length; ++formIndex)
-				if (this.forms[formIndex].elements.length)
-					if (this.entities.length || this.forms[formIndex].collect == 'project')
+		Project.prototype.isReadyForReporting = function() {
+			for (var formIndex = 0; formIndex < this.forms.length; ++formIndex) {
+				var form = this.forms[formIndex];
+				
+				if (form.elements.length) {
+					var canInputAllEntities = form.collect == 'entity' && this.entities.length,
+						canInputSomeEntities = form.collect == 'some_entity' && form.entities.length,
+						canInputProject = form.collect == 'project';
+
+					if (canInputAllEntities || canInputSomeEntities || canInputProject)
 						return true;
-
-			return false;
-		};
-
-		/**
-		 * Does it makes sense to display a link for objective reporting?
-		 */
-		Project.prototype.hasObjectiveReporting = function() {
-			for (var lfIndex = 0; lfIndex < this.logicalFrames.length; ++lfIndex) {
-				if (this.logicalFrames[lfIndex].indicators.length)
-					return true;
-
-				for (var pIndex = 0; pIndex < this.logicalFrames[lfIndex].purposes.length; ++pIndex) {
-					if (this.logicalFrames[lfIndex].purposes[pIndex].indicators.length)
-						return true;
-
-					for (var oIndex = 0; oIndex < this.logicalFrames[lfIndex].purposes[pIndex].outputs.length; ++oIndex)
-						if (this.logicalFrames[lfIndex].purposes[pIndex].outputs[oIndex].indicators.length)
-							return true;
 				}
 			}
-
+			
 			return false;
-		};
+		}
 
 		/**
 		 * Add an entity to the project.
@@ -87,38 +75,8 @@ angular
 		 * Remove an entity from the project, with all related dependencies.
 		 */
 		Project.prototype.removeEntity = function(entityId) {
-			// Remove from entities
 			this.entities = this.entities.filter(function(e) { return e.id !== entityId; });
-			
-			// Remove from groups
-			this.groups.forEach(function(group) {
-				var index = group.members.indexOf(entityId);
-				if (index !== -1)
-					group.members.splice(index, 1);
-			});
-
-			// Remove from users
-			this.users.forEach(function(user) {
-				if (user.entities) {
-					var index = user.entities.indexOf(entityId);
-					if (index !== -1) {
-						user.entities.splice(index, 1);
-						if (user.entities.length == 0) {
-							user.role = 'read';
-							delete user.entities;
-						}
-					}
-				}
-			});
-
-			// Remove from forms
-			this.forms.forEach(function(form) {
-				if (form.entities) {
-					var index = form.entities.indexOf(entityId);
-					if (index !== -1)
-						form.entities.splice(index, 1);
-				}
-			});
+			this.sanitize();
 		};
 
 
@@ -139,110 +97,80 @@ angular
 		/**
 		 * Clone project
 		 */
-		Project.prototype.clone = function(newName) {
-			// change all ids, just in case
+		Project.prototype.clone = function(newName, userId) {
+			// replace all uuids inside the project by new ones, to avoid collisions.
 			var old2new = {};
-
-			var newProject = angular.copy(this);
-			newProject._id = uuid.v4();
-			newProject.name = newName;
-			delete newProject._rev;
-			newProject.users = [{type: "internal", id: $rootScope.userCtx._id, role: "owner"}];
-
-			newProject.entities.forEach(function(entity) {
-				old2new[entity.id] = uuid.v4();
-				entity.id = old2new[entity.id];
+			var strProject = angular.toJson(this).replace(/[\da-z]{8}-([\da-z]{4}-){3}-[\da-z]{12}/, function(match) {
+				if (!old2new[match])
+					old2new[match] = uuid.v4();
+				return old2new[match];
 			});
 
-			newProject.groups.forEach(function(group) {
-				old2new[group.id] = uuid.v4();
-				group.id = old2new[group.id];
-				group.members = group.members.map(function(oldId) { return old2new[oldId]; });
-			});
-
-			newProject.forms.forEach(function(form) {
-				old2new[form.id] = uuid.v4();
-				form.id = old2new[form.id];
-
-				form.elements.forEach(function(element) {
-					old2new[element.id] = uuid.v4();
-					element.id = old2new[element.id];
-
-					element.partitions.forEach(function(partition) {
-						old2new[partition.id] = uuid.v4();
-						partition.id = old2new[partition.id];
-
-						partition.elements.forEach(function(pElement) {
-							old2new[pElement.id] = uuid.v4();
-							pElement.id = old2new[pElement.id];
-						});
-
-						partition.groups.forEach(function(pGroup) {
-							old2new[pGroup.id] = uuid.v4();
-							pGroup.id = old2new[pGroup.id];
-							pGroup.members = pGroup.members.map(function(oldId) { return old2new[oldId]; });
-						});
-					});
-				});
-
-				if (form.collect == 'some_entity') {
-					form.entities = form.entities.map(function(oldId) { return old2new[oldId]; });
-				}
-			});
-
-			var updateIndicator = function(indicator) {
-				for (var key in indicator.parameters) {
-					var param = indicator.parameters[key];
-
-					param.elementId = old2new[param.elementId] || null;
-					var newFilter = {};
-					for (key in param.filter)
-						newFilter[old2new[key]] = param.filter[key].map(function(i) { return old2new[i]; });
-					param.filter = newFilter;
-				}
-			};
-
-			newProject.logicalFrames.forEach(function(logframe) {
-				logframe.indicators.forEach(updateIndicator);
-				logframe.purposes.forEach(function(purpose) {
-					purpose.indicators.forEach(updateIndicator);
-					purpose.outputs.forEach(function(output) {
-						output.indicators.forEach(updateIndicator);
-					});
-				});
-			});
+			// Create new project
+			var newProject = new Project(JSON.parse(strProject));
+			newProject.name = newName; // Change name
+			delete newProject._rev; // Delete revision
+			newProject.users = [{type: "internal", id: userId, role: "owner"}]; // Change users
 
 			return newProject;
 		};
 
-		/**
-		 * ACLS
-		 */
-		Project.prototype.canEditInputsOnEntity = function(entityId) {
-			var user = $rootScope.userCtx,
-				projectUser = this.users.find(function(u) {
-					return (user.type == 'user' && u.id == user._id) ||
-						   (user.type == 'partner' && u.username == user.username);
-				});
-
-			if (user.type == 'user' && user.role === 'admin')
-				return true;
-
-			else if (!projectUser)
+		Project.prototype.canInputForm = function(projectUser, formId) {
+			if (!projectUser)
 				return false;
 
-			else {
-				var role = projectUser.role;
-				if (role === 'owner' || role === 'input_all')
-					return true;
-				else if (role === 'input')
-					return projectUser.entities.indexOf(entityId) !== -1;
-				else if (role === 'read')
-					return false;
-				else
-					throw new Error('invalid role');
+			if (projectUser.role === 'owner' || projectUser.role === 'input_all')
+				return true;
+			
+			if (projectUser.role === 'input') {
+				var form = this.forms.find(function(f) { return f.id == formId; });
+
+				var formColumns;
+				if (form.collect == 'project')
+					formColumns = ['none'];
+				else if (form.collect == 'some_entity')
+					formColumns = form.entities;
+				else if (form.collect == 'entity')
+					formColumns = this.entities.pluck('id')
+
+				var userColumns = projectUser.entities;
+
+				return !!itertools.intersect(formColumns, userColumns).length;
 			}
+			
+			return false;
 		};
+
+
+
+		/**
+		 * Check if given user is allowed to make data inputs on a given input entity
+		 */
+		// Project.prototype.canEditInputsOnEntity = function(entityId) {
+		// 	var user = $rootScope.userCtx,
+		// 		projectUser = this.users.find(function(u) {
+		// 			return (user.type == 'user' && u.id == user._id) ||
+		// 				   (user.type == 'partner' && u.username == user.username);
+		// 		});
+
+		// 	if (user.type == 'user' && user.role === 'admin')
+		// 		return true;
+
+		// 	else if (!projectUser)
+		// 		return false;
+
+		// 	else {
+		// 		var role = projectUser.role;
+		// 		if (role === 'owner' || role === 'input_all')
+		// 			return true;
+		// 		else if (role === 'input')
+		// 			return projectUser.entities.indexOf(entityId) !== -1;
+		// 		else if (role === 'read')
+		// 			return false;
+		// 		else
+		// 			throw new Error('invalid role');
+		// 	}
+		// };
 
 		Project.prototype.reset = function() {
 			this.type = "project";
@@ -250,12 +178,117 @@ angular
 			this.start = new Date(86400000 * Math.floor(Date.now() / 86400000));
 			this.end = new Date(86400000 * Math.floor(Date.now() / 86400000));
 			this.themes = [];
+			this.crossCutting = {};
 			this.logicalFrames = [];
 			this.entities = [];
 			this.groups = [];
 			this.forms = [];
 			this.users = [];
-		}
+		};
+
+
+		/**
+		 * Scan all references to variables, partitions and partitions elements
+		 * inside a given indicator to ensure that there are no broken links
+		 * and repair them if needed.
+		 */
+		Project.prototype.sanitizeIndicator = function(indicator) {
+			if (indicator.computation === null)
+					return;
+
+			for (var key in indicator.computation.parameters) {
+				var parameter = indicator.computation.parameters[key];
+				var element = null;
+
+				this.forms.forEach(function(f) {
+					f.elements.forEach(function(e) {
+						if (e.id === parameter.elementId)
+							element = e;
+					});
+				});
+
+				// Element was not found.
+				if (!element) {
+					indicator.computation = null;
+					return;
+				}
+
+				for (var partitionId in parameter.filter) {
+					var partition = element.partitions.find(function(p) { return p.id === partitionId; });
+					if (!partition) {
+						indicator.computation = null;
+						return;
+					}
+
+					var elementIds = parameter.filter[partitionId];
+					for (var i = 0; i < elementIds.length; ++i) {
+						if (!partition.elements.find(function(e) { return e.id === elementIds[i]; })) {
+							indicator.computation = null;
+							return;
+						}
+					}
+				}
+			}
+		};
+
+		
+		/**
+		 * Scan all internal references to entities, variables, partitions, and partitions elements
+		 * inside the project to ensure that there are no broken links and repair them if needed.
+		 */
+		Project.prototype.sanitize = function() {
+			//////////////////
+			// Sanitize links to input entities
+			//////////////////
+
+			var entityIds = this.entities.pluck('id'),
+				entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
+
+			// Filter groups members
+			this.groups.forEach(function(group) {
+				group.members = group.members.filter(entityIdFilter);
+			});
+
+			this.users.forEach(function(user) {
+				if (user.entities)
+					user.entities = user.entities.filter(entityIdFilter);
+			});
+
+			this.forms.forEach(function(form) {
+				if (user.entities)
+					form.entities = form.entities.filter(entityIdFilter);
+			});
+
+			/////////////
+			// Sanitize links to variables from indicators
+			/////////////
+
+			this.logicalFrames.forEach(function(logicalFrame) {
+				logicalFrame.indicators.forEach(this.sanitizeIndicator, this);
+				logicalFrame.purposes.forEach(function(purpose) {
+					purpose.indicators.forEach(this.sanitizeIndicator, this);
+					purpose.outputs.forEach(function(output) {
+						output.indicators.forEach(this.sanitizeIndicator, this);
+					}, this);
+				}, this);
+			}, this);
+
+			for (var key in this.crossCutting)
+				this.sanitizeIndicator(this.crossCutting[key]);
+		};
 
 		return Project;
 	});
+
+
+			// Sanitize order and distribution
+			//
+			// this.forms.forEach(function(form) {
+			// 	form.elements.forEach(function(element) {
+			// 		if (element.distribution < 0 || element.distribution > element.partitions.length)
+			// 			element.distribution = 0;
+			//
+			// 		if (element.order < 0 || element.order >= Math.factorial(element.partitions.length))
+			// 			element.order = 0;
+			// 	});
+			// });

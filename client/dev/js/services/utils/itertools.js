@@ -67,4 +67,41 @@ angular
 			return perm;
 		};
 
+		this.transpose2D = function(rows) {
+			if (rows.length === 0)
+				return [];
+
+			var result = new Array(rows[0].length);
+
+			for (var x = 0; x < rows[0].length; ++x) {
+				result[x] = new Array(rows.length);
+
+				for (var y = 0; y < rows.length; ++y) {
+					result[x][y] = angular.copy(rows[y][x]);
+
+					if (result[x][y].colSpan) {
+						result[x][y].rowSpan = result[x][y].colSpan;
+						delete result[x][y].colSpan;
+					}
+					else if (result[x][y].rowSpan) {
+						result[x][y].colSpan = result[x][y].rowSpan;
+						delete result[x][y].rowSpan;
+					}
+				}
+			}
+
+			return result;
+		};
+
+		this.isSubset = function(superset, subset) {
+			return this.intersect(subset, superset).length === subset.length;
+		};
+
+		this.intersect = function(array1, array2) {
+			return array1.filter(function(el) {
+				return array2.indexOf(el) !== -1;
+			});
+		};
+
 	});
+

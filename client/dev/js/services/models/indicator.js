@@ -15,8 +15,6 @@ angular
 			this.name = {en: '', fr: '', es: ''};
 			this.description = {en: '', fr: '', es: ''};
 			this.themes = [];
-			this.unit = "%";
-			this.targetType = "higher_is_better";
 		};
 
 		return Indicator;

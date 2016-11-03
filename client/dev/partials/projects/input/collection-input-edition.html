@@ -1,8 +1,8 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics">{{project.name|maxLength:50}}</a></li>
+	<li><a ui-sref="main.project.structure.basics">{{masterProject.name|maxLength:50}}</a></li>
 	<li><a ui-sref="main.project.input.list">{{form.name|maxLength:50}}</a></li>
-	<li class="active" ng-if="inputEntity">{{inputEntity.name|maxLength:50}}</li>
+	<li class="active" ng-if="inputEntityName">{{inputEntityName|maxLength:50|translate}}</li>
 	<li class="active">{{currentInput.period|formatSlot}}</li>
 </ol>
 
@@ -13,7 +13,7 @@
 		<label class="col-sm-2 control-label" translate="project.collection_site"></label>
 
 		<div class="col-sm-10">
-			<input class="form-control disabled" disabled ng-value="inputEntity.name" />
+			<input class="form-control disabled" disabled ng-value="inputEntityName|translate" />
 		</div>
 	</div>
 
@@ -43,7 +43,7 @@
 	</div>
 </form>
 
-<div ng-if="canEdit" class="noprint">
+<div class="noprint">
 	<a class="btn btn-primary" ng-click="save()">
 		<i class="fa fa-floppy-o"></i>
 		<span translate="shared.save"></span>

@@ -58,7 +58,7 @@ angular
 		this._makeActivityRow = function(cubes, indent, groupBy, viewFilters, columns, element) {
 			// Retrieve cube & create filter.
 			var cube = cubes[element.id],
-				row = {id: uuid.v4(), name: element.name, type: 'data', indent: indent, unit: 'none'};
+				row = {id: uuid.v4(), name: element.name, type: 'data', indent: indent};
 
 			// Handle invalid groupBy
 			if (groupBy == 'entity' && !cube.dimensionsById.entity)
@@ -92,37 +92,36 @@ angular
 
 
 		this._makeIndicatorRow = function(cubes, indent, groupBy, viewFilters, columns, indicator) {
-			var baseline = indicator.baseline,
-				target = indicator.target;
-
-			if (typeof baseline == 'number' && indicator.unit != 'none')
-				baseline += indicator.unit;
-
-			if (typeof target == 'number' && indicator.unit != 'none')
-				target += indicator.unit;
-
 			var row = {
 				id: uuid.v4(),
-				name: indicator.display, unit: indicator.unit, colorize: indicator.colorize,
-				baseline: baseline, target: target, targetType: indicator.targetType,
+				name: indicator.display, colorize: indicator.colorize,
+				baseline: indicator.baseline, target: indicator.target,
 				type: 'data',
 				indent: indent
 			};
 
-			try {
-				var cube = new CompoundCube(indicator, cubes),
-					cubeFilters = this.createCubeFilter(cube, viewFilters);
+			if (indicator.computation === null)
+				row.message = 'project.indicator_computation_missing';
 
+			else if (!isNaN(indicator.computation.formula))
+				row.cols = columns.map(function(col) { return parseInt(indicator.computation.formula); });
+
+			else {
 				try {
-					var values = cube.query([groupBy], cubeFilters, true);
-					row.cols = columns.map(function(col) { return values[col.id]; });
+					var cube = new CompoundCube(indicator.computation, cubes),
+						cubeFilters = this.createCubeFilter(cube, viewFilters);
+
+					try {
+						var values = cube.query([groupBy], cubeFilters, true);
+						row.cols = columns.map(function(col) { return values[col.id]; });
+					}
+					catch (e) {
+						row.message = 'project.no_data';
+					}
 				}
 				catch (e) {
-					row.message = 'project.no_data';
+					row.message = 'project.not_available';
 				}
-			}
-			catch (e) {
-				row.message = 'project.not_available_by_entity';
 			}
 
 			return row;

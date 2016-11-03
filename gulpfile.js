@@ -25,32 +25,25 @@ var files = {
 		'client/dev/bower_components/handsontable/dist/handsontable.full.css',
 	],
 	js: [
-		// PNG generation
-		'client/dev/bower_components/blob/Blob.js',
-		'client/dev/bower_components/canvas-to-Blob.js/canvas-toBlob.js',
-		'client/dev/bower_components/file-saver/FileSaver.min.js',
-
-		// Angular
-		'client/dev/bower_components/angular/angular.js',
-		'client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-		'client/dev/bower_components/angular-ui-router/release/angular-ui-router.min.js',
-		'client/dev/bower_components/angular-ui-select/dist/select.min.js',
-		'client/dev/bower_components/angular-cookies/angular-cookies.min.js',
-		'client/dev/bower_components/angular-resource/angular-resource.min.js',
-		'client/dev/bower_components/angular-translate/angular-translate.min.js',
-		'client/dev/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js',
-		'client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js',
-
-		// Graphs
-		'client/dev/bower_components/d3/d3.min.js',
-		'client/dev/bower_components/c3/c3.min.js',
-
-		// Excel
-		'client/dev/bower_components/handsontable/dist/handsontable.full.min.js',
-
-		// Sortable
-		'client/dev/bower_components/Sortable/Sortable.min.js',
-		'client/dev/bower_components/Sortable/ng-sortable.js'
+		"client/dev/bower_components/pdfmake/build/pdfmake.min.js",
+		"client/dev/bower_components/pdfmake/build/vfs_fonts.js",
+		"client/dev/bower_components/blob/Blob.js",
+		"client/dev/bower_components/canvas-to-Blob.js/canvas-toBlob.js",
+		"client/dev/bower_components/file-saver/FileSaver.min.js",
+		"client/dev/bower_components/angular/angular.min.js",
+		"client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js",
+		"client/dev/bower_components/angular-ui-router/release/angular-ui-router.min.js",
+		"client/dev/bower_components/angular-ui-select/dist/select.min.js",
+		"client/dev/bower_components/angular-cookies/angular-cookies.min.js",
+		"client/dev/bower_components/angular-resource/angular-resource.min.js",
+		"client/dev/bower_components/angular-translate/angular-translate.min.js",
+		"client/dev/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js",
+		"client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js",
+		"client/dev/bower_components/d3/d3.min.js",
+		"client/dev/bower_components/c3/c3.min.js",
+		"client/dev/bower_components/handsontable/dist/handsontable.full.min.js",
+		"client/dev/bower_components/Sortable/Sortable.min.js",
+		"client/dev/bower_components/Sortable/ng-sortable.js"
 	]
 };
 

@@ -201,11 +201,41 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+
+		delete_input: "Êtes-vous sûr de vouloir supprimer cette saisie?",
+		multi_theme_indicator: "Multi-thématique",
+		which_variable: "De quelle variable provient cette information?",
+		which_partitions: "Quelles désagrégations sont concernées?",
+		value_unknown: "Valeur inconnue",
+
+		computations: {
+			unavailable: "Il n'est pas possible de calculer cet indicateur",
+			fixed: "Utiliser une valeur fixe",
+			copy: "Copier une valeur (depuis une sources de données)",
+			percentage: "Pourcentage (depuis les sources de données)",
+			permille: "Pour mille (depuis les sources de données)",
+			formula: "Formule personalisée (depuis les sources de données)",
+		},
+
+		formula: {
+			copied_value: "Valeur à copier",
+			denominator: "Dénominateur",
+			numerator: "Numérateur"
+		},
+
 		same_as_start: "Idem début du projet",
 		same_as_end: "Idem fin du projet",
 
 		specific_start: "Date de lancement spécifique",
 		specific_end: "Date de fin spécifique",
+		choose_sites_for_form: "Choisir les structures pour lesquelles cette source de données s'applique",
+		choose_sites_for_user: "Choisir les structures sur lesquelles cet utilisateur pourra saisir des données",
+
+		partition_edit: "Édition partition",
+		partition_help_name: "Ce nom apparaîtra dans divers tableaux de statistiques. Il nomme la désagrégation que vous voulez créer sur votre donnée",
+		partition_help_elements: 'Les éléments de la désagrégation doivent être mutuellement exclusifs, et il doit être possible de trouver la valeur totale en les aggrégant.',
+		partition_help_aggregation: 'Comment trouver la valeur totale en agrégeant les éléments décrits?',
+		partition_help_groups: 'Les groupes permettent de faire des aggrégations intermédiaires',
 
 		structure: "Structure",
 		no_data: "Les données ne sont pas disponibles",
@@ -219,16 +249,18 @@ var FRENCH_TRANSLATION = {
 		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements. Ceux-ci seront perdus.",
 		no_logical_frames: "Aucun cadre logique n'a encore été créé sur ce projet.",
 		partition_general: "Général",
-		partition_general_placeholder: "ex: Tranches d'âge",
+		partition_general_placeholder: "ex: Tranches d'âge, sexe, motif de consultation, pathologie ou référencement effectué, ...",
 		partition_elements: "Éléments",
+		aggregation_lab: "Comment grouper les éléments entre eux?",
 		partition_name: "Nom",
-		partition_name_placeholder: "ex: Moins de 12 ans",
+		partition_name_placeholder: "ex: Moins de 12 ans, Homme, Consultation sociale, Grippe ou Réferencement communautaire, ...",
 		no_partition_elements: "Appuyez sur \"Ajouter\" pour ajouter un élément à la partition",
 
 		partition_groups: "Groupes",
 		partition_group_name: "Nom",
-		partition_group_name_placeholder: "ex: Mineurs",
+		partition_group_name_placeholder: "ex: Mineurs, Pathologies chroniques, ...",
 		no_partition_groups: "Appuyez sur \"Ajouter\" pour ajouter un groupe à la partition",
+		use_groups: "Utiliser des groupes",
 
 		no_inputs: "Aucune saisie en attente",
 		no_variable: "Aucune variable n'est définie sur cette source de données. Cliquez sur \"Ajouter une variable\" pour en créer une!",
@@ -282,7 +314,8 @@ var FRENCH_TRANSLATION = {
 		update_logframe: "Mettre à jour le cadre logique",
 		edit_indicator: "Édition indicateur",
 		display: "Nom",
-		display_ph: "Taux de CPN1 au sein des structures de santés",
+		display_ph: "ex: Taux de CPN1 au sein des structures de santé",
+		computation: "Calcul",
 
 		show_finished: "Voir les saisies réalisées",
 		field_order: "Ordre",
@@ -294,12 +327,10 @@ var FRENCH_TRANSLATION = {
 		data_selection: "Selection des données",
 		filters: "Filtres",
 		input_status: {
-			'done-read': "Afficher",
-			'outofschedule-read': "Afficher (Hors calendrier)",
-			'done-edit': "Modifier",
-			'expected-edit': "Saisir",
-			'expected-edit-new': "Saisir (nouvelle date)",
-			'outofschedule-edit': "Afficher (Hors calendrier)"
+			'done': "Modifier",
+			'expected': "Saisir",
+			'expected-new': "Saisir (nouvelle date)",
+			'outofschedule': "Afficher (Hors calendrier)"
 		},
 		cols: "Colonnes",
 		rows: "Lignes",
@@ -423,8 +454,8 @@ var FRENCH_TRANSLATION = {
 
 		input: 'Saisir',
 
-		baseline: 'Baseline',
-		target: 'Cible',
+		baseline: 'Valeur initiale',
+		target: 'Valeur cible',
 
 		goal: 'Objectif général',
 		intervention_logic: 'Logique d\'intervention',
@@ -441,6 +472,8 @@ var FRENCH_TRANSLATION = {
 		output: "Résultat",
 		activities: 'Activités',
 
+		indicator_is_computed: "Valide",
+		indicator_is_not_computed: "Invalide",
 
 		intervention_logic_goal_ph: 'ex: Réduire la mortalité et la morbidité des populations affectées par la crise',
 		intervention_logic_purpose_ph: 'ex: Améliorer l\'accès aux soins des populations affectées par la crise dans les districts de Bimbo et Begoua',
@@ -471,11 +504,10 @@ var FRENCH_TRANSLATION = {
 		you_are_not_owner: "Vous ne pouvez pas éditer ce projet",
 		you_are_not_editor: "Vous ne pouvez pas saisir sur ce projet",
 
-		formula: "Formule",
 		link: "Lien: {{name}}",
 		collected: "Collecté",
 
-		basics_info: "<p>Les données de bases de votre projet permettent de le classer parmi les autres.</p>",
+		basics_info: "<p>Les données de bases permettent de classer votre projet parmi les autres de l'ONG.</p>",
 		basics_help_country: "Dans quel pays le projet se déroule-t'il? S'il s'agit d'un projet régional, entrez le nom de la région.",
 		basics_help_name: "Le nom permet de retrouver le projet dans Monitool. Choisissez un nom suffisament informatif, ou copiez l'objectif général du projet.",
 		basics_help_thematics: "Le choix des thématiques conditionne les indicateurs transversaux que vous devrez collecter au sein de votre projet.",
@@ -525,7 +557,8 @@ var FRENCH_TRANSLATION = {
 			"<p>Tous les indicateurs présents dans les cadres logiques doivent être calculables à partir des données décrites dans les sources de données</p>",
 
 		cross_cutting_list_info:
-			"<p>Les indicateurs transversaux</p>",
+			"<p>Les indicateurs transversaux a collecter sont déterminés à partir de la liste de thématiques renseignée dans les données de bases.</p>" + 
+			"<p>Cette liste contient tous les indicateurs qui doivent être collectés pour réaliser le suivi transversal</p>",
 
 		input_list_info:
 			"<p>Ce planning de saisie liste toutes les saisies qui ont été programmées pour la source de données \"{{name}}\"</p>" +
@@ -554,7 +587,14 @@ var FRENCH_TRANSLATION = {
 		delete_purpose: "Supprimer l'objectif spécifique",
 		delete_result: "Supprimer le résultat",
 
-		
+		no_element_selected: "Aucun élément selectionné",
+
+		indicator_ph_fixed: "Entrez ici la valeur fixe de l'indicateur",
+		indicator_help_display: "Nommez votre indicateur. Le nom doit provenir d'un catalogue d'indicateur, afin d'être cohérent avec les autres projets.",
+		indicator_help_baseline: "Combien valait cet indicateur avant le début du projet? Cochez la case pour spécifier cette valeur.",
+		indicator_help_target: "Quel est l'objectif à atteindre sur cet indicateur?  Cochez la case pour spécifier cette valeur.",
+		indicator_help_colorize: "Voulez-vous ajouter des couleurs (rouge, orange, vert) sur les tableaux de statistiques pour cet indicateur?",
+		indicator_help_computation: "Comment calculer cet indicateur à partir des données que vous avez collecté dans les sources de données?"
 	},
 
 	form: {

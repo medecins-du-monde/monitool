@@ -16,7 +16,7 @@ angular
 				/^\d{4}\-\d{2}$/,
 				/^\d{4}\-W\d{2}$/,
 				/^\d{4}\-\d{2}\-\d{2}$/
-				];
+			];
 
 			var index = regexps.findIndex(function(regexp) { return slot.match(regexp); });
 

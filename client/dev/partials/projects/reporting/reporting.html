@@ -1,6 +1,6 @@
 <ol class="breadcrumb">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics" ng-bind="project.name|maxLength:50"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="masterProject.name|maxLength:50"></a></li>
 	<li class="active" translate="shared.reporting_general"></li>
 </ol>
 
@@ -60,10 +60,10 @@
 						<select class="form-control input-sm" id="filter-by-input" ng-model="filters._location">
 							<option value="none" translate="project.full_project"></option>
 							<optgroup label="{{'project.collection_site_list'|translate}}">
-								<option ng-repeat="entity in project.entities" value="ent_{{entity.id}}">{{entity.name}}</option>
+								<option ng-repeat="entity in masterProject.entities" value="ent_{{entity.id}}">{{entity.name}}</option>
 							</optgroup>
 							<optgroup label="{{'project.groups'|translate}}">
-								<option ng-repeat="group in project.groups" value="grp_{{group.id}}">{{group.name}}</option>
+								<option ng-repeat="group in masterProject.groups" value="grp_{{group.id}}">{{group.name}}</option>
 							</optgroup>
 						</select>
 					</div>
@@ -102,9 +102,9 @@
 		</tr>
 	</thead>
 	<tbody ng-repeat="(blockIndex, block) in blocks">
-		<tr>
+		<tr ng-click="open[blockIndex] = !open[blockIndex]">
 			<td ng-class="{noprint: open[blockIndex]}" style="text-align: center" rowspan="{{open[blockIndex] ? block.rows.length + 1 : 1}}">
-				<button class="btn btn-xs btn-default" ng-click="open[blockIndex] = !open[blockIndex]">
+				<button class="btn btn-xs btn-default">
 					<i class="fa fa-angle-double-up" ng-if="open[blockIndex]"></i>
 					<i class="fa fa-angle-double-down" ng-if="!open[blockIndex]"></i>
 				</button>
