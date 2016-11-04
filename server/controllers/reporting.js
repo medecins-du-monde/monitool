@@ -302,7 +302,7 @@ module.exports = express.Router()
 
 		Project.get(request.params.id, function(error, project) {
 			Input.list({mode: "project_inputs", projectId: request.params.id}, function(error, inputs) {
-				response.json(Cube.fromProject(project, inputs));
+				response.json({type: 'cubes', projectId: project._id, cubes: Cube.fromProject(project, inputs)});
 			});
 		});
 	})
@@ -321,7 +321,7 @@ module.exports = express.Router()
 					result[project._id] = Cube.fromProject(project, inputs);
 				}
 
-				response.json(result);
+				response.json({type: 'cubes', cubes: result});
 			});
 		});
 	});

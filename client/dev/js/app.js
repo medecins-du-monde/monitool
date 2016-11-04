@@ -132,7 +132,12 @@ app.config(function($httpProvider) {
 		return data;
 	});
 
-	$httpProvider.defaults.transformResponse.push(function(data) {
+	$httpProvider.defaults.transformResponse.push(function(data, headersGetter, status) {
+		
+		var needParsing = function(model) {
+			return model.type !== 'input' && model.type !== 'cubes';
+		};
+
 		var parseDatesRec = function(model) {
 			if (typeof model === 'string' && model.match(/^\d\d\d\d\-\d\d\-\d\d$/)) {
 				// Using new Date('2010-01-01') <=> new Date('2010-01-01T00:00:00Z')
@@ -156,7 +161,7 @@ app.config(function($httpProvider) {
 			return model;
 		};
 
-		return parseDatesRec(data);
+		return needParsing(data) ? parseDatesRec(data) : data;
 	});
 });
 

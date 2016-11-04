@@ -50,7 +50,7 @@ angular
 
 		Cube.fetchProject = function(projectId) {
 			return $http({url: '/reporting/project/' + projectId}).then(function(cubes) {
-				return cubes.data.map(function(c) {
+				return cubes.data.cubes.map(function(c) {
 					return new Cube(c.id, c.dimensions, c.dimensionGroups, c.data);
 				})
 			});
@@ -58,7 +58,7 @@ angular
 
 		Cube.fetchIndicator = function(indicatorId) {
 			return $http({url: '/reporting/indicator/' + indicatorId}).then(function(cubes) {
-				cubes = cubes.data
+				cubes = cubes.data.cubes;
 
 				var res = {};
 				for (var projectId in cubes) {
