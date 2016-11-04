@@ -41,7 +41,7 @@
 		</tr>
 		<tr ng-repeat="project in projects|orderBy:pred:rev">
 			<td>{{project.country}}</td>
-			<td><a ng-click="open(project._id)">{{project.name}}</a></td>
+			<td><a ng-click="open(project)">{{project.name}}</a></td>
 			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
 			<td>{{project.start|date}}</td>
 			<td>{{project.end|date}}</td>

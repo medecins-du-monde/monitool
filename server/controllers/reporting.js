@@ -278,9 +278,11 @@ function _arrayBufferToBase64(ab) {
 
 		Cube.fromProject = function(project, allInputs) {
 			var cubes = [];
+
+			console.log(JSON.stringify(project, null, "\t"))
 			project.forms.forEach(function(form) {
 				var inputs = allInputs.filter(function(input) { return input.form === form.id; })
-				
+
 				form.elements.forEach(function(element) {
 					cubes.push(Cube.fromElement(project, form, element, inputs));
 				});

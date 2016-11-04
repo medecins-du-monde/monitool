@@ -1,6 +1,6 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics">{{masterProject.name|maxLength:50}}</a></li>
+	<li class="active">{{masterProject.name|maxLength:50}}</li>
 	<li><a ui-sref="main.project.input.list">{{form.name|maxLength:50}}</a></li>
 	<li class="active" ng-if="inputEntityName">{{inputEntityName|maxLength:50|translate}}</li>
 	<li class="active">{{currentInput.period|formatSlot}}</li>

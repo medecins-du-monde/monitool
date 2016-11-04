@@ -91,10 +91,17 @@
 			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
-	<tbody ng-repeat="(blockIndex, block) in blocks">
+	
+	<tbody ng-if="blocks.length === 0">
 		<tr>
+			<td colspan="{{3 + cols.length}}" translate="indicator.not_collected"></th>
+		</tr>
+	</tbody>
+
+	<tbody ng-repeat="(blockIndex, block) in blocks">
+		<tr ng-click="open[blockIndex] = !open[blockIndex]">
 			<td ng-class="{noprint: open[blockIndex]}" style="text-align: center" rowspan="{{open[blockIndex] ? block.rows.length + 1 : 1}}">
-				<button class="btn btn-xs btn-default" ng-click="open[blockIndex] = !open[blockIndex]">
+				<button class="btn btn-xs btn-default">
 					<i class="fa fa-angle-double-up" ng-if="open[blockIndex]"></i>
 					<i class="fa fa-angle-double-down" ng-if="!open[blockIndex]"></i>
 				</button>
@@ -130,26 +137,6 @@
 			<td ng-repeat="col in row.cols track by $index" reporting-field></td>
 			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);">{{row.message|translate}}</td>
 		</tr>
-
 	</tbody>
-
-	
-<!-- 	<tbody>
-		<tr ng-repeat="row in rows track by $index">
-			<td class="noprint" style="text-align: center">
-				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.cols" />
-			</td>
-			<td class="indent{{row.indent}}">
-				<label for="{{row.id}}">{{row.project}}</label><br/>
-				<small>{{row.name}}</small>
-			</td>
-			<td>{{row.baseline}}</td>
-			<td>{{row.target}}</td>
-			<td ng-repeat="col in row.cols track by $index" indicator-reporting-field></td>
-			<td ng-if="!row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);"></td>
-
-
-		</tr>
-	</tbody> -->
 </table>
 

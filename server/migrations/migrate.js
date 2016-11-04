@@ -1,12 +1,78 @@
 "use strict";
 
+var sanitizeIndicator = function(project, indicator) {
+	if (indicator.computation === null)
+		return;
+
+	for (var key in indicator.computation.parameters) {
+		var parameter = indicator.computation.parameters[key];
+		var element = null;
+
+		project.forms.forEach(function(f) {
+			f.elements.forEach(function(e) {
+				if (e.id === parameter.elementId)
+					element = e;
+			});
+		});
+
+		// Element was not found.
+		if (!element) {
+			indicator.computation = null;
+			return;
+		}
+
+		for (var partitionId in parameter.filter) {
+			var partition = element.partitions.find(function(p) { return p.id === partitionId; });
+			if (!partition) {
+				indicator.computation = null;
+				return;
+			}
+
+			var elementIds = parameter.filter[partitionId];
+			for (var i = 0; i < elementIds.length; ++i) {
+				if (!partition.elements.find(function(e) { return e.id === elementIds[i]; })) {
+					indicator.computation = null;
+					return;
+				}
+			}
+		}
+	}
+};
 
 function fixIndicator(indicator) {
-	indicator.computation = {formula: indicator.formula, parameters: indicator.parameters};
 
 	delete indicator.targetType;
 	delete indicator.unit;
 	delete indicator.indicatorId;
+
+
+	// Guess computation from formula
+	indicator.computation = {};
+	
+	var cleanFormula = indicator.computation.formula.replace(/ +/g, ''),
+		withoutNames = cleanFormula.replace(/[a-z]+[0-9]*/, '_');
+
+	if (withoutNames === '_') {
+		// it's a copy
+		indicator.computation.formula = 'copied_value';
+		indicator.computation.parameters = {};
+		for (var key in indicator.parameters) {
+			indicator.computation.parameters.copied_value = indicator.parameters[key]
+			break;
+		}
+	}
+	else if (withoutNames === '100*_/_' || withoutNames === '_/_*100' || withoutNames === '_*100/_') {
+		// it's a percentage
+		var match = cleanFormula.match(/[a-z]+[0-9]*/g);
+		
+		indicator.computation.formula = '100 * numerator / denominator';
+		indicator.computation.parameters = {
+			numerator: indicator.parameters[match[0]],
+			denominator: indicator.parameters[match[1]]
+		};
+	}
+
+	// Remove old formula.
 	delete indicator.formula;
 	delete indicator.parameters;
 }
@@ -66,10 +132,16 @@ old.list({include_docs: true}, function(error, result) {
 		// Remove activities, fix indicators
 		project.logicalFrames.forEach(function(logicalFrame) {
 			logicalFrame.indicators.forEach(fixIndicator);
+			logicalFrame.indicators.forEach(sanitizeIndicator.bind(null, project));
+
 			logicalFrame.purposes.forEach(function(purpose) {
 				purpose.indicators.forEach(fixIndicator);
+				purpose.indicators.forEach(sanitizeIndicator.bind(null, project));
+
 				purpose.outputs.forEach(function(output) {
 					output.indicators.forEach(fixIndicator);
+					output.indicators.forEach(sanitizeIndicator.bind(null, project));
+
 					delete output.activities;
 				});
 			});

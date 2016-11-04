@@ -28,12 +28,20 @@ angular.module(
 			$state.go('main.project.structure.basics', {projectId: uuid.v4()});
 		};
 
-		$scope.open = function(projectId) { 
-			$state.go("main.project.structure.basics", {projectId: projectId});
+		$scope.open = function(project) {
+			var projectUser = project.users.find(function(u) {
+				return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
+					   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
+			});
+
+			if (projectUser && projectUser.role == 'owner')
+				$state.go("main.project.structure.basics", {projectId: project._id});
+			else
+				$state.go("main.project.reporting.general", {projectId: project._id});
 		};
 	})
 	
-	.controller('ProjectMenuController', function($scope, project) {
+	.controller('ProjectMenuController', function($scope, $filter, project) {
 		$scope.masterProject = project;
 
 		// When master changes, update menu elements

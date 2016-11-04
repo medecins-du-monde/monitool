@@ -50,11 +50,12 @@ angular.module('monitool.directives.acl', [])
 			if (askedRole === 'owner') {
 				if (userCtx.type === 'user') {
 					var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
-					return userCtx.role === 'admin' || internalUser.role === 'owner';
+					return userCtx.role === 'admin' || (internalUser && internalUser.role === 'owner');
 				}
 
-				else if (userCtx.type === 'partner')
+				else if (userCtx.type === 'partner') {
 					return userCtx.projectId === project._id && userCtx.role === 'owner';
+				}
 				
 				else
 					throw new Error('Invalid userCtx.type value');
@@ -62,7 +63,7 @@ angular.module('monitool.directives.acl', [])
 			else if (askedRole === 'input') {
 				if (userCtx.type === 'user') {
 					var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
-					return userCtx.role === 'admin' || ['owner', 'input', 'input_all'].indexOf(internalUser.role) !== -1;
+					return userCtx.role === 'admin' || internalUser && ['owner', 'input', 'input_all'].indexOf(internalUser.role) !== -1;
 				}
 
 				else if (userCtx.type === 'partner')

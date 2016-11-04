@@ -41,7 +41,7 @@ module.exports = {
 			}.toString()
 		},
 
-		crosscutting: {
+		cross_cutting: {
 			map: function(doc) {
 				if (doc.type === 'project')
 					for (var indicatorId in doc.crossCutting)

@@ -142,36 +142,6 @@ angular
 		};
 
 
-
-		/**
-		 * Check if given user is allowed to make data inputs on a given input entity
-		 */
-		// Project.prototype.canEditInputsOnEntity = function(entityId) {
-		// 	var user = $rootScope.userCtx,
-		// 		projectUser = this.users.find(function(u) {
-		// 			return (user.type == 'user' && u.id == user._id) ||
-		// 				   (user.type == 'partner' && u.username == user.username);
-		// 		});
-
-		// 	if (user.type == 'user' && user.role === 'admin')
-		// 		return true;
-
-		// 	else if (!projectUser)
-		// 		return false;
-
-		// 	else {
-		// 		var role = projectUser.role;
-		// 		if (role === 'owner' || role === 'input_all')
-		// 			return true;
-		// 		else if (role === 'input')
-		// 			return projectUser.entities.indexOf(entityId) !== -1;
-		// 		else if (role === 'read')
-		// 			return false;
-		// 		else
-		// 			throw new Error('invalid role');
-		// 	}
-		// };
-
 		Project.prototype.reset = function() {
 			this.type = "project";
 			this.name = "";

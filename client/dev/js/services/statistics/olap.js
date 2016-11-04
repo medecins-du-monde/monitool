@@ -501,13 +501,10 @@ angular
 					return localScope[key];
 			}
 
-			console.log(this.computation)
-
 			try {
 				return Parser.evaluate(this.computation.formula, localScope);
 			}
 			catch (e) {
-				console.log(e)
 				return 'INVALID_FORMULA';
 			}
 		};

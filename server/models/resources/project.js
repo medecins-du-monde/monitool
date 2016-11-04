@@ -574,7 +574,7 @@ module.exports = {
 			});
 
 		else if (options.mode === 'crossCutting')
-			database.view('reporting', 'crosscutting', {key: options.indicatorId, include_docs: true}, function(error, result) {
+			database.view('reporting', 'cross_cutting', {key: options.indicatorId, include_docs: true}, function(error, result) {
 				var projects = result.rows.map(function(row) { return row.doc; });
 
 				// strip down project
@@ -584,8 +584,9 @@ module.exports = {
 					project.crossCutting = cc;
 
 					var used = {};
-					for (var key in project.crossCutting[options.indicatorId].parameters)
-						used[project.crossCutting[options.indicatorId].parameters[key].elementId] = true;
+					if (project.crossCutting[options.indicatorId].computation)
+						for (var key in project.crossCutting[options.indicatorId].computation.parameters)
+							used[project.crossCutting[options.indicatorId].computation.parameters[key].elementId] = true;
 
 					delete project.logicalFrames;
 					delete project.users;

@@ -317,7 +317,7 @@ angular.module('monitool.directives.reporting', [])
 										return result;
 									}
 									catch (e) {
-										return null;
+										return undefined;
 									}
 								})
 						});
