@@ -276,6 +276,12 @@ app.config(function($stateProvider, $urlRouterProvider) {
 					project.users.push({ type: "internal", id: $rootScope.userCtx._id, role: "owner" });
 					return $q.when(project);
 				});
+			},
+			indicators: function(project, Indicator) {
+				return Indicator.query().$promise;
+			},
+			themes: function(Theme) {
+				return Theme.query().$promise;
 			}
 		}
 	});
@@ -293,12 +299,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.project.structure.basics', {
 		url: '/basics',
 		templateUrl: 'partials/projects/structure/basics.html',
-		controller: 'ProjectBasicsController',
-		resolve: {
-			themes: function(Theme) {
-				return Theme.query().$promise;
-			}
-		}
+		controller: 'ProjectBasicsController'
 	});
 
 	$stateProvider.state('main.project.structure.collection_site_list', {
@@ -339,14 +340,12 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/cross-cutting',
 		templateUrl: 'partials/projects/structure/cross-cutting.html',
 		controller: 'ProjectCrossCuttingController',
-		resolve: {
-			indicators: function(project, Indicator) {
-				return Indicator.query().$promise;
-			},
-			themes: function(Theme) {
-				return Theme.query().$promise;
-			}
-		}
+	});
+	
+	$stateProvider.state('main.project.structure.extra', {
+		url: '/extra',
+		templateUrl: 'partials/projects/structure/extra-indicators.html',
+		controller: 'ProjectExtraIndicators',
 	});
 
 	$stateProvider.state('main.project.structure.logical_frame_list', {
@@ -372,11 +371,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		abstract: true,
 		url: '/input/:formId',
 		template: '<div ui-view></div>',
-		resolve: {
-			// form: function($stateParams, project) {
-			// 	return project.forms.find(function(form) { return form.id == $stateParams.formId; });
-			// }
-		}
 	});
 
 	$stateProvider.state('main.project.input.list', {
@@ -410,9 +404,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 		url: '/reporting',
 		template: '<div ui-view></div>',
 		resolve: {
-			indicators: function(Indicator, project) {
-				return Indicator.fetchForProject(project);
-			},
 			cubes: function(Cube, project) {
 				return Cube.fetchProject(project._id).then(function(cs) {
 					var byid = {};

@@ -1,23 +1,23 @@
 // From http://stackoverflow.com/a/26426761/1897495
 
 Date.prototype.isLeapYear = function() {
-    var year = this.getFullYear();
-    if ((year & 3) != 0)
-    	return false;
+	var year = this.getFullYear();
+	if ((year & 3) != 0)
+		return false;
 
-    return (year % 100) != 0 || (year % 400) == 0;
+	return (year % 100) != 0 || (year % 400) == 0;
 };
 
 Date.prototype.getUTCISODateOfYear = function() {
-    var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-    var mn = this.getMonth();
-    var dn = this.getUTCDate();
-    var dayOfYear = dayCount[mn] + dn;
+	var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+	var mn = this.getMonth();
+	var dn = this.getUTCDate();
+	var dayOfYear = dayCount[mn] + dn;
 
-    if (mn > 1 && this.isLeapYear())
-    	dayOfYear++;
+	if (mn > 1 && this.isLeapYear())
+		dayOfYear++;
 
-    return dayOfYear;
+	return dayOfYear;
 };
 
 Date.prototype.getUTCISODay = function() {

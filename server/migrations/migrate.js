@@ -154,8 +154,8 @@ old.list({include_docs: true}, function(error, result) {
 			});
 		});
 
-		// Add cross-cutting indicators
 		project.crossCutting = {};
+		project.extraIndicators = [];
 
 		docsToUpdate.push(project);
 	}

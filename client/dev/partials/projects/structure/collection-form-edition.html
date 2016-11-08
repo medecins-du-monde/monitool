@@ -112,7 +112,7 @@
 
 	<div ng-sortable="{handle: '.variable-handle'}">
 		<div class="panel panel-info" ng-repeat="(index, element) in editableProject.forms[currentFormIndex].elements">
-			<div class="panel-heading">
+			<div class="panel-heading" ng-click="toggle(element.id)" style="cursor: pointer">
 				<div class="pull-right">
 					<a class="btn btn-xxs btn-default variable-handle">
 						<i class="fa fa-sort fa-fw"></i>
@@ -126,15 +126,16 @@
 				</div>
 
 				<div class="panel-title">
+					<i fa-open="container.visibleElement==element.id"></i>
 					<strong>{{'project.variable'|translate}} {{index + 1}}:</strong> {{element.name}}
 				</div>
 			</div>
 
-			<div class="panel-body">
+			<div class="panel-body" ng-show="container.visibleElement==element.id">
 				<div class="form-group">
 					<label class="col-sm-2 control-label" translate="project.variable_name_label"></label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" ng-model="element.name" placeholder="{{'project.variable_name_ph'|translate}}">
+						<input type="text" class="form-control" ng-model="element.name" placeholder="{{'project.variable_name_ph'|translate}}" required name="{{element.id}}-name">
 
 						<span class="help-block">
 							<i class="fa fa-info-circle"></i>
@@ -244,8 +245,8 @@
 		<span translate="project.add_variable"></span>
 
 	</a>
-<br/>
-<br/>
+	<br/>
+	<br/>
 
 </form>
 

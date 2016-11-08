@@ -4,7 +4,7 @@ angular
 
 	.module('monitool.directives.pdfExport', [])
 	
-	.directive('pdfExportSource', function(itertools) {
+	.directive('pdfExportSource', function($filter, itertools) {
 
 		var makeRows = function(partitions) {
 			var totalCols = partitions.reduce(function(memo, tp) { return memo * tp.elements.length; }, 1),
@@ -97,14 +97,14 @@ angular
 				content: [
 					{image: "logo", width: 80, absolutePosition: {x: format == 'portrait' ? 480 : 720, y:15}},
 					{text: source.name, style: 'header'},
-					{text: "Information génerales", style: "header2"},
-					{style: "variableName", text: "Lieu de collecte"},
+					{text: $filter('translate')('project.general_info'), style: "header2"},
+					{style: "variableName", text: $filter('translate')('project.collection_site')},
 					{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
-					{style: "variableName", text: "Période couverte"},
+					{style: "variableName", text: $filter('translate')('project.covered_period')},
 					{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
-					{style: "variableName", text: "Information collectée par"},
+					{style: "variableName", text: $filter('translate')('project.collected_by')},
 					{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
-					{text: "Données", style: "header2"}
+					{text: $filter('translate')('project.data'), style: "header2"}
 				].concat(source.elements.map(elementToDocDefinition)),
 
 				styles: {

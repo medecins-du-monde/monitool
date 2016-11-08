@@ -129,18 +129,40 @@ var SPANISH_LOCALE = (function() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var SPANISH_TRANSLATION = {
 	shared: {
+		name_label_fr: "Nombre (francès)",
+		name_label_es: "Nombre (español)",
+		name_label_en: "Nombre (inglès)",
+
+		description_label_fr: "Descripción (francès)",
+		description_label_es: "Descripción (español)",
+		description_label_en: "Descripción (inglès)",
+
+		description: "Descripción",
+
 		country: "País",
 		apply: "Aplicar los cambios",
 		clone: "Clonar",
-		user_guide: "Guía del usuario",
 		home: "Inicio",
-		up: "Subir",
-		down: "Bajar",
 
 		date: "Fecha",
-		administrator: "Administrador",
 
 		settings: "Configuración",
 		projects: 'Proyectos',
@@ -163,7 +185,7 @@ var SPANISH_TRANSLATION = {
 
 		members: 'Miembros',
 		
-		day: 'Dia',
+		day: 'Día',
 		week: 'Semana',
 		month: 'Mes',
 		quarter: "Trimestre",
@@ -194,55 +216,75 @@ var SPANISH_TRANSLATION = {
 		english: "Inglés",
 	},
 
-	help: {
-		block: {
-			project: "Proyecto",
-			indicators: "Catálogo de indicadores"
-		},
-		page: {
-			create: "Crear un nuevo proyecto",
-			structure: "Estructurar los datos de seguimiento",
-			input: "Hacer una entrada de datos",
-			activity_followup: "Seguir las actividades",
-			logical_frame: "Entrar un marco lógico",
-			objectives_results: "Seguir los objetivos & resultatos",
-			change_definition: "Cambiar un proyecto en curso",
-			indicator_usage: "Usar el catálogo",
-			create_new_indicator: "Crear un indicador",
-			merge_indicators: "Fusionar dos indicadores",
-			indicator_reporting: "Seguir un indicator transversal"
-		},
-		reminder: {
-			have_you_read_single_pre: "¿Ha leido la sección ",
-			have_you_read_single_post: "de la documentación?",
-			have_you_read_multiple: "Ha leido las secciones siguientes en la documentación?",
-		}
-	},
-
 	project: {
+		general_info: "Información general",
+		collected_by: "Información colectada por",
+		reporting_empty: "Ningún indicador ha sido añadido en esta sección.",
+		no_cross_cutting: "Este proyecto no requiere ningún indicador transversal. Ha rellenado las temáticas?",
+		indicator_computation_missing: "Falta el cálculo",
+		delete_input: "Esta seguro que desea suprimir esta entrada?",
+		multi_theme_indicator: "Varias temáticas",
+		which_variable: "De que variable viene esta información?",
+		which_partitions: "Qué particiones son relevantes?",
+		value_unknown: "Valor desconocido",
+
+		computations: {
+			unavailable: "No es posible calcular este indicador",
+			fixed: "Usar un valor constante",
+			copy: "Copiar un valor (desde una fuente de datos)",
+			percentage: "Porcentaje (desde fuentes de datos)",
+			permille: "Por mil (desde fuentes de datos)",
+			formula: "Formula personalizada (desde fuentes de datos)"
+		},
+
+		formula: {
+			copied_value: "Valor a copiar",
+			denominator: "Denominador",
+			numerator: "Numerador"
+		},
+
+		same_as_start: "Igual que el inicio del proyecto",
+		same_as_end: "Igual que el final del proyecto",
+
+		specific_start: "Fecha de inicio específica",
+		specific_end: "Fecha de final específica",
+		choose_sites_for_form: "Elija los lugares en los que esta fuente de datos se aplica",
+		choose_sites_for_user: "Elija los lugares en los que este usuario puede entrar datos",
+
+		partition_edit: "Edición partición",
+		partition_help_name: "Este nombre aparecera en varias tablas de estadísticas. Identifica la partición que desea crear en su variable",
+		partition_help_elements: 'Los elementos de la partición deben ser mutualmente exclusivos, y se debe poder calcular el valor total agregandolos.',
+		partition_help_aggregation: 'Como calcular el valor total agregando los elementos describidos?',
+		partition_help_groups: 'Los grupos permiten hacer agregaciones intermediarias',
+		logical_frame: "Marco lógico",
+		
+		structure: "Estructura",
 		no_data: "Datos no disponibles",
 		not_available_by_entity: "Datos no disponibles por lugar de colecta",
 		not_available_by_group: "Datos no disponibles por grupo",
-		not_available_min_week: "Elija Agrégez au moins par semaine pour accéder à ces données",
-		not_available_min_month: "Agrégez au moins par mois pour accéder à ces données",
-		not_available_min_quarter: "Agrégez au moins par trimestre pour accéder à ces données",
-		not_available_min_year: "Agrégez au moins par an pour accéder à ces données",
+		not_available_min_week: "Agrege por semana para acceder a estos datos",
+		not_available_min_month: "Agrege por mes para acceder a estos datos",
+		not_available_min_quarter: "Agrege por trimestre para acceder a estos datos",
+		not_available_min_year: "Agrege por año para acceder a estos datos",
 
-		saving_failed: "Monitool no consiguio salvar los cambios. Se va a recargar la página",
+		saving_failed: "Monitool no consiguio salvar los cambios.",
 		no_logical_frame: "Ningún marco lógico has sido creado en este proyecto.",
 		partition_general: "General",
-		partition_general_placeholder: "ej: Edad",
+		partition_general_placeholder: "ej: Grupos de edad, sexo, motivo de consulta, patología, ...",
 		partition_elements: "Elementos",
+		aggregation_lab: "Como agregar los elements juntos?",
 		partition_name: "Nombre",
-		partition_name_placeholder: "ex: Menor de 12 años",
+		partition_name_placeholder: "ex: Menor de 12 años, hombre, consultación social, gripe, ...",
 		no_partition_elements: "Pulse \"Añadir\" para añadir un elemento en la partición",
 
 		partition_groups: "Groupos",
 		partition_group_name: "Nombre",
-		partition_group_name_placeholder: "ej: Menores de edad",
+		partition_group_name_placeholder: "ej: Menores de edad, patologias crónicas, ...",
 		no_partition_groups: "Pulse \"Añadir\" para añadir un grupo en la partición",
+		use_groups: "Usar grupos",
 
 		no_inputs: "Ninguna entrada de datos en espera",
+		no_variable: "Ninguna variable esta definida en esta fuente de datos. ¡Haga click en \"Añadir una variable\" para create una nueva!",
 		no_partitions: "Ninguna partición esta definida en esta variable",
 
 		dimensions: {
@@ -272,17 +314,14 @@ var SPANISH_TRANSLATION = {
 		user_role: "Nivel de autorización",
 		user_roles: {
 			owner: "Proprietario",
-			input_all: "Entrada de datos",
-			input: "Entrada de datos limitada",
-			read: "Consultar"
+			input_all: "Entrada de datos para todos los lugares",
+			input: "Entrada de datos para lugares escogidos",
+			read: "Consulta unicamente"
 		},
 		user_fullname: "Nombre y apellido",
 		user: "Usuario",
 		username: "Nombre de usuario",
 		password: "Contraseña",
-
-		link_indicator: "Conectar con un indicador del catálogo",
-		unlink_indicator: 'Deconectar del catálogo',
 
 		parameter: "Parametro",
 		all_selected: "Sin filtro",
@@ -293,9 +332,9 @@ var SPANISH_TRANSLATION = {
 		update_logframe: "Actualizar el marco lógico",
 		edit_indicator: "Editar usuario",
 		display: "Nombre",
-		display_ph: "Tasa de consultaciones prenatales en las estructuras de salud",
+		display_ph: "ej: Tasa de consultaciones prenatales en las estructuras de salud",
+		computation: "Cálculo",
 
-		fill_with_last_input: "Rellenar con los datos de la última entrada",
 		show_finished: "Ver todas las entradas",
 		field_order: "Orden",
 		field_distribution: "Distribución",
@@ -306,12 +345,10 @@ var SPANISH_TRANSLATION = {
 		data_selection: "Seleccione los datos",
 		filters: "Filtros",
 		input_status: {
-			'done-read': "Consultar",
-			'outofschedule-read': "Consultar (fuera calendario)",
-			'done-edit': "Editar",
-			'expected-edit': "Crear",
-			'expected-edit-new': "Crear (nueva fecha)",
-			'outofschedule-edit': "Consultar (fuera calendario)"
+			'done': "Editar",
+			'expected': "Crear",
+			'expected-new': "Crear (nueva fecha)",
+			'outofschedule': "Consultar (fuera calendario)"
 		},
 		cols: "Columnas",
 		rows: "Linear",
@@ -342,20 +379,16 @@ var SPANISH_TRANSLATION = {
 		add_partition: "Añadir una partición",
 		remove_partition: "Quitar esta partición",
 
-		aggregation: "Agregación",
-		sites_agg: "Entre lugares",
-		time_agg: "Entre periodos",
+		aggregation: {
+			sum: "Suma",
+			average: "Promedio",
+			highest: "Número mayor",
+			lowest: "Número menor",
+			last: "Último valor",
+			none: "No es posible agregar"
+		},
 
-		none: "No agregar",
-		sum: "Suma",
-		average: "Promedio",
-		highest: "Mas alto",
-		lowest: "Mas bajo",
-		last: "Último",
-
-		variable_up: "Subir la variable",
-		variable_down: "Bajar la variable",
-
+		covered_period: "Periodo cubierto",
 
 		collection_site_list: "Lugares de colecta",
 		collection_form_list: "Fuentes de datos",
@@ -377,47 +410,21 @@ var SPANISH_TRANSLATION = {
 		finished: "Proyectos terminados",
 		noproject: "Ningún proyecto corresponde a este criterio",
 
-
-		activity: "Actividad",
-		activity_management: "Actividades y Demografía",
 		variable: "Variable",
 
-
-		result_management: "Objectivos & resultados",
 		no_purposes: "Ningun objetivo específico ha sido definido",
 
-
-		form_name_ph: "ej: Recuperación mensual en los centros de salud",
-
-		analysis: "Análisis",
-		analysis_insert_data: "Insertar datos",
-		analysis_insert_text: "Insertar texto",
-		analysis_up_next: "Subir",
-		analysis_down_next: "Bajar",
-		analysis_delete_next: "Suprimir",
-		analysis_data: "Mostrar",
-		analysis_table: "Tabla",
-		analysis_graph: "Gráfico",
-		analysis_both: "Tabla & Gráfico",
-		report_name_ph: "ex: Análisis descriptivo mensual de mayo 2015",
-		no_reports: "Ningún analisis descriptivo ha sido creado!",
-
-
-		missing_mandatory_indicators: "Indicadores obligatorios",
-		other_indicators: "Otros indicadores",
-		see_other_themes: "Ver tambien las otra temáticas",
+		form_name_ph: "ej: Datos SNIS, Ficha de colecta ante-natal, Ficha sanidad primaria, ...",
 
 		entity_name: "Nombre de la estructura o del lugar de intervención",
 		group_name: "Nombre del grupo",
 		entity_name_placeholder: "ej: Centro de salud X, Hospital X, ...",
 		group_name_placeholder: "ej: Hospitales regionales, parte Norte del país, ...",
 
-
 		create: "Crear un nuevo proyecto",
 		periodicity: "Periodicidad",
 		start: 'Principio del proyecto',
 		end: 'Fin del proyecto',
-
 
 		periodicities: {
 			day: 'Diario',
@@ -429,17 +436,15 @@ var SPANISH_TRANSLATION = {
 		},
 		collect: "Recuperar",
 		collects: {
-			some_entity: "Para algunos lugares de colecta",
+			some_entity: "Para algunos de los lugares de colecta",
 			entity: "Para cada lugar de colecta",
 			project: "Una vez para todo el proyecto"
 		},
-		
 
 		no_input_entities: '¡Ningún lugar de colecta ha sido creado!',
 		no_input_groups: '¡Ningún grupo de colecta ha sido creado!',
 		no_users: '¡Ningún usuario ha sido añadido!',
 		no_forms: '¡Ningúna fuente de datos ha sido creada!',
-
 
 		input: 'Entrar datos',
 
@@ -448,105 +453,242 @@ var SPANISH_TRANSLATION = {
 
 		goal: 'Objectivo global',
 		intervention_logic: 'Logica de intervención',
-		intervention_logic_goal_ph: 'Descripción de la contribución del proyecto a los objectivos (impacto) de una política o de un programa',
-		intervention_logic_purpose_ph: 'Descripción de las ventajas directas destinadas a los beneficiarios',
-		assumptions_purpose_ph: 'Factores externos susceptibles de comprometer el alcanze del objetivo',
 
 		start_date: "Fecha de inicio",
 		end_date: "Fecha de fin",
-		country_ph: 'Por ejemplo: República Centroafricana',
-		name_ph: 'Por ejemplo: Acceso a atención de calidad para las personas afectadas por la crisis',
+		country_ph: 'ej: República Centroafricana',
+		name_ph: 'ej: Acceso a atención de calidad para las personas afectadas por la crisis',
 		add_indicator: 'Añadir un indicador',
 
-		purpose: 'Objectivo Específico',
-		purposes: 'Objectivos Específicos',
+		purpose: 'Objectivo específico',
+		purposes: 'Objectivos específicos',
 		assumptions: 'Hipotesis',
 		output: "Resultado",
-		activities: 'Actividades',
-		activity_desc_ph: 'Producto o servicio tangible aportado por el proyecto.',
-		output_assumptions_ph: 'Factores externos susceptibles de comprometer el alcanze del resultado',
-		output_desc_ph: 'Producto o servicio tangible aportado por el proyecto.',
 
-		add_activity: 'Añadir una actividad',
-		add_output: 'Añadir un resultado esperado',
+		indicator_is_computed: "Valido",
+		indicator_is_not_computed: "Invalido",
+
+		intervention_logic_goal_ph: 'ej. Reducir la mortalidad y la morbididad de la población afectada por la crisis',
+		intervention_logic_purpose_ph: 'ej. Mejorar el acceso a la salud para la población afectada por la crisis en los districtos de Bimbo y Begoua',
+		output_desc_ph: 'ej. Mejorar la atención de salud primaria en los centros de salud de Bimbo y Begoua',
+		assumptions_purpose_ph: '',
+		output_assumptions_ph: '',
+		logframe_ph_name: "ej. ECHO",
+
+		logframe_help_name: "Nombre este marco lógico para poder identificarlo facilment. Por ejemplo con el nombre del donante relevante",
+		logframe_help_goal: "Descripción de la contribución del proyecto a los objectivos (impacto) de una política o de un programa",
+		logframe_help_goal_indicators: "Entre los indicadores que permiten medir el objectivo general",
+		logframe_help_purpose_desc: "Describa las ventajas tangibles que se proporcionan a los beneficiarios",
+		logframe_help_purpose_assumptions: "Factores externos susceptibles de comprometer el alcanze del objectivo específico",
+		logframe_help_purpose_indicators: "Entre los indicadores que permiten medir el objectivo específico",
+		logframe_help_output_desc: "Producto o servicio tangible proporcionado por el proyecto",
+		logframe_help_output_assumptions: "Factores externos susceptibles de comprometer el alcanze del resultado",
+		logframe_help_output_indicators: "Entre los indicadores que permiten medir el resultado",
+
+		add_output: 'Añadir un resultado',
 		add_purpose: 'Añadir un objetivo específico',
 
 		users: "Usuarios",
 		owners: "Proprietarios",
 
+		basics_info: "<p>Los datos básicos permiten clasificar su proyecto entre los demas de la ONG.</p>",
+		basics_help_country: "En que país tiene lugar su proyecto? Si es un proyecto regional, entre el nombre de la región.",
+		basics_help_name: "El nombre del proyecto le permite encontrarlo en Monitool. Elija algo que sea suficientemente informativo, o copie el objectivo general.",
+		basics_help_thematics: "Las temáticas que elija van a determinar la lista de indicadores transversales que se deberan collectar.",
+		basics_help_begin: "La fecha de inicio es el momento en el que su proyecto empieza a colectar datos (usualemente, con la primeras actividades)",
+		basics_help_end: "La fecha de fin es el momento en el que termina la colecta de datos. Si no es conocida, entre una fecha en el futuro.",
 
-		you_are_owner: "Puede editar este proyecto",
-		you_are_editor: "Puede entrar indicadores en este proyecto",
-		you_are_not_owner: "No puede editar este proyecto",
-		you_are_not_editor: "No puede entrar indicadores en este proyecto",
+		collection_site_info:
+			"<p>Cuando un proyecto tiene las mismas actividades en varios lugares, se deben seguir por lugar, grupos de lugares y a nivel de proyecto.</p>" + 
+			"<p>Entre aqui:</p>" + 
+			"<ul>" + 
+				"<li>La lista de lugares donde su proyecto trabaja (ej: la lista de centros de salud)</li>" + 
+				"<li>los grupos que se usuran durante la vida del proyecto (ej: por región, o tipo de estructura)</li>" + 
+			"</ul>",
+
+		users_list_info:
+			"<p>Muchas personas diferentes participan en crear y seguir un proyecto: coordination, equipo M&E, operadores de entrada de datos, partnerarios, ...</p>" + 
+			"<p>Entre aqui la lista de todos los usuarios que deben tener acceso a los datos del programa.</p>",
+
+		user_help_type: "Elija \"Cuenta MDM\" si el usuario tiene una dirección email xxx@medecinsdumonde.net. Elija \"Cuenta partnerio\" sino.",
+		user_help_user: "Quien es el usuario MDM que desea añadir? Si el usuario no esta en la lista, pidale que se conecte al menos una vez a Monitool.",
+		user_help_username: "El usuario usara este nombre para conectarse. No se autorizan direcciones de correo electronico (por ej. use \"apellido.nombre\", o \"puesto.país\")",
+		user_help_fullname: "Entre aqui el nombre completo de la persona que va a usar la cuenta.",
+		user_help_password: "La contraseña debe ser al menos 6 letras. No use el mismo valor que el nombre de usuario",
+		user_help_role: "Este campo determina que podra hacer este usuario: los proprietarios pueden cambiar la estructura de los proyectos, los operadores de entrada solo entrar datos.",
+		user_help_sites: "Para que lugares podra este usuario entrar datos?",
+
+		collection_form_list_info:
+			"<p>Las fuentes de datos son los diferentes soportes donde se encuentran los datos necesarios para seguir el proyecto (fichas de colecta, historiales clínicos, ficheros excel, ...).</p>" + 
+			"<p>En Monitool, no hace falta entrar todos los datos disponibles en las fuentes de datos: solo lo que es relevante</p>" + 
+			"<p>Para que sea mas facil entrar los datos, la fuentes deben corresponder a herramientas reales usadas en el terreno.</p>",
+
+		collection_edit_help_name: "Cual es el nombre de la fuente de datos de la que quiere extraer datos? ej. \"Historiales clínicos electronicos\", \"Fichas de colecta\", \"Informe SNIS\", ...",
+		collection_edit_help_sites: "Entre los lugares identificados en \"Lugares de colecta\", cuales son los que colectan esta fuente de datos?",
+		collection_edit_help_periodicity: "Cada cuanto son disponibles estos datos? Tenga ciudado, no entre aqui la frecuencia a la que hace sus informes.",
+		collection_edit_help_start: "Si esta fuente de datos fue creada despues del inicio del proyecto, especifique la fecha, sino deje el valor por defecto",
+		collection_edit_help_end: "Si esta fuente de datos terminara antes del fin del proyecto, o se ha reemplazado, entre la fecha aqui",
+
+		collection_edit_help_varname: "Nombre la variable que quiere extraer de <code>{{name}}</code>. ej: \"Número de diagnosticos\".",
+		collection_edit_help_geoagg: "En un proyecto que trabaja en dos lugares, si <code>{{name}}</code> vale 10 en el primero, y 20 en el segundo, cual es el valor para el proyecto entero?",
+		collection_edit_help_timeagg: "En un proyecto que colecta datos mensuales, si <code>{{name}}</code> vale 10 en enero, 20 en febrero y 30 en marzo, que vale para el trimer trimestre?",
+		collection_edit_help_partition: "Quiere poder diferenciar <code>{{name}}</code> por edad, sexo, tipo de consulta, motivo de consulta, patología, hora del dia, ...?",
+		collection_edit_help_distribution: "Si va a imprimir formulario en A4, prefiera tener columnas a la izquierda para que las tablas sean menor anchas.",
+		collection_edit_help_order: "En que ordén quiere que aparescan la particiones en las tablas de entrada de datos?",
+
+		logical_frame_list_info:
+			"<p>Un marco lógico es un documento que describe los objectivos, resultados y actividades de un proyecto, asi como indicadores para seguir el progreso de cada uno de ellos</p>" + 
+			"<p>Todos los indicadores deben ser calculables a partir de los datos describidos en las fuentes de datos</p>",
+
+		cross_cutting_list_info:
+			"<p>Los indicadores transversales se deciden según la lista de temáticas en \"Datos basicos\".</p>" + 
+			"<p>Esta lista contiene todos los indicadores transversales que su proyecto debe colectar</p>",
+
+		input_list_info:
+			"<p>Este calendario de entrada hace la lista de todas las entradas de datos programadas para la fuente de datos \"{{name}}\"</p>" +
+			"<p>Para limitar los errores de entrada, es preferible entrar los datos cerca de donde se colectaron, directamente en Monitool.</p>" + 
+			"<p>Si no es posible, una versión PDF del formulario esta provista.</p>",
+
+		extra_indicators_list_info: 
+			"<p>Los indicadores adicionales son indicadores que no estan en ningún marco lógico.</p>" +
+			"<p>Permiten seguir elementos especificos del proyecto (datos medicales, logisticos, ...)</p>",
+
+		download_portrait: "Descargar PDF (vertical)",
+		download_landscape: "Descargar PDF (horizontal)",
+
+		press_to_drag: "Pulse para arrastrar y soltar",
+		titles: "Título",
+		data: "Datos",
+		general_informations: "Informaciones generales",
+		fill_with_last_input: "Rellenar con los datos de la última entrada",
 		
-		formula: "Formula: {{name}}",
-		link: "Vínculo: {{name}}",
-		collected: "Recuperado"
+		variable_name_label: "Qué esta midiendo?",
+		variable_name_ph: "ej: Número de diagnosticos",
+		site_agg_label: "Como agregar entradas provenientes de diferentes lugares?",
+		time_agg_label: "Como agregar entradas provenientes de diferentes periodos?",
+		partitions_label: "Que particiones quiere usar en esta variable?",
+		distribution_label: "Como mostrar la particiones en el formulario de colecta?",
+		order_label: "En que ordén mostrar las particiones en el formulario de colecta?",
+		no_indicator: "Ningún indicador esta definido. Haga click en \"Añadir un indicador\"",
+		delete_form: "Suprimir la fuente de datos",
+		delete_logical_frame: "Suprimir el marco lógico",
+		delete_purpose: "Suprimir el objectivo especifico",
+		delete_result: "Suprimir el resultado",
+
+		no_element_selected: "Ningún elemento esta seleccionado",
+
+		indicator_ph_fixed: "Entre el valor constante del indicador (ej: \"12\")",
+		indicator_help_display: "Nombre su indicador. Es preferible obtener el nombre a partir de un catalogo para ser consistente con otros proyectos.",
+		indicator_help_baseline: "Cual era el valor del indicador antes de empezar la actividades? Marque la casilla para especificar un valor.",
+		indicator_help_target: "Cual es el objectivo para este indicador? Marque la casilla para especificar un valor.",
+		indicator_help_colorize: "Desea tener colores (rojo, naranja, verde) en estadísticas para este indicador?",
+		indicator_help_computation: "Como se calcula este indicador a partir de las variables que ha colectado en fuentes de datos?"
 	},
-	indicator: {
-		cross_cutting: "Indicadores transversales",
-		cant_create: "No esta autorizado a crear nuevos indicadores",
-		name: "Nombre",
-		translate_from_fr: "Traducir automaticamente desde el francès",
-		translate_from_es: "Traducir automaticamente desde el español",
-		translate_from_en: "Traducir automaticamente desde el inglès",
 
-		delete_indicator: "¿Esta seguro que quiere suprimir este indicador? Afectara a todos los proyectos que lo usan.",
-		delete_formula: "¿Esta seguro que quiere suprimir esta formula? Afectara a todos los proyectos que la usan.",
-
-		classification: "Clasificación",
-
-		is_mandatory: "Obligatorio - Debe ser colectado por todos los proyectos de misma tématica",
-		is_approved: "Opcional - Puede o no ser colectado por proyecto de misma tématica",
-		is_waiting: "En espera - La sede no se ha pronunciado aún sobre la calidad de este indicador",
-		
-		num_collecting_projects: "Número de proyectos que colectan este indicador",
-
-		search: "Buscar",
-		search_ph: "Entre por lo menos 3 caracteres",
-
-		standard: "Norma",
-		sources: "Origen",
-		comments: "Notas",
-		standard_ph: "¿A que norma pertenece este indicador?",
-		sources_ph: "¿Dónde se puede colectar este indicador?",
-		comments_ph: "¿En qué casos es pertinente usar este indicador, y con qué limites?",
-
-		target: "Relación con el objetivo",
-		higher_is_better: "Alcanzado si la entrada es superior al objetivo",
-		lower_is_better: "Alcanzado si la entrada es inferior al objetivo",
-		around_is_better: "Alcanzado si la entrada es igual al objetivo",
-		non_relevant: "No pertinente",
-
-		no_theme: 'Sin temática',
-		no_type: 'Sin tipo',
-
-		operation: "Modo de operación",
-
-		name_ph: 'Por ejemplo: Porcentaje de fichas de paciente completas',
-		definition: 'Definición',
-		unit: 'Unidad',
-		other: 'Otro',
-		percent: 'Porcentaje (%)',
-		permille: 'Por mil (‰)',
-		types: 'Tipos',
-		themes: 'Temáticas',
-		select_types: 'Selectione uno o varios tipos',
-		select_themes: 'Selectione una o varias tématicas',
-
-		num_projects: 'Número de proyectos',
-		create_new: 'Crear un nuevo indicador',
-
-		themes_list: "Lista de temáticas",
-		types_list: "Lista de tipos",
-		num_indicators: 'Número de indicadores',
-		
-	},
 	form: {
 		mandatory: "Este campo es obligatorio",
 		start_lower_than_end: 'La fecha de inicio tiene que ser inferior a la de fin',
 		end_greater_than_start: 'la fecha de fin tiene que ser superior a la de inicio',
+	
+		help: {
+			show: "Mostrar ayuda para este campo",
+			hide: "Esconder ayuda para este campo"
+		}
+	},
+	theme: {
+		new_theme: "Nueva temática",
+		create_new: "Create una temática"
+	},
+	user: {
+		email: "Correo electrónico",
+		fullname: "Nombre completo",
+		role: "Tipo",
+		save: "Guardar usuario",
+		
+		list_info: 
+			"<p>Esta página contiene la lista de todos los usuarios que se han conectado por lo menos una vez a Monitool</p>" + 
+			"<p>No es necesario crear cuentas para usuario con una dirección de correo xxx@medecinsdumonde.net: apareceran automáticamente una vez se hayan conectado una vez. Para socios, es posible crear cuentas desde la páginas dedicadas a cada proyecto.</p>",
+
+		edit_info:
+			"<p>Puede editar aqui la permisiones de los demas usuarios. Haga click en \"Mostrar ayuda para este campo\" para mas detalles sobre los diferentes tipos de permision que son disponibles.</p>",
+
+		roles_short: {
+			admin: "Administrador",
+			project: "Creador proyectos",
+			common: "Normal",
+		},
+
+		permissions: {
+			thematics: "Crear y editar temáticas",
+			cross_cutting: "Crear y editar indicadores transversales",
+			user_roles: "Editar las permisiones de los demás usuarios",
+			own_all_projects: "Editar los datos y estructura de todos los proyectos",
+			create_projects: "Crear proyectos",
+			edit_projects: "Editar los datos y la estructura de proyecto donde se ha autorizado explicitamente",
+			see_reporting: "Ver la estadísticas de todos los proyectos"
+		}
+	},
+
+	theme: {
+		list_info: 
+			"<p>Esta página contiene la lista de las temáticas tratadas por la ONG.</p>" +
+			"<p>Los proyectos y los indicadores transversales se pueden conectar a temáticas.</p>",
+
+		edit_info:
+			"",
+
+		themes: "Temáticas",
+		edit_title: "Édition thématique",
+		save: "Guardar la temática",
+
+		new_theme: "Nueva temática",
+		create_new: "Crear una nueva temática",
+
+		name_placeholder_fr: "i.e. Santé Sexuelle et Reproductive",
+		name_placeholder_es: "i.e. Salud Sexual y reproductiva",
+		name_placeholder_en: "i.e. Sexual and Reproductive Health",
+
+		info: 
+			"<p>Entre aqui el nombre de la temática en todos los idiomas usados por su organización.</p>" +
+			"<p>Si no puede traducir a todos los idiomas:</p>" +
+			"<ol>" +
+				"<li>Entre manualmente todos los idiomas que pueda</li>" +
+				"<li>Pulse el botón a la izquierda para traducir automáticamente los demás</li>" +
+			"</ol>"
+	},
+
+	indicator: {
+		extra: "Indicadores adicionales",
+		new_indicator: "Nuevo indicador",
+		create_new: 'Crear un nuevo indicador',
+		
+		cross_cutting: "Indicadores transversales",
+		select_themes: 'Selectione una o varias temáticas',
+
+		edit_title: "Edición indicador",
+		themes_label: "Temáticas",
+
+		name_placeholder_fr: "Volume de formation",
+		name_placeholder_en: "Training volume",
+		name_placeholder_es: "Volumen de formación",
+
+		description_placeholder_fr: "On ne parle pas d'éducation pour la santé, mais de formation à du personnel soignant. On compte le nombre de participations et non pas le nombre de personnes différentes ayant participé à ces formations.",
+		description_placeholder_en: "We are not talking about health education, but training of medical staff. Count the number of entries and not the number of different people who attended these trainings.",
+		description_placeholder_es: "No se trata de educación para la salud, sino de formación para el personal sanitario. Se cuenta el número de participaciones y no el número de personas distintas que hayan participado.",
+
+		list_info: 
+			"<p>Esta página contiene la lista de todos los indicadores transversales de la ONG.<br/>Colectar estos indicadores es obligatorio para todos los proyectos que tengan por los menos una temática en común con ese.</p>" + 
+			"<p>Para ayudar los proyectos a planificar su colecta de datos, evite cambiar esta lista a menudo.</p>",
+
+		edit_info: 
+			"<p>Esta página permite cambiar la definicion de un indicador transversal. Si have cambios, tenga cuidado en poner todos los idiomas a día.</p>" + 
+			"<p>Si no puede traducir a todos los idiomas:</p>" +
+			"<ol>" +
+				"<li>Entre manualmente todos los idiomas que pueda</li>" +
+				"<li>Pulse el botón a la izquierda para traducir automáticamente los demás</li>" +
+			"</ol>",
+
+		save: "Guardar indicador"
 	}
 };
 

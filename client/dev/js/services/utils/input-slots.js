@@ -44,7 +44,7 @@ angular
 			throw new Error('Invalid periodicity.');
 		};
 
-		InputSlots.slotToDate = function(slot) {
+		InputSlots.slotToBeginDate = function(slot) {
 			switch (InputSlots.slotToPeriodicity(slot)) {
 				case 'year':
 					return new Date(slot + '-01-01T00:00:00Z');
@@ -82,11 +82,11 @@ angular
 				case 'quarter':
 					if ($rootScope.language == 'fr') {
 						var trim = {"1": "1er", "2": "2ème", "3": "3ème", "4": "4ème"}
-						return trim[slot.substring(6)] + ' trimestre ' + slot.substring(0, 4);
+						return trim[slot.substring(6)] + ' trim. ' + slot.substring(0, 4);
 					}
 					else if ($rootScope.language == 'es') {
 						var trim = {"1": "Primer", "2": "Segundo", "3": "Tercero", "4": "Quarto"}
-						return trim[slot.substring(6)] + ' trimestre ' + slot.substring(0, 4);
+						return trim[slot.substring(6)] + ' trim. ' + slot.substring(0, 4);
 					}
 					else
 						return slot;

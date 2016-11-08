@@ -41,7 +41,7 @@ angular.module(
 		};
 	})
 	
-	.controller('ProjectMenuController', function($scope, $filter, project) {
+	.controller('ProjectMenuController', function($scope, $filter, $state, project) {
 		$scope.masterProject = project;
 
 		// When master changes, update menu elements

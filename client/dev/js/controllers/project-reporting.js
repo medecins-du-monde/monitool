@@ -9,7 +9,7 @@ angular
 		]
 	)
 
-	.controller('ProjectReportingController', function($scope, Cube, cubes, mtReporting, indicators) {
+	.controller('ProjectReportingController', function($scope, $filter, Cube, cubes, mtReporting, indicators) {
 		// Create default filter so that all inputs are used.
 		$scope.filters = {_location: "none", _start: $scope.masterProject.start, _end: $scope.masterProject.end < new Date() ? $scope.masterProject.end : new Date()};
 
@@ -33,13 +33,14 @@ angular
 		$scope.plots = {};
 
 		$scope.blocks = $scope.masterProject.logicalFrames.map(function(logicalFrame, index) {
-			return {text: "Logical frame: " + logicalFrame.name};
+			return {text: $filter('translate')('project.logical_frame') + ": " + logicalFrame.name};
 		})
-		.concat([{text: "Cross-Cutting Indicators"}])
+		.concat([{text: $filter('translate')('indicator.cross_cutting')}])
+		.concat([{text: $filter('translate')('indicator.extra')}])
 		.concat($scope.masterProject.forms.map(function(form, index) {
-			return {text: "Data source: " + form.name};
+			return {text: $filter('translate')('project.collection_form') + ": " + form.name};
 		}));
-		$scope.open = $scope.blocks.map(function(_, index) { return index == 0; });
+		$scope.open = $scope.blocks.map(function(_, index) { return false; });
 
 		$scope.$watch('[filters, groupBy, splits, open]', function() {
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, $scope.filters._location, $scope.masterProject)
@@ -48,11 +49,12 @@ angular
 				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeLogicalFrameReporting(cubes, $scope.masterProject, logicalFrame, $scope.groupBy, $scope.filters) : null;
 			});
 
-			var index = $scope.masterProject.logicalFrames.length
+			var index = $scope.masterProject.logicalFrames.length;
 			$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeCrossCuttingReporting(cubes, $scope.masterProject, indicators, $scope.groupBy, $scope.filters) : null;
+			$scope.blocks[index + 1].rows = $scope.open[index + 1] ? mtReporting.computeExtraReporting(cubes, $scope.masterProject, $scope.groupBy, $scope.filters) : null;
 
 			$scope.masterProject.forms.forEach(function(form, index) {
-				index += $scope.masterProject.logicalFrames.length + 1;
+				index += $scope.masterProject.logicalFrames.length + 2;
 				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeDataSourceReporting(cubes, $scope.masterProject, form, $scope.groupBy, $scope.filters, $scope.splits) : null;
 			});
 

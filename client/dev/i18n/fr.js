@@ -126,6 +126,25 @@ var FRENCH_LOCALE = (function() {
 })();
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var FRENCH_TRANSLATION = {
 	shared: {
 		name_label_fr: "Nom (français)",
@@ -141,10 +160,7 @@ var FRENCH_TRANSLATION = {
 		country: "Pays",
 		apply: "Appliquer les modifications",
 		clone: "Cloner",
-		user_guide: "Guide d'utilisation",
 		home: "Accueil",
-		up: "Monter d'un cran",
-		down: "Descendre d'un cran",
 
 		date: "Date",
 
@@ -201,7 +217,11 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
-
+		general_info: "Information génerales",
+		collected_by: "Information collectée par",
+		reporting_empty: "Aucun indicateur n'a été ajouté dans cette section.",
+		no_cross_cutting: "Ce project n'a besoin de collecter aucun indicateur transversal. Avez-vous bien renseigné vos thématiques?",
+		indicator_computation_missing: "Calcul absent",
 		delete_input: "Êtes-vous sûr de vouloir supprimer cette saisie?",
 		multi_theme_indicator: "Multi-thématique",
 		which_variable: "De quelle variable provient cette information?",
@@ -236,7 +256,8 @@ var FRENCH_TRANSLATION = {
 		partition_help_elements: 'Les éléments de la désagrégation doivent être mutuellement exclusifs, et il doit être possible de trouver la valeur totale en les aggrégant.',
 		partition_help_aggregation: 'Comment trouver la valeur totale en agrégeant les éléments décrits?',
 		partition_help_groups: 'Les groupes permettent de faire des aggrégations intermédiaires',
-
+		logical_frame: "Cadre logique",
+		
 		structure: "Structure",
 		no_data: "Les données ne sont pas disponibles",
 		not_available_by_entity: "Ces données ne sont pas disponibles par lieu de collecte",
@@ -246,10 +267,10 @@ var FRENCH_TRANSLATION = {
 		not_available_min_quarter: "Agrégez au moins par trimestre pour accéder à ces données",
 		not_available_min_year: "Agrégez au moins par an pour accéder à ces données",
 
-		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements. Ceux-ci seront perdus.",
+		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements.",
 		no_logical_frames: "Aucun cadre logique n'a encore été créé sur ce projet.",
 		partition_general: "Général",
-		partition_general_placeholder: "ex: Tranches d'âge, sexe, motif de consultation, pathologie ou référencement effectué, ...",
+		partition_general_placeholder: "ex: Tranches d'âge, sexe, motif de consultation, pathologie, référencement effectué, ...",
 		partition_elements: "Éléments",
 		aggregation_lab: "Comment grouper les éléments entre eux?",
 		partition_name: "Nom",
@@ -301,9 +322,6 @@ var FRENCH_TRANSLATION = {
 		user: "Utilisateur",
 		username: "Login",
 		password: "Mot de passe",
-
-		link_indicator: "Lier à un indicateur du catalogue",
-		unlink_indicator: 'Retirer le lien avec le catalogue',
 
 		parameter: "Paramètre",
 		all_selected: "Pas de filtre",
@@ -370,7 +388,6 @@ var FRENCH_TRANSLATION = {
 			none: "Il n'est pas possible de faire ce calcul"
 		},
 
-		collection_site: "Lieu de collecte",
 		covered_period: "Période couverte",
 
 		collection_site_list: "Lieux de collecte",
@@ -393,39 +410,16 @@ var FRENCH_TRANSLATION = {
 		finished: "Projets terminés",
 		noproject: "Aucun projet ne correspond à ce critère",
 
-
-		activity: "Activités",
-		activity_management: "Activités & Démographie",
 		variable: "Variable",
 
-		result_management: "Objectifs & résultats",
 		no_purposes: "Aucun objectif spécifique n'a été défini",
 
-		form_name_ph: "ex: Données système national d'information sanitaire",
-
-		analysis: "Analyse",
-		analysis_insert_data: "Insérer des données",
-		analysis_insert_text: "Insérer du texte",
-		analysis_up_next: "Monter",
-		analysis_down_next: "Descendre",
-		analysis_delete_next: "Supprimer",
-		analysis_data: "Affichage",
-		analysis_table: "Tableau",
-		analysis_graph: "Graphique",
-		analysis_both: "Tableau & Graphique",
-		report_name_ph: "ex: Analyse descriptive mensuelle mai 2015",
-		no_reports: "Aucune analyse descriptive n'a encore été créé!",
-
-
-		missing_mandatory_indicators: "Indicateurs obligatoires manquants",
-		other_indicators: "Autres indicateurs",
-		see_other_themes: "Voir aussi les autres thématiques",
+		form_name_ph: "ex: Données SNIS, Fiche consultations prénatales, Fiche consultations générales, ...",
 
 		entity_name: "Nom de la structure ou lieu d’intervention",
 		group_name: "Nom du groupe",
 		entity_name_placeholder: "ex: Centre de santé X, Hôpital X, ...",
 		group_name_placeholder: "ex: Hôpitaux régionaux, parti Nord du pays, ...",
-
 
 		create: "Créer un nouveau projet",
 		periodicity: "Périodicité",
@@ -462,15 +456,14 @@ var FRENCH_TRANSLATION = {
 
 		start_date: "Date de lancement",
 		end_date: "Date de fin",
-		country_ph: "Exemple: RCA",
-		name_ph: 'Exemple: Accès a des soins de santé de qualité pour les populations touchées par la crise',
+		country_ph: "ex: RCA",
+		name_ph: 'ex: Accès a des soins de santé de qualité pour les populations touchées par la crise',
 		add_indicator: 'Ajouter un indicateur',
 
 		purpose: 'Objectif Spécifique',
 		purposes: 'Objectifs Spécifiques',
 		assumptions: 'Hypothèses',
 		output: "Résultat",
-		activities: 'Activités',
 
 		indicator_is_computed: "Valide",
 		indicator_is_not_computed: "Invalide",
@@ -498,15 +491,6 @@ var FRENCH_TRANSLATION = {
 		users: "Utilisateurs",
 		owners: "Propriétaires",
 
-
-		you_are_owner: "Vous pouvez éditer ce projet",
-		you_are_editor: "Vous pouvez saisir sur ce projet",
-		you_are_not_owner: "Vous ne pouvez pas éditer ce projet",
-		you_are_not_editor: "Vous ne pouvez pas saisir sur ce projet",
-
-		link: "Lien: {{name}}",
-		collected: "Collecté",
-
 		basics_info: "<p>Les données de bases permettent de classer votre projet parmi les autres de l'ONG.</p>",
 		basics_help_country: "Dans quel pays le projet se déroule-t'il? S'il s'agit d'un projet régional, entrez le nom de la région.",
 		basics_help_name: "Le nom permet de retrouver le projet dans Monitool. Choisissez un nom suffisament informatif, ou copiez l'objectif général du projet.",
@@ -528,14 +512,14 @@ var FRENCH_TRANSLATION = {
 
 		user_help_type: "Choisissez \"Compte MDM\" si l'utilisateur possède une adresse email xxx@medecinsdumonde.net, et compte partenaire sinon.",
 		user_help_user: "De quel utilisateur MDM s'agit-il? Si l'utilisateur que vous voulez ajouter n'est pas disponible dans la liste, demandez lui de se connecter à Monitool une première fois.",
-		user_help_username: "Cet identifiant permettra à l'utilisateur de se connecter. Les adresses emails ne sont pas acceptés comme identifiant (utiliser par exemple: \"nom.prenom\", ou \"fonction.pays\"",
+		user_help_username: "Cet identifiant permettra à l'utilisateur de se connecter. Les adresses emails ne sont pas acceptés comme identifiant (utiliser par exemple: \"nom.prenom\", ou \"fonction.pays\")",
 		user_help_fullname: "Rentrez ici le nom complet de la personne qui va utiliser ce compte.",
 		user_help_password: "Le mot de passe doit avoir 6 caractères au minimum. Ne pas utiliser la même valeur que l'identifiant",
 		user_help_role: "Ce champs determine les modifications que pourra réaliser cet utilisateur sur le projet: les propriétaires peuvent changer la structure du projet, les saisisseurs, uniquement rentrer des données.",
 		user_help_sites: "Sur quels lieux de collecte cet utilisateur pourra-t'il saisir des données?",
 
 		collection_form_list_info:
-			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont présentes</p>" + 
+			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont présentes (fiches de suivi, dossiers patient, fichiers Excel, ...)</p>" + 
 			"<p>Au sein de monitool, on ne décrira pas l'intégralité des données existantes, mais uniquement la partie qui va être extraite pour le suivi du projet</p>" + 
 			"<p>Afin de faciliter l'organisation de la saisie, les sources doivent correspondre à des outils réel utilisés sur le terrain.</p>",
 
@@ -546,14 +530,14 @@ var FRENCH_TRANSLATION = {
 		collection_edit_help_end: "Si cette source de données finira avant la fin du projet, ou à été remplacée, indiquez le ici",
 
 		collection_edit_help_varname: "Nommez la variable que vous voulez extraire de/du <code>{{name}}</code>. Par exemple \"Nombre de diagnostics effectués\".",
-		collection_edit_help_geoagg: "Dans un projet avec deux sites, si <code>{{name}}</code> vaut 10 pour un site, et 20 pour l'autre, que vaut-il pour le projet?",
+		collection_edit_help_geoagg: "Dans un projet avec deux sites, si <code>{{name}}</code> vaut 10 pour un site, et 20 pour l'autre, que vaut-il pour le projet dans son ensemble?",
 		collection_edit_help_timeagg: "Dans un projet qui collecte mensuellement, si <code>{{name}}</code> vaut 10 en janvier, et 20 en février et 30 en mars que vaut-il pour le premier trimestre?",
 		collection_edit_help_partition: "Veut-t'on être capable de différencier <code>{{name}}</code> par age, sexe, prise en charge, motif de consultation, pathologie, tranche horaire, reférencement effectif, ...?",
 		collection_edit_help_distribution: "Si vous desirez imprimer des formulaires en A4, préférez placer les intitulés sur la gauche des tableaux, afin de limiter leur largeur.",
 		collection_edit_help_order: "Dans quel ordre voulez vous placer vos désagrégations dans les différentes lignes et colonnes?",
 
 		logical_frame_list_info:
-			"<p>Un cadre logique est un document qui décrit les objectifs d'un projet, les activités misent en oeuvre pour y parvenir, ainsi que les indicateurs qui permette de suivre l'avancement de chaque élément</p>" + 
+			"<p>Un cadre logique est un document qui décrit les objectifs, les résultats attendus, et les activités misent en oeuvre pour y parvenir, ainsi que les indicateurs qui permette de suivre l'avancement de chaque élément</p>" + 
 			"<p>Tous les indicateurs présents dans les cadres logiques doivent être calculables à partir des données décrites dans les sources de données</p>",
 
 		cross_cutting_list_info:
@@ -563,7 +547,11 @@ var FRENCH_TRANSLATION = {
 		input_list_info:
 			"<p>Ce planning de saisie liste toutes les saisies qui ont été programmées pour la source de données \"{{name}}\"</p>" +
 			"<p>Afin de limiter les erreurs de saisie, il est préférable de la réaliser au plus près du lieu d'où sont extraites les données, directement sur monitool.</p>" + 
-			"<p>Si ce n'est pas possible, il est possible de télécharger une version PDF à imprimer du formulaire.</p>",
+			"<p>Si ce n'est pas possible, une version PDF à imprimer du formulaire est disponible.</p>",
+
+		extra_indicators_list_info: 
+			"<p>Les indicateurs annexés sont des indicateurs complémentaires qui ne figurent dans aucun cadre logique.</p>" +
+			"<p>Ils permettent de suivre des éléments spécifiques du projet (données médicales, logistiques, ...)</p>",
 
 		download_portrait: "Télécharger PDF (portrait)",
 		download_landscape: "Télécharger PDF (paysage)",
@@ -670,6 +658,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	indicator: {
+		extra: "Indicateurs annexés",
 		new_indicator: "Nouvel indicateur",
 		create_new: 'Créer un nouvel indicateur',
 
@@ -679,21 +668,6 @@ var FRENCH_TRANSLATION = {
 		edit_title: "Édition indicateur",
 		themes_label: "Thématiques",
 		
-		target_label: "Relation à la cible",
-		targets: {
-			higher_is_better: "Atteinte si la saisie est supérieure à la cible",
-			lower_is_better: "Atteinte si la saisie est inférieure à la cible",
-			around_is_better: "Atteinte si la saisie est égale à la cible",
-			non_relevant: "Non pertinent"
-		},
-
-		unit_label: "Unité",
-		units: {
-			other: 'Autre',
-			percent: 'Pour cent (%)',
-			permille: 'Pour mille (‰)',
-		},
-
 		name_placeholder_fr: "Volume de formation",
 		name_placeholder_en: "Training volume",
 		name_placeholder_es: "Volumen de formación",

@@ -96,23 +96,24 @@
 	<thead>
 		<tr>
 			<th style="width: 30px" class="noprint"></th>
-			<th style="width: 30px" class="noprint"></th>
 			<th translate="shared.name"></th>
 			<th ng-repeat="col in cols">{{col.name}}</th>
 		</tr>
 	</thead>
 	<tbody ng-repeat="(blockIndex, block) in blocks">
-		<tr ng-click="open[blockIndex] = !open[blockIndex]">
-			<td ng-class="{noprint: open[blockIndex]}" style="text-align: center" rowspan="{{open[blockIndex] ? block.rows.length + 1 : 1}}">
-				<button class="btn btn-xs btn-default">
-					<i class="fa fa-angle-double-up" ng-if="open[blockIndex]"></i>
-					<i class="fa fa-angle-double-down" ng-if="!open[blockIndex]"></i>
-				</button>
-			</td>
-			<th class="indent0" colspan="{{2 + cols.length}}">{{block.text}}</th>
+		<tr ng-click="open[blockIndex] = !open[blockIndex]" style="cursor: pointer">
+			<th class="indent0" colspan="{{2 + cols.length}}">
+				<i class="noprint" fa-open="open[blockIndex]"></i>
+				{{block.text}}
+			</th>
 		</tr>
 		
-		<tr ng-repeat="row in block.rows">
+		<tr ng-if="open[blockIndex] && !block.rows.length">
+			<td class="noprint"></td>
+			<td colspan="{{1 + cols.length}}" translate="project.reporting_empty"></td>
+		</tr>
+
+		<tr ng-repeat="row in block.rows" ng-if="open[blockIndex]">
 			<td class="noprint" style="text-align: center">
 				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data' && row.cols" />
 			</td>

@@ -4,17 +4,11 @@
 		<div class="panel-group">
 
 			<div class="panel panel-default" acl-has-project-role="owner">
-				<div class="panel-heading" ng-click="structureSwitchVisibility()">
-					
-					<button class="btn btn-default btn-xxs pull-right" style="margin-top: -1px" disable-if="!isStructureFoldable()">
-						<i class="fa fa-angle-double-down" ng-if="!isStructureVisible()"></i>
-						<i class="fa fa-angle-double-up" ng-if="isStructureVisible()"></i>
-					</button>
-
+				<div class="panel-heading">
 					<h4 class="panel-title" translate="project.structure"></h4>
 				</div>
 
-				<div class="panel-collapse" ng-show="isStructureVisible()">
+				<div class="panel-collapse">
 					<div class="list-group">
 						<a ui-sref="main.project.structure.basics"
 						   ui-sref-active="active"
@@ -73,6 +67,16 @@
 							<i class="fa fa-sign-out fa-fw"></i>
 							<span translate="indicator.cross_cutting"></span>
 						</a>
+
+						<a ui-sref="main.project.structure.extra"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!masterProject._rev">
+
+							<span class="label label-default pull-right">{{masterProject.extraIndicators.length}}</span>
+							<i class="fa fa-sign-out fa-fw"></i>
+							<span translate="indicator.extra"></span>
+						</a>						
 					</div>
 				</div>
 			</div>

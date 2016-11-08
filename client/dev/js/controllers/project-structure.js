@@ -15,7 +15,7 @@ angular
 	 * 		- A warning when the user try to change current page without saving changes.
 	 *		- Form validation + save & reset" buttons
 	 */
-	.controller('ProjectEditController', function($scope, $filter) {
+	.controller('ProjectEditController', function($scope, $filter, indicators) {
 		$scope.editableProject = angular.copy($scope.masterProject);	// Current version of project.
 		$scope.projectSaveRunning = false;				// We are not currently saving.
 		$scope.formContainer = {currentForm: null};
@@ -59,7 +59,7 @@ angular
 				return;
 
 			$scope.projectSaveRunning = true;
-			$scope.editableProject.sanitize();
+			$scope.editableProject.sanitize(indicators);
 
 			return $scope.editableProject.$save().then(function() {
 				angular.copy($scope.editableProject, $scope.masterProject);
@@ -234,11 +234,18 @@ angular
 	 */
 	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $uibModal, $timeout, formUsage, uuid) {
 
+		$scope.container = {}
+		$scope.toggle = function(elementId) {
+			if ($scope.container.visibleElement!== elementId)
+				$scope.container.visibleElement = elementId;
+			else
+				$scope.container.visibleElement = null;
+		}
+
 		/////////////////////
 		// Pass the form to the shared controller over it, to be able
 		// to enable and disable the save button.
 		/////////////////////
-		
 		$scope.$watch('dataSourceForm', function(dataSourceForm) {
 			$scope.formContainer.currentForm = dataSourceForm;
 		});
@@ -565,6 +572,28 @@ angular
 			});
 		};
 	})
+
+	.controller('ProjectExtraIndicators', function($scope, $uibModal) {
+		$scope.editIndicator = function(planning) {
+			var promise = $uibModal.open({
+				controller: 'ProjectIndicatorEditionModalController',
+				templateUrl: 'partials/projects/structure/edition-modal.html',
+				size: 'lg',
+				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
+				resolve: {planning: function() { return planning; }, indicator: function() { return null; }}
+			}).result;
+
+			promise.then(function(newPlanning) {
+				if (planning && !newPlanning)
+					$scope.editableProject.extraIndicators.splice($scope.editableProject.extraIndicators.indexOf(planning), 1);
+				else if (!planning && newPlanning)
+					$scope.editableProject.extraIndicators.push(newPlanning);
+				else if (planning && newPlanning)
+					$scope.editableProject.extraIndicators.splice($scope.editableProject.extraIndicators.indexOf(planning), 1, newPlanning);
+			});
+		};
+	})
+
 
 	.controller('ProjectIndicatorEditionModalController', function($scope, $uibModalInstance, planning, indicator) {
 		$scope.indicator = indicator;

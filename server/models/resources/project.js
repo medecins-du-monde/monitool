@@ -11,7 +11,7 @@ var validate = validator({
 	title: "Monitool project schema",
 	type: "object",
 	additionalProperties: false,
-	required: [ '_id', 'type', 'name', 'themes', 'start', 'end', 'entities', 'groups', 'forms', 'crossCutting', 'logicalFrames', 'users'],
+	required: [ '_id', 'type', 'name', 'themes', 'start', 'end', 'entities', 'groups', 'forms', 'crossCutting', 'logicalFrames', 'users', 'extraIndicators'],
 
 	properties: {
 		_id: { $ref: "#/definitions/uuid" },
@@ -175,6 +175,11 @@ var validate = validator({
 					$ref: "#/definitions/cc_indicator"
 				}
 			}
+		},
+
+		extraIndicators: {
+			type: "array",
+			items: {$ref: "#/definitions/indicator"}
 		}
 	},
 

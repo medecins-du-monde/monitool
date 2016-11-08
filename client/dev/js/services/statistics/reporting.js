@@ -12,7 +12,7 @@ angular
 
 	// TODO profiling this piece of code for perfs could not hurt.
 	// we will see how bad if performs on the wild.
-	.service('mtReporting', function($filter, $rootScope, uuid, CompoundCube, Cube, InputSlots) {
+	.service('mtReporting', function($filter, $rootScope, uuid, CompoundCube, Cube, InputSlots, itertools) {
 
 		this.getColumns = function(groupBy, start, end, location, project) {
 			var type;
@@ -243,22 +243,41 @@ angular
 			return rows;
 		};
 
+		this.computeExtraReporting = function(cubes, project, groupBy, viewFilters) {
+			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project),
+				rows = [];
+
+			project.extraIndicators.forEach(function(indicatorPlanning, indicatorIndex) {
+				var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicatorPlanning);
+				row.id = 'ext_' + indicatorIndex;
+				rows.push(row);
+			}, this);
+
+			return rows;
+		};
+
 		this.computeCrossCuttingReporting = function(cubes, project, indicators, groupBy, viewFilters) {
 			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project),
 				rows = [];
 
-			for (var indicatorId in project.crossCutting) {
-				var planning = project.crossCutting[indicatorId],
-					indicator = indicators.find(function(i) { return i._id === indicatorId; });
+			indicators.forEach(function(indicator) {
+				if (itertools.intersect(indicator.themes, project.themes).length === 0)
+					return;
 
-				var fakePlanning = angular.copy(planning);
-				fakePlanning.display = indicator.name[$rootScope.language];
-				fakePlanning.unit = indicator.unit;
+				var planning = {};
+				if (project.crossCutting[indicator._id])
+					angular.copy(project.crossCutting[indicator._id], planning);
+				else
+					planning.baseline = planning.target = planning.computation = null;
 
-				var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, fakePlanning);
-				row.id = 'cc_' + indicatorId;
+				planning.display = indicator.name[$rootScope.language];
+
+				var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, planning);
+				row.id = 'cc_' + indicator._id;
 				rows.push(row);
-			}
+			}, this);
+
+			rows.sort(function(a, b) { return a.name.localeCompare(b.name); });
 
 			return rows;
 		};

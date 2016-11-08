@@ -1,0 +1,45 @@
+<ol class="breadcrumb noprint">
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li><a ui-sref="main.project.structure.basics" ng-bind="masterProject.name|maxLength:50"></a></li>
+	<li class="active" translate="indicator.cross_cutting"></li>
+</ol>
+
+<div class="alert alert-info" translate="project.extra_indicators_list_info"></div>
+
+<div>
+	<div class="panel panel-primary indicator-panel">
+		<div class="panel-heading">
+			<div class="panel-title" translate="indicator.new_indicator"></div>
+		</div>
+		<div class="panel-body">
+			<a ng-click="editIndicator(null)" class="btn btn-xxs btn-primary" translate="indicator.create_new"></a>
+	  </div>
+	</div><div class="panel panel-default indicator-panel"
+		 ng-repeat="indicator in editableProject.extraIndicators|orderBy:'display'">
+
+		<div class="panel-heading">
+			{{indicator.display}}
+		</div>
+		
+		<div class="panel-body" style="padding-bottom: 10px">
+			<strong>{{'project.baseline'|translate}}:</strong> {{indicator.baseline != null ? indicator.baseline : '?'}}<br/>
+			<strong>{{'project.target'|translate}}:</strong> {{indicator.target != null ? indicator.target : '?'}}<br/>
+
+			<strong>{{'project.computation'|translate}}:</strong>
+			<span class="text-danger" ng-if="!indicator.computation">
+				{{'project.indicator_is_not_computed'|translate}}
+				<i class="fa fa-unlink" ></i>
+			</span>
+			<span class="text-success" ng-if="indicator.computation">
+				{{'project.indicator_is_computed'|translate}}
+				<i class="fa fa-link" ></i>
+			</span>
+
+			<button class="btn btn-xxs btn-default" style="width: 100%; display: block" ng-click="editIndicator(indicator)">
+				<i class="fa fa-pencil"></i>
+				{{'shared.edit'|translate}}
+			</button>
+		</div>
+	</div>
+</div>
+

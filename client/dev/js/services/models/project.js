@@ -2,7 +2,7 @@
 
 angular
 	.module('monitool.services.models.project', ['ngResource'])
-	.factory('Project', function($resource, $q, $rootScope, uuid, itertools) {
+	.factory('Project', function($resource, $q, $rootScope, $filter, uuid, itertools) {
 
 		var Project = $resource('/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
@@ -13,7 +13,15 @@ angular
 		Project.prototype.getAllIndicators = function(indicators) {
 			var elementOptions = [];
 			this.logicalFrames.forEach(function(logicalFrame, i0) {
-				var fn = function(i) { return {name: i.display, type: "indicator", group: "Logical frame: " + logicalFrame.name, indicator: i}; };
+				var fn = function(i) { 
+					return {
+						name: i.display,
+						type: "indicator",
+						group: $filter('translate')('project.logical_frame') + ": " + logicalFrame.name,
+						indicator: i
+					};
+				};
+
 				Array.prototype.push.apply(elementOptions, logicalFrame.indicators.map(fn));
 				logicalFrame.purposes.forEach(function(purpose, i1) {
 					Array.prototype.push.apply(elementOptions, purpose.indicators.map(fn));
@@ -23,26 +31,47 @@ angular
 				}, this);
 			}, this);
 
-			for (var indicatorId in this.crossCutting) {
-				var indicator = indicators.find(function(i) { return i._id == indicatorId; });
+			indicators.sort(function(a, b) { return a.name[$rootScope.language].localeCompare(b.name[$rootScope.language]); });
+			indicators.forEach(function(indicator) {
+				if (itertools.intersect(indicator.themes, this.themes).length === 0)
+					return;
+				
 				elementOptions.push({
 					name: indicator.name[$rootScope.language],
 					type: "indicator",
-					group: "Cross-Cutting Indicators",
-					indicator: this.crossCutting[indicatorId]
+					group: $filter('translate')('indicator.cross_cutting'),
+					indicator: this.crossCutting[indicator._id] || {
+						display: indicator.name[$rootScope.language],
+						baseline: null,
+						target: null, 
+						computation: null
+					}
 				});
-			}
+			}, this);
+
+			this.extraIndicators.forEach(function(planning) {
+				elementOptions.push({
+					name: planning.display,
+					type: "indicator",
+					group: $filter('translate')('indicator.extra'),
+					indicator: planning
+				});
+			});
 
 			this.forms.forEach(function(form) {
 				form.elements.forEach(function(element) {
-					elementOptions.push({name: element.name, type: "variable", group: "Data source: " + form.name, element: element, form: form});
+					elementOptions.push({
+						name: element.name,
+						type: "variable",
+						group: $filter('translate')('project.collection_form') + ": " + form.name,
+						element: element,
+						form: form
+					});
 				});
 			});
 
 			return elementOptions;
 		};
-
-		
 		
 		/**
 		 * Does it makes sense to display links for input and reporting?
@@ -149,6 +178,7 @@ angular
 			this.end = new Date(86400000 * Math.floor(Date.now() / 86400000));
 			this.themes = [];
 			this.crossCutting = {};
+			this.extraIndicators = [];
 			this.logicalFrames = [];
 			this.entities = [];
 			this.groups = [];
@@ -164,7 +194,7 @@ angular
 		 */
 		Project.prototype.sanitizeIndicator = function(indicator) {
 			if (indicator.computation === null)
-					return;
+				return;
 
 			for (var key in indicator.computation.parameters) {
 				var parameter = indicator.computation.parameters[key];
@@ -201,12 +231,28 @@ angular
 			}
 		};
 
-		
+		/**
+		 * Scan references to entities and remove broken links
+		 * If no valid links remain, change the user to read only mode
+		 */
+		Project.prototype.sanitizeUser = function(user) {
+			if (user.entities) {
+				var entityIds = this.entities.pluck('id'),
+					entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
+
+				user.entities = user.entities.filter(entityIdFilter);
+				if (user.entities.length == 0) {
+					delete user.entities;
+					user.role = 'read';
+				}
+			}
+		};
+
 		/**
 		 * Scan all internal references to entities, variables, partitions, and partitions elements
 		 * inside the project to ensure that there are no broken links and repair them if needed.
 		 */
-		Project.prototype.sanitize = function() {
+		Project.prototype.sanitize = function(indicators) {
 			//////////////////
 			// Sanitize links to input entities
 			//////////////////
@@ -219,13 +265,10 @@ angular
 				group.members = group.members.filter(entityIdFilter);
 			});
 
-			this.users.forEach(function(user) {
-				if (user.entities)
-					user.entities = user.entities.filter(entityIdFilter);
-			});
+			this.users.forEach(this.sanitizeUser, this);
 
 			this.forms.forEach(function(form) {
-				if (user.entities)
+				if (form.entities)
 					form.entities = form.entities.filter(entityIdFilter);
 			});
 
@@ -243,8 +286,15 @@ angular
 				}, this);
 			}, this);
 
-			for (var key in this.crossCutting)
-				this.sanitizeIndicator(this.crossCutting[key]);
+			for (var indicatorId in this.crossCutting) {
+				var indicator = indicators.find(function(i) { return i._id == indicatorId; });
+				if (!indicator || itertools.intersect(indicator.themes, this.themes).length === 0)
+					delete this.crossCutting[indicatorId];
+				else
+					this.sanitizeIndicator(this.crossCutting[indicatorId]);
+			}
+
+			this.extraIndicators.forEach(this.sanitizeIndicator, this);
 		};
 
 		return Project;
