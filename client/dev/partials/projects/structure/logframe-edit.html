@@ -6,9 +6,10 @@
 </ol>
 
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate ng-if="logicalFrameIndex !== null">
+
 	<fieldset>
 		<legend>
-			<span translate="project.goal"></span>
+			<span translate="project.general_informations"></span>
 		</legend>
 
 		<div class="form-group" show-errors>
@@ -29,6 +30,12 @@
 				</span>
 			</div>
 		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend>
+			<span translate="project.goal"></span>
+		</legend>
 
 		<div class="form-group" show-errors>
 			<label for="logframe-goal-input" class="col-sm-2 control-label" translate="project.goal"></label>
