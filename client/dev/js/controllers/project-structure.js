@@ -524,14 +524,13 @@ angular
 		$scope.themes = [];
 
 		// Create a category with indicators that match project on 2 thematics or more 
-		$scope.themes.push({
-			definition: null,
-			indicators: indicators.filter(function(indicator) {
-				return indicator.themes.length > 1 && indicator.themes.filter(function(themeId) {
-					return $scope.masterProject.themes.indexOf(themeId) !== -1;
-				}).length > 0;
-			})
+		var manyThematicsIndicators = indicators.filter(function(indicator) {
+			return indicator.themes.length > 1 && indicator.themes.filter(function(themeId) {
+				return $scope.masterProject.themes.indexOf(themeId) !== -1;
+			}).length > 0;
 		});
+		if (manyThematicsIndicators.length)
+			$scope.themes.push({definition: null, indicators: manyThematicsIndicators});
 
 		// Create a category with indicators that match project on exactly 1 thematic
 		themes.forEach(function(theme) {

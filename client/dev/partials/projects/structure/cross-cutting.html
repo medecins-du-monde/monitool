@@ -6,6 +6,8 @@
 
 <div class="alert alert-info" translate="project.cross_cutting_list_info"></div>
 
+<div translate="project.no_cross_cutting" ng-if="themes.length == 0" style="margin-bottom: 10px"></div>
+
 <div ng-repeat="theme in themes">
 	<legend ng-if="theme.definition">{{theme.definition.name[language]}}</legend>
 	<legend ng-if="!theme.definition" translate="project.multi_theme_indicator"></legend>
@@ -13,7 +15,7 @@
 	<!-- markup is broken on purpose: do not fix -->
 	<!-- If we put spaces between tags, margins break -->
 
-	<div><div translate="project.no_cross_cutting" ng-if="theme.indicators.length == 0"></div><div class="panel panel-default indicator-panel"
+	<div><div class="panel panel-default indicator-panel"
 		 ng-repeat="indicator in theme.indicators|orderBy:getName">
 
 		<div class="panel-heading" title="{{indicator.name[language]}}">{{indicator.name[language]|maxLength:90}}</div>
