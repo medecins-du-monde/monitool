@@ -432,7 +432,8 @@ InputSlots.iterate = function(begin, end, periodicity) {
 			this.id = id;
 			this.dimensions = dimensions;
 			this.dimensionGroups = dimensionGroups;
-			this.data = _arrayBufferToBase64(data.buffer);
+			// this.data = _arrayBufferToBase64(data.buffer);
+			this.data = data;
 
 			// // Index dimensions and dimensionGroups by id
 			// this.dimensionsById = {};
@@ -477,7 +478,7 @@ InputSlots.iterate = function(begin, end, periodicity) {
 			var dataSize = 1;
 			dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
 
-			var data = new Int32Array(dataSize)
+			var data = new Array(dataSize)
 			for (var i = 0; i < dataSize; ++i)
 				data[i] = -2147483648;
 
@@ -486,12 +487,16 @@ InputSlots.iterate = function(begin, end, periodicity) {
 				var offset = dimensions[0].items.indexOf(input.period),
 					length = 1; // Slow!
 
-				if (offset < 0)
-					console.log(offset)
+				if (offset < 0) {
+					console.log("Skip variable", element.id, 'from', input._id, "(did not find period in timeDim)");
+					return;
+				}
 
 				if (form.collect == 'entity' || form.collect == 'some_entity') {
-					if (dimensions[1].items.indexOf(input.entity) < 0)
-						console.log('WTF')
+					if (dimensions[1].items.indexOf(input.entity) < 0) {
+						console.log("Skip variable", element.id, 'from', input._id, "(did not find entity in spacialDim)");
+						return;
+					}
 
 					offset = offset * dimensions[1].items.length + dimensions[1].items.indexOf(input.entity);
 				}
@@ -509,7 +514,7 @@ InputSlots.iterate = function(begin, end, periodicity) {
 						data[offset + i] = source[i];
 				}
 				else {
-					console.log("Skip variable", element.id, 'from', input._id);
+					console.log("Skip variable", element.id, 'from', input._id, "(value size mismatch)");
 				}
 			});
 
