@@ -16,7 +16,7 @@
 	  </div>
 	</div><div class="panel panel-default indicator-panel" ng-repeat="indicator in indicators">
 		<div class="panel-heading">
-			<div class="panel-title">{{indicator.name[language]}}</div>
+			<div class="panel-title" title="{{indicator.name[language]}}">{{indicator.name[language]|maxLength:90}}</div>
 		</div>
 		<div class="panel-body">
 			<i class="fa fa-circle"
@@ -27,7 +27,7 @@
 				{{theme.name[language]}}
 			</i>
 
-			<div>{{indicator.description[language]}}</div>
+			<div>{{indicator.description[language]|maxLength:200}}</div>
 			
 			<a ng-click="edit(indicator)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
 	  </div>
