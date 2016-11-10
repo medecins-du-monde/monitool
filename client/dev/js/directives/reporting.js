@@ -274,13 +274,12 @@ angular.module('monitool.directives.reporting', [])
 				colorization: '=',
 				cols: '=',
 				rows: '=',
-				data: '=',
-				filters: '='
+				data: '='
 			},
 			templateUrl: "partials/projects/reporting/_olap_grid.html",
 
 			link: function($scope, element) {
-				$scope.$watch('[cols,rows,data,filters]', function() {
+				$scope.$watch('[cols,rows,data]', function() {
 					// Create empty grid.
 					var grid = {header: [], body: []};
 					
