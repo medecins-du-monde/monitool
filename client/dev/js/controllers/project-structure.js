@@ -306,19 +306,28 @@ angular
 			$scope.dataSourceForm.$setValidity('elementsLength', length >= 1);
 		});
 
-		$scope.editPartition = function(currentList, currentPartition) {
+		$scope.editPartition = function(element, currentPartition) {
 			$uibModal.open({
 				controller: 'PartitionEditionModalController',
 				templateUrl: 'partials/projects/structure/partition-modal.html',
 				size: 'lg',
 				resolve: { currentPartition: function() { return currentPartition; } }
 			}).result.then(function(updatedPartition) {
-				if (currentPartition && !updatedPartition)
-					currentList.splice(currentList.indexOf(currentPartition), 1);
+				var sizeChanged = false;
+
+				if (currentPartition && !updatedPartition) {
+					element.partitions.splice(element.partitions.indexOf(currentPartition), 1);
+					sizeChanged = true;
+				}
 				else if (currentPartition && updatedPartition)
-					currentList[currentList.indexOf(currentPartition)] = updatedPartition;
-				else if (!currentPartition && updatedPartition)
-					currentList.push(updatedPartition);
+					element.partitions[element.partitions.indexOf(currentPartition)] = updatedPartition;
+				else if (!currentPartition && updatedPartition) {
+					sizeChanged = true;
+					element.partitions.push(updatedPartition);
+				}
+
+				if (sizeChanged)
+					element.distribution = Math.ceil(element.partitions.length / 2);
 			});
 		};
 

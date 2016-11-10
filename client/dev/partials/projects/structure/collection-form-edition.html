@@ -192,7 +192,7 @@
 								<li ng-if="element.partitions.length == 0" translate="project.no_partitions"></li>
 
 								<li ng-repeat="partition in element.partitions">
-									<a ng-click="editPartition(element.partitions, partition)">
+									<a ng-click="editPartition(element, partition)">
 										<i class="fa fa-pencil"></i>
 										<strong>{{partition.name}}</strong>
 										({{partition.elements|pluck:"name"|join:", "}})
@@ -200,7 +200,7 @@
 								</li>
 							</ul>
 
-							<a ng-click="editPartition(element.partitions, null)" class="btn btn-xxs btn-default">
+							<a ng-click="editPartition(element, null)" class="btn btn-xxs btn-default">
 								<i class="fa fa-plus"></i>
 								<span translate="project.add_partition"></span>
 							</a>
