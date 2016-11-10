@@ -110,11 +110,11 @@
 		<table class="table table-bordered" id="reporting">
 			<tbody>
 				<tr>
-					<td>{{display.data}}</td>
+					<td reporting-field="display.data"></td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 
-	<olap-grid cols="display.cols" rows="display.rows" data="display.data"></olap-grid>
+	<olap-grid colorization="colorization" cols="display.cols" rows="display.rows" data="display.data"></olap-grid>
 </div>

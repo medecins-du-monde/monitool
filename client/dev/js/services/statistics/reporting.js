@@ -92,24 +92,22 @@ angular
 		};
 
 
-		this._makeIndicatorRow = function(cubes, indent, groupBy, viewFilters, columns, indicator) {
-			var row = {
-				id: uuid.v4(),
-				name: indicator.display, colorize: indicator.colorize,
-				baseline: indicator.baseline, target: indicator.target,
-				type: 'data',
-				indent: indent
-			};
+		this._makeIndicatorRow = function(cubes, indent, groupBy, viewFilters, columns, planning) {
+			var row = {id: uuid.v4(), name: planning.display,  type: 'data', indent: indent};
 
-			if (indicator.computation === null)
-				row.message = 'project.indicator_computation_missing';
+			// handle colorization
+			if (planning.colorize && planning.baseline !== null && planning.target !== null)
+				row.colorization = {baseline: planning.baseline, target: planning.target};
 
-			else if (!isNaN(indicator.computation.formula))
-				row.cols = columns.map(function(col) { return parseInt(indicator.computation.formula); });
+			if (planning.computation === null)
+				row.message = 'project.planning_computation_missing';
+
+			else if (!isNaN(planning.computation.formula))
+				row.cols = columns.map(function(col) { return parseInt(planning.computation.formula); });
 
 			else {
 				try {
-					var cube = new CompoundCube(indicator.computation, cubes),
+					var cube = new CompoundCube(planning.computation, cubes),
 						cubeFilters = this.createCubeFilter(cube, viewFilters);
 
 					try {

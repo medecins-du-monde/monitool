@@ -114,7 +114,8 @@ angular.module('monitool.directives.reporting', [])
 			scope: false,
 			link: function($scope, element, attributes, controller) {
 
-				$scope.$watch('col', function(value) {
+				$scope.$watch(attributes.reportingField || 'col', function(value) {
+
 					if (value === undefined) {
 						element.html('');
 						element.css('background-color', '#eee');
@@ -128,9 +129,15 @@ angular.module('monitool.directives.reporting', [])
 						element.css('background-color', '');
 					}
 					else if (typeof value === "number") {
-						// if baseline and target are available.
-						if ($scope.row.colorize && $scope.row.baseline !== null && $scope.row.target !== null) {
-							var baseline = parseInt($scope.row.baseline), target = parseInt($scope.row.target);
+						// Do we use colors?
+						var colorization;
+						if ($scope.row && $scope.row.colorization)
+							colorization = $scope.row.colorization;
+						else if ($scope.colorization)
+							colorization = $scope.colorization;
+
+						if (colorization) {
+							var baseline = parseInt(colorization.baseline), target = parseInt(colorization.target);
 
 							// compute progress 
 							var progress = (value - baseline) / (target - baseline);
@@ -264,6 +271,7 @@ angular.module('monitool.directives.reporting', [])
 		return {
 			restrict: 'E',
 			scope: {
+				colorization: '=',
 				cols: '=',
 				rows: '=',
 				data: '=',

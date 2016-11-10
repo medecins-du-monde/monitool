@@ -245,10 +245,19 @@ angular
 			// Query cube & postprocess for display
 			////////////////////////////////////////
 			var cube;
-			if (query.element.type == 'variable')
+			if (query.element.type == 'variable') {
 				cube = cubes[query.element.element.id];
-			else
+				$scope.colorization = null;
+			}
+			else {
 				cube = new CompoundCube(query.element.indicator.computation, cubes);
+				
+				var planning = query.element.indicator;
+				if (planning.colorize && planning.baseline !== null && planning.target !== null)
+					$scope.colorization = {baseline: planning.baseline, target: planning.target};
+				else
+					$scope.colorization = null;
+			}
 
 			var cubeDimensions = $scope.query.colDimensions.concat($scope.query.rowDimensions),
 				cubeFilters = mtReporting.createCubeFilter(cube, $scope.query.filters);
