@@ -38,13 +38,7 @@
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
 						<select class="form-control input-sm" id="group-by-input" ng-model="groupBy">
-							<option value="day" translate="shared.day"></option>
-							<option value="week_sat" translate="shared.week_sat"></option>
-							<option value="week_sun" translate="shared.week_sun"></option>
-							<option value="week_mon" translate="shared.week_mon"></option>
-							<option value="month" translate="shared.month"></option>
-							<option value="quarter" translate="shared.quarter"></option>
-							<option value="year" translate="shared.year"></option>
+							<option value="{{periodicity}}" ng-repeat="periodicity in periodicities">{{('shared.' + periodicity)|translate}}</option>
 							<option value="entity" translate="project.collection_site_list"></option>
 							<option value="group" translate="project.groups"></option>
 						</select>

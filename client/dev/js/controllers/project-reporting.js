@@ -9,17 +9,26 @@ angular
 		]
 	)
 
-	.controller('ProjectReportingController', function($scope, $filter, Cube, cubes, mtReporting, indicators) {
+	.controller('ProjectReportingController', function($scope, $filter, TimeSlot, Cube, cubes, mtReporting, indicators) {
 		// Create default filter so that all inputs are used.
 		$scope.filters = {_location: "none", _start: $scope.masterProject.start, _end: $scope.masterProject.end < new Date() ? $scope.masterProject.end : new Date()};
 
-		// default group by
-		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
-			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters._start, $scope.filters._end).length < 15)
-			$scope.groupBy = 'quarter';
-		else
-			$scope.groupBy = 'year';
+		// default + available group by
+		$scope.periodicities = ["day", "week_sat", "week_sun", "week_mon", "month", "quarter", "year"].filter(function(periodicity) {
+			for (var i = 0; i < $scope.masterProject.forms.length; ++i) {
+				var form = $scope.masterProject.forms[i];
+				if (form.periodicity == 'free' || form.periodicity == periodicity || TimeSlot._upperSlots[form.periodicity].indexOf(periodicity) !== -1)
+					return true;
+			}
+		});
+		$scope.groupBy = $scope.periodicities[$scope.periodicities.length - 1];
+		for (var i = 0; i < $scope.periodicities.length; ++i) {
+			var periodicity = $scope.periodicities[i];
+			if (mtReporting.getColumns(periodicity, $scope.filters._start, $scope.filters._end).length < 15) {
+				$scope.groupBy = periodicity;
+				break;
+			}
+		}
 
 		$scope.splits = {};
 		$scope.onSplitClick = function(rowId, partitionId) {
