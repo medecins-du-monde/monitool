@@ -219,6 +219,7 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		no_data_source: "<span style=\"font-style: italic\">Cree una fuente de datos para poder hacer entradas</span>",
 		general_info: "Información general",
 		collected_by: "Información colectada por",
 		reporting_empty: "Ningún indicador ha sido añadido en esta sección.",

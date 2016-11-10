@@ -219,6 +219,7 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		no_data_source: "<span style=\"font-style: italic\">Create data sources to allow for data input</span>",
 		general_info: "General information",
 		collected_by: "Information collected by",
 		reporting_empty: "No indicators were added to this section.",
@@ -405,8 +406,8 @@ var ENGLISH_TRANSLATION = {
 		collection_form_planning: "Calendar",
 		collection_form_structure: "Structure",
 
-		delete_form_easy: "Are you sure to delete this input form?",
-		delete_form_hard: "If you delete this input form, all linked inputs will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
+		delete_form_easy: "Are you sure to delete this data source?",
+		delete_form_hard: "If you delete this data source, all linked inputs will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
 		delete_form_hard_answer: "Delete the {{num_inputs}} inputs",
 		delete_entity: "If you delete this collection site, all linked inputs will be deleted as well. Enter \"Delete the {{num_inputs}} inputs\" to confirm",
 		delete_entity_answer: "Delete the {{num_inputs}} inputs",

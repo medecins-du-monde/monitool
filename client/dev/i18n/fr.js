@@ -219,6 +219,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		no_data_source: "<span style=\"font-style: italic\">Créez des sources de données pour pouvoir saisir</span>",
 		general_info: "Information génerales",
 		collected_by: "Information collectée par",
 		reporting_empty: "Aucun indicateur n'a été ajouté dans cette section.",
@@ -405,7 +406,7 @@ var FRENCH_TRANSLATION = {
 		collection_form_planning: "Calendrier",
 		collection_form_structure: "Structure",
 
-		delete_form_easy: "Voulez-vous vraiment supprimer ce planning de saisie?",
+		delete_form_easy: "Voulez-vous vraiment supprimer cette source de données?",
 		delete_form_hard: "Si vous supprimez cette source de données, toutes les saisies associées seront supprimés. Tapez \"Supprimer les {{num_inputs}} saisies\" pour confirmer",
 		delete_form_hard_answer: "Supprimer les {{num_inputs}} saisies",
 		delete_entity: "Si vous supprimez ce lieu de collecte, toutes les saisies associées seront supprimés. Tapez \"Supprimer les {{num_inputs}} saisies\" pour confirmer",
@@ -552,8 +553,8 @@ var FRENCH_TRANSLATION = {
 			"<p>Cette liste contient tous les indicateurs qui doivent être collectés pour réaliser le suivi transversal</p>",
 
 		input_list_info:
-			"<p>Ce planning de saisie liste toutes les saisies qui ont été programmées pour la source de données \"{{name}}\"</p>" +
-			"<p>Afin de limiter les erreurs de saisie, il est préférable de la réaliser au plus près du lieu d'où sont extraites les données, directement sur monitool.</p>" + 
+			"<p>Ce planning liste toutes les saisies qui ont été programmées pour la source de données \"{{name}}\"</p>" +
+			"<p>Afin de limiter les erreurs, il est préférable de réaliser la saisie au plus près du lieu d'où sont extraites les données, directement sur Monitool.</p>" + 
 			"<p>Si ce n'est pas possible, une version PDF à imprimer du formulaire est disponible.</p>",
 
 		extra_indicators_list_info: 
