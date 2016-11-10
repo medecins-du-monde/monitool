@@ -107,10 +107,13 @@
 <div style="clear: both">
 
 	<div ng-if="display.cols.length == 0 && display.rows.length == 0">
+		
+		
 		<table class="table table-bordered" id="reporting">
 			<tbody>
 				<tr>
-					<td reporting-field="display.data"></td>
+					<td ng-if="display.data == 'formula_missing'" translate="project.indicator_computation_missing"></td>
+					<td ng-if="display.data != 'formula_missing'" reporting-field="display.data"></td>
 				</tr>
 			</tbody>
 		</table>

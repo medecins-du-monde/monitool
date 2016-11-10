@@ -133,6 +133,7 @@ angular
 		}, true);
 	})
 
+	// FIXME this need a complete rewrite with proper object oriented stuff
 	.controller('ProjectOlapController', function($scope, $filter, Cube, CompoundCube, mtReporting, cubes, indicators) {
 
 		////////////////////////////////////////////////////
@@ -154,12 +155,19 @@ angular
 		////////////////////////////////////////////////////
 
 		$scope.$watch('wrap.chosenElement', function(element) {
+			var filters = {_start: $scope.masterProject.start, _end: new Date() < $scope.masterProject.end ? new Date() : $scope.masterProject.end};
+
+			// Work around invalid indicators (those w/o computation)
+			if (element.type === 'indicator' && !element.indicator.computation) {
+				$scope.query = {element: element, colDimensions: [], rowDimensions: [], filters: filters};
+				$scope.dimensions = [];
+				return;
+			}
 
 			////////////////////////////////////////
 			// Create default query for this elementId
 			////////////////////////////////////////
 
-			var filters = {_start: $scope.masterProject.start, _end: new Date() < $scope.masterProject.end ? new Date() : $scope.masterProject.end};
 			var cube;
 			if (element.type === 'variable')
 				cube = cubes[element.element.id];
@@ -230,6 +238,15 @@ angular
 		////////////////////////////////////////////////////
 		
 		$scope.$watch('query', function(query) {
+
+			if (query.element.type === 'indicator' && !query.element.indicator.computation) {
+				$scope.display = {
+					data: 'formula_missing',
+					cols: [],
+					rows: []
+				};
+				return;
+			}
 
 			var makeRowCol = function(selectedDimId) {
 				var dimension = $scope.dimensions.find(function(dim) { return dim.id == selectedDimId; });
