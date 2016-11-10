@@ -335,7 +335,6 @@ var ENGLISH_TRANSLATION = {
 		reporting_compare_sites: "Compare locations",
 		unnamed_logframe: "Unnamed logical frame",
 
-		update_logframe: "Update the logical frame",
 		edit_indicator: "Edit indicator",
 		display: "Name",
 		display_ph: "i.e. ANC1 rate for the health centers",

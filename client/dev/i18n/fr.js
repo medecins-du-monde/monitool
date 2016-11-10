@@ -335,7 +335,6 @@ var FRENCH_TRANSLATION = {
 		reporting_compare_sites: "Comparer les lieux",
 		unnamed_logframe: "Cadre logique sans nom",
 
-		update_logframe: "Mettre à jour le cadre logique",
 		edit_indicator: "Édition indicateur",
 		display: "Nom",
 		display_ph: "ex: Taux de CPN1 au sein des structures de santé",

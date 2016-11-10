@@ -335,7 +335,6 @@ var SPANISH_TRANSLATION = {
 		reporting_compare_sites: "Comparar lugares",
 		unnamed_logframe: "Marco lógico sin nombre",
 
-		update_logframe: "Actualizar el marco lógico",
 		edit_indicator: "Editar usuario",
 		display: "Nombre",
 		display_ph: "ej: Tasa de consultaciones prenatales en las estructuras de salud",
