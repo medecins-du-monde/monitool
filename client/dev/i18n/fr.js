@@ -509,8 +509,8 @@ var FRENCH_TRANSLATION = {
 			"<p>Lorsqu'un projet réalise les même activités dans plusieurs lieux, celles-ci doivent pouvoir être suivi individuellements, par groupes, et tous ensembles.</p>" + 
 			"<p>Rentrez ici:</p>" + 
 			"<ul>" + 
-				"<li>La liste des lieux sur lesquels le projet travaille (par exemple: liste des centres de santé)</li>" + 
-				"<li>Des groupements qui seront utilisé lors du suivi (par exemple: par région, ou type de structure)</li>" + 
+				"<li>La liste des lieux sur lesquels le projet travaille (par exemple: une liste des centres de santé)</li>" + 
+				"<li>Des groupements qui seront utilisé lors du suivi (par exemple: des régions, des types de structure)</li>" + 
 			"</ul>",
 
 		users_list_info:
@@ -526,7 +526,7 @@ var FRENCH_TRANSLATION = {
 		user_help_sites: "Sur quels lieux de collecte cet utilisateur pourra-t'il saisir des données?",
 
 		collection_form_list_info:
-			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont présentes (fiches de suivi, dossiers patient, fichiers Excel, ...)</p>" + 
+			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont extraites (fiches de suivi, dossiers patient, fichiers Excel, ...)</p>" + 
 			"<p>Au sein de monitool, on ne décrira pas l'intégralité des données existantes, mais uniquement la partie qui va être extraite pour le suivi du projet</p>" + 
 			"<p>Afin de faciliter l'organisation de la saisie, les sources doivent correspondre à des outils réels utilisés sur le terrain.</p>",
 
