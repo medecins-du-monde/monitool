@@ -424,7 +424,8 @@ old.list({include_docs: true}, function(error, result) {
 				form.periodicity = 'week_mon';
 
 			form.elements.forEach(function(element) {
-				element.distribution = element.order = 0;
+				element.distribution = Math.ceil(element.partitions.length / 2);
+				element.order = 0;
 			});
 		});
 
