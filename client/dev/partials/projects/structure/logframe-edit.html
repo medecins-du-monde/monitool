@@ -1,6 +1,6 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li><a ui-sref="main.project.structure.basics" ng-bind="editableProject.name|maxLength:50"></a></li>
+	<li class="active" title="{{masterProject.name}}" ng-bind="masterProject.name|maxLength:50"></li>
 	<li><a ui-sref="main.project.structure.logical_frame_list" translate="shared.logical_frames"></a></li>
 	<li class="active">{{editableProject.logicalFrames[logicalFrameIndex].name|maxLength:50}}</li>
 </ol>
