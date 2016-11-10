@@ -6,18 +6,16 @@
 
 <div class="alert alert-info" translate="project.extra_indicators_list_info"></div>
 
-<div>
-	<div class="panel panel-primary indicator-panel">
-		<div class="panel-heading">
-			<div class="panel-title" translate="indicator.new_indicator"></div>
-		</div>
-		<div class="panel-body">
-			<a ng-click="editIndicator(null)" class="btn btn-xxs btn-primary" translate="indicator.create_new"></a>
-	  </div>
-	</div><div class="panel panel-default indicator-panel"
-		 ng-repeat="indicator in editableProject.extraIndicators|orderBy:'display'">
+<p ng-if="editableProject.extraIndicators.length == 0" translate="project.no_extra_indicators"></p>
 
-		<div class="panel-heading" title="{{indicator.display}}">{{indicator.display|maxLength:90}}</div>
+<div ng-sortable="{handle: '.indicator-handle'}">
+	<div class="panel panel-default indicator-panel"
+		 ng-repeat="indicator in editableProject.extraIndicators">
+
+		<div class="panel-heading" title="{{indicator.display}}">
+			<i class="fa fa-arrows fa-fw indicator-handle"></i>
+			{{indicator.display|maxLength:90}}
+		</div>
 		
 		<div class="panel-body" style="padding-bottom: 10px">
 			<strong>{{'project.baseline'|translate}}:</strong> {{indicator.baseline != null ? indicator.baseline : '?'}}<br/>
@@ -41,3 +39,7 @@
 	</div>
 </div>
 
+<a class="btn btn-default btn-sm" ng-click="editIndicator(null)" style="margin-bottom: 20px">
+	<i class="fa fa-plus"></i>
+	{{"project.add_indicator"|translate}}
+</a>

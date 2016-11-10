@@ -632,3 +632,6 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 }
 
 
+.indicator-handle {
+  cursor: pointer;
+}

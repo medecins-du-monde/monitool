@@ -219,6 +219,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		no_extra_indicators: "Aucune indicateur annexé n'a été créé. Cliquez sur \"Ajouter un indicateur\" pour en créer un!",
 		no_data_source: "<span style=\"font-style: italic\">Créez des sources de données pour pouvoir saisir</span>",
 		general_info: "Information génerales",
 		collected_by: "Information collectée par",
