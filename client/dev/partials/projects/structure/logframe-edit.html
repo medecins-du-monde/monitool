@@ -60,9 +60,9 @@
 			<div class="col-sm-10">
 				<div class="form-control-static">
 					<div class="drag-destination" ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)"><div class="panel panel-default indicator-panel" ng-repeat="indicator in editableProject.logicalFrames[logicalFrameIndex].indicators">
-						<div class="panel-heading">
+						<div class="panel-heading" title="{{indicator.display}}">
 							<i class="fa fa-arrows fa-fw indicator-handle"></i>
-							{{indicator.display}}
+							{{indicator.display|maxLength:90}}
 						</div>
 						
 						<div class="panel-body" style="padding-bottom: 10px">
@@ -167,9 +167,9 @@
 								<div class="form-control-static">
 
 									<div class="drag-destination" ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)"><div class="panel panel-default indicator-panel" ng-repeat="indicator in purpose.indicators">
-										<div class="panel-heading">
+										<div class="panel-heading" title="{{indicator.display}}">
 											<i class="fa fa-arrows fa-fw indicator-handle"></i>
-											{{indicator.display}}
+											{{indicator.display|maxLength:90}}
 										</div>
 										
 										<div class="panel-body" style="padding-bottom: 10px">
@@ -264,9 +264,9 @@
 												<div class="form-control-static">
 
 													<div class="drag-destination" ng-sortable="indicatorsSortOptions" ng-mouseenter="onSortableMouseEvent('indicators', true)" ng-mouseleave="onSortableMouseEvent('indicators', false)"><div class="panel panel-default indicator-panel" ng-repeat="indicator in output.indicators">
-														<div class="panel-heading">
+														<div class="panel-heading" title="{{indicator.display}}">
 															<i class="fa fa-arrows fa-fw indicator-handle"></i>
-															{{indicator.display}}
+															{{indicator.display|maxLength:90}}
 														</div>
 														
 														<div class="panel-body" style="padding-bottom: 10px">

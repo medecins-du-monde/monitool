@@ -186,7 +186,9 @@ var FRENCH_TRANSLATION = {
 		members: 'Membres',
 
 		day: 'Jour',
-		week: 'Semaine',
+		week_sat: 'Semaine (samedi à vendredi)',
+		week_sun: 'Semaine (dimanche à lundi)',
+		week_mon: 'Semaine (lundi à dimanche)',
 		month: 'Mois',
 		quarter: "Trimestre",
 		year: "Année",
@@ -262,10 +264,12 @@ var FRENCH_TRANSLATION = {
 		no_data: "Les données ne sont pas disponibles",
 		not_available_by_entity: "Ces données ne sont pas disponibles par lieu de collecte",
 		not_available_by_group: "Ces données ne sont pas disponibles par groupe",
-		not_available_min_week: "Agrégez au moins par semaine pour accéder à ces données",
-		not_available_min_month: "Agrégez au moins par mois pour accéder à ces données",
-		not_available_min_quarter: "Agrégez au moins par trimestre pour accéder à ces données",
-		not_available_min_year: "Agrégez au moins par an pour accéder à ces données",
+		not_available_min_week_sat: "Ces données sont disponible par semaine (samedi à vendredi)",
+		not_available_min_week_sun: "Ces données sont disponible par semaine (dimanche à samedi)",
+		not_available_min_week_mon: "Ces données sont disponible par semaine (lundi à dimanche)",
+		not_available_min_month: "Ces données sont disponible par mois",
+		not_available_min_quarter: "Ces données sont disponible par trimestres",
+		not_available_min_year: "Ces données sont disponible par an",
 
 		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements.",
 		no_logical_frames: "Aucun cadre logique n'a encore été créé sur ce projet.",
@@ -289,7 +293,9 @@ var FRENCH_TRANSLATION = {
 
 		dimensions: {
 			day: "Jours",
-			week: "Semaines",
+			week_sat: "Semaines (samedi à vendredi)",
+			week_sun: "Semaines (dimanche à samedi)",
+			week_mon: "Semaines (lundi à dimanche)",
 			month: "Mois",
 			quarter: "Trimestres",
 			year: "Années",
@@ -428,7 +434,9 @@ var FRENCH_TRANSLATION = {
 
 		periodicities: {
 			day: 'Tous les jours',
-			week: 'Toutes les semaines',
+			week_sat: 'Toutes les semaines (samedi à vendredi)',
+			week_sun: 'Toutes les semaines (dimanche à lundi)',
+			week_mon: 'Toutes les semaines (lundi à dimanche)',
 			month: 'Tous les mois',
 			quarter: 'Tous les trimestres',
 			year: 'Tous les ans',
@@ -521,7 +529,7 @@ var FRENCH_TRANSLATION = {
 		collection_form_list_info:
 			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont présentes (fiches de suivi, dossiers patient, fichiers Excel, ...)</p>" + 
 			"<p>Au sein de monitool, on ne décrira pas l'intégralité des données existantes, mais uniquement la partie qui va être extraite pour le suivi du projet</p>" + 
-			"<p>Afin de faciliter l'organisation de la saisie, les sources doivent correspondre à des outils réel utilisés sur le terrain.</p>",
+			"<p>Afin de faciliter l'organisation de la saisie, les sources doivent correspondre à des outils réels utilisés sur le terrain.</p>",
 
 		collection_edit_help_name: "Comment s'apelle la source de laquelle vous voulez extraire des données? Par exemple: \"Dossier patient informatisé\", \"Registre des centre de santé\", \"Rapport du système national d'information sanitaire\", ...",
 		collection_edit_help_sites: "Parmi les structures identifiées dans \"Lieux de collecte\", lesquelles font remonter cette source de donnée?",
@@ -658,6 +666,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	indicator: {
+		not_collected: "Cet indicateur n'est collecté par aucun projet",
 		extra: "Indicateurs annexés",
 		new_indicator: "Nouvel indicateur",
 		create_new: 'Créer un nouvel indicateur',

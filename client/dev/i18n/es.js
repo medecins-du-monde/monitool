@@ -186,7 +186,9 @@ var SPANISH_TRANSLATION = {
 		members: 'Miembros',
 		
 		day: 'Día',
-		week: 'Semana',
+		week_sat: 'Semana (sábado a viernes)',
+		week_sun: 'Semana (domingo a sábado)',
+		week_mon: 'Semana (lunes a domingo)',
 		month: 'Mes',
 		quarter: "Trimestre",
 		year: "Año",
@@ -262,10 +264,12 @@ var SPANISH_TRANSLATION = {
 		no_data: "Datos no disponibles",
 		not_available_by_entity: "Datos no disponibles por lugar de colecta",
 		not_available_by_group: "Datos no disponibles por grupo",
-		not_available_min_week: "Agrege por semana para acceder a estos datos",
-		not_available_min_month: "Agrege por mes para acceder a estos datos",
-		not_available_min_quarter: "Agrege por trimestre para acceder a estos datos",
-		not_available_min_year: "Agrege por año para acceder a estos datos",
+		not_available_min_week_sat: "Estos datos estan disponibles por semana (sábado a viernes)",
+		not_available_min_week_sun: "Estos datos estan disponibles por semana (domingo a sábado)",
+		not_available_min_week_mon: "Estos datos estan disponibles por semana (lunes a domingo)",
+		not_available_min_month: "Estos datos estan disponibles por mes",
+		not_available_min_quarter: "Estos datos estan disponibles por trimestre",
+		not_available_min_year: "Estos datos estan disponibles por año",
 
 		saving_failed: "Monitool no consiguio salvar los cambios.",
 		no_logical_frame: "Ningún marco lógico has sido creado en este proyecto.",
@@ -289,7 +293,9 @@ var SPANISH_TRANSLATION = {
 
 		dimensions: {
 			day: "Días",
-			week: "Semanas",
+			week_sat: "Semanas (sábado a viernes)",
+			week_sun: "Semanas (domingo a sábado)",
+			week_mon: "Semanas (lunes a domingo)",
 			month: "Meses",
 			quarter: "Trimestres",
 			year: "Años",
@@ -428,7 +434,9 @@ var SPANISH_TRANSLATION = {
 
 		periodicities: {
 			day: 'Diario',
-			week: 'Cada semana',
+			week_sat: 'Cada semana (sábado a viernes)',
+			week_sun: 'Cada semana (domingo a sábado)',
+			week_mon: 'Cada semana (lunes a domingo)',
 			month: 'Cada mes',
 			quarter: 'Cada trimestre',
 			year: 'Cada año',
@@ -658,6 +666,7 @@ var SPANISH_TRANSLATION = {
 	},
 
 	indicator: {
+		not_collected: "Ningún proyecto colecta este indicador",
 		extra: "Indicadores adicionales",
 		new_indicator: "Nuevo indicador",
 		create_new: 'Crear un nuevo indicador',

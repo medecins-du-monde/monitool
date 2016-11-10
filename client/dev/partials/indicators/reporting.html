@@ -51,7 +51,9 @@
 						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
 						<select class="form-control input-sm" id="group-by-input" ng-model="groupBy">
 							<option value="day" translate="shared.day"></option>
-							<option value="week" translate="shared.week"></option>
+							<option value="week_sat" translate="shared.week_sat"></option>
+							<option value="week_sun" translate="shared.week_sun"></option>
+							<option value="week_mon" translate="shared.week_mon"></option>
 							<option value="month" translate="shared.month"></option>
 							<option value="quarter" translate="shared.quarter"></option>
 							<option value="year" translate="shared.year"></option>
@@ -71,7 +73,7 @@
 <div style="clear: both"></div>
 
 <reporting-graph-adapter
-	type="['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
+	type="['year', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
 	rows="rows" cols="cols" plots="plots">
 </reporting-graph-adapter>
 
@@ -86,8 +88,8 @@
 	<thead>
 		<tr>
 			<th style="width: 30px" class="noprint"></th>
-			<th translate="shared.name"></th>
-			<th ng-repeat="col in cols">{{col.name}}</th>
+			<th translate="shared.name" style="min-width: 300px"></th>
+			<th ng-repeat="col in cols" style="min-width: 50px" title="{{col.title}}">{{col.name}}</th>
 		</tr>
 	</thead>
 	

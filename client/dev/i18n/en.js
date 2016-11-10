@@ -186,7 +186,9 @@ var ENGLISH_TRANSLATION = {
 		members: 'Members',
 
 		day: 'Day',
-		week: 'Week',
+		week_sat: 'Week (saturday to friday)',
+		week_sun: 'Week (sunday to saturday)',
+		week_mon: 'Week (monday to sunday)',
 		month: 'Month',
 		quarter: "Quarter",
 		year: "Year",
@@ -262,10 +264,12 @@ var ENGLISH_TRANSLATION = {
 		no_data: "This data is not available",
 		not_available_by_entity: "This data is not available by site",
 		not_available_by_group: "This data is not available by group",
-		not_available_min_week: "Aggregate by week to access this data",
-		not_available_min_month: "Aggregate by month to access this data",
-		not_available_min_quarter: "Aggregate by quarter to access this data",
-		not_available_min_year: "Aggregate by year to access this data",
+		not_available_min_week_sat: "This data is available by week (saturday to friday)",
+		not_available_min_week_sun: "This data is available by week (sunday to saturday)",
+		not_available_min_week_mon: "This data is available by week (monday to sunday)",
+		not_available_min_month: "This data is available by month",
+		not_available_min_quarter: "This data is available by quarter",
+		not_available_min_year: "This data is available by year",
 
 		saving_failed: "Monitool was unable to save the changes.",
 		no_logical_frame: "No logical frame was created yet for this project.",
@@ -289,7 +293,9 @@ var ENGLISH_TRANSLATION = {
 
 		dimensions: {
 			day: "Days",
-			week: "Weeks",
+			week_sat: "Weeks (saturday to friday)",
+			week_sun: "Weeks (sunday to saturday)",
+			week_mon: "Weeks (monday to sunday)",
 			month: "Months",
 			quarter: "Quarters",
 			year: "Years",
@@ -428,7 +434,9 @@ var ENGLISH_TRANSLATION = {
 
 		periodicities: {
 			day: "Every day",
-			week: "Every week",
+			week_sat: "Every week (saturday to friday)",
+			week_sun: "Every week (sunday to saturday)",
+			week_mon: "Every week (monday to sunday)",
 			month: 'Every month',
 			quarter: 'Every quarter',
 			year: "Every year",
@@ -658,6 +666,7 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	indicator: {
+		not_collected: "This indicator is not collected by any project",
 		extra: "Extra indicators",
 		new_indicator: "New indicator",
 		create_new: 'Create a new indicator',

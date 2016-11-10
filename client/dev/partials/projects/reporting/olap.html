@@ -87,7 +87,7 @@
 				</div>
 			</div>
 
-			<div class="form-group" ng-repeat="dimension in dimensions" ng-if="dimension.id != 'day' && dimension.id != 'week' && dimension.id != 'month' && dimension.id != 'quarter' && dimension.id != 'year'">
+			<div class="form-group" ng-repeat="dimension in dimensions" ng-if="dimension.id != 'day' && dimension.id != 'week_sat' && dimension.id != 'week_sun' && dimension.id != 'week_mon' && dimension.id != 'month' && dimension.id != 'quarter' && dimension.id != 'year'">
 				<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{dimension.name|translate}}</label>
 				<div class="col-sm-11">
 					

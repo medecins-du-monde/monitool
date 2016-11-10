@@ -55,7 +55,7 @@ var validate = validator({
 					name: { type: "string", minLength: 1 },
 					entities: { type: "array", items: { $ref: "#/definitions/uuid" } },
 					collect: { type: "string", enum: ["project", 'entity', 'some_entity'] },
-					periodicity: { type: "string", enum: ["day", "week", "month", "quarter", "year", "free"] },
+					periodicity: { type: "string", enum: ["day", "week_sat", "week_sun", "week_mon", "month", "quarter", "year", "free"] },
 					start: { oneOf: [{type: 'null'}, { type: "string", format: "date" }]},
 					end: { oneOf: [{type: 'null'}, { type: "string", format: "date" }]},
 					elements: {

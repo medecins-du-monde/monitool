@@ -153,67 +153,67 @@ angular
 		};
 
 
-		Input.fetchForProject = function(project) {
-			return this.fetchForProjects([project]);
-		};
+		// Input.fetchForProject = function(project) {
+		// 	return this.fetchForProjects([project]);
+		// };
 
-		Input.fetchForProjects = function(projects) {
-			// Index projects by uuid.
-			var projectsById = {};
-			projects.forEach(function(project) { projectsById[project._id] = project; });
+		// Input.fetchForProjects = function(projects) {
+		// 	// Index projects by uuid.
+		// 	var projectsById = {};
+		// 	projects.forEach(function(project) { projectsById[project._id] = project; });
 
-			// Buid promises to fetch each project's inputs.
-			var promises = projects.map(function(project) {
-				return Input.query({mode: "project_inputs", projectId: project._id}).$promise;
-			});
+		// 	// Buid promises to fetch each project's inputs.
+		// 	var promises = projects.map(function(project) {
+		// 		return Input.query({mode: "project_inputs", projectId: project._id}).$promise;
+		// 	});
 
-			// Fetch
-			return $q.all(promises).then(function(inputs) {
-				return inputs
-					// Merge the inputs arrays into one long array.
-					.reduce(function(m, i) { return m.concat(i); }, [])
+		// 	// Fetch
+		// 	return $q.all(promises).then(function(inputs) {
+		// 		return inputs
+		// 			// Merge the inputs arrays into one long array.
+		// 			.reduce(function(m, i) { return m.concat(i); }, [])
 
-					// remove inputs that are out of date.
-					.filter(function(input) { return input.isOutOfSchedule(projectsById[input.project]); });
-			});
-		};
+		// 			// remove inputs that are out of date.
+		// 			.filter(function(input) { return input.isOutOfSchedule(projectsById[input.project]); });
+		// 	});
+		// };
 
-		Input.prototype.isOutOfSchedule = function(project) {
-			if (project._id !== this.project)
-				throw new Error();
+		// Input.prototype.isOutOfSchedule = function(project) {
+		// 	if (project._id !== this.project)
+		// 		throw new Error();
 
-			var form    = project.forms.find(function(f) { return f.id == this.form; }.bind(this)),
-				entity  = project.entities.find(function(e) { return e.id == this.entity; }.bind(this));
+		// 	var form    = project.forms.find(function(f) { return f.id == this.form; }.bind(this)),
+		// 		entity  = project.entities.find(function(e) { return e.id == this.entity; }.bind(this));
 			
-			// an input needs to have an associated form.
-			if (!form) {
-				console.log("Dropping input:", this._id, '(no form)');
-				return false;
-			}
+		// 	// an input needs to have an associated form.
+		// 	if (!form) {
+		// 		console.log("Dropping input:", this._id, '(no form)');
+		// 		return false;
+		// 	}
 
-			// an input needs to be on one of the allowed entities (or none for project collection).
-			if (form.collect == 'project' && this.entity !== 'none') {
-				console.log("Dropping input:", this._id, '(not linked with project)');
-				return false;
-			}
+		// 	// an input needs to be on one of the allowed entities (or none for project collection).
+		// 	if (form.collect == 'project' && this.entity !== 'none') {
+		// 		console.log("Dropping input:", this._id, '(not linked with project)');
+		// 		return false;
+		// 	}
 
-			if (form.collect == 'some_entity' && (!entity || form.entities.indexOf(this.entity) === -1)) {
-				console.log("Dropping input:", this._id, '(entity not in form)');
-				return false;
-			}
+		// 	if (form.collect == 'some_entity' && (!entity || form.entities.indexOf(this.entity) === -1)) {
+		// 		console.log("Dropping input:", this._id, '(entity not in form)');
+		// 		return false;
+		// 	}
 
-			if (form.collect == 'entity' && !entity) {
-				console.log("Dropping input:", this._id, '(entity not in project)');
-				return false;
-			}
+		// 	if (form.collect == 'entity' && !entity) {
+		// 		console.log("Dropping input:", this._id, '(entity not in project)');
+		// 		return false;
+		// 	}
 
-			if (!InputSlots.isValid(project, entity, form, this.period)) {
-				console.log("Dropping input:", this._id, '(invalid slot)', this.period);
-				return false;
-			}
+		// 	if (!InputSlots.isValid(project, entity, form, this.period)) {
+		// 		console.log("Dropping input:", this._id, '(invalid slot)', this.period);
+		// 		return false;
+		// 	}
 
-			return true;
-		};
+		// 	return true;
+		// };
 
 		return Input;
 	});

@@ -17,9 +17,7 @@
 	</div><div class="panel panel-default indicator-panel"
 		 ng-repeat="indicator in editableProject.extraIndicators|orderBy:'display'">
 
-		<div class="panel-heading">
-			{{indicator.display}}
-		</div>
+		<div class="panel-heading" title="{{indicator.display}}">{{indicator.display|maxLength:90}}</div>
 		
 		<div class="panel-body" style="padding-bottom: 10px">
 			<strong>{{'project.baseline'|translate}}:</strong> {{indicator.baseline != null ? indicator.baseline : '?'}}<br/>

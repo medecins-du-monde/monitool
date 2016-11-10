@@ -16,7 +16,7 @@ var validate = validator({
 	properties: {
 		_id:     {
 			type: "string",
-			pattern: "^[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}:(([a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12})|none):[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}:\\d{4}(\\-((Q[1-4])|(W\\d{2})|(\\d{2}(\\-\\d{2})?)))?$"
+			pattern: "^[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}:(([a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12})|none):[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}:\\d{4}(\\-((Q[1-4])|(W\\d{2}\\-(sat|sun|mon))|(\\d{2}(\\-\\d{2})?)))?$"
 		},
 		_rev:    { "$ref": "#/definitions/revision" },
 		type:    { "type": "string", "pattern": "^input$" },
@@ -28,7 +28,7 @@ var validate = validator({
 		form:    { "$ref": "#/definitions/uuid" },
 		period: {
 			"type": "string",
-			"pattern": "^\\d{4}(\\-((Q[1-4])|(W\\d{2})|(\\d{2}(\\-\\d{2})?)))?$"
+			"pattern": "^\\d{4}(\\-((Q[1-4])|(W\\d{2}\\-(sat|sun|mon))|(\\d{2}(\\-\\d{2})?)))?$"
 		},
 		values: {
 			type: "object",

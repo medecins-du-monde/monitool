@@ -1,7 +1,10 @@
 <div class="modal-body">
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
 		<legend translate="project.edit_indicator" ng-if="!indicator"></legend>
-		<legend ng-if="indicator">{{indicator.name[language]}}</legend>
+		<legend ng-if="indicator" title="{{indicator.name[language]}}">{{indicator.name[language]|maxLength:90}}</legend>
+
+		<p ng-if="indicator" style="text-align: center; margin-bottom: 10px">{{indicator.description[language]}}</p>
+
 
 		<div class="form-group" ng-if="!indicator">
 			<label for="display-input" class="col-sm-2 control-label" translate="project.display"></label>

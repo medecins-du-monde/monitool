@@ -41,7 +41,7 @@ angular.module(
 		};
 	})
 	
-	.controller('ProjectMenuController', function($scope, $filter, $state, project) {
+	.controller('ProjectMenuController', function($scope, $filter, $state, $rootScope, project) {
 		$scope.masterProject = project;
 
 		// When master changes, update menu elements
@@ -49,33 +49,20 @@ angular.module(
 			$scope.projectReadyForReporting = $scope.masterProject.isReadyForReporting();
 		}, true);
 
-		$scope.wantFold = true;
-		$scope.isStructureVisible = function() {
-			if (!$scope.isStructureFoldable())
-				return true;
-
-			
-			return true;
-		};
-
-		$scope.isStructureFoldable = function() {
-			return false;
-		};
-
-		$scope.structureSwitchVisibility = function() {
-			if (!$scope.isStructureFoldable())
-				$scope.wantFold = !$scope.wantFold;
-		};
-	
-
 		$scope.cloneProject = function() {
 			var newName = window.prompt($filter('translate')('project.please_enter_new_name'));
 
-			if (newName)
-				$scope.master.clone(newName, $rootScope.userCtx._id)
-					.$save()
-					.then(function() { $state.go('main.projects'); })
-					.catch(function(error) { $scope.error = error; });
+			if (newName) {
+				var newProject = $scope.masterProject.clone(newName, $rootScope.userCtx._id);
+				
+				newProject.$save()
+					.then(function() {
+						$state.go('main.project.structure.basics', {projectId: newProject._id});
+					})
+					.catch(function(error) {
+						$scope.error = error;
+					});
+			}
 		};
 
 		$scope.deleteProject = function() {

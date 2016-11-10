@@ -12,7 +12,7 @@ angular
 
 	// TODO profiling this piece of code for perfs could not hurt.
 	// we will see how bad if performs on the wild.
-	.service('mtReporting', function($filter, $rootScope, uuid, CompoundCube, Cube, InputSlots, itertools) {
+	.service('mtReporting', function($filter, $rootScope, uuid, CompoundCube, Cube, InputSlots, TimeSlot, itertools) {
 
 		this.getColumns = function(groupBy, start, end, location, project) {
 			var type;
@@ -23,13 +23,14 @@ angular
 			else
 				type = 'entity';
 
-			if (['year', 'quarter', 'month', 'week', 'day'].indexOf(groupBy) !== -1) {
-				var slots = InputSlots.iterate(start, end, groupBy);
-				slots.push('_total');
-
-				return slots.map(function(slot) {
-					return {id: slot, name: $filter('formatSlot')(slot)};
+			if (['year', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1) {
+				var slots = InputSlots.iterate(start, end, groupBy).map(function(slot) {
+					return {id: slot, name: $filter('formatSlot')(slot), title: $filter('formatSlotRange')(slot)};
 				});
+				
+				slots.push({id:'_total', name: "Total"});
+
+				return slots;
 			}
 			else if (groupBy === 'entity') {
 				if (type === 'project')
@@ -149,8 +150,8 @@ angular
 				if (key === '_start') {
 					if (!cubeFilters[timeDimension.id])
 						cubeFilters[timeDimension.id] = timeDimension.items;
-					// _start => filter day
-					var start = moment.utc(viewFilters._start).startOf(timeDimension.id).format(formats[timeDimension.id]);
+
+					var start = TimeSlot.fromDate(viewFilters._start, timeDimension.id).value;
 
 					// This is O(n), but should not be. Can do O(logn)
 					cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(function(dimItem) { return start <= dimItem; });
@@ -162,8 +163,7 @@ angular
 					if (!cubeFilters[timeDimension.id])
 						cubeFilters[timeDimension.id] = timeDimension.items;
 
-					// _end => filter day
-					var end = moment.utc(viewFilters._end).endOf(timeDimension.id).format(formats[timeDimension.id]);
+					var end = TimeSlot.fromDate(viewFilters._end, timeDimension.id).value;
 
 					// This is O(n), but should not be. Can do O(logn)
 					cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(function(dimItem) { return dimItem <= end; });

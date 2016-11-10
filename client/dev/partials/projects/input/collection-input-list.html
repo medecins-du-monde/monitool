@@ -37,7 +37,7 @@
 	</thead>
 	<tbody>
 		<tr ng-repeat="(date, status) in inputsStatus">
-			<th>{{date|formatSlot}}</th>
+			<th title="{{date|formatSlotRange}}">{{date|formatSlot}}</th>
 
 			<td ng-repeat="col in columns">
 				<a class="btn btn-xs"

@@ -127,16 +127,8 @@ angular
 		 * Clone project
 		 */
 		Project.prototype.clone = function(newName, userId) {
-			// replace all uuids inside the project by new ones, to avoid collisions.
-			var old2new = {};
-			var strProject = angular.toJson(this).replace(/[\da-z]{8}-([\da-z]{4}-){3}-[\da-z]{12}/, function(match) {
-				if (!old2new[match])
-					old2new[match] = uuid.v4();
-				return old2new[match];
-			});
-
-			// Create new project
-			var newProject = new Project(JSON.parse(strProject));
+			var newProject = angular.copy(this);
+			newProject._id = uuid.v4();
 			newProject.name = newName; // Change name
 			delete newProject._rev; // Delete revision
 			newProject.users = [{type: "internal", id: userId, role: "owner"}]; // Change users

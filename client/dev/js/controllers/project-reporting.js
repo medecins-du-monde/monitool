@@ -172,7 +172,7 @@ angular
 			
 			// Init all filters as full
 			cube.dimensions.forEach(function(dimension) {
-				if (['day', 'week', 'month', 'quarter', 'year'].indexOf(dimension.id) === -1)
+				if (['day', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'year'].indexOf(dimension.id) === -1)
 					filters[dimension.id] = dimension.items;
 			});
 
@@ -188,13 +188,13 @@ angular
 			if (element.type === 'variable')
 				$scope.dimensions = $scope.dimensions.concat(element.element.partitions);
 
-			['day', 'week', 'month', 'quarter', 'year'].forEach(function(time) {
+			['day', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'year'].forEach(function(time) {
 				var dim = cube.dimensionsById[time] || cube.dimensionGroupsById[time];
 				if (dim)
 					$scope.dimensions.push({
 						id: time,
 						name: 'project.dimensions.' + time,
-						elements: dim.items.map(function(i) { return {id: i, name: i}; })
+						elements: dim.items.map(function(i) { return {id: i, name: $filter('formatSlot')(i), title: $filter('formatSlotRange')(i) }; })
 					});
 			});
 		});
@@ -205,7 +205,7 @@ angular
 
 		$scope.$watch('[dimensions, query.colDimensions, query.rowDimensions]', function() {
 			// update available rows and cols
-			var timeFields = ['year', 'quarter', 'month', 'week', 'day'],
+			var timeFields = ['year', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'],
 				timeUsedOnCols = timeFields.find(function(tf) { return $scope.query.colDimensions.indexOf(tf) !== -1; }),
 				timeUsedOnRows = timeFields.find(function(tf) { return $scope.query.rowDimensions.indexOf(tf) !== -1; });
 

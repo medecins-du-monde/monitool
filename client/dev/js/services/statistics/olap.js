@@ -443,16 +443,30 @@ angular
 			// create fake dimensions and groups to mimic the intersection.
 			if (dimensionIds.indexOf('day') !== -1) {
 				this.dimensions.push(createDimension('day', undefined, computation, cubes));
-				this.dimensionGroups.push(createDimension('week', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('week_sat', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('week_sun', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('week_mon', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('month', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('quarter', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('year', 'day', computation, cubes));
 			}
-			else if (dimensionIds.indexOf('week') !== -1) {
-				this.dimensions.push(createDimension('week', undefined, computation, cubes));
-				this.dimensionGroups.push(createDimension('month', 'week', computation, cubes));
-				this.dimensionGroups.push(createDimension('quarter', 'week', computation, cubes));
-				this.dimensionGroups.push(createDimension('year', 'week', computation, cubes));
+			else if (dimensionIds.indexOf('week_sat') !== -1) {
+				this.dimensions.push(createDimension('week_sat', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('month', 'week_sat', computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'week_sat', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'week_sat', computation, cubes));
+			}
+			else if (dimensionIds.indexOf('week_sun') !== -1) {
+				this.dimensions.push(createDimension('week_sun', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('month', 'week_sun', computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'week_sun', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'week_sun', computation, cubes));
+			}
+			else if (dimensionIds.indexOf('week_mon') !== -1) {
+				this.dimensions.push(createDimension('week_mon', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('month', 'week_mon', computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'week_mon', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'week_mon', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('month') !== -1) {
 				this.dimensions.push(createDimension('month', undefined, computation, cubes));

@@ -32,42 +32,60 @@ angular.module('monitool.directives.formControls', [])
 	})
 
 	.directive('optionalDate', function() {
+
+		var local2utc = function(date) {
+			return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+		};
+
+		var utc2local = function(date) {
+			return new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+		};
+
 		return {
 			restrict: 'E',
 			require: 'ngModel',
 			templateUrl: 'partials/_forms/optional-date.html',
 			scope: {default:'=default'},
 			link: function(scope, element, attributes, ngModelController) {
-
 				scope.message = attributes.message;
+				scope.container = {};
 
 				ngModelController.$formatters.push(function(modelValue) {
 					if (modelValue === null)
-						return {specifyDate: false, chosenDate: scope.default};
+						return {specifyDate: false, chosenDate: null };
 					else
-						return {specifyDate: true, chosenDate: new Date(modelValue.getTime() + modelValue.getTimezoneOffset() * 60 * 1000)};
+						return {specifyDate: true, chosenDate: utc2local(modelValue) };
 				});
 
 				ngModelController.$parsers.push(function(viewValue) {
-					return viewValue.specifyDate ? new Date(viewValue.chosenDate.getTime() - viewValue.chosenDate.getTimezoneOffset() * 60 * 1000) : null;
+					if (viewValue.specifyDate)
+						return local2utc(viewValue.chosenDate);
+					else
+						return null;
 				});
 
 				// We render using more ng-models and bindings, which make it a bit strange.
 				// We should simply update the form values manually.
 				ngModelController.$render = function() {
-					scope.chosenDate = ngModelController.$viewValue.chosenDate;
+					scope.container.chosenDate = ngModelController.$viewValue.chosenDate;
 					scope.specifyDate = ngModelController.$viewValue.specifyDate;
 				};
 
 				// if specifyDate change, we need to update the view value.
-				scope.$watchGroup(['specifyDate', 'chosenDate'], function() {
-					if (scope.specifyDate)
-						ngModelController.$setViewValue({specifyDate: true, chosenDate: scope.chosenDate});
+				scope.$watch('specifyDate', function(oldValue, newValue) {
+					// first time
+					if (oldValue == newValue)
+						return;
 
-					else {
-						scope.chosenDate = scope.default;
-						ngModelController.$setViewValue({specifyDate: false, chosenDate: scope.default});
-					}
+					if (scope.specifyDate)
+						ngModelController.$setViewValue({specifyDate: true, chosenDate: utc2local(scope.default)});
+					else
+						ngModelController.$setViewValue({specifyDate: false, chosenDate: null});
+				});
+
+				scope.$watch('container.chosenDate', function(oldValue, newValue) {
+					if (scope.specifyDate)
+						ngModelController.$setViewValue({specifyDate: true, chosenDate: scope.container.chosenDate});
 				});
 			}
 		}
@@ -185,6 +203,24 @@ angular.module('monitool.directives.formControls', [])
 					scope.size = width + ' x ' + height;
 				};
 
+
+				// we should only watch partitions.length, partitions[*].id and partitions[*].name
+				// but that will do it.
+				// however it's a bit overkill (will reset partitin order when we change an element name)
+				scope.$watch('partitions', function(newValue, oldValue) {
+					if (!angular.equals(oldValue, newValue)) {
+						// this will trigger orderedPartitions watch, which will redraw everything.
+						scope.orderedPartitions = scope.partitions.slice();
+						scope.table = {
+							// rows and cols for this table.
+							leftCols: itertools.range(0, scope.distribution),
+							headerRows: itertools.range(scope.distribution, scope.partitions.length)
+						};
+
+						updateSize();
+					}
+				}, true);
+
 				// Tell the template about the table layout
 				scope.$watch('distribution', function() {
 					scope.table = {
@@ -196,12 +232,10 @@ angular.module('monitool.directives.formControls', [])
 					updateSize();
 				})
 
-				// We need to use a container for the distribution value because we use it inside a ng-repeat which have its own scope
 				scope.orderedPartitions = scope.partitions.slice();
 
 				// We do not allow values to be present 2 times in the list.
 				scope.$watchCollection('orderedPartitions', function(after, before) {
-					
 					// Did last change cause a duplicate?
 					var hasDuplicates = false,
 						duplicates = {};
@@ -226,11 +260,11 @@ angular.module('monitool.directives.formControls', [])
 
 						scope.orderedPartitions[oldIndex] = before[changedIndex];
 
+					}
 						// tell ngModelController that the viewValue changed
 						ngModelController.$setViewValue(scope.orderedPartitions.slice());
 
 						updateSize();
-					}
 				});
 
 				// To render the ngModelController, we just pass the orderedPartitions to the scope.

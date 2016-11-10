@@ -16,9 +16,7 @@
 	<div><div translate="project.no_cross_cutting" ng-if="theme.indicators.length == 0"></div><div class="panel panel-default indicator-panel"
 		 ng-repeat="indicator in theme.indicators|orderBy:getName">
 
-		<div class="panel-heading">
-			{{indicator.name[language]}}
-		</div>
+		<div class="panel-heading" title="{{indicator.name[language]}}">{{indicator.name[language]|maxLength:90}}</div>
 		
 		<div class="panel-body" style="padding-bottom: 10px">
 			<strong>{{'project.baseline'|translate}}:</strong> {{editableProject.crossCutting[indicator._id].baseline != null ? editableProject.crossCutting[indicator._id].baseline : '?'}}<br/>

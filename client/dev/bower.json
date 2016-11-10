@@ -33,7 +33,6 @@
     "file-saver": "master",
     "blob": "master",
     "angular-mocks": "~1.5.8",
-    "pdfmake": "^0.1.20",
-    "pdfjs-dist": "^1.5.500"
+    "pdfmake": "^0.1.20"
   }
 }
