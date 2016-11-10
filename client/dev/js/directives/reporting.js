@@ -153,7 +153,14 @@ angular.module('monitool.directives.reporting', [])
 						else
 							element.css('background-color', '');
 
-						element.html(Math.round(value));
+						// should we append a symbol
+						var symbol = '';
+						if ($scope.row && $scope.row.unit)
+							symbol = $scope.row.unit;
+						else if ($scope.unit)
+							symbol = $scope.unit;
+
+						element.html(Math.round(value) + symbol);
 					}
 					else {
 						element.html('<i class="fa fa-interrogation" title="' + value + '"></i>');
@@ -271,6 +278,7 @@ angular.module('monitool.directives.reporting', [])
 		return {
 			restrict: 'E',
 			scope: {
+				unit: '=',
 				colorization: '=',
 				cols: '=',
 				rows: '=',
@@ -279,6 +287,7 @@ angular.module('monitool.directives.reporting', [])
 			templateUrl: "partials/projects/reporting/_olap_grid.html",
 
 			link: function($scope, element) {
+
 				$scope.$watch('[cols,rows,data]', function() {
 					// Create empty grid.
 					var grid = {header: [], body: []};

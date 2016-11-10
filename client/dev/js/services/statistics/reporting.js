@@ -98,14 +98,19 @@ angular
 			// handle colorization
 			if (planning.colorize && planning.baseline !== null && planning.target !== null)
 				row.colorization = {baseline: planning.baseline, target: planning.target};
-
+	
 			if (planning.computation === null)
-				row.message = 'project.planning_computation_missing';
+				row.message = 'project.indicator_computation_missing';
 
 			else if (!isNaN(planning.computation.formula))
 				row.cols = columns.map(function(col) { return parseInt(planning.computation.formula); });
 
 			else {
+				if (/1000/.test(planning.computation.formula))
+					row.unit = '‰';
+				else if (/100/.test(planning.computation.formula))
+					row.unit = '%';
+				
 				try {
 					var cube = new CompoundCube(planning.computation, cubes),
 						cubeFilters = this.createCubeFilter(cube, viewFilters);

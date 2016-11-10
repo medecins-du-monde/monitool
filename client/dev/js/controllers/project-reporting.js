@@ -248,15 +248,28 @@ angular
 			if (query.element.type == 'variable') {
 				cube = cubes[query.element.element.id];
 				$scope.colorization = null;
+				$scope.unit = null;
 			}
 			else {
-				cube = new CompoundCube(query.element.indicator.computation, cubes);
-				
 				var planning = query.element.indicator;
+
+				cube = new CompoundCube(planning.computation, cubes);
+				
 				if (planning.colorize && planning.baseline !== null && planning.target !== null)
 					$scope.colorization = {baseline: planning.baseline, target: planning.target};
 				else
 					$scope.colorization = null;
+
+				if (planning.computation) {
+					if (/1000/.test(planning.computation.formula))
+						$scope.unit = '‰';
+					else if (/100/.test(planning.computation.formula))
+						$scope.unit = '%';
+					else
+						$scope.unit = undefined;
+				}
+				else
+					$scope.unit = undefined;
 			}
 
 			var cubeDimensions = $scope.query.colDimensions.concat($scope.query.rowDimensions),
