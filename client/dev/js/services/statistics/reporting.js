@@ -106,21 +106,34 @@ angular
 				row.cols = columns.map(function(col) { return parseInt(planning.computation.formula); });
 
 			else {
-				if (/1000/.test(planning.computation.formula))
-					row.unit = '‰';
-				else if (/100/.test(planning.computation.formula))
-					row.unit = '%';
 				
 				try {
+					// row.unit should not be inside the try/catch, but better safe than sorry
+					if (/1000/.test(planning.computation.formula))
+						row.unit = '‰';
+					else if (/100/.test(planning.computation.formula))
+						row.unit = '%';
+
 					var cube = new CompoundCube(planning.computation, cubes),
 						cubeFilters = this.createCubeFilter(cube, viewFilters);
 
-					try {
-						var values = cube.query([groupBy], cubeFilters, true);
-						row.cols = columns.map(function(col) { return values[col.id]; });
-					}
-					catch (e) {
-						row.message = 'project.no_data';
+					if (groupBy == 'entity' && !cube.dimensionsById.entity)
+						row.message = 'project.not_available_by_entity';
+
+					else if (groupBy == 'group' && !cube.dimensionsById.group)
+						row.message = 'project.not_available_by_group';
+
+					else if (!cube.dimensionsById[groupBy] && !cube.dimensionGroupsById[groupBy])
+						row.message = 'project.not_available_min_' + cube.dimensions[0].id;
+
+					else {
+						try {
+							var values = cube.query([groupBy], cubeFilters, true);
+							row.cols = columns.map(function(col) { return values[col.id]; });
+						}
+						catch (e) {
+							row.message = 'project.no_data';
+						}
 					}
 				}
 				catch (e) {
