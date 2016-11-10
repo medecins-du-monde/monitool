@@ -401,8 +401,8 @@ angular
 		
 
 		var createDimension = function(dimensionId, childDimension, computation, cubes) {
+			// Take all lists of items from the real dimensions
 			var itemsLists = [];
-
 			for (var key in computation.parameters) {
 				var cube = cubes[computation.parameters[key].elementId],
 					dimension = cube.dimensionsById[dimensionId] || cube.dimensionGroupsById[dimensionId];
@@ -410,23 +410,31 @@ angular
 				itemsLists.push(dimension.items);
 			}
 
+			// intersect them
 			var items = itemsLists.reduce(function(memo, arr) {
 				return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
 			}, null) || [];
 
+			// sort what remains (why? those the display order depends on this one?)
 			items.sort();
 			
+			// our new dimension is the intersection of all the others (child dimension might be undefined but that's ok)
 			return {id: dimensionId, childDimension: childDimension, items: items};				
 		};
 
 		var CompoundCube = function(computation, cubes) {
 			this.computation = computation;
-			this.cubes = cubes;
+			
+			this.cubes = {}; // we could leave everything here, but it's easier to debug with less clutter.
+			for (key in computation.parameters)
+				this.cubes[computation.parameters[key].elementId] = cubes[computation.parameters[key].elementId];
 			
 			this.dimensions = [];
 			this.dimensionGroups = [];
 
-			// retrieve all dimensions and groups for parameters of computation
+			// The dimensions that our CompoundCube will have is the intersection of the dimensions
+			// of all of the other cubes => compute that.
+			// first: retrieve all dimensions and groups for parameters of computation
 			var dimensionIds = [];
 			for (var key in computation.parameters) {
 				var cube = cubes[computation.parameters[key].elementId],
@@ -435,12 +443,12 @@ angular
 				dimensionIds.push(dimensions);
 			}
 
-			// intersect them to know which dimensions we have left
+			// intersect them to know which dimensions we have left (FIXME: why not depend on itertools.intersect?).
 			dimensionIds = dimensionIds.reduce(function(memo, arr) {
 				return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
 			}, null) || [];
 
-			// create fake dimensions and groups to mimic the intersection.
+			// create fake dimensions and groups to mimic the intersection of the cubes.
 			if (dimensionIds.indexOf('day') !== -1) {
 				this.dimensions.push(createDimension('day', undefined, computation, cubes));
 				this.dimensionGroups.push(createDimension('week_sat', 'day', computation, cubes));
