@@ -32,60 +32,55 @@ angular.module('monitool.directives.formControls', [])
 	})
 
 	.directive('optionalDate', function() {
-
-		var local2utc = function(date) {
-			return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
-		};
-
-		var utc2local = function(date) {
-			return new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
-		};
-
 		return {
 			restrict: 'E',
 			require: 'ngModel',
 			templateUrl: 'partials/_forms/optional-date.html',
-			scope: {default:'=default'},
+			scope: {
+				defaultUTC: '=default'
+			},
 			link: function(scope, element, attributes, ngModelController) {
 				scope.message = attributes.message;
+
+				scope.$watch('defaultUTC', function(defaultUTC) {
+					scope.defaultLocal = new Date(defaultUTC.getTime() + defaultUTC.getTimezoneOffset() * 60 * 1000);
+				});
+
 				scope.container = {};
 
-				ngModelController.$formatters.push(function(modelValue) {
-					if (modelValue === null)
-						return {specifyDate: false, chosenDate: null };
-					else
-						return {specifyDate: true, chosenDate: utc2local(modelValue) };
-				});
-
-				ngModelController.$parsers.push(function(viewValue) {
-					if (viewValue.specifyDate)
-						return local2utc(viewValue.chosenDate);
-					else
-						return null;
-				});
-
-				// We render using more ng-models and bindings, which make it a bit strange.
-				// We should simply update the form values manually.
 				ngModelController.$render = function() {
-					scope.container.chosenDate = ngModelController.$viewValue.chosenDate;
-					scope.specifyDate = ngModelController.$viewValue.specifyDate;
+					var dateUTC = ngModelController.$viewValue;
+					if (dateUTC) {
+						scope.container.dateLocal = new Date(dateUTC.getTime() + dateUTC.getTimezoneOffset() * 60 * 1000);
+						scope.specifyDate = true;
+					}
+					else {
+						scope.container.dateLocal = null;
+						scope.specifyDate = false;
+					}
 				};
 
-				// if specifyDate change, we need to update the view value.
-				scope.$watch('specifyDate', function(oldValue, newValue) {
-					// first time
-					if (oldValue == newValue)
+				scope.$watch('container.dateLocal', function(newDateLocal, oldDateLocal) {
+					if (newDateLocal === oldDateLocal)
 						return;
 
-					if (scope.specifyDate)
-						ngModelController.$setViewValue({specifyDate: true, chosenDate: utc2local(scope.default)});
+					if (newDateLocal)
+						ngModelController.$setViewValue(new Date(newDateLocal.getTime() - newDateLocal.getTimezoneOffset() * 60 * 1000));
 					else
-						ngModelController.$setViewValue({specifyDate: false, chosenDate: null});
+						ngModelController.$setViewValue(null);
 				});
 
-				scope.$watch('container.chosenDate', function(oldValue, newValue) {
-					if (scope.specifyDate)
-						ngModelController.$setViewValue({specifyDate: true, chosenDate: scope.container.chosenDate});
+				scope.$watch('specifyDate', function(newValue, oldValue) {
+					if (oldValue === newValue)
+						return;
+
+					if (newValue) {
+						var dateUTC = scope.defaultUTC;
+						scope.container.dateLocal = new Date(dateUTC.getTime() + dateUTC.getTimezoneOffset() * 60 * 1000);
+					}
+					else {
+						scope.container.dateLocal = null;
+					}
 				});
 			}
 		}
