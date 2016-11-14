@@ -9,16 +9,36 @@ angular
 	)
 
 	.controller('IndicatorListController', function($scope, indicators, themes) {
-		$scope.indicators = indicators;
-		$scope.themes = themes;
 
-		// give a color to each theme
-		// give to indicators the color of the first theme
-		var classes = ["text-primary", "text-success", "text-info", "text-warning", "text-danger"];
-		$scope.themes.forEach(function(theme, index) { theme.class = classes[index % classes.length]; });
+		$scope.themes = [];
 
-		// allow to sort indicators by name, and still work on language change
-		$scope.getName = function(a) { return a.name[$scope.language] };
+		var noThematicsIndicators = indicators.filter(function(indicator) {
+			return indicator.themes.length == 0;
+		});
+		if (noThematicsIndicators.length)
+			$scope.themes.push({definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators});
+
+		// Create a category with indicators that match project on 2 thematics or more 
+		var manyThematicsIndicators = indicators.filter(function(indicator) {
+			return indicator.themes.length > 1;
+		});
+		if (manyThematicsIndicators.length)
+			$scope.themes.push({definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators});
+
+		// Create a category with indicators that match project on exactly 1 thematic
+		themes.forEach(function(theme) {
+			var themeIndicators = indicators.filter(function(indicator) {
+				return indicator.themes.length === 1 && indicator.themes[0] === theme._id;
+			});
+
+			if (themeIndicators.length !== 0)
+				$scope.themes.push({definition: theme, indicators: themeIndicators});
+		});
+
+		// This getter will be used by the orderBy directive to sort indicators in the partial.
+		$scope.getName = function(indicator) {
+			return indicator.name[$scope.language];
+		};
 	})
 		
 	.controller('IndicatorReportingController', function($scope, Cube, mtReporting, indicator, projects, cubes, themes) {

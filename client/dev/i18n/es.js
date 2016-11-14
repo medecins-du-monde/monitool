@@ -227,6 +227,7 @@ var SPANISH_TRANSLATION = {
 		no_cross_cutting: "Este proyecto no requiere ningún indicador transversal. Ha rellenado las temáticas?",
 		indicator_computation_missing: "Falta el cálculo",
 		delete_input: "Esta seguro que desea suprimir esta entrada?",
+		zero_theme_indicator: "Sin temática",
 		multi_theme_indicator: "Varias temáticas",
 		which_variable: "De que variable viene esta información?",
 		which_partitions: "Qué particiones son relevantes?",

@@ -227,6 +227,7 @@ var FRENCH_TRANSLATION = {
 		no_cross_cutting: "Ce project n'a besoin de collecter aucun indicateur transversal. Avez-vous bien renseigné vos thématiques?",
 		indicator_computation_missing: "Calcul absent",
 		delete_input: "Êtes-vous sûr de vouloir supprimer cette saisie?",
+		zero_theme_indicator: "Sans thématique",
 		multi_theme_indicator: "Multi-thématique",
 		which_variable: "De quelle variable provient cette information?",
 		which_partitions: "Quelles désagrégations sont concernées?",

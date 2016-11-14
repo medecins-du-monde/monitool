@@ -227,6 +227,7 @@ var ENGLISH_TRANSLATION = {
 		no_cross_cutting: "This project does not require collecting any cross-cutting indicator. Did you filled the thematics?",
 		indicator_computation_missing: "Calculation is missing",
 		delete_input: "Are you sure to delete this input?",
+		zero_theme_indicator: "No thematics",
 		multi_theme_indicator: "Multiple thematics",
 		which_variable: "From which variable does this information comes from?",
 		which_partitions: "Which partitions are relevant?",
