@@ -19,7 +19,6 @@
     "karma-chrome-launcher": "x",
     "karma-jasmine": "x",
     "karma-spec-reporter": "x",
-    "moment": "x",
     "node-uuid": "x",
     "request": "x",
     "streamqueue": "x"
@@ -34,7 +33,6 @@
     "express-session": "x",
     "is-my-json-valid": "x",
     "jade": "x",
-    "moment": "^2.14.1",
     "nano": "x",
     "oauth2orize": "x",
     "passport": "x",
