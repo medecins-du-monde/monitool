@@ -188,7 +188,10 @@ angular
 
 		// Build the list of forbidden usernames if creating a partner account.
 		$scope.partners = $scope.editableProject.users.filter(function(u) {
-			return u.type == 'partner' && u.username !== projectUser.username;
+			if (projectUser)
+				return u.type == 'partner' && u.username !== projectUser.username;
+			else
+				return u.type == 'partner';
 		}).pluck('username');
 
 		// isNew will be used by the view to disable inputs that can't be changed (username, etc), and show delete button.
