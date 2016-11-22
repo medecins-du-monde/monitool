@@ -4,56 +4,10 @@ var async     = require('async'),
 	validator = require('is-my-json-valid'),
 	Project   = require('./project'),
 	Abstract  = require('../abstract'),
-	database  = require('../database');
+	database  = require('../database'),
+	schema    = require('./input.json');
 
-var validate = validator({
-	$schema: "http://json-schema.org/schema#",
-	title: "Monitool input schema",
-	type: "object",
-	additionalProperties: false,
-	required: ["_id", "type", "project", "entity", "form", "period", "values"],
-	
-	properties: {
-		_id:     {
-			type: "string",
-			pattern: "^[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}:(([a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12})|none):[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}:\\d{4}(\\-((Q[1-4])|(W\\d{2}\\-(sat|sun|mon))|(\\d{2}(\\-\\d{2})?)))?$"
-		},
-		_rev:    { "$ref": "#/definitions/revision" },
-		type:    { "type": "string", "pattern": "^input$" },
-		project: { "$ref": "#/definitions/uuid" },
-		entity:  {
-			type: "string",
-			pattern: "^([a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12})|none$"
-		},
-		form:    { "$ref": "#/definitions/uuid" },
-		period: {
-			"type": "string",
-			"pattern": "^\\d{4}(\\-((Q[1-4])|(W\\d{2}\\-(sat|sun|mon))|(\\d{2}(\\-\\d{2})?)))?$"
-		},
-		values: {
-			type: "object",
-			additionalProperties: false,
-			patternProperties: {
-				"[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}": {
-					type: "array",
-					items: { type: "number" },
-					minItems: 1
-				}
-			}
-		}
-	},
-
-	definitions: {
-		uuid: {
-			type: "string",
-			pattern: "^[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}$"
-		},
-		revision: {
-			type: "string",
-			pattern: "^[\\d]+\\-[\\da-f]{32}$"
-		}
-	}
-});
+var validate = validator(schema);
 
 var Input = module.exports = {
 

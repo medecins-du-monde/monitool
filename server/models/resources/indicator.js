@@ -3,59 +3,10 @@
 var async     = require('async'),
 	validator = require('is-my-json-valid'),
 	Abstract  = require('../abstract'),
-	database  = require('../database');
+	database  = require('../database'),
+	schema    = require('./indicator.json');
 
-var validate = validator({
-	$schema: "http://json-schema.org/schema#",
-	title: "Monitool indicator schema",
-	type: "object",
-	additionalProperties: false,
-	required: [
-		"_id", "type", "name", "description", "themes"
-	],
-	properties: {
-		_id:       { $ref: "#/definitions/uuid" },
-		_rev:      { $ref: "#/definitions/revision" },
-		description:  { $ref: "#/definitions/translated" },
-		name:      { $ref: "#/definitions/translated_req" },
-		type:      { type: "string", "pattern": "^indicator$" },
-		themes: {
-			type: "array",
-			uniqueItems: true,
-			items: { "$ref": "#/definitions/uuid" }
-		}
-	},
-	definitions: {
-		translated_req: {
-			type: "object",
-			additionalProperties: false,
-			properties: {
-				en: { type: "string", minLength: 1 },
-				fr: { type: "string", minLength: 1 },
-				es: { type: "string", minLength: 1 }
-			}
-		},
-
-		translated: {
-			type: "object",
-			additionalProperties: false,
-			properties: {
-				en: { type: "string" },
-				fr: { type: "string" },
-				es: { type: "string" }
-			}
-		},
-
-		uuid: {
-			type: "string",
-			pattern: "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
-		},
-		revision: {
-			type: "string",
-			pattern: "^[0-9]+\\-[0-9a-f]{32}$"
-		}
-	}
-});
+var validate = validator(schema);
 
 var Indicator = module.exports = {
 	get: Abstract.get.bind(this, 'indicator'),
