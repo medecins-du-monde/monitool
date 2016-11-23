@@ -176,18 +176,18 @@
 </div>
 
 <div class="modal-footer">
-	<a ng-disabled="partitionForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
+	<button ng-disabled="partitionForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
 		<i class="fa fa-table"></i>
 		<span translate="shared.apply"></span>
-	</a>
+	</button>
 
-	<a ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+	<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
 		<i class="fa fa-undo"></i>
 		<span translate="shared.remove_changes"></span>
-	</a>
+	</button>
 
-	<a ng-click="delete()" ng-if="!isNew" class="btn btn-danger">
+	<button ng-click="delete()" ng-if="!isNew" class="btn btn-danger">
 		<i class="fa fa-times"></i>
 		<span translate="shared.delete"></span>
-	</a>
+	</button>
 </div>
