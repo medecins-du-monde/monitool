@@ -29,11 +29,15 @@ var checkEditPermissions = function(realUser, modelName, modelId, callback) {
 		// project permissions are located on the project itself
 		Project.get(modelId, function(error, project) {
 			if (error === 'not_found') {
-				// check if the user is allowed to create projects
-				if (realUser.role === 'project')
-					return callback('missing_permission');
+				if (realUser.type === 'user') {
+					// check if the user is allowed to create projects
+					if (realUser.role === 'project')
+						return callback(null);
+					else
+						return callback('missing_permission');
+				}
 				else
-					return callback(null);
+					return callback('missing_permission');
 			}
 			else if (error === 'type')
 				// user is crafting this query to see if it can overwrite a type with a project?
