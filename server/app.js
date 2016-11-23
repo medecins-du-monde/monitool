@@ -5,9 +5,7 @@ var express      = require('express'),
 	cookieParser = require('cookie-parser'),
 	session      = require('express-session'),
 	path         = require('path'),
-	request      = require('request'),
 	passport     = require('./authentication/passport'),
-	cacheControl = require('./middlewares/cache-control'),
 	config       = require('../config');
 
 var CouchSessionStore = require('connect-couchdb')(session),
@@ -26,7 +24,15 @@ express()
 	.set('views', path.join(__dirname, 'views'))
 
 	.use(compression())
-	.use(cacheControl)
+	
+	.use(function(request, response, next) {
+		if (request.url.match(/^\/(glyphicons|fontawesome)/))
+			response.setHeader('Cache-Control', 'max-age=31449600,public');
+		else
+			response.setHeader('Cache-Control', 'max-age=0,public');
+		next();
+	})
+
 	.use(require('./controllers/static'))
 
 	.use(cookieParser())
