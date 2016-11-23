@@ -275,7 +275,7 @@ var SPANISH_TRANSLATION = {
 		not_available_min_year: "Estos datos estan disponibles por año",
 
 		saving_failed: "Monitool no consiguio salvar los cambios.",
-		no_logical_frame: "Ningún marco lógico has sido creado en este proyecto.",
+		no_logical_frames: "Ningún marco lógico has sido creado en este proyecto.",
 		partition_general: "General",
 		partition_general_placeholder: "ej: Grupos de edad, sexo, motivo de consulta, patología, ...",
 		partition_elements: "Elementos",

@@ -275,7 +275,7 @@ var ENGLISH_TRANSLATION = {
 		not_available_min_year: "This data is available by year",
 
 		saving_failed: "Monitool was unable to save the changes.",
-		no_logical_frame: "No logical frame was created yet for this project.",
+		no_logical_frames: "No logical frame was created yet for this project.",
 		partition_general: "General",
 		partition_general_placeholder: "ex: Age group, gender, motive for consultation, pathology, referral status, ...",
 		partition_elements: "Elements",
@@ -454,7 +454,7 @@ var ENGLISH_TRANSLATION = {
 		no_input_entities: 'No collection site was created yet!',
 		no_input_groups: 'No collection group was created yet!',
 		no_users: 'No user was added yet!',
-		no_forms: 'No form was created yet!',
+		no_forms: 'No data source was created yet!',
 
 		input: 'Input',
 
