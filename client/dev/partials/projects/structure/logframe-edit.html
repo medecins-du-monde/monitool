@@ -2,7 +2,10 @@
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li class="active" title="{{masterProject.name}}" ng-bind="masterProject.name|maxLength:50"></li>
 	<li><a ui-sref="main.project.structure.logical_frame_list" translate="shared.logical_frames"></a></li>
-	<li class="active">{{editableProject.logicalFrames[logicalFrameIndex].name|maxLength:50}}</li>
+	<li class="active">
+		<span ng-show="editableProject.logicalFrames[logicalFrameIndex].name">{{editableProject.logicalFrames[logicalFrameIndex].name|maxLength:50}}</span>
+		<span ng-hide="editableProject.logicalFrames[logicalFrameIndex].name" translate="project.unnamed_logframe"></span>
+	</li>
 </ol>
 
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate ng-if="logicalFrameIndex !== null">
@@ -21,7 +24,8 @@
 						  name="nameDesc"
 						  id="logframe-name-input"
 						  placeholder="{{'project.logframe_ph_name'|translate}}"
-						  required
+						  ng-required="1"
+						  ng-minlength="1"
 						  ng-model="editableProject.logicalFrames[logicalFrameIndex].name"></textarea>
 
 				<span class="help-block">
