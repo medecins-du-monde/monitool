@@ -94,35 +94,37 @@ angular.module('monitool.directives.formControls', [])
 			scope: {default:'=default'},
 			link: function(scope, element, attributes, ngModelController) {
 				scope.message = attributes.message;
+				scope.container = {};
 				
-				ngModelController.$formatters.push(function(modelValue) {
-					if (modelValue === null)
-						return {specifyValue: false, chosenValue: scope.default};
-					else
-						return {specifyValue: true, chosenValue: modelValue};
-				});
-
-				// We render using more ng-models and bindings, which make it a bit strange.
-				// We should simply update the form values manually.
 				ngModelController.$render = function() {
-					scope.chosenValue = ngModelController.$viewValue.chosenValue;
-					scope.specifyValue = ngModelController.$viewValue.specifyValue;
+					var numberValue = ngModelController.$viewValue;
+					if (numberValue !== null) {
+						scope.specifyValue = true;
+						scope.container.chosenValue = numberValue;
+					}
+					else {
+						scope.specifyValue = false;
+						scope.container.chosenValue = null;
+					}
 				};
 
-				// if specifyValue change, we need to update the view value.
-				scope.$watchGroup(['specifyValue', 'chosenValue'], function() {
-					if (scope.specifyValue)
-						ngModelController.$setViewValue({specifyValue: true, chosenValue: scope.chosenValue});
+				scope.$watch('container.chosenValue', function(newValue, oldValue) {
+					if (newValue === oldValue)
+						return;
 
-					else {
-						scope.chosenValue = scope.default;
-						ngModelController.$setViewValue({specifyValue: false, chosenValue: scope.default});
-					}
+					ngModelController.$setViewValue(newValue);
 				});
 
-				ngModelController.$parsers.push(function(viewValue) {
-					return viewValue.specifyValue ? viewValue.chosenValue : null;
+				scope.$watch('specifyValue', function(newSpecifyValue, oldSpecifyValue) {
+					if (newSpecifyValue === oldSpecifyValue)
+						return;
+
+					if (newSpecifyValue)
+						scope.container.chosenValue = scope.default;
+					else
+						scope.container.chosenValue = null;
 				});
+
 			}
 		}
 	})
