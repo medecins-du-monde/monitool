@@ -206,7 +206,7 @@ angular
 			filter = this._remove_dimension_groups(filter);
 			filter = this._rewrite_as_indexes(filter);
 			try {
-				return this._query_rec(filter, 0);
+				return Math.round(this._query_rec(filter, 0));
 			}
 			catch (e) {
 				return e.message;
