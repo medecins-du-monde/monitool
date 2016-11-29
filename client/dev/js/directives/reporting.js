@@ -189,12 +189,36 @@ angular.module('monitool.directives.reporting', [])
 					if (!$scope.originalRows)
 						return;
 
-					$scope.data = {
-						cols: $scope.cols,
-						rows: angular.copy($scope.originalRows).filter(function(row) {
-							return $scope.plots[row.id] && row.type == 'data' && row.cols;
-						})
-					};
+					var rows = angular.copy($scope.originalRows),
+						numRows = rows.length
+					
+					for (var i = 0; i < numRows; ++i) {
+						var row = rows[i];
+
+						if (row.indent >= 2) {
+							for (var j = i; j >= 0; --j) {
+								if (rows[j].indent == 1) {
+									row.name = rows[j].name + ' ' + row.name;
+									break;
+								}
+							}
+						}
+
+						if (row.indent >= 1) {
+							for (var j = i; j >= 0; --j) {
+								if (rows[j].indent == 0) {
+									row.name = rows[j].name + ' ' + row.name;
+									break;
+								}
+							}
+						}
+					}
+
+					rows = rows.filter(function(row) {
+						return $scope.plots[row.id] && row.type == 'data' && row.cols;
+					});
+
+					$scope.data = {cols: $scope.cols, rows: rows};
 				}, true);
 			}
 		};
