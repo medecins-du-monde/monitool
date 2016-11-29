@@ -59,7 +59,7 @@ angular
 		this._makeActivityRow = function(cubes, indent, groupBy, viewFilters, columns, element) {
 			// Retrieve cube & create filter.
 			var cube = cubes[element.id],
-				row = {id: uuid.v4(), name: element.name, type: 'data', indent: indent};
+				row = {id: uuid.v4(), name: element.name, type: 'data', family: 'activity', indent: indent};
 
 			// Handle invalid groupBy
 			if (groupBy == 'entity' && !cube.dimensionsById.entity)
@@ -93,7 +93,7 @@ angular
 
 
 		this._makeIndicatorRow = function(cubes, indent, groupBy, viewFilters, columns, planning) {
-			var row = {id: uuid.v4(), name: planning.display,  type: 'data', indent: indent};
+			var row = {id: uuid.v4(), name: planning.display,  type: 'data', family: 'indicator', indent: indent};
 
 			// handle colorization
 			if (planning.colorize && planning.baseline !== null && planning.target !== null)

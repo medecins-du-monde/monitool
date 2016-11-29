@@ -195,20 +195,22 @@ angular.module('monitool.directives.reporting', [])
 					for (var i = 0; i < numRows; ++i) {
 						var row = rows[i];
 
-						if (row.indent >= 2) {
-							for (var j = i; j >= 0; --j) {
-								if (rows[j].indent == 1) {
-									row.name = rows[j].name + ' ' + row.name;
-									break;
+						if (row.family == 'activity') {
+							if (row.indent == 2) {
+								for (var j = i; j >= 0; --j) {
+									if (rows[j].indent == 1) {
+										row.name = rows[j].name + ' ' + row.name;
+										break;
+									}
 								}
 							}
-						}
 
-						if (row.indent >= 1) {
-							for (var j = i; j >= 0; --j) {
-								if (rows[j].indent == 0) {
-									row.name = rows[j].name + ' ' + row.name;
-									break;
+							if (row.indent == 1) {
+								for (var j = i; j >= 0; --j) {
+									if (rows[j].indent == 0) {
+										row.name = rows[j].name + ' ' + row.name;
+										break;
+									}
 								}
 							}
 						}
