@@ -28,8 +28,8 @@
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
-			<th ng-style="{width: (100 / displayInfo._.numCols) + '%'}" translate="shared.date"></th>
-			<th ng-style="{width: (100 / (columns.length + 1)) + '%'}"
+			<th style="min-width: 140px" ng-style="{width: (100 / (columns.length + 1)) + '%'}" translate="shared.date"></th>
+			<th style="min-width: 140px" ng-style="{width: (100 / (columns.length + 1)) + '%'}"
 				ng-repeat="col in columns">
 				{{col.name|translate}}
 			</th>
