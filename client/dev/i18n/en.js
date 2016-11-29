@@ -335,7 +335,7 @@ var ENGLISH_TRANSLATION = {
 		parameter: "Parameter",
 		all_selected: "No filter",
 		create_logframe: "Add a logical frame",
-		reporting_compare_sites: "Compare locations",
+		reporting_compare_sites: "Compare sites",
 		unnamed_logframe: "Unnamed logical frame",
 
 		edit_indicator: "Edit indicator",
