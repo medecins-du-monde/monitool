@@ -189,38 +189,12 @@ angular.module('monitool.directives.reporting', [])
 					if (!$scope.originalRows)
 						return;
 
-					var rows = angular.copy($scope.originalRows),
-						numRows = rows.length
-					
-					for (var i = 0; i < numRows; ++i) {
-						var row = rows[i];
-
-						if (row.family == 'activity') {
-							if (row.indent == 2) {
-								for (var j = i; j >= 0; --j) {
-									if (rows[j].indent == 1) {
-										row.name = rows[j].name + ' ' + row.name;
-										break;
-									}
-								}
-							}
-
-							if (row.indent == 1) {
-								for (var j = i; j >= 0; --j) {
-									if (rows[j].indent == 0) {
-										row.name = rows[j].name + ' ' + row.name;
-										break;
-									}
-								}
-							}
-						}
-					}
-
-					rows = rows.filter(function(row) {
-						return $scope.plots[row.id] && row.type == 'data' && row.cols;
-					});
-
-					$scope.data = {cols: $scope.cols, rows: rows};
+					$scope.data = {
+						cols: $scope.cols,
+						rows: angular.copy($scope.originalRows).filter(function(row) {
+							return $scope.plots[row.id] && row.type == 'data' && row.cols;
+						})
+					};
 				}, true);
 			}
 		};
@@ -272,18 +246,18 @@ angular.module('monitool.directives.reporting', [])
 						// Create Y series
 						var xSerie  = ['x'].concat(stats.cols.map(function(e) { return e.name; })),
 							ySeries = stats.rows.map(function(row) {
-								var name = row.name[$rootScope.language] || row.name,
-									values = row.cols.map(function(v) { return v === undefined ? null : v; });
-								return [name].concat(values);
+								var values = row.cols.map(function(v) { return v === undefined ? null : v; });
+								
+								return [row.fullname].concat(values);
 							});
 
 						// compute which rows are leaving.
 						var exitingRowNames = [];
 						if (oldStats)
 							exitingRowNames = oldStats.rows.filter(function(oldRow) {
-								return !stats.rows.find(function(newRow) { return newRow.id === oldRow.id; });
+								return !stats.rows.find(function(newRow) { return newRow.fullname === oldRow.fullname; });
 							}).map(function(row) {
-								return row.name[$rootScope.language] || row.name;
+								return row.fullname;
 							});
 
 						chart.load({ type: $scope.type, unload: exitingRowNames, columns: [xSerie].concat(ySeries) });

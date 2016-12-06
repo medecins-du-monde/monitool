@@ -70,6 +70,7 @@ angular
 			// Work around graph bug
 			$scope.rows = [];
 			$scope.blocks.forEach(function(block) { if (block.rows) $scope.rows = $scope.rows.concat(block.rows); });
+			mtReporting.deduplicateRows($scope.rows);
 		}, true);
 	})
 
