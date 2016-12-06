@@ -206,7 +206,8 @@ angular
 			filter = this._remove_dimension_groups(filter);
 			filter = this._rewrite_as_indexes(filter);
 			try {
-				return Math.round(this._query_rec(filter, 0));
+				var res = this._query_rec(filter, 0);
+				return typeof res === 'number' ? Math.round(res) : res;
 			}
 			catch (e) {
 				return e.message;
