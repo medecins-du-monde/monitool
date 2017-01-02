@@ -46,10 +46,7 @@
 	<div class="form-group" ng-if="editableProject.forms[currentFormIndex].collect == 'some_entity'">
 		<label for="entities-input" class="col-sm-2 control-label"></label>
 		<div class="col-sm-10">
-			<ui-select multiple ng-model="editableProject.forms[currentFormIndex].entities" theme="bootstrap" ui-required="true">
-				<ui-select-match placeholder="{{'project.choose_sites_for_form'|translate}}">{{$item.name|translate}}</ui-select-match>
-				<ui-select-choices repeat="entity.id as entity in editableProject.entities">{{entity.name|translate}}</ui-select-choices>
-			</ui-select>
+			<element-filter ng-model="editableProject.forms[currentFormIndex].entities" elements="editableProject.entities" groups="editableProject.groups"></element-filter>
 		</div>
 	</div>
 

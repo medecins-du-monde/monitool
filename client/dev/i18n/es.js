@@ -220,6 +220,7 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		all_elements: "Todo",
 		no_extra_indicators: "Ningún indicador adicional ha sido creado. ¡Haga click en \"Añadir un indicador\" para agregar uno!",
 		no_data_source: "<span style=\"font-style: italic\">Cree una fuente de datos para poder hacer entradas</span>",
 		general_info: "Información general",

@@ -686,14 +686,14 @@ angular.module('monitool.directives.formControls', [])
 	})
 
 
-	.directive('partitionFilter', function(itertools) {
+	.directive('elementFilter', function(itertools, $filter) {
 
-		var model2view = function(model, partition) {
-			if (model.length == partition.elements.length)
+		var model2view = function(model, elements, groups) {
+			if (model.length == elements.length)
 				return ['all'];
 			
 			// retrieve all groups that are in the list.
-			var selectedGroups = partition.groups.filter(function(group) {
+			var selectedGroups = groups.filter(function(group) {
 				return itertools.isSubset(model, group.members);
 			});
 			var numSelectedGroups = selectedGroups.length;
@@ -708,15 +708,15 @@ angular.module('monitool.directives.formControls', [])
 			return selectedGroups.pluck('id').concat(additionalElements);
 		};
 
-		var view2model = function(view, partition) {
+		var view2model = function(view, elements, groups) {
 			var model = {};
 
 			view.forEach(function(id) {
 				if (id == 'all')
-					partition.elements.forEach(function(e) { model[e.id] = true; });
+					elements.forEach(function(e) { model[e.id] = true; });
 				
 				else {
-					var group = partition.groups.find(function(g) { return g.id == id; });
+					var group = groups.find(function(g) { return g.id == id; });
 					if (group)
 						group.members.forEach(function(m) { model[m] = true; });
 					else
@@ -731,25 +731,28 @@ angular.module('monitool.directives.formControls', [])
 			restrict: "E",
 			require: "ngModel",
 			scope: {
-				partition: '='
+				elements: '=',
+				groups: '='
 			},
-			templateUrl: 'partials/_forms/partition-filter.html',
+			templateUrl: 'partials/_forms/element-filter.html',
 			link: function(scope, element, attributes, ngModelController) {
 				scope.container = {};
 
-				scope.$watch('partition', function(partition, oldPartition) {
-					scope.selectableElements = [{id: 'all', name: 'Tous les éléments'}].concat(partition.groups).concat(partition.elements);
+				scope.$watchGroup(['elements', 'groups'], function(newValues, oldValues) {
+					scope.selectableElements = [
+						{id: 'all', name: $filter('translate')('project.all_elements')}
+					].concat(scope.groups).concat(scope.elements);
 					
-					if (oldPartition !== partition)
+					if (newValues[0] !== oldValues[0])
 						scope.container.selectedElements = ['all'];
 				});
 				
 				ngModelController.$formatters.push(function(modelValue) {
-					return model2view(modelValue, scope.partition);
+					return model2view(modelValue, scope.elements, scope.groups);
 				});
 
 				ngModelController.$parsers.push(function(viewValue) {
-					return view2model(viewValue, scope.partition);
+					return view2model(viewValue, scope.elements, scope.groups);
 				});
 
 				ngModelController.$render = function() {
@@ -760,10 +763,11 @@ angular.module('monitool.directives.formControls', [])
 					if (selectedElements.length === 2 && selectedElements[0] === 'all')
 						scope.container.selectedElements = [selectedElements[1]];
 					else
-						scope.container.selectedElements = model2view(view2model(selectedElements, scope.partition), scope.partition);
+						scope.container.selectedElements = model2view(view2model(selectedElements, scope.elements, scope.groups), scope.elements, scope.groups);
 
 					ngModelController.$setViewValue(selectedElements);
 				}, true)
 			}
 		}
 	})
+
