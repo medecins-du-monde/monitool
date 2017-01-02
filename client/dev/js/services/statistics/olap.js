@@ -457,34 +457,44 @@ angular
 				this.dimensionGroups.push(createDimension('week_mon', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('month', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('quarter', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('year', 'day', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('week_sat') !== -1) {
 				this.dimensions.push(createDimension('week_sat', undefined, computation, cubes));
 				this.dimensionGroups.push(createDimension('month', 'week_sat', computation, cubes));
 				this.dimensionGroups.push(createDimension('quarter', 'week_sat', computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'week_sat', computation, cubes));
 				this.dimensionGroups.push(createDimension('year', 'week_sat', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('week_sun') !== -1) {
 				this.dimensions.push(createDimension('week_sun', undefined, computation, cubes));
 				this.dimensionGroups.push(createDimension('month', 'week_sun', computation, cubes));
 				this.dimensionGroups.push(createDimension('quarter', 'week_sun', computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'week_sun', computation, cubes));
 				this.dimensionGroups.push(createDimension('year', 'week_sun', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('week_mon') !== -1) {
 				this.dimensions.push(createDimension('week_mon', undefined, computation, cubes));
 				this.dimensionGroups.push(createDimension('month', 'week_mon', computation, cubes));
 				this.dimensionGroups.push(createDimension('quarter', 'week_mon', computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'week_mon', computation, cubes));
 				this.dimensionGroups.push(createDimension('year', 'week_mon', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('month') !== -1) {
 				this.dimensions.push(createDimension('month', undefined, computation, cubes));
 				this.dimensionGroups.push(createDimension('quarter', 'month', computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'month', computation, cubes));
 				this.dimensionGroups.push(createDimension('year', 'month', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('quarter') !== -1) {
 				this.dimensions.push(createDimension('quarter', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'quarter', computation, cubes));
 				this.dimensionGroups.push(createDimension('year', 'quarter', computation, cubes));
+			}
+			else if (dimensionIds.indexOf('semester') !== -1) {
+				this.dimension.push(createDimension('semester', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'semester', computation, cubes));
 			}
 			else {
 				this.dimensions.push(createDimension('year', undefined, computation, cubes));

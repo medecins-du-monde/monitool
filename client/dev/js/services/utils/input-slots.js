@@ -39,6 +39,12 @@ angular
 					'-Q' + (1 + Math.floor(utcDate.getUTCMonth() / 3)).toString()
 				);
 
+			else if (periodicity === 'semester')
+				return new TimeSlot(
+					utcDate.getUTCFullYear().toString() +
+					'-S' + (1 + Math.floor(utcDate.getUTCMonth() / 6)).toString()
+				)
+
 			else if (periodicity === 'year')
 				return new TimeSlot(utcDate.getUTCFullYear().toString());
 
@@ -48,12 +54,13 @@ angular
 
 
 		TimeSlot._upperSlots = {
-			'day': ['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'year'],
-			'week_sat': ['month', 'quarter', 'year'],
-			'week_sun': ['month', 'quarter', 'year'],
-			'week_mon': ['month', 'quarter', 'year'],
-			'month': ['quarter', 'year'],
-			'quarter': ['year'],
+			'day': ['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'],
+			'week_sat': ['month', 'quarter', 'semester', 'year'],
+			'week_sun': ['month', 'quarter', 'semester', 'year'],
+			'week_mon': ['month', 'quarter', 'semester', 'year'],
+			'month': ['quarter', 'semester', 'year'],
+			'quarter': ['semester', 'year'],
+			'semester': ['year'],
 			'year': []
 		};
 
@@ -142,25 +149,28 @@ angular
 
 		TimeSlot._detectPeriodicity = function(slotValue) {
 			if (slotValue.match(/^\d{4}$/))
-				return 'year'
+				return 'year';
 			
+			if (slotValue.match(/^\d{4}\-S\d$/))
+				return 'semester';
+
 			if (slotValue.match(/^\d{4}\-Q\d$/))
-				return 'quarter'
+				return 'quarter';
 			
 			if (slotValue.match(/^\d{4}\-\d{2}$/))
-				return 'month'
+				return 'month';
 			
 			if (slotValue.match(/^\d{4}\-W\d{2}-sat$/))
-				return 'week_sat'
+				return 'week_sat';
 			
 			if (slotValue.match(/^\d{4}\-W\d{2}-sun$/))
-				return 'week_sun'
+				return 'week_sun';
 			
 			if (slotValue.match(/^\d{4}\-W\d{2}-mon$/))
-				return 'week_mon'
+				return 'week_mon';
 			
 			if (slotValue.match(/^\d{4}\-\d{2}\-\d{2}$/))
-				return 'day'
+				return 'day';
 
 			return null;
 		};
@@ -184,6 +194,13 @@ angular
 					month = '0' + month;
 
 				return new Date(this.value.substring(0, 5) + month + '-01T00:00:00Z');
+			}
+			else if (this.periodicity === 'semester') {
+				var month2 = (this.value.substring(6, 7) - 1) * 6 + 1;
+				if (month2 < 10)
+					month2 = '0' + month2;
+
+				return new Date(this.value.substring(0, 5) + month2 + '-01T00:00:00Z');
 			}
 			else if (this.periodicity === 'year')
 				return new Date(this.value + '-01-01T00:00:00Z');
@@ -213,31 +230,32 @@ angular
 				return quarterDate;
 			}
 
+			else if (this.periodicity === 'semester') {
+				var semesterDate = this.getFirstDate();
+				semesterDate.setUTCMonth(semesterDate.getUTCMonth() + 6); // add six month.
+				semesterDate.setUTCDate(0); // go to last day of previous month.
+				return semesterDate;
+			}
+
 			else if (this.periodicity === 'year')
 				return new Date(this.value + '-12-31T00:00:00Z');
 		};
 
 		TimeSlot.prototype.toUpperSlot = function(newPeriodicity) {
-			// No conversion needed
-			if (this.periodicity === newPeriodicity)
-				return this;
-
 			// Raise when we make invalid conversions
 			if (TimeSlot._upperSlots[this.periodicity].indexOf(newPeriodicity) === -1)
 				throw new Error('Cannot convert ' + this.periodicity + ' to ' + newPeriodicity);
 
-			// For days, months and quarters, we can assume that getting the slot from any date works
-			// as long as we don't cheat the method in getting a lower slot.
-			if (this.periodicity === 'day' || this.periodicity === 'month' || this.periodicity === 'quarter')
-				return TimeSlot.fromDate(this.getFirstDate(), newPeriodicity);
+			// For days, months, quarters, semesters, we can assume that getting the slot from any date works
+			var upperSlotDate = this.getFirstDate();
 			
 			// if it's a week, we need to be a bit more cautious.
 			// the month/quarter/year is not that of the first or last day, but that of the middle day of the week
 			// (which depend on the kind of week, but adding 3 days to the beginning gives the good date).
-			else if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon') {
-				var date = new Date(this.getFirstDate().getTime() + 3 * 24 * 60 * 60 * 1000);
-				return TimeSlot.fromDate(date, newPeriodicity);
-			}
+			if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon')
+				upperSlotDate = new Date(upperSlotDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+			return TimeSlot.fromDate(upperSlotDate, newPeriodicity);
 		};
 
 		TimeSlot.prototype.next = function() {
@@ -300,6 +318,19 @@ angular
 
 				if (slot.periodicity === 'year')
 					return slot.value;
+
+				else if (slot.periodicity === 'semester') {
+					if ($rootScope.language == 'fr') {
+						var sem = {"1": "1er", "2": "2ème"}
+						return sem[slot.value.substring(6)] + ' sem. ' + slot.value.substring(0, 4);
+					}
+					else if ($rootScope.language == 'es') {
+						var sem = {"1": "Primer", "2": "Segundo"}
+						return sem[slot.value.substring(6)] + ' sem. ' + slot.value.substring(0, 4);
+					}
+					else
+						return slot.value;
+				}
 
 				else if (slot.periodicity === 'quarter') {
 					if ($rootScope.language == 'fr') {

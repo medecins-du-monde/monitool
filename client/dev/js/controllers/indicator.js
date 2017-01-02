@@ -59,6 +59,8 @@ angular
 			$scope.groupBy = 'month';
 		else if (mtReporting.getColumns('quarter', $scope.filters._start, $scope.filters._end).length < 15)
 			$scope.groupBy = 'quarter';
+		else if (mtReporting.getColumns('semester', $scope.filters._start, $scope.filters._end).length < 15)
+			$scope.groupBy = 'semester';
 		else
 			$scope.groupBy = 'year';
 
