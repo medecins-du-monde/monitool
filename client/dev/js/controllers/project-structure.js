@@ -145,12 +145,12 @@ angular
 	 * Controller used by the "main.project.structure.user_list" state.
 	 * Allows to list and reorder users that can access/edit the project.
 	 */
-	.controller('ProjectUserListController', function($scope, $uibModal, users) {
+	.controller('ProjectUserListController', function($scope, $uibModal, $filter, users) {
 
 		$scope.users = {};
 		users.forEach(function(user) { $scope.users[user._id] = user});
 		
-		$scope.availableEntities = [{id: 'none', name: 'shared.project'}].concat($scope.masterProject.entities);
+		$scope.availableEntities = [{id: 'none', name: $filter('translate')('shared.project')}].concat($scope.masterProject.entities);
 
 		$scope.editUser = function(user) {
 			var promise = $uibModal.open({

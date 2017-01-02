@@ -102,10 +102,7 @@
 		<div class="form-group" ng-if="user.role == 'input'">
 			<label for="entities-input" class="col-sm-3 control-label" translate="project.collection_site_list"></label>
 			<div class="col-sm-9">
-				<ui-select multiple ng-model="user.entities" theme="bootstrap" name="entities" ui-required="true">
-					<ui-select-match placeholder="{{'project.choose_sites_for_user'|translate}}">{{$item.name|translate}}</ui-select-match>
-					<ui-select-choices repeat="entity.id as entity in availableEntities">{{entity.name|translate}}</ui-select-choices>
-				</ui-select>
+				<element-filter ng-model="user.entities" elements="availableEntities" groups="editableProject.groups"></element-filter>
 
 				<p class="help-block">
 					<i class="fa fa-info-circle"></i>

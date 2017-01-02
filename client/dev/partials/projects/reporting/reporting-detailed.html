@@ -90,7 +90,7 @@
 			<div class="form-group" ng-repeat="dimension in dimensions">
 				<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{dimension.name}}</label>
 				<div class="col-sm-11">
-					<partition-filter ng-model="query.filters[dimension.id]" partition="dimension"></partition-filter>
+					<element-filter ng-model="query.filters[dimension.id]" elements="dimension.elements" groups="dimension.groups"></element-filter>
 				</div>
 			</div>
 
