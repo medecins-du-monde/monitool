@@ -569,6 +569,7 @@ var ENGLISH_TRANSLATION = {
 
 		download_portrait: "Download PDF (portrait)",
 		download_landscape: "Download PDF (landscape)",
+		download_pdf: "Download PDF",
 
 		press_to_drag: "Hold to drag & drop",
 		titles: "Titles",

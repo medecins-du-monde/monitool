@@ -569,6 +569,7 @@ var FRENCH_TRANSLATION = {
 
 		download_portrait: "Télécharger PDF (portrait)",
 		download_landscape: "Télécharger PDF (paysage)",
+		download_pdf: "Télécharger PDF",
 
 		press_to_drag: "Restez appuyé pour glisser déposer",
 		titles: "Intitulés",

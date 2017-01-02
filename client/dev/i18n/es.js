@@ -569,6 +569,7 @@ var SPANISH_TRANSLATION = {
 
 		download_portrait: "Descargar PDF (vertical)",
 		download_landscape: "Descargar PDF (horizontal)",
+		download_pdf: "Descargar PDF",
 
 		press_to_drag: "Pulse para arrastrar y soltar",
 		titles: "Título",
