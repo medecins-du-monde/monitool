@@ -18,7 +18,7 @@ class Cube {
 
 		// Time
 		dimensions.push(Dimension.createTime(project, form, element, inputs));
-		['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'year'].forEach(function(periodicity) {
+		['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].forEach(function(periodicity) {
 			// This will fail while indexOf(periodicity) < indexOf(form.periodicity)
 			try {
 				dimensionGroups.push(DimensionGroup.createTime(periodicity, dimensions[0]));

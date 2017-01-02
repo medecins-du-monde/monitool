@@ -191,6 +191,7 @@ var SPANISH_TRANSLATION = {
 		week_mon: 'Semana (lunes a domingo)',
 		month: 'Mes',
 		quarter: "Trimestre",
+		semester: "Semestre",
 		year: "Año",
 
 		choose: 'Elegir',
@@ -272,6 +273,7 @@ var SPANISH_TRANSLATION = {
 		not_available_min_week_mon: "Estos datos estan disponibles por semana (lunes a domingo)",
 		not_available_min_month: "Estos datos estan disponibles por mes",
 		not_available_min_quarter: "Estos datos estan disponibles por trimestre",
+		not_available_min_semester: "Estos datos estan disponibles por semestre",
 		not_available_min_year: "Estos datos estan disponibles por año",
 
 		saving_failed: "Monitool no consiguio salvar los cambios.",
@@ -301,6 +303,7 @@ var SPANISH_TRANSLATION = {
 			week_mon: "Semanas (lunes a domingo)",
 			month: "Meses",
 			quarter: "Trimestres",
+			semester: "Semestres",
 			year: "Años",
 			entity: "Lugar de colecta",
 			group: "Grupo de colecta"
@@ -441,6 +444,7 @@ var SPANISH_TRANSLATION = {
 			week_mon: 'Cada semana (lunes a domingo)',
 			month: 'Cada mes',
 			quarter: 'Cada trimestre',
+			semester: 'Cada semestre',
 			year: 'Cada año',
 			free: 'Libre'
 		},

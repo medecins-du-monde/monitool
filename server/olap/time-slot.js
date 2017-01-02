@@ -30,6 +30,12 @@ class TimeSlot {
 				'-Q' + (1 + Math.floor(utcDate.getUTCMonth() / 3)).toString()
 			);
 
+		else if (periodicity === 'semester')
+			return new TimeSlot(
+				utcDate.getUTCFullYear().toString() +
+				'-S' + (1 + Math.floor(utcDate.getUTCMonth() / 6)).toString()
+			)
+
 		else if (periodicity === 'year')
 			return new TimeSlot(utcDate.getUTCFullYear().toString());
 
@@ -132,6 +138,9 @@ class TimeSlot {
 			if (this.value.match(/^\d{4}$/))
 				this._periodicity = 'year'
 			
+			else if (this.value.match(/^\d{4}\-S\d$/))
+				this._periodicity = 'semester';
+
 			else if (this.value.match(/^\d{4}\-Q\d$/))
 				this._periodicity = 'quarter'
 			
@@ -174,6 +183,13 @@ class TimeSlot {
 
 			return new Date(this.value.substring(0, 5) + month + '-01T00:00:00Z');
 		}
+		else if (this.periodicity === 'semester') {
+			var month2 = (this.value.substring(6, 7) - 1) * 6 + 1;
+			if (month2 < 10)
+				month2 = '0' + month2;
+
+			return new Date(this.value.substring(0, 5) + month2 + '-01T00:00:00Z');
+		}
 		else if (this.periodicity === 'year')
 			return new Date(this.value + '-01-01T00:00:00Z');
 	}
@@ -202,6 +218,13 @@ class TimeSlot {
 			return quarterDate;
 		}
 
+		else if (this.periodicity === 'semester') {
+			var semesterDate = this.firstDate;
+			semesterDate.setUTCMonth(semesterDate.getUTCMonth() + 6); // add six month.
+			semesterDate.setUTCDate(0); // go to last day of previous month.
+			return semesterDate;
+		}
+
 		else if (this.periodicity === 'year')
 			return new Date(this.value + '-12-31T00:00:00Z');
 	}
@@ -211,18 +234,16 @@ class TimeSlot {
 		if (TimeSlot._upperSlots[this.periodicity].indexOf(newPeriodicity) === -1)
 			throw new Error('Cannot convert ' + this.periodicity + ' to ' + newPeriodicity);
 
-		// For days, months and quarters, we can assume that getting the slot from any date works
-		// as long as we don't cheat the method in getting a lower slot.
-		if (this.periodicity === 'day' || this.periodicity === 'month' || this.periodicity === 'quarter')
-			return TimeSlot.fromDate(this.firstDate, newPeriodicity);
+		// For days, months, quarters, semesters, we can assume that getting the slot from any date works
+		var upperSlotDate = this.firstDate;
 		
 		// if it's a week, we need to be a bit more cautious.
 		// the month/quarter/year is not that of the first or last day, but that of the middle day of the week
 		// (which depend on the kind of week, but adding 3 days to the beginning gives the good date).
-		else if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon') {
-			var date = new Date(this.firstDate.getTime() + 3 * 24 * 60 * 60 * 1000);
-			return TimeSlot.fromDate(date, newPeriodicity);
-		}
+		if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon')
+			upperSlotDate = new Date(upperSlotDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+		return TimeSlot.fromDate(upperSlotDate, newPeriodicity);
 	}
 
 	next() {
@@ -233,15 +254,14 @@ class TimeSlot {
 };
 
 TimeSlot._upperSlots = {
-	'day': ['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'year'],
-	'week_sat': ['month', 'quarter', 'year'],
-	'week_sun': ['month', 'quarter', 'year'],
-	'week_mon': ['month', 'quarter', 'year'],
-	'month': ['quarter', 'year'],
-	'quarter': ['year'],
+	'day': ['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'],
+	'week_sat': ['month', 'quarter', 'semester', 'year'],
+	'week_sun': ['month', 'quarter', 'semester', 'year'],
+	'week_mon': ['month', 'quarter', 'semester', 'year'],
+	'month': ['quarter', 'semester', 'year'],
+	'quarter': ['semester', 'year'],
+	'semester': ['year'],
 	'year': []
-}
-
-
+};
 
 module.exports = TimeSlot;

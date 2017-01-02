@@ -191,6 +191,7 @@ var FRENCH_TRANSLATION = {
 		week_mon: 'Semaine (lundi à dimanche)',
 		month: 'Mois',
 		quarter: "Trimestre",
+		semester: "Semestre",
 		year: "Année",
 		
 		choose: 'Choisir',
@@ -271,7 +272,8 @@ var FRENCH_TRANSLATION = {
 		not_available_min_week_sun: "Ces données sont disponibles par semaine (dimanche à samedi)",
 		not_available_min_week_mon: "Ces données sont disponibles par semaine (lundi à dimanche)",
 		not_available_min_month: "Ces données sont disponibles par mois",
-		not_available_min_quarter: "Ces données sont disponibles par trimestres",
+		not_available_min_quarter: "Ces données sont disponibles par trimestre",
+		not_available_min_semester: "Ces données sont disponibles par semestre",
 		not_available_min_year: "Ces données sont disponibles par an",
 
 		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements.",
@@ -301,6 +303,7 @@ var FRENCH_TRANSLATION = {
 			week_mon: "Semaines (lundi à dimanche)",
 			month: "Mois",
 			quarter: "Trimestres",
+			semester: "Semestres",
 			year: "Années",
 			entity: "Lieux de collecte",
 			group: "Groupe de collecte"
@@ -441,6 +444,7 @@ var FRENCH_TRANSLATION = {
 			week_mon: 'Toutes les semaines (lundi à dimanche)',
 			month: 'Tous les mois',
 			quarter: 'Tous les trimestres',
+			semester: 'Tous les semestres',
 			year: 'Tous les ans',
 			free: 'Libre'
 		},

@@ -43,7 +43,7 @@ angular
 			else
 				type = 'entity';
 
-			if (['year', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1) {
+			if (['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1) {
 				var slots = InputSlots.iterate(start, end, groupBy).map(function(slot) {
 					return {id: slot, name: $filter('formatSlot')(slot), title: $filter('formatSlotRange')(slot)};
 				});
@@ -176,7 +176,6 @@ angular
 		this.createCubeFilter = function(cube, viewFilters) {
 			// Create a filter that explicitely allows everything!
 			var cubeFilters = angular.copy(viewFilters);
-			var formats = {year: 'YYYY', quarter: 'YYYY-[Q]Q', month: 'YYYY-MM', week: 'YYYY-[W]WW', day: 'YYYY-MM-DD'};
 			var timeDimension = cube.dimensions[0]; // hack. We do this because we know the internals of Cube.
 			
 			for (var key in cubeFilters) {

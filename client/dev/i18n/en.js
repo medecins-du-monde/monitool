@@ -191,6 +191,7 @@ var ENGLISH_TRANSLATION = {
 		week_mon: 'Week (monday to sunday)',
 		month: 'Month',
 		quarter: "Quarter",
+		semester: "Semester",
 		year: "Year",
 		
 		choose: 'Choose',
@@ -272,6 +273,7 @@ var ENGLISH_TRANSLATION = {
 		not_available_min_week_mon: "This data is available by week (monday to sunday)",
 		not_available_min_month: "This data is available by month",
 		not_available_min_quarter: "This data is available by quarter",
+		not_available_min_semester: "This data is available by semester",
 		not_available_min_year: "This data is available by year",
 
 		saving_failed: "Monitool was unable to save the changes.",
@@ -301,6 +303,7 @@ var ENGLISH_TRANSLATION = {
 			week_mon: "Weeks (monday to sunday)",
 			month: "Months",
 			quarter: "Quarters",
+			semester: "Semesters",
 			year: "Years",
 			entity: "Collection site",
 			group: "Collection group"
@@ -441,6 +444,7 @@ var ENGLISH_TRANSLATION = {
 			week_mon: "Every week (monday to sunday)",
 			month: 'Every month',
 			quarter: 'Every quarter',
+			semester: 'Every semester',
 			year: "Every year",
 			free: 'Free'
 		},
