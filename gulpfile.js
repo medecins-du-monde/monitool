@@ -112,9 +112,7 @@ gulp.task('bower', function() {
 gulp.task('design-docs', function(callback) {
 	var urlPrefix = config.couchdb.url + '/' + config.couchdb.bucket;
 	var ddocs = {
-		reporting: require('./server/designdocs/app_reporting'),
-		shortlists: require('./server/designdocs/app_shortlists'),
-		server: require('./server/designdocs/server'),
+		monitool: require('./server/designdocs/monitool')
 	};
 
 	var numDocs = 3;

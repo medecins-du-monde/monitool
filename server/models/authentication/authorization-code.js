@@ -1,11 +1,24 @@
 "use strict";
 
-var Abstract  = require('../abstract');
+var Store = require('../store'),
+	Model = require('../model');
 
-module.exports = {
-	list: Abstract.list.bind(this, 'authorization-code'),
-	get: Abstract.get.bind(this, 'authorization-code'),
-	delete: Abstract.delete.bind(this, 'authorization-code'),
-	set: Abstract.set.bind(this),
+class AuthorizationCodeStore extends Store {
 
-};
+	get modelClass() { return AuthorizationCode; }
+	get modelString() { return 'authorization-code'; }
+}
+
+var storeInstance = new AuthorizationCodeStore();
+
+
+class AuthorizationCode extends Model {
+
+	static get storeInstance() { return storeInstance; }
+
+	constructor(data) {
+		super(data);
+	}
+}
+
+module.exports = AuthorizationCode;

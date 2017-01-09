@@ -1,7 +1,7 @@
 {
   "name": "Monitool",
   "description": "Indicator monitoring application for Medecins du Monde",
-  "version": "2.2.1",
+  "version": "2.5",
   "devDependencies": {
     "del": "x",
     "event-stream": "x",

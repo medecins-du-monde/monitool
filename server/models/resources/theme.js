@@ -1,43 +1,95 @@
 "use strict";
 
-var async     = require('async'),
-	validator = require('is-my-json-valid'),
-	Abstract  = require('../abstract'),
-	database  = require('../database'),
-	schema    = require('./theme.json');;
+var validator = require('is-my-json-valid'),
+	Store = require('../store'),
+	Model = require('../model'),
+	schema = require('./theme.json');
 
 var validate = validator(schema);
 
-module.exports = {
-	get: Abstract.get.bind(this, 'theme'),
-	delete: Abstract.delete.bind(this, 'theme'),
-	set: Abstract.set.bind(this),
 
-	list: function(options, callback) {
-		database.view('shortlists', 'by_type', {include_docs: true, key: 'theme'}, function(error, data) {
-			var themes = data.rows.map(function(row) { return row.doc; });
-			if (!options.with_counts)
-				return callback(null, themes);
+class ThemeStore extends Store {
 
-			database.view('server', 'themes_usage', {group: true}, function(error, data) {
-				themes.forEach(function(theme) {
-					var projectUsage = data.rows.filter(function(row) { return row.key[0] === theme._id && row.key[1] === 'project'; }),
-						indicatorUsage = data.rows.filter(function(row) { return row.key[0] === theme._id && row.key[1] === 'indicator'; });
+	get modelClass() { return Theme; }
+	get modelString() { return 'theme'; }
 
-					theme.__projectUsage   = projectUsage.length ? projectUsage[0].value : 0;
-					theme.__indicatorUsage = indicatorUsage.length ? indicatorUsage[0].value : 0;
-				});
+	/**
+	 * Retrieve all themes
+	 */
+	listWithUsage() {
+		var promises = [
+			this.list(),
+			this._callView('themes_usage', {group: true})
+		];
 
-				return callback(null, themes);
+		return Promise.all(promises).then(function(result) {
+			var themes = result[0], usage = result[1];
+
+			themes.forEach(function(theme) {
+				var projectUsage = usage.rows.filter(function(row) { return row.key[0] === theme._id && row.key[1] === 'project'; }),
+					indicatorUsage = usage.rows.filter(function(row) { return row.key[0] === theme._id && row.key[1] === 'indicator'; });
+
+				theme.__projectUsage   = projectUsage.length ? projectUsage[0].value : 0;
+				theme.__indicatorUsage = indicatorUsage.length ? indicatorUsage[0].value : 0;
 			});
+
+			return themes;
 		});
-	},
+	}
+}
 
-	validate: function(item, callback) {
-		validate(item);
+var storeInstance = new ThemeStore();
 
+
+class Theme extends Model {
+
+	static get storeInstance() { return storeInstance; }
+
+	/**
+	 * Deserialize and validate a project that comes from the API.
+	 */
+	constructor(data) {
+		validate(data);
 		var errors = validate.errors || [];
-		return callback(errors.length ? errors : null);
-	},
+		if (errors.length)
+			throw new Error('invalid_data');
 
-};
+		super(data);
+	}
+
+	destroy() {
+		throw new Error("Implement me");
+
+		// Promise.all([Project.listByTheme(this._id, false), Indicator.listByTheme(this._id)])
+
+
+		// return new Promise(function(resolve, reject) {
+
+
+
+
+		// 	Project.listByTheme(this._id, false).then(function(projects) {
+		// 		// Delete theme from projects.
+		// 		projects.forEach(function(project) {
+		// 			project.themes = project.themes.filter(themeId => themeId !== this._id);
+		// 		}, this);
+
+		// 		// Mark ourself as deleted
+		// 		this._deleted = true;
+
+		// 		// Save everything in on request
+		// 		var docs = projects.concat([this]);
+		// 		database.bulk({docs: docs}, function(error) {
+		// 			if (error)
+		// 				return reject(error);
+		// 			resolve();
+		// 		});
+
+		// 	}.bind(this));
+		// });
+	}
+
+
+}
+
+module.exports = Theme;
