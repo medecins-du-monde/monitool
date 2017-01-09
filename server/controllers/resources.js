@@ -10,105 +10,20 @@ var express     = require('express'),
 	Project     = require('../models/resources/project'),
 	Theme       = require('../models/resources/theme');
 
-var ModelsByName = {indicator: Indicator, input: Input, project: Project, theme: Theme, user: User},
-	bodyParser   = require('body-parser').json();
+var bodyParser = require('body-parser').json();
 
-
-// All routes here should be protected behind a bearer token
-var checkEditPermissions = function(realUser, modelName, modelId, callback) {
-	// Only users and partner can access those resources (Clients need to inpersonate a user, and can only access oauth routes).
-	if (realUser.type !== 'user' && realUser.type !== 'partner')
-		return callback('not_a_user');
-
-	// Admins can do what they please
-	if (realUser.type === 'user' && realUser.role === 'admin')
-		return callback(null);
-
-	// General case.
-	if (modelName === "project") {
-		// project permissions are located on the project itself
-		Project.get(modelId, function(error, project) {
-			if (error === 'not_found') {
-				if (realUser.type === 'user') {
-					// check if the user is allowed to create projects
-					if (realUser.role === 'project')
-						return callback(null);
-					else
-						return callback('missing_permission');
-				}
-				else
-					return callback('missing_permission');
-			}
-			else if (error === 'type')
-				// user is crafting this query to see if it can overwrite a type with a project?
-				return callback('uuid_must_be_unique_across_types');
-			
-			else if (error)
-				return callback('other_error');
-
-			else {
-				// check if the user is allowed to update this particular project
-				if (realUser.type == 'user') {
-					if (project.users.filter(function(u) { return u.type == 'internal' && u.role == 'owner' && u.id == realUser._id; }).length)
-						return callback(null);
-					else
-						return callback('user_not_is_allowed_list');
-				}
-				else if (realUser.type == 'partner') {
-					if (project.users.filter(function(u) { return u.type == 'partner' && u.role == 'owner' && u.username == realUser.username; }).length)
-						return callback(null);
-					else
-						return callback('partner_not_is_allowed_list');
-				}
-			}
-		});
-	}
-
-	else if (modelName == "input") {
-		var id = modelId.split(':'), projectId = id[0], entityId = id[1];
-
-		Project.get(projectId, function(error, project) {
-			if (error)
-				return callback('could_not_retrieve_project');
-
-			// Retrieve projectUser from project.
-			var projectUsers, projectUser;
-			if (realUser.type == 'user')
-				projectUsers = project.users.filter(function(u) { return u.type == 'internal' && u.id == realUser._id; });
-			else if (realUser.type == 'partner')
-				projectUsers = project.users.filter(function(u) { return u.type == 'partner' && u.username == realUser.username; });
-			else
-				throw new Error('invalid user type');
-			projectUser = projectUsers.length ? projectUsers[0] : null;
-
-			// Check permissions.
-			if (projectUser) {
-				if (projectUser.role == 'owner' || projectUser.role == 'input_all')
-					return callback(null);
-				else if (projectUser.role == 'input' && projectUser.entities.indexOf(entityId) !== -1)
-					return callback(null);
-				else
-					return callback('not_allowed');
-			}
-			else
-				return callback('not_associated_with_project');
-		});
-	}
-
-	else
-		return callback('admins_only');
-};
 
 
 module.exports = express.Router()
 
 	.use(function(request, response, next) {
-		// we check that user is properly authenticated with a cookie.
+		// Check that user is properly authenticated with a cookie.
 		// and that it's really a user, not a client that found a way to get a cookie.
 		if (request.isAuthenticated && request.isAuthenticated() && request.user && (request.user.type === 'user' || request.user.type === 'partner'))
 			next();
 		else {
 			passport.authenticate('user_accesstoken', {session: false}, function(error, user, info) {
+				// FIXME: not sure what this does 2 years after, only real users can have accesstokens?
 				if (user && user.type === 'user') {
 					request.user = user;
 					next();
@@ -129,77 +44,197 @@ module.exports = express.Router()
 	///////////////////////////////////////////
 	// Special cases: projects and inputs
 	///////////////////////////////////////////
-	
-	// list projects
+
 	.get('/project', function(request, response) {
-		if (request.user.type == 'user')
-			Project.list(request.query, function(error, data) {
-				if (error)
-					response.json({error: true, message: error});
-				else
-					response.json(data);
-			});
+		var promise;
+		if (request.user.type === 'user' && request.query.mode === 'short')
+			promise = Project.storeInstance.listShort(request.user._id);
 
-		else if (request.user.type == 'partner')
-			Project.get(request.user.projectId, function(error, data) {
-				if (error)
-					response.json({error: true, message: error});
-				else
-					response.json([data]);
-			});
+		else {
+			if (request.query.mode === 'crossCutting')
+				promise = Project.storeInstance.listByIndicator(request.query.indicatorId, true);
+			else
+				promise = Project.storeInstance.list();
+			
+			// Filter projects for partners.
+			if (request.user.type === 'partner')
+				promise = promise.then(function(projects) {
+					return projects.filter(p => p._id === request.user.projectId);
+				});
 
-		else
-			throw new Error();
+			// listShort, listByIndicator and list require a post processing step
+			// to hide passwords (which is not the case for listShort)
+			promise = promise.then(function(projects) {
+				return projects.map(p => p.toAPI());
+			});
+		}
+
+		promise.then(
+			function(projectsData) { response.json({error: false, response: projectsData}); },
+			function(error) { response.status(500).json({error: true, message: error}); }
+		);
 	})
 
-	// get projects
 	.get('/project/:id', function(request, response) {
 		if (request.user.type == 'partner' && request.params.id != request.user.projectId)
-			return response.status(404).json({error: true, message: "Not Found"});
+			return response.status(403).json({error: true, message: "forbidden"});
 
-		Project.get(request.params.id, function(error, data) {
-			if (error) {
+		Project.storeInstance.get(request.params.id)
+			.then(function(project) {
+				response.json({error: false, response: project.toAPI()});
+			})
+			.catch(function(error) {
+				var statusCode = error === 'not_found' ? 404 : 500;
+				response.status(statusCode).json({error: true, message: error});
+			});
+	})
+
+	.put('/project/:id', bodyParser, function(request, response) {
+		// Validate that the _id in the payload is the same as the id in the URL.
+		if (request.body._id !== request.params.id || request.body.type !== 'project')
+			return response.status(400).json({error: true, message: 'id must match with URL'});
+
+		var canSavePromise = Project.storeInstance.get(request.params.id).then(
+			function(project) {
+				// We override a project
+				return 'owner' === project.getRole(request.user);
+			},
+			function(error) {
+				var u = request.user;
 				if (error === 'not_found')
-					return response.status(404).json({error: true, message: "Not Found"});
-				else
-					return response.status(500).json({error: true, message: "Server"});
+					// Create a new project
+					return u.type === 'user' && (u.role === 'admin' || u.role === 'project');
+				// Other error (trying to override an indicator with a project?).
+				return false;
 			}
+		);
 
-			response.json(data);
+		canSavePromise.then(function(canSave) {
+			if (!canSave)
+				return response.status(403).json({error: true, message: 'forbidden'});
+			
+			var newProject = new Project(response.body);
+			newProject.save().then(
+				p => response.json({error: null, response: p}),
+				e => response.json({error: e})
+			);
 		});
 	})
 
-	// list inputs
+	.delete('/project/:id', bodyParser, function(request, response) {
+		// Partners cannot delete projects (that would be deleting themselves).
+		if (request.user.type !== 'user')
+			return response.status(403).json({error: true, message: 'forbidden'});
+
+		Project.storeInstance.get(request.params.id)
+			.then(function(project) {
+				// Ask the project if it is deletable.
+				if (project.getRole(request.user) !== 'owner')
+					return Promise.reject("forbidden");
+
+				return project.destroy();
+			})
+			.then(
+				// project was destroyed
+				function() {
+					response.json({error: false});
+				},
+				// manages errors from both storeInstance.get and acl check.
+				function(error) {
+					response
+						.status({not_found: 404, forbidden: 403}[error] || 500)
+						.json({error: true, message: error});
+				}
+			);
+	})
+
 	.get('/input', function(request, response) {
-		var options = request.query;
-		if (request.user.type == 'partner')
-			options.restrictProjectId = request.user.projectId;
+		var q = request.query;
 
-		Input.list(options, function(error, data) {
-			if (error)
-				response.json({error: true, message: error});
-			else {
-				response.json(data);
-			}
-		});
+		// If user is a partner, force him to have a projectId filter.
+		if (request.user.type === 'partner') {
+			// User if trying to access forbidden ressources.
+			if (typeof q.projectId === 'string' && q.projectId !== request.user.projectId)
+				return response.status(403).json({error: true, message: "forbidden"});
+			
+			q.projectId = request.user.projectId;
+		}
+
+		var promise;
+		if (q.mode === 'ids_by_form' || q.mode === 'ids_by_entity') {
+			if (q.mode === 'ids_by_form')
+				promise = Input.storeInstance.listIdsByDataSource(q.projectId, q.formId);
+			else // mode === 'ids_by_entity'
+				promise = Input.storeInstance.listIdsByEntity(q.projectId, q.entityId);
+		}
+		else {
+			if (q.mode === 'current+last')
+				promise = Input.storeInstance.getLasts(q.projectId, q.formId, q.entityId, q.period);
+			else if (typeof q.projectId === 'string')
+				promise = Input.storeInstance.listByProject(q.projectId);
+			else
+				promise = Input.storeInstance.list(); // get all from all projects, never happens for partners.
+		}
+
+		promise.then(
+			function(data) { response.json({error: false, response: data}); },
+			function(error) { response.json({error: true, message: error}); }
+		);
 	})
 
-	// get item
 	.get('/input/:id', function(request, response) {
 		var projectId = request.params.id.split(':')[0];
-		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
-			return response.status(404).json({error: true, message: "Not Found"});
+		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
+			return response.status(403).json({error: true, message: "forbidden"});
 
-		Input.get(request.params.id, function(error, data) {
-			if (error) {
-				if (error === 'not_found')
-					return response.status(404).json({error: true, message: "Not Found"});
-				else
-					return response.status(500).json({error: true, message: "Server"});
-			}
+		Input.storeInstance.get(request.params.id)
+			.then(function(input) {
+				response.json({error: false, response: input});
+			})
+			.catch(function(error) {
+				response
+					.status(error === 'not_found' ? 404 : 500)
+					.json({error: true, message: error});
+			});
+	})
 
-			response.json(data);
-		});
+	.put('/input/:id', bodyParser, function(request, response) {
+		var projectId = request.params.id.split(':')[0];
+		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
+			return response.status(403).json({error: true, message: "forbidden"});
+
+
+	})
+
+	.delete('/input/:id', function(request, response) {
+		var projectId = request.params.id.split(':')[0];
+		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
+			return response.status(403).json({error: true, message: "forbidden"});
+
+		Promise.all([Project.storeInstance.get(projectId), Input.storeInstance.get(request.params.id)])
+			.then(function(res) {
+				var project = res[0], input = res[1];
+
+				throw new Error('Implement me!');
+
+
+
+
+				if (project.getRole(request.user) !== 'owner')
+					return Promise.reject('forbidden');
+
+				return input.destroy();
+			})
+			.then(
+				function() {
+					response.json({error: false});
+				},
+				function(error) {
+					response
+						.status({not_found: 404, forbidden: 403}[error] || 500)
+						.json({error: true, message: error});
+				}
+			);
 	})
 
 	///////////////////////////////////////////
@@ -207,112 +242,82 @@ module.exports = express.Router()
 	///////////////////////////////////////////
 
 	// list
-	.get('/:modelName(indicator|theme|type|user)', function(request, response) {
-		var Model = ModelsByName[request.params.modelName];
+	.get('/:modelName(indicator|theme|user)', function(request, response) {
+		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
+			Model = ModelsByName[request.params.modelName];
 
-		Model.list(request.query, function(error, data) {
-			if (error)
+		Model.storeInstance.list()
+			.then(function(models) {
+				response.json({error: false, response: models});
+			})
+			.catch(function(error) {
 				response.json({error: true, message: error});
-			else
-				response.json(data);
-		});
+			});
 	})
 
 	// get item
-	.get('/:modelName(indicator|theme|type|user)/:id', function(request, response) {
-		var Model = ModelsByName[request.params.modelName];
+	.get('/:modelName(indicator|theme|user)/:id', function(request, response) {
+		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
+			Model = ModelsByName[request.params.modelName];
 
-		Model.get(request.params.id, function(error, data) {
-			if (error) {
-				if (error === 'not_found')
-					return response.status(404).json({error: true, message: "Not Found"});
-				else
-					return response.status(500).json({error: true, message: "Server"});
-			}
-
-			response.json(data);
-		});
+		Model.storeInstance.get(request.params.id)
+			.then(function(model) {
+				response.json({error: false, response: model});
+			})
+			.catch(function(error) {
+				var statusCode = error === 'not_found' ? 404 : 500;
+				response.status(statusCode).json({error: true, message: error});
+			});
 	})
 
-	// .get('/client', function(request, response) {
-	// 	Client.list({}, function(error, clients) {
-	// 		AccessToken.list({}, function(error, accessTokens) {
-	// 			// SLOW!
-				
-	// 			clients.forEach(function(c) { c.__numUserTokens = 0; c.__numTokens = 0; });
-	// 			if (request.user.roles.indexOf('_admin') === -1)
-	// 				clients.forEach(function(c) { delete c.secret; });
+	.put('/:modelName(indicator|theme|user)/:id', bodyParser, function(request, response) {
+		// Only admin accounts can touch indicators, themes and users.
+		if (request.user.role !== 'admin')
+			return response.status(403).json({error: true, message: 'forbidden'});
 
-	// 			accessTokens.forEach(function(accessToken) {
-	// 				clients.forEach(function(c) {
-	// 					if (accessToken.clientId === c._id) {
-	// 						if (accessToken.userId === request.user._id)
-	// 							c.__numUserTokens++;
-	// 						c.__numTokens++;
-	// 					}
-	// 				});
-	// 			});
+		// Save the model.
+		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
+			Model = ModelsByName[request.params.modelName];
 
-	// 			response.json(clients);
-	// 		})
-	// 	});
-	// })
+		var model = null;
+		try { model = new Model(request.body); }
+		catch (e) {}
 
-	// .get('/client/:id', function(request, response) {
-	// 	Client.get(request.params.id, function(error, client) {
-	// 		if (request.user.roles.indexOf('_admin') === -1)
-	// 			delete client.secret;
-
-	// 		response.json(client);
-	// 	});
-	// })
-
-	.put('/:modelName(indicator|project|input|theme|type|user)/:id', bodyParser, function(request, response) {
-		var modelName  = request.params.modelName,
-			ModelClass = ModelsByName[request.params.modelName],
-			newModel   = request.body;
-
-		// check submission against schema + check dependencies
-		ModelClass.validate(newModel, function(errors) {
-			if (errors && errors.length)
-				return response.status(400).json({error: true, detail: errors});
-
-			// check that the user did not craft a query playing with no DRY data to skip acls. Don't remove this!
-			if (newModel._id !== request.params.id || newModel.type !== modelName)
-				return response.status(400).json({error: true, detail: [{field: '_id', message: 'id must match with URL'}]});
-
-			// FIXME => make sure we are not overwriting something...
-
-			// check user permissions
-			checkEditPermissions(request.user, modelName, request.params.id, function(error) {
-				if (error)
-					return response.status(403).json({error: true, detail: error});
-
-				// update
-				ModelClass.set(newModel, function(error, result) {
-					if (error)
-						return response.status(500).json({error: true, detail: "Could not save. Try again"});
-
-					newModel._rev = result.rev;
-					return response.json(newModel);
-				});
-			});
-		});
+		if (!model)
+			response.status(400).json({error: true, message: 'invalid_data'})
+		else
+			model.save().then(
+				function(model) {
+					response.json({error: false, response: model});
+				},
+				function(error) {
+					response.json({error: true, message: error});
+				}
+			);
 	})
 
-	.delete('/:modelName(indicator|project|input|theme|type)/:id', bodyParser, function(request, response) {
-		var modelName = request.params.modelName;
+	.delete('/:modelName(indicator|input|theme)/:id', bodyParser, function(request, response) {
+		// Only admin accounts can touch indicators, themes and users.
+		if (request.user.role !== 'admin')
+			return response.status(403).json({error: true, message: 'forbidden'});
 
-		checkEditPermissions(request.user, modelName, request.params.id, function(error) {
-			if (error)
-				return response.status(403).json({error: true, detail: error});
+		// Save the model.
+		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
+			Model = ModelsByName[request.params.modelName];
 
-			ModelsByName[modelName].delete(request.params.id, function(error) {
-				if (error)
-					response.status(400).json({error: true, message: "Can't do."});
-				else
-					response.json({error: false, message: "The item was deleted."});
-			});
-		});
+		Model.storeInstance.get(request.params.id)
+			.then(function(model) {
+				return model.destroy();
+			})
+			.then(
+				function() {
+					response.json({error: false});
+				},
+				function(error) {
+					response
+						.status({not_found: 404, forbidden: 403}[error] || 500)
+						.json({error: true, message: error});
+				}
+			);
 	});
 

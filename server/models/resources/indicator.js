@@ -1,48 +1,54 @@
 "use strict";
 
-var async     = require('async'),
-	validator = require('is-my-json-valid'),
-	Abstract  = require('../abstract'),
-	database  = require('../database'),
-	schema    = require('./indicator.json');
+var validator = require('is-my-json-valid'),
+	Store = require('../store'),
+	Model = require('../model'),
+	Project = require('./project'),
+	schema = require('./indicator.json');
 
 var validate = validator(schema);
 
-var Indicator = module.exports = {
-	get: Abstract.get.bind(this, 'indicator'),
+class IndicatorStore extends Store {
 
-	list: function(options, callback) {
-		return Abstract.list('indicator', options, callback);
-	},
+	get modelClass() { return Indicator; }
+	get modelString() { return 'indicator'; }
 
-	set: Abstract.set.bind(this),
+}
 
-	"delete": function(id, callback) {
-		var options = {keys: [id], reduce: false, offset: 0, include_docs: true};
+var storeInstance = new IndicatorStore();
 
-		database.view('server', 'reverse_dependencies', options, function(error, result) {
-			var projects = result.rows
-				.map(function(row) { return row.doc; })
-				.filter(function(p) { return p.crossCutting[id]; });
 
-			projects.forEach(function(project) { delete project.crossCutting[id]; });
+class Indicator extends Model {
 
-			// save them all
-			database.bulk({docs: projects}, function() {
-				// delete indicator
-				Abstract.delete('indicator', id, callback);
-			});
-		});
-	},
+	static get storeInstance() { return storeInstance; }
 
-	validate: function(item, callback) {
-		validate(item);
-
+	/**
+	 * Deserialize and validate a project that comes from either API or Database.
+	 */
+	constructor(data) {
+		validate(data);
 		var errors = validate.errors || [];
 		if (errors.length)
-			return callback(errors);
+			throw new Error('invalid_data');
 
-		return callback(null);
+		super(data);
 	}
-	
-};
+
+	/**
+	 * Delete indicator and updates all projects that are using it.
+	 */
+	destroy() {
+		return Project.storeInstance.listCrossCutting(this._id, false).then(function(projects) {
+			// Delete cross cutting indicator from projects.
+			projects.forEach(function(project) { delete project.crossCutting[id]; });
+
+			// Mark ourself as deleted
+			this._deleted = true;
+
+			// Save everything in on request
+			return this._callBulk({docs: projects.concat([this])});
+		});
+	}
+}
+
+module.exports = Indicator;

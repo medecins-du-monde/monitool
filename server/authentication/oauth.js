@@ -17,12 +17,10 @@ server.serializeClient(function(client, done) {
 });
 
 server.deserializeClient(function(id, done) {
-	Client.get(id, function(error, client) {
-		if (error)
-			return done(error);
-
-		return done(null, client);
-	});
+	Client.storageInstance.get(id).then(
+		function(client) { done(null, client); },
+		function(error) { done(error); }
+	);
 });
 
 //////////////////////////////////////////////
@@ -32,36 +30,32 @@ server.deserializeClient(function(id, done) {
 // Define grants (authorization code and access token).
 
 var createAuthorizationCode = function(clientId, userId, redirectURI, done) {
-	var authorizationCode = {
+	var authorizationCode = new AuthorizationCode({
 		_id: uuid.v4(),
 		type: 'authorization-code',
 		clientId: clientId,
 		userId: userId,
 		redirectURI: redirectURI
-	};
-
-	AuthorizationCode.set(authorizationCode, function(error) {
-		if (error)
-			return done(error);
-
-		done(null, authorizationCode._id);
 	});
+
+	authorizationCode.save().then(
+		function() { done(null, authorizationCode._id); },
+		function(error) { done(error); }
+	);
 };
 
 var createAccessToken = function(clientId, userId, done) {
-	var accessToken = {
+	var accessToken = new AccessToken({
 		_id: uuid.v4(),
 		type: 'access-token',
 		clientId: clientId,
 		userId: userId
-	};
-
-	AccessToken.set(accessToken, function(error) {
-		if (error)
-			return done(error);
-
-		done(null, accessToken._id);
 	});
+
+	accessToken.save().then(
+		function() { done(null, authorizationCode._id); },
+		function(error) { done(error); }
+	);
 };
 
 server.grant(oauth2orize.grant.code(function(client, redirectURI, user, ares, done) {
@@ -80,15 +74,17 @@ server.grant(oauth2orize.grant.token(function(client, user, ares, done) {
 // Define exchanges (we only allow authorization code to access token).
 
 server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, done) {
-	AuthorizationCode.get(code, function(error, authorizationCode) {
-		if (error)
-			return done(error);
+	AuthorizationCode.storageInstance.get(code).then(
+		function(authorizationCode) {
+			if (authorizationCode.clientId !== client._id || authorizationCode.redirectURI !== redirectURI)
+				return done(null, false);
 
-		if (authorizationCode.clientId !== client._id || authorizationCode.redirectURI !== redirectURI)
-			return done(null, false);
-
-		createAccessToken(authorizationCode.clientId, authorizationCode.userId, done);
-	});
+			createAccessToken(authorizationCode.clientId, authorizationCode.userId, done);
+		},
+		function(error) {
+			done(error);
+		}
+	);
 }));
 
 module.exports = server;

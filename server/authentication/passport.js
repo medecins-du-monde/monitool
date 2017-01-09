@@ -12,8 +12,6 @@ var passport               = require('passport'),
 	AccessToken            = require('../models/authentication/access-token'),
 	config                 = require('../../config');
 
-var database = require('../models/database');
-
 /////////////////////////////////////////////////////////////////////////////
 // User serialization
 /////////////////////////////////////////////////////////////////////////////
@@ -36,20 +34,16 @@ passport.deserializeUser(function(id, done) {
 	var type = id.substring(0, id.indexOf(':'));
 
 	if (type === 'usr') {
-		User.get(id, function(error, user) {
-			done(error, user);
-		});
+		User.storeInstance
+			.get(id)
+			.then(function(user) { done(null, user); })
+			.catch(function(error) { done(error); });
 	}
 	else if (type === 'partner') {
-		database.view('shortlists', 'partners', {key: id.substring('partner:'.length)}, function(error, data) {
-			if (error)
-				return done('db_fail');
-
-			if (data.rows.length == 0)
-				return done('partner_not_found');
-
-			done(null, data.rows[0].value)
-		});
+		User.storeInstance
+			.getPartner(id.substring('partner:'.length))
+			.then(function(user) { done(null, user); })
+			.catch(function(error) { done(error); });
 	}
 	else
 		throw new Error('Clients cannot have sessions.');
@@ -81,22 +75,35 @@ var strategy = new OAuth2Strategy(
 					"Try closing and reopening your browser to log in again."
 				);
 			
-			User.get(userId, function(error, user) {
-				if (error) {
-					user = {_id: userId, type: 'user', name: profile.name, role: 'common'};
-					User.set(user, function(error, result) {
-						done(null, user);
-					});
-				}
-				else if (user.name !== profile.name) {
-					user.name = profile.name;
-					User.set(user, function(error, result) {
-						done(null, user);
-					});
-				}
-				else
+			User.storeInstance.get(userId).then(
+				function(user) {
+					// If Oauth provider updated the name, we update as well in DB
+					if (user.name !== profile.name) {
+						user.name = profile.name;
+						user.save(); // don't wait for the callback
+					}
+
+					// Auth was OK
 					done(null, user);
-			});
+				},
+				function(error) {
+					if (error === 'not_found') {
+						// This user never logged in!
+						var user = new User({_id: userId, type: 'user', name: profile.name, role: 'common'});
+						user.save().then(
+							function() {
+								done(null, user); // Auth is OK
+							},
+							function(error) {
+								done(error); // Something failed while creating user.
+							}
+						);
+					}
+					else
+						// Something failed (db is down?).
+						done(error);
+				}
+			);
 		}
 		catch (e) {
 			done("An error has occured while loggin you in. Are you using a medecinsdumonde.net account?");
@@ -137,19 +144,17 @@ passport.use('user_azure', strategy);
 /////////////////////////////////////////////////////////////////////////////
 
 passport.use('user_accesstoken', new BearerStrategy(function(strAccessToken, done) {
-	AccessToken.get(strAccessToken, function(error, accessToken) {
-		if (error || !accessToken)
-			return done('Invalid Token');
-
-		User.get(accessToken.userId, function(error, user) {
-			if (error || !user)
-				return done('Invalid User');
-
-			// note that we could add metadata to allow only partial access
-			// done(null, user, {scope: something})
+	AccessToken.storeInstance
+		.get(strAccessToken)
+		.then(function(accessToken) {
+			return User.storeInstance.get(accessToken.userId);
+		})
+		.then(function(user) {
 			done(null, user);
+		})
+		.catch(function(error) {
+			done(error);
 		});
-	});
 }));
 
 /////////////////////////////////////////////////////////////////////////////
@@ -158,19 +163,17 @@ passport.use('user_accesstoken', new BearerStrategy(function(strAccessToken, don
 
 passport.use('partner_local', new LocalStrategy(
 	function(username, password, done) {
-		database.view('shortlists', 'partners', {key: username}, function(error, data) {
-			if (error)
-				return done('failed to connect to DB');
+		User.storeInstance.getPartner(username).then(
+			function(partner) {
+				if (!passwordHash.verify(password, partner.password))
+					return done(null, false);
 
-			if (data.rows.length == 0)
-				return done(null, false);
-
-			var partner = data.rows[0].value;
-			if (!passwordHash.verify(password, partner.password))
-				return done(null, false);
-
-			done(null, partner)
-		})
+				done(null, partner)
+			},
+			function(error) {
+				return done(error);
+			}
+		);
 	}
 ));
 
@@ -179,17 +182,19 @@ passport.use('partner_local', new LocalStrategy(
 /////////////////////////////////////////////////////////////////////////////
 
 var authenticateClient = function(clientId, clientSecret, done) {
-	Client.get(clientId, function(error, client) {
-		if (error || !client)
-			return done('Invalid Client');
+	Client.storeInstance.get(clientId).then(
+		function(client) {
+			// Timing attack yeah!
+			// No password hashing yeah!
+			if (client.secret !== clientSecret)
+				return done(null, false);
 
-		// Timing attack yeah!
-		// No password hashing yeah!
-		if (client.secret !== clientSecret)
-			return done(null, false);
-
-		return done(null, client);
-	});
+			return done(null, client);
+		},
+		function(error) {
+			return done(error);
+		}
+	);
 };
 
 passport.use('client_basic', new BasicStrategy(authenticateClient));

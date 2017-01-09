@@ -1,11 +1,24 @@
 "use strict";
 
-var Abstract  = require('../abstract');
+var Store = require('../store'),
+	Model = require('../model');
 
-module.exports = {
-	list: Abstract.list.bind(this, 'client'),
-	get: Abstract.get.bind(this, 'client'),
-	delete: Abstract.delete.bind(this, 'client'),
-	set: Abstract.set.bind(this),
+class ClientStore extends Store {
 
-};
+	get modelClass() { return Client; }
+	get modelString() { return 'client'; }
+}
+
+var storeInstance = new ClientStore();
+
+
+class Client extends Model {
+
+	static get storeInstance() { return storeInstance; }
+
+	constructor(data) {
+		super(data);
+	}
+}
+
+module.exports = Client;

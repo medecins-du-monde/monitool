@@ -1,11 +1,24 @@
 "use strict";
 
-var Abstract  = require('../abstract');
+var Store = require('../store'),
+	Model = require('../model');
 
-module.exports = {
-	list: Abstract.list.bind(this, 'refresh-token'),
-	get: Abstract.get.bind(this, 'refresh-token'),
-	delete: Abstract.delete.bind(this, 'refresh-token'),
-	set: Abstract.set.bind(this),
+class RefreshTokenStore extends Store {
 
-};
+	get modelClass() { return RefreshToken; }
+	get modelString() { return 'refresh-token'; }
+}
+
+var storeInstance = new RefreshTokenStore();
+
+
+class RefreshToken extends Model {
+
+	static get storeInstance() { return storeInstance; }
+
+	constructor(data) {
+		super(data);
+	}
+}
+
+module.exports = RefreshToken;
