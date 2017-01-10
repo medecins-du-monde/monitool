@@ -83,7 +83,7 @@ module.exports = express.Router()
 		if (request.body._id !== request.params.id)
 			return response.jsonError(new Error('id_mismatch'));
 
-		// Get old project to check ACLS
+		// Get old project to check ACLs
 		Project.storeInstance.get(request.params.id)
 			.then(
 				// project was found, we raise an error if user is not allowed, otherwise we return the project.
@@ -102,8 +102,9 @@ module.exports = express.Router()
 				}
 			)
 			.then(function() {
-				return new Project(response.body).save();
+				return new Project(request.body).save();
 			})
+			.then(p => p.toAPI())
 			.then(response.jsonPB, response.jsonErrorPB);
 	})
 
@@ -166,12 +167,24 @@ module.exports = express.Router()
 		if (request.body._id !== request.params.id)
 			return response.jsonError(new Error('id_mismatch'));
 
-		var projectId = request.params.id.split(':')[0];
-		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
-			return response.jsonError(new Error('forbidden'));
+		// Create new Input
+		var input;
+		try { input = new Input(request.body); }
+		catch (e) { return response.jsonError(e); }
 
+		// Get project to check ACLs and format
+		Project.storeInstance.get(input.project).then(function(project) {
+			// Check ACLs
+			var projectUser = project.getProjectUser(request.user),
+				projectRole = project.getRole(request.user);
 
+			if (projectRole !== 'owner' &&
+				projectRole !== 'input_all' &&
+				!(projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1))
+				throw new Error('forbidden');
 
+			return input.save();
+		}).then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	.delete('/input/:id', function(request, response) {
@@ -179,16 +192,18 @@ module.exports = express.Router()
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
 
-		Promise.all([Project.storeInstance.get(projectId), Input.storeInstance.get(request.params.id)])
+		Promise
+			.all([Project.storeInstance.get(projectId), Input.storeInstance.get(request.params.id)])
 			.then(function(res) {
 				var project = res[0], input = res[1];
 
-				throw new Error('Implement me!');
+				// Check ACLs
+				var projectUser = project.getProjectUser(request.user),
+					projectRole = project.getRole(request.user);
 
-
-
-
-				if (project.getRole(request.user) !== 'owner')
+				if (projectRole !== 'owner' &&
+					projectRole !== 'input_all' &&
+					!(projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1))
 					throw new Error('forbidden');
 
 				return input.destroy();
