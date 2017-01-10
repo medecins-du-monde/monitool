@@ -71,7 +71,7 @@ module.exports = express.Router()
 
 		promise.then(
 			function(projectsData) { response.json({error: false, response: projectsData}); },
-			function(error) { response.status(500).json({error: true, message: error}); }
+			function(error) { response.status(500).json({error: true, message: error.message}); }
 		);
 	})
 
@@ -84,8 +84,8 @@ module.exports = express.Router()
 				response.json({error: false, response: project.toAPI()});
 			})
 			.catch(function(error) {
-				var statusCode = error === 'not_found' ? 404 : 500;
-				response.status(statusCode).json({error: true, message: error});
+				var statusCode = error.message === 'missing' ? 404 : 500;
+				response.status(statusCode).json({error: true, message: error.message});
 			});
 	})
 
@@ -101,7 +101,7 @@ module.exports = express.Router()
 			},
 			function(error) {
 				var u = request.user;
-				if (error === 'not_found')
+				if (error.message === 'missing')
 					// Create a new project
 					return u.type === 'user' && (u.role === 'admin' || u.role === 'project');
 				// Other error (trying to override an indicator with a project?).
@@ -130,7 +130,7 @@ module.exports = express.Router()
 			.then(function(project) {
 				// Ask the project if it is deletable.
 				if (project.getRole(request.user) !== 'owner')
-					return Promise.reject("forbidden");
+					throw new Error("forbidden");
 
 				return project.destroy();
 			})
@@ -142,8 +142,8 @@ module.exports = express.Router()
 				// manages errors from both storeInstance.get and acl check.
 				function(error) {
 					response
-						.status({not_found: 404, forbidden: 403}[error] || 500)
-						.json({error: true, message: error});
+						.status({missing: 404, forbidden: 403}[error.message] || 500)
+						.json({error: true, message: error.message});
 				}
 			);
 	})
@@ -178,7 +178,7 @@ module.exports = express.Router()
 
 		promise.then(
 			function(data) { response.json({error: false, response: data}); },
-			function(error) { response.json({error: true, message: error}); }
+			function(error) { response.json({error: true, message: error.message}); }
 		);
 	})
 
@@ -193,8 +193,8 @@ module.exports = express.Router()
 			})
 			.catch(function(error) {
 				response
-					.status(error === 'not_found' ? 404 : 500)
-					.json({error: true, message: error});
+					.status(error.message === 'missing' ? 404 : 500)
+					.json({error: true, message: error.message});
 			});
 	})
 
@@ -221,7 +221,7 @@ module.exports = express.Router()
 
 
 				if (project.getRole(request.user) !== 'owner')
-					return Promise.reject('forbidden');
+					throw new Error('forbidden');
 
 				return input.destroy();
 			})
@@ -231,8 +231,8 @@ module.exports = express.Router()
 				},
 				function(error) {
 					response
-						.status({not_found: 404, forbidden: 403}[error] || 500)
-						.json({error: true, message: error});
+						.status({missing: 404, forbidden: 403}[error.message] || 500)
+						.json({error: true, message: error.message});
 				}
 			);
 	})
@@ -251,7 +251,7 @@ module.exports = express.Router()
 				response.json({error: false, response: models});
 			})
 			.catch(function(error) {
-				response.json({error: true, message: error});
+				response.json({error: true, message: error.message});
 			});
 	})
 
@@ -265,8 +265,8 @@ module.exports = express.Router()
 				response.json({error: false, response: model});
 			})
 			.catch(function(error) {
-				var statusCode = error === 'not_found' ? 404 : 500;
-				response.status(statusCode).json({error: true, message: error});
+				var statusCode = error.message === 'missing' ? 404 : 500;
+				response.status(statusCode).json({error: true, message: error.message});
 			});
 	})
 
@@ -291,7 +291,7 @@ module.exports = express.Router()
 					response.json({error: false, response: model});
 				},
 				function(error) {
-					response.json({error: true, message: error});
+					response.json({error: true, message: error.message});
 				}
 			);
 	})
@@ -315,8 +315,8 @@ module.exports = express.Router()
 				},
 				function(error) {
 					response
-						.status({not_found: 404, forbidden: 403}[error] || 500)
-						.json({error: true, message: error});
+						.status({missing: 404, forbidden: 403}[error.message] || 500)
+						.json({error: true, message: error.message});
 				}
 			);
 	});

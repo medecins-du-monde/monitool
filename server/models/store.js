@@ -66,13 +66,19 @@ class Store {
 		return new Promise(function(resolve, reject) {
 			this._db.get(id, function(error, data) {
 				if (error)
-					return reject('not_found');
+					reject(error);
 
-				if (data.type !== this.modelString)
-					return reject('wrong_type');
+				else if (data.type !== this.modelString)
+					reject(new Error('wrong_type'));
 
-				try { resolve(new this.modelClass(data)); }
-				catch (e) { reject(e.message); }
+				else {
+					try {
+						resolve(new this.modelClass(data));
+					}
+					catch (e) {
+						reject(e.message);
+					}
+				}
 				
 			}.bind(this));
 		}.bind(this));

@@ -16,7 +16,7 @@ class UserStore extends Store {
 	getPartner(username) {
 		return this._callView('partners', {key: username}).then(function(data) {
 			if (data.rows.length == 0)
-				throw new Error('not_found');
+				throw new Error('missing');
 
 			return data.rows[0].value;
 		});

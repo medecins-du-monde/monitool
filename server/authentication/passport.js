@@ -88,8 +88,8 @@ var strategy = new OAuth2Strategy(
 					done(null, user);
 				},
 				function(error) {
-					if (error === 'not_found') {
-						// This user never logged in!
+					// This user never logged in!
+					if (error.message === 'missing') {
 						var user = new User({_id: userId, type: 'user', name: profile.name, role: 'common'});
 						user.save().then(
 							function() {
@@ -101,7 +101,7 @@ var strategy = new OAuth2Strategy(
 						);
 					}
 					else
-						// Something failed (db is down?).
+						// Something else failed (db is down?).
 						done(error);
 				}
 			);
