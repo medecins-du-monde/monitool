@@ -3,6 +3,7 @@
 var validator = require('is-my-json-valid'),
 	Model     = require('../model'),
 	Store     = require('../store'),
+	Theme     = require('./theme'),
 	schema    = require('./indicator.json');
 
 var validate = validator(schema);
@@ -36,8 +37,8 @@ class Indicator extends Model {
 			this.themes.forEach(function(themeId) {
 				if (themes.filter(t => t._id === themeId).length === 0)
 					throw new Error('invalid_reference');
-			});
-		});
+			}.bind(this));
+		}.bind(this));
 	}
 
 	/**
@@ -46,16 +47,18 @@ class Indicator extends Model {
 	destroy() {
 		var Project = require('./project'); // circular import...
 
-		return Project.storeInstance.listCrossCutting(this._id, false).then(function(projects) {
+		return Project.storeInstance.listByIndicator(this._id, false).then(function(projects) {
 			// Delete cross cutting indicator from projects.
-			projects.forEach(function(project) { delete project.crossCutting[id]; });
+			projects.forEach(function(project) {
+				delete project.crossCutting[this._id];
+			}, this);
 
 			// Mark ourself as deleted
 			this._deleted = true;
 
 			// Save everything in on request
-			return this._callBulk({docs: projects.concat([this])});
-		});
+			return Indicator.storeInstance._callBulk({docs: projects.concat([this])});
+		}.bind(this)).then(function() { /* do not pass couchdb result to caller */ });
 	}
 }
 
