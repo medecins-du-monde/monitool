@@ -247,7 +247,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			controller: 'ProjectListController',
 			resolve: {
 				projects: function(Project) {
-					return Project.query({mode: 'list'}).$promise;
+					return Project.query({mode: 'short'}).$promise;
 				},
 				themes: function(Theme) {
 					return Theme.query().$promise;
