@@ -49,7 +49,7 @@ class InputStore extends Store {
 
 	/**
 	 * Retrieve all inputs of a given project
-	 * Used to generate cubes, or fetch partner inputs.
+	 * Used to generate cubes (for project reporting), or fetch partner inputs.
 	 */
 	listByProject(projectId) {
 		if (typeof projectId !== 'string')
@@ -65,7 +65,7 @@ class InputStore extends Store {
 
 	/**
 	 * Retrieve all inputs of a given data source
-	 * Used to update inputs when project is mutated.
+	 * Used to generate cubes (for indicator reporting), or update inputs when project is mutated.
 	 */
 	listByDataSource(projectId, formId) {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
