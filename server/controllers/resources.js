@@ -53,8 +53,10 @@ module.exports = express.Router()
 		else {
 			if (request.query.mode === 'crossCutting')
 				promise = Project.storeInstance.listByIndicator(request.query.indicatorId, true);
-			else
+			else if (request.query.mode === undefined)
 				promise = Project.storeInstance.list();
+			else
+				promise = Promise.reject(new Error('invalid_mode'));
 			
 			// Filter projects for partners.
 			if (request.user.type === 'partner')
@@ -70,23 +72,22 @@ module.exports = express.Router()
 		}
 
 		promise.then(
-			function(projectsData) { response.json({error: false, response: projectsData}); },
-			function(error) { response.status(500).json({error: true, message: error.message}); }
+			function(projectsData) {
+				response.json(projectsData);
+			},
+			response.jsonError
 		);
 	})
 
 	.get('/project/:id', function(request, response) {
 		if (request.user.type == 'partner' && request.params.id != request.user.projectId)
-			return response.status(403).json({error: true, message: "forbidden"});
+			return response.jsonError(new Error('forbidden'));
 
 		Project.storeInstance.get(request.params.id)
 			.then(function(project) {
-				response.json({error: false, response: project.toAPI()});
+				response.json(project.toAPI());
 			})
-			.catch(function(error) {
-				var statusCode = error.message === 'missing' ? 404 : 500;
-				response.status(statusCode).json({error: true, message: error.message});
-			});
+			.catch(response.jsonError)
 	})
 
 	.put('/project/:id', bodyParser, function(request, response) {
@@ -115,8 +116,10 @@ module.exports = express.Router()
 			
 			var newProject = new Project(response.body);
 			newProject.save().then(
-				p => response.json({error: null, response: p}),
-				e => response.json({error: e})
+				function(project) {
+					response.json(p);
+				},
+				response.jsonError
 			);
 		});
 	})
@@ -137,14 +140,10 @@ module.exports = express.Router()
 			.then(
 				// project was destroyed
 				function() {
-					response.json({error: false});
+					response.json({});
 				},
 				// manages errors from both storeInstance.get and acl check.
-				function(error) {
-					response
-						.status({missing: 404, forbidden: 403}[error.message] || 500)
-						.json({error: true, message: error.message});
-				}
+				response.jsonError
 			);
 	})
 
@@ -155,7 +154,7 @@ module.exports = express.Router()
 		if (request.user.type === 'partner') {
 			// User if trying to access forbidden ressources.
 			if (typeof q.projectId === 'string' && q.projectId !== request.user.projectId)
-				return response.status(403).json({error: true, message: "forbidden"});
+				return response.jsonError(new Error('forbidden'));
 			
 			q.projectId = request.user.projectId;
 		}
@@ -170,6 +169,8 @@ module.exports = express.Router()
 		else {
 			if (q.mode === 'current+last')
 				promise = Input.storeInstance.getLasts(q.projectId, q.formId, q.entityId, q.period);
+			else if (q.mode !== undefined)
+				promise = Promise.reject(new Error('invalid_mode'));
 			else if (typeof q.projectId === 'string')
 				promise = Input.storeInstance.listByProject(q.projectId);
 			else
@@ -177,31 +178,29 @@ module.exports = express.Router()
 		}
 
 		promise.then(
-			function(data) { response.json({error: false, response: data}); },
-			function(error) { response.json({error: true, message: error.message}); }
+			function(data) {
+				response.json(data);
+			},
+			response.jsonError
 		);
 	})
 
 	.get('/input/:id', function(request, response) {
 		var projectId = request.params.id.split(':')[0];
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
-			return response.status(403).json({error: true, message: "forbidden"});
+			return response.jsonError(new Error('forbidden'));
 
 		Input.storeInstance.get(request.params.id)
 			.then(function(input) {
-				response.json({error: false, response: input});
+				response.json(input);
 			})
-			.catch(function(error) {
-				response
-					.status(error.message === 'missing' ? 404 : 500)
-					.json({error: true, message: error.message});
-			});
+			.catch(response.jsonError);
 	})
 
 	.put('/input/:id', bodyParser, function(request, response) {
 		var projectId = request.params.id.split(':')[0];
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
-			return response.status(403).json({error: true, message: "forbidden"});
+			return response.jsonError(new Error('forbidden'));
 
 
 	})
@@ -209,7 +208,7 @@ module.exports = express.Router()
 	.delete('/input/:id', function(request, response) {
 		var projectId = request.params.id.split(':')[0];
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
-			return response.status(403).json({error: true, message: "forbidden"});
+			return response.jsonError(new Error('forbidden'));
 
 		Promise.all([Project.storeInstance.get(projectId), Input.storeInstance.get(request.params.id)])
 			.then(function(res) {
@@ -227,13 +226,9 @@ module.exports = express.Router()
 			})
 			.then(
 				function() {
-					response.json({error: false});
+					response.json({});
 				},
-				function(error) {
-					response
-						.status({missing: 404, forbidden: 403}[error.message] || 500)
-						.json({error: true, message: error.message});
-				}
+				response.jsonError
 			);
 	})
 
@@ -248,11 +243,9 @@ module.exports = express.Router()
 
 		Model.storeInstance.list()
 			.then(function(models) {
-				response.json({error: false, response: models});
+				response.json(models);
 			})
-			.catch(function(error) {
-				response.json({error: true, message: error.message});
-			});
+			.catch(response.jsonError);
 	})
 
 	// get item
@@ -262,38 +255,34 @@ module.exports = express.Router()
 
 		Model.storeInstance.get(request.params.id)
 			.then(function(model) {
-				response.json({error: false, response: model});
+				response.json(model);
 			})
-			.catch(function(error) {
-				var statusCode = error.message === 'missing' ? 404 : 500;
-				response.status(statusCode).json({error: true, message: error.message});
-			});
+			.catch(response.jsonError);
 	})
 
 	.put('/:modelName(indicator|theme|user)/:id', bodyParser, function(request, response) {
 		// Only admin accounts can touch indicators, themes and users.
 		if (request.user.role !== 'admin')
-			return response.status(403).json({error: true, message: 'forbidden'});
+			return response.jsonError(new Error('forbidden'));
 
 		// Save the model.
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
 			Model = ModelsByName[request.params.modelName];
 
-		var model = null;
-		try { model = new Model(request.body); }
-		catch (e) {}
+		var model;
+		try {
+			model = new Model(request.body);
 
-		if (!model)
-			response.status(400).json({error: true, message: 'invalid_data'})
-		else
 			model.save().then(
 				function(model) {
-					response.json({error: false, response: model});
+					response.json(model);
 				},
-				function(error) {
-					response.json({error: true, message: error.message});
-				}
+				response.jsonError
 			);
+		}
+		catch (e) {
+			return response.jsonError(e);
+		}
 	})
 
 	.delete('/:modelName(indicator|input|theme)/:id', bodyParser, function(request, response) {
@@ -311,13 +300,9 @@ module.exports = express.Router()
 			})
 			.then(
 				function() {
-					response.json({error: false});
+					response.json({});
 				},
-				function(error) {
-					response
-						.status({missing: 404, forbidden: 403}[error.message] || 500)
-						.json({error: true, message: error.message});
-				}
+				response.jsonError
 			);
 	});
 
