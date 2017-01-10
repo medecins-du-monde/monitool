@@ -89,13 +89,10 @@ class Project extends Model {
 	static get storeInstance() { return storeInstance; }
 
 	/**
-	 * Deserialize and validate a project that comes from the API.
+	 * Deserialize and validate a project that comes from the API/DB.
 	 */
 	constructor(data) {
-		validate(data);
-		var errors = validate.errors || [];
-		if (errors.length)
-			throw new Error('invalid_data');
+		super(data, validate);
 
 		// Check that entity ids exist in groups, ...
 		var entityIds = data.entities.map(e => e.id);
@@ -106,9 +103,7 @@ class Project extends Model {
 			});
 		});
 
-		// Create project.
-		super(data);
-		
+		// Create forms
 		this.forms = this.forms.map(f => new DataSource(f));
 
 		// Replace passwords by a salted hash
