@@ -30,6 +30,7 @@ var statusCodes = {
 	// put
 	id_mismatch: 400,	// id in URL and model do not match
 	invalid_data: 400,	// saving entity that did not pass validation
+	missing_data: 400
 };
 
 
