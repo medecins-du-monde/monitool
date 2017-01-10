@@ -127,12 +127,7 @@ class Input extends Model {
 	 * Raises exception if data is not formatted properly.
 	 */
 	constructor(data) {
-		validate(data);
-		var errors = validate.errors || [];
-		if (errors.length)
-			throw new Error('invalid_data');
-
-		super(data);
+		super(data, validate);
 	}
 
 	_adaptInputValue(oldVariable, oldValue) {

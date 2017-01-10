@@ -49,12 +49,7 @@ class Theme extends Model {
 	 * Deserialize and validate a project that comes from the API.
 	 */
 	constructor(data) {
-		validate(data);
-		var errors = validate.errors || [];
-		if (errors.length)
-			throw new Error('invalid_data');
-
-		super(data);
+		super(data, validate);
 	}
 
 	destroy() {

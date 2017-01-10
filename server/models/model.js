@@ -1,12 +1,19 @@
 "use strict";
 
-var nano     = require('nano'),
-	config   = require('../../config'),
-	database = nano(config.couchdb.url).use(config.couchdb.bucket);
+var nano      = require('nano'),
+	config    = require('../../config'),
+	database  = nano(config.couchdb.url).use(config.couchdb.bucket);
 
 class Model {
 
-	constructor(data) {
+	constructor(data, validate) {
+		if (validate) {
+			validate(data);
+			var errors = validate.errors || [];
+			if (errors.length)
+				throw new Error('invalid_data');
+		}
+
 		Object.assign(this, data);
 	}
 

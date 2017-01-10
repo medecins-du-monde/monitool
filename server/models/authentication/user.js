@@ -14,19 +14,14 @@ class UserStore extends Store {
 	get modelString() { return 'user'; }
 
 	getPartner(username) {
-		return new Promise(function(resolve, reject) {
-			database.view('shortlists', 'partners', {key: username}, function(error, data) {
-				if (error)
-					return reject('db_fail');
+		return this._callView('partners', {key: username}).then(function(data) {
+			if (data.rows.length == 0)
+				throw new Error('not_found');
 
-				if (data.rows.length == 0)
-					return reject('not_found');
-
-				resolve(data.rows[0].value);
-			});
-		})
+			return data.rows[0].value;
+		});
 	}
-
+	
 }
 
 var storeInstance = new UserStore();
@@ -39,12 +34,7 @@ class User extends Model {
 	 * Deserialize and validate a project that comes from the API.
 	 */
 	constructor(data) {
-		validate(data);
-		var errors = validate.errors || [];
-		if (errors.length)
-			throw new Error('invalid_data');
-
-		super(data);
+		super(data, validate);
 	}
 }
 

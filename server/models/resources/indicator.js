@@ -1,10 +1,10 @@
 "use strict";
 
 var validator = require('is-my-json-valid'),
-	Store = require('../store'),
-	Model = require('../model'),
-	Project = require('./project'),
-	schema = require('./indicator.json');
+	Model     = require('../model'),
+	Store     = require('../store'),
+	Project   = require('./project'),
+	schema    = require('./indicator.json');
 
 var validate = validator(schema);
 
@@ -26,12 +26,7 @@ class Indicator extends Model {
 	 * Deserialize and validate a project that comes from either API or Database.
 	 */
 	constructor(data) {
-		validate(data);
-		var errors = validate.errors || [];
-		if (errors.length)
-			throw new Error('invalid_data');
-
-		super(data);
+		super(data, validate);
 	}
 
 	/**
