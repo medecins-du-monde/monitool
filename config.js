@@ -4,6 +4,7 @@ try {
 }
 catch (e) {
 	module.exports = {
+		debug: process.env.DEBUG === 'TRUE',
 		port: process.env.PORT,
 		couchdb: {
 			url: process.env['couchdb.url'],
