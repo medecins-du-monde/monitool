@@ -60,95 +60,69 @@ module.exports = express.Router()
 			
 			// Filter projects for partners.
 			if (request.user.type === 'partner')
-				promise = promise.then(function(projects) {
-					return projects.filter(p => p._id === request.user.projectId);
-				});
+				promise = promise.then(projects => projects.filter(p => p._id === request.user.projectId));
 
 			// listShort, listByIndicator and list require a post processing step
 			// to hide passwords (which is not the case for listShort)
-			promise = promise.then(function(projects) {
-				return projects.map(p => p.toAPI());
-			});
+			promise = promise.then(projects => projects.map(p => p.toAPI()))
 		}
 
-		promise.then(
-			function(projectsData) {
-				response.json(projectsData);
-			},
-			response.jsonError
-		);
+		promise.then(response.jsonPB, response.jsonErrorPB);
 	})
-
 	.get('/project/:id', function(request, response) {
-		if (request.user.type == 'partner' && request.params.id != request.user.projectId)
+		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
-
+		
 		Project.storeInstance.get(request.params.id)
-			.then(function(project) {
-				response.json(project.toAPI());
-			})
-			.catch(response.jsonError)
+			.then(p => p.toAPI())
+			.then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	.put('/project/:id', bodyParser, function(request, response) {
 		// Validate that the _id in the payload is the same as the id in the URL.
-		if (request.body._id !== request.params.id || request.body.type !== 'project')
-			return response.status(400).json({error: true, message: 'id must match with URL'});
+		if (request.body._id !== request.params.id)
+			return response.jsonError(new Error('id_mismatch'));
 
-		var canSavePromise = Project.storeInstance.get(request.params.id).then(
-			function(project) {
-				// We override a project
-				return 'owner' === project.getRole(request.user);
-			},
-			function(error) {
-				var u = request.user;
-				if (error.message === 'missing')
-					// Create a new project
-					return u.type === 'user' && (u.role === 'admin' || u.role === 'project');
-				// Other error (trying to override an indicator with a project?).
-				return false;
-			}
-		);
-
-		canSavePromise.then(function(canSave) {
-			if (!canSave)
-				return response.status(403).json({error: true, message: 'forbidden'});
-			
-			var newProject = new Project(response.body);
-			newProject.save().then(
+		// Get old project to check ACLS
+		Project.storeInstance.get(request.params.id)
+			.then(
+				// project was found, we raise an error if user is not allowed, otherwise we return the project.
 				function(project) {
-					response.json(p);
+					if ('owner' !== project.getRole(request.user))
+						throw new Error('forbidden');
 				},
-				response.jsonError
-			);
-		});
+				// project was not found, we check if user can create projects, and raise error otherwise
+				// if the error was something else, reraise it.
+				function(error) {
+					var u = request.user;
+					if (error.message === 'missing' && !(u.type === 'user' && (u.role === 'admin' || u.role === 'project')))
+						throw new Error('forbidden'); // Cannot create project
+					else if (error.message !== 'missing')
+						throw error; // any other database error.
+				}
+			)
+			.then(function() {
+				return new Project(response.body).save();
+			})
+			.then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	.delete('/project/:id', bodyParser, function(request, response) {
 		// Partners cannot delete projects (that would be deleting themselves).
 		if (request.user.type !== 'user')
-			return response.status(403).json({error: true, message: 'forbidden'});
+			return response.jsonError(new Error('forbidden'));
+		
+		Project.storeInstance.get(request.params.id).then(function(project) {
+			// Ask the project if it is deletable.
+			if (project.getRole(request.user) !== 'owner')
+				throw new Error("forbidden");
 
-		Project.storeInstance.get(request.params.id)
-			.then(function(project) {
-				// Ask the project if it is deletable.
-				if (project.getRole(request.user) !== 'owner')
-					throw new Error("forbidden");
-
-				return project.destroy();
-			})
-			.then(
-				// project was destroyed
-				function() {
-					response.json({});
-				},
-				// manages errors from both storeInstance.get and acl check.
-				response.jsonError
-			);
+			return project.destroy();
+		}).then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	.get('/input', function(request, response) {
-		var q = request.query;
+		var promise, q = request.query;
 
 		// If user is a partner, force him to have a projectId filter.
 		if (request.user.type === 'partner') {
@@ -159,7 +133,6 @@ module.exports = express.Router()
 			q.projectId = request.user.projectId;
 		}
 
-		var promise;
 		if (q.mode === 'ids_by_form' || q.mode === 'ids_by_entity') {
 			if (q.mode === 'ids_by_form')
 				promise = Input.storeInstance.listIdsByDataSource(q.projectId, q.formId);
@@ -177,12 +150,7 @@ module.exports = express.Router()
 				promise = Input.storeInstance.list(); // get all from all projects, never happens for partners.
 		}
 
-		promise.then(
-			function(data) {
-				response.json(data);
-			},
-			response.jsonError
-		);
+		promise.then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	.get('/input/:id', function(request, response) {
@@ -190,17 +158,18 @@ module.exports = express.Router()
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
 
-		Input.storeInstance.get(request.params.id)
-			.then(function(input) {
-				response.json(input);
-			})
-			.catch(response.jsonError);
+		Input.storeInstance.get(request.params.id).then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	.put('/input/:id', bodyParser, function(request, response) {
+		// Validate that the _id in the payload is the same as the id in the URL.
+		if (request.body._id !== request.params.id)
+			return response.jsonError(new Error('id_mismatch'));
+
 		var projectId = request.params.id.split(':')[0];
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
+
 
 
 	})
@@ -224,12 +193,7 @@ module.exports = express.Router()
 
 				return input.destroy();
 			})
-			.then(
-				function() {
-					response.json({});
-				},
-				response.jsonError
-			);
+			.then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	///////////////////////////////////////////
@@ -241,11 +205,7 @@ module.exports = express.Router()
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
 			Model = ModelsByName[request.params.modelName];
 
-		Model.storeInstance.list()
-			.then(function(models) {
-				response.json(models);
-			})
-			.catch(response.jsonError);
+		Model.storeInstance.list().then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	// get item
@@ -253,17 +213,17 @@ module.exports = express.Router()
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
 			Model = ModelsByName[request.params.modelName];
 
-		Model.storeInstance.get(request.params.id)
-			.then(function(model) {
-				response.json(model);
-			})
-			.catch(response.jsonError);
+		Model.storeInstance.get(request.params.id).then(response.jsonPB, response.jsonErrorPB);
 	})
 
 	.put('/:modelName(indicator|theme|user)/:id', bodyParser, function(request, response) {
 		// Only admin accounts can touch indicators, themes and users.
 		if (request.user.role !== 'admin')
 			return response.jsonError(new Error('forbidden'));
+
+		// Validate that the _id in the payload is the same as the id in the URL.
+		if (request.body._id !== request.params.id)
+			return response.jsonError(new Error('id_mismatch'));
 
 		// Save the model.
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
@@ -272,13 +232,7 @@ module.exports = express.Router()
 		var model;
 		try {
 			model = new Model(request.body);
-
-			model.save().then(
-				function(model) {
-					response.json(model);
-				},
-				response.jsonError
-			);
+			model.save().then(response.jsonPB, response.jsonErrorPB);
 		}
 		catch (e) {
 			return response.jsonError(e);
@@ -288,7 +242,7 @@ module.exports = express.Router()
 	.delete('/:modelName(indicator|input|theme)/:id', bodyParser, function(request, response) {
 		// Only admin accounts can touch indicators, themes and users.
 		if (request.user.role !== 'admin')
-			return response.status(403).json({error: true, message: 'forbidden'});
+			return response.jsonError(new Error('forbidden'));
 
 		// Save the model.
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
@@ -298,11 +252,5 @@ module.exports = express.Router()
 			.then(function(model) {
 				return model.destroy();
 			})
-			.then(
-				function() {
-					response.json({});
-				},
-				response.jsonError
-			);
+			.then(response.jsonPB, response.jsonErrorPB);
 	});
-

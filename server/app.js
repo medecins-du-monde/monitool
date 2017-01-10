@@ -28,6 +28,7 @@ var statusCodes = {
 	missing: 404,		// trying to get non existing item
 	
 	// put
+	id_mismatch: 400,	// id in URL and model do not match
 	invalid_data: 400,	// saving entity that did not pass validation
 };
 
@@ -49,6 +50,7 @@ express()
 	})
 
 	.use(function(request, response, next) {
+
 		response.jsonError = function(error) {
 			response.status(statusCodes[error.message] || 500);
 
@@ -56,7 +58,10 @@ express()
 				response.json(error);
 			else
 				response.json({message: error.message});
-		}.bind(response);
+		};
+
+		response.jsonErrorPB = response.jsonError.bind(response);
+		response.jsonPB = response.json.bind(response);
 
 		next();
 	})
