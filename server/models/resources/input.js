@@ -21,7 +21,7 @@ class InputStore extends Store {
 	 */
 	listIdsByDataSource(projectId, formId) {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
-			return Promise.reject('missing_parameter');
+			return Promise.reject(new Error('missing_parameter'));
 
 		var view = 'inputs_by_project_form_date',
 			opt = {startkey: [projectId, formId], endkey: [projectId, formId, {}]};
@@ -37,7 +37,7 @@ class InputStore extends Store {
 	 */
 	listIdsByEntity(projectId, entityId) {
 		if (typeof projectId !== 'string' || typeof entityId !== 'string')
-			return Promise.reject('missing_parameter');
+			return Promise.reject(new Error('missing_parameter'));
 
 		var view = 'inputs_by_project_entity_date',
 			opt = {startkey: [projectId, entityId], endkey: [projectId, entityId, {}]};
@@ -53,7 +53,7 @@ class InputStore extends Store {
 	 */
 	listByProject(projectId) {
 		if (typeof projectId !== 'string')
-			return Promise.reject('missing_parameter');
+			return Promise.reject(new Error('missing_parameter'));
 
 		var view = 'inputs_by_project_form_date',
 			opt = {include_docs: true, startkey: [projectId], endkey: [projectId, {}]};
@@ -69,7 +69,7 @@ class InputStore extends Store {
 	 */
 	listByDataSource(projectId, formId) {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
-			return Promise.reject('missing_parameter');
+			return Promise.reject(new Error('missing_parameter'));
 
 		var view = 'inputs_by_project_form_date',
 			opt = {include_docs: true, startkey: [projectId, formId], endkey: [projectId, formId, {}]};
@@ -85,7 +85,7 @@ class InputStore extends Store {
 	 */
 	getLasts(projectId, formId, entityId, period) {
 		if (typeof projectId !== 'string' || typeof formId !== 'string' || typeof entityId !== 'string' || typeof period !== 'string')
-			return Promise.reject('missing_parameter');
+			return Promise.reject(new Error('missing_parameter'));
 
 		var id       = [projectId, entityId, formId, period].join(':'),
 			startKey = id,

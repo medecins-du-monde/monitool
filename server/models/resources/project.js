@@ -23,7 +23,7 @@ class ProjectStore extends Store {
 	 */
 	listShort(userId) {
 		if (typeof userId !== 'string')
-			return Promise.reject('missing_parameter');
+			return Promise.reject(new Error('missing_parameter'));
 
 		var view = 'projects_short';
 
@@ -47,7 +47,7 @@ class ProjectStore extends Store {
 	 */
 	listByIndicator(indicatorId, strippedDown) {
 		if (typeof indicatorId !== 'string')
-			return Promise.reject("missing_parameter");
+			return Promise.reject(new Error("missing_parameter"));
 
 		var view = 'cross_cutting', opt = {key: indicatorId, include_docs: true};
 
