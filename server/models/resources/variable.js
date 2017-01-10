@@ -34,7 +34,7 @@ class Variable {
 	 * ['8655ac1c-2c43-43f6-b4d0-177ad2d3eb8e', '1847b479-bc08-4ced-9fc3-a569b168a764'] => 232
 	 */
 	computeFieldIndex(partitionElementIds) {
-		var numPartitions = partitions.length;
+		var numPartitions = this.partitions.length;
 
 		if (partitionElementIds.length != numPartitions)
 			throw new Error('Invalid partitionElementIds.length');
@@ -42,15 +42,15 @@ class Variable {
 		var fieldIndex = 0;
 		for (var i = 0; i < numPartitions; ++i) {
 			// array find.
-			for (var index = 0; index < partitions[i].elements.length; ++index)
-				if (partitions[i].elements[index].id == partitionElementIds[i])
+			for (var index = 0; index < this.partitions[i].elements.length; ++index)
+				if (this.partitions[i].elements[index].id == partitionElementIds[i])
 					break;
 
-			if (index == partitions[i].elements.length)
+			if (index == this.partitions[i].elements.length)
 				throw new Error('Invalid partitionElementId');
 
 			// compute field index.
-			fieldIndex = fieldIndex * partitions[i].elements.length + index;
+			fieldIndex = fieldIndex * this.partitions[i].elements.length + index;
 		}
 
 		return fieldIndex;
@@ -61,15 +61,15 @@ class Variable {
 	 * 232 => ['8655ac1c-2c43-43f6-b4d0-177ad2d3eb8e', '1847b479-bc08-4ced-9fc3-a569b168a764']
 	 */
 	computePartitionElementIds(fieldIndex) {
-		var numPartitions = partitions.length,
+		var numPartitions = this.partitions.length,
 			partitionElementIds = new Array(numPartitions);
 
 		if (fieldIndex < 0)
 			throw new Error('Invalid field index (negative)')
 
 		for (var i = numPartitions - 1; i >= 0; --i) {
-			partitionElementIds[i] = partitions[i].elements[fieldIndex % partitions[i].elements.length].id;
-			fieldIndex = Math.floor(fieldIndex / partitions[i].elements.length);
+			partitionElementIds[i] = this.partitions[i].elements[fieldIndex % this.partitions[i].elements.length].id;
+			fieldIndex = Math.floor(fieldIndex / this.partitions[i].elements.length);
 		}
 
 		if (fieldIndex !== 0)

@@ -13,6 +13,9 @@ class Store {
 		this._db = database;
 	}
 
+	/**
+	 * Wrap view queries to database into a promise
+	 */
 	_callView(viewName, options) {
 		return new Promise(function(resolve, reject) {
 			this._db.view('monitool', viewName, options, function(error, result) {
@@ -24,6 +27,9 @@ class Store {
 		}.bind(this));
 	}
 
+	/**
+	 * Wrap list queries to database into a promise
+	 */
 	_callList(options) {
 		return new Promise(function(resolve, reject) {
 			this._db.list(options, function(error, result) {
@@ -35,6 +41,9 @@ class Store {
 		}.bind(this));
 	}
 
+	/**
+	 * Wrap bulk queries to database into a promise
+	 */
 	_callBulk(options) {
 		return new Promise(function(resolve, reject) {
 			this._db.bulk(options, function(error, result) {
@@ -47,7 +56,7 @@ class Store {
 	}
 
 	/**
-	 * Retrieve all models
+	 * Retrieve all models of current type.
 	 */
 	list() {
 		var view = 'by_type',

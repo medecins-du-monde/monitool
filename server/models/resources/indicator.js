@@ -3,7 +3,6 @@
 var validator = require('is-my-json-valid'),
 	Model     = require('../model'),
 	Store     = require('../store'),
-	Project   = require('./project'),
 	schema    = require('./indicator.json');
 
 var validate = validator(schema);
@@ -30,9 +29,23 @@ class Indicator extends Model {
 	}
 
 	/**
+	 * Validate that indicator does not make references to things that don't exist
+	 */
+	validateForeignKeys() {
+		return Theme.storeInstance.list().then(function(themes) {
+			this.themes.forEach(function(themeId) {
+				if (themes.filter(t => t._id === themeId).length === 0)
+					throw new Error('invalid_reference');
+			});
+		});
+	}
+
+	/**
 	 * Delete indicator and updates all projects that are using it.
 	 */
 	destroy() {
+		var Project = require('./project'); // circular import...
+
 		return Project.storeInstance.listCrossCutting(this._id, false).then(function(projects) {
 			// Delete cross cutting indicator from projects.
 			projects.forEach(function(project) { delete project.crossCutting[id]; });

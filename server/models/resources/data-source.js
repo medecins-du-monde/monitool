@@ -15,7 +15,7 @@ class DataSource {
 	 */
 	get signature() {
 		return JSON.stringify(
-			form.elements.map(function(element) {
+			this.elements.map(function(element) {
 				// the order of partitions matters => to not sort!
 				return [element.id, element.signature];
 				// the order of elements does not matters => sort by id to avoid rewriting all inputs for nothing.

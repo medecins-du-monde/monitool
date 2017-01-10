@@ -5,6 +5,9 @@ var validator    = require('is-my-json-valid'),
 	Store        = require('../store'),
 	Model        = require('../model'),
 	DataSource   = require('./data-source'),
+	Indicator    = require('./indicator'),
+	Input        = require('./input'),
+	Theme        = require('./theme'),
 	schema       = require('./project.json');
 
 var validate = validator(schema);
@@ -77,7 +80,14 @@ class ProjectStore extends Store {
 		});
 	}
 
+	/**
+	 * Retrieve all projects that are associated with a given theme
+	 * This is used to update the projects when deleting a theme
+	 */
 	listByTheme(themeId) {
+		if (typeof themeId !== 'string')
+			return Promise.reject(new Error("missing_parameter"));
+
 		throw new Error("Implement me")
 	}
 }
@@ -104,6 +114,9 @@ class Project extends Model {
 			});
 		});
 
+		// FIXME a lot is missing here.
+
+
 		// Create forms
 		this.forms = this.forms.map(f => new DataSource(f));
 
@@ -119,6 +132,18 @@ class Project extends Model {
 		return dataSources.length ? dataSources[0] : null;
 	}
 
+	getProjectUser(user) {
+		if (user.type === 'partner')
+			return user.projectId === this._id ? user : null;
+
+		else if (user.type === 'user') {
+			var projectUsers = this.users.filter(u => u.id === user._id);
+			return projectUsers.length !== 0 ? projectUsers[0] : null;
+		}
+		else
+			throw new Error('invalid_user');
+	}
+
 	getRole(user) {
 		if (user.type === 'partner')
 			return user.projectId !== this._id ? 'none' : user.role;
@@ -127,63 +152,125 @@ class Project extends Model {
 			if (user.role === 'admin')
 				return 'owner';
 			else {
-				var projectUsers = this.users.filter(u => u.id === user._id);
-				return projectUsers.length === 0 ? 'readonly' : projectUsers[0].role;
+				var projectUser = this.getProjectUser(user);
+				return projectUser ? projectUser.role : 'readonly';
 			}
 		}
 		else
-			return 'none';
+			throw new Error('invalid_user');
+	}
+
+	getPartnerByUsername(username) {
+		var matches = this.users.filter(function(u) { return u.username === username });
+		return matches.length ? matches[0] : null;
 	}
 
 	copyUnchangedPasswords(oldProject) {
 		this.users.forEach(function(user) {
-			// retrieve old user.
-			var oldUser = oldProject.getUserByUsername(user.username);
+			if (user.type === 'partner') {
+				// retrieve old user.
+				var oldUser = oldProject.getPartnerByUsername(user.username);
 
-			// copy hash
-			if (user.password === null && oldUser !== null)
-				user.password = oldUser.password;
+				// copy hash or raise error
+				if (user.password === null) {
+					if (oldUser)
+						user.password = oldUser.password;
+					else
+						throw new Error('invalid_data');
+				}
+			}
 		});
 	}
 
 	computeInputsUpdates(oldProject) {
-		var changedFormsId = [];
+		var changedFormsIds = [];
 
 		// Get all forms that existed before, and changed since last time.
 		this.forms.forEach(function(newForm) {
-			var oldForm = oldProject.forms.find(f => f.id == newForm.id);
+			var oldForm = oldProject.getDataSourceById(newForm.id);
 
 			if (oldForm && oldForm.signature !== newForm.signature)
-				changedFormsId.push(newForm.id)
+				changedFormsIds.push(newForm.id)
 		});
 
 		// Get all forms that were deleted.
 		oldProject.forms.forEach(function(oldForm) {
-			if (!oldProject.forms.find(f => f.id == oldForm.id))
-				changedFormsId.push(oldForm.id);
+			if (!oldProject.getDataSourceById(oldForm.id))
+				changedFormsIds.push(oldForm.id);
 		});
 
-		var promises = changedFormsId.map(formId => Input.listByDataSource(this._id, changedFormsId));
+		var promises = changedFormsIds.map(dataSourceId => Input.storeInstance.listByDataSource(this._id, dataSourceId));
 		
 		return Promise.all(promises).then(function(inputs) {
-			inputs = inputs.reduce((m, e) => Array.prototype.push.call(m, e), []);
+			inputs = inputs.reduce((m, e) => m.concat(e), []);
 			inputs.forEach(input => input.update(oldProject, this));
-
 			return inputs;
 		}.bind(this));
 	}
 
-	save() {
-		return Project
-			.get(this._id)
+	/**
+	 * Validate that project does not make references to things that don't exist
+	 */
+	validateForeignKeys() {
+		return Promise.all([Indicator.storeInstance.list(), Theme.storeInstance.list()]).then(function(res) {
+			var indicators = res[0], themes = res[1];
+
+			Object.keys(this.crossCutting).forEach(function(indicatorId) {
+				if (indicators.filter(i => i._id === indicatorId).length === 0)
+					throw new Error('invalid_reference');
+			});
+
+			this.themes.forEach(function(themeId) {
+				if (themes.filter(t => t._id === themeId).length === 0)
+					throw new Error('invalid_reference');
+			});
+		}.bind(this));
+	}
+
+	save(skipChecks) {
+		// If we skip checks, because we know what we are doing, just delegate to parent class.
+		if (skipChecks)
+			return super.save(true);
+
+		return this.validateForeignKeys()
+
+			// Get former project or null if missing.
+			.then(function() {
+				return Project.storeInstance.get(this._id).catch(function(error) {
+					// if we can't get former project for some other reason than "missing" we are done.
+					return error.message === 'missing' ? null : Promise.reject(error);
+				});
+			}.bind(this))
+
+			// Handle partner passwords & input structure
 			.then(function(oldProject) {
-				this.copyUnchangedPasswords(oldProject);
-				return this.computeInputsUpdates(oldProject);
-			})
+				// If we are updating, copy old passwords from the old project
+				if (oldProject)
+					this.copyUnchangedPasswords(oldProject);
+
+				// If we are updating the project, we need to update related inputs.
+				return oldProject ? this.computeInputsUpdates(oldProject) : [];
+			}.bind(this))
+
 			.then(function(updates) {
 				updates.push(this);
+
+				// FIXME
+				// Bulk operations are not really atomic in a couchdb database.
+				// if someone else is playing with the database at the same time, we might leave the database in an inconsistent state.
+				// This can be easily fixed http://stackoverflow.com/questions/29491618/transaction-like-update-of-two-documents-using-couchdb
+				return Project.storeInstance._callBulk({docs: updates});
+			}.bind(this))
+
+			.then(function(bulkResults) {
+				// bulk updates don't give us the whole document
+				var projectResult = bulkResults.filter(res => res.id === this._id)[0];
+				if (projectResult.error)
+					throw new Error(projectResult.error);
 				
-			});
+				this._rev = projectResult.rev;
+				return this; // return updated document.
+			}.bind(this));
 	}
 
 	toAPI() {
