@@ -10,8 +10,12 @@ class Model {
 		if (validate) {
 			validate(data);
 			var errors = validate.errors || [];
-			if (errors.length)
-				throw new Error('invalid_data');
+			if (errors.length) {
+				var error = new Error('invalid_data');
+				error.detail = errors;
+				error.model = data;
+				throw error;
+			}
 		}
 
 		Object.assign(this, data);
