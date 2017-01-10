@@ -69,6 +69,7 @@ class ProjectStore extends Store {
 					project.logicalFrames = project.users = project.themes = [];
 					project.forms.forEach(function(f) { f.elements = f.elements.filter(e => used[e.id]); });
 					project.forms = project.forms.filter(f => f.elements.length);
+					project.extraIndicators = [];
 				});
 			}
 			
