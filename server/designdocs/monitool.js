@@ -26,6 +26,24 @@ module.exports = {
 			}.toString()
 		},
 
+		project_by_theme: {
+			map: function(doc) {
+				if (doc.type === 'project')
+					doc.themes.forEach(function(themeId) {
+						emit(themeId);
+					});
+			}.toString()
+		},
+
+		indicator_by_theme: {
+			map: function(doc) {
+				if (doc.type === 'indicator')
+					doc.themes.forEach(function(themeId) {
+						emit(themeId);
+					});
+			}.toString()
+		},
+
 		cross_cutting: {
 			map: function(doc) {
 				if (doc.type === 'project')

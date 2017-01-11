@@ -88,7 +88,10 @@ class ProjectStore extends Store {
 		if (typeof themeId !== 'string')
 			return Promise.reject(new Error("missing_parameter"));
 
-		throw new Error("Implement me")
+		var view = 'project_by_theme', opt = {key: themeId, include_docs: true};
+		return this._callView(view, opt).then(function(result) {
+			return result.rows.map(row => new Project(row.doc));
+		});
 	}
 }
 
@@ -264,7 +267,7 @@ class Project extends Model {
 
 			.then(function(bulkResults) {
 				// bulk updates don't give us the whole document
-				var projectResult = bulkResults.filter(res => res.id === this._id)[0];
+				var projectResult = bulkResults.find(res => res.id === this._id);
 				if (projectResult.error)
 					throw new Error(projectResult.error);
 				
