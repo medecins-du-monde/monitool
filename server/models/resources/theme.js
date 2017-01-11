@@ -14,7 +14,7 @@ class ThemeStore extends Store {
 	get modelString() { return 'theme'; }
 
 	/**
-	 * Retrieve all themes
+	 * Retrieve all themes with their relative usage
 	 */
 	listWithUsage() {
 		var promises = [
@@ -53,38 +53,55 @@ class Theme extends Model {
 	}
 
 	destroy() {
-		throw new Error("Implement me");
+		var Project = require('./project'), Indicator = require('./indicator'); // circular import...
+		var promises = [Project.storeInstance.listByTheme(this._id), Indicator.storeInstance.listByTheme(this._id)];
+		
+		return Promise.all(promises)
+			.then(function(res) {
+				var projects = res[0], indicators = res[1];
 
-		// Promise.all([Project.listByTheme(this._id, false), Indicator.listByTheme(this._id)])
+				// Delete outself
+				this._deleted = true;
 
+				indicators.forEach(function(indicator) {
+					// Remove ourself from indicator.
+					indicator.themes = indicator.themes.filter(t => t !== this._id);
+				}, this);
+				
+				projects.forEach(function(project) {
+					// Remove ourself from project
+					project.themes = project.themes.filter(t => t !== this._id);
 
-		// return new Promise(function(resolve, reject) {
+					// Check if the crossCutting indicators in the projects are still relevant
+					for (var indicatorId in project.crossCutting) {
+						var indicator = indicators.find(i => i._id === indicatorId);
+						
+						// if the indicator is not in the list we just fetched, it won't be touched
+						// by the removal of the thematic (the indicator did not have it from the beginning, so
+						// it must be collected for another reason).
+						if (indicator) {
+							// if the intersection of themes between project and indicator have become empty
+							// because of removing ourself, we have to delete the indicator from the project.
+							var intersection = project.themes.filter(themeId => indicator.themes.indexOf(themeId) !== -1);
+							if (intersection.length === 0)
+								delete project.crossCutting[indicatorId];
+						}
+					}
+				}, this);
 
+				return Theme.storeInstance._callBulk({docs: indicators.concat(projects).concat([this])});
+			}.bind(this))
+			
+			.then(function(bulkResults) {
+				// bulk updates don't give us the whole document
+				var themeResult = bulkResults.find(res => res.id === this._id);
+				if (themeResult.error)
+					throw new Error(themeResult.error);
 
-
-
-		// 	Project.listByTheme(this._id, false).then(function(projects) {
-		// 		// Delete theme from projects.
-		// 		projects.forEach(function(project) {
-		// 			project.themes = project.themes.filter(themeId => themeId !== this._id);
-		// 		}, this);
-
-		// 		// Mark ourself as deleted
-		// 		this._deleted = true;
-
-		// 		// Save everything in on request
-		// 		var docs = projects.concat([this]);
-		// 		database.bulk({docs: docs}, function(error) {
-		// 			if (error)
-		// 				return reject(error);
-		// 			resolve();
-		// 		});
-
-		// 	}.bind(this));
-		// });
+			}.bind(this));
 	}
-
 
 }
 
 module.exports = Theme;
+
