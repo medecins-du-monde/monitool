@@ -511,7 +511,7 @@ var ENGLISH_TRANSLATION = {
 		basics_help_name: "The project's name allow finding your project in Monitool. Choose something that is informative enought, or copy the general objective.",
 		basics_help_thematics: "The thematics that you choose will determine which cross-cutting indicators your project will need to collect.",
 		basics_help_begin: "The begin date is the moment when your projects starts collecting data (usually, with the first activities)",
-		basics_help_end: "The end date is the moment when your project closes it's data collection. If unknown, enter a date far into the future.",
+		basics_help_end: "The end date is the moment when your project closes its data collection. If unknown, enter a date far into the future.",
 
 		collection_site_info:
 			"<p>When a project have the same activities on different sites, those activities need to be followed-up by site, groups of sites, and at project level.</p>" + 
