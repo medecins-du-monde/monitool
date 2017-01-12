@@ -7,6 +7,9 @@ var express = require('express'),
 
 module.exports = express.Router()
 
+	/**
+	 * Generate the cubes for a given project
+	 */
 	.get('/project/:id', function(request, response) {
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
@@ -29,6 +32,9 @@ module.exports = express.Router()
 			);
 	})
 
+	/**
+	 * Generates the cubes for a given indicator
+	 */
 	.get('/indicator/:id', function(request, response) {
 		if (request.user.type == 'partner')
 			return response.jsonError(new Error('forbidden'));

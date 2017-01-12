@@ -12,8 +12,10 @@ module.exports = express.Router()
 	// Configure Oauth Routes
 	///////////////////////////////////////////////////////////////
 
-	// Users gets send here to be presented a dialog asking them if they OK the client accessing their data.
-	// They come with the client id and the return URL that we have to send them to with their autorization code once they say OK.
+	/**
+	 * Users gets send here to be presented a dialog asking them if they OK the client accessing their data.
+	 * They come with the client id and the return URL that we have to send them to with their autorization code once they say OK.
+	 */
 	.get(
 		'/authorization',
 
@@ -52,6 +54,9 @@ module.exports = express.Router()
 		}
 	)
 
+	/**
+	 * This handler is called when submitting the form from /authorization
+	 */
 	.post(
 		'/decision',
 
@@ -70,6 +75,9 @@ module.exports = express.Router()
 		server.decision()
 	)
 
+	/**
+	 * This handler is called by oauth2 clients to get an access token
+	 */
 	.post(
 		'/access',
 
@@ -89,6 +97,9 @@ module.exports = express.Router()
 	// Configure Login/Logout routes.
 	///////////////////////////////////////////////////////////////
 
+	/**
+	 * This handler is POSTed to validate the username and password of partners
+	 */
 	.post(
 		'/login-partner',
 		bodyParser,
@@ -98,6 +109,10 @@ module.exports = express.Router()
 		})
 	)
 
+	/**
+	 * This handler is called to log in users with azure oauth.
+	 * It checks if user is already logged in, and redirect to azure if not.
+	 */
 	.get(
 		'/login',
 
@@ -119,6 +134,9 @@ module.exports = express.Router()
 		passport.authenticate('user_azure')
 	)
 
+	/**
+	 * This handler is called when users come back from azure.
+	 */
 	.get(
 		'/login-callback',
 		
@@ -136,7 +154,10 @@ module.exports = express.Router()
 		}
 	)
 
-	// FIXME this query is not idempotent, and should be POST.
+	/**
+	 * Log current user out.
+	 * FIXME This query should be POST: loggin an user out is not idempotent.
+	 */
 	.get('/logout', function(request, response) {
 		request.session.destroy();
 		request.logout();

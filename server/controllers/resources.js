@@ -16,9 +16,12 @@ var bodyParser = require('body-parser').json();
 
 module.exports = express.Router()
 
+	/**
+	 * FIXME => this should be in another file and included in app.js
+	 * Check that user is properly authenticated with a cookie.
+	 * and that it's really a user, not a client that found a way to get a cookie.
+	 */
 	.use(function(request, response, next) {
-		// Check that user is properly authenticated with a cookie.
-		// and that it's really a user, not a client that found a way to get a cookie.
 		if (request.isAuthenticated && request.isAuthenticated() && request.user && (request.user.type === 'user' || request.user.type === 'partner'))
 			next();
 		else {
@@ -37,14 +40,22 @@ module.exports = express.Router()
 		}
 	})
 
+	/**
+	 * Get current logged in account information
+	 * This is used by the client to check if current session is valid and learn user name for display purposes.
+	 */
 	.get('/myself', function(request, response) {
 		response.json(request.user || null);
 	})
 
-	///////////////////////////////////////////
-	// Special cases: projects and inputs
-	///////////////////////////////////////////
-
+	/**
+	 * Retrieve multiple projects.
+	 *
+	 * Multiple modes are supported
+	 * 		- no parameter: Retrieve all projects.
+	 *		- ?mode=short: Retrieve all projects (only country, name, themes, and current user).
+	 *		- ?mode=crossCutting&indicatorId=123: Retrieve projects that collect indicator 123 (bare minimum to compute indicator from cubes).
+	 */
 	.get('/project', function(request, response) {
 		var promise;
 		if (request.user.type === 'user' && request.query.mode === 'short')
@@ -69,6 +80,10 @@ module.exports = express.Router()
 
 		promise.then(response.jsonPB, response.jsonErrorPB);
 	})
+
+	/**
+	 * Retrieve one project
+	 */
 	.get('/project/:id', function(request, response) {
 		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
@@ -78,6 +93,9 @@ module.exports = express.Router()
 			.then(response.jsonPB, response.jsonErrorPB);
 	})
 
+	/**
+	 * Save a project
+	 */
 	.put('/project/:id', bodyParser, function(request, response) {
 		// Validate that the _id in the payload is the same as the id in the URL.
 		if (request.body._id !== request.params.id)
@@ -108,7 +126,10 @@ module.exports = express.Router()
 			.then(response.jsonPB, response.jsonErrorPB);
 	})
 
-	.delete('/project/:id', bodyParser, function(request, response) {
+	/**
+	 * Delete a project
+	 */
+	.delete('/project/:id', function(request, response) {
 		// Partners cannot delete projects (that would be deleting themselves).
 		if (request.user.type !== 'user')
 			return response.jsonError(new Error('forbidden'));
@@ -122,6 +143,14 @@ module.exports = express.Router()
 		}).then(response.jsonPB, response.jsonErrorPB);
 	})
 
+	/**
+	 * Retrieve a list of inputs, or inputs ids.
+	 * 
+	 * Multiple modes are supported
+	 * 		- ids_by_form: retrieve all input ids that match a given projectId and formId
+	 *		- ids_by_entity: retrieve all inputs ids that match a given projectId and entityId
+	 * 		- current+last: retrieve a given input and the previous one (with projectId, formId, entityId & period)
+	 */
 	.get('/input', function(request, response) {
 		var promise, q = request.query;
 
@@ -154,6 +183,9 @@ module.exports = express.Router()
 		promise.then(response.jsonPB, response.jsonErrorPB);
 	})
 
+	/**
+	 * Retrieve one input by id
+	 */
 	.get('/input/:id', function(request, response) {
 		var projectId = request.params.id.split(':')[0];
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
@@ -162,6 +194,9 @@ module.exports = express.Router()
 		Input.storeInstance.get(request.params.id).then(response.jsonPB, response.jsonErrorPB);
 	})
 
+	/**
+	 * Save an input
+	 */
 	.put('/input/:id', bodyParser, function(request, response) {
 		// Validate that the _id in the payload is the same as the id in the URL.
 		if (request.body._id !== request.params.id)
@@ -187,6 +222,9 @@ module.exports = express.Router()
 		}).then(response.jsonPB, response.jsonErrorPB);
 	})
 
+	/**
+	 * Delete an input.
+	 */
 	.delete('/input/:id', function(request, response) {
 		var projectId = request.params.id.split(':')[0];
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
@@ -211,11 +249,10 @@ module.exports = express.Router()
 			.then(response.jsonPB, response.jsonErrorPB);
 	})
 
-	///////////////////////////////////////////
-	// General case
-	///////////////////////////////////////////
-
-	// list
+	/**
+	 * List indicators, themes, users
+	 * (Those are public data).
+	 */
 	.get('/:modelName(indicator|theme|user)', function(request, response) {
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
 			Model = ModelsByName[request.params.modelName];
@@ -223,7 +260,9 @@ module.exports = express.Router()
 		Model.storeInstance.list().then(response.jsonPB, response.jsonErrorPB);
 	})
 
-	// get item
+	/**
+	 * Get an indicator, theme or user.
+	 */
 	.get('/:modelName(indicator|theme|user)/:id', function(request, response) {
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
 			Model = ModelsByName[request.params.modelName];
@@ -231,6 +270,9 @@ module.exports = express.Router()
 		Model.storeInstance.get(request.params.id).then(response.jsonPB, response.jsonErrorPB);
 	})
 
+	/**
+	 * Save an indicator, theme or user (need to be admin).
+	 */
 	.put('/:modelName(indicator|theme|user)/:id', bodyParser, function(request, response) {
 		// Only admin accounts can touch indicators, themes and users.
 		if (request.user.role !== 'admin')
@@ -254,6 +296,9 @@ module.exports = express.Router()
 		}
 	})
 
+	/**
+	 * Delete an indicator, theme or user (need to be admin).
+	 */
 	.delete('/:modelName(indicator|input|theme)/:id', bodyParser, function(request, response) {
 		// Only admin accounts can touch indicators, themes and users.
 		if (request.user.role !== 'admin')

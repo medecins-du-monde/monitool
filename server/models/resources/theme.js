@@ -46,12 +46,16 @@ class Theme extends Model {
 	static get storeInstance() { return storeInstance; }
 
 	/**
-	 * Deserialize and validate a project that comes from the API.
+	 * Deserialize and validate a theme
 	 */
 	constructor(data) {
 		super(data, validate);
 	}
 
+	/**
+	 * Delete the theme from the database.
+	 * This method also updates all indicators and projects that used the theme and related cross-cutting indicators.
+	 */
 	destroy() {
 		var Project = require('./project'), Indicator = require('./indicator'); // circular import...
 		var promises = [Project.storeInstance.listByTheme(this._id), Indicator.storeInstance.listByTheme(this._id)];

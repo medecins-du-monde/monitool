@@ -8,8 +8,7 @@ class Model {
 
 	/**
 	 * Construct model from POJO
-	 * A first validation step will happen here to ensure that the POJO is properly
-	 * formatted for this model.
+	 * A first validation step will happen here to ensure that the POJO is properly formatted.
 	 */
 	constructor(data, validate) {
 		if (validate) {
