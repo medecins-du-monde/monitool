@@ -44,9 +44,14 @@ class Indicator extends Model {
 	}
 
 	/**
-	 * Validate that indicator does not make references to things that don't exist
+	 * Validate that indicator does not make references to themes that don't exist
 	 */
 	validateForeignKeys() {
+		// If not themes are defined, early quit
+		if (this.themes.length === 0)
+			return Promise.resolve();
+
+		// Otherwise we just fetch all themes and check.
 		return Theme.storeInstance.list().then(function(themes) {
 			this.themes.forEach(function(themeId) {
 				if (themes.filter(t => t._id === themeId).length === 0)

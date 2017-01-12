@@ -130,23 +130,33 @@ class Project extends Model {
 		});
 	}
 
+	/**
+	 * Retrieve a datasource by id.
+	 */
 	getDataSourceById(id) {
-		var dataSources = this.forms.filter(ds => ds.id === id);
-		return dataSources.length ? dataSources[0] : null;
+		return this.forms.find(ds => ds.id === id);
 	}
 
+	/**
+	 * Retrieve the user object from the project that correspond to a user session (request.user).
+	 * User session may be a real user, or a partner.
+	 * This method does not throw if the user is not found.
+	 */
 	getProjectUser(user) {
 		if (user.type === 'partner')
 			return user.projectId === this._id ? user : null;
 
-		else if (user.type === 'user') {
-			var projectUsers = this.users.filter(u => u.id === user._id);
-			return projectUsers.length !== 0 ? projectUsers[0] : null;
-		}
+		else if (user.type === 'user')
+			return this.users.find(u => u.id === user._id);
+
 		else
 			throw new Error('invalid_user');
 	}
 
+	/**
+	 * Get the role of an account from its session.
+	 * The role may be one of: "none", "readonly", "input", "input_all" or "owner".
+	 */
 	getRole(user) {
 		if (user.type === 'partner')
 			return user.projectId !== this._id ? 'none' : user.role;
@@ -163,11 +173,19 @@ class Project extends Model {
 			throw new Error('invalid_user');
 	}
 
+	/**
+	 * Retrieve a partner account from its username.
+	 * This is used to update passwords
+	 */
 	getPartnerByUsername(username) {
-		var matches = this.users.filter(function(u) { return u.username === username });
-		return matches.length ? matches[0] : null;
+		return this.users.find(function(u) { return u.username === username });
 	}
 
+	/**
+	 * Take the previous version of the project, and copies all password hashes
+	 * from it (this allows not sending them to the client back and forth).
+	 * This is used when saving the project.
+	 */
 	copyUnchangedPasswords(oldProject) {
 		this.users.forEach(function(user) {
 			if (user.type === 'partner') {
@@ -185,6 +203,10 @@ class Project extends Model {
 		});
 	}
 
+	/**
+	 * Take the previous version of the project, and compute all updates
+	 * to inputs that are needed to deal with the structural changes of the forms.
+	 */
 	computeInputsUpdates(oldProject) {
 		var changedFormsIds = [];
 
@@ -212,7 +234,7 @@ class Project extends Model {
 	}
 
 	/**
-	 * Validate that project does not make references to things that don't exist
+	 * Validate that project does not make references to indicators and themes that don't exist.
 	 */
 	validateForeignKeys() {
 		return Promise.all([Indicator.storeInstance.list(), Theme.storeInstance.list()]).then(function(res) {
@@ -230,6 +252,14 @@ class Project extends Model {
 		}.bind(this));
 	}
 
+	/**
+	 * Save the project.
+	 * 
+	 * This method makes many checks do deal with the fact that there are no foreign keys nor update method.
+	 * 	- validate that all foreign keys exist.
+	 *	- copy the passwords that were not changed for partners.
+	 *	- update all inputs that need a change (depending on structural changes in data sources).
+	 */
 	save(skipChecks) {
 		// If we skip checks, because we know what we are doing, just delegate to parent class.
 		if (skipChecks)
@@ -279,6 +309,7 @@ class Project extends Model {
 	toAPI() {
 		var json = Object.assign({}, this);
 
+		// Replace the password by null before sending the project to the user.
 		json.users = this.users.map(function(user) {
 			user = Object.assign({}, user);
 			if (user.type === 'partner')

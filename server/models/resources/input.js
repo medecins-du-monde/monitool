@@ -16,7 +16,7 @@ class InputStore extends Store {
 
 	/**
 	 * Retrieve all input ids that are linked to a particular data source.
-	 * Used
+	 * Usage
 	 *		- Populate datasource planning (/projects/xxx/input).
 	 *		- Display warning message when data source is deleted.
 	 */
@@ -135,21 +135,26 @@ class Input extends Model {
 		if (parts.length !== 4 || parts[0] !== this.project || parts[1] !== this.entity || parts[2] !== this.form || parts[3] !== this.period)
 			throw new Error('invalid_id');
 
-		// check that timeslot is valid
+		// Check that timeslot is valid
 		try { new TimeSlot(this.period); }
 		catch (e) { throw new Error('invalid_period'); }
 	}
 
+	/**
+	 * Compute the new value of an input variable according to the changes that were made
+	 * in the partitions of a variable.
+	 */
 	_computeUpdatedValuesKey(oldVariable, newVariable) {
 		// Result will be an array of size numValues
 		var oldValues = this.values[newVariable.id],
 			newValues = new Array(newVariable.numValues);
 
-		// If the form element did not exist before, fill with zeros.
+		// If the variable did not exist before, fill with zeros.
 		if (!oldVariable) {
 			for (var fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex)
 				newValues[fieldIndex] = 0;
 		}
+		// If the variable changed, recompute.
 		else {
 			var decodedValues = {};
 
@@ -163,7 +168,7 @@ class Input extends Model {
 				for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
 					var subsetKey = peIds.filter((id, index) => subsetIndex & (1 << index)).join('.');
 
-					// FIXME this assumes that we sum data.
+					// FIXME this assumes that we sum data which is not always the case.
 					if (decodedValues[subsetKey] == undefined)
 						decodedValues[subsetKey] = 0;
 					decodedValues[subsetKey] += field || 0;
@@ -182,21 +187,13 @@ class Input extends Model {
 		return newValues;
 	}
 
-	_computeUpdatedValuesHash(oldDataSource, newDataSource) {
-		var newInputValues = {};
-
-		newDataSource.elements.forEach(function(newVariable) {
-			var oldVariable = oldDataSource.getVariableById(newVariable.id);
-			newInputValues[newVariable.id] = this._computeUpdatedValuesKey(oldVariable, newVariable);
-		}, this);
-
-		return newInputValues;
-	}
-
+	/**
+	 * When a project changes, update the content of this input's values.
+	 */
 	update(oldProject, newProject) {
 		var newDataSource = newProject.getDataSourceById(this.form);
 
-		// The form was deleted, so we can delete the input as well.
+		// The data source was deleted, so we can delete the input as well.
 		if (!newDataSource) {
 			this._deleted = true;
 			return true;
@@ -207,12 +204,26 @@ class Input extends Model {
 		if (oldDataSource.signature === newDataSource.signature)
 			return false;
 
-		this.values = this._computeUpdatedValuesHash(oldDataSource, newDataSource);
+		// We need to update the values.
+		var newInputValues = {};
+
+		newDataSource.elements.forEach(function(newVariable) {
+			var oldVariable = oldDataSource.getVariableById(newVariable.id);
+
+			// Update only values that changed.
+			if (!oldVariable || oldVariable.signature !== newVariable.signature)
+				newInputValues[newVariable.id] = this._computeUpdatedValuesKey(oldVariable, newVariable);
+		}, this);
+		
+		this.values = newInputValues;
+
 		return true;
 	}
 
 	/**
-	 * Validate that input does not make references to things that don't exist
+	 * Validate that input does not make references to project, datasource, variable, partitions that don't exist
+	 * We don't check for valid periodicity and entity because the client supports having inputs that are "out of calendar".
+	 * This allows not loosing data when we update the periodicity of a data source but will be removed.
 	 */
 	validateForeignKeys() {
 		var Project = require('./project'); // Circular import...
@@ -242,12 +253,6 @@ class Input extends Model {
 					if (!variable)
 						errors.push('extra_variable_' + variable.id);
 				}
-
-				// FIXME
-				// We don't check for valid periodicity and entity
-				// before the client supports having inputs that are "out of calendar".
-				// This allows not loosing data when we update the periodicity of a data source
-				// but will be removed.
 			}
 			else
 				// Data source must exist

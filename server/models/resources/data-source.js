@@ -11,7 +11,10 @@ class DataSource {
 	}
 
 	/**
-	 * Signature that changes when the storage of this data source changes
+	 * Signature of this variable
+	 * The signature is a string with no special meaning that changes when the way to store this variable in
+	 * inputs will change.
+	 * It is used to know when it is needed to update inputs.
 	 */
 	get signature() {
 		return JSON.stringify(
@@ -23,9 +26,11 @@ class DataSource {
 		);
 	}
 
+	/**
+	 * Retrieve a variable by id
+	 */
 	getVariableById(id) {
-		var variables = this.elements.filter(el => el.id === id);
-		return variables.length ? variables[0] : null;
+		return this.elements.find(el => el.id === id);
 	}
 
 }

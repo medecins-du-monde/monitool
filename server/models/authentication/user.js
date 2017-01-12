@@ -31,7 +31,7 @@ class User extends Model {
 	static get storeInstance() { return storeInstance; }
 
 	/**
-	 * Deserialize and validate a project that comes from the API.
+	 * Deserialize and validate POJO
 	 */
 	constructor(data) {
 		super(data, validate);
