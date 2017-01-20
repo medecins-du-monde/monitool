@@ -76,8 +76,13 @@ class Cube {
 
 			// Retrieve data from input, and copy (if valid).
 			var source = input.values[element.id];
-			if (!source || source.length !== length) {
-				console.log("Skip variable", element.id, 'from', input._id, "(value size mismatch)");
+			if (!source) {
+				console.log("Skip variable", element.id, 'from', input._id, "(value missing)");
+				return;
+			}
+
+			if (source.length !== length) {
+				console.log("Skip variable", element.id, 'from', input._id, "(value size mismatch expected", length, ", found", source.length, ")");
 				return;
 			}
 			
