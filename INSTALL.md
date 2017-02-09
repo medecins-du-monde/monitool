@@ -1,6 +1,4 @@
-# Monitool
-
-## Installation guide
+# Monitool installation guide
 
 We assume in this manual than:
 
