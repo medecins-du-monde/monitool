@@ -3,9 +3,6 @@
 var Dimension = require('./dimension'),
 	DimensionGroup = require('./dimension-group');
 
- 
-
-
 /**
  * This class represents an OLAP Cube (https://en.wikipedia.org/wiki/OLAP_cube)
  * 
@@ -434,13 +431,6 @@ class Cube {
 	}
 
 }
-
-
-
-
-
-
-
 
 
 module.exports = Cube;
