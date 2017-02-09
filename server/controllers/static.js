@@ -16,6 +16,6 @@ router.get('/ping', function(request, response) {
  * Serve static files.
  * This could be done by the webserver.
  */
-router.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? 'client/dev' : 'client/build'));
+router.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? 'client' : 'wwwroot'));
 
 module.exports = router;

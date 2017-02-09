@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 "use strict";
 
 var express      = require('express'),
@@ -5,8 +7,8 @@ var express      = require('express'),
 	cookieParser = require('cookie-parser'),
 	session      = require('express-session'),
 	path         = require('path'),
-	passport     = require('./authentication/passport'),
-	config       = require('../config');
+	passport     = require('../server/authentication/passport'),
+	config       = require('../server/config');
 
 var CouchSessionStore = require('connect-couchdb')(session),
 	store = new CouchSessionStore({
@@ -39,7 +41,7 @@ express()
 	.disable('x-powered-by')
 
 	.set('view engine', 'jade')
-	.set('views', path.join(__dirname, 'views'))
+	.set('views', path.join(__dirname, '../server/views'))
 
 	.use(compression())
 	
@@ -68,16 +70,16 @@ express()
 		next();
 	})
 
-	.use(require('./controllers/static'))
+	.use(require('../server/controllers/static'))
 
 	.use(cookieParser())
 	.use(session({ secret: 'cd818da5bcd0d3d9ba5a9a44e49148d2', resave: false, saveUninitialized: false, store: store }))
 	.use(passport.initialize())
 	.use(passport.session())
 
-	.use('/authentication', require('./controllers/authentication'))
-	.use('/resources', require('./controllers/resources'))
-	.use('/reporting', require('./controllers/reporting'))
+	.use('/authentication', require('../server/controllers/authentication'))
+	.use('/resources', require('../server/controllers/resources'))
+	.use('/reporting', require('../server/controllers/reporting'))
 	
 	.listen(config.port);
 

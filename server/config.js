@@ -1,6 +1,6 @@
 
 try {
-	module.exports = require('./config.json');
+	module.exports = require('../config.json');
 }
 catch (e) {
 	module.exports = {
