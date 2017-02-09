@@ -14,36 +14,36 @@ var async         = require('async'),
 	es            = require('event-stream'),
 	request       = require('request'),
 	Queue         = require('streamqueue'),
-	config        = require('./config');
+	config        = require('./server/config');
 
 var files = {
 	css: [
-		'client/dev/bower_components/font-awesome/css/font-awesome.min.css',
-		'client/dev/bower_components/bootstrap-css-only/css/bootstrap.min.css',
-		'client/dev/bower_components/angular-ui-select/dist/select.min.css',
-		'client/dev/bower_components/c3/c3.min.css',
-		'client/dev/bower_components/handsontable/dist/handsontable.full.css',
+		'client/bower_components/font-awesome/css/font-awesome.min.css',
+		'client/bower_components/bootstrap-css-only/css/bootstrap.min.css',
+		'client/bower_components/angular-ui-select/dist/select.min.css',
+		'client/bower_components/c3/c3.min.css',
+		'client/bower_components/handsontable/dist/handsontable.full.css',
 	],
 	js: [
-		"client/dev/bower_components/pdfmake/build/pdfmake.min.js",
-		"client/dev/bower_components/pdfmake/build/vfs_fonts.js",
-		"client/dev/bower_components/blob/Blob.js",
-		"client/dev/bower_components/canvas-to-Blob.js/canvas-toBlob.js",
-		"client/dev/bower_components/file-saver/FileSaver.min.js",
-		"client/dev/bower_components/angular/angular.min.js",
-		"client/dev/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js",
-		"client/dev/bower_components/angular-ui-router/release/angular-ui-router.min.js",
-		"client/dev/bower_components/angular-ui-select/dist/select.min.js",
-		"client/dev/bower_components/angular-cookies/angular-cookies.min.js",
-		"client/dev/bower_components/angular-resource/angular-resource.min.js",
-		"client/dev/bower_components/angular-translate/angular-translate.min.js",
-		"client/dev/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js",
-		"client/dev/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js",
-		"client/dev/bower_components/d3/d3.min.js",
-		"client/dev/bower_components/c3/c3.min.js",
-		"client/dev/bower_components/handsontable/dist/handsontable.full.min.js",
-		"client/dev/bower_components/Sortable/Sortable.min.js",
-		"client/dev/bower_components/Sortable/ng-sortable.js"
+		"client/bower_components/pdfmake/build/pdfmake.min.js",
+		"client/bower_components/pdfmake/build/vfs_fonts.js",
+		"client/bower_components/blob/Blob.js",
+		"client/bower_components/canvas-to-Blob.js/canvas-toBlob.js",
+		"client/bower_components/file-saver/FileSaver.min.js",
+		"client/bower_components/angular/angular.min.js",
+		"client/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js",
+		"client/bower_components/angular-ui-router/release/angular-ui-router.min.js",
+		"client/bower_components/angular-ui-select/dist/select.min.js",
+		"client/bower_components/angular-cookies/angular-cookies.min.js",
+		"client/bower_components/angular-resource/angular-resource.min.js",
+		"client/bower_components/angular-translate/angular-translate.min.js",
+		"client/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js",
+		"client/bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js",
+		"client/bower_components/d3/d3.min.js",
+		"client/bower_components/c3/c3.min.js",
+		"client/bower_components/handsontable/dist/handsontable.full.min.js",
+		"client/bower_components/Sortable/Sortable.min.js",
+		"client/bower_components/Sortable/ng-sortable.js"
 	]
 };
 
@@ -55,15 +55,15 @@ gulp.task('default', ['build']);
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
 
 gulp.task('clean', function(cb) {
-	del(['client/build/**/*'], cb);
+	del(['wwwroot/**/*'], cb);
 });
 
 gulp.task('copy-static', ['bower'], function() {
-	gulp.src('client/dev/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('client/build'));
-	gulp.src('client/dev/favicon.ico').pipe(gulp.dest('client/build'));
-	gulp.src('client/dev/bower_components/font-awesome/fonts/*').pipe(gulp.dest('client/build'));
-	gulp.src('client/dev/bower_components/bootstrap/fonts/*').pipe(gulp.dest('client/build'));
-	gulp.src('client/dev/img/*').pipe(gulp.dest('client/build/img'));
+	gulp.src('client/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('wwwroot'));
+	gulp.src('client/favicon.ico').pipe(gulp.dest('wwwroot'));
+	gulp.src('client/bower_components/font-awesome/fonts/*').pipe(gulp.dest('wwwroot'));
+	gulp.src('client/bower_components/bootstrap-css-only/fonts/*').pipe(gulp.dest('wwwroot'));
+	gulp.src('client/img/*').pipe(gulp.dest('wwwroot/img'));
 });
 
 gulp.task('build-js', ['bower'], function() {
@@ -75,14 +75,14 @@ gulp.task('build-js', ['bower'], function() {
 
 	// js are annotated, uglified
 	queue.queue(
-		gulp.src(['client/dev/js/**/*.js', 'client/dev/i18n/**/*.js', '!client/dev/js/**/*_test.js'])
+		gulp.src(['client/js/**/*.js', 'client/i18n/**/*.js', '!client/js/**/*_test.js'])
 			.pipe(ngAnnotate())
 			.pipe(uglify())
 	);
 
 	// merge all templates into one angular module.
 	queue.queue(
-		gulp.src('client/dev/partials/**/*.html')
+		gulp.src('client/partials/**/*.html')
 			.pipe(replace(/<!--[\s\S]*?-->/g, ''))	// Remove HTML comments
 			.pipe(replace(/[  \t\n\r]+/g, ' '))		// Merge spaces
 			.pipe(templateCache({module: 'monitool.app', root: 'partials'}))
@@ -91,28 +91,28 @@ gulp.task('build-js', ['bower'], function() {
 	// concat it all.
 	return queue.done()
 				.pipe(concat('monitool2.js'))
-				.pipe(gulp.dest('client/build'));
+				.pipe(gulp.dest('wwwroot'));
 });
 
 gulp.task('build-css', ['bower'], function() {
 	var queue = new Queue({ objectMode: true });
 	queue.queue(gulp.src(files.css));
-	queue.queue(gulp.src('client/dev/css/**/*.css').pipe(cleanCSS()));
+	queue.queue(gulp.src('client/css/**/*.css').pipe(cleanCSS()));
 
 	return queue.done()
 				.pipe(concat('monitool2.css'))
 				.pipe(replace(/\.\.\/fonts\//g, ''))
-				.pipe(gulp.dest('client/build'));
+				.pipe(gulp.dest('wwwroot'));
 });
 
 gulp.task('bower', function() {
-	return bower({cwd: './client/dev'});
+	return bower({cwd: './client'});
 });
 
 gulp.task('design-docs', function(callback) {
 	var urlPrefix = config.couchdb.url + '/' + config.couchdb.bucket;
 	var ddocs = {
-		monitool: require('./server/designdocs/monitool')
+		monitool: require('./designdocs/monitool')
 	};
 
 	var numDocs = 3;

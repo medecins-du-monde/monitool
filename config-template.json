@@ -9,8 +9,8 @@
 		"password": ""
 	},
 	"oauth": {
-		"authUrl": "",
-		"tokenUrl": "",
+		"authUrl": "https://login.windows.net/xxxxxxxxxxxxxx/oauth2/authorize",
+		"tokenUrl": "https://login.windows.net/xxxxxxxxxxxxxx/oauth2/token",
 		"clientId": "",
 		"clientSecret": "",
 		"callbackUrl": "http://localhost:8000/auth/callback",
