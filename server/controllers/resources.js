@@ -17,7 +17,7 @@ var bodyParser = require('body-parser').json();
 module.exports = express.Router()
 
 	/**
-	 * FIXME => this should be in another file and included in app.js
+	 * FIXME => this middleware should be in another file and included in app.js
 	 * Check that user is properly authenticated with a cookie.
 	 * and that it's really a user, not a client that found a way to get a cookie.
 	 */

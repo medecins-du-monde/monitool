@@ -25,9 +25,13 @@ All others dependencies can be installed by using the adapted package managers
 We assume in this manual than:
 
 - Your virtual machine is reachable at `monitool.yourorganization.com`.
-- You are using a debian base distribution.
+- You are using a debian based distribution.
 - Your name is "John Doe" (please, do not leave default password).
 
+Also
+- You must have a working firewall that does not accept incoming connections to
+	- CouchDB (port: 5984)
+	- Monitool (port: 8000)
 
 ### Installing NodeJS
 
@@ -95,9 +99,6 @@ We assume that NodeJS is already installed and running.
 	# Install all dependencies needed by Monitool's API
 	> npm install
 
-	# Build all javascript release files
-	> gulp build
-
 We now need to create a configuration file
 
 	# Copy the reference file
@@ -128,10 +129,18 @@ We now need to create a configuration file
 	}
 
 
+The last step is to build release files, and configure the database
+
+	# Build all javascript release files
+	> gulp build
+
+	# Configure the database
+	> gulp design-docs
 
 ### Installing monitool as a service (only for production server)
 
-An easy way to install a NodeJS application as a service is to use pm2
+An easy way to install a NodeJS application as a service is to use pm2.
+
 FIXME
 
 
@@ -149,3 +158,4 @@ Simply run the app.js file with nodejs
 ### On a production machine
 
 Monitool is installed as a service, and already running.
+
