@@ -2,9 +2,9 @@
 
 var uuid              = require('node-uuid'),
 	oauth2orize       = require('oauth2orize'),
-	Client            = require('../models/authentication/client'),
-	AccessToken       = require('../models/authentication/access-token'),
-	AuthorizationCode = require('../models/authentication/authorization-code');
+	Client            = require('../resource/model/client'),
+	AccessToken       = require('../resource/model/access-token'),
+	AuthorizationCode = require('../resource/model/authorization-code');
 
 var server = oauth2orize.createServer();
 

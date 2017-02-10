@@ -3,7 +3,7 @@
 var express    = require('express'),
 	passport   = require('../authentication/passport'),
 	server     = require('../authentication/oauth'),
-	Client     = require('../models/authentication/client'),
+	Client     = require('../resource/model/client'),
 	bodyParser = require('body-parser').urlencoded({extended: false});
 
 module.exports = express.Router()

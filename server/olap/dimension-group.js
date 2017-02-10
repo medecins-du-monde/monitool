@@ -2,6 +2,10 @@
 
 var TimeSlot = require('./time-slot');
 
+/**
+ * A DimensionGroup allows to query cubes on dimension aggregates.
+ * For instance, for a cube containing a "date" dimension, then a "month" dimension group can be created.
+ */
 class DimensionGroup {
 
 	static createTime(parent, dimension) {

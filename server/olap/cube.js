@@ -4,25 +4,7 @@ var Dimension = require('./dimension'),
 	DimensionGroup = require('./dimension-group');
 
 /**
- * This class represents an OLAP Cube (https://en.wikipedia.org/wiki/OLAP_cube)
- * 
- * @example
- * var time = new Dimension('year', ['2013', '2014', '2015'], 'sum'),
- *     location = new Dimension('location', ['shopA', 'shopB'], 'sum');
- * 
- * var c = new Cube('sells', [time, location], [], [10, 20, 30, 15, 43, 60]);
- * 
- * c.query();
- * // 178
- * 
- * c.query(['year']);
- * // {2013: 25, 2014: 63, 2015: 90}
- * 
- * c.query(['year', 'location']);
- * // {2013: {shopA: 10, shopB: 20}, 2014: {shopA: 30, shopB: 15}, 2015: {shopA: 43, shopB: 60}}
- * 
- * c.query(['year', 'location'], {year: ['2013', '2014']}, true);
- * // {2013: {shopA: 10, shopB: 20, _total: 30}, 2014: {shopA: 30, shopB: 15, _total: 45}, _total: 75}
+ * This class represents an [OLAP Cube](https://en.wikipedia.org/wiki/OLAP_cube)
  */
 class Cube {
 
@@ -31,6 +13,12 @@ class Cube {
 	 * 
 	 * @param {Object} obj Object retrieved by calling the serialize method on a Cube instance.
 	 * @return {Cube}
+	 * 
+	 * @example
+	 * let c   = new Cube(...),
+	 *     str = JSON.stringify(c.serialize()),
+	 *     obj = JSON.parse(str),
+	 *     c2  = Cube.fromSerialization(obj);
 	 */
 	static fromSerialization(obj) {
 		return new Cube(obj.id, obj.dimensions, obj.dimensionGroups, obj.data);
@@ -44,6 +32,16 @@ class Cube {
 	 * @param {Variable} element
 	 * @param {Array.<Input>} inputs
 	 * @return {Cube}
+	 * 
+	 * @example
+	 * let projectId = '6acefb96-a047-4b77-a698-6a9da3994306';
+	 * 
+	 * Project.store.get(projectId).then(function(project) {
+	 *     Input.listByDataSource(projectId, project.forms[0].id).then(function(inputs) {
+	 *         let c =  = Cube.fromElement(project, project.forms[0], project.forms[0].element[0], inputs);
+	 *         // do stuff here
+	 *     });
+	 * });
 	 */
 	static fromElement(project, form, element, inputs) {
 		////////////
@@ -137,6 +135,12 @@ class Cube {
 	 * @param {Array.<Dimension>} dimensions The list of dimensions that this cube is using
 	 * @param {Array.<DimensionGroup>} dimensionGroups The list of dimension groups that this cube is using
 	 * @param {Array.<number>} data Data contained in the cube. The size of this array must be the product of the number of elements in the dimension.
+	 * 
+	 * @example
+	 * var time = new Dimension('year', ['2013', '2014', '2015'], 'sum'),
+	 *     location = new Dimension('location', ['shopA', 'shopB'], 'sum');
+	 * 
+	 * var c = new Cube('sells', [time, location], [], [10, 20, 30, 15, 43, 60]);
 	 */
 	constructor(id, dimensions, dimensionGroups, data) {
 		// Check size.
@@ -164,6 +168,21 @@ class Cube {
 	 * @param {Object.<string, Array.<string>>} filters Elements that should be included by dimension. Missing dimensions are not filtered.
 	 * @param {boolean} [withTotals=false] Include an additional "total" key at every level
 	 * @return {Object|number} An nested object which contain total value in each dimensionElement.
+	 *
+	 * @example
+	 * var c = new Cube(...);
+	 * 
+	 * c.query();
+	 * // 178
+	 * 
+	 * c.query(['year']);
+	 * // {2013: 25, 2014: 63, 2015: 90}
+	 * 
+	 * c.query(['year', 'location']);
+	 * // {2013: {shopA: 10, shopB: 20}, 2014: {shopA: 30, shopB: 15}, 2015: {shopA: 43, shopB: 60}}
+	 * 
+	 * c.query(['year', 'location'], {year: ['2013', '2014']}, true);
+	 * // {2013: {shopA: 10, shopB: 20, _total: 30}, 2014: {shopA: 30, shopB: 15, _total: 45}, _total: 75}
 	 */
 	query(dimensionIds, filter, withTotals) {
 		// End condition
@@ -225,8 +244,8 @@ class Cube {
 	 * 
 	 * @example
 	 * let cube = Cube.fromSerialization(...);
-	 * var result = cube._query_total({year: ['2014'], "bc4b0c3f-ee9d-4507-87ad-6eaea9102cd9": ["2d31a636-1739-4b77-98a5-bf9b7a080626"]})
-	 * console.log(result == 2321) // true
+	 * let result = cube._query_total({year: ['2014'], "bc4b0c3f-ee9d-4507-87ad-6eaea9102cd9": ["2d31a636-1739-4b77-98a5-bf9b7a080626"]})
+	 * result // 2321
 	 */
 	_query_total(filter) {
 		// rewrite the filter so that it contains only dimensions.
@@ -240,7 +259,24 @@ class Cube {
 		}
 	}
 
-	// FIXME we need to push/pop instead of shift/unshift (it's 10 times faster).
+	/**
+	 * Retrieve the total value matching given indexes and read offset.
+	 * 
+	 * @private
+	 * @todo Would be faster to use push/pop instead of shift/unshift into the indexes.
+	 * 
+	 * @param  {Array.<Array.<number>>}
+	 * @param  {number}
+	 * @return {number|undefined}
+	 *
+	 * @example
+	 * var c = new Cube('sells', [time, location], [], [0, 1, 2, 3, 4, 5, 6]);
+	 * c._query_rec([], 0); // 0
+	 * c._query_rec([], 2); // 2
+	 *
+	 * c._query_rec([[1, 2]], 0); // 3
+	 * c._query_rec([[0], [0]], 5); // 5
+	 */
 	_query_rec(allIndexes, offset) {
 		if (allIndexes.length == 0)
 			return this.data[offset] == -2147483648 ? undefined : this.data[offset];
@@ -331,9 +367,8 @@ class Cube {
 		return result;
 	}
 
-
 	/**
-	 * when querying the cube with _query_total(), we only support
+	 * When querying the cube with _query_total(), we only support
 	 * using dimensions (and not dimensionGroups).
 	 * 
 	 * This rewrites any filter so that they use dimensions.

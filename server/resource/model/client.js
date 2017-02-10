@@ -1,13 +1,7 @@
 "use strict";
 
-var Store = require('../store'),
-	Model = require('../model');
-
-class ClientStore extends Store {
-
-	get modelClass() { return Client; }
-	get modelString() { return 'client'; }
-}
+var Model       = require('./model'),
+	ClientStore = require('../store/client');
 
 var storeInstance = new ClientStore();
 

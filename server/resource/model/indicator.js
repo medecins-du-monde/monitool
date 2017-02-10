@@ -1,36 +1,14 @@
 "use strict";
 
-var validator = require('is-my-json-valid'),
-	Model     = require('../model'),
-	Store     = require('../store'),
-	Theme     = require('./theme'),
-	schema    = require('./indicator.json');
-
-var validate = validator(schema);
-
-class IndicatorStore extends Store {
-
-	get modelClass() { return Indicator; }
-	get modelString() { return 'indicator'; }
+var validator      = require('is-my-json-valid'),
+	Model          = require('./model'),
+	IndicatorStore = require('../store/indicator'),
+	Theme          = require('./theme'),
+	schema         = require('../schema/indicator.json');
 
 
-	/**
-	 * Retrieve all indicators that are associated with a given theme
-	 * This is used to update the indicators when deleting a theme
-	 */
-	listByTheme(themeId) {
-		if (typeof themeId !== 'string')
-			return Promise.reject(new Error("missing_parameter"));
-
-		var view = 'indicator_by_theme', opt = {key: themeId, include_docs: true};
-		return this._callView(view, opt).then(function(result) {
-			return result.rows.map(row => new Indicator(row.doc));
-		});
-	}
-}
-
-var storeInstance = new IndicatorStore();
-
+var validate = validator(schema),
+	storeInstance = new IndicatorStore();
 
 class Indicator extends Model {
 

@@ -2,13 +2,13 @@
 
 var express     = require('express'),
 	passport    = require('../authentication/passport'),
-	AccessToken = require('../models/authentication/access-token'),
-	Client      = require('../models/authentication/client'),
-	User        = require('../models/authentication/user'),
-	Indicator   = require('../models/resources/indicator'),
-	Input       = require('../models/resources/input'),
-	Project     = require('../models/resources/project'),
-	Theme       = require('../models/resources/theme');
+	AccessToken = require('../resource/model/access-token'),
+	Client      = require('../resource/model/client'),
+	User        = require('../resource/model/user'),
+	Indicator   = require('../resource/model/indicator'),
+	Input       = require('../resource/model/input'),
+	Project     = require('../resource/model/project'),
+	Theme       = require('../resource/model/theme');
 
 var bodyParser = require('body-parser').json();
 

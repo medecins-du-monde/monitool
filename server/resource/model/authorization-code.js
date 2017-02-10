@@ -1,13 +1,7 @@
 "use strict";
 
-var Store = require('../store'),
-	Model = require('../model');
-
-class AuthorizationCodeStore extends Store {
-
-	get modelClass() { return AuthorizationCode; }
-	get modelString() { return 'authorization-code'; }
-}
+var Model                  = require('./model'),
+	AuthorizationCodeStore = require('../store/authorization-code');
 
 var storeInstance = new AuthorizationCodeStore();
 

@@ -1,16 +1,9 @@
 "use strict";
 
-var Store = require('../store'),
-	Model = require('../model');
-
-class RefreshTokenStore extends Store {
-
-	get modelClass() { return RefreshToken; }
-	get modelString() { return 'refresh-token'; }
-}
+var Model             = require('./model'),
+	RefreshTokenStore = require('../store/refresh-token');
 
 var storeInstance = new RefreshTokenStore();
-
 
 class RefreshToken extends Model {
 
