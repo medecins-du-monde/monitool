@@ -1,8 +1,8 @@
 "use strict";
 
 var express = require('express'),
-	Input   = require('../models/resources/input'),
-	Project = require('../models/resources/project'),
+	Input   = require('../resource/model/input'),
+	Project = require('../resource/model/project'),
 	CubeCollection = require('../olap/cube-collection');
 
 module.exports = express.Router()

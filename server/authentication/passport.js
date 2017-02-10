@@ -7,10 +7,10 @@ var passport               = require('passport'),
 	OAuth2Strategy         = require('passport-oauth2'),
 	ClientPasswordStrategy = require('passport-oauth2-client-password'),
 	passwordHash           = require('password-hash'),
-	User                   = require('../models/authentication/user'),
-	Client                 = require('../models/authentication/client'),
-	AccessToken            = require('../models/authentication/access-token'),
-	config                 = require('../../config');
+	User                   = require('../resource/model/user'),
+	Client                 = require('../resource/model/client'),
+	AccessToken            = require('../resource/model/access-token'),
+	config                 = require('../config');
 
 /////////////////////////////////////////////////////////////////////////////
 // User serialization

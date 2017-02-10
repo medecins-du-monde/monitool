@@ -1,16 +1,10 @@
 "use strict";
 
-var Store = require('../store'),
-	Model = require('../model');
+var Model            = require('./model'),
+	AccessTokenStore = require('../store/access-token');
 
-class AccessTokenStore extends Store {
-
-	get modelClass() { return AccessToken; }
-	get modelString() { return 'access-token'; }
-}
 
 var storeInstance = new AccessTokenStore();
-
 
 class AccessToken extends Model {
 

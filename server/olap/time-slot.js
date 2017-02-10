@@ -1,7 +1,23 @@
 "use strict";
 
+/**
+ * A class representing a time slot used in monitoring.
+ * This can be a given day, epidemiological week, month, quarter, ...
+ */
 class TimeSlot {
 
+	/**
+	 * @param  {Date} utcDate Date which we want to build the TimeSlot around 
+	 * @param  {string} periodicity One of day, week_sat, week_sun, week_mon, month, quarter, semester, year
+	 * @return {TimeSlot} The TimeSlot instance of the given periodicity containing utcDate
+	 *
+	 * @example
+	 * let ts = TimeSlot.fromDate(new Date(2010, 01, 07, 18, 34), "month");
+	 * ts.value // '2010-01'
+	 * 
+	 * let ts2 = TimeSlot.fromDate(new Date(2010, 12, 12, 6, 21), "quarter");
+	 * ts2.value // '2010-Q4'
+	 */
 	static fromDate(utcDate, periodicity) {
 		if (periodicity === 'day')
 			return new TimeSlot(utcDate.toISOString().substring(0, 10));
@@ -43,8 +59,18 @@ class TimeSlot {
 			throw new Error("Invalid periodicity");
 	}
 
-	// This function is incredibly verbose for what it does
-	// Probably a single divmod could give the same result but debugging was nightmarish.
+	/**
+	 * Get the date from which we should count weeks to compute the epidemiological week number.
+	 * 
+	 * @private
+	 * @todo
+	 * This function is incredibly verbose for what it does.
+	 * Probably a single divmod could give the same result but debugging was nightmarish.
+	 * 
+	 * @param  {number} year
+	 * @param  {string} periodicity
+	 * @return {Date}
+	 */
 	static _getEpidemiologicWeekEpoch(year, periodicity) {
 		var SUNDAY = 0, MONDAY = 1, TUESDAY = 2, WEDNESDAY = 3, THURSDAY = 4, FRIDAY = 5, SATURDAY = 6;
 		var firstDay = new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0)).getUTCDay();
@@ -125,14 +151,34 @@ class TimeSlot {
 		return new Date(epoch);
 	};
 
+	/**
+	 * Constructs a TimeSlot instance from a time slot value.
+	 * The periodicity will be automatically computed.
+	 * 
+	 * @param  {string} value A valid TimeSlot value (those can be found calling the `value` getter).
+	 */
 	constructor(value) {
 		this._value = value;
 	}
 
+	/**
+	 * The value of the TimeSlot.
+	 * This is a string that uniquely identifies this timeslot.
+	 * 
+	 * For instance: `2010`, `2010-Q1`, `2010-W07-sat`.
+	 * @type {string}
+	 */
 	get value() {
 		return this._value;
 	}
 
+	/**
+	 * The periodicity used for this timeslot.
+	 * By periodicity, we mean, the method that was used to cut time into slots.
+	 *
+	 * For instance: `year`, `quarter`, `week-sat`, ...
+	 * @type {string}
+	 */
 	get periodicity() {
 		if (!this._periodicity) {
 			if (this.value.match(/^\d{4}$/))
@@ -163,6 +209,14 @@ class TimeSlot {
 		return this._periodicity;
 	}
 
+	/**
+	 * The date where this instance of TimeSlot begins.
+	 * 
+	 * @type {Date}
+	 * @example
+	 * var t = new TimeSlot('2012-01');
+	 * t.firstDate.toUTCString(); // 2012-01-01T00:00:00Z
+	 */
 	get firstDate() {
 		if (this.periodicity === 'day')
 			return new Date(this.value + 'T00:00:00Z');
@@ -194,6 +248,14 @@ class TimeSlot {
 			return new Date(this.value + '-01-01T00:00:00Z');
 	}
 
+	/**
+	 * The date where this instance of TimeSlot ends.
+	 * 
+	 * @type {Date}
+	 * @example
+	 * var t = new TimeSlot('2012-01');
+	 * t.firstDate.toUTCString(); // 2012-01-31T00:00:00Z
+	 */
 	get lastDate() {
 		if (this.periodicity === 'day')
 			// last day is current day
@@ -229,6 +291,18 @@ class TimeSlot {
 			return new Date(this.value + '-12-31T00:00:00Z');
 	}
 
+	/**
+	 * Creates a TimeSlot instance with a longer periodicity that contains this one.
+	 * 
+	 * @param  {string} newPeriodicity The desired periodicity
+	 * @return {TimeSlot} A new TimeSlot instance.
+	 * 
+	 * @example
+	 * let t  = new TimeSlot('2010-07'),
+	 *     t2 = t.toUpperSlot('quarter');
+	 *
+	 * t2.value; // 2010-Q3
+	 */
 	toUpperSlot(newPeriodicity) {
 		// Raise when we make invalid conversions
 		if (TimeSlot._upperSlots[this.periodicity].indexOf(newPeriodicity) === -1)
@@ -246,6 +320,17 @@ class TimeSlot {
 		return TimeSlot.fromDate(upperSlotDate, newPeriodicity);
 	}
 
+	/**
+	 * Creates a TimeSlot instance of the same periodicity than the current once, but which follows it
+	 * 
+	 * @return {TimeSlot}
+	 * @example
+	 * var ts = new TimeSlot('2010');
+	 * ts.next().value // 2011
+	 *
+	 * var ts2 = new TimeSlot('2010-W52-sat');
+	 * ts.next().value // 2011-W01-sat
+	 */
 	next() {
 		var date = this.lastDate;
 		date.setUTCDate(date.getUTCDate() + 1);
@@ -253,6 +338,12 @@ class TimeSlot {
 	}
 };
 
+/**
+ * Static member documenting which periodicity contains the others.
+ *
+ * @private
+ * @type {Object}
+ */
 TimeSlot._upperSlots = {
 	'day': ['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'],
 	'week_sat': ['month', 'quarter', 'semester', 'year'],

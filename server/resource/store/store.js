@@ -6,8 +6,13 @@ var nano     = require('nano'),
 
 class Store {
 
-	get modelClass() { throw new Error('modelClass'); }
-	get modelString() { throw new Error('modelString'); }
+	get modelClass() {
+		return require('../model/' + this.modelString);
+	}
+
+	get modelString() {
+		throw new Error('modelString must be overriden');
+	}
 	
 	constructor() {
 		this._db = database;

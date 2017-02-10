@@ -8,9 +8,9 @@
     "monitool": "./bin/monitool.js"
   },
   "scripts": {
-    "test-server": "./node_modules/mocha/bin/mocha --recursive server.test ",
+    "test": "./node_modules/mocha/bin/mocha --recursive server/test ",
     "test-client": "./node_modules/karma/bin/karma start",
-    "doc-server": "./node_modules/.bin/jsdoc -c jsdoc-server.json",
+    "doc-server": "./node_modules/.bin/jsdoc --package package.json --readme README.md -c jsdoc-server.json",
     "doc-client": "./node_modules/.bin/jsdoc -c jsdoc-client.json"
   },
   "devDependencies": {
