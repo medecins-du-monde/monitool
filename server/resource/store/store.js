@@ -4,22 +4,46 @@ var nano     = require('nano'),
 	config   = require('../../config'),
 	database = nano(config.couchdb.url).use(config.couchdb.bucket);
 
+/**
+ * Represents a collection of models.
+ * 
+ * This is an abstract from which all stores inherit.
+ */
 class Store {
 
+	/**
+	 * Get the name of this store.
+	 *
+	 * @type {Function}
+	 */
 	get modelClass() {
 		return require('../model/' + this.modelString);
 	}
 
+	/**
+	 * Get the name of this store
+	 *
+	 * @abstract
+	 * @type {string}
+	 */
 	get modelString() {
 		throw new Error('modelString must be overriden');
 	}
 	
+	/**
+	 * Create a new store
+	 */
 	constructor() {
 		this._db = database;
 	}
 
 	/**
 	 * Wrap view queries to database into a promise
+	 * 
+	 * @protected
+	 * @param  {string} viewName
+	 * @param  {Object} options
+	 * @return {Array}
 	 */
 	_callView(viewName, options) {
 		return new Promise(function(resolve, reject) {
@@ -34,6 +58,10 @@ class Store {
 
 	/**
 	 * Wrap list queries to database into a promise
+	 * 
+	 * @protected
+	 * @param  {Object} options
+	 * @return {Array}
 	 */
 	_callList(options) {
 		return new Promise(function(resolve, reject) {
@@ -48,6 +76,10 @@ class Store {
 
 	/**
 	 * Wrap bulk queries to database into a promise
+	 * 
+	 * @protected
+	 * @param  {Object} options
+	 * @return {Array}
 	 */
 	_callBulk(options) {
 		return new Promise(function(resolve, reject) {
@@ -62,6 +94,8 @@ class Store {
 
 	/**
 	 * Retrieve all models of current type.
+	 * 
+	 * @return {Array.<Model>}
 	 */
 	list() {
 		var view = 'by_type',
@@ -75,6 +109,8 @@ class Store {
 
 	/**
 	 * Retrieve a given model
+	 * 
+	 * @return {Model}
 	 */
 	get(id) {
 		return new Promise(function(resolve, reject) {
