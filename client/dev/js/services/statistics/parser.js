@@ -316,6 +316,9 @@ angular.module('monitool.services.statistics.parser', [])
 		function neg(a) {
 			return -a;
 		}
+		function default_val(a, b) {
+			return a === undefined || Number.isNaN(a) ? b : a;
+		}
 
 		function random(a) {
 			return Math.random() * (a || 1);
@@ -382,7 +385,7 @@ angular.module('monitool.services.statistics.parser', [])
 				"%": mod,
 				"^": Math.pow,
 				",": append,
-				"||": concat
+				"||": default_val
 			};
 
 			this.functions = {

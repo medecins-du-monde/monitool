@@ -411,9 +411,9 @@ angular
 				itemsLists.push(dimension.items);
 			}
 
-			// intersect them
+			// union them
 			var items = itemsLists.reduce(function(memo, arr) {
-				return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
+				return memo == null ? arr.slice() : memo.concat(arr.filter(function(el) { return memo.indexOf(el) === -1; }));
 			}, null) || [];
 
 			// sort what remains (why? those the display order depends on this one?)
@@ -519,13 +519,20 @@ angular
 				for (var key2 in parameter.filter)
 					finalFilter[key2] = parameter.filter[key2];
 
-				localScope[key] = cube._query_total(finalFilter);
-				if (typeof localScope[key] !== 'number') // undefined, 'AGGREGATION_FORBIDDEN', 'INVALID_AGGREGATION_MODE'
+				try {
+					localScope[key] = cube._query_total(finalFilter);
+				}
+				catch (e) {
+					localScope[key] = undefined;
+				}
+
+				if (typeof localScope[key] === 'string') // 'AGGREGATION_FORBIDDEN', 'INVALID_AGGREGATION_MODE'
 					return localScope[key];
 			}
 
 			try {
-				return Parser.evaluate(this.computation.formula, localScope);
+				var result = Parser.evaluate(this.computation.formula, localScope);
+				return Number.isNaN(result) ? 'MISSING_DATA' : result;
 			}
 			catch (e) {
 				return 'INVALID_FORMULA';

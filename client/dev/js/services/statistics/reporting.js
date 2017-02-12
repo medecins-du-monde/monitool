@@ -157,7 +157,7 @@ angular
 					}
 				}
 				catch (e) {
-					row.message = 'project.not_available';
+					row.message = 'project.no_data';
 				}
 			}
 
