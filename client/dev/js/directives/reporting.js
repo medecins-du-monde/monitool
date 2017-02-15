@@ -85,7 +85,26 @@ angular.module('monitool.directives.reporting', [])
 				if (!table.nodeType)
 					table = document.getElementById(table)
 
-				var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML};
+				var innerHTML = table.innerHTML;
+				innerHTML = innerHTML.replace(/<!--[\s\S]*?-->/g, ''); // remove comments
+				innerHTML = innerHTML.replace(/<i class.*?<\/i>/g, ''); // remove pictograms
+				
+				// remove checkboxes
+				innerHTML = innerHTML.replace(/<input.*?>/g, '');
+				innerHTML = innerHTML.replace(/<div class="btn-group btn-group-xs">[\s\S]*?<\/div>/g, '');
+				innerHTML = innerHTML.replace(/<div class="btn-toolbar">[\s\S]*?<\/div>/g, '');
+				innerHTML = innerHTML.replace(/<div class="btn-toolbar">[\s\S]*?<\/div>/g, '');
+				innerHTML = innerHTML.replace(/<div class="pull-right">[\s\S]*?<\/div>/g, '');
+				
+				// Replace label by complete content
+				innerHTML = innerHTML.replace(/<label for=".*?" title="(.*?)" class="ng-binding">.*?<\/label>/g, function(match, title) {
+					return title;
+				});
+
+				// remove angular, classes, styles attrs
+				innerHTML = innerHTML.replace(/ (ng-[a-z]+?|class|style|reporting-field|title|translate)=".*?"/g, '');
+
+				var ctx = {worksheet: name || 'Worksheet', table: innerHTML};
 				// window.location.href = uri + base64(format(template, ctx));
 
 				var blob = new Blob([format(template, ctx)], {type: "application/vnd.ms-excel"});
