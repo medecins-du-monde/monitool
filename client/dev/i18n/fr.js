@@ -448,7 +448,7 @@ var FRENCH_TRANSLATION = {
 		collects: {
 			some_entity: "Pour certains lieux de collecte",
 			entity: "Pour tous les lieux de collecte",
-			project: "Une fois pour tout le projet"
+			project: "Pour tout le projet"
 		},
 
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',

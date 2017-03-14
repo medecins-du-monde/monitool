@@ -448,7 +448,7 @@ var SPANISH_TRANSLATION = {
 		collects: {
 			some_entity: "Para algunos de los lugares de colecta",
 			entity: "Para cada lugar de colecta",
-			project: "Una vez para todo el proyecto"
+			project: "Para todo el proyecto"
 		},
 
 		no_input_entities: '¡Ningún lugar de colecta ha sido creado!',

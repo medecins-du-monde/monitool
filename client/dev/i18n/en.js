@@ -448,7 +448,7 @@ var ENGLISH_TRANSLATION = {
 		collects: {
 			some_entity: "For some of the collection sites",
 			entity: "For each collection site",
-			project: "Once for the whole project"
+			project: "For the whole project"
 		},
 		
 		no_input_entities: 'No collection site was created yet!',
