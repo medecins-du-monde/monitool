@@ -71,7 +71,10 @@ gulp.task('build-js', ['bower'], function() {
 	queue.queue()
 
 	// min.js are unchanged
-	queue.queue(gulp.src(files.js));
+	queue.queue(
+		gulp.src(files.js)
+			.pipe(replace('glyphicon', 'fa'))
+	);
 
 	// js are annotated, uglified
 	queue.queue(
