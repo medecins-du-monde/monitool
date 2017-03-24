@@ -71,6 +71,7 @@ var strategy = new OAuth2Strategy(
 	// This method is invoked upon auth sequence completion
 	// Its the hook to cache the access/refresh tokens, post-process the Azure profile, etc.
 	function (accessToken, refreshToken, profile, done) {
+		return done(this._callbackURL);
 		currentDomain =/https?:\/\/([a-z]+\.)+([a-z]+\.[a-z]+)\//gi.exec(this._callbackURL)[2]
 		try {
 			var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
@@ -82,7 +83,7 @@ var strategy = new OAuth2Strategy(
 					"Try closing and reopening your browser to log in again."
 				);
 			
-			return done(userId);
+			
 			User.get(userId, function(error, user) {
 				if (error) {
 					user = {_id: userId, type: 'user', name: profile.name, role: 'common'};
