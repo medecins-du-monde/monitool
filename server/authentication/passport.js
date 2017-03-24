@@ -73,7 +73,6 @@ var strategy = new OAuth2Strategy(
 	function (accessToken, refreshToken, profile, done) {
 		var currentDomain =/https?:\/\/([a-z]+\.)+([a-z]+\.[a-z]+)\//gi.exec(this._callbackURL)[2]
 		try {
-		return done(currentDomain);
 			var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
 				domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
@@ -83,6 +82,7 @@ var strategy = new OAuth2Strategy(
 					"Try closing and reopening your browser to log in again."
 				);
 			
+		return done(userId);
 			
 			User.get(userId, function(error, user) {
 				if (error) {
