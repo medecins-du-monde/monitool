@@ -82,8 +82,6 @@ var strategy = new OAuth2Strategy(
 					"Try closing and reopening your browser to log in again."
 				);
 			
-		return done(userId);
-			
 			User.get(userId, function(error, user) {
 				if (error) {
 					user = {_id: userId, type: 'user', name: profile.name, role: 'common'};
