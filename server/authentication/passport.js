@@ -75,9 +75,10 @@ var strategy = new OAuth2Strategy(
 			var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
 				domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
-			if (domain !== 'medecinsdumonde.net')
+			currentDomain =/https?:\/\/([a-z]+\.)+([a-z]+\.[a-z]+)\//gi.exec(this._callbackURL)[2]
+			if (domain !== currentDomain)
 				return done(
-					"You must use an account from medecinsdumonde.net (not " + domain + ").\n" +
+					"You must use an account from " + currentDomain + " (not " + domain + ").\n" +
 					"Try closing and reopening your browser to log in again."
 				);
 			
