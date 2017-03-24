@@ -119,4 +119,79 @@ The last step is to build release files, and configure the database
 
 An easy way to install a NodeJS application as a service is to use pm2.
 
+install pm2
+
+	sudo npm install pm2 -g
+	
+Run this command to run your application as a service by typing the following:
+
+	sudo env PATH=$PATH:/usr/local/bin pm2 startup  -u USER --hp /home/USER/
+	
+prepar configuration excute app
+
+	pm2 ecosystem
+	vi ecosystem.config.js
+
+example ecosystem.config.js
+
+	module.exports = {
+  		/**
+   		* Application configuration section
+   		* http://pm2.keymetrics.io/docs/usage/application-declaration/
+   		*/
+  		apps : [
+
+    			// First application
+    			{
+      				name      : "monitool",
+      				script    : "server/app.js",
+      				env: {
+        				COMMON_VARIABLE: "true"
+      				},
+      				env_production : {
+        				NODE_ENV: "production"
+      				},
+      				cwd       : "/home/USER/monitool"
+    			}
+  		],
+
+  		/**
+   		* Deployment section
+   		* http://pm2.keymetrics.io/docs/usage/deployment/
+   		*/
+  		deploy : {
+    			production : {
+    	  			user : "node",
+    	  			host : "212.83.163.1",
+    	  			ref  : "origin/master",
+    	  			repo : "git@github.com:repo.git",
+    	  			path : "/var/www/production",
+    	  			"post-deploy" : "npm install && pm2 startOrRestart ecosystem.config.js --env production"
+    			},
+    			dev : {
+      				user : "node",
+      				host : "212.83.163.1",
+      				ref  : "origin/master",
+      				repo : "git@github.com:repo.git",
+      				path : "/var/www/development",
+      				"post-deploy" : "npm install && pm2 startOrRestart ecosystem.config.js --env dev",
+      				env  : {
+        				NODE_ENV: "dev"
+      				}
+    			}
+  		}
+	}
+	
+	
+start app
+
+	pm2 start ecosystem.config.js
+	pm2 save
+	
+enable on boot
+
+	sudo systemctl enable pm2-USER
+	
+
+
 FIXME
