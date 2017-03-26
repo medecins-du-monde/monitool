@@ -103,7 +103,16 @@ We now need to create a configuration file
 			"clientSecret": <get this from azure>,
 			"callbackUrl": "http://monitool.yourorganization.com/authentication/login-callback",
 			"resource": "https://graph.windows.net"
-		}
+		},
+        	"apps": [{
+                	"name"       : "monitool",
+                	"script"     : "server/app.js",
+                	"cwd"        : "/home/USER/monitool",
+                	"error_file" : "log/monitool-error.log",
+                	"out_file"   : "log/monitool-out.log",
+                	"pid_file"   : "pids/monitool.pid",
+                	"watch"      : true
+        	}]
 	}
 
 
@@ -126,66 +135,16 @@ install pm2
 Run this command to run your application as a service by typing the following:
 
 	sudo env PATH=$PATH:/usr/local/bin pm2 startup  -u USER --hp /home/USER/
+	sudo chmod 0644 /etc/systemd/system/pm2-USER.service
+	sudo vim /etc/systemd/system/pm2-USER.service
 	
-prepar configuration excute app
+delet line
 
-	pm2 ecosystem
-	vi ecosystem.config.js
-
-example ecosystem.config.js
-
-	module.exports = {
-  		/**
-   		* Application configuration section
-   		* http://pm2.keymetrics.io/docs/usage/application-declaration/
-   		*/
-  		apps : [
-
-    			// First application
-    			{
-      				name      : "monitool",
-      				script    : "server/app.js",
-      				env: {
-        				COMMON_VARIABLE: "true"
-      				},
-      				env_production : {
-        				NODE_ENV: "production"
-      				},
-      				cwd       : "/home/USER/monitool"
-    			}
-  		],
-
-  		/**
-   		* Deployment section
-   		* http://pm2.keymetrics.io/docs/usage/deployment/
-   		*/
-  		deploy : {
-    			production : {
-    	  			user : "node",
-    	  			host : "212.83.163.1",
-    	  			ref  : "origin/master",
-    	  			repo : "git@github.com:repo.git",
-    	  			path : "/var/www/production",
-    	  			"post-deploy" : "npm install && pm2 startOrRestart ecosystem.config.js --env production"
-    			},
-    			dev : {
-      				user : "node",
-      				host : "212.83.163.1",
-      				ref  : "origin/master",
-      				repo : "git@github.com:repo.git",
-      				path : "/var/www/development",
-      				"post-deploy" : "npm install && pm2 startOrRestart ecosystem.config.js --env dev",
-      				env  : {
-        				NODE_ENV: "dev"
-      				}
-    			}
-  		}
-	}
-	
+	Type=forking
 	
 start app
 
-	pm2 start ecosystem.config.js
+	pm2 start monitool/config.json
 	pm2 save
 	
 enable on boot
