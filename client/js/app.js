@@ -17,7 +17,7 @@
 
 "use strict";
 
-var app = angular.module('monitool.app', [
+window.monitool = angular.module('monitool.app', [
 
 	'monitool.controllers.admin',
 	'monitool.controllers.helper',
@@ -65,7 +65,7 @@ var app = angular.module('monitool.app', [
 /**
  * Init translation modules
  */
-app.config(function($translateProvider) {
+window.monitool.config(function($translateProvider) {
 	$translateProvider.translations('fr', FRENCH_TRANSLATION);
 	$translateProvider.translations('en', ENGLISH_TRANSLATION);
 	$translateProvider.translations('es', SPANISH_TRANSLATION);
@@ -76,11 +76,11 @@ app.config(function($translateProvider) {
 });
 
 
-app.run(function($rootScope) {
+window.monitool.run(function($rootScope) {
 	$rootScope.userCtx = window.user;
 });
 
-app.run(function($translate, $rootScope, $locale) {
+window.monitool.run(function($translate, $rootScope, $locale) {
 	var langKey = $translate.use();
 	
 	$rootScope.languages = {fr: "french", en: "english", es: 'spanish'};
@@ -99,7 +99,7 @@ app.run(function($translate, $rootScope, $locale) {
 /**
  * Init datepicker modules
  */
-app.config(function(uibDatepickerConfig, uibDatepickerPopupConfig) {
+window.monitool.config(function(uibDatepickerConfig, uibDatepickerPopupConfig) {
 	uibDatepickerConfig.showWeeks = false;
 	uibDatepickerConfig.startingDay = 1;
 	uibDatepickerPopupConfig.showButtonBar = false;
@@ -110,7 +110,7 @@ app.config(function(uibDatepickerConfig, uibDatepickerPopupConfig) {
  * Remove all properties prefixed by "__" when submitting to server
  * (which allow us to add helper properties on objects, and not submit them).
  */
-app.config(function($httpProvider) {
+window.monitool.config(function($httpProvider) {
 
 	$httpProvider.defaults.transformRequest.unshift(function(data) {
 		if (!data)
@@ -182,7 +182,7 @@ app.config(function($httpProvider) {
 	});
 });
 
-app.config(function($stateProvider, $urlRouterProvider) {
+window.monitool.config(function($stateProvider, $urlRouterProvider) {
 
 	///////////////////////////
 	// redirects
@@ -499,7 +499,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 });
 
 
-app.run(function($rootScope, $state) {
+window.monitool.run(function($rootScope, $state) {
 	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
 		if (error.status === 401) {
 			alert("Session has expired, you need to log in again");

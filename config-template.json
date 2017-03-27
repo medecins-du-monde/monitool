@@ -10,10 +10,18 @@
 		"username": "",
 		"password": ""
 	},
-	"oauth": {
-		"authUrl": "https://login.windows.net/common/oauth2/authorize",
-		"tokenUrl": "https://login.windows.net/common/oauth2/token",
-		"clientId": "[enter client id]",
-		"clientSecret": "[enter client secret]"
+	"auth": {
+		"azureAD": {
+			"label": "Use MDM account",
+			"domain": "medecinsdumonde.net",
+			"authUrl": "https://login.windows.net/common/oauth2/authorize",
+			"tokenUrl": "https://login.windows.net/common/oauth2/token",
+			"clientId": "[enter client id]",
+			"clientSecret": "[enter client secret]"
+		},
+		"training": {
+			"label": "Use training account (admin)",
+			"account": "romain.gilliotte"
+		}
 	}
 }

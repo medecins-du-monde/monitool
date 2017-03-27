@@ -19,7 +19,9 @@
 
 var express     = require('express'),
 	serveStatic = require('serve-static'),
-	router      = express.Router();
+	router      = express.Router(),
+	config      = require('../config'),
+	pkg         = require('../../package.json');
 
 
 /**
@@ -33,6 +35,18 @@ router.get('/ping', function(request, response) {
  * Serve static files.
  * This could be done by the webserver.
  */
-router.use(serveStatic(process.argv.indexOf('--dev') !== -1 ? 'client' : 'wwwroot'));
+router.use(serveStatic(config.debug ? 'client' : 'wwwroot'));
+
+
+router.get('/', function(request, response) {
+	response.render('index', {
+		debug: config.debug,
+		version: pkg.version,
+		trainingLabel: config.auth.training ? config.auth.training.label : null,
+		azureLabel: config.auth.azureAD ? config.auth.azureAD.label : null,
+		googleLabel: config.auth.google ? config.auth.google.label : null
+	});
+});
+
 
 module.exports = router;

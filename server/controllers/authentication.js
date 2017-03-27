@@ -20,6 +20,7 @@
 var express    = require('express'),
 	passport   = require('../authentication/passport'),
 	server     = require('../authentication/oauth'),
+	config     = require('../config'),
 	Client     = require('../resource/model/client'),
 	bodyParser = require('body-parser').urlencoded({extended: false});
 
@@ -131,7 +132,7 @@ module.exports = express.Router()
 	 * It checks if user is already logged in, and redirect to azure if not.
 	 */
 	.get(
-		'/login',
+		'/login-azure',
 
 		// Check that user is not already logged in.
 		function(request, response, next) {
@@ -180,3 +181,18 @@ module.exports = express.Router()
 		request.logout();
 		response.redirect('/');
 	});
+
+if (config.auth.training) {
+
+	/**
+	 * Log user in, without asking for a password
+	 */
+	module.exports.post(
+		'/login-training',
+		bodyParser,
+		passport.authenticate('training_local', {
+			successRedirect: '/',
+			failureRedirect: '/',
+		})
+	);
+}

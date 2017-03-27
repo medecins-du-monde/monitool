@@ -44,7 +44,6 @@ passport.serializeUser(function(user, done) {
 	// let's make sure of that
 	else
 		throw new Error('Clients cannot have sessions. Use bearer token or basic auth');
-
 });
 
 passport.deserializeUser(function(id, done) {
@@ -67,95 +66,97 @@ passport.deserializeUser(function(id, done) {
 });
 
 
+
 /////////////////////////////////////////////////////////////////////////////
 // User log in with Microsoft Azure Active Directory
 /////////////////////////////////////////////////////////////////////////////
 
-var strategy = new OAuth2Strategy(
-	{
-		authorizationURL: config.oauth.authUrl,
-		tokenURL: config.oauth.tokenUrl,
-		clientID: config.oauth.clientId,
-		clientSecret: config.oauth.clientSecret,
-		callbackURL: config.baseUrl + '/authentication/login-callback'
-	},
-	// This method is invoked upon auth sequence completion
-	// Its the hook to cache the access/refresh tokens, post-process the Azure profile, etc.
-	function (accessToken, refreshToken, profile, done) {
-		var currentDomain =/https?:\/\/([a-z]+\.)+([a-z]+\.[a-z]+)\//gi.exec(this._callbackURL)[2]
-		try {
-			var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
-				domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
+if (config.auth.azureAD) {
+	var strategy = new OAuth2Strategy(
+		{
+			authorizationURL: config.auth.azureAD.authUrl,
+			tokenURL: config.auth.azureAD.tokenUrl,
+			clientID: config.auth.azureAD.clientId,
+			clientSecret: config.auth.azureAD.clientSecret,
+			callbackURL: config.baseUrl + '/authentication/login-callback'
+		},
+		// This method is invoked upon auth sequence completion
+		// Its the hook to cache the access/refresh tokens, post-process the Azure profile, etc.
+		function (accessToken, refreshToken, profile, done) {
+			try {
+				var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
+					domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
-			if (domain !== currentDomain)
-				return done(
-					"You must use an account from " + currentDomain + " (not " + domain + ").\n" +
-					"Try closing and reopening your browser to log in again."
+				if (domain !== 'medecinsdumonde.net')
+					return done(
+						"You must use an account from medecinsdumonde.net (not " + domain + ").\n" +
+						"Try closing and reopening your browser to log in again."
+					);
+				
+				User.storeInstance.get(userId).then(
+					function(user) {
+						// If Oauth provider updated the name, we update as well in DB
+						if (user.name !== profile.name) {
+							user.name = profile.name;
+							user.save(); // don't wait for the callback
+						}
+
+						// Auth was OK
+						done(null, user);
+					},
+					function(error) {
+						// This user never logged in!
+						if (error.message === 'missing') {
+							var user = new User({_id: userId, type: 'user', name: profile.name, role: 'common'});
+							user.save().then(
+								function() {
+									done(null, user); // Auth is OK
+								},
+								function(error) {
+									done(error); // Something failed while creating user.
+								}
+							);
+						}
+						else
+							// Something else failed (db is down?).
+							done(error);
+					}
 				);
-			
-			User.storeInstance.get(userId).then(
-				function(user) {
-					// If Oauth provider updated the name, we update as well in DB
-					if (user.name !== profile.name) {
-						user.name = profile.name;
-						user.save(); // don't wait for the callback
-					}
-
-					// Auth was OK
-					done(null, user);
-				},
-				function(error) {
-					// This user never logged in!
-					if (error.message === 'missing') {
-						var user = new User({_id: userId, type: 'user', name: profile.name, role: 'common'});
-						user.save().then(
-							function() {
-								done(null, user); // Auth is OK
-							},
-							function(error) {
-								done(error); // Something failed while creating user.
-							}
-						);
-					}
-					else
-						// Something else failed (db is down?).
-						done(error);
-				}
-			);
+			}
+			catch (e) {
+				done("An error has occured while loggin you in. Are you using a medecinsdumonde.net account?");
+			}
 		}
-		catch (e) {
-			done("An error has occured while loggin you in. Are you using a " + currentDomain + " account?");
+	);
+
+	// Azure AD requires an additional 'resource' parameter for the token request
+	//  this corresponds to the Azure resource you're requesting access to
+	//  in our case we're just trying to authenticate, so we just request generic access to the Azure AD graph API
+	strategy.tokenParams = strategy.authorizationParams = function(options) {
+		return { resource: "https://graph.windows.net" };
+	};
+
+	// this is our custom logic for digging into the token returned to us by Azure
+	//  in raw form its base64 text and we want the corresponding JSON
+	strategy.userProfile = function(accessToken, done) {
+		// thx: https://github.com/QuePort/passport-azure-oauth/blob/master/lib/passport-azure-oauth/strategy.js
+		var profile = {};
+
+		try {
+			var tokenBase64 = accessToken.split('.')[1],
+				tokenBinary = new Buffer(tokenBase64, 'base64'),
+				tokenAscii  = JSON.parse(tokenBinary.toString());
+
+			done(null, tokenAscii);
 		}
-	}
-);
-
-// Azure AD requires an additional 'resource' parameter for the token request
-//  this corresponds to the Azure resource you're requesting access to
-//  in our case we're just trying to authenticate, so we just request generic access to the Azure AD graph API
-strategy.tokenParams = strategy.authorizationParams = function(options) {
-	return { resource: "https://graph.windows.net" };
-};
-
-// this is our custom logic for digging into the token returned to us by Azure
-//  in raw form its base64 text and we want the corresponding JSON
-strategy.userProfile = function(accessToken, done) {
-	// thx: https://github.com/QuePort/passport-azure-oauth/blob/master/lib/passport-azure-oauth/strategy.js
-	var profile = {};
-
-	try {
-		var tokenBase64 = accessToken.split('.')[1],
-			tokenBinary = new Buffer(tokenBase64, 'base64'),
-			tokenAscii  = JSON.parse(tokenBinary.toString());
-
-		done(null, tokenAscii);
-	}
-	catch (ex) {
-		done(ex, null);
-	}
-};
+		catch (ex) {
+			done(ex, null);
+		}
+	};
 
 
-passport.use('user_azure', strategy);
+	passport.use('user_azure', strategy);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // User authentication with bearer token
@@ -194,6 +195,24 @@ passport.use('partner_local', new LocalStrategy(
 		);
 	}
 ));
+
+/////////////////////////////////////////////////////////////////////////////
+// User authentication with training account
+/////////////////////////////////////////////////////////////////////////////
+
+if (config.auth.training) {
+	passport.use('training_local', new LocalStrategy(
+		function(username, password, done) {
+			User.storeInstance.get('usr:' + config.auth.training.account)
+				.then(function(user) {
+					done(null, user);
+				})
+				.catch(function(error) {
+					done(error);
+				});
+		})
+	);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // Client log in, with passport or basic auth.

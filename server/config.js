@@ -35,13 +35,20 @@ catch (e) {
 			username: process.env['monitool.couchdb.username'],
 			password: process.env['monitool.couchdb.password']
 		},
-		oauth: {
-			authUrl: process.env['monitool.oauth.authUrl'],
-			tokenUrl: process.env['monitool.oauth.tokenUrl'],
-			clientId: process.env['monitool.oauth.clientId'],
-			clientSecret: process.env['monitool.oauth.clientSecret']
+		auth: {
+			azureAD: {
+				label: process.env['monitool.auth.azureAD.label'],
+				domain: process.env['monitool.auth.azureAD.domain'],
+				authUrl: process.env['monitool.auth.azureAD.authUrl'],
+				tokenUrl: process.env['monitool.auth.azureAD.tokenUrl'],
+				clientId: process.env['monitool.auth.azureAD.clientId'],
+				clientSecret: process.env['monitool.auth.azureAD.clientSecret']
+			},
+			training: {
+				label: process.env['monitool.auth.training.label']
+			}
 		}
-	}
+	};
 	
 	winston.log('info', '[Config] Loading from environnement variables');
 }

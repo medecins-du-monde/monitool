@@ -1,0 +1,161 @@
+doctype html
+html(lang="en")
+	head
+		title Monitool
+
+		if debug
+			meta(charset="UTF-8")
+			meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+
+			link(rel="stylesheet", type="text/css", href="bower_components/angular-ui-select/dist/select.min.css")
+			link(rel="stylesheet", type="text/css", href="bower_components/bootstrap-css-only/css/bootstrap.min.css")
+			link(rel="stylesheet", type="text/css", href="bower_components/c3/c3.min.css")
+			link(rel="stylesheet", type="text/css", href="bower_components/font-awesome/css/font-awesome.min.css")
+			link(rel="stylesheet", type="text/css", href="bower_components/handsontable/dist/handsontable.full.css")
+
+			link(rel="stylesheet", type="text/css", href="css/app.css")
+
+			script(type="text/javascript", src="i18n/fr.js")
+			script(type="text/javascript", src="i18n/es.js")
+			script(type="text/javascript", src="i18n/en.js")
+
+			// PDF generation
+			script(type="text/javascript", src="bower_components/pdfmake/build/pdfmake.min.js")
+			script(type="text/javascript", src="bower_components/pdfmake/build/vfs_fonts.js")
+
+			// PNG generation
+			script(type="text/javascript", src="bower_components/blob/Blob.js")
+			script(type="text/javascript", src="bower_components/canvas-to-Blob.js/canvas-toBlob.js")
+			script(type="text/javascript", src="bower_components/file-saver/FileSaver.min.js")
+
+			// Angular
+			script(type="text/javascript", src="bower_components/angular/angular.min.js")
+			script(type="text/javascript", src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js")
+			script(type="text/javascript", src="bower_components/angular-ui-router/release/angular-ui-router.min.js")
+			script(type="text/javascript", src="bower_components/angular-ui-select/dist/select.min.js")
+			script(type="text/javascript", src="bower_components/angular-cookies/angular-cookies.min.js")
+			script(type="text/javascript", src="bower_components/angular-resource/angular-resource.min.js")
+			script(type="text/javascript", src="bower_components/angular-translate/angular-translate.min.js")
+			script(type="text/javascript", src="bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.min.js")
+			script(type="text/javascript", src="bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js")
+
+			// Graphs
+			script(type="text/javascript", src="bower_components/d3/d3.min.js")
+			script(type="text/javascript", src="bower_components/c3/c3.min.js")
+
+			// Excel
+			script(type="text/javascript", src="bower_components/handsontable/dist/handsontable.full.min.js")
+
+			// Sortable
+			script(type="text/javascript", src="bower_components/Sortable/Sortable.min.js")
+			script(type="text/javascript", src="bower_components/Sortable/ng-sortable.js")
+
+			script(type="text/javascript", src="js/polyfills/array.js")
+			script(type="text/javascript", src="js/polyfills/math.js")
+
+			script(type="text/javascript", src="js/controllers/project-shared.js")
+			script(type="text/javascript", src="js/controllers/project-structure.js")
+			script(type="text/javascript", src="js/controllers/project-input.js")
+			script(type="text/javascript", src="js/controllers/project-reporting.js")
+
+			script(type="text/javascript", src="js/controllers/indicator.js")
+			script(type="text/javascript", src="js/controllers/admin.js")
+			script(type="text/javascript", src="js/controllers/helper.js")
+
+			script(type="text/javascript", src="js/directives/pdf-export.js")
+			script(type="text/javascript", src="js/directives/_shared.js")
+			script(type="text/javascript", src="js/directives/reporting.js")
+			script(type="text/javascript", src="js/directives/form-controls.js")
+			script(type="text/javascript", src="js/directives/form-helpers.js")
+			script(type="text/javascript", src="js/directives/form-validators.js")
+			script(type="text/javascript", src="js/directives/_acls.js")
+
+			script(type="text/javascript", src="js/filters/shared.js")
+
+			script(type="text/javascript", src="js/services/models/indicator.js")
+			script(type="text/javascript", src="js/services/models/input.js")
+			script(type="text/javascript", src="js/services/models/project.js")
+			script(type="text/javascript", src="js/services/models/theme.js")
+			script(type="text/javascript", src="js/services/models/user.js")
+
+			script(type="text/javascript", src="js/services/statistics/reporting.js")
+			script(type="text/javascript", src="js/services/statistics/olap.js")
+			script(type="text/javascript", src="js/services/statistics/parser.js")
+
+			script(type="text/javascript", src="js/services/utils/input-slots.js")
+			script(type="text/javascript", src="js/services/utils/itertools.js")
+			script(type="text/javascript", src="js/services/utils/string.js")
+			script(type="text/javascript", src="js/services/utils/translate.js")
+			script(type="text/javascript", src="js/services/utils/uuid.js")
+
+			script(type="text/javascript", src="js/app.js")
+			script(type="text/javascript", src="js/init.js")
+
+		else
+			link(rel="stylesheet", type="text/css", href="monitool2.css")
+			script(type="text/javascript", src="js/init.js")
+
+
+	body
+		div(ui-view)
+
+		div(id="version")= "Version " + version
+
+		div(id="load-container")
+			div(id="load-content")
+				img(id="logo_img", src="/img/logo_color.svg")
+
+				div(id="login_buttons", style="display: none")
+
+					if trainingLabel
+						form(action="/authentication/login-training", style="margin-bottom: 5px", method="POST")
+							input(type="hidden", name="username", value="value")
+							input(type="hidden", name="password", value="value")
+							input(type="submit", class="btn btn-primary btn-lg btn-block", value=trainingLabel)
+					
+					if azureLabel
+						a(href="/authentication/login-azure", class="btn btn-primary btn-lg btn-block")= azureLabel
+
+					if googleLabel
+						a(href="/authentication/login-google", class="btn btn-primary btn-lg btn-block")=googleLabel
+
+					a(id="partner_login_btn", class="btn btn-default btn-lg btn-block") Use partner account
+
+				div(id="partner_login", style="display: none")
+					form(class="form-horizontal well well-sm", action="/authentication/login-partner", method="POST")
+
+						legend Partner authentication
+
+						div(class="form-group")
+							label(for="username", class="col-sm-2 control-label") Username
+							div(class="col-sm-10")
+								input(type="text", class="form-control", id="username", name="username", placeholder="Username")
+
+						div(class="form-group")
+							label(for="password", class="col-sm-2 control-label") Password
+							div(class="col-sm-10")
+								input(type="password", class="form-control", id="password", name="password", placeholder="Password")
+
+						div(class="form-group")
+							div(class="col-sm-6")
+								button(type="submit", class="btn btn-primary btn-block") Connect
+
+							div(class="col-sm-6")
+								a(id="go_back_btn", class="btn btn-default btn-block") Go back
+
+				div(id="ie_warning", style="display: none")
+					h3 Monitool cannot be used with a legacy Internet Explorer version
+					p Please use either Chrome, Firefox, or a recent version of Internet Explorer.
+
+				div(id="server_down", style="display: none")
+					h3 Server seems to be down
+					h3 Please, try again later
+
+				div(id="loader", style="display: none")
+					h3 Loading
+
+					div(class="progress")
+						div(id="progress", class="progress-bar progress-bar-info", style="width: 0")
+
+		script.
+			startLoginPage();
