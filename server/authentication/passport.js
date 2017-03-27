@@ -71,13 +71,14 @@ var strategy = new OAuth2Strategy(
 	// This method is invoked upon auth sequence completion
 	// Its the hook to cache the access/refresh tokens, post-process the Azure profile, etc.
 	function (accessToken, refreshToken, profile, done) {
+		var currentDomain =/https?:\/\/([a-z]+\.)+([a-z]+\.[a-z]+)\//gi.exec(this._callbackURL)[2]
 		try {
 			var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
 				domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
-			if (domain !== 'medecinsdumonde.net')
+			if (domain !== currentDomain)
 				return done(
-					"You must use an account from medecinsdumonde.net (not " + domain + ").\n" +
+					"You must use an account from " + currentDomain + " (not " + domain + ").\n" +
 					"Try closing and reopening your browser to log in again."
 				);
 			
@@ -99,7 +100,7 @@ var strategy = new OAuth2Strategy(
 			});
 		}
 		catch (e) {
-			done("An error has occured while loggin you in. Are you using a medecinsdumonde.net account?");
+			done("An error has occured while loggin you in. Are you using a " + currentDomain + " account?");
 		}
 	}
 );
