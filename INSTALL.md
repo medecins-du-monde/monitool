@@ -97,10 +97,10 @@ We now need to create a configuration file
 			"password": null
 		},
 		"oauth": {
-			"authUrl": "https://login.windows.net/<get this from azure>/oauth2/authorize",
-			"tokenUrl": "https://login.windows.net/<get this from azure>/oauth2/token",
-			"clientId": <get this from azure>,
-			"clientSecret": <get this from azure>,
+			"authUrl": "https://login.windows.net/common/oauth2/authorize",
+			"tokenUrl": "https://login.windows.net/common/oauth2/token",
+			"clientId": <get application ID of azure>,
+			"clientSecret": <get key value of azure>,
 			"callbackUrl": "http://monitool.yourorganization.com/authentication/login-callback",
 			"resource": "https://graph.windows.net"
 		},
@@ -123,6 +123,16 @@ The last step is to build release files, and configure the database
 
 	# Configure the database
 	> gulp design-docs
+	
+initialisation the first admin user
+
+	> curl -H 'Content-Type: application/json' \
+            -X POST http://127.0.0.1:5984/monitool-documents \
+            -d '{"_id":"usr:firstname.lastname","type":"user","name":"FirtsName LastName","role":"admin"}'
+	    
+anwer
+
+	{"ok":true,"id":"usr:firstname.lastname","rev":"1-910a851579dc5dd380bf757f3cd33bcd"}
 
 ### Installing monitool as a service (only for production server)
 
@@ -151,6 +161,4 @@ enable on boot
 
 	sudo systemctl enable pm2-USER
 	
-
-
 FIXME
