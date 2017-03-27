@@ -103,7 +103,16 @@ We now need to create a configuration file
 			"clientSecret": <get key value of azure>,
 			"callbackUrl": "http://monitool.yourorganization.com/authentication/login-callback",
 			"resource": "https://graph.windows.net"
-		}
+		},
+        	"apps": [{
+                	"name"       : "monitool",
+                	"script"     : "server/app.js",
+                	"cwd"        : "/home/USER/monitool",
+                	"error_file" : "log/monitool-error.log",
+                	"out_file"   : "log/monitool-out.log",
+                	"pid_file"   : "pids/monitool.pid",
+                	"watch"      : true
+        	}]
 	}
 
 
@@ -129,4 +138,27 @@ anwer
 
 An easy way to install a NodeJS application as a service is to use pm2.
 
+install pm2
+
+	sudo npm install pm2 -g
+	
+Run this command to run your application as a service by typing the following:
+
+	sudo env PATH=$PATH:/usr/local/bin pm2 startup  -u USER --hp /home/USER/
+	sudo chmod 0644 /etc/systemd/system/pm2-USER.service
+	sudo vim /etc/systemd/system/pm2-USER.service
+	
+delet line
+
+	Type=forking
+	
+start app
+
+	pm2 start monitool/config.json
+	pm2 save
+	
+enable on boot
+
+	sudo systemctl enable pm2-USER
+	
 FIXME
