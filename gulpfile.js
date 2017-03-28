@@ -2,6 +2,7 @@
 
 var async         = require('async'),
 	del           = require('del'),
+	fs            = require('fs'),
 	gulp          = require('gulp'),
 	templateCache = require('gulp-angular-templatecache'),
 	bower         = require('gulp-bower'),
@@ -135,3 +136,14 @@ gulp.task('design-docs', function(callback) {
 	});
 });
 
+gulp.task('size', function() {
+	var sizes = files.js.map(function(path) {
+		return [fs.statSync(path).size, path];
+	});
+
+	sizes.sort((a, b) => b[0] - a[0]);
+
+	sizes.forEach(function(arr) {
+		console.log(Math.round(arr[0] / 1024) + "kB\t" + arr[1]);
+	});
+});
