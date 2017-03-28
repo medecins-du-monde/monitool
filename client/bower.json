@@ -6,7 +6,7 @@
     "Romain Gilliotte <romain.gilliotte@medecinsdumonde.net>"
   ],
   "main": "main.html",
-  "license": "MIT",
+  "license": "GPL-3.0+",
   "ignore": [
     "**/.*",
     "node_modules",
