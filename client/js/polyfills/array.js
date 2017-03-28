@@ -1,6 +1,6 @@
 
 // Most polyfills just come from MDN.
-// I'm not sure about the licence, but it should be OK.
+// I'm not sure about the licence, but everything should be MIT or alike.
 
 if (!Array.prototype.pluck)
 	Array.prototype.pluck = function(col) {

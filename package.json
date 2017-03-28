@@ -3,7 +3,7 @@
   "description": "Indicator monitoring application for Medecins du Monde",
   "version": "2.6.0",
   "repository": "git@github.com:medecins-du-monde/monitool.git",
-  "license": "UNLICENSED",
+  "license": "GPL-3.0+",
   "bin": {
     "monitool": "./bin/monitool.js"
   },
