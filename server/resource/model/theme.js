@@ -19,13 +19,13 @@
 
 var validator  = require('is-my-json-valid'),
 	ThemeStore = require('../store/theme'),
-	Model      = require('./model'),
+	DbModel    = require('./db-model'),
 	schema     = require('../schema/theme.json');
 
 var validate = validator(schema),
 	storeInstance = new ThemeStore();
 
-class Theme extends Model {
+class Theme extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 

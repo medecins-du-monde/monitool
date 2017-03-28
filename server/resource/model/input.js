@@ -20,7 +20,7 @@
 var validator  = require('is-my-json-valid'),
 	TimeSlot   = require('../../olap/time-slot'),
 	InputStore = require('../store/input'),
-	Model      = require('./model'),
+	DbModel    = require('./db-model'),
 	schema     = require('../schema/input.json');
 
 
@@ -28,7 +28,7 @@ var validate = validator(schema),
 	storeInstance = new InputStore();
 
 
-class Input extends Model {
+class Input extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 

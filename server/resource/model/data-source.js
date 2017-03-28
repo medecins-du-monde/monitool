@@ -24,7 +24,7 @@ var Variable       = require('./variable'),
 
 var validate = validator(schema);
 
-class DataSource {
+class DataSource extends Model {
 
 	constructor(data) {
 		super(data, validate);
@@ -52,7 +52,12 @@ class DataSource {
 	 * Retrieve a variable by id
 	 */
 	getVariableById(id) {
-		return this.elements.find(el => el.id === id);
+		var variable = this.elements.find(el => el.id === id);
+
+		if (!variable)
+			throw new Error('missing_variable');
+
+		return variable;
 	}
 
 }

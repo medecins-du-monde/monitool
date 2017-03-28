@@ -17,13 +17,13 @@
 
 "use strict";
 
-var Model                  = require('./model'),
+var DbModel                = require('./db-model'),
 	AuthorizationCodeStore = require('../store/authorization-code');
 
 var storeInstance = new AuthorizationCodeStore();
 
 
-class AuthorizationCode extends Model {
+class AuthorizationCode extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 

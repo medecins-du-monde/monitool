@@ -17,12 +17,12 @@
 
 "use strict";
 
-var Model             = require('./model'),
+var DbModel           = require('./db-model'),
 	RefreshTokenStore = require('../store/refresh-token');
 
 var storeInstance = new RefreshTokenStore();
 
-class RefreshToken extends Model {
+class RefreshToken extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 

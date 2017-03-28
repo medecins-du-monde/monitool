@@ -22,69 +22,45 @@ var assert     = require('assert'),
 
 
 describe('DataSource', function() {
-	var oldDataSource, newDataSource;
+	var dataSource;
 
 	before(function() {
-		oldDataSource = new DataSource({
-			id: "formId",
+		dataSource = new DataSource({
+			id: "1760d546-cccf-43fe-8f28-1e40a05f23b5",
+			name: "form",
+			collect: "entity",
+			periodicity: "month",
+			start: null,
+			end: null,
 			elements: [
 				{
-					id: "element1",
-					partitions: [
-						{
-							id: "gender",
-							elements: [
-								{id: 'male'},
-								{id: 'female'}
-							],
-							groups: []
-						},
-						{
-							id: "age",
-							elements: [
-								{id: 'under_10'},
-								{id: 'between_10_and_15'},
-								{id: 'over_15'}
-							],
-							groups: []
-						},
-						{
-							id: "somth",
-							elements: [
-								{id: 'something'},
-								{id: 'something_else'}
-							],
-							groups: []
-						}
-					]
+					id: "d986f4bc-a0b6-4269-a847-78b195185b06",
+					name: "element1",
+					order: 0, distribution: 0, timeAgg: 'sum', geoAgg: 'sum',
+					partitions: []
 				},
 				{
-					id: 'element2',
-					partitions: [
-						{
-							id: "gender",
-							elements: [
-								{id: 'male'},
-								{id: 'female'}
-							],
-							groups: []
-						}
-					]
+					id: "5b1dd275-2c74-4d74-b5f6-33225fc14d12",
+					name: 'element2',
+					order: 0, distribution: 0, timeAgg: 'sum', geoAgg: 'sum',
+					partitions: []
 				}
 			]
 		});
 	});
 
-	beforeEach(function() {
-		newDataSource = new DataSource(JSON.parse(JSON.stringify(oldDataSource)));
-	});
 
 	describe("signature", function() {
+		var newDataSource;
+
+		beforeEach(function() {
+			newDataSource = new DataSource(JSON.parse(JSON.stringify(dataSource)));
+		});
 
 		it('renaming the form should not change anything', function() {
 			newDataSource.name = "newName"
 
-			assert.equal(oldDataSource.signature, newDataSource.signature);
+			assert.equal(dataSource.signature, newDataSource.signature);
 		});
 
 		it('Inverting two elements should not change anything', function() {
@@ -92,27 +68,43 @@ describe('DataSource', function() {
 			newDataSource.elements[0] = newDataSource.elements[1];
 			newDataSource.elements[1] = tmp;
 
-			assert.equal(oldDataSource.signature, newDataSource.signature);
+			assert.equal(dataSource.signature, newDataSource.signature);
 		});
 
 		it('Adding an element should change the result', function() {
 			newDataSource.elements.push({id: 'element3', partitions: []});
 
-			assert.notEqual(oldDataSource.signature, newDataSource.signature);
+			assert.notEqual(dataSource.signature, newDataSource.signature);
 		});
 
 		it('Removing an element should change the result', function() {
 			newDataSource.elements.splice(0, 1);
 
-			assert.notEqual(oldDataSource.signature, newDataSource.signature);
+			assert.notEqual(dataSource.signature, newDataSource.signature);
+		});
+	});
+
+	describe('getVariableById', function() {
+
+		it('should retrieve the first variable', function() {
+			assert.equal(
+				dataSource.getVariableById('d986f4bc-a0b6-4269-a847-78b195185b06').name,
+				'element1'
+			);
 		});
 
-		it('Adding a partition should change the result', function() {
-			newDataSource.elements[0].partitions.push({id: "location", elements: [{id: 'madrid'}, {id: 'paris'}]});
+		it('should retrieve the last variable', function() {
+			assert.equal(
+				dataSource.getVariableById('5b1dd275-2c74-4d74-b5f6-33225fc14d12').name,
+				'element2'
+			);
+		});
 
-			assert.notEqual(oldDataSource.signature, newDataSource.signature);
+		it('should raise an error', function() {
+			assert.throws(() => dataSource.getVariableById('unknownid'));
 		});
 
 	});
+
 });
 

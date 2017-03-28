@@ -18,7 +18,7 @@
 "use strict";
 
 var validator      = require('is-my-json-valid'),
-	Model          = require('./model'),
+	DbModel        = require('./db-model'),
 	IndicatorStore = require('../store/indicator'),
 	Theme          = require('./theme'),
 	schema         = require('../schema/indicator.json');
@@ -27,7 +27,7 @@ var validator      = require('is-my-json-valid'),
 var validate = validator(schema),
 	storeInstance = new IndicatorStore();
 
-class Indicator extends Model {
+class Indicator extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 

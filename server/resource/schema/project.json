@@ -50,23 +50,7 @@
 					"periodicity": { "type": "string", "enum": ["day", "week_sat", "week_sun", "week_mon", "month", "quarter", "semester", "year", "free"] },
 					"start": { "oneOf": [{"type": "null"}, { "type": "string", "format": "date" }]},
 					"end": { "oneOf": [{"type": "null"}, { "type": "string", "format": "date" }]},
-					"elements": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"additionalProperties": false,
-							"required": ["id", "name", "timeAgg", "geoAgg", "partitions", "order", "distribution"],
-							"properties": {
-								"id": { "$ref": "#/definitions/uuid" },
-								"name": { "type": "string", "minLength": 1 },
-								"timeAgg": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
-								"geoAgg": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
-								"partitions": { "$ref": "#/definitions/partitions" },
-								"order": { "type": "number" },
-								"distribution": { "type": "number" }
-							}
-						}
-					}
+					"elements": {"type": "array"}
 				}
 			}
 		},
@@ -187,49 +171,6 @@
 		"revision": {
 			"type": "string",
 			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
-		},
-
-		"partitions": {
-			"type": "array",
-			"items": {
-				"type": "object",
-				"additionalProperties": false,
-				"required": ["id", "name", "aggregation", "elements", "groups"],
-				"properties": {
-					"id": { "$ref": "#/definitions/uuid" },
-					"name": { "type": "string", "minLength": 1 },
-					"aggregation": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
-					"elements": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"additionalProperties": false,
-							"required": ["id", "name"],
-							"properties": {
-								"id": { "$ref": "#/definitions/uuid" },
-								"name": { "type": "string", "minLength": 1 }
-							}
-						}
-					},
-
-					"groups": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"additionalProperties": false,
-							"required": ["id", "name", "members"],
-							"properties": {
-								"id": { "$ref": "#/definitions/uuid" },
-								"name": { "type": "string", "minLength": 1 },
-								"members": {
-									"type": "array",
-									"items": { "$ref": "#/definitions/uuid" }
-								}
-							}
-						}
-					}
-				}
-			}
 		},
 
 		"computation": {

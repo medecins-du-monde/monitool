@@ -17,10 +17,16 @@
 
 "use strict";
 
-class Variable {
+var validator = require('is-my-json-valid'),
+	Model     = require('./model'),
+	schema    = require('../schema/variable.json');
+
+var validate = validator(schema);
+
+class Variable extends Model {
 
 	constructor(data) {
-		Object.assign(this, data);
+		super(data, validate);
 	}
 
 	/**

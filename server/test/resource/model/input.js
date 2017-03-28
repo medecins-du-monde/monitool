@@ -73,7 +73,7 @@ describe("Input migration", function() {
 										{id: 'bcda5c13-6b48-4a4c-82a9-21947b51459d', name: "whatever2"}
 									],
 									groups: [],
-									aggregate: 'sum'
+									aggregation: 'sum'
 								},
 								{
 									id: "104b93c3-8d50-43b5-b149-4bf8d80a850a",
@@ -84,7 +84,7 @@ describe("Input migration", function() {
 										{id: '39ded232-3801-4745-ab7a-04e29371c0d5', name: "whatever3"}
 									],
 									groups: [],
-									aggregate: 'sum'
+									aggregation: 'sum'
 								},
 								{
 									id: "53ef3c3e-5dfc-411a-9c0f-4df7e52b6bc9",
@@ -94,7 +94,7 @@ describe("Input migration", function() {
 										{id: 'c71bd1cb-1acd-4b7b-9933-4aebdbe4be4f', name: "whatever"}
 									],
 									groups: [],
-									aggregate: 'average'
+									aggregation: 'average'
 								}
 							]
 						},

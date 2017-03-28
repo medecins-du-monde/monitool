@@ -17,13 +17,13 @@
 
 "use strict";
 
-var Model            = require('./model'),
+var DbModel          = require('./db-model'),
 	AccessTokenStore = require('../store/access-token');
 
 
 var storeInstance = new AccessTokenStore();
 
-class AccessToken extends Model {
+class AccessToken extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 

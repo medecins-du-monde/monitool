@@ -20,7 +20,7 @@
 var validator    = require('is-my-json-valid'),
 	passwordHash = require('password-hash'),
 	ProjectStore = require('../store/project'),
-	Model        = require('./model'),
+	DbModel      = require('./db-model'),
 	DataSource   = require('./data-source'),
 	Indicator    = require('./indicator'),
 	Input        = require('./input'),
@@ -30,7 +30,7 @@ var validator    = require('is-my-json-valid'),
 var validate = validator(schema),
 	storeInstance = new ProjectStore();
 
-class Project extends Model {
+class Project extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 

@@ -17,13 +17,13 @@
 
 "use strict";
 
-var Model       = require('./model'),
+var DbModel     = require('./db-model'),
 	ClientStore = require('../store/client');
 
 var storeInstance = new ClientStore();
 
 
-class Client extends Model {
+class Client extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 
