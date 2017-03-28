@@ -1,12 +1,17 @@
 "use strict";
 
-var Variable = require('./variable');
+var Variable       = require('./variable'),
+	validator      = require('is-my-json-valid'),
+	Model          = require('./model'),
+	schema         = require('../schema/data-source.json');
 
+var validate = validator(schema);
 
 class DataSource {
 
 	constructor(data) {
-		Object.assign(this, data);
+		super(data, validate);
+
 		this.elements = this.elements.map(el => new Variable(el));
 	}
 

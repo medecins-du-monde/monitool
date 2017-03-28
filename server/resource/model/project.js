@@ -75,7 +75,7 @@ class Project extends Model {
 	getRole(user) {
 		if (user.type === 'partner')
 			return user.projectId !== this._id ? 'none' : user.role;
-		
+
 		else if (user.type === 'user') {
 			if (user.role === 'admin')
 				return 'owner';
@@ -140,7 +140,7 @@ class Project extends Model {
 		});
 
 		var promises = changedFormsIds.map(dataSourceId => Input.storeInstance.listByDataSource(this._id, dataSourceId));
-		
+
 		return Promise.all(promises).then(function(inputs) {
 			inputs = inputs.reduce((m, e) => m.concat(e), []);
 			inputs.forEach(input => input.update(oldProject, this));
@@ -169,7 +169,7 @@ class Project extends Model {
 
 	/**
 	 * Save the project.
-	 * 
+	 *
 	 * This method makes many checks do deal with the fact that there are no foreign keys nor update method.
 	 * 	- validate that all foreign keys exist.
 	 *	- copy the passwords that were not changed for partners.
@@ -215,7 +215,7 @@ class Project extends Model {
 				var projectResult = bulkResults.find(res => res.id === this._id);
 				if (projectResult.error)
 					throw new Error(projectResult.error);
-				
+
 				this._rev = projectResult.rev;
 				return this; // return updated document.
 			}.bind(this));

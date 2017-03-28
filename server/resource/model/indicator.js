@@ -25,7 +25,7 @@ class Indicator extends Model {
 	 * Validate that indicator does not make references to themes that don't exist
 	 */
 	validateForeignKeys() {
-		// If not themes are defined, early quit
+		// If no themes are defined, early quit
 		if (this.themes.length === 0)
 			return Promise.resolve();
 

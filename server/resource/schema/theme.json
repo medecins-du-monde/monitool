@@ -4,7 +4,7 @@
 	"type": "object",
 	"additionalProperties": false,
 	"required": [ "_id", "type", "name" ],
-	
+
 	"properties": {
 		"_id":  { "$ref": "#/definitions/uuid" },
 		"_rev": { "$ref": "#/definitions/revision" },

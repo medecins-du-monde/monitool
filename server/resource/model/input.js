@@ -106,7 +106,7 @@ class Input extends Model {
 			if (!oldVariable || oldVariable.signature !== newVariable.signature)
 				newInputValues[newVariable.id] = this._computeUpdatedValuesKey(oldVariable, newVariable);
 		}, this);
-		
+
 		this.values = newInputValues;
 
 		return true;

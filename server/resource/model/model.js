@@ -14,7 +14,7 @@ class Model {
 		if (validate) {
 			if (!data)
 				throw new Error('missing_data');
-			
+
 			validate(data);
 			var errors = validate.errors || [];
 			if (errors.length) {

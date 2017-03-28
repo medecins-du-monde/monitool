@@ -1,97 +1,320 @@
 "use strict";
 
-var assert = require('assert'),
+let assert = require('assert'),
+	Project = require('../../../resource/model/project'),
 	Input  = require('../../../resource/model/input');
 
-// var oldForm = {
-// 	id: "formId",
-// 	elements: [
-// 		{
-// 			id: "element1",
-// 			partitions: [
-// 				{
-// 					id: "gender",
-// 					elements: [{id: 'male'}, {id: 'female'}],
-// 					aggregate: 'sum'
-// 				},
-// 				{
-// 					id: "age",
-// 					elements: [{id: 'under_10'}, {id: 'between_10_and_15'}, {id: 'over_15'}],
-// 					aggregate: 'sum'
-// 				},
-// 				{
-// 					id: "somth",
-// 					elements: [{id: 'something'}, {id: 'something_else'}],
-// 					aggregate: 'average'
-// 				}
-// 			]
-// 		},
-// 		{
-// 			id: "element2",
-// 			partitions: []
-// 		}
-// 	]
-// };
 
 
-// describe('Input Migration', function() {
 
-// 	it('getFieldIndex should work with all combinations', function() {
-// 		var partitions = oldForm.elements[0].partitions;
+// var oldForm = ;
 
-// 		assert.equal(Project._getFieldIndex(partitions, ['male', 'under_10', 'something']),					0);
-// 		assert.equal(Project._getFieldIndex(partitions, ['male', 'under_10', 'something_else']),			1);
-// 		assert.equal(Project._getFieldIndex(partitions, ['male', 'between_10_and_15', 'something']),		2);
-// 		assert.equal(Project._getFieldIndex(partitions, ['male', 'between_10_and_15', 'something_else']),	3);
-// 		assert.equal(Project._getFieldIndex(partitions, ['male', 'over_15', 'something']),					4);
-// 		assert.equal(Project._getFieldIndex(partitions, ['male', 'over_15', 'something_else']),				5);
-// 		assert.equal(Project._getFieldIndex(partitions, ['female', 'under_10', 'something']),				6);
-// 		assert.equal(Project._getFieldIndex(partitions, ['female', 'under_10', 'something_else']),			7);
-// 		assert.equal(Project._getFieldIndex(partitions, ['female', 'between_10_and_15', 'something']),		8);
-// 		assert.equal(Project._getFieldIndex(partitions, ['female', 'between_10_and_15', 'something_else']),	9);
-// 		assert.equal(Project._getFieldIndex(partitions, ['female', 'over_15', 'something']),				10);
-// 		assert.equal(Project._getFieldIndex(partitions, ['female', 'over_15', 'something_else']),			11);
-// 	});
+describe("Input migration", function() {
+	let formerProject;
+	let newProject, input;
 
-// 	it('getFieldIndex should raise an error with invalid input', function() {
-// 		var partitions = oldForm.elements[0].partitions;
 
-// 		// invalid partition id
-// 		assert.throws(Project._getFieldIndex.bind(null, partitions, ['male', 'under_11', 'something']));
-		
-// 		// combination too short.
-// 		assert.throws(Project._getFieldIndex.bind(null, partitions, ['male', 'under_10']));
+	before(function() {
+		formerProject = new Project({
+			_id: "624c94fa-9ebc-4f8b-8389-f5959149a0a7",
+			type: "project",
+			country: "testCountry",
+			name: "testProject",
+			start: "2010-01-01",
+			end: "2014-01-01",
+			entities: [
+				{id: "0c243e08-8c21-4946-9f5f-ce255106901b", name: "location1"}
+			],
+			groups: [],
+			users: [],
+			themes: [],
+			logicalFrames: [],
+			crossCutting: {},
+			extraIndicators: [],
+			forms: [
+				{
+					id: "8a7980f8-0e47-49bb-bf54-fdbe2013e3ea",
+					name: "whatever",
+					collect: "entity",
+					periodicity: "month",
+					start: null,
+					end: null,
+					elements: [
+						{
+							id: "c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce",
+							name: "whatever",
+							timeAgg: "sum",
+							geoAgg: "sum",
+							order: 0,
+							distribution: 0,
+							partitions: [
+								{
+									id: "a7623d67-6cf0-42eb-b5b5-1d8c8dada396",
+									name: "whatever",
+									elements: [
+										{id: 'bcda5c13-6b48-4a4c-82a9-21947b51459d', name: "whatever"},
+										{id: 'bcda5c13-6b48-4a4c-82a9-21947b51459d', name: "whatever2"}
+									],
+									groups: [],
+									aggregate: 'sum'
+								},
+								{
+									id: "104b93c3-8d50-43b5-b149-4bf8d80a850a",
+									name: "whatever",
+									elements: [
+										{id: '26ca342c-f119-429a-9e11-0ef82f541376', name: "whatever"},
+										{id: '8e568d78-e844-4563-9ff8-ecab5af06b31', name: "whatever2"},
+										{id: '39ded232-3801-4745-ab7a-04e29371c0d5', name: "whatever3"}
+									],
+									groups: [],
+									aggregate: 'sum'
+								},
+								{
+									id: "53ef3c3e-5dfc-411a-9c0f-4df7e52b6bc9",
+									name: "whatever",
+									elements: [
+										{id: 'e33904be-4c43-4e58-a3cb-45d272212cd5', name: "whatever"},
+										{id: 'c71bd1cb-1acd-4b7b-9933-4aebdbe4be4f', name: "whatever"}
+									],
+									groups: [],
+									aggregate: 'average'
+								}
+							]
+						},
+						{
+							id: "a83cda13-fbc7-477d-b158-33077a243c81",
+							name: "whatever",
+							timeAgg: "sum",
+							geoAgg: "sum",
+							order: 0,
+							distribution: 0,
+							partitions: []
+						}
+					]
+				}
+			]
+		});
+	});
 
-// 		// combination too long.
-// 		assert.throws(Project._getFieldIndex.bind(null, partitions, ['male', 'under_10', 'something', 'invalid']));
-// 	});
+	beforeEach(function() {
+		newProject = formerProject.clone();
+		input = formerInput.clone();
+	});
 
-// 	it('getPartitionElementIds should work with all indexes', function() {
-// 		var partitions = oldForm.elements[0].partitions;
+	describe('start_replace', function() {
+		beforeEach(function() {
 
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 0),	['male', 'under_10', 'something']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 1),	['male', 'under_10', 'something_else']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 2),	['male', 'between_10_and_15', 'something']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 3),	['male', 'between_10_and_15', 'something_else']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 4),	['male', 'over_15', 'something']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 5),	['male', 'over_15', 'something_else']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 6),	['female', 'under_10', 'something']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 7),	['female', 'under_10', 'something_else']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 8),	['female', 'between_10_and_15', 'something']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 9),	['female', 'between_10_and_15', 'something_else']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 10),	['female', 'over_15', 'something']);
-// 		assert.deepEqual(Project._getPartitionElementIds(partitions, 11),	['female', 'over_15', 'something_else']);
-// 	});
+		});
 
-// 	it('getPartitionElementIds should raise an error with invalid input', function() {
-// 		var partitions = oldForm.elements[0].partitions;
+		it('', function() {
 
-// 		// invalid partition id
-// 		assert.throws(Project._getPartitionElementIds.bind(null, partitions, -1));
-// 		assert.throws(Project._getPartitionElementIds.bind(null, partitions, 12));
-// 	});
+		});
 
-// });
+	});
+
+	describe('end_replace', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('entities_add', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('entities_remove', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('entities_start_replace', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('entities_end_replace', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_remove', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_periodicity_replace', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_collect_replace', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_start_replace', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_end_replace', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_entities_add', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_entities_remove', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_elements_add', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_elements_remove', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_elements_partitions_add', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_elements_partitions_remove', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_elements_partitions_elements_add', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+	describe('forms_elements_partitions_elements_remove', function() {
+		beforeEach(function() {
+
+		});
+
+		it('', function() {
+
+		});
+
+	});
+
+});
+
+
+
+
 
 // describe('Input correction', function() {
 
@@ -288,103 +511,3 @@ var assert = require('assert'),
 // 		}]);
 // 	});
 // });
-
-
-// describe('Form comparison', function() {
-
-// 	var extractInfo = Project._extractRelevantInformation;
-
-// 	var oldForm = {
-// 		id: "formId",
-// 		elements: [
-// 			{
-// 				id: "element1",
-// 				partitions: [
-// 					{ id: "gender", elements: [{id: 'male'}, {id: 'female'}], groups: [] },
-// 					{ id: "age", elements: [{id: 'under_10'}, {id: 'between_10_and_15'}, {id: 'over_15'}], groups: [] },
-// 					{ id: "somth", elements: [{id: 'something'}, {id: 'something_else'}], groups: [] }
-// 				]
-// 			},
-// 			{
-// 				id: 'element2',
-// 				partitions: [
-// 					{ id: "gender", elements: [{id: 'male'}, {id: 'female'}], groups: [] }
-// 				]
-// 			}
-// 		]
-// 	};
-
-// 	it('Inverting two elements should not change anything', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-		
-// 		var tmp = newForm.elements[0];
-// 		newForm.elements[0] = newForm.elements[1];
-// 		newForm.elements[1] = tmp;
-
-// 		assert.equal(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// 	it('Adding an element should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		newForm.elements.push({id: 'element3', partitions: []});
-		
-// 		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// 	it('Removing an element should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		newForm.elements.splice(0, 1);
-		
-// 		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// 	it('Adding a partition should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		newForm.elements[0].partitions.push({id: "location", elements: [{id: 'madrid'}, {id: 'paris'}]});
-		
-// 		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// 	it('Removing a partition should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		newForm.elements[0].partitions.splice(0, 1);
-		
-// 		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// 	it('Reordering a partition should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-		
-// 		var tmp = newForm.elements[0].partitions[0];
-// 		newForm.elements[0].partitions[0] = newForm.elements[0].partitions[1];
-// 		newForm.elements[0].partitions[1] = tmp;
-
-// 		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// 	it('Adding a partition element should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		newForm.elements[0].partitions[0].elements.push({id: 'transexual'});
-		
-// 		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// 	it('Removing a partition element should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		newForm.elements[0].partitions[0].elements.splice(0, 1);
-		
-// 		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// 	it('Reordering a partition element should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-		
-// 		var tmp = newForm.elements[0].partitions[0].elements[0];
-// 		newForm.elements[0].partitions[0].elements[0] = newForm.elements[0].partitions[0].elements[1];
-// 		newForm.elements[0].partitions[0].elements[1] = tmp;
-
-// 		assert.notEqual(extractInfo(oldForm), extractInfo(newForm));
-// 	});
-
-// });
-

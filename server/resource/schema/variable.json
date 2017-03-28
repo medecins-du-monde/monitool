@@ -1,0 +1,64 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "Monitool variable schema",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["id", "name", "timeAgg", "geoAgg", "partitions", "order", "distribution"],
+	"properties": {
+		"id": { "$ref": "#/definitions/uuid" },
+		"name": { "type": "string", "minLength": 1 },
+		"timeAgg": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
+		"geoAgg": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
+		"partitions": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name", "aggregation", "elements", "groups"],
+				"properties": {
+					"id": { "$ref": "#/definitions/uuid" },
+					"name": { "type": "string", "minLength": 1 },
+					"aggregation": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
+					"elements": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": ["id", "name"],
+							"properties": {
+								"id": { "$ref": "#/definitions/uuid" },
+								"name": { "type": "string", "minLength": 1 }
+							}
+						}
+					},
+
+					"groups": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": ["id", "name", "members"],
+							"properties": {
+								"id": { "$ref": "#/definitions/uuid" },
+								"name": { "type": "string", "minLength": 1 },
+								"members": {
+									"type": "array",
+									"items": { "$ref": "#/definitions/uuid" }
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"order": { "type": "number" },
+		"distribution": { "type": "number" }
+	},
+
+	"definitions": {
+		"uuid": {
+			"type": "string",
+			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+		}
+	}
+}

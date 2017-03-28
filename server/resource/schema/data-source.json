@@ -1,0 +1,41 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "Monitool data source schema",
+
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["id", "name", "collect", "periodicity", "start", "end", "elements"],
+	"properties": {
+		"id": { "$ref": "#/definitions/uuid" },
+		"name": { "type": "string", "minLength": 1 },
+		"entities": { "type": "array", "items": { "$ref": "#/definitions/uuid" } },
+		"collect": { "type": "string", "enum": ["project", "entity", "some_entity"] },
+		"periodicity": { "type": "string", "enum": ["day", "week_sat", "week_sun", "week_mon", "month", "quarter", "semester", "year", "free"] },
+		"start": { "oneOf": [{"type": "null"}, { "type": "string", "format": "date" }]},
+		"end": { "oneOf": [{"type": "null"}, { "type": "string", "format": "date" }]},
+		"elements": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name", "timeAgg", "geoAgg", "partitions", "order", "distribution"],
+				"properties": {
+					"id": { "$ref": "#/definitions/uuid" },
+					"name": { "type": "string", "minLength": 1 },
+					"timeAgg": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
+					"geoAgg": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
+					"partitions": { "$ref": "#/definitions/partitions" },
+					"order": { "type": "number" },
+					"distribution": { "type": "number" }
+				}
+			}
+		}
+	},
+
+	"definitions": {
+		"uuid": {
+			"type": "string",
+			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+		}
+	}
+}
