@@ -36,7 +36,7 @@ class InputStore extends Store {
 		var view = 'inputs_by_project_form_date',
 			opt = {startkey: [projectId, formId], endkey: [projectId, formId, {}]};
 
-		return this._callView(view, opt).then(function(result) {
+		return this._db.callView(view, opt).then(function(result) {
 			return result.rows.map(item => item.id);
 		});
 	}
@@ -52,7 +52,7 @@ class InputStore extends Store {
 		var view = 'inputs_by_project_entity_date',
 			opt = {startkey: [projectId, entityId], endkey: [projectId, entityId, {}]};
 
-		return this._callView(view, opt).then(function(result) {
+		return this._db.callView(view, opt).then(function(result) {
 			return result.rows.map(item => item.id);
 		});
 	}
@@ -69,7 +69,7 @@ class InputStore extends Store {
 			opt = {include_docs: true, startkey: [projectId], endkey: [projectId, {}]},
 			Input = this.modelClass;
 
-		return this._callView(view, opt).then(function(result) {
+		return this._db.callView(view, opt).then(function(result) {
 			return result.rows.map(row => new Input(row.doc));
 		});
 	}
@@ -86,7 +86,7 @@ class InputStore extends Store {
 			opt = {include_docs: true, startkey: [projectId, formId], endkey: [projectId, formId, {}]},
 			Input = this.modelClass;
 
-		return this._callView(view, opt).then(function(result) {
+		return this._db.callView(view, opt).then(function(result) {
 			return result.rows.map(row => new Input(row.doc));
 		});
 	}
@@ -105,7 +105,7 @@ class InputStore extends Store {
 			options  = {startkey: startKey, endkey: endKey, descending: true, limit: 2, include_docs: true},
 			Input    = this.modelClass;
 
-		return this._callList(options).then(function(result) {
+		return this._db.callList(options).then(function(result) {
 			// retrieve current and previous from view result.
 			var current = null, previous = null;
 

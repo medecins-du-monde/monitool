@@ -71,7 +71,7 @@ class Indicator extends DbModel {
 			this._deleted = true;
 
 			// Save everything in on request
-			return Indicator.storeInstance._callBulk({docs: projects.concat([this])});
+			return this._db.callBulk({docs: projects.concat([this])});
 		}.bind(this)).then(function() { /* do not pass couchdb result to caller */ });
 	}
 }

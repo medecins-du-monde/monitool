@@ -17,27 +17,21 @@
 
 "use strict";
 
-var nano      = require('nano'),
-	Model     = require('./model'),
-	config    = require('../../config'),
-	database  = nano(config.couchdb.url).use(config.couchdb.bucket);
+var Model     = require('./model'),
+	database  = require('../database');
 
 class DbModel extends Model {
 
+	get _db() {
+		return database;
+	}
 
 	/**
 	 * Delete the model from the database.
 	 * No checks are performed to ensure that database integrity is not lost!
 	 */
 	destroy() {
-		return new Promise(function(resolve, reject) {
-			database.destroy(this._id, this._rev, function(error) {
-				if (error)
-					reject(error);
-				else
-					resolve();
-			}.bind(this));
-		}.bind(this));
+		return this._db.destroy(this._id, this._rev);
 	}
 
 	/**
@@ -55,16 +49,7 @@ class DbModel extends Model {
 		var canSave = skipChecks ? Promise.resolve() : this.validateForeignKeys();
 
 		return canSave.then(function() {
-			return new Promise(function(resolve, reject)  {
-				database.insert(this, function(error, result) {
-					if (error)
-						reject(error)
-					else {
-						this._rev = result.rev;
-						resolve(this);
-					}
-				}.bind(this));
-			}.bind(this));
+			return this._db.insert(this);
 		}.bind(this));
 	}
 

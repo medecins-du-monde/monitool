@@ -1,7 +1,7 @@
+let database = require('../database');
 
 
-
-module.exports = {
+var designDoc = {
 	_id: '_design/monitool',
 
 	views: {
@@ -108,3 +108,8 @@ module.exports = {
 	}
 };
 
+
+
+module.exports = function(callback) {
+	return database.insert(designDoc);
+};

@@ -19,7 +19,7 @@
 
 var nano     = require('nano'),
 	config   = require('../../config'),
-	database = nano(config.couchdb.url).use(config.couchdb.bucket);
+	database = require('../database');
 
 /**
  * Represents a collection of models.
@@ -27,6 +27,10 @@ var nano     = require('nano'),
  * This is an abstract from which all stores inherit.
  */
 class Store {
+
+	get _db() {
+		return database;
+	}
 
 	/**
 	 * Get the name of this store.
@@ -48,68 +52,6 @@ class Store {
 	}
 	
 	/**
-	 * Create a new store
-	 */
-	constructor() {
-		this._db = database;
-	}
-
-	/**
-	 * Wrap view queries to database into a promise
-	 * 
-	 * @protected
-	 * @param  {string} viewName
-	 * @param  {Object} options
-	 * @return {Array}
-	 */
-	_callView(viewName, options) {
-		return new Promise(function(resolve, reject) {
-			this._db.view('monitool', viewName, options, function(error, result) {
-				if (error)
-					reject(error);
-				else
-					resolve(result);
-			});
-		}.bind(this));
-	}
-
-	/**
-	 * Wrap list queries to database into a promise
-	 * 
-	 * @protected
-	 * @param  {Object} options
-	 * @return {Array}
-	 */
-	_callList(options) {
-		return new Promise(function(resolve, reject) {
-			this._db.list(options, function(error, result) {
-				if (error)
-					reject(error);
-				else
-					resolve(result);
-			});
-		}.bind(this));
-	}
-
-	/**
-	 * Wrap bulk queries to database into a promise
-	 * 
-	 * @protected
-	 * @param  {Object} options
-	 * @return {Array}
-	 */
-	_callBulk(options) {
-		return new Promise(function(resolve, reject) {
-			this._db.bulk(options, function(error, result) {
-				if (error)
-					reject(error);
-				else
-					resolve(result);
-			});
-		}.bind(this));
-	}
-
-	/**
 	 * Retrieve all models of current type.
 	 * 
 	 * @return {Array.<Model>}
@@ -119,7 +61,7 @@ class Store {
 			opt = {include_docs: true, key: this.modelString},
 			ModelClass = this.modelClass;
 
-		return this._callView(view, opt).then(function(result) {
+		return this._db.callView(view, opt).then(function(result) {
 			return result.rows.map(row => new ModelClass(row.doc));
 		});
 	}
@@ -130,24 +72,8 @@ class Store {
 	 * @return {Model}
 	 */
 	get(id) {
-		return new Promise(function(resolve, reject) {
-			this._db.get(id, function(error, data) {
-				if (error)
-					reject(error);
-
-				else if (data.type !== this.modelString)
-					reject(new Error('wrong_type'));
-
-				else {
-					try {
-						resolve(new this.modelClass(data));
-					}
-					catch (e) {
-						reject(e.message);
-					}
-				}
-				
-			}.bind(this));
+		return this._db.get(id).then(function(data) {
+			return new this.modelClass(data);
 		}.bind(this));
 	}
 }

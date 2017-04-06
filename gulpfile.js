@@ -112,30 +112,6 @@ gulp.task('bower', function() {
 	return bower({cwd: './client'});
 });
 
-gulp.task('design-docs', function(callback) {
-	var urlPrefix = config.couchdb.url + '/' + config.couchdb.bucket;
-	var ddocs = {
-		monitool: require('./designdocs/monitool')
-	};
-
-	var numDocs = 3;
-	Object.keys(ddocs).forEach(function(ddoc) {
-		var url = urlPrefix + '/_design/' + ddoc;
-
-		request({method: 'GET', url: url}, function(error, response, doc) {
-			var newDdoc = ddocs[ddoc];
-			newDdoc._rev = JSON.parse(doc)._rev;
-
-			request({method: 'PUT', url: url, json: newDdoc}, function(error, response, doc) {
-				console.log(JSON.stringify(doc));
-				numDocs--;
-				if (numDocs == 0)
-					callback();
-			});
-		});
-	});
-});
-
 gulp.task('size', function() {
 	var sizes = files.js.map(function(path) {
 		return [fs.statSync(path).size, path];

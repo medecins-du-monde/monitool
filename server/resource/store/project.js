@@ -36,7 +36,7 @@ class ProjectStore extends Store {
 
 		var view = 'projects_short';
 
-		return this._callView(view, {}).then(function(result) {
+		return this._db.callView(view, {}).then(function(result) {
 			var projects = result.rows.map(row => row.value);
 
 			projects.forEach(function(p) {
@@ -61,7 +61,7 @@ class ProjectStore extends Store {
 		var view = 'cross_cutting', opt = {key: indicatorId, include_docs: true},
 			Project = this.modelClass;
 
-		return this._callView(view, opt).then(function(result) {
+		return this._db.callView(view, opt).then(function(result) {
 			var projects = result.rows.map(row => row.doc);
 
 			// strip down project
@@ -98,7 +98,7 @@ class ProjectStore extends Store {
 		var view = 'project_by_theme', opt = {key: themeId, include_docs: true},
 			Project = this.modelClass;
 
-		return this._callView(view, opt).then(function(result) {
+		return this._db.callView(view, opt).then(function(result) {
 			return result.rows.map(row => new Project(row.doc));
 		});
 	}

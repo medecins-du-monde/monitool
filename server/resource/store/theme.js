@@ -29,7 +29,7 @@ class ThemeStore extends Store {
 	listWithUsage() {
 		var promises = [
 			this.list(),
-			this._callView('themes_usage', {group: true})
+			this._db.callView('themes_usage', {group: true})
 		];
 
 		return Promise.all(promises).then(function(result) {

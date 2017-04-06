@@ -15,28 +15,33 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
+let winston = require('winston');
+
 try {
 	module.exports = require('../config.json');
+
+	winston.log('info', '[Config] Loading from config.json');
 }
 catch (e) {
 	module.exports = {
-		debug: process.env.DEBUG === 'TRUE',
-		port: process.env.PORT,
+		debug: process.env['monitool.debug'] === 'TRUE',
+		baseUrl: process.env['monitool.baseUrl'],
+		port: process.env['monitool.port'],
 		couchdb: {
-			url: process.env['couchdb.url'],
-			bucket: process.env['couchdb.bucket'],
-			host: process.env['couchdb.host'],
-			sessionBucket: process.env['couchdb.sessionBucket'],
-			username: process.env['couchdb.username'],
-			password: process.env['couchdb.password']
+			host: process.env['monitool.couchdb.host'],
+			port: process.env['monitool.couchdb.port'],
+			bucket: process.env['monitool.couchdb.bucket'],
+			sessionBucket: process.env['monitool.couchdb.sessionBucket'],
+			username: process.env['monitool.couchdb.username'],
+			password: process.env['monitool.couchdb.password']
 		},
 		oauth: {
-			authUrl: process.env['oauth.authUrl'],
-			tokenUrl: process.env['oauth.tokenUrl'],
-			clientId: process.env['oauth.clientId'],
-			clientSecret: process.env['oauth.clientSecret'],
-			callbackUrl: process.env['oauth.callbackUrl'],
-			resource: process.env['oauth.resource']
+			authUrl: process.env['monitool.oauth.authUrl'],
+			tokenUrl: process.env['monitool.oauth.tokenUrl'],
+			clientId: process.env['monitool.oauth.clientId'],
+			clientSecret: process.env['monitool.oauth.clientSecret']
 		}
 	}
+	
+	winston.log('info', '[Config] Loading from environnement variables');
 }

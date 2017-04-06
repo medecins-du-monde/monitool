@@ -14,6 +14,7 @@ var CouchSessionStore = require('connect-couchdb')(session),
 	store = new CouchSessionStore({
 		name: config.couchdb.sessionBucket,
 		host: config.couchdb.host,
+		port: config.couchdb.port,
 		username: config.couchdb.username,
 		password: config.couchdb.password
 	});

@@ -35,7 +35,7 @@ class IndicatorStore extends Store {
 		var view = 'indicator_by_theme', opt = {key: themeId, include_docs: true},
 			Indicator = this.modelClass;
 		
-		return this._callView(view, opt).then(function(result) {
+		return this._db.callView(view, opt).then(function(result) {
 			return result.rows.map(row => new Indicator(row.doc));
 		});
 	}

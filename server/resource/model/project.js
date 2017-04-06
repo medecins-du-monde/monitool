@@ -224,7 +224,7 @@ class Project extends DbModel {
 				// Bulk operations are not really atomic in a couchdb database.
 				// if someone else is playing with the database at the same time, we might leave the database in an inconsistent state.
 				// This can be easily fixed http://stackoverflow.com/questions/29491618/transaction-like-update-of-two-documents-using-couchdb
-				return Project.storeInstance._callBulk({docs: updates});
+				return this._db.callBulk({docs: updates});
 			}.bind(this))
 
 			.then(function(bulkResults) {

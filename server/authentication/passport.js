@@ -77,7 +77,7 @@ var strategy = new OAuth2Strategy(
 		tokenURL: config.oauth.tokenUrl,
 		clientID: config.oauth.clientId,
 		clientSecret: config.oauth.clientSecret,
-		callbackURL: config.oauth.callbackUrl
+		callbackURL: config.baseUrl + '/authentication/login-callback'
 	},
 	// This method is invoked upon auth sequence completion
 	// Its the hook to cache the access/refresh tokens, post-process the Azure profile, etc.
@@ -133,7 +133,7 @@ var strategy = new OAuth2Strategy(
 //  this corresponds to the Azure resource you're requesting access to
 //  in our case we're just trying to authenticate, so we just request generic access to the Azure AD graph API
 strategy.tokenParams = strategy.authorizationParams = function(options) {
-	return { resource: config.oauth.resource };
+	return { resource: "https://graph.windows.net" };
 };
 
 // this is our custom logic for digging into the token returned to us by Azure

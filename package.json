@@ -56,6 +56,7 @@
     "passport-oauth2": "x",
     "passport-oauth2-client-password": "x",
     "password-hash": "x",
-    "serve-static": "x"
+    "serve-static": "x",
+    "winston": "^2.3.1"
   }
 }

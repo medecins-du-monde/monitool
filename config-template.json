@@ -1,19 +1,19 @@
 {
-	"port": 80,
+	"debug": true,
+	"baseUrl": "http://localhost:8000",
+	"port": 8000,
 	"couchdb": {
-		"url": "",
-		"bucket": "",
-		"host": "",
-		"sessionBucket": "",
+		"host": "localhost",
+		"port": 5984,
+		"bucket": "monitool",
+		"sessionBucket": "monitool-sessions",
 		"username": "",
 		"password": ""
 	},
 	"oauth": {
-		"authUrl": "https://login.windows.net/xxxxxxxxxxxxxx/oauth2/authorize",
-		"tokenUrl": "https://login.windows.net/xxxxxxxxxxxxxx/oauth2/token",
-		"clientId": "",
-		"clientSecret": "",
-		"callbackUrl": "http://localhost:8000/auth/callback",
-		"resource": "https://graph.windows.net"
+		"authUrl": "https://login.windows.net/common/oauth2/authorize",
+		"tokenUrl": "https://login.windows.net/common/oauth2/token",
+		"clientId": "[enter client id]",
+		"clientSecret": "[enter client secret]"
 	}
 }

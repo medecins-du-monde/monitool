@@ -77,7 +77,7 @@ class Theme extends DbModel {
 					}
 				}, this);
 
-				return Theme.storeInstance._callBulk({docs: indicators.concat(projects).concat([this])});
+				return this._db.callBulk({docs: indicators.concat(projects).concat([this])});
 			}.bind(this))
 			
 			.then(function(bulkResults) {
