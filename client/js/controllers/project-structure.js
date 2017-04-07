@@ -258,9 +258,9 @@ angular
 	.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $uibModal, $timeout, formUsage, uuid) {
 
 		$scope.container = {}
-		$scope.toggle = function(elementId) {
-			if ($scope.container.visibleElement!== elementId)
-				$scope.container.visibleElement = elementId;
+		$scope.toggle = function(variableId) {
+			if ($scope.container.visibleElement !== variableId)
+				$scope.container.visibleElement = variableId;
 			else
 				$scope.container.visibleElement = null;
 		}
@@ -347,9 +347,12 @@ angular
 		};
 
 		$scope.newVariable = function() {
-			$scope.editableProject.forms[$scope.currentFormIndex].elements.push({
+			var newVariable = {
 				id: uuid.v4(), name: "", partitions: [], order: 0, distribution: 0, geoAgg: 'sum', timeAgg: 'sum'
-			});
+			};
+
+			$scope.editableProject.forms[$scope.currentFormIndex].elements.push(newVariable);
+			$scope.toggle(newVariable.id);
 		};
 		
 		$scope.remove = function(item, target) {
