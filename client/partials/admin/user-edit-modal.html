@@ -1,7 +1,14 @@
+<div class="modal-header">
+	<h3 class="modal-title">
+		<a ng-click="cancel()" class="pull-right" style="cursor: pointer">
+			<i class="fa fa-times"></i>
+		</a>
+		<span translate="project.edit_user"></span>
+	</h3>
+</div>
 <div class="modal-body">
 
 	<form class="form-horizontal" role="form" name="userForm" novalidate>
-		<legend translate="project.edit_user"></legend>
 
 		<div class="alert alert-info" translate="user.edit_info"></div>
 
@@ -103,10 +110,5 @@
 	<button ng-click="save()" ng-disabled="userForm.$invalid || !hasChanged" class="btn btn-primary">
 		<i class="fa fa-object-group"></i>
 		<span translate="user.save"></span>
-	</button>
-
-	<button ng-click="cancel()" class="btn btn-default">
-		<i class="fa fa-undo"></i>
-		<span translate="shared.cancel"></span>
 	</button>
 </div>

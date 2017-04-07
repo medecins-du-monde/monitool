@@ -434,6 +434,10 @@ angular
 		$scope.delete = function() {
 			$uibModalInstance.close(null);
 		};
+
+		$scope.closeModal = function() {
+			$uibModalInstance.dismiss(null);
+		};
 	})
 
 

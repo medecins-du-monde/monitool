@@ -677,3 +677,13 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 #input-list .bodyField a { display: block; width: 100%;}
 
 #input-list .bodyField2 { height: 24px; text-align: center; overflow: hidden; }
+
+
+  .modal-header {
+    padding: 7px 15px;
+  }
+
+  .modal-header h3 {
+    font-size: 18px;
+  }
+

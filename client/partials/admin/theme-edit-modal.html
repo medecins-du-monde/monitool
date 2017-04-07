@@ -1,7 +1,15 @@
+<div class="modal-header">
+	<h3 class="modal-title">
+		<a ng-click="cancel()" class="pull-right" style="cursor: pointer">
+			<i class="fa fa-times"></i>
+		</a>
+		<span translate="theme.edit_title"></span>
+	</h3>
+</div>
+
 <div class="modal-body">
 
 	<form class="form-horizontal" role="form" name="themeForm" novalidate>
-		<legend translate="theme.edit_title"></legend>
 	
 		<div class="alert alert-info" translate="theme.info"></div>
 
@@ -41,10 +49,5 @@
 	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew">
 		<i class="fa fa-times"></i>
 		<span translate="shared.delete"></span>
-	</button>
-
-	<button ng-click="cancel()" class="btn btn-default">
-		<i class="fa fa-undo"></i>
-		<span translate="shared.cancel"></span>
 	</button>
 </div>

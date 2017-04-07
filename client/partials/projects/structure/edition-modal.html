@@ -1,7 +1,16 @@
+<div class="modal-header">
+	<h3 class="modal-title">
+		<a ng-click="cancel()" class="pull-right" style="cursor: pointer">
+			<i class="fa fa-times"></i>
+		</a>
+
+		<span ng-if="!indicator" translate="project.edit_indicator"></span>
+		<span ng-if="indicator" title="{{indicator.name[language]}}">{{indicator.name[language]|maxLength:90}}</span>
+	</h3>
+</div>
+
 <div class="modal-body">
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
-		<legend translate="project.edit_indicator" ng-if="!indicator"></legend>
-		<legend ng-if="indicator" title="{{indicator.name[language]}}">{{indicator.name[language]|maxLength:90}}</legend>
 
 		<p ng-if="indicator" style="text-align: center; margin-bottom: 10px">{{indicator.description[language]}}</p>
 
@@ -75,10 +84,5 @@
 	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew && !indicator">
 		<i class="fa fa-remove"></i>
 		<span translate="shared.delete"></span>
-	</button>
-
-	<button ng-click="cancel()" class="btn btn-default">
-		<i class="fa fa-undo"></i>
-		<span translate="shared.cancel"></span>
 	</button>
 </div>
