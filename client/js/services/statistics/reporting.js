@@ -52,14 +52,6 @@ angular
 		};
 
 		this.getColumns = function(groupBy, start, end, location, project) {
-			var type;
-			if (location === 'none')
-				type = 'project';
-			else if (project.groups.find(function(g) { return 'grp_' + g.id === location }))
-				type = 'group';
-			else
-				type = 'entity';
-
 			if (['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1) {
 				var slots = InputSlots.iterate(start, end, groupBy).map(function(slot) {
 					return {id: slot, name: $filter('formatSlot')(slot), title: $filter('formatSlotRange')(slot)};
@@ -69,25 +61,35 @@ angular
 
 				return slots;
 			}
-			else if (groupBy === 'entity') {
-				if (type === 'project')
-					return project.entities.concat([{id: '_total', name: 'Total'}]);
-				else if (type === 'entity')
-					return project.entities.filter(function(e) { return 'ent_' + e.id === location })
-												.concat([{id: '_total', name: 'Total'}]);
-				else  if (type === 'group') {
-					var group = project.groups.find(function(g) { return 'grp_' + g.id === location });
-					return project.entities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
-												.concat([{id: '_total', name: 'Total'}]);
+			else if (groupBy === 'entity' || groupBy === 'group') {
+				var type;
+				if (location === 'none')
+					type = 'project';
+				else if (project.groups.find(function(g) { return 'grp_' + g.id === location }))
+					type = 'group';
+				else
+					type = 'entity';
+
+				if (groupBy === 'entity') {
+					if (type === 'project')
+						return project.entities.concat([{id: '_total', name: 'Total'}]);
+					else if (type === 'entity')
+						return project.entities.filter(function(e) { return 'ent_' + e.id === location })
+													.concat([{id: '_total', name: 'Total'}]);
+					else  if (type === 'group') {
+						var group = project.groups.find(function(g) { return 'grp_' + g.id === location });
+						return project.entities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
+													.concat([{id: '_total', name: 'Total'}]);
+					}
 				}
-			}
-			else if (groupBy === 'group') {
-				if (type === 'project')
-					return project.groups;
-				else if (type === 'entity')
-					return project.groups.filter(function(g) { return g.members.indexOf(location.substring(4)) !== -1 });
-				else if (type === 'group')
-					return project.groups.filter(function(g) { return 'grp_' + g.id === location });
+				else {
+					if (type === 'project')
+						return project.groups;
+					else if (type === 'entity')
+						return project.groups.filter(function(g) { return g.members.indexOf(location.substring(4)) !== -1 });
+					else if (type === 'group')
+						return project.groups.filter(function(g) { return 'grp_' + g.id === location });
+				}
 			}
 			else
 				throw new Error('Invalid groupBy: ' + groupBy)
