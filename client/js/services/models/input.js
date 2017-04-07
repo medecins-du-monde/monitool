@@ -44,77 +44,29 @@ angular
 
 				if (form.periodicity === 'free') {
 					// we expect all dates and centers where we have @ least one input
-					if (form.collect === 'some_entity') {
-						for (var strPeriod in prj) {
-							form.entities.forEach(function(entityId) {
-								if (prj[strPeriod][entityId] == 'outofschedule')
-									prj[strPeriod][entityId] = 'done';
-								else
-									prj[strPeriod][entityId] = 'expected';
-							});
-						}
-					}
-					else if (form.collect === 'entity') {
-						for (var strPeriod in prj) {
-							project.entities.forEach(function(entity) {
-								if (prj[strPeriod][entity.id] == 'outofschedule')
-									prj[strPeriod][entity.id] = 'done';
-								else
-									prj[strPeriod][entity.id] = 'expected';
-							});
-						}
-					}
-					else if (form.collect === 'project') {
-						for (var strPeriod in prj) {
-							if (prj[strPeriod].none == 'outofschedule')
-								prj[strPeriod].none = 'done';
+					for (var strPeriod in prj) {
+						form.entities.forEach(function(entityId) {
+							if (prj[strPeriod][entityId] == 'outofschedule')
+								prj[strPeriod][entityId] = 'done';
 							else
-								prj[strPeriod].none = 'expected';
-						}
+								prj[strPeriod][entityId] = 'expected';
+						});
 					}
-					else
-						throw new Error('Invalid form.collect value.');
 				}
 				else {
 					// we expect only the dates that are specified with the periodicity.
-					if (form.collect === 'some_entity')
-						form.entities.forEach(function(entityId) {
-							var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
+					form.entities.forEach(function(entityId) {
+						var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
 
-							InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
-								prj[strPeriod] = prj[strPeriod] || {}
-
-								if (prj[strPeriod][inputEntity.id] == 'outofschedule')
-									prj[strPeriod][inputEntity.id] = 'done';
-								else
-									prj[strPeriod][inputEntity.id] = 'expected';
-							});
-						});
-					
-					else if (form.collect === 'entity')
-						project.entities.forEach(function(inputEntity) {
-							InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
-								prj[strPeriod] = prj[strPeriod] || {}
-
-								if (prj[strPeriod][inputEntity.id] == 'outofschedule')
-									prj[strPeriod][inputEntity.id] = 'done';
-								else
-									prj[strPeriod][inputEntity.id] = 'expected';
-							});
-						});
-					
-					else if (form.collect === 'project')
-						InputSlots.getList(project, null, form).forEach(function(strPeriod) {
+						InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
 							prj[strPeriod] = prj[strPeriod] || {}
 
-							if (prj[strPeriod].none == 'outofschedule')
-								prj[strPeriod].none = 'done';
+							if (prj[strPeriod][inputEntity.id] == 'outofschedule')
+								prj[strPeriod][inputEntity.id] = 'done';
 							else
-								prj[strPeriod].none = 'expected';
+								prj[strPeriod][inputEntity.id] = 'expected';
 						});
-					
-					else
-						throw new Error('Invalid form.collect value.');
+					});
 				}
 
 				// Sort periods alphabetically

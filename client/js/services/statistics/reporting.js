@@ -53,7 +53,7 @@ angular
 
 		this.getColumns = function(groupBy, start, end, location, project) {
 			var type;
-			if (!location || location == 'none')
+			if (location === 'none')
 				type = 'project';
 			else if (project.groups.find(function(g) { return 'grp_' + g.id === location }))
 				type = 'group';

@@ -466,11 +466,6 @@ var ENGLISH_TRANSLATION = {
 			free: 'Free'
 		},
 		collect: "Collect",
-		collects: {
-			some_entity: "For some of the collection sites",
-			entity: "For each collection site",
-			project: "For the whole project"
-		},
 		
 		no_input_entities: 'No collection site was created yet!',
 		no_input_groups: 'No collection group was created yet!',

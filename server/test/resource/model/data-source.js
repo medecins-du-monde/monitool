@@ -28,8 +28,8 @@ describe('DataSource', function() {
 		dataSource = new DataSource({
 			id: "1760d546-cccf-43fe-8f28-1e40a05f23b5",
 			name: "form",
-			collect: "entity",
 			periodicity: "month",
+			entities: ["3b96c9d9-9b6f-4c56-a0df-bd4495fd85ef"],
 			start: null,
 			end: null,
 			elements: [

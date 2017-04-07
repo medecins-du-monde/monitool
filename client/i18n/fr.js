@@ -466,11 +466,6 @@ var FRENCH_TRANSLATION = {
 			free: 'Libre'
 		},
 		collect: "Collecter",
-		collects: {
-			some_entity: "Pour certains lieux de collecte",
-			entity: "Pour tous les lieux de collecte",
-			project: "Pour tout le projet"
-		},
 
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',
 		no_input_groups: 'Aucun groupe d\'activité n\'a encore été créé!',

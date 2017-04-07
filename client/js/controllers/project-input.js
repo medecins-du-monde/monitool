@@ -26,13 +26,7 @@ angular.module('monitool.controllers.project.input', [])
 		// Create planning.
 		//////
 		$scope.inputsStatus = inputsStatus;
-
-		if ($scope.form.collect == 'project')
-			$scope.columns = [{id: 'none', name: "shared.project"}];
-		else if ($scope.form.collect == 'some_entity')
-			$scope.columns = $scope.masterProject.entities.filter(function(e) { return $scope.form.entities.indexOf(e.id) !== -1; });
-		else if ($scope.form.collect == 'entity')
-			$scope.columns = $scope.masterProject.entities;
+		$scope.columns = $scope.masterProject.entities.filter(function(e) { return $scope.form.entities.indexOf(e.id) !== -1; });
 
 		// => restrict columns depending on user permissions
 		if ($scope.userCtx.role !== 'admin') {

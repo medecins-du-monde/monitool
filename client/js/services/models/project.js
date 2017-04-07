@@ -96,15 +96,8 @@ angular
 		Project.prototype.isReadyForReporting = function() {
 			for (var formIndex = 0; formIndex < this.forms.length; ++formIndex) {
 				var form = this.forms[formIndex];
-				
-				if (form.elements.length) {
-					var canInputAllEntities = form.collect == 'entity' && this.entities.length,
-						canInputSomeEntities = form.collect == 'some_entity' && form.entities.length,
-						canInputProject = form.collect == 'project';
-
-					if (canInputAllEntities || canInputSomeEntities || canInputProject)
-						return true;
-				}
+				if (form.elements.length && form.entities.length)
+					return true;
 			}
 			
 			return false;
@@ -162,18 +155,9 @@ angular
 			
 			if (projectUser.role === 'input') {
 				var form = this.forms.find(function(f) { return f.id == formId; });
-
-				var formColumns;
-				if (form.collect == 'project')
-					formColumns = ['none'];
-				else if (form.collect == 'some_entity')
-					formColumns = form.entities;
-				else if (form.collect == 'entity')
-					formColumns = this.entities.pluck('id')
-
 				var userColumns = projectUser.entities;
 
-				return !!itertools.intersect(formColumns, userColumns).length;
+				return !!itertools.intersect(form.entities, userColumns).length;
 			}
 			
 			return false;

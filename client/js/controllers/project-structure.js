@@ -167,7 +167,7 @@ angular
 		$scope.users = {};
 		users.forEach(function(user) { $scope.users[user._id] = user});
 		
-		$scope.availableEntities = [{id: 'none', name: $filter('translate')('shared.project')}].concat($scope.masterProject.entities);
+		$scope.availableEntities = $scope.masterProject.entities;
 
 		$scope.editUser = function(user) {
 			var promise = $uibModal.open({
@@ -240,9 +240,12 @@ angular
 	 * Controller used by the "main.project.structure.collection_form_list" state.
 	 * Allows to list and reorder data sources.
 	 */
-	.controller('ProjectCollectionFormListController', function($scope, $state, uuid) {
+	.controller('ProjectCollectionFormListController', function($scope, $state, $filter, uuid) {
+
+		$scope.availableEntities = $scope.masterProject.entities;
+
 		$scope.createForm = function() {
-			var newForm = {id: uuid.v4(), name: '', periodicity: 'month', collect: 'entity', start: null, end: null, elements: []};
+			var newForm = {id: uuid.v4(), name: '', periodicity: 'month', entities: [], start: null, end: null, elements: []};
 			$scope.editableProject.forms.push(newForm);
 			$state.go('main.project.structure.collection_form_edition', {formId: newForm.id});
 		};
@@ -290,7 +293,7 @@ angular
 			// If user is OK with the data lost, remove the form, save and go back to the list of forms.
 			if (really) {
 				// Kill the watches
-				w1(); w2(); w3();
+				w1(); w3();
 
 				// Remove the form
 				$scope.editableProject.forms.splice($scope.currentFormIndex, 1);
@@ -307,17 +310,9 @@ angular
 		// Watch currentForm. If undefined, means that user clicked "cancel changes" on a new project.
 		var w1 = $scope.$watch('editableProject.forms[currentFormIndex]', function(form) {
 			if (!form) {
-				w1(); w2(); w3();
+				w1(); w3();
 				$state.go('main.project.structure.collection_form_list');
 			}
-		});
-
-		// Watch currentForm.collect to empty the list of sites this form will be used in.
-		var w2 = $scope.$watch('editableProject.forms[currentFormIndex].collect', function(collect) {
-			if (collect === 'some_entity' && !$scope.editableProject.forms[$scope.currentFormIndex].entities)
-				$scope.editableProject.forms[$scope.currentFormIndex].entities = [];
-			else if (collect !== 'some_entity' && $scope.editableProject.forms[$scope.currentFormIndex].entities)
-				delete $scope.editableProject.forms[$scope.currentFormIndex].entities;
 		});
 
 		// Watch form to invalidate HTML form on some conditions

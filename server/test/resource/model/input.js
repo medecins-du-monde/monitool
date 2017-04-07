@@ -52,8 +52,8 @@ describe("Input migration", function() {
 				{
 					id: "8a7980f8-0e47-49bb-bf54-fdbe2013e3ea",
 					name: "whatever",
-					collect: "entity",
 					periodicity: "month",
+					entities: ["0c243e08-8c21-4946-9f5f-ce255106901b"],
 					start: null,
 					end: null,
 					elements: [
@@ -196,17 +196,6 @@ describe("Input migration", function() {
 	});
 
 	describe('forms_periodicity_replace', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_collect_replace', function() {
 		beforeEach(function() {
 
 		});

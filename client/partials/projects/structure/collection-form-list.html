@@ -40,7 +40,9 @@
 			<td ng-if="!form.end" translate="project.same_as_end"></td>
 			
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
-			<td>{{'project.collects.' + form.collect|translate}}</td>
+			<td>
+				{{form.entities|getObjects:availableEntities|pluck:'name'|translate_list|join:', '}}
+			</td>
  		</tr>
 	</tbody>
 	<tfoot>

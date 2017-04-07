@@ -466,11 +466,6 @@ var SPANISH_TRANSLATION = {
 			free: 'Libre'
 		},
 		collect: "Recuperar",
-		collects: {
-			some_entity: "Para algunos de los lugares de colecta",
-			entity: "Para cada lugar de colecta",
-			project: "Para todo el proyecto"
-		},
 
 		no_input_entities: '¡Ningún lugar de colecta ha sido creado!',
 		no_input_groups: '¡Ningún grupo de colecta ha sido creado!',

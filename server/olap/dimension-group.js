@@ -40,16 +40,11 @@ class DimensionGroup {
 	}
 
 	static createLocation(project, form) {
-		var entities;
-		if (form.collect == 'some_entity')
-			entities = form.entities;
-		else if (form.collect == 'entity')
-			entities = project.entities.map(function(e) { return e.id; });
-
 		var groups = {};
+		
 		project.groups.forEach(function(group) {
 			groups[group.id] = group.members.filter(function(id) {
-				return entities.indexOf(id) !== -1;
+				return form.entities.indexOf(id) !== -1;
 			});
 
 			if (groups[group.id].length === 0)

@@ -141,7 +141,7 @@ class Input extends DbModel {
 			var errors = [];
 
 			// entity must exist in the project
-			if (this.entity !== 'none' && project.entities.filter(e => this.entity === e.id).length === 0)
+			if (project.entities.filter(e => this.entity === e.id).length === 0)
 				errors.push('unknown_entity');
 
 			var dataSource = project.getDataSourceById(this.form);

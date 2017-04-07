@@ -78,13 +78,11 @@ class Cube {
 		});
 		
 		// Location
-		if (form.collect == 'entity' || form.collect == 'some_entity') {
-			dimensions.push(Dimension.createLocation(project, form, element));
-			if (project.groups.length)
-				dimensionGroups.push(DimensionGroup.createLocation(project, form))
-		}
+		dimensions.push(Dimension.createLocation(project, form, element));
+		if (project.groups.length)
+			dimensionGroups.push(DimensionGroup.createLocation(project, form))
 
-		// Partitions
+		// Disaggregations
 		element.partitions.forEach(function(partition) {
 			dimensions.push(Dimension.createPartition(partition));
 			if (partition.groups.length)
@@ -111,14 +109,11 @@ class Cube {
 				return;
 			}
 
-			if (form.collect == 'entity' || form.collect == 'some_entity') {
-				if (dimensions[1].items.indexOf(input.entity) < 0) {
-					winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(did not find entity in spacialDim)");
-					return;
-				}
-
-				offset = offset * dimensions[1].items.length + dimensions[1].items.indexOf(input.entity);
+			if (dimensions[1].items.indexOf(input.entity) < 0) {
+				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(did not find entity in spacialDim)");
+				return;
 			}
+			offset = offset * dimensions[1].items.length + dimensions[1].items.indexOf(input.entity);
 
 			element.partitions.forEach(function(partition) {
 				offset *= partition.elements.length;

@@ -70,16 +70,7 @@ class Dimension {
 	}
 
 	static createLocation(project, form, element) {
-		var entities;
-		if (form.collect == 'some_entity')
-			entities = form.entities;
-		else if (form.collect == 'entity')
-			entities = project.entities.map(function(e) { return e.id; });
-
-		if (!entities)
-			throw new Error('No location dimension');
-		else
-			return new Dimension('entity', entities, element.geoAgg);
+		return new Dimension('entity', form.entities, element.geoAgg);
 	}
 
 	static createPartition(partition) {
