@@ -110,6 +110,6 @@ var designDoc = {
 
 
 
-module.exports = function(callback) {
+module.exports = function() {
 	return database.insert(designDoc);
 };

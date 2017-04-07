@@ -45,11 +45,11 @@ angular.module('monitool.directives.acl', [])
 			else if (askedRole === 'input') {
 				if (userCtx.type === 'user') {
 					var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
-					return userCtx.role === 'admin' || internalUser && ['owner', 'input', 'input_all'].indexOf(internalUser.role) !== -1;
+					return userCtx.role === 'admin' || internalUser && ['owner', 'input'].indexOf(internalUser.role) !== -1;
 				}
 
 				else if (userCtx.type === 'partner')
-					return userCtx.projectId === project._id && ['owner', 'input', 'input_all'].indexOf(userCtx.role) !== -1;
+					return userCtx.projectId === project._id && ['owner', 'input'].indexOf(userCtx.role) !== -1;
 
 				else
 					throw new Error('Invalid userCtx.type value');

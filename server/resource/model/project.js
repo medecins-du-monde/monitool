@@ -87,7 +87,7 @@ class Project extends DbModel {
 
 	/**
 	 * Get the role of an account from its session.
-	 * The role may be one of: "none", "readonly", "input", "input_all" or "owner".
+	 * The role may be one of: "none", "readonly", "input" or "owner".
 	 */
 	getRole(user) {
 		if (user.type === 'partner')

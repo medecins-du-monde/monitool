@@ -344,8 +344,7 @@ var ENGLISH_TRANSLATION = {
 		user_role: "Role",
 		user_roles: {
 			owner: "Owner",
-			input_all: "Data entry on all sites",
-			input: "Data entry for specified sites",
+			input: "Data entry",
 			read: "Read-only"
 		},
 		user_fullname: "Full name",

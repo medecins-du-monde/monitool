@@ -344,8 +344,7 @@ var SPANISH_TRANSLATION = {
 		user_role: "Nivel de autorización",
 		user_roles: {
 			owner: "Proprietario",
-			input_all: "Entrada de datos para todos los lugares",
-			input: "Entrada de datos para lugares escogidos",
+			input: "Entrada de datos",
 			read: "Consulta unicamente"
 		},
 		user_fullname: "Nombre y apellido",

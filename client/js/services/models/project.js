@@ -157,7 +157,7 @@ angular
 			if (!projectUser)
 				return false;
 
-			if (projectUser.role === 'owner' || projectUser.role === 'input_all')
+			if (projectUser.role === 'owner')
 				return true;
 			
 			if (projectUser.role === 'input') {

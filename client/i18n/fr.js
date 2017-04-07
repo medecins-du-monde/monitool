@@ -344,8 +344,7 @@ var FRENCH_TRANSLATION = {
 		user_role: "Rôle",
 		user_roles: {
 			owner: "Propriétaire",
-			input_all: "Saisisseur pour tous les lieux de collecte",
-			input: "Saisisseur pour certains les lieux de collecte",
+			input: "Saisisseur",
 			read: "Consultation uniquement"
 		},
 		user_fullname: "Nom complet",
