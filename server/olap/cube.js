@@ -107,13 +107,13 @@ class Cube {
 				length = 1; // Slow!
 
 			if (offset < 0) {
-				winston.log('debug', "Skip variable", element.id, 'from', input._id, "(did not find period in timeDim)");
+				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(did not find period in timeDim)");
 				return;
 			}
 
 			if (form.collect == 'entity' || form.collect == 'some_entity') {
 				if (dimensions[1].items.indexOf(input.entity) < 0) {
-					winston.log('debug', "Skip variable", element.id, 'from', input._id, "(did not find entity in spacialDim)");
+					winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(did not find entity in spacialDim)");
 					return;
 				}
 
@@ -128,12 +128,12 @@ class Cube {
 			// Retrieve data from input, and copy (if valid).
 			var source = input.values[element.id];
 			if (!source) {
-				winston.log('debug', "Skip variable", element.id, 'from', input._id, "(value missing)");
+				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(value missing)");
 				return;
 			}
 
 			if (source.length !== length) {
-				winston.log('debug', "Skip variable", element.id, 'from', input._id, "(value size mismatch expected", length, ", found", source.length, ")");
+				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(value size mismatch expected", length, ", found", source.length, ")");
 				return;
 			}
 			
