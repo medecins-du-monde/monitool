@@ -20,6 +20,8 @@ express()
 		next();
 	})
 
+	.use(require('../server/middlewares/logger'))
+
 	// Serve static files.
 	.use(require('../server/controllers/static'))
 
