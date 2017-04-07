@@ -106,24 +106,21 @@ class InputStore extends Store {
 			Input    = this.modelClass;
 
 		return this._db.callList(options).then(function(result) {
-			// retrieve current and previous from view result.
-			var current = null, previous = null;
+			if (result.rows.length === 0)
+				return [];
 
-			if (result.rows.length === 1) {
-				if (result.rows[0].id !== id) // we only got an old input
-					previous = new Input(result.rows[0].doc);
-				else // we only got the current input
-					current = new Input(result.rows[0].doc);
-			}
+			else if (result.rows.length === 1)
+				return [new Input(result.rows[0].doc)];
+			
 			else if (result.rows.length === 2) {
-				if (result.rows[0].id !== id) // we got two old inputs
-					previous = new Input(result.rows[0].doc);
-				else // we got the current and previous inputs
-					current = new Input(result.rows[0].doc);
-					previous = new Input(result.rows[1].doc);
+				var first = new Input(result.rows[0].doc);
+				if (first.period === period)
+					return [first, new Input(result.rows[1].doc)];
+				else
+					return [first];
 			}
-
-			return [current, previous].filter(i => !!i);
+			else
+				throw new Error('couchdb did not respect limit=2');
 		});
 	}
 }
