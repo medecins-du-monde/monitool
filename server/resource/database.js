@@ -192,6 +192,9 @@ class Database {
 	}
 
 	destroy(id, rev) {
+		if (typeof id !== 'string' || typeof rev !== 'string')
+			throw new Error('invalid call to destroy.');
+
 		return new Promise(function(resolve, reject) {
 			this.database.destroy(id, rev, function(error) {
 				if (error)
