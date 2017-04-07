@@ -90,7 +90,7 @@ angular.module('monitool.directives.reporting', [])
 		}
 	})
 
-	.directive('csvSave', function() {
+	.directive('csvSave', function(mtRemoveDiacritics) {
 		// From https://gist.github.com/insin/1031969
 		var tableToExcel = (function() {
 			var uri = 'data:application/vnd.ms-excel;base64,', 
@@ -118,11 +118,20 @@ angular.module('monitool.directives.reporting', [])
 					return title;
 				});
 
+				// Remove separators from numbers
+				innerHTML = innerHTML.replace(/>(\d+.)+\d+</g, function(match) {
+					var numbers = match.match(/\d+/g);
+					return '>' + numbers.join('') + '<';
+				});
+
 				// remove angular, classes, styles attrs
 				innerHTML = innerHTML.replace(/ (ng-[a-z]+?|class|style|reporting-field|title|translate)=".*?"/g, '');
 
+				// DIRTY: Remove accents, because there is no way to have encoding working.
+				innerHTML = mtRemoveDiacritics(innerHTML);
+
 				var ctx = {worksheet: name || 'Worksheet', table: innerHTML};
-				// window.location.href = uri + base64(format(template, ctx));
+				
 
 				var blob = new Blob([format(template, ctx)], {type: "application/vnd.ms-excel"});
 				saveAs(blob, 'export.xls');
@@ -196,7 +205,19 @@ angular.module('monitool.directives.reporting', [])
 						else if ($scope.unit)
 							symbol = $scope.unit;
 
-						element.html(Math.round(value) + symbol);
+						// split value by thousands
+						value = Math.round(value).toString();
+
+						var finalString = symbol;
+						while (value.length !== 0) {
+							finalString = '.' + value.substr(-3) + finalString;
+							value = value.substr(0, value.length - 3);
+						}
+
+						finalString = finalString.substring(1);
+
+
+						element.html(finalString);
 					}
 					else {
 						element.html('<i class="fa fa-interrogation" title="' + value + '"></i>');
