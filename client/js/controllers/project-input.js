@@ -26,7 +26,15 @@ angular.module('monitool.controllers.project.input', [])
 		// Create planning.
 		//////
 		$scope.inputsStatus = inputsStatus;
-		$scope.columns = $scope.masterProject.entities.filter(function(e) { return $scope.form.entities.indexOf(e.id) !== -1; });
+		$scope.columns = $scope.masterProject.entities.filter(function(e) {
+			// If unexpected entries need to be deleted / sorted out, display the column.
+			for (var period in $scope.inputsStatus)
+				if ($scope.inputsStatus[period][e.id] === 'outofschedule')
+					return true;
+
+			// Otherwise, display the column only if specified by the form.
+			return $scope.form.entities.indexOf(e.id) !== -1;
+		});
 
 		// => restrict columns depending on user permissions
 		if ($scope.userCtx.role !== 'admin') {
@@ -35,24 +43,26 @@ angular.module('monitool.controllers.project.input', [])
 					   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
 			});
 
-			if (projectUser.role === 'input')
+			if (projectUser.role === 'input') {
+				// This will happen regardless of unexpected entries.
 				$scope.columns = $scope.columns.filter(function(column) {
 					return projectUser.entities.indexOf(column.id) !== -1;
 				});
+			}
 		}
 
-		$scope.displayFooter = $scope.form.periodicity === 'free';
-
 		//////
-		// pass information needed for creating new inputs on free forms.
+		// Free periodicity allow entering data as needed.
 		//////
-
-		$scope.newInputDate = {date: new Date(Math.floor(Date.now() / 86400000) * 86400000)};
-		
-		$scope.addInput = function(entityId) {
-			var period = $scope.newInputDate.date.toISOString().substring(0, 10);
-			$state.go('main.project.input.edit', {period: period, formId: $scope.form.id, entityId: entityId});
-		};
+		if ($scope.form.periodicity === 'free') {
+			$scope.displayFooter = true;
+			$scope.newInputDate = {date: new Date(Math.floor(Date.now() / 86400000) * 86400000)};
+			
+			$scope.addInput = function(entityId) {
+				var period = $scope.newInputDate.date.toISOString().substring(0, 10);
+				$state.go('main.project.input.edit', {period: period, formId: $scope.form.id, entityId: entityId});
+			};
+		}
 	})
 
 	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, $stateParams, inputs) {
