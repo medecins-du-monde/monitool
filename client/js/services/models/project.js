@@ -19,7 +19,7 @@
 
 angular
 	.module('monitool.services.models.project', ['ngResource'])
-	.factory('Project', function($resource, $q, $rootScope, $filter, uuid, itertools) {
+	.factory('Project', function($resource, $q, $rootScope, $filter, uuid, itertools, Parser) {
 
 		var Project = $resource('/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
@@ -189,7 +189,24 @@ angular
 			if (indicator.computation === null)
 				return;
 
+			// try to retrive the symbols from the formula.
+			var symbols = null;
+			try {
+				symbols = Parser.parse(indicator.computation.formula).variables();
+			}
+			catch (e) {
+				// if we fail to retrieve symbols => computation is invalid.
+				indicator.computation = null;
+				return;
+			}
+
 			for (var key in indicator.computation.parameters) {
+				// This key is useless.
+				if (symbols.indexOf(key) === -1) {
+					delete indicator.computation.parameters[key];
+					continue;
+				}
+
 				var parameter = indicator.computation.parameters[key];
 				var element = null;
 
@@ -229,16 +246,21 @@ angular
 		 * If no valid links remain, change the user to read only mode
 		 */
 		Project.prototype.sanitizeUser = function(user) {
-			if (user.entities) {
-				var entityIds = this.entities.pluck('id'),
-					entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
+			var entityIds = this.entities.pluck('id'),
+				entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
 
-				user.entities = user.entities.filter(entityIdFilter);
-				if (user.entities.length == 0) {
-					delete user.entities;
-					user.role = 'read';
-				}
+			user.entities = user.entities.filter(entityIdFilter);
+			if (user.entities.length == 0) {
+				delete user.entities;
+				user.role = 'read';
 			}
+		};
+
+		Project.prototype.sanitizeForm = function(form) {
+			var entityIds = this.entities.pluck('id'),
+				entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
+
+			form.entities = form.entities.filter(entityIdFilter);
 		};
 
 		/**
@@ -259,11 +281,7 @@ angular
 			});
 
 			this.users.forEach(this.sanitizeUser, this);
-
-			this.forms.forEach(function(form) {
-				if (form.entities)
-					form.entities = form.entities.filter(entityIdFilter);
-			});
+			this.forms.forEach(this.sanitizeForm, this);
 
 			/////////////
 			// Sanitize links to variables from indicators

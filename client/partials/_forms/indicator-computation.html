@@ -40,7 +40,7 @@
 				<input expression class="form-control" ng-model="computation.formula" />
 			</td>
 		</tr>
-		<tr ng-repeat="(key, parameter) in computation.parameters">
+		<tr ng-repeat="key in symbols">
 			<!-- parameter key (this one we edit in the formula) -->
 			<td>
 				<span ng-if="computation.type !== 'formula'">{{('project.formula.' + key)|translate}}</span>
@@ -51,7 +51,7 @@
 			<td>
 				<select required
 						class="form-control"
-						ng-model="parameter.elementId"
+						ng-model="computation.parameters[key].elementId"
 						ng-options="v.id as v.name group by v.group for v in selectElements"></select>
 
 				<p class="help-block">
@@ -60,8 +60,8 @@
 				</p>
 			</td>
 
-			<td ng-show="elementsById[parameter.elementId].partitions.length">
-				<partitions-filter ng-model="parameter.filter" element="elementsById[parameter.elementId]"></partitions-filter>
+			<td ng-show="elementsById[computation.parameters[key].elementId].partitions.length">
+				<partitions-filter ng-model="computation.parameters[key].filter" element="elementsById[computation.parameters[key].elementId]"></partitions-filter>
 
 				<p class="help-block">
 					<i class="fa fa-info-circle"></i>
@@ -69,7 +69,7 @@
 				</p>
 			</td>
 
-			<td ng-hide="elementsById[parameter.elementId].partitions.length"
+			<td ng-hide="elementsById[computation.parameters[key].elementId].partitions.length"
 				style="background-color: #f3f3f3"></td>
 		</tr>
 	</tbody>

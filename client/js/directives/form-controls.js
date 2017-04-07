@@ -558,7 +558,11 @@ angular.module('monitool.directives.formControls', [])
 					});
 				});
 
-				var formulaWatch; // The watch will be set by 
+				scope.symbols = [];
+
+				// The watch will be set by the render function to be sure the value is initialiazed
+				var formulaWatch; 
+
 				var onFormulaChange = function(formula) {
 					// Create and remove items in computation.parameters hash, when the formula changes.
 					var newSymbols, oldSymbols = Object.keys(scope.computation.parameters);
@@ -566,17 +570,15 @@ angular.module('monitool.directives.formControls', [])
 					catch (e) { newSymbols = []; }
 
 					if (!angular.equals(newSymbols, oldSymbols)) {
-						var removedSymbols = oldSymbols.filter(function(s) { return newSymbols.indexOf(s) === -1; }),
-							addedSymbols   = newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; });
-
-						// Remove old symbols from formula
-						removedSymbols.forEach(function(s) { delete scope.computation.parameters[s]; });
+						var addedSymbols = newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; });
 
 						// Add new symbols to formula
 						addedSymbols.forEach(function(s) {
 							scope.computation.parameters[s] = {elementId: null, filter: {}};
 						});
 					}
+
+					scope.symbols = newSymbols;
 				};
 
 				ngModelController.$render = function() {
