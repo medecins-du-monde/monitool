@@ -249,7 +249,7 @@ var SPANISH_TRANSLATION = {
 		zero_theme_indicator: "Sin temática",
 		multi_theme_indicator: "Varias temáticas",
 		which_variable: "De que variable viene esta información?",
-		which_partitions: "Qué particiones son relevantes?",
+		which_partitions: "Qué desagregaciones son relevantes?",
 		value_unknown: "Valor desconocido",
 
 		computations: {
@@ -275,9 +275,9 @@ var SPANISH_TRANSLATION = {
 		choose_sites_for_form: "Elija los lugares en los que esta fuente de datos se aplica",
 		choose_sites_for_user: "Elija los lugares en los que este usuario puede entrar datos",
 
-		partition_edit: "Edición partición",
-		partition_help_name: "Este nombre aparecera en varias tablas de estadísticas. Identifica la partición que desea crear en su variable",
-		partition_help_elements: 'Los elementos de la partición deben ser mutualmente exclusivos, y se debe poder calcular el valor total agregandolos.',
+		partition_edit: "Edición desagregación",
+		partition_help_name: "Este nombre aparecera en varias tablas de estadísticas. Identifica la desagregación que desea crear en su variable",
+		partition_help_elements: 'Los elementos de la desagregación deben ser mutualmente exclusivos, y se debe poder calcular el valor total agregandolos.',
 		partition_help_aggregation: 'Como calcular el valor total agregando los elementos describidos?',
 		partition_help_groups: 'Los grupos permiten hacer agregaciones intermediarias',
 		logical_frame: "Marco lógico",
@@ -302,17 +302,17 @@ var SPANISH_TRANSLATION = {
 		aggregation_lab: "Como agregar los elements juntos?",
 		partition_name: "Nombre",
 		partition_name_placeholder: "ex: Menor de 12 años, hombre, consultación social, gripe, ...",
-		no_partition_elements: "Pulse \"Añadir\" para añadir un elemento en la partición",
+		no_partition_elements: "Pulse \"Añadir\" para añadir un elemento en la desagregación",
 
 		partition_groups: "Groupos",
 		partition_group_name: "Nombre",
 		partition_group_name_placeholder: "ej: Menores de edad, patologias crónicas, ...",
-		no_partition_groups: "Pulse \"Añadir\" para añadir un grupo en la partición",
+		no_partition_groups: "Pulse \"Añadir\" para añadir un grupo en la desagregación",
 		use_groups: "Usar grupos",
 
 		no_inputs: "Ninguna entrada de datos en espera",
 		no_variable: "Ninguna variable esta definida en esta fuente de datos. ¡Haga click en \"Añadir una variable\" para create una nueva!",
-		no_partitions: "Ninguna partición esta definida en esta variable",
+		no_partitions: "Ninguna desagregación esta definida en esta variable",
 
 		dimensions: {
 			day: "Días",
@@ -328,7 +328,7 @@ var SPANISH_TRANSLATION = {
 		},
 		group: {
 			location: "Lugar",
-			partition: "Particiones",
+			partition: "Desagregaciónes",
 			time: "Fechas"
 		},
 
@@ -401,12 +401,12 @@ var SPANISH_TRANSLATION = {
 			'	<li>Los cambios sobre la estructura de datos tendran consequencias diferentes según el tipo de cambio: lea la guía del usuario</li>' + 
 			'</ul>',
 
-		partitions: "Particiones",
+		partitions: "Desagregaciones",
 
 		add_variable: "Añadir una variable",
 		remove_variable: "Quitar esta variable",
-		add_partition: "Añadir una partición",
-		remove_partition: "Quitar esta partición",
+		add_partition: "Añadir una desagregación",
+		remove_partition: "Quitar esta desagregación",
 
 		aggregation: {
 			sum: "Suma",
@@ -566,7 +566,7 @@ var SPANISH_TRANSLATION = {
 		collection_edit_help_timeagg: "En un proyecto que colecta datos mensuales, si <code>{{name}}</code> vale 10 en enero, 20 en febrero y 30 en marzo, que vale para el trimer trimestre?",
 		collection_edit_help_partition: "Quiere poder diferenciar <code>{{name}}</code> por edad, sexo, tipo de consulta, motivo de consulta, patología, hora del dia, ...?",
 		collection_edit_help_distribution: "Si va a imprimir formulario en A4, prefiera tener columnas a la izquierda para que las tablas sean menor anchas.",
-		collection_edit_help_order: "En que ordén quiere que aparescan la particiones en las tablas de entrada de datos?",
+		collection_edit_help_order: "En que ordén quiere que aparescan la desagregaciones en las tablas de entrada de datos?",
 
 		logical_frame_list_info:
 			"<p>Un marco lógico es un documento que describe los objectivos, resultados y actividades de un proyecto, asi como indicadores para seguir el progreso de cada uno de ellos</p>" + 
@@ -599,9 +599,9 @@ var SPANISH_TRANSLATION = {
 		variable_name_ph: "ej: Número de diagnosticos",
 		site_agg_label: "Como agregar entradas provenientes de diferentes lugares?",
 		time_agg_label: "Como agregar entradas provenientes de diferentes periodos?",
-		partitions_label: "Que particiones quiere usar en esta variable?",
-		distribution_label: "Como mostrar la particiones en el formulario de colecta?",
-		order_label: "En que ordén mostrar las particiones en el formulario de colecta?",
+		partitions_label: "Que desagregaciones quiere usar en esta variable?",
+		distribution_label: "Como mostrar la desagregaciones en el formulario de colecta?",
+		order_label: "En que ordén mostrar las desagregaciones en el formulario de colecta?",
 		no_indicator: "Ningún indicador esta definido. Haga click en \"Añadir un indicador\"",
 		delete_form: "Suprimir la fuente de datos",
 		delete_logical_frame: "Suprimir el marco lógico",

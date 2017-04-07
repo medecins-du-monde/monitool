@@ -275,7 +275,7 @@ var FRENCH_TRANSLATION = {
 		choose_sites_for_form: "Choisir les structures pour lesquelles cette source de données s'applique",
 		choose_sites_for_user: "Choisir les structures sur lesquelles cet utilisateur pourra saisir des données",
 
-		partition_edit: "Édition partition",
+		partition_edit: "Édition désagrégation",
 		partition_help_name: "Ce nom apparaîtra dans divers tableaux de statistiques. Il nomme la désagrégation que vous voulez créer sur votre donnée",
 		partition_help_elements: 'Les éléments de la désagrégation doivent être mutuellement exclusifs, et il doit être possible de trouver la valeur totale en les aggrégant.',
 		partition_help_aggregation: 'Comment trouver la valeur totale en agrégeant les éléments décrits?',
@@ -302,17 +302,17 @@ var FRENCH_TRANSLATION = {
 		aggregation_lab: "Comment grouper les éléments entre eux?",
 		partition_name: "Nom",
 		partition_name_placeholder: "ex: Moins de 12 ans, Homme, Consultation sociale, Grippe ou Réferencement communautaire, ...",
-		no_partition_elements: "Appuyez sur \"Ajouter\" pour ajouter un élément à la partition",
+		no_partition_elements: "Appuyez sur \"Ajouter\" pour ajouter un élément à la désagrégation",
 
 		partition_groups: "Groupes",
 		partition_group_name: "Nom",
 		partition_group_name_placeholder: "ex: Mineurs, Pathologies chroniques, ...",
-		no_partition_groups: "Appuyez sur \"Ajouter\" pour ajouter un groupe à la partition",
+		no_partition_groups: "Appuyez sur \"Ajouter\" pour ajouter un groupe à la désagrégation",
 		use_groups: "Utiliser des groupes",
 
 		no_inputs: "Aucune saisie en attente",
 		no_variable: "Aucune variable n'est définie sur cette source de données. Cliquez sur \"Ajouter une variable\" pour en créer une!",
-		no_partitions: "Aucune partition n'est définie sur cette variable",
+		no_partitions: "Aucune désagrégation n'est définie sur cette variable",
 
 		dimensions: {
 			day: "Jours",
@@ -328,7 +328,7 @@ var FRENCH_TRANSLATION = {
 		},
 		group: {
 			location: "Lieux",
-			partition: "Partitions",
+			partition: "Désagrégations",
 			time: "Dates"
 		},
 
@@ -391,7 +391,7 @@ var FRENCH_TRANSLATION = {
 		basics: "Données de base",
 		general: "Général",
 		full_project: "Tout le projet",
-		select_filters: "Sélectionnez les partitions désirées",
+		select_filters: "Sélectionnez les désagrégations désirées",
 
 		collection_form_warning:
 			'<strong>Attention, en modifiant cette page vous risquez de perdre des données.</strong><br/>' + 
@@ -405,8 +405,8 @@ var FRENCH_TRANSLATION = {
 
 		add_variable: "Ajouter une variable",
 		remove_variable: "Supprimer la variable",
-		add_partition: "Ajouter une partition",
-		remove_partition: "Supprimer la partition",
+		add_partition: "Ajouter une désagrégation",
+		remove_partition: "Supprimer la désagrégation",
 
 		aggregation: {
 			sum: "Faire une somme",

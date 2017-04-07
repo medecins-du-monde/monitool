@@ -249,7 +249,7 @@ var ENGLISH_TRANSLATION = {
 		zero_theme_indicator: "No thematics",
 		multi_theme_indicator: "Multiple thematics",
 		which_variable: "From which variable does this information comes from?",
-		which_partitions: "Which partitions are relevant?",
+		which_partitions: "Which disaggregations are relevant?",
 		value_unknown: "Unknown value",
 
 		computations: {
@@ -275,9 +275,9 @@ var ENGLISH_TRANSLATION = {
 		choose_sites_for_form: "Choose the sites from which this data source applies",
 		choose_sites_for_user: "Choose the sites from which this user can input data",
 
-		partition_edit: "Partition edition",
-		partition_help_name: "This name will appear on multiple reporting tables. It names the partition that you want to create on your variable",
-		partition_help_elements: 'Elements from the partition must be mutually exclusive, and it should be possible to find the total value by aggregating them.',
+		partition_edit: "Disaggregation edition",
+		partition_help_name: "This name will appear on multiple reporting tables. It names the disaggregation that you want to create on your variable",
+		partition_help_elements: 'Elements from the disaggregation must be mutually exclusive, and it should be possible to find the total value by aggregating them.',
 		partition_help_aggregation: 'How to find the total value by aggregating the elements described above?',
 		partition_help_groups: 'Groups allow making intermediary aggregations',
 		logical_frame: "Logical frame",
@@ -302,17 +302,17 @@ var ENGLISH_TRANSLATION = {
 		aggregation_lab: "How to group elements together?",
 		partition_name: "Name",
 		partition_name_placeholder: "ex: Less than 12 years old, male, social consultation, flu, community referral, ...",
-		no_partition_elements: "Click \"Add\" to add a new element to the partition",
+		no_partition_elements: "Click \"Add\" to add a new element to the disaggregation",
 
 		partition_groups: "Groups",
 		partition_group_name: "Name",
 		partition_group_name_placeholder: "ex: Minors, chronic pathologies, ...",
-		no_partition_groups: "Click \"Add\" to add a new group to the partition",
+		no_partition_groups: "Click \"Add\" to add a new group to the disaggregation",
 		use_groups: "Use groups",
 
 		no_inputs: "You are all done. There are no expected inputs",
 		no_variable: "No variable is defined on this data source. Click \"Add a variable\" to create one!",
-		no_partitions: "No partitions are defined on this variable",
+		no_partitions: "No disaggregations are defined on this variable",
 
 		dimensions: {
 			day: "Days",
@@ -328,7 +328,7 @@ var ENGLISH_TRANSLATION = {
 		},
 		group: {
 			location: "Location",
-			partition: "Partitions",
+			partition: "Disaggregations",
 			time: "Dates"
 		},
 
@@ -401,12 +401,12 @@ var ENGLISH_TRANSLATION = {
 			'	<li>Modifications on the data structure will have variable consequences: please refer to the user guide</li>' + 
 			'</ul>',
 
-		partitions: "Partitions",
+		partitions: "Disaggregations",
 
 		add_variable: "Add a variable",
 		remove_variable: "Remove this variable",
-		add_partition: "Add a partition",
-		remove_partition: "Remove this partition",
+		add_partition: "Add a disaggregation",
+		remove_partition: "Remove this disaggregation",
 
 		aggregation: {
 			sum: "Sum",
@@ -566,7 +566,7 @@ var ENGLISH_TRANSLATION = {
 		collection_edit_help_timeagg: "In a project collecting monthly data, if <code>{{name}}</code> is 10 in january, 20 in february and 30 in march, what is the value for the first quarter?",
 		collection_edit_help_partition: "Do we want to be able to differenciate <code>{{name}}</code> by age, gender, type of care, consultation motive, pathology, hour of the day, referral type, ...?",
 		collection_edit_help_distribution: "If you wish to print the forms in A4 format, prefer having the titles at the left of the tables, to shorten their width.",
-		collection_edit_help_order: "How do you wish to show the partitions on the input form?",
+		collection_edit_help_order: "How do you wish to show the disaggregations on the input form?",
 
 		logical_frame_list_info:
 			"<p>A logical frame is a document that describe objectives, expected results, and actities to achieve them, as well as indicators to monitor the advancement of each of those elements</p>" + 
@@ -599,9 +599,9 @@ var ENGLISH_TRANSLATION = {
 		variable_name_ph: "ex: Number of diagnostics",
 		site_agg_label: "How to group entries from different sites?",
 		time_agg_label: "How to group entries from different periods?",
-		partitions_label: "Which partitions should be used on this variable?",
-		distribution_label: "Where should partition elements be displayed on the forms?",
-		order_label: "In which order should the partitions be shown?",
+		partitions_label: "Which disaggregations should be used on this variable?",
+		distribution_label: "Where should disaggregation elements be displayed on the forms?",
+		order_label: "In which order should the disaggregations be shown?",
 		no_indicator: "No indicator is defined. Click on \"Add an indicator\"",
 		delete_form: "Delete data source",
 		delete_logical_frame: "Delete logical frame",
