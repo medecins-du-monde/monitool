@@ -21,6 +21,7 @@
     "gulp-bower": "x",
     "gulp-clean-css": "x",
     "gulp-concat": "x",
+    "gulp-gzip": "^1.4.0",
     "gulp-ng-annotate": "x",
     "gulp-rename": "x",
     "gulp-replace": "x",
@@ -56,7 +57,6 @@
     "passport-oauth2": "x",
     "passport-oauth2-client-password": "x",
     "password-hash": "x",
-    "serve-static": "x",
     "winston": "^2.3.1"
   }
 }

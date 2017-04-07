@@ -182,7 +182,7 @@ module.exports = express.Router()
 		response.redirect('/');
 	});
 
-if (config.auth.training) {
+if (config.auth.providers.training) {
 
 	/**
 	 * Log user in, without asking for a password

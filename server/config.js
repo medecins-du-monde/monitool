@@ -15,21 +15,27 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-let winston = require('winston');
+let winston   = require('winston'),
+	validator = require('is-my-json-valid'),
+	schema = require('./config-schema');
+
+let config;
 
 try {
-	module.exports = require('../config.json');
+	// If there is a config.json file, load configuration from there.
+	config = require('../config.json');
 
 	winston.log('info', '[Config] Loading from config.json');
 }
 catch (e) {
-	module.exports = {
+	// otherwise, fallback to environnement variables.
+	config = {
 		debug: process.env['monitool.debug'] === 'TRUE',
 		baseUrl: process.env['monitool.baseUrl'],
-		port: process.env['monitool.port'],
+		port: parseInt(process.env['monitool.port']),
 		couchdb: {
 			host: process.env['monitool.couchdb.host'],
-			port: process.env['monitool.couchdb.port'],
+			port: parseInt(process.env['monitool.couchdb.port']),
 			bucket: process.env['monitool.couchdb.bucket'],
 			sessionBucket: process.env['monitool.couchdb.sessionBucket'],
 			username: process.env['monitool.couchdb.username'],
@@ -52,3 +58,20 @@ catch (e) {
 	
 	winston.log('info', '[Config] Loading from environnement variables');
 }
+
+// Validate that nothing is missing from the configuration file.
+let validate = validator(schema);
+
+validate(config);
+
+var errors = validate.errors || [];
+if (errors.length) {
+	// if there is errors, log them and exit the process.
+	errors.forEach(function(error) {
+		winston.log('error', 'Invalid config', error);
+	});
+
+	process.exit(1);
+}
+
+module.exports = config;

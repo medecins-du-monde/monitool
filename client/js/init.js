@@ -112,7 +112,13 @@ function onAuthResponse(e) {
 }
 
 function onAppProgress(e) {
-	document.getElementById('progress').style.width = 100 * e.loaded / 2557327 + '%';
+	// Firefox reports compressed sizes (ex: e.loaded = 120kB, e.total = 1.3MB)
+	// Chrome reports uncompressed loaded, but no total (ex: e.loaded = 2.3MB, e.total = 0)
+	// IE ? 
+
+	// This hack should work at least for Firefox and Chrome (as long as the bundle size does not change too much).
+	var total = e.total || 3634199; 
+	document.getElementById('progress').style.width = Math.round(100 * e.loaded / total) + '%';
 }
 
 function onAppLoaded(e) {

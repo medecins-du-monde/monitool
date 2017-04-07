@@ -52,7 +52,13 @@ passport.deserializeUser(function(id, done) {
 	if (type === 'usr') {
 		User.storeInstance
 			.get(id)
-			.then(function(user) { done(null, user); })
+			.then(function(user) {
+				// Upgrade user to administrator if specified in the configuration file.
+				if ('usr:' + config.auth.administrator === user._id)
+					user.role = 'admin';
+
+				done(null, user);
+			})
 			.catch(function(error) { done(error); });
 	}
 	else if (type === 'partner') {
@@ -71,13 +77,13 @@ passport.deserializeUser(function(id, done) {
 // User log in with Microsoft Azure Active Directory
 /////////////////////////////////////////////////////////////////////////////
 
-if (config.auth.azureAD) {
+if (config.auth.providers.azureAD) {
 	var strategy = new OAuth2Strategy(
 		{
-			authorizationURL: config.auth.azureAD.authUrl,
-			tokenURL: config.auth.azureAD.tokenUrl,
-			clientID: config.auth.azureAD.clientId,
-			clientSecret: config.auth.azureAD.clientSecret,
+			authorizationURL: "https://login.windows.net/common/oauth2/authorize",
+			tokenURL: "https://login.windows.net/common/oauth2/token",
+			clientID: config.auth.providers.azureAD.clientId,
+			clientSecret: config.auth.providers.azureAD.clientSecret,
 			callbackURL: config.baseUrl + '/authentication/login-callback'
 		},
 		// This method is invoked upon auth sequence completion
@@ -87,9 +93,10 @@ if (config.auth.azureAD) {
 				var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
 					domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
-				if (domain !== 'medecinsdumonde.net')
+				if (domain !== config.auth.providers.azureAD.domain)
 					return done(
-						"You must use an account from medecinsdumonde.net (not " + domain + ").\n" +
+						"You must use an account from " + 
+						config.auth.providers.azureAD.domain + " (not " + domain + ").\n" +
 						"Try closing and reopening your browser to log in again."
 					);
 				
@@ -200,10 +207,10 @@ passport.use('partner_local', new LocalStrategy(
 // User authentication with training account
 /////////////////////////////////////////////////////////////////////////////
 
-if (config.auth.training) {
+if (config.auth.providers.training) {
 	passport.use('training_local', new LocalStrategy(
 		function(username, password, done) {
-			User.storeInstance.get('usr:' + config.auth.training.account)
+			User.storeInstance.get('usr:' + config.auth.providers.training.account)
 				.then(function(user) {
 					done(null, user);
 				})

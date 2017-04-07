@@ -3,7 +3,7 @@ html(lang="en")
 	head
 		title Monitool
 
-		if debug
+		if debugVersion
 			meta(charset="UTF-8")
 			meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
 
@@ -93,7 +93,7 @@ html(lang="en")
 
 		else
 			link(rel="stylesheet", type="text/css", href="monitool2.css")
-			script(type="text/javascript", src="js/init.js")
+			script(type="text/javascript", src="init.js")
 
 
 	body
@@ -112,7 +112,7 @@ html(lang="en")
 							input(type="hidden", name="username", value="value")
 							input(type="hidden", name="password", value="value")
 							input(type="submit", class="btn btn-primary btn-lg btn-block", value=trainingLabel)
-					
+
 					if azureLabel
 						a(href="/authentication/login-azure", class="btn btn-primary btn-lg btn-block")= azureLabel
 

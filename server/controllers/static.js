@@ -18,11 +18,8 @@
 "use strict";
 
 var express     = require('express'),
-	serveStatic = require('serve-static'),
 	router      = express.Router(),
-	config      = require('../config'),
-	pkg         = require('../../package.json');
-
+	config      = require('../config');
 
 /**
  * Ping route, used to check if the service is online.
@@ -31,22 +28,30 @@ router.get('/ping', function(request, response) {
 	response.send('pong');
 });
 
+
 /**
  * Serve static files.
  * This could be done by the webserver.
  */
-router.use(serveStatic(config.debug ? 'client' : 'wwwroot'));
+router.use(express.static(config.debug ? 'client' : 'wwwroot', {
+	setHeaders: function(response, path, stat) {
+		// When debug=false, files are served directly from the bundles generated on /wwwroot
 
+		// For the loading progress bar to work, we need monitool to give the Content-Length header when serving the file
+		// which is not possible when the file is compressed on the fly at every request.
+		// => monitool2.js and monitool2.css are compressed at compile time (when running gulp build)
+		// => we need to alter the header here for the browser to understand what to do with the file.
 
-router.get('/', function(request, response) {
-	response.render('index', {
-		debug: config.debug,
-		version: pkg.version,
-		trainingLabel: config.auth.training ? config.auth.training.label : null,
-		azureLabel: config.auth.azureAD ? config.auth.azureAD.label : null,
-		googleLabel: config.auth.google ? config.auth.google.label : null
-	});
-});
+		let filename = path.substring(path.lastIndexOf('/') + 1);
+		
+		if (filename === 'monitool2.js' || filename === 'monitool2.css')
+			response.header('Content-Encoding', 'gzip');
+
+		// Fonts will never change => infinite cache control
+		if (filename.match(/^\/(fontawesome)/))
+			response.setHeader('Cache-Control', 'max-age=31449600,public');
+	}
+}))
 
 
 module.exports = router;

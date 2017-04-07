@@ -11,11 +11,10 @@
 		"password": ""
 	},
 	"auth": {
+		"administrator": "romain.gilliotte",
 		"azureAD": {
 			"label": "Use MDM account",
 			"domain": "medecinsdumonde.net",
-			"authUrl": "https://login.windows.net/common/oauth2/authorize",
-			"tokenUrl": "https://login.windows.net/common/oauth2/token",
 			"clientId": "[enter client id]",
 			"clientSecret": "[enter client secret]"
 		},

@@ -8,6 +8,7 @@ var async         = require('async'),
 	bower         = require('gulp-bower'),
 	concat        = require('gulp-concat'),
 	cleanCSS      = require('gulp-clean-css'),
+	gzip          = require('gulp-gzip'),
 	ngAnnotate    = require('gulp-ng-annotate'),
 	rename        = require('gulp-rename'),
 	replace       = require('gulp-replace'),
@@ -60,9 +61,13 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('copy-static', ['bower'], function() {
-	gulp.src('client/index-prod.html').pipe(rename('index.html')).pipe(gulp.dest('wwwroot'));
-	gulp.src('client/favicon.ico').pipe(gulp.dest('wwwroot'));
-	gulp.src('client/bower_components/font-awesome/fonts/*').pipe(gulp.dest('wwwroot'));
+	gulp.src([
+			'client/js/init.js',
+			'client/favicon.ico',
+			'client/bower_components/font-awesome/fonts/*'
+		])
+		.pipe(gulp.dest('wwwroot'));
+
 	gulp.src('client/img/*').pipe(gulp.dest('wwwroot/img'));
 });
 
@@ -78,7 +83,7 @@ gulp.task('build-js', ['bower'], function() {
 
 	// js are annotated, uglified
 	queue.queue(
-		gulp.src(['client/js/**/*.js', 'client/i18n/**/*.js', '!client/js/**/*_test.js'])
+		gulp.src(['client/js/**/*.js', 'client/i18n/**/*.js', '!client/js/**/*_test.js', '!client/js/init.js'])
 			.pipe(ngAnnotate())
 			.pipe(uglify())
 	);
@@ -94,6 +99,7 @@ gulp.task('build-js', ['bower'], function() {
 	// concat it all.
 	return queue.done()
 				.pipe(concat('monitool2.js'))
+				.pipe(gzip({append: false}))
 				.pipe(gulp.dest('wwwroot'));
 });
 
@@ -105,6 +111,7 @@ gulp.task('build-css', ['bower'], function() {
 	return queue.done()
 				.pipe(concat('monitool2.css'))
 				.pipe(replace(/\.\.\/fonts\//g, ''))
+				.pipe(gzip({append: false}))
 				.pipe(gulp.dest('wwwroot'));
 });
 
