@@ -18,41 +18,6 @@
 "use strict";
 
 angular.module('monitool.directives.acl', [])
-
-	.service('_makeReadOnly', function() {
-		return function(scope, element, attributes) {
-			// replace by raw text
-			if (attributes.mtContentEditable !== undefined || attributes.contenteditable !== undefined) {
-				element.removeAttr('mt-content-editable');
-				element.removeAttr('contenteditable');
-				element.removeAttr('ng-model');
-			}
-			
-			else if (attributes.aclFallback) {
-				var fallback = scope.$eval(attributes.aclFallback) || '';
-
-				// handle boolean and dates case.
-				if (fallback === true)
-					fallback = '<i class="fa fa-check" style="color: green"></i>';
-				
-				else if (fallback === false)
-					fallback = '<i class="fa fa-times" style="color: red"></i>';
-				
-				else if (Object.prototype.toString.call(fallback) === '[object Date]')
-					fallback = $filter('date')(fallback, 'longDate', 'UTC');
-
-				// Nest in a form-control-static if needed.
-				if (element.parent().hasClass('form-group'))
-					fallback = '<p class="form-control-static">' + fallback + '</p>';
-
-				element.html(fallback.toString());
-			}
-			// Just remove editable properties
-			else {
-				element.remove();
-			}
-		};
-	})
  
 	.service('_isAllowedProject', function() {
 
@@ -113,7 +78,7 @@ angular.module('monitool.directives.acl', [])
 		};
 	})
 
-	.directive('aclHasInputForm', function($rootScope, _makeReadOnly, _isAllowedForm) {
+	.directive('aclHasInputForm', function($rootScope, _isAllowedForm) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
@@ -122,7 +87,7 @@ angular.module('monitool.directives.acl', [])
 
 					var isAllowed = _isAllowedForm(userCtx, scope, element, attributes);
 					if (!isAllowed)
-						_makeReadOnly(scope, element, attributes);
+						element.remove();
 					
 					unwatch();
 				});
@@ -130,7 +95,7 @@ angular.module('monitool.directives.acl', [])
 		}
 	})
 
-	.directive('aclLacksInputForm', function($rootScope, _makeReadOnly, _isAllowedForm) {
+	.directive('aclLacksInputForm', function($rootScope, _isAllowedForm) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
@@ -139,7 +104,7 @@ angular.module('monitool.directives.acl', [])
 
 					var isAllowed = _isAllowedForm(userCtx, scope, element, attributes);
 					if (isAllowed)
-						_makeReadOnly(scope, element, attributes);
+						element.remove();
 					
 					unwatch();
 				});
@@ -148,7 +113,7 @@ angular.module('monitool.directives.acl', [])
 	})
 
 
-	.directive('aclHasAdministration', function($rootScope, _makeReadOnly) {
+	.directive('aclHasAdministration', function($rootScope) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
@@ -156,7 +121,7 @@ angular.module('monitool.directives.acl', [])
 						return;
 
 					if (userCtx.type !== 'user' || userCtx.role !== 'admin')
-						_makeReadOnly(scope, element, attributes);
+						element.remove();
 
 					unwatch();
 				});
@@ -164,7 +129,7 @@ angular.module('monitool.directives.acl', [])
 		}
 	})
 
-	.directive('aclLacksAdministration', function($rootScope, _makeReadOnly) {
+	.directive('aclLacksAdministration', function($rootScope) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
@@ -172,7 +137,7 @@ angular.module('monitool.directives.acl', [])
 						return;
 
 					if (userCtx.type === 'user' && userCtx.role === 'admin')
-						_makeReadOnly(scope, element, attributes);
+						element.remove();
 
 					unwatch();
 				});
@@ -181,7 +146,7 @@ angular.module('monitool.directives.acl', [])
 	})
 
 
-	.directive('aclHasProjectCreation', function($rootScope, _makeReadOnly) {
+	.directive('aclHasProjectCreation', function($rootScope) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
@@ -189,7 +154,7 @@ angular.module('monitool.directives.acl', [])
 						return;
 
 					if (userCtx.type !== 'user' || userCtx.role === 'common')
-						_makeReadOnly(scope, element, attributes);
+						element.remove();
 
 					unwatch();
 				});
@@ -197,7 +162,7 @@ angular.module('monitool.directives.acl', [])
 		}
 	})
 
-	.directive('aclLacksProjectCreation', function($rootScope, _makeReadOnly) {
+	.directive('aclLacksProjectCreation', function($rootScope) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
@@ -205,7 +170,7 @@ angular.module('monitool.directives.acl', [])
 						return;
 
 					if (userCtx.type === 'user' && userCtx.role !== 'common')
-						_makeReadOnly(scope, element, attributes);
+						element.remove();
 
 					unwatch();
 				});
@@ -213,7 +178,7 @@ angular.module('monitool.directives.acl', [])
 		}
 	})
 
-	.directive('aclHasProjectRole', function($rootScope, _makeReadOnly, _isAllowedProject) {
+	.directive('aclHasProjectRole', function($rootScope, _isAllowedProject) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
@@ -222,7 +187,7 @@ angular.module('monitool.directives.acl', [])
 
 					var isAllowed = _isAllowedProject(userCtx, scope, element, attributes);
 					if (!isAllowed)
-						_makeReadOnly(scope, element, attributes);
+						element.remove();
 
 					unwatch();
 				});
@@ -230,7 +195,7 @@ angular.module('monitool.directives.acl', [])
 		}
 	})
 
-	.directive('aclLacksProjectRole', function($rootScope, _makeReadOnly, _isAllowedProject) {
+	.directive('aclLacksProjectRole', function($rootScope, _isAllowedProject) {
 		return {
 			link: function(scope, element, attributes) {
 				var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
@@ -239,7 +204,7 @@ angular.module('monitool.directives.acl', [])
 
 					var isAllowed = _isAllowedProject(userCtx, scope, element, attributes);
 					if (isAllowed)
-						_makeReadOnly(scope, element, attributes);
+						element.remove();
 
 					unwatch();
 				});
