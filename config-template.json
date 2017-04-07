@@ -10,6 +10,9 @@
 		"username": "",
 		"password": ""
 	},
+	"api": {
+		"google": "[enter google translate api key here]"
+	},
 	"auth": {
 		"administrator": "romain.gilliotte",
 		"azureAD": {

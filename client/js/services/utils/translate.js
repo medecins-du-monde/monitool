@@ -25,7 +25,7 @@ angular
 			url: 'https://www.googleapis.com/language/translate/v2',
 			method: 'GET',
 			params: {
-				key: 'AIzaSyAvLe2P4D1GQ5_DfsHeg0E29yJCsRe0_Jw'
+				key: window.GOOGLE_TRANSLATE_KEY
 			}
 		};
 

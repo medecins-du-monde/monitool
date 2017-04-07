@@ -157,5 +157,6 @@ html(lang="en")
 					div(class="progress")
 						div(id="progress", class="progress-bar progress-bar-info", style="width: 0")
 
-		script.
-			startLoginPage();
+		script
+			| window.GOOGLE_TRANSLATE_KEY = "#{googleKey}";
+			| startLoginPage();
