@@ -703,8 +703,25 @@ angular.module('monitool.directives.formControls', [])
 	})
 
 
+	/**
+	 * This directive is a form control that allows to select multiple elements in a list.
+	 * To make thing faster than selecting one by one, it allows to select groups at once.
+	 */
 	.directive('elementFilter', function(itertools, $filter) {
 
+		/**
+		 * Convert the model value to the array that will be used in the view.
+		 * It merges elements that can be merged together using the group ids,
+		 * then add the elements that are not in any group.
+		 * 
+		 * For instance:
+		 * 	model = ['element1', 'element2']
+		 * 	elements = [{id: 'element1', ...}, {id: 'element2', ...}]
+		 * 	groups = [{id: 'whatever', members: ['element1', 'element2']}]
+		 *
+		 * Will give
+		 * 	['whatever']
+		 */
 		var model2view = function(model, elements, groups) {
 			if (model.length == elements.length)
 				return ['all'];
@@ -725,6 +742,17 @@ angular.module('monitool.directives.formControls', [])
 			return selectedGroups.pluck('id').concat(additionalElements);
 		};
 
+		/**
+		 * Convert the view array to the model value, by expanding all groups.
+		 * 
+		 * For instance:
+		 * 	view = ['whatever']
+		 * 	elements = [{id: 'element1', ...}, {id: 'element2', ...}]
+		 * 	groups = [{id: 'whatever', members: ['element1', 'element2']}]
+		 *
+		 * Will give
+		 * 	['element1', 'element2']
+		 */
 		var view2model = function(view, elements, groups) {
 			var model = {};
 
@@ -753,15 +781,22 @@ angular.module('monitool.directives.formControls', [])
 			},
 			templateUrl: 'partials/_forms/element-filter.html',
 			link: function(scope, element, attributes, ngModelController) {
+				// This container is needed because we depend on ui-select, which can only see changed this way.
 				scope.container = {};
 
+				// When elements or groups definition change.
 				scope.$watchGroup(['elements', 'groups'], function(newValues, oldValues) {
+					// Reset the list of selectable elements.
 					scope.selectableElements = [
 						{id: 'all', name: $filter('translate')('project.all_elements')}
 					].concat(scope.groups).concat(scope.elements);
 					
-					if (newValues[0] !== oldValues[0])
-						scope.container.selectedElements = ['all'];
+					// Check that all selected elements are still valid.
+					scope.container.selectedElements = scope.container.selectedElements.filter(function(id) {
+						return !!scope.selectableElements.find(function(selectableElement) {
+							return selectableElement.id == id;
+						});
+					});
 				});
 				
 				ngModelController.$formatters.push(function(modelValue) {
@@ -778,9 +813,15 @@ angular.module('monitool.directives.formControls', [])
 
 				scope.$watch('container.selectedElements', function(selectedElements) {
 					if (selectedElements.length === 2 && selectedElements[0] === 'all')
+						// Special case: we want to empty the list when a user select something over "all".
 						scope.container.selectedElements = [selectedElements[1]];
 					else
-						scope.container.selectedElements = model2view(view2model(selectedElements, scope.elements, scope.groups), scope.elements, scope.groups);
+						// Evaluate the whole list to remove inconsistencies.
+						scope.container.selectedElements = model2view(
+							view2model(selectedElements, scope.elements, scope.groups),
+							scope.elements,
+							scope.groups
+						);
 
 					ngModelController.$setViewValue(selectedElements);
 				}, true)

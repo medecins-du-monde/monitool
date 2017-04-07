@@ -216,6 +216,8 @@ angular
 
 		// The form updates a copy of the object, so that user can cancel the changes by just dismissing the modal.
 		$scope.user = projectUser ? angular.copy(projectUser) : {type: "internal", id: null, role: "owner", entities: []};
+		if (!$scope.user.entities)
+			$scope.user.entities = [];
 
 		$scope.done = function() {
 			if ($scope.user.type == 'internal') {
