@@ -296,10 +296,14 @@ angular
 		};
 
 		InputSlots.iterate = function(begin, end, periodicity) {
+			var now = TimeSlot.fromDate(new Date(), periodicity);
+
 			var slot = TimeSlot.fromDate(begin, periodicity),
 				endSlot = TimeSlot.fromDate(end, periodicity);
 
-			var now = TimeSlot.fromDate(new Date(), periodicity);
+			if (now.value < slot.value)
+				return [];
+
 			if (now.value < endSlot.value)
 				endSlot = now;
 

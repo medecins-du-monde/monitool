@@ -449,12 +449,6 @@ window.monitool.config(function($stateProvider, $urlRouterProvider) {
 		controller: 'ProjectOlapController'
 	});
 
-
-	///////////////////////////
-	// Indicators
-	///////////////////////////
-	
-
 	///////////////////////////
 	// Indicator
 	///////////////////////////

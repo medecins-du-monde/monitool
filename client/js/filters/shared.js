@@ -27,6 +27,12 @@ angular.module('monitool.filters.shared', [])
 		};
 	})
 
+	.filter('isEmpty', function() {
+		return function(obj) {
+			return Object.keys(obj).length == 0;
+		};
+	})
+
 	.filter('unsafe', function($sce) {
 		return $sce.trustAsHtml;
 	})
@@ -95,9 +101,8 @@ angular.module('monitool.filters.shared', [])
 			if (!string)
 				return string;
 
-			if (string.length > size) {
+			if (string.length > size)
 				return string.slice(0, size - 3) + '...';
-			}
 			else
 				return string;
 		};
