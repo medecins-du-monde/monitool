@@ -193,7 +193,7 @@ class Database {
 
 	destroy(id, rev) {
 		return new Promise(function(resolve, reject) {
-			this.database.destroy(this._id, this._rev, function(error) {
+			this.database.destroy(id, rev, function(error) {
 				if (error)
 					reject(error);
 				else
