@@ -465,7 +465,6 @@ var FRENCH_TRANSLATION = {
 			year: 'Tous les ans',
 			free: 'Libre'
 		},
-		collect: "Collecter",
 
 		no_input_entities: 'Aucun lieu d\'activité n\'a encore été créé!',
 		no_input_groups: 'Aucun groupe d\'activité n\'a encore été créé!',

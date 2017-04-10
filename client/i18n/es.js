@@ -465,7 +465,6 @@ var SPANISH_TRANSLATION = {
 			year: 'Cada año',
 			free: 'Libre'
 		},
-		collect: "Recuperar",
 
 		no_input_entities: '¡Ningún lugar de colecta ha sido creado!',
 		no_input_groups: '¡Ningún grupo de colecta ha sido creado!',

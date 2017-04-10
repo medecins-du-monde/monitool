@@ -465,7 +465,6 @@ var ENGLISH_TRANSLATION = {
 			year: "Every year",
 			free: 'Free'
 		},
-		collect: "Collect",
 		
 		no_input_entities: 'No collection site was created yet!',
 		no_input_groups: 'No collection group was created yet!',
