@@ -28,7 +28,7 @@ const fontDescriptors = {
 	Roboto: {
 		normal: 'node_modules/roboto-fontface/fonts/Roboto/Roboto-Regular.ttf',
 		bold: 'node_modules/roboto-fontface/fonts/Roboto/Roboto-Medium.ttf',
-		italics: 'node_modules/roboto-fontface/fonts/Roboto/Roboto-Italic.ttf',
+		italics: 'node_modules/roboto-fontface/fonts/Roboto/Roboto-RegularItalic.ttf',
 		bolditalics: 'node_modules/roboto-fontface/fonts/Roboto/Roboto-MediumItalic.ttf'
 	}
 };
