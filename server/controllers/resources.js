@@ -18,9 +18,6 @@
 "use strict";
 
 var express     = require('express'),
-	passport    = require('../authentication/passport'),
-	AccessToken = require('../resource/model/access-token'),
-	Client      = require('../resource/model/client'),
 	User        = require('../resource/model/user'),
 	Indicator   = require('../resource/model/indicator'),
 	Input       = require('../resource/model/input'),
@@ -32,30 +29,6 @@ var bodyParser = require('body-parser').json();
 
 
 module.exports = express.Router()
-
-	/**
-	 * FIXME => this middleware should be in another file and included in app.js
-	 * Check that user is properly authenticated with a cookie.
-	 * and that it's really a user, not a client that found a way to get a cookie.
-	 */
-	.use(function(request, response, next) {
-		if (request.isAuthenticated && request.isAuthenticated() && request.user && (request.user.type === 'user' || request.user.type === 'partner'))
-			next();
-		else {
-			passport.authenticate('user_accesstoken', {session: false}, function(error, user, info) {
-				// FIXME: not sure what this does 2 years after, only real users can have accesstokens?
-				if (user && user.type === 'user') {
-					request.user = user;
-					next();
-				}
-				else
-					response.status(401).json({
-						error: "credentials_required",
-						message: "Please provide either session cookie or an access token."
-					});
-			})(request, response, next);
-		}
-	})
 
 	/**
 	 * Get current logged in account information

@@ -40,19 +40,19 @@ express()
 	.use(compression())
 
 	// Serve authentication related pages.
-	.use('/authentication', require('../server/controllers/authentication'))
+	.use('/authentication', require('../server/controllers/authentication')) // eg: login page, ...
 
 	// Serve API
-	.use(require('../server/middlewares/status-code'))
-	.use('/resources', require('../server/controllers/pdf'))
-	.use('/resources', require('../server/controllers/resources'))
-	.use('/reporting', require('../server/controllers/reporting'))
+	.use(require('../server/middlewares/force-authentication'))		// From now on, all pages require auth
+	.use(require('../server/middlewares/status-code'))				// Add helpers to the response object
+	.use('/resources', require('../server/controllers/pdf'))		// PDF generation module
+	.use('/resources', require('../server/controllers/resources'))	// REST JSON API
+	.use('/reporting', require('../server/controllers/reporting'))	// Reporting API
 	
 	.listen(config.port);
 
-// catch the uncaught errors that weren't wrapped in a domain or try catch statement
-// do not use this in modules, but only in applications, as otherwise we could have multiple of these bound
+// Catch the uncaught errors that weren't wrapped in a domain or try catch statement
 process.on('uncaughtException', function(err) {
-	// handle the error safely
+	// This should absolutely never be called, as we handle all errors insides promises.
 	console.log(err.stack)
 });
