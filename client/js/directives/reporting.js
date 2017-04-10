@@ -208,14 +208,17 @@ angular.module('monitool.directives.reporting', [])
 						// split value by thousands
 						value = Math.round(value).toString();
 
-						var finalString = symbol;
-						while (value.length !== 0) {
-							finalString = '.' + value.substr(-3) + finalString;
-							value = value.substr(0, value.length - 3);
+						var finalString;
+						if (value !== 'Infinity') {
+							finalString = symbol;
+							while (value.length !== 0) {
+								finalString = '.' + value.substr(-3) + finalString;
+								value = value.substr(0, value.length - 3);
+							}
+							finalString = finalString.substring(1);
 						}
-
-						finalString = finalString.substring(1);
-
+						else
+							finalString = value + symbol;
 
 						element.html(finalString);
 					}
