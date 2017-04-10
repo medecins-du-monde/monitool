@@ -109,7 +109,7 @@
 		<div class="form-group" ng-if="user.role == 'input'">
 			<label for="entities-input" class="col-sm-3 control-label" translate="project.collection_site_list"></label>
 			<div class="col-sm-9">
-				<element-filter ng-model="user.entities" elements="availableEntities" groups="editableProject.groups"></element-filter>
+				<element-filter ng-model="user.entities" elements="masterProject.entities" groups="editableProject.groups"></element-filter>
 
 				<p class="help-block">
 					<i class="fa fa-info-circle"></i>
@@ -117,6 +117,19 @@
 				</p>
 			</div>
 		</div>
+
+		<div class="form-group" ng-if="user.role == 'input'">
+			<label for="dataSources-input" class="col-sm-3 control-label" translate="project.collection_form_list"></label>
+			<div class="col-sm-9">
+				<element-filter ng-model="user.dataSources" elements="masterProject.forms"></element-filter>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_datasources'|translate}}
+				</p>
+			</div>
+		</div>
+
 	</form>
 </div>
 

@@ -154,6 +154,11 @@ angular
 				return true;
 			
 			if (projectUser.role === 'input') {
+				// Check if user is explicitly forbidden
+				if (projectUser.dataSources.indexOf(formId) !== -1)
+					return false;
+
+				// Check if entities where user is allowed intersect with the data source.
 				var form = this.forms.find(function(f) { return f.id == formId; });
 				var userColumns = projectUser.entities;
 
@@ -246,12 +251,17 @@ angular
 		 * If no valid links remain, change the user to read only mode
 		 */
 		Project.prototype.sanitizeUser = function(user) {
-			var entityIds = this.entities.pluck('id'),
-				entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
+			user.entities = user.entities.filter(function(entityId) {
+				return !!this.entities.find(function(entity) { return entity.id === entityId; });
+			}.bind(this));
 
-			user.entities = user.entities.filter(entityIdFilter);
-			if (user.entities.length == 0) {
+			user.dataSources = user.dataSources.filter(function(dataSourceId) {
+				return !!this.forms.find(function(form) { return form.id === dataSourceId; });
+			}.bind(this));
+
+			if (user.entities.length == 0 || user.dataSources.length == 0) {
 				delete user.entities;
+				delete user.dataSources;
 				user.role = 'read';
 			}
 		};

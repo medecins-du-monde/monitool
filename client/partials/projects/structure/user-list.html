@@ -15,6 +15,7 @@
 			<th translate="shared.name"></th>
 			<th translate="project.user_role"></th>
 			<th translate="project.collection_site_list"></th>
+			<th translate="project.collection_form_list"></th>
 		</tr>
 	</thead>
 	<tbody ng-if="editableProject.users.length == 0">
@@ -34,7 +35,10 @@
 			</td>
 			<td>{{('project.user_roles.' + user.role)|translate}}</td>
 			<td>
-				{{user.entities|getObjects:availableEntities|pluck:'name'|translate_list|join:', '}}
+				{{user.entities|getObjects:masterProject.entities|pluck:'name'|translate_list|join:', '}}
+			</td>
+			<td>
+				{{user.dataSources|getObjects:masterProject.forms|pluck:'name'|translate_list|join:', '}}
 			</td>
 		</tr>
 	</tbody>

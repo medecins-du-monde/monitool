@@ -1,8 +1,7 @@
 let database = require('../database');
 
 /**
- * This migration replaces user that had the permission "input_all",
- * by user with the permission "input", but with all entities.
+ * this migration add the missing "dataSources" field on all users.
  */
 module.exports = function() {
 	var view = 'by_type',
@@ -16,9 +15,8 @@ module.exports = function() {
 			var project = row.doc;
 
 			project.users.forEach(function(user) {
-				if (user.role === 'input_all') {
-					user.role = 'input';
-					user.entities = ["none"].concat(project.entities.map(entity => entity.id));
+				if (user.role === 'input') {
+					user.dataSources = project.forms.map(f => f.id);
 					update = true;
 				}
 			});

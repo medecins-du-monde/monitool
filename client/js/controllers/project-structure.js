@@ -167,8 +167,6 @@ angular
 		$scope.users = {};
 		users.forEach(function(user) { $scope.users[user._id] = user});
 		
-		$scope.availableEntities = $scope.masterProject.entities;
-
 		$scope.editUser = function(user) {
 			var promise = $uibModal.open({
 				controller: 'ProjectUserModalController',
@@ -215,9 +213,11 @@ angular
 		$scope.isNew = !projectUser;
 
 		// The form updates a copy of the object, so that user can cancel the changes by just dismissing the modal.
-		$scope.user = projectUser ? angular.copy(projectUser) : {type: "internal", id: null, role: "owner", entities: []};
+		$scope.user = projectUser ? angular.copy(projectUser) : {type: "internal", id: null, role: "owner", entities: [], dataSources: []};
 		if (!$scope.user.entities)
 			$scope.user.entities = [];
+		if (!$scope.user.dataSources)
+			$scope.user.dataSources = [];
 
 		$scope.done = function() {
 			if ($scope.user.type == 'internal') {
@@ -227,8 +227,10 @@ angular
 			else
 				delete $scope.user.id;
 
-			if ($scope.user.role != 'input')
+			if ($scope.user.role != 'input') {
 				delete $scope.user.entities;
+				delete $scope.user.dataSources;
+			}
 
 			$uibModalInstance.close($scope.user);
 		};

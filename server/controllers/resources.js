@@ -212,9 +212,13 @@ module.exports = express.Router()
 				var projectUser = project.getProjectUser(request.user),
 					projectRole = project.getRole(request.user);
 
-				if (projectRole !== 'owner' &&
-					projectRole !== 'input_all' &&
-					!(projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1))
+				var allowed = false;
+				if (projectRole === 'owner')
+					allowed = true;
+				else if (projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1 && projectUser.dataSources.indexOf(input.form) !== -1)
+					allowed = true;
+
+				if (!allowed)
 					throw new Error('forbidden');
 
 				return input.save();
@@ -240,9 +244,13 @@ module.exports = express.Router()
 				var projectUser = project.getProjectUser(request.user),
 					projectRole = project.getRole(request.user);
 
-				if (projectRole !== 'owner' &&
-					projectRole !== 'input_all' &&
-					!(projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1))
+				var allowed = false;
+				if (projectRole === 'owner')
+					allowed = true;
+				else if (projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1 && projectUser.dataSources.indexOf(input.form) !== -1)
+					allowed = true;
+
+				if (!allowed)
 					throw new Error('forbidden');
 
 				return input.destroy();
@@ -311,9 +319,7 @@ module.exports = express.Router()
 			Model = ModelsByName[request.params.modelName];
 
 		Model.storeInstance.get(request.params.id)
-			.then(function(model) {
-				return model.destroy();
-			})
+			.then(model => model.destroy())
 			.then(response.jsonPB)
 			.catch(response.jsonErrorPB);
 	});

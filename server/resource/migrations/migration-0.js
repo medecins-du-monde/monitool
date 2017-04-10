@@ -109,7 +109,9 @@ var designDoc = {
 };
 
 
-
+/**
+ * This migration creates the initial design doc.
+ */
 module.exports = function() {
 	return database.insert(designDoc);
 };

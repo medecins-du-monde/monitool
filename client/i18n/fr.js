@@ -544,7 +544,8 @@ var FRENCH_TRANSLATION = {
 		user_help_fullname: "Rentrez ici le nom complet de la personne qui va utiliser ce compte.",
 		user_help_password: "Le mot de passe doit avoir 6 caractères au minimum. Ne pas utiliser la même valeur que l'identifiant",
 		user_help_role: "Ce champs determine les modifications que pourra réaliser cet utilisateur sur le projet: les propriétaires peuvent changer la structure du projet, les saisisseurs, uniquement rentrer des données.",
-		user_help_sites: "Sur quels lieux de collecte cet utilisateur pourra-t'il saisir des données?",
+		user_help_sites: "Sur quels lieux de collecte cet utilisateur pourra-t'il saisir?",
+		user_help_datasources: "Sur quels sources de données cet utilisateur pourra-t'il saisir?",
 
 		collection_form_list_info:
 			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont extraites (fiches de suivi, dossiers patient, fichiers Excel, ...)</p>" + 

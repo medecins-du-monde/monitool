@@ -545,6 +545,7 @@ var SPANISH_TRANSLATION = {
 		user_help_password: "La contraseña debe ser al menos 6 letras. No use el mismo valor que el nombre de usuario",
 		user_help_role: "Este campo determina que podra hacer este usuario: los proprietarios pueden cambiar la estructura de los proyectos, los operadores de entrada solo entrar datos.",
 		user_help_sites: "Para que lugares podra este usuario entrar datos?",
+		user_help_datasources: "Para que fuentes de datos podra este usuario entrar datos?",
 
 		collection_form_list_info:
 			"<p>Las fuentes de datos son los diferentes soportes donde se encuentran los datos necesarios para seguir el proyecto (fichas de colecta, historiales clínicos, ficheros excel, ...).</p>" + 

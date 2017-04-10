@@ -725,6 +725,8 @@ angular.module('monitool.directives.formControls', [])
 		 * 	['whatever']
 		 */
 		var model2view = function(model, elements, groups) {
+			groups = groups || [];
+			
 			if (model.length == elements.length)
 				return ['all'];
 			
@@ -756,6 +758,8 @@ angular.module('monitool.directives.formControls', [])
 		 * 	['element1', 'element2']
 		 */
 		var view2model = function(view, elements, groups) {
+			groups = groups || [];
+
 			var model = {};
 
 			view.forEach(function(id) {
@@ -791,7 +795,7 @@ angular.module('monitool.directives.formControls', [])
 					// Reset the list of selectable elements.
 					scope.selectableElements = [
 						{id: 'all', name: $filter('translate')('project.all_elements')}
-					].concat(scope.groups).concat(scope.elements);
+					].concat(scope.groups || []).concat(scope.elements);
 					
 					// Check that all selected elements are still valid.
 					scope.container.selectedElements = scope.container.selectedElements.filter(function(id) {

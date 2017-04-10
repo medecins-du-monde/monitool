@@ -545,6 +545,7 @@ var ENGLISH_TRANSLATION = {
 		user_help_password: "The password must be at least 6 characters long. Do not use the same value than the username",
 		user_help_role: "This field determines what will this user be allowed to do: owners can change the project's structure, data entry officers can only do data input.",
 		user_help_sites: "For which sites will this user enter data?",
+		user_help_datasources: "For which data sources will this user enter data?",
 
 		collection_form_list_info:
 			"<p>The data sources are the different supports where the data needed for monitoring are available (tally sheets, medical records, excel files, ...).</p>" + 

@@ -1,6 +1,11 @@
 let database = require('../database'),
 	uuid = require('node-uuid');
 
+/**
+ * This migration removes the fake "none" entity used to attach data
+ * directly to the project.
+ * The same effect is obtained by creating a fake collection site.
+ */
 module.exports = function() {
 	var view = 'by_type',
 		opt = {include_docs: true, key: 'project'};
