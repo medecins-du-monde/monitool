@@ -46,7 +46,22 @@ class Model {
 	 * Override it on child classes when needed.
 	 */
 	toAPI() {
-		return this;
+		return this.toJSON();
+	}
+
+	/**
+	 * When serializing a model to JSON, we want all private properties
+	 * to be removed (ex: send to database or to api).
+	 */
+	toJSON() {
+		var obj = {};
+		
+		Object.assign(obj, this);
+		for (let key in obj)
+			if (key !== '_id' && key !== '_rev' && key.substr(0, 1) === '_')
+				delete obj[key];
+
+		return obj;
 	}
 
 }

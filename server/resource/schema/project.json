@@ -91,42 +91,7 @@
 
 		"logicalFrames": {
 			"type": "array",
-			"items": {
-				"type": "object",
-				"additionalProperties": false,
-				"required": ["name", "goal", "indicators", "purposes"],
-				"properties": {
-					"name": { "type": "string" },
-					"goal": { "type": "string" },
-					"indicators": { "$ref": "#/definitions/indicators" },
-					"purposes": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"additionalProperties": false,
-							"required": ["description", "assumptions", "indicators", "outputs"],
-							"properties": {
-								"description": { "type": "string" },
-								"assumptions": { "type": "string" },
-								"indicators": { "$ref": "#/definitions/indicators" },
-								"outputs": {
-									"type": "array",
-									"items": {
-										"type": "object",
-										"additionalProperties": false,
-										"required": ["description", "assumptions", "indicators"],
-										"properties": {
-											"description": { "type": "string" },
-											"assumptions": { "type": "string" },
-											"indicators": { "$ref": "#/definitions/indicators" }
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+			"items": { "type": "object" }
 		},
 
 		"crossCutting": {

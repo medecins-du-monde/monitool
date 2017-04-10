@@ -21,6 +21,7 @@ var validator    = require('is-my-json-valid'),
 	passwordHash = require('password-hash'),
 	ProjectStore = require('../store/project'),
 	DbModel      = require('./db-model'),
+	LogicalFrame = require('./logical-frame'),
 	DataSource   = require('./data-source'),
 	Indicator    = require('./indicator'),
 	Input        = require('./input'),
@@ -52,8 +53,9 @@ class Project extends DbModel {
 		// FIXME a lot is missing here.
 
 
-		// Create forms
-		this.forms = this.forms.map(f => new DataSource(f));
+		// Create forms & logicalFrames
+		this.forms = this.forms.map(f => new DataSource(f, this));
+		this.logicalFrames = this.logicalFrames.map(lf => new LogicalFrame(lf, this));
 
 		// Replace passwords by a salted hash
 		this.users.forEach(function(user) {
@@ -239,10 +241,10 @@ class Project extends DbModel {
 	}
 
 	toAPI() {
-		var json = Object.assign({}, this);
+		var obj = super.toAPI();
 
 		// Replace the password by null before sending the project to the user.
-		json.users = this.users.map(function(user) {
+		obj.users = this.users.map(function(user) {
 			user = Object.assign({}, user);
 			if (user.type === 'partner')
 				user.password = null;
@@ -250,10 +252,9 @@ class Project extends DbModel {
 			return user;
 		});
 
-		return json;
+		return obj;
 	}
 
 }
-
 
 module.exports = Project;

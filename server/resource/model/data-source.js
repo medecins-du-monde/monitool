@@ -17,18 +17,19 @@
 
 "use strict";
 
-var Variable       = require('./variable'),
-	validator      = require('is-my-json-valid'),
-	Model          = require('./model'),
-	schema         = require('../schema/data-source.json');
+var Variable  = require('./variable'),
+	validator = require('is-my-json-valid'),
+	Model     = require('./model'),
+	schema    = require('../schema/data-source.json');
 
 var validate = validator(schema);
 
 class DataSource extends Model {
 
-	constructor(data) {
+	constructor(data, project) {
 		super(data, validate);
 
+		this._project = project;
 		this.elements = this.elements.map(el => new Variable(el));
 	}
 
@@ -60,7 +61,26 @@ class DataSource extends Model {
 		return variable;
 	}
 
-}
+	getPdfDocDefinition(pageOrientation) {
+		var doc = {};
+		doc.pageSize = "A4";
+		doc.pageOrientation = pageOrientation;
 
+		doc.content = [
+			{text: this.name, style: 'header'},
+			{text: "General information", style: "header2"},
+			{style: "variableName", text: "Collection site"},
+			{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
+			{style: "variableName", text: "Covered period"},
+			{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
+			{style: "variableName", text: "Collected by"},
+			{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
+			{text: "Data", style: "header2"}
+		].concat(this.elements.map(el => el.getPdfDocDefinition()));
+
+		return doc;
+	}
+
+}
 
 module.exports = DataSource;

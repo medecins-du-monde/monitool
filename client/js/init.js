@@ -117,7 +117,7 @@ function onAppProgress(e) {
 	// IE ? 
 
 	// This hack should work at least for Firefox and Chrome (as long as the bundle size does not change too much).
-	var total = e.total || 3634199; 
+	var total = e.total || 1593763; 
 	document.getElementById('progress').style.width = Math.round(100 * e.loaded / total) + '%';
 }
 

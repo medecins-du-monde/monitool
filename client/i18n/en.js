@@ -164,6 +164,9 @@ var ENGLISH_LOCALE = (function() {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		portrait: "Portrait",
+		landscape: "Landscape",
+
 		name_label_fr: "Name (french)",
 		name_label_es: "Name (spanish)",
 		name_label_en: "Name (english)",

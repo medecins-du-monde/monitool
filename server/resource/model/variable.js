@@ -17,9 +17,10 @@
 
 "use strict";
 
-var validator = require('is-my-json-valid'),
-	Model     = require('./model'),
-	schema    = require('../schema/variable.json');
+var validator  = require('is-my-json-valid'),
+	Model      = require('./model'),
+	schema     = require('../schema/variable.json'),
+	arrayUtils = require('../../utils/array');
 
 var validate = validator(schema);
 
@@ -100,6 +101,89 @@ class Variable extends Model {
 
 		return partitionElementIds;
 	}
+
+	getPdfDocDefinition() {
+		var permutation = arrayUtils.computeNthPermutation(this.partitions.length, this.order),
+			partitions = permutation.map(index => this.partitions[index]);
+
+		var body, widths;
+
+		var colPartitions = partitions.slice(this.distribution),
+			rowPartitions = partitions.slice(0, this.distribution);
+
+		var topRows = this._makeRows(colPartitions),
+			bodyRows = arrayUtils.transpose2D(this._makeRows(rowPartitions));
+
+		if (!bodyRows.length)
+			bodyRows.push([])
+
+		var dataColsPerRow = topRows.length ? topRows[0].length : 1;
+
+		// Add empty data fields to bodyRows
+		bodyRows.forEach(function(bodyRow) {
+			for (var i = 0; i < dataColsPerRow; ++i)
+				bodyRow.push(' ');
+		});
+
+		// Add empty field in the top-left corner for topRows
+		topRows.forEach(function(topRow, index) {
+			for (var i = 0; i < rowPartitions.length; ++i)
+				topRow.unshift('');
+		});
+
+		body = topRows.concat(bodyRows);
+
+		widths = [];
+		for (var i = 0; i < rowPartitions.length; ++i)
+			widths.push('auto');
+		for (var j = 0; j < dataColsPerRow; ++j)
+			widths.push('*');
+
+		return  [
+			{style: "variableName", text: this.name},
+			{
+				table: {
+					headerRows: colPartitions.length,
+					widths: widths,
+					body: body
+				}
+			}
+		];
+	}
+
+	_makeRows(partitions) {
+		var totalCols = partitions.reduce(function(memo, tp) { return memo * tp.elements.length; }, 1),
+			currentColSpan = totalCols;
+
+		var body = [];
+
+		// Create header rows for top partitions
+		partitions.forEach(function(tp) {
+			// Update currentColSpan
+			currentColSpan /= tp.elements.length;
+
+			// Create header row
+			var row = [];
+
+			// Add one field for each element in tp, with current colspan
+			for (var colIndex = 0; colIndex < totalCols; ++colIndex) {
+				// Add field
+				var tpe = tp.elements[(colIndex / currentColSpan) % tp.elements.length];
+				row.push({colSpan: currentColSpan, text: tpe.name});
+
+				// Add as many fillers as the colSpan value - 1
+				var colLimit = colIndex + currentColSpan - 1;
+				for (; colIndex < colLimit; ++colIndex)
+					row.push("");
+			}
+
+			// push to body
+			body.push(row);
+		});
+
+		return body;
+	}
+
 }
 
 

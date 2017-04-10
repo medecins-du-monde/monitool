@@ -14,15 +14,14 @@
 		<tr>
 			<th style="width: 30px"></th>
 			<th translate="shared.name"></th>
-			<th translate="shared.start"></th>
-			<th translate="shared.end"></th>
 			<th translate="project.periodicity"></th>
 			<th translate="project.collection_site_list"></th>
+			<th style="width: 250px"></th>
 		</tr>
 	</thead>
 	<tbody ng-if="editableProject.forms.length == 0">
 		<tr>
-			<td colspan="7" style="text-align: center" translate="project.no_forms"></td>
+			<td colspan="6" style="text-align: center" translate="project.no_forms"></td>
 		</tr>
 	</tbody>
 	<tbody ng-if="editableProject.forms.length != 0" ng-sortable="{handle: '.handle'}">
@@ -33,21 +32,21 @@
 					{{form.name}}
 				</a>
 			</td>
-	
-			<td ng-if="form.start">{{form.start|date}}</td>
-			<td ng-if="!form.start" translate="project.same_as_start"></td>
-			<td ng-if="form.end">{{form.end|date}}</td>
-			<td ng-if="!form.end" translate="project.same_as_end"></td>
-			
 			<td>{{'project.periodicities.' + form.periodicity|translate}}</td>
 			<td>
 				{{form.entities|getObjects:availableEntities|pluck:'name'|translate_list|join:', '}}
+			</td>
+			<td>
+				<i class="fa fa-file-pdf-o"></i>
+				<span translate="project.download_pdf"></span>
+				(<a href="/resources/project/{{masterProject._id}}/data-source/{{form.id}}.pdf?orientation=portrait" target="_blank" translate="shared.portrait"></a>,
+				<a href="/resources/project/{{masterProject._id}}/data-source/{{form.id}}.pdf?orientation=landscape" target="_blank" translate="shared.landscape"></a>)
 			</td>
  		</tr>
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="7" style="text-align: center">
+			<td colspan="6" style="text-align: center">
 				<a class="btn btn-default btn-xs" ng-click="createForm()">
 					<i class="fa fa-plus"></i>
 					<span translate="shared.add"></span>

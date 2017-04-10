@@ -14,11 +14,12 @@
 			<th style="width: 30px;"></th>
 			<th translate="shared.name"></th>
 			<th translate="project.goal"></th>
+			<th style="width: 250px"></th>
 		</tr>
 	</thead>
 	<tbody ng-if="editableProject.logicalFrames.length == 0">
 		<tr>
-			<td colspan="3" style="text-align: center" translate="project.no_logical_frames"></td>
+			<td colspan="4" style="text-align: center" translate="project.no_logical_frames"></td>
 		</tr>
 	</tbody>
 	<tbody ng-if="editableProject.logicalFrames.length != 0" ng-sortable="{handle: '.handle'}">
@@ -31,11 +32,17 @@
 				</a>
 			</td>
 			<td>{{logicalFrame.goal}}</td>
+			<td>
+				<i class="fa fa-file-pdf-o"></i>
+				<span translate="project.download_pdf"></span>
+				(<a href="/resources/project/{{editableProject._id}}/logical-frame/{{index}}.pdf?orientation=portrait" target="_blank" translate="shared.portrait"></a>,
+				<a href="/resources/project/{{editableProject._id}}/logical-frame/{{index}}.pdf?orientation=landscape" target="_blank" translate="shared.landscape"></a>)
+			</td>
  		</tr>
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="3" style="text-align: center">
+			<td colspan="4" style="text-align: center">
 				<a class="btn btn-default btn-xs" ng-click="createLogicalFrame()">
 					<i class="fa fa-plus"></i>
 					<span translate="shared.add"></span>

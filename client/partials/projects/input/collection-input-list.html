@@ -7,10 +7,10 @@
 <div class="alert alert-info" >
 
 	<div class="pull-right" style="text-align: right">
-		<a pdf-export-source="form" format="portrait" class="btn btn-default pdf-export" style="margin-bottom: 5px; display: inline-block">
+		<a target="_blank" href="/resources/project/{{masterProject._id}}/data-source/{{form.id}}.pdf?orientation=portrait" class="btn btn-default pdf-export" style="margin-bottom: 5px; display: inline-block">
 			<i class="fa fa-file-pdf-o"></i>
 			<span translate="project.download_portrait"></span>
-		</a><br/><a pdf-export-source="form" format="landscape" class="btn btn-default pdf-export">
+		</a><br/><a target="_blank" href="/resources/project/{{masterProject._id}}/data-source/{{form.id}}.pdf?orientation=landscape" class="btn btn-default pdf-export">
 			<i class="fa fa-file-pdf-o fa-rotate-270"></i>
 			<span translate="project.download_landscape"></span>
 		</a>

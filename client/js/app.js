@@ -32,7 +32,6 @@ window.monitool = angular.module('monitool.app', [
 	'monitool.directives.formHelpers',
 	'monitool.directives.formValidators',
 	'monitool.directives.shared',
-	'monitool.directives.pdfExport',
 	'monitool.directives.reporting',
 
 	'monitool.filters.shared',

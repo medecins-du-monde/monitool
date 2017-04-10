@@ -44,6 +44,7 @@ express()
 
 	// Serve API
 	.use(require('../server/middlewares/status-code'))
+	.use('/resources', require('../server/controllers/pdf'))
 	.use('/resources', require('../server/controllers/resources'))
 	.use('/reporting', require('../server/controllers/reporting'))
 	

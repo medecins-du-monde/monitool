@@ -164,6 +164,9 @@ var SPANISH_LOCALE = (function() {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		portrait: "Vertical",
+		landscape: "Horizontal",
+
 		name_label_fr: "Nombre (francès)",
 		name_label_es: "Nombre (español)",
 		name_label_en: "Nombre (inglès)",

@@ -164,6 +164,9 @@ var FRENCH_LOCALE = (function() {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		portrait: "Portrait",
+		landscape: "Paysage",
+
 		name_label_fr: "Nom (français)",
 		name_label_es: "Nom (espagnol)",
 		name_label_en: "Nom (anglais)",

@@ -27,8 +27,6 @@ var files = {
 		'client/bower_components/handsontable/dist/handsontable.full.css',
 	],
 	js: [
-		"client/bower_components/pdfmake/build/pdfmake.min.js",
-		"client/bower_components/pdfmake/build/vfs_fonts.js",
 		"client/bower_components/blob/Blob.js",
 		"client/bower_components/canvas-to-Blob.js/canvas-toBlob.js",
 		"client/bower_components/file-saver/FileSaver.min.js",

@@ -57,6 +57,8 @@
     "passport-oauth2": "x",
     "passport-oauth2-client-password": "x",
     "password-hash": "x",
+    "pdfmake": "^0.1.27",
+    "roboto-fontface": "^0.7.0",
     "winston": "^2.3.1"
   }
 }
