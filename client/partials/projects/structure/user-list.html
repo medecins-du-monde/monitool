@@ -12,7 +12,6 @@
 	<thead>
 		<tr>
 			<th style="width: 30px"></th>
-			<th style="width: 30px"></th>
 			<th translate="shared.name"></th>
 			<th translate="project.user_role"></th>
 			<th translate="project.collection_site_list"></th>
@@ -27,12 +26,11 @@
 	<tbody ng-if="editableProject.users.length != 0" ng-sortable="{handle: '.handle'}">
 		<tr ng-repeat="user in editableProject.users">
 			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
-
-			<td style="text-align: center">
-				<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
-			</td>
 			<td>
-				<a ng-click="editUser(user)">{{user.name || users[user.id].name}}</a>
+				<a ng-click="editUser(user)">
+					<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
+					{{user.name || users[user.id].name}}
+				</a>
 			</td>
 			<td>{{('project.user_roles.' + user.role)|translate}}</td>
 			<td>
