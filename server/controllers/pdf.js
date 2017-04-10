@@ -21,6 +21,9 @@ const express = require('express'),
 	  Project = require('../resource/model/project'),
 	  PdfPrinter = require('pdfmake');
 
+/**
+ * Boilerplate needed to start-up pdfmake
+ */
 const fontDescriptors = {
 	Roboto: {
 		normal: 'node_modules/roboto-fontface/fonts/Roboto/Roboto-Regular.ttf',
@@ -30,6 +33,9 @@ const fontDescriptors = {
 	}
 };
 
+/**
+ * More boilerplate needed to start-up pdfmake
+ */
 const styles = {
 	header: {
 		fontSize: 22,

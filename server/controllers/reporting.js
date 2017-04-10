@@ -36,17 +36,15 @@ module.exports = express.Router()
 				Project.storeInstance.get(request.params.id),
 				Input.storeInstance.listByProject(request.params.id)
 			])
-			.then(
-				function(results) {
-					response.json({
-						error: false,
-						type: 'cubes',
-						projectId: results[0]._id,
-						cubes: CubeCollection.fromProject(results[0], results[1]).serialize()
-					});
-				},
-				response.jsonErrorPB
-			);
+			.then(function(results) {
+				response.json({
+					error: false,
+					type: 'cubes',
+					projectId: results[0]._id,
+					cubes: CubeCollection.fromProject(results[0], results[1]).serialize()
+				});
+			})
+			.catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -81,8 +79,8 @@ module.exports = express.Router()
 			);
 		});
 
-		return Promise.all([projectsPromise, inputsPromise]).then(
-			function(queryRes) {
+		return Promise.all([projectsPromise, inputsPromise])
+			.then(function(queryRes) {
 				var projects = queryRes[0], inputsByProject = queryRes[1];
 
 				var result = {};
@@ -91,8 +89,7 @@ module.exports = express.Router()
 					result[project._id] = CubeCollection.fromProject(project, inputs).serialize();
 				}
 				response.json({type: 'cubes', cubes: result});
-			},
-			response.jsonErrorPB
-		);
+			})
+			.catch(response.jsonErrorPB);
 	});
 
