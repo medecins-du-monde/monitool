@@ -95,7 +95,7 @@ module.exports = express.Router()
 			promise = promise.then(projects => projects.map(p => p.toAPI()))
 		}
 
-		promise.then(response.jsonPB, response.jsonErrorPB);
+		promise.then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -107,7 +107,8 @@ module.exports = express.Router()
 		
 		Project.storeInstance.get(request.params.id)
 			.then(p => p.toAPI())
-			.then(response.jsonPB, response.jsonErrorPB);
+			.then(response.jsonPB)
+			.catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -140,7 +141,8 @@ module.exports = express.Router()
 				return new Project(request.body).save();
 			})
 			.then(p => p.toAPI())
-			.then(response.jsonPB, response.jsonErrorPB);
+			.then(response.jsonPB)
+			.catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -151,13 +153,16 @@ module.exports = express.Router()
 		if (request.user.type !== 'user')
 			return response.jsonError(new Error('forbidden'));
 		
-		Project.storeInstance.get(request.params.id).then(function(project) {
-			// Ask the project if it is deletable.
-			if (project.getRole(request.user) !== 'owner')
-				throw new Error("forbidden");
+		Project.storeInstance.get(request.params.id)
+			.then(function(project) {
+				// Ask the project if it is deletable.
+				if (project.getRole(request.user) !== 'owner')
+					throw new Error("forbidden");
 
-			return project.destroy();
-		}).then(response.jsonPB, response.jsonErrorPB);
+				return project.destroy();
+			})
+			.then(response.jsonPB)
+			.catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -197,7 +202,8 @@ module.exports = express.Router()
 				promise = Input.storeInstance.list(); // get all from all projects, never happens for partners.
 		}
 
-		promise.then(response.jsonPB, response.jsonErrorPB);
+		promise.then(response.jsonPB)
+			   .catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -208,7 +214,9 @@ module.exports = express.Router()
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
 
-		Input.storeInstance.get(request.params.id).then(response.jsonPB, response.jsonErrorPB);
+		Input.storeInstance.get(request.params.id)
+			.then(response.jsonPB)
+			.catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -225,18 +233,21 @@ module.exports = express.Router()
 		catch (e) { return response.jsonError(e); }
 
 		// Get project to check ACLs and format
-		Project.storeInstance.get(input.project).then(function(project) {
-			// Check ACLs
-			var projectUser = project.getProjectUser(request.user),
-				projectRole = project.getRole(request.user);
+		Project.storeInstance.get(input.project)
+			.then(function(project) {
+				// Check ACLs
+				var projectUser = project.getProjectUser(request.user),
+					projectRole = project.getRole(request.user);
 
-			if (projectRole !== 'owner' &&
-				projectRole !== 'input_all' &&
-				!(projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1))
-				throw new Error('forbidden');
+				if (projectRole !== 'owner' &&
+					projectRole !== 'input_all' &&
+					!(projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1))
+					throw new Error('forbidden');
 
-			return input.save();
-		}).then(response.jsonPB, response.jsonErrorPB);
+				return input.save();
+			})
+			.then(response.jsonPB)
+			.catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -263,7 +274,8 @@ module.exports = express.Router()
 
 				return input.destroy();
 			})
-			.then(response.jsonPB, response.jsonErrorPB);
+			.then(response.jsonPB)
+			.catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -274,7 +286,7 @@ module.exports = express.Router()
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
 			Model = ModelsByName[request.params.modelName];
 
-		Model.storeInstance.list().then(response.jsonPB, response.jsonErrorPB);
+		Model.storeInstance.list().then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -284,7 +296,7 @@ module.exports = express.Router()
 		var ModelsByName = {indicator: Indicator, theme: Theme, user: User},
 			Model = ModelsByName[request.params.modelName];
 
-		Model.storeInstance.get(request.params.id).then(response.jsonPB, response.jsonErrorPB);
+		Model.storeInstance.get(request.params.id).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -306,7 +318,7 @@ module.exports = express.Router()
 		var model;
 		try {
 			model = new Model(request.body);
-			model.save().then(response.jsonPB, response.jsonErrorPB);
+			model.save().then(response.jsonPB).catch(response.jsonErrorPB);
 		}
 		catch (e) {
 			return response.jsonError(e);
@@ -329,5 +341,6 @@ module.exports = express.Router()
 			.then(function(model) {
 				return model.destroy();
 			})
-			.then(response.jsonPB, response.jsonErrorPB);
+			.then(response.jsonPB)
+			.catch(response.jsonErrorPB);
 	});
