@@ -100,6 +100,16 @@ angular.module('monitool.controllers.project.input', [])
 			return angular.equals($scope.master, $scope.currentInput);
 		};
 
+		$scope.isValid = function() {
+			for (var key in $scope.currentInput.values) {
+				var arr = $scope.currentInput.values[key], len = arr.length;
+				for (var i = 0; i < arr.length; ++i)
+					if (typeof arr[i] !== 'number')
+						return false;
+			}
+			return true;
+		}
+
 		$scope.delete = function() {
 			var easy_question = $filter('translate')('project.delete_input');
 

@@ -327,7 +327,7 @@ angular.module('monitool.directives.formControls', [])
 			}
 		};
 
-		var dataOptions = {type: 'numeric'};
+		var dataOptions = {type: 'numeric', validator: /^\d+$/};
 
 		/** This is a slightly changed version of pdf-export.js, we should refactor this */ 
 		var makeRows = function(partitions) {

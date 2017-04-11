@@ -240,14 +240,10 @@
 		<span translate="project.add_variable"></span>
 
 	</a>
-	<br/>
-	<br/>
 
 </form>
-
-<div class="pull-right">
-	<button ng-click="deleteForm()" ng-if="masterProject.forms[currentFormIndex]" class="btn btn-danger">
-		<i class="fa fa-times"></i>
-		<span translate="project.delete_form"></span>
-	</button>
-</div>
+<br/>
+<button ng-click="deleteForm()" ng-if="masterProject.forms[currentFormIndex]" class="btn btn-danger">
+	<i class="fa fa-times"></i>
+	<span translate="project.delete_form"></span>
+</button>
