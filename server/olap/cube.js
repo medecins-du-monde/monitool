@@ -95,9 +95,9 @@ class Cube {
 		var dataSize = 1;
 		dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
 
-		var data = new Array(dataSize)
-		for (var i = 0; i < dataSize; ++i)
-			data[i] = -2147483648;
+		var data = {}; //new Array(dataSize)
+		// for (var i = 0; i < dataSize; ++i)
+		// 	data[i] = -2147483648;
 
 		inputs.forEach(function(input) {
 			// Compute location where this subtable should go, and length of data to copy.
@@ -133,8 +133,9 @@ class Cube {
 			}
 			
 			// Copy into destination table.
-			for (var i = 0; i < length; ++i)
-				data[offset + i] = source[i];
+			data[offset] = source;
+			// for (var i = 0; i < length; ++i)
+			// 	data[offset + i] = source[i];
 		});
 
 		// Build and fill cube
@@ -157,10 +158,10 @@ class Cube {
 	 */
 	constructor(id, dimensions, dimensionGroups, data) {
 		// Check size.
-		var dataSize = 1;
-		dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
-		if (data.length !== dataSize)
-			throw new Error('Invalid data size');
+		// var dataSize = 1;
+		// dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
+		// if (data.length !== dataSize)
+		// 	throw new Error('Invalid data size');
 
 		this.id = id;
 		this.dimensions = dimensions;

@@ -47,7 +47,6 @@ angular
 			this.id = id;
 			this.dimensions = dimensions;
 			this.dimensionGroups = dimensionGroups;
-			this.data = data;
 
 			// Index dimensions and dimensionGroups by id
 			this.dimensionsById = {};
@@ -61,8 +60,15 @@ angular
 			// Check size.
 			var dataSize = 1;
 			dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
-			if (this.data.length !== dataSize)
-				throw new Error('Invalid data size');
+			
+			this.data = new Array(dataSize);
+			for (var offset in data) {
+				offset = offset * 1;
+				var lst = data[offset], lstLength = lst.length;
+
+				for (var i = 0; i < lstLength; ++i)
+					this.data[offset + i] = lst[i];
+			}
 		};
 
 		Cube.fetchProject = function(projectId) {
@@ -234,7 +240,7 @@ angular
 		// FIXME we need to push/pop instead of shift/unshift (it's 10 times faster).
 		Cube.prototype._query_rec = function(allIndexes, offset) {
 			if (allIndexes.length == 0)
-				return this.data[offset] == -2147483648 ? undefined : this.data[offset];
+				return this.data[offset];
 
 			var dimension  = this.dimensions[this.dimensions.length - allIndexes.length],
 				indexes    = allIndexes.shift(),
