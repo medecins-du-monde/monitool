@@ -251,18 +251,24 @@ angular
 		 * If no valid links remain, change the user to read only mode
 		 */
 		Project.prototype.sanitizeUser = function(user) {
-			user.entities = user.entities.filter(function(entityId) {
-				return !!this.entities.find(function(entity) { return entity.id === entityId; });
-			}.bind(this));
+			if (user.role === 'input') {
+				user.entities = user.entities.filter(function(entityId) {
+					return !!this.entities.find(function(entity) { return entity.id === entityId; });
+				}.bind(this));
 
-			user.dataSources = user.dataSources.filter(function(dataSourceId) {
-				return !!this.forms.find(function(form) { return form.id === dataSourceId; });
-			}.bind(this));
+				user.dataSources = user.dataSources.filter(function(dataSourceId) {
+					return !!this.forms.find(function(form) { return form.id === dataSourceId; });
+				}.bind(this));
 
-			if (user.entities.length == 0 || user.dataSources.length == 0) {
+				if (user.entities.length == 0 || user.dataSources.length == 0) {
+					delete user.entities;
+					delete user.dataSources;
+					user.role = 'read';
+				}
+			}
+			else {
 				delete user.entities;
 				delete user.dataSources;
-				user.role = 'read';
 			}
 		};
 
