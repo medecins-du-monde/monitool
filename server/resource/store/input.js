@@ -65,11 +65,10 @@ class InputStore extends Store {
 		if (typeof projectId !== 'string')
 			return Promise.reject(new Error('missing_parameter'));
 
-		var view = 'inputs_by_project_form_date',
-			opt = {include_docs: true, startkey: [projectId], endkey: [projectId, {}]},
+		var opt = {include_docs: true, startkey: projectId + ':!', endkey: projectId + ':~'},
 			Input = this.modelClass;
 
-		return this._db.callView(view, opt).then(function(result) {
+		return this._db.callList(opt).then(function(result) {
 			return result.rows.map(row => new Input(row.doc));
 		});
 	}
