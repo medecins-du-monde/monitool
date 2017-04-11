@@ -240,6 +240,7 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		show_more_inputs: "See older dates",
 		all_elements: "All",
 		no_extra_indicators: "No extra indicator has been created yet. Click on \"Add indicator\" to create one!",
 		no_data_source: "<span style=\"font-style: italic\">Create data sources to allow for data input</span>",

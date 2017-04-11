@@ -240,6 +240,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		show_more_inputs: "Voir les dates précedentes",
 		all_elements: "Tout",
 		no_extra_indicators: "Aucune indicateur annexé n'a été créé. Cliquez sur \"Ajouter un indicateur\" pour en créer un!",
 		no_data_source: "<span style=\"font-style: italic\">Créez des sources de données pour pouvoir saisir</span>",

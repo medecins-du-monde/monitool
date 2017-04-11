@@ -240,6 +240,7 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		show_more_inputs: "Ver la fechas anteriores",
 		all_elements: "Todo",
 		no_extra_indicators: "Ningún indicador adicional ha sido creado. ¡Haga click en \"Añadir un indicador\" para agregar uno!",
 		no_data_source: "<span style=\"font-style: italic\">Cree una fuente de datos para poder hacer entradas</span>",

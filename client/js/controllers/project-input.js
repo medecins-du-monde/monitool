@@ -51,6 +51,14 @@ angular.module('monitool.controllers.project.input', [])
 			}
 		}
 
+		$scope.visibleStatus = Object.keys($scope.inputsStatus).slice(-10);
+		$scope.hiddenStatus = Object.keys($scope.inputsStatus).slice(0, -10);
+
+		$scope.showMore = function() {
+			$scope.visibleStatus = $scope.hiddenStatus.slice(-10).concat($scope.visibleStatus);
+			$scope.hiddenStatus.splice(-10, 10);
+		};
+
 		//////
 		// Free periodicity allow entering data as needed.
 		//////

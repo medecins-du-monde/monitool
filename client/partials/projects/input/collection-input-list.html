@@ -1,25 +1,28 @@
 <ol class="breadcrumb">
-	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li class="active" title="{{masterProject.name}}" ng-bind="masterProject.name|maxLength:50"></li>
-	<li class="active">{{form.name|maxLength:50}}</li>
+	<li ng-if="::(userCtx.type == 'user')"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{::masterProject.name}}" ng-bind="::masterProject.name|maxLength:50"></li>
+	<li class="active">{{::form.name|maxLength:50}}</li>
 </ol>
 
 <div class="alert alert-info" >
 
 	<div class="pull-right" style="text-align: right">
-		<a target="_blank" href="/resources/project/{{masterProject._id}}/data-source/{{form.id}}.pdf?orientation=portrait" class="btn btn-default pdf-export" style="margin-bottom: 5px; display: inline-block">
+		<a target="_blank"
+		   href="/resources/project/{{::masterProject._id}}/data-source/{{::form.id}}.pdf?orientation=portrait"
+		   class="btn btn-default pdf-export"
+		   style="margin-bottom: 5px; display: inline-block">
 			<i class="fa fa-file-pdf-o"></i>
 			<span translate="project.download_portrait"></span>
-		</a><br/><a target="_blank" href="/resources/project/{{masterProject._id}}/data-source/{{form.id}}.pdf?orientation=landscape" class="btn btn-default pdf-export">
+		</a><br/><a target="_blank" href="/resources/project/{{::masterProject._id}}/data-source/{{form.id}}.pdf?orientation=landscape" class="btn btn-default pdf-export">
 			<i class="fa fa-file-pdf-o fa-rotate-270"></i>
 			<span translate="project.download_landscape"></span>
 		</a>
 	</div>
 
-	<span translate="project.input_list_info" translate-values="{name: form.name}"></span>
+	<span translate="project.input_list_info" translate-values="::{name: form.name}"></span>
 </div>
 
-<legend>{{form.name}}</legend>
+<legend>{{::form.name}}</legend>
 
 <div id="input-list">
 
@@ -27,14 +30,17 @@
 		<table id="table1" class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
-					<th><div class="headerField"><div translate="shared.date"></div></div></th>
+					<th><div class="headerField" translate="shared.date"></div></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="(date, status) in inputsStatus">
-					<td title="{{date|formatSlotRange}}"><div class="bodyField">{{date|formatSlot}}</div></td>
+				<tr ng-show="hiddenStatus.length">
+					<td><div class="bodyField">&nbsp;</div></td>
 				</tr>
-				<tr ng-show="inputsStatus|isEmpty">
+				<tr ng-repeat="date in visibleStatus">
+					<td title="{{::date|formatSlotRange}}"><div class="bodyField">{{::date|formatSlot}}</div></td>
+				</tr>
+				<tr ng-hide="visibleStatus.length">
 					<td><div class="bodyField">&nbsp;</div></td>
 				</tr>
 			</tbody>
@@ -54,32 +60,37 @@
 		<table id="table2" class="table table-bordered table-stripped table-condensed">
 			<thead>
 				<tr>
-					<th ng-repeat="col in columns"><div class="headerField"><div>{{col.name|translate}}</div></div></th>
+					<th ng-repeat="col in ::columns"><div class="headerField"><div>{{::col.name}}</div></div></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="(date, status) in inputsStatus">
-					<td ng-repeat="col in columns">
+				<tr ng-show="hiddenStatus.length">
+					<td colspan="{{::columns.length}}">
 						<div class="bodyField">
-							<a class="btn btn-xs"
-							   ng-class="{'btn-default': status[col.id] === 'done', 'btn-primary': status[col.id] === 'expected', 'btn-danger': status[col.id] === 'outofschedule'}"
-							   ui-sref="main.project.input.edit({period: date, entityId: col.id})"
-							   ng-if="status[col.id]">
-								{{('project.input_status.' + status[col.id]) | translate}}
-							</a>
+							<a ng-click="showMore()" translate="project.show_more_inputs"></a>
 						</div>
 					</td>
 				</tr>
-
-				<tr ng-show="inputsStatus|isEmpty">
-					<td colspan="{{columns.length}}">
+				<tr ng-repeat="date in visibleStatus">
+					<td ng-repeat="col in ::columns">
+						<div class="bodyField">
+							<a class="btn btn-xs"
+							   ng-class="::{'btn-default': inputsStatus[date][col.id] === 'done', 'btn-primary': inputsStatus[date][col.id] === 'expected', 'btn-danger': inputsStatus[date][col.id] === 'outofschedule'}"
+							   ui-sref="main.project.input.edit({period: date, entityId: col.id})"
+							   ng-if="::inputsStatus[date][col.id]"
+							   translate="{{::('project.input_status.' + inputsStatus[date][col.id])}}"></a>
+						</div>
+					</td>
+				</tr>
+				<tr ng-hide="visibleStatus.length">
+					<td colspan="{{::columns.length}}">
 						<div class="bodyField" translate="project.no_inputs"></div>
 					</td>
 				</tr>
 			</tbody>
 			<tfoot ng-if="displayFooter">
 				<tr>
-					<td ng-repeat="col in columns">
+					<td ng-repeat="col in ::columns">
 						<div class="bodyField2">
 							<a class="btn btn-xs btn-success" ng-click="addInput(col.id)" translate="project.input_status.expected-new"></a>
 						</div>
