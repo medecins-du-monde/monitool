@@ -185,15 +185,8 @@ angular.module('monitool.directives.reporting', [])
 							var baseline = parseInt(colorization.baseline), target = parseInt(colorization.target);
 
 							// compute progress 
-							var progress = (value - baseline) / (target - baseline);
-
-							// and apply color to field
-							if (progress < .333)
-								element.css('background-color', '#F88');
-							else if (progress < .667)
-								element.css('background-color', '#FC6');
-							else
-								element.css('background-color', '#AFA');
+							var progress = Math.max(0, Math.min(1, (value - baseline) / (target - baseline)));
+							element.css('background-color', 'hsl(' + progress * 120 +  ', 100%, 75%)');
 						}
 						else
 							element.css('background-color', '');
