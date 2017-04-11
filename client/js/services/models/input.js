@@ -33,41 +33,31 @@ angular
 
 				inputsDone.forEach(function(inputId) {
 					var splitted      = inputId.split(':'),
-						projectId     = splitted[0],
 						inputEntityId = splitted[1],
-						formId        = splitted[2],
 						strPeriod     = splitted[3];
 
 					prj[strPeriod] = prj[strPeriod] || {};
 					prj[strPeriod][inputEntityId] = 'outofschedule';
 				});
 
-				if (form.periodicity === 'free') {
-					// we expect all dates and centers where we have @ least one input
-					for (var strPeriod in prj) {
-						form.entities.forEach(function(entityId) {
-							if (prj[strPeriod][entityId] == 'outofschedule')
-								prj[strPeriod][entityId] = 'done';
-							else
-								prj[strPeriod][entityId] = 'expected';
-						});
+				form.entities.forEach(function(entityId) {
+					var strPeriods;
+					if (form.periodicity === 'free')
+						strPeriods = Object.keys(prj);
+					else {
+						var entity = project.entities.find(function(entity) { return entity.id == entityId; });
+						strPeriods = InputSlots.getList(project, entity, form);
 					}
-				}
-				else {
-					// we expect only the dates that are specified with the periodicity.
-					form.entities.forEach(function(entityId) {
-						var inputEntity = project.entities.find(function(entity) { return entity.id == entityId; });
 
-						InputSlots.getList(project, inputEntity, form).forEach(function(strPeriod) {
-							prj[strPeriod] = prj[strPeriod] || {}
+					strPeriods.forEach(function(strPeriod) {
+						prj[strPeriod] = prj[strPeriod] || {};
 
-							if (prj[strPeriod][inputEntity.id] == 'outofschedule')
-								prj[strPeriod][inputEntity.id] = 'done';
-							else
-								prj[strPeriod][inputEntity.id] = 'expected';
-						});
+						if (prj[strPeriod][entityId] == 'outofschedule')
+							prj[strPeriod][entityId] = 'done';
+						else
+							prj[strPeriod][entityId] = 'expected';
 					});
-				}
+				});
 
 				// Sort periods alphabetically
 				var periods = Object.keys(prj);
