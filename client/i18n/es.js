@@ -240,6 +240,10 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		form_error: "Algunos campos del formulario no son validos, arreglelos para poder guardar.",
+		form_persisted: "Sus datos estan guardados.",
+		form_changed: "Ha realizado cambios. No olvide hacer click en Guardar.",
+
 		show_more_inputs: "Ver la fechas anteriores",
 		all_elements: "Todo",
 		no_extra_indicators: "Ningún indicador adicional ha sido creado. ¡Haga click en \"Añadir un indicador\" para agregar uno!",

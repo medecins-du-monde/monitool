@@ -240,6 +240,10 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		form_error: "Some fields are invalid in the form, fix them in order to save.",
+		form_persisted: "Your data is saved.",
+		form_changed: "You made changes. Don't forget to click on Save.",
+
 		show_more_inputs: "See older dates",
 		all_elements: "All",
 		no_extra_indicators: "No extra indicator has been created yet. Click on \"Add indicator\" to create one!",

@@ -2,6 +2,7 @@
 	<div ui-view></div>
 
 	<div class="noprint" style="margin-bottom: 20px">
+
 		<a ng-disabled="!projectSavable || projectSaveRunning" class="btn btn-primary" ng-click="save()">
 			<i class="fa fa-floppy-o" ng-if="!projectSaveRunning"></i>
 			<i class="fa fa-circle-o-notch fa-spin" ng-if="projectSaveRunning"></i>
@@ -13,5 +14,23 @@
 			<i class="fa fa-undo"></i>
 			<span translate="shared.remove_changes"></span>
 		</a>
+
+		<br/><br/>
+
+		<p class="text-danger" ng-if="formContainer.currentForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_error"></span>
+		</p>
+
+		<p class="text-info" ng-if="!projectChanged">
+			<i class="fa fa-info-circle"></i>
+			<span translate="project.form_persisted"></span>
+		</p>
+
+		<p class="text-warning" ng-if="projectChanged && formContainer.currentForm.$valid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_changed"></span>
+		</p>
+
 	</div>
 </div>

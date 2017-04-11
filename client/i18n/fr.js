@@ -240,6 +240,10 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		form_error: "Un ou plusieurs champs du formulaire sont en erreur, corrigez-les afin de pouvoir sauvegarder.",
+		form_persisted: "Vos données sont sauvegardées.",
+		form_changed: "Vous avez réalisé des changements. N'oubliez pas de cliquer sur sauvegarder.",
+
 		show_more_inputs: "Voir les dates précedentes",
 		all_elements: "Tout",
 		no_extra_indicators: "Aucune indicateur annexé n'a été créé. Cliquez sur \"Ajouter un indicateur\" pour en créer un!",
