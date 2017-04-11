@@ -43,11 +43,11 @@ angular
 
 			$scope.projectSavable = $scope.projectChanged;
 			if ($scope.formContainer.currentForm)
-				$scope.projectSavable = $scope.projectSavable && !$scope.formContainer.currentForm.$invalid;
+				$scope.projectSavable = $scope.projectSavable && $scope.formContainer.currentForm.$valid;
 		};
 
 		var projectWatch = $scope.$watch('editableProject', onProjectChange, true);
-		var formWatch = $scope.$watch('formContainer.currentForm', onProjectChange);
+		var formWatch = $scope.$watch('formContainer.currentForm.$valid', onProjectChange);
 
 		// Restore $scope.master to avoid unsaved changes from a given page to pollute changes to another one.
 		$scope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
