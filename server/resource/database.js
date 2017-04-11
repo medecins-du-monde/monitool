@@ -88,7 +88,7 @@ class Database {
 				nextMigration = require('./migrations/migration-' + versionDoc.version);
 			}
 			catch (e) {
-				winston.log('info', '[Database] No more migrations. Current version is ', versionDoc.version);
+				winston.log('info', '[Database] No more migrations. Current version is ' + versionDoc.version);
 				return;
 			}
 
