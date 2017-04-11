@@ -309,7 +309,7 @@ module.exports = express.Router()
 	/**
 	 * Delete an indicator, theme or user (need to be admin).
 	 */
-	.delete('/:modelName(indicator|input|theme)/:id', bodyParser, function(request, response) {
+	.delete('/:modelName(indicator|theme)/:id', bodyParser, function(request, response) {
 		// Only admin accounts can touch indicators, themes and users.
 		if (request.user.role !== 'admin')
 			return response.jsonError(new Error('forbidden'));
