@@ -47,6 +47,7 @@
     "express-session": "x",
     "is-my-json-valid": "x",
     "jade": "x",
+    "memory-cache": "^0.1.6",
     "nano": "x",
     "oauth2orize": "x",
     "passport": "x",

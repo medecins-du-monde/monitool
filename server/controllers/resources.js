@@ -18,6 +18,7 @@
 "use strict";
 
 var express     = require('express'),
+	cache       = require('memory-cache'),
 	User        = require('../resource/model/user'),
 	Indicator   = require('../resource/model/indicator'),
 	Input       = require('../resource/model/input'),
@@ -111,6 +112,8 @@ module.exports = express.Router()
 				}
 			)
 			.then(function() {
+				cache.del('reporting:project:' + request.params.id);
+
 				return new Project(request.body).save();
 			})
 			.then(p => p.toAPI())
@@ -131,6 +134,8 @@ module.exports = express.Router()
 				// Ask the project if it is deletable.
 				if (project.getRole(request.user) !== 'owner')
 					throw new Error("forbidden");
+
+				cache.del('reporting:project:' + request.params.id);
 
 				return project.destroy();
 			})
@@ -221,6 +226,8 @@ module.exports = express.Router()
 				if (!allowed)
 					throw new Error('forbidden');
 
+				cache.del('reporting:project:' + input.project);
+
 				return input.save();
 			})
 			.then(response.jsonPB)
@@ -252,6 +259,8 @@ module.exports = express.Router()
 
 				if (!allowed)
 					throw new Error('forbidden');
+
+				cache.del('reporting:project:' + input.project);
 
 				return input.destroy();
 			})

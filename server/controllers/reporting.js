@@ -17,9 +17,10 @@
 
 "use strict";
 
-var express = require('express'),
-	Input   = require('../resource/model/input'),
-	Project = require('../resource/model/project'),
+var express        = require('express'),
+	cache          = require('memory-cache'),
+	Input          = require('../resource/model/input'),
+	Project        = require('../resource/model/project'),
 	CubeCollection = require('../olap/cube-collection');
 
 module.exports = express.Router()
@@ -31,20 +32,34 @@ module.exports = express.Router()
 		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
 
-		Promise
-			.all([
-				Project.storeInstance.get(request.params.id),
-				Input.storeInstance.listByProject(request.params.id)
-			])
-			.then(function(results) {
-				response.json({
-					error: false,
-					type: 'cubes',
-					projectId: results[0]._id,
-					cubes: CubeCollection.fromProject(results[0], results[1]).serialize()
-				});
-			})
-			.catch(response.jsonErrorPB);
+		var cacheKey = 'reporting:project:' + request.params.id,
+			reporting = cache.get(cacheKey);
+
+		if (reporting) {
+			response.header('Content-Type', 'application/json');
+			response.end(reporting);
+		}
+		else {
+			Promise
+				.all([
+					Project.storeInstance.get(request.params.id),
+					Input.storeInstance.listByProject(request.params.id)
+				])
+				.then(function(results) {
+					var reporting = JSON.stringify({
+						error: false,
+						type: 'cubes',
+						projectId: results[0]._id,
+						cubes: CubeCollection.fromProject(results[0], results[1]).serialize()
+					});
+
+					cache.put(cacheKey, reporting, 24 * 3600 * 1000);
+
+					response.header('Content-Type', 'application/json');
+					response.end(reporting);
+				})
+				.catch(response.jsonErrorPB);
+		}
 	})
 
 	/**
