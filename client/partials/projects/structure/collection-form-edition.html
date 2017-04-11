@@ -12,6 +12,7 @@
 <form class="form-horizontal" role="form" name="dataSourceForm" novalidate>
 	<legend translate="project.collection_form_planning"></legend>
 	
+	<!-- [name] -->
 	<div class="form-group" show-errors>
 		<label for="input-name" class="col-sm-2 control-label" translate="shared.name"></label>
 		<div class="col-sm-10">
@@ -31,24 +32,23 @@
 			<!-- <p class="help-block" ng-if="dataSourceForm.name.$error.required" translate="form.mandatory"></p> -->
 		</div>
 	</div>
+	<!-- [/name] -->
 
+	<!-- [collection sites] -->
 	<div class="form-group">
 		<label for="collect-input" class="col-sm-2 control-label" translate="project.collection_site_list"></label>
 		<div class="col-sm-10">
 			<element-filter ng-model="editableProject.forms[currentFormIndex].entities" elements="editableProject.entities" groups="editableProject.groups"></element-filter>
-		</div>
-	</div>
 
-	<div class="row" style="margin-top: -10px; margin-bottom: 10px;">
-		<div class="col-sm-2"></div>
-		<div class="col-sm-10">
 			<span class="help-block">
 				<i class="fa fa-info-circle"></i>
 				{{'project.collection_edit_help_sites'|translate}}
 			</span>
 		</div>
 	</div>
+	<!-- [/collection sites] -->
 
+	<!-- [Periodicity] -->
 	<div class="form-group">
 		<label for="periodicity-input" class="col-sm-2 control-label" translate="project.periodicity"></label>
 		<div class="col-sm-10">
@@ -70,7 +70,9 @@
 			</span>
 		</div>
 	</div>
+	<!-- [/Periodicity] -->
 
+	<!-- [Specific dates] -->
 	<div class="form-group" ng-if="editableProject.forms[currentFormIndex].periodicity !== 'free'">
 		<label for="periodicity" class="col-sm-2 control-label" translate="project.specific_start"></label>
 		<div class="col-sm-10">
@@ -94,9 +96,11 @@
 			</span>
 		</div>
 	</div>
+	<!-- [/Specific dates] -->
 
 	<legend translate="project.collection_form_structure"></legend>
 
+	<!-- [Variables] -->
 	<div ng-if="editableProject.forms[currentFormIndex].elements.length === 0" translate="project.no_variable"></div>
 
 	<div ng-sortable="{handle: '.variable-handle'}">
@@ -120,11 +124,11 @@
 				</div>
 			</div>
 
-			<div class="panel-body" ng-show="container.visibleElement==element.id">
+			<div class="panel-body" ng-show="container.visibleElement==element.id" ng-form="variableForm">
 				<div class="form-group">
 					<label class="col-sm-2 control-label" translate="project.variable_name_label"></label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" ng-model="element.name" placeholder="{{'project.variable_name_ph'|translate}}" required name="{{element.id}}-name">
+						<input type="text" class="form-control" ng-model="element.name" placeholder="{{'project.variable_name_ph'|translate}}" required name="variablename">
 
 						<span class="help-block">
 							<i class="fa fa-info-circle"></i>
@@ -136,7 +140,7 @@
 				<div class="form-group">
 					<label for="site-agg-select" class="col-sm-2 control-label" translate="project.site_agg_label"></label>
 					<div class="col-sm-10 form-control-static">
-						<select if="site-agg-select" class="form-control" ng-model="element.geoAgg">
+						<select if="site-agg-select" class="form-control" ng-model="element.geoAgg" name="geoAgg">
 							<option value="sum" translate="project.aggregation.sum"></option>
 							<option value="average" translate="project.aggregation.average"></option>
 							<option value="highest" translate="project.aggregation.highest"></option>
@@ -154,7 +158,7 @@
 				<div class="form-group">
 					<label for="time-agg-select" class="col-sm-2 control-label" translate="project.time_agg_label"></label>
 					<div class="col-sm-10 form-control-static">
-						<select id="time-agg-select" class="form-control" ng-model="element.timeAgg">
+						<select id="time-agg-select" class="form-control" ng-model="element.timeAgg" name="timeAgg">
 							<option value="sum" translate="project.aggregation.sum"></option>
 							<option value="average" translate="project.aggregation.average"></option>
 							<option value="highest" translate="project.aggregation.highest"></option>
@@ -228,6 +232,8 @@
 			</div>
 		</div>
 	</div>
+	<!-- [/Variables] -->
+
 
 	<a class="btn btn-default" ng-click="newVariable()">
 		<i class="fa fa-plus"></i>
