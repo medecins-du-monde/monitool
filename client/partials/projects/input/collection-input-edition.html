@@ -62,7 +62,7 @@
 			<span translate="project.form_error"></span>
 		</p>
 
-		<p class="text-info" ng-if="isUnchanged()">
+		<p class="text-info" ng-if="!isNew && isUnchanged()">
 			<i class="fa fa-info-circle"></i>
 			<span translate="project.form_persisted"></span>
 		</p>

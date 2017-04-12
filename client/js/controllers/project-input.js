@@ -74,7 +74,7 @@ angular.module('monitool.controllers.project.input', [])
 	})
 
 	.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, $stateParams, inputs) {
-		$scope.form = $scope.masterProject.forms.find(function(f) { return f.id == $stateParams.formId; });
+		$scope.form          = $scope.masterProject.forms.find(function(f) { return f.id == $stateParams.formId; });
 		$scope.isNew         = inputs.isNew;
 		$scope.currentInput  = inputs.current;
 		$scope.lastInput     = inputs.previous;
@@ -108,7 +108,7 @@ angular.module('monitool.controllers.project.input', [])
 						return false;
 			}
 			return true;
-		}
+		};
 
 		$scope.delete = function() {
 			var easy_question = $filter('translate')('project.delete_input');
