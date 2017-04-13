@@ -28,16 +28,6 @@
 							<span translate="project.collection_site_list"></span>
 						</a>
 
-						<a ui-sref="main.project.structure.user_list"
-						   ui-sref-active="active"
-						   class="list-group-item"
-						   disable-if="!masterProject._rev">
-
-						   <span class="label label-default pull-right">{{masterProject.users.length}}</span>
-							<i class="fa fa-user fa-fw"></i>
-							<span translate="project.users"></span>
-						</a>
-
 						<a ui-sref="main.project.structure.collection_form_list"
 						   class="list-group-item"
 						   ng-class="{active: $state.is('main.project.structure.collection_form_list') || $state.is('main.project.structure.collection_form_edition')}"
@@ -76,7 +66,17 @@
 							<span class="label label-default pull-right">{{masterProject.extraIndicators.length}}</span>
 							<i class="fa fa-sign-out fa-fw"></i>
 							<span translate="indicator.extra"></span>
-						</a>						
+						</a>
+
+						<a ui-sref="main.project.structure.user_list"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!masterProject._rev">
+
+						   <span class="label label-default pull-right">{{masterProject.users.length}}</span>
+							<i class="fa fa-user fa-fw"></i>
+							<span translate="project.users"></span>
+						</a>
 					</div>
 				</div>
 			</div>
