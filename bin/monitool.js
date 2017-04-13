@@ -7,11 +7,18 @@ var express      = require('express'),
 	cookieParser = require('cookie-parser'),
 	session      = require('express-session'),
 	path         = require('path'),
+	database     = require('../server/resource/database'),
 	passport     = require('../server/authentication/passport'),
 	sessionStore = require('../server/authentication/session-store'),
 	config       = require('../server/config');
 
-express()
+// Catch the uncaught errors that weren't wrapped in a domain or try catch statement
+process.on('uncaughtException', function(err) {
+	// This should absolutely never be called, as we handle all errors insides promises.
+	console.log(err.stack)
+});
+
+let application = express()
 	.disable('x-powered-by')
 
 	// By default users should never cache anything.
@@ -49,10 +56,14 @@ express()
 	.use('/resources', require('../server/controllers/resources'))	// REST JSON API
 	.use('/reporting', require('../server/controllers/reporting'))	// Reporting API
 	
-	.listen(config.port);
+	
 
-// Catch the uncaught errors that weren't wrapped in a domain or try catch statement
-process.on('uncaughtException', function(err) {
-	// This should absolutely never be called, as we handle all errors insides promises.
-	console.log(err.stack)
-});
+database.prepare().then(
+	function() {
+		application.listen(config.port);
+	},
+	function(error) {
+		winston.log('error', 'Could not start database: ' + error.message);
+		process.exit(1);
+	}
+);

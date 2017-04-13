@@ -210,9 +210,3 @@ class Database {
 var database = new Database(config.couchdb);
 
 module.exports = database;
-
-database.prepare().catch(function(error) {
-	winston.log('error', 'Could not start database: ' + error.message);
-	process.exit(1);
-});
-
