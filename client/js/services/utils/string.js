@@ -17,7 +17,13 @@
 
 "use strict";
 
-angular.module('monitool.services.utils.string', [])
+angular
+	.module('monitool.services.utils.string', [])
+
+	/**
+	 * This service allows to remove diacritrics from any string.
+	 * It is used as a last resort hack when generating Excel files, because there was no way no specify encoding.
+	 */
 	.factory('mtRemoveDiacritics', function() {
 
 		// http://stackoverflow.com/questions/990904/javascript-remove-accents-diacritics-in-strings

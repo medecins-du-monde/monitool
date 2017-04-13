@@ -217,7 +217,6 @@ angular.module('monitool.directives.formControls', [])
 					scope.size = width + ' x ' + height;
 				};
 
-
 				// we should only watch partitions.length, partitions[*].id and partitions[*].name
 				// but that will do it.
 				// however it's a bit overkill (will reset partitin order when we change an element name)
@@ -273,12 +272,12 @@ angular.module('monitool.directives.formControls', [])
 						var oldIndex = before.indexOf(after[changedIndex]);
 
 						scope.orderedPartitions[oldIndex] = before[changedIndex];
-
 					}
-						// tell ngModelController that the viewValue changed
-						ngModelController.$setViewValue(scope.orderedPartitions.slice());
 
-						updateSize();
+					// tell ngModelController that the viewValue changed
+					ngModelController.$setViewValue(scope.orderedPartitions.slice());
+
+					updateSize();
 				});
 
 				// To render the ngModelController, we just pass the orderedPartitions to the scope.
@@ -287,31 +286,16 @@ angular.module('monitool.directives.formControls', [])
 				};
 
 				ngModelController.$parsers.push(function(viewValue) {
-					// FIXME bruteforcing this instead of doing proper math is O(scary)
-					// It *should* be fast enough in practice as we have never seen more than 5 partitions (5! = 120 permutations)
-					// Will be slow with 6 partitions, most likely broken with 7.
-					var numPermutations = Math.factorial(scope.partitions.length);
-
-					for (var permutationId = 0; permutationId < numPermutations; ++permutationId) {
-						var permutation = itertools.computeNthPermutation(scope.partitions.length, permutationId);
-
-						// compare array
-						for (var i = 0; i < scope.partitions.length; ++i)
-							if (permutation[i] !== scope.partitions.indexOf(scope.orderedPartitions[i]))
-								break;
-
-						// we have a match
-						if (i == scope.partitions.length)
-							return permutationId;
-					}
-
-					throw new Exception('Permutation was not found. Should not happen.');
+					return itertools.computePermutationIndex(
+						scope.orderedPartitions.map(function(partition) {
+							return scope.partitions.indexOf(partition);
+						})
+					);
 				});
 
 				ngModelController.$formatters.push(function(modelValue) {
-					var permutation = itertools.computeNthPermutation(scope.partitions.length, modelValue);
-
-					return permutation.map(function(index) { return scope.partitions[index]; });
+					return itertools.computeNthPermutation(scope.partitions.length, modelValue)
+									.map(function(index) { return scope.partitions[index]; });
 				});
 			}
 		};

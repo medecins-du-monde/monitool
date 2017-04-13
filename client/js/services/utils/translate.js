@@ -20,6 +20,17 @@
 angular
 	.module('monitool.services.utils.translate', [])
 
+	/**
+	 * This service allows calling the google translate API to translate strings.
+	 * A valid API key should be included in the config.json file for the service to work.
+	 *
+	 * @example
+	 * googleTranslation.translate('Hello', 'fr', 'en') == 'bonjour'
+	 * googleTranslation.translate('Hello', 'es', 'en') == 'buenos dias'
+	 *
+	 * // google translate can guess source language.
+	 * googleTranslation.translate('Hello', 'fr') == 'bonjour'
+	 */
 	.service('googleTranslation', function($http) {
 		var CONFIG = {
 			url: 'https://www.googleapis.com/language/translate/v2',
