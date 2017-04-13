@@ -16,22 +16,22 @@
   ],
   "dependencies": {
     "angular": "~1.5.8",
-    "angular-resource": "~1.5.8",
-    "angular-cookies": "~1.5.8",
-    "Sortable": "~1.4.2",
-    "angular-translate": "~2.11.1",
     "angular-bootstrap": "~2.0.2",
+    "angular-cookies": "~1.5.8",
+    "angular-i18n": "~1.5.8",
+    "angular-mocks": "~1.5.8",
+    "angular-resource": "~1.5.8",
+    "angular-translate": "~2.11.1",
+    "angular-translate-storage-local": "~2.11.1",
     "angular-ui-router": "~0.3.1",
     "angular-ui-select": "~0.19.1",
-    "angular-translate-storage-local": "~2.11.1",
+    "blob": "master",
     "bootstrap-css-only": "~3.3.6",
     "c3": "~0.4.11",
-    "handsontable": "~0.26.1",
-    "font-awesome": "~4.6.3",
-    "angular-i18n": "~1.5.8",
     "canvas-to-Blob.js": "master",
     "file-saver": "master",
-    "blob": "master",
-    "angular-mocks": "~1.5.8"
+    "font-awesome": "~4.6.3",
+    "handsontable": "~0.26.1",
+    "Sortable": "~1.4.2"
   }
 }
