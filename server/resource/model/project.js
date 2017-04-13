@@ -154,14 +154,29 @@ class Project extends DbModel {
 
 		// Get all forms that were deleted.
 		oldProject.forms.forEach(function(oldForm) {
-			if (!oldProject.getDataSourceById(oldForm.id))
+			if (!this.getDataSourceById(oldForm.id))
 				changedFormsIds.push(oldForm.id);
-		});
+		}, this);
 
-		var promises = changedFormsIds.map(dataSourceId => Input.storeInstance.listByDataSource(this._id, dataSourceId));
+		// Get all entities that were deleted
+		var deletedEntitiesIds = oldProject.entities.filter(function(entity) {
+			return this.entities.find(e => e.id === entity.id);
+		}).map(entity => entity.id);
 
-		return Promise.all(promises).then(function(inputs) {
-			inputs = inputs.reduce((m, e) => m.concat(e), []);
+		var promises =
+			changedFormsIds.map(dsId => Input.storeInstance.listByDataSource(this._id, dsId))
+			.concat(deletedEntitiesIds.map(eId => Input.storeInstance.listByEntity(this._id, eId)));
+
+		return Promise.all(promises).then(function(result) {
+			let inputsById = {};
+
+			result.forEach(function(inputs) {
+				inputs.forEach(function(input) {
+					inputsById[input._id] = input;
+				});
+			});
+			
+			let inputs = Object.values(inputsById);
 			inputs.forEach(input => input.update(oldProject, this));
 			return inputs;
 		}.bind(this));

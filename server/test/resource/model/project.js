@@ -17,6 +17,37 @@
 
 "use strict";
 
-var assert  = require('assert'),
-	Project = require('../../../resource/model/project');
+require('../../mock-database');
+
+
+let assert    = require('assert'),
+	mockCouch = require('../../mock-database'),
+	Project   = require('../../../resource/model/project');
+
+describe('Project', function() {
+
+	beforeEach(function() {
+		mockCouch.addDoc('monitool', require('../../data/project.json'));
+		mockCouch.addDoc('monitool', require('../../data/input.json'));
+	});
+
+	it('should fail to load', function(done) {
+		Project.storeInstance.get('8dccaa8a-425a-4a60-b7ca-ccf623b0b27d')
+			.then(function() { throw new Error(); })
+			.catch(function() { done(); })
+	});
+
+	it('should load', function() {
+		return Project.storeInstance.get('624c94fa-9ebc-4f8b-8389-f5959149a0a7');
+	});
+
+	it('should delete input if entity is deleted', function(done) {
+
+
+		
+	});
+
+
+
+});
 

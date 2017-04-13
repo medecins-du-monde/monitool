@@ -1,0 +1,79 @@
+{
+	"_id": "624c94fa-9ebc-4f8b-8389-f5959149a0a7",
+	"type": "project",
+	"country": "testCountry",
+	"name": "testProject",
+	"start": "2010-01-01",
+	"end": "2014-01-01",
+	"entities": [
+		{"id": "0c243e08-8c21-4946-9f5f-ce255106901b", "name": "location1"}
+	],
+	"groups": [],
+	"users": [],
+	"themes": [],
+	"logicalFrames": [],
+	"crossCutting": {},
+	"extraIndicators": [],
+	"forms": [
+		{
+			"id": "8a7980f8-0e47-49bb-bf54-fdbe2013e3ea",
+			"name": "whatever",
+			"periodicity": "month",
+			"entities": ["0c243e08-8c21-4946-9f5f-ce255106901b"],
+			"start": null,
+			"end": null,
+			"elements": [
+				{
+					"id": "c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce",
+					"name": "whatever",
+					"timeAgg": "sum",
+					"geoAgg": "sum",
+					"order": 0,
+					"distribution": 0,
+					"partitions": [
+						{
+							"id": "a7623d67-6cf0-42eb-b5b5-1d8c8dada396",
+							"name": "whatever",
+							"elements": [
+								{"id": "da93cae1-9d79-413e-ae31-da25fe57cb47", "name": "whatever"},
+								{"id": "bcda5c13-6b48-4a4c-82a9-21947b51459d", "name": "whatever2"}
+							],
+							"groups": [],
+							"aggregation": "sum"
+						},
+						{
+							"id": "104b93c3-8d50-43b5-b149-4bf8d80a850a",
+							"name": "whatever",
+							"elements": [
+								{"id": "26ca342c-f119-429a-9e11-0ef82f541376", "name": "whatever"},
+								{"id": "8e568d78-e844-4563-9ff8-ecab5af06b31", "name": "whatever2"},
+								{"id": "39ded232-3801-4745-ab7a-04e29371c0d5", "name": "whatever3"}
+							],
+							"groups": [],
+							"aggregation": "sum"
+						},
+						{
+							"id": "53ef3c3e-5dfc-411a-9c0f-4df7e52b6bc9",
+							"name": "whatever",
+							"elements": [
+								{"id": "e33904be-4c43-4e58-a3cb-45d272212cd5", "name": "whatever"},
+								{"id": "c71bd1cb-1acd-4b7b-9933-4aebdbe4be4f", "name": "whatever"}
+							],
+							"groups": [],
+							"aggregation": "sum"
+						}
+					]
+				},
+				{
+					"id": "a83cda13-fbc7-477d-b158-33077a243c81",
+					"name": "whatever",
+					"timeAgg": "sum",
+					"geoAgg": "sum",
+					"order": 0,
+					"distribution": 0,
+					"partitions": []
+				}
+			]
+		}
+	]
+}

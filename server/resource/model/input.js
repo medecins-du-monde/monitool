@@ -18,6 +18,9 @@
 "use strict";
 
 var validator  = require('is-my-json-valid'),
+	Cube       = require('../../olap/cube'),
+	Variable   = require('./variable'),
+	Dimension  = require('../../olap/dimension'),
 	TimeSlot   = require('../../olap/time-slot'),
 	InputStore = require('../store/input'),
 	DbModel    = require('./db-model'),
@@ -55,41 +58,66 @@ class Input extends DbModel {
 	 */
 	_computeUpdatedValuesKey(oldVariable, newVariable) {
 		// Result will be an array of size numValues
-		var oldValues = this.values[newVariable.id],
+		let oldValues = this.values[newVariable.id],
 			newValues = new Array(newVariable.numValues);
 
 		// If the variable did not exist before, fill with zeros.
 		if (!oldVariable) {
-			for (var fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex)
+			for (let fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex)
 				newValues[fieldIndex] = 0;
 		}
 		// If the variable changed, recompute.
 		else {
-			var decodedValues = {};
-
-			// FIXME This is O(scary)
-			// Compute all possibles partitions sums for this field.
-			oldValues.forEach(function(field, fieldIndex) {
-				// Which partition does this field correspond to?
-				var peIds = oldVariable.computePartitionElementIds(fieldIndex).sort();
-
-				var numSubsets = Math.pow(2, peIds.length);
-				for (var subsetIndex = 0; subsetIndex < numSubsets; ++subsetIndex) {
-					var subsetKey = peIds.filter((id, index) => subsetIndex & (1 << index)).join('.');
-
-					// FIXME this assumes that we sum data which is not always the case.
-					if (decodedValues[subsetKey] == undefined)
-						decodedValues[subsetKey] = 0;
-					decodedValues[subsetKey] += field || 0;
-				}
+			// Search for new partitions.
+			var newPartitions = newVariable.partitions.filter(function(nvp) {
+				return !oldVariable.partitions.find(ovp => ovp.id === nvp.id);
 			});
 
-			// Fill it using same magic as before.
-			for (var fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex) {
-				// now that we have our index and value, we have to guess from which partition elements
-				// they come from.
-				var key = newVariable.computePartitionElementIds(fieldIndex).sort().join('.');
-				newValues[fieldIndex] = decodedValues[key] || 0;
+			// partitions were created, let's handle this first.
+			if (newPartitions.length) {
+				// we create an intermediary variable with the new partitions.
+				oldVariable = new Variable(JSON.parse(JSON.stringify(oldVariable)));
+				oldValues = oldValues.slice();
+
+				newPartitions.forEach(function(newPartition) {
+					oldVariable.partitions.unshift(newPartition);
+					
+					let newLength = oldValues.length * newPartition.elements.length;
+					while (oldValues.length < newLength)
+						oldValues.push(0);
+				});
+			}
+			else {
+				// nothing in this case.
+				// - Partition removal, or partition element removal will be handled
+				//   natively by the cube.
+				// - partition element add will be detected by catching exception when
+				//   querying the cube.
+			}
+
+			// Create an olap cube from the old values.
+			let dimensions = oldVariable.partitions.map(p => Dimension.createPartition(p)),
+				cube = new Cube(oldVariable.id, dimensions, [], oldValues);
+
+			// Fill the new values from the cube.
+			for (let fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex) {
+				// Build a filter targeting this specific value.
+				let peIds = newVariable.computePartitionElementIds(fieldIndex),
+					filter = {};
+
+				for (let i = 0; i < newVariable.partitions.length; ++i)
+					filter[newVariable.partitions[i].id] = [peIds[i]];
+
+				// Try to retrieve the value from the cube.
+				try {
+					newValues[fieldIndex] = cube.query([], filter);
+				}
+
+				// The cube raised an error, this means that we asked for an inexistent
+				// partitionElementId in the cube (which is made from former data).
+				catch (e) {
+					newValues[fieldIndex] = 0;
+				}
 			}
 		}
 
@@ -124,6 +152,8 @@ class Input extends DbModel {
 			// Update only values that changed.
 			if (!oldVariable || oldVariable.signature !== newVariable.signature)
 				newInputValues[newVariable.id] = this._computeUpdatedValuesKey(oldVariable, newVariable);
+			else
+				newInputValues[newVariable.id] = this.values[newVariable.id];
 		}, this);
 
 		this.values = newInputValues;

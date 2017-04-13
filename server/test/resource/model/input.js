@@ -17,503 +17,227 @@
 
 "use strict";
 
-let assert = require('assert'),
-	Project = require('../../../resource/model/project'),
-	Input  = require('../../../resource/model/input');
+require('../../mock-database');
+
+let assert     = require('assert'),
+	Project    = require('../../../resource/model/project'),
+	DataSource = require('../../../resource/model/data-source'),
+	Variable   = require('../../../resource/model/variable'),
+	Input      = require('../../../resource/model/input');
 
 
+describe("Input", function() {
 
+	describe('update', function() {
+		let oldProject, newProject, oldInput, input;
 
-// var oldForm = ;
-
-describe("Input migration", function() {
-	let formerProject;
-	let newProject, input;
-
-
-	before(function() {
-		formerProject = new Project({
-			_id: "624c94fa-9ebc-4f8b-8389-f5959149a0a7",
-			type: "project",
-			country: "testCountry",
-			name: "testProject",
-			start: "2010-01-01",
-			end: "2014-01-01",
-			entities: [
-				{id: "0c243e08-8c21-4946-9f5f-ce255106901b", name: "location1"}
-			],
-			groups: [],
-			users: [],
-			themes: [],
-			logicalFrames: [],
-			crossCutting: {},
-			extraIndicators: [],
-			forms: [
-				{
-					id: "8a7980f8-0e47-49bb-bf54-fdbe2013e3ea",
-					name: "whatever",
-					periodicity: "month",
-					entities: ["0c243e08-8c21-4946-9f5f-ce255106901b"],
-					start: null,
-					end: null,
-					elements: [
-						{
-							id: "c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce",
-							name: "whatever",
-							timeAgg: "sum",
-							geoAgg: "sum",
-							order: 0,
-							distribution: 0,
-							partitions: [
-								{
-									id: "a7623d67-6cf0-42eb-b5b5-1d8c8dada396",
-									name: "whatever",
-									elements: [
-										{id: 'bcda5c13-6b48-4a4c-82a9-21947b51459d', name: "whatever"},
-										{id: 'bcda5c13-6b48-4a4c-82a9-21947b51459d', name: "whatever2"}
-									],
-									groups: [],
-									aggregation: 'sum'
-								},
-								{
-									id: "104b93c3-8d50-43b5-b149-4bf8d80a850a",
-									name: "whatever",
-									elements: [
-										{id: '26ca342c-f119-429a-9e11-0ef82f541376', name: "whatever"},
-										{id: '8e568d78-e844-4563-9ff8-ecab5af06b31', name: "whatever2"},
-										{id: '39ded232-3801-4745-ab7a-04e29371c0d5', name: "whatever3"}
-									],
-									groups: [],
-									aggregation: 'sum'
-								},
-								{
-									id: "53ef3c3e-5dfc-411a-9c0f-4df7e52b6bc9",
-									name: "whatever",
-									elements: [
-										{id: 'e33904be-4c43-4e58-a3cb-45d272212cd5', name: "whatever"},
-										{id: 'c71bd1cb-1acd-4b7b-9933-4aebdbe4be4f', name: "whatever"}
-									],
-									groups: [],
-									aggregation: 'average'
-								}
-							]
-						},
-						{
-							id: "a83cda13-fbc7-477d-b158-33077a243c81",
-							name: "whatever",
-							timeAgg: "sum",
-							geoAgg: "sum",
-							order: 0,
-							distribution: 0,
-							partitions: []
-						}
-					]
-				}
-			]
+		before("create project and input", function() {
+			oldProject = new Project(require('../../data/project.json'));
+			oldInput = new Input(require('../../data/input.json'));
 		});
-	});
 
-	beforeEach(function() {
-		newProject = formerProject.clone();
-		input = formerInput.clone();
-	});
-
-	describe('start_replace', function() {
 		beforeEach(function() {
-
+			newProject = new Project(JSON.parse(JSON.stringify(oldProject)));
+			input = new Input(JSON.parse(JSON.stringify(oldInput)));
 		});
 
-		it('', function() {
-
+		it('no change', function() {
+			assert.equal(false, input.update(oldProject, newProject));
 		});
 
+		it('remove form', function() {
+			newProject.forms.splice(0, 1);
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.equal(input._deleted, true);
+		});
+
+		it('adding a simple variable shoud add one zero', function() {
+			newProject.forms[0].elements.push(new Variable({
+				id: '03ca15e3-6dab-438a-bbb0-40a673df547e',
+				name: "newVariable",
+				timeAgg: 'sum', geoAgg: 'sum', order: 0, distribution: 0, partitions: []
+			}));
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1],
+				'03ca15e3-6dab-438a-bbb0-40a673df547e': [0]
+			});
+		});
+
+		it('adding a variable with a partition shoud add two zeros', function() {
+			newProject.forms[0].elements.push(new Variable({
+				id: '03ca15e3-6dab-438a-bbb0-40a673df547e',
+				name: "newVariable",
+				timeAgg: 'sum', geoAgg: 'sum', order: 0, distribution: 0,
+				partitions: [
+					{
+						id: "b0c9849f-c1ae-437d-ba93-2d52879455a1",
+						name: "whatever",
+						elements: [
+							{id: '7fa4cf21-a350-4a85-a095-941392201a9e', name: "whatever"},
+							{id: '0391baaa-4e2e-4d3f-a85d-4bf03b6f26a4', name: "whatever2"}
+						],
+						groups: [],
+						aggregation: 'sum'
+					}
+				]
+			}));
+
+			assert.equal(true, input.update(oldProject, newProject));
+
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1],
+				'03ca15e3-6dab-438a-bbb0-40a673df547e': [0, 0]
+			});
+		});
+
+		it('removing a variable shoud remove the entry', function() {
+			newProject.forms[0].elements.splice(0, 1);
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		});
+
+		it('removing another variable shoud remove the entry', function() {
+			newProject.forms[0].elements.splice(1, 1);
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+			});
+		});
+
+		it('adding a partition at the back should move all data to the first element of that partition', function() {
+			newProject.forms[0].elements[0].partitions.push({
+				id: "b0c9849f-c1ae-437d-ba93-2d52879455a1",
+				name: "whatever",
+				elements: [
+					{id: '7fa4cf21-a350-4a85-a095-941392201a9e', name: "whatever"},
+					{id: '0391baaa-4e2e-4d3f-a85d-4bf03b6f26a4', name: "whatever2"}
+				],
+				groups: [],
+				aggregation: 'sum'
+			});
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [
+					1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 0, 12, 0
+				],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		});
+
+		it('adding a partition in front should move all data to the first element of that partition', function() {
+			newProject.forms[0].elements[0].partitions.unshift({
+				id: "b0c9849f-c1ae-437d-ba93-2d52879455a1",
+				name: "whatever",
+				elements: [
+					{id: '7fa4cf21-a350-4a85-a095-941392201a9e', name: "whatever"},
+					{id: '0391baaa-4e2e-4d3f-a85d-4bf03b6f26a4', name: "whatever2"}
+				],
+				groups: [],
+				aggregation: 'sum'
+			});
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [
+					1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+				],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		});
+
+		it('adding a partition elements on the beginning of first partition should update the data', function() {
+			newProject.forms[0].elements[0].partitions[0].elements.push({
+				'id': '717a2728-c82c-426a-9198-88bd54821f0d',
+				'name': 'newElement'
+			});
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [
+					1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0, 0, 0, 0, 0, 0
+				],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		})
+
+		it('adding a partition elements on the middle first partition should update the data', function() {
+			newProject.forms[0].elements[0].partitions[0].elements.splice(1, 0, {
+				'id': '717a2728-c82c-426a-9198-88bd54821f0d',
+				'name': 'newElement'
+			});
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [
+					1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 7, 8, 9, 10, 11, 12
+				],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		});
+
+		it('adding a partition elements on the middle of the second partition should update the data', function() {
+			newProject.forms[0].elements[0].partitions[1].elements.splice(1, 0, {
+				'id': '717a2728-c82c-426a-9198-88bd54821f0d',
+				'name': 'newElement'
+			});
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [
+					1, 2, 0, 0, 3, 4, 5, 6, 7, 8, 0, 0, 9, 10, 11, 12
+				],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		});
+
+		it('removing a partition element 1', function() {
+			newProject.forms[0].elements[0].partitions[0].elements.splice(0, 1);
+
+			assert.equal(true, input.update(oldProject, newProject));
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [
+					7, 8, 9, 10, 11, 12
+				],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		});
+
+		it('reordering partition elements', function() {
+			newProject.forms[0].elements[0].partitions.forEach(function(partition) {
+				partition.elements.reverse();
+			});
+
+			assert.equal(true, input.update(oldProject, newProject));
+
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [
+					12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+				],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		});
+
+		it('removing a partition', function() {
+			newProject.forms[0].elements[0].partitions.splice(2, 1);
+
+			assert.equal(true, input.update(oldProject, newProject));
+
+			assert.deepEqual(input.values, {
+				'c0cdae8e-4ebb-41e3-a68e-d8247d3ca7ce': [
+					3, 7, 11, 15, 19, 23
+				],
+				'a83cda13-fbc7-477d-b158-33077a243c81': [1]
+			});
+		});
 	});
-
-	describe('end_replace', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('entities_add', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('entities_remove', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('entities_start_replace', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('entities_end_replace', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_remove', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_periodicity_replace', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_start_replace', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_end_replace', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_entities_add', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_entities_remove', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_elements_add', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_elements_remove', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_elements_partitions_add', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_elements_partitions_remove', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_elements_partitions_elements_add', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
-	describe('forms_elements_partitions_elements_remove', function() {
-		beforeEach(function() {
-
-		});
-
-		it('', function() {
-
-		});
-
-	});
-
 });
-
-
-
-
-
-// describe('Input correction', function() {
-
-// 	var oldInputs = [
-// 		{
-// 			values: {
-// 				element1: [
-// 					0,	// male		under_10			something
-// 					1,	// male		under_10			something_else
-// 					2,	// male		between_10_and_15	something
-// 					3,	// male		between_10_and_15	something_else
-// 					4,	// male		over_15				something
-// 					5,	// male		over_15				something_else
-// 					6,	// female	under_10			something
-// 					7,	// female	under_10			something_else
-// 					8,	// female	between_10_and_15	something
-// 					9,	// female	between_10_and_15	something_else
-// 					10,	// female	over_15				something
-// 					11	// female	over_15				something_else
-// 				],
-// 				element2: [99]
-// 			}
-// 		}
-// 	];
-
-// 	it('correctInput should do nothing if the form was not updated', function() {
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-// 		Project._correctFormInputs(oldForm, oldForm, inputs);
-
-// 		assert.deepEqual(inputs, oldInputs);
-// 	});
-
-// 	it('Inverting two elements should not change anything', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		var tmp = newForm.elements[0];
-// 		newForm.elements[0] = newForm.elements[1];
-// 		newForm.elements[1] = tmp;
-
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-// 		assert.deepEqual(oldInputs, inputs);
-// 	});
-
-
-// 	it('Adding elements should create the new elements in new inputs', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		newForm.elements.push({id: 'element3', partitions: []});
-// 		newForm.elements.push({id: 'element4', partitions: [{id: 'gender', elements: [{id: 'male'}, {id: 'female'}]}]});
-		
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-// 				element2: [99],
-// 				element3: [0],
-// 				element4: [0, 0]
-// 			}
-// 		}]);
-// 	});
-
-// 	it('Removing an element should remove that element from inputs', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		newForm.elements.splice(0, 1);
-		
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element2: [99]
-// 			}
-// 		}])
-// 	});
-
-// 	it('Adding a partition should reset the whole field to zeros', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		newForm.elements[0].partitions.push({id: "location", elements: [{id: 'madrid'}, {id: 'paris'}]});
-
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-		
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-// 				element2: [99]
-// 			}
-// 		}])
-// 	});
-
-// 	it('Removing a partition should aggregate the values (sum).', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		newForm.elements[0].partitions.splice(0, 1);
-
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-		
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element1: [6, 8, 10, 12, 14, 16],
-// 				element2: [99]
-// 			}
-// 		}]);
-// 	});
-
-// 	it('Removing a partition should aggregate the values (average).', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		newForm.elements[0].partitions.splice(2, 1);
-
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-		
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element1: [0.5, 2.5, 4.5, 6.5, 8.5, 10.5],
-// 				element2: [99]
-// 			}
-// 		}]);
-// 	});
-
-// 	it('Reordering a partition should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-		
-// 		var tmp = newForm.elements[0].partitions[0];
-// 		newForm.elements[0].partitions[0] = newForm.elements[0].partitions[1];
-// 		newForm.elements[0].partitions[1] = tmp;
-
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element1: [0, 1, 6, 7, 2, 3, 8, 9, 4, 5, 10, 11],
-// 				element2: [99]
-// 			}
-// 		}]);
-// 	});
-
-// 	it('Adding a partition element should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		newForm.elements[0].partitions[0].elements.push({id: 'transexual'});
-		
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0, 0, 0, 0, 0],
-// 				element2: [99]
-// 			}
-// 		}]);
-// 	});
-
-// 	it('Removing a partition element should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		newForm.elements[0].partitions[0].elements.splice(0, 1);
-		
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element1: [6, 7, 8, 9, 10, 11],
-// 				element2: [99]
-// 			}
-// 		}]);
-// 	});
-
-// 	it('Reordering a partition element should change the result', function() {
-// 		var newForm = JSON.parse(JSON.stringify(oldForm));
-// 		var inputs = JSON.parse(JSON.stringify(oldInputs));
-
-// 		var tmp = newForm.elements[0].partitions[0].elements[0];
-// 		newForm.elements[0].partitions[0].elements[0] = newForm.elements[0].partitions[0].elements[1];
-// 		newForm.elements[0].partitions[0].elements[1] = tmp;
-
-// 		Project._correctFormInputs(oldForm, newForm, inputs);
-
-// 		assert.deepEqual(inputs, [{
-// 			values: {
-// 				element1: [6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5],
-// 				element2: [99]
-// 			}
-// 		}]);
-// 	});
-// });

@@ -91,6 +91,23 @@ class InputStore extends Store {
 	}
 
 	/**
+	 * Retrieve all input that are linked to a particular entity.
+	 * Used to delete inputs when matching entity is deleted.
+	 */
+	listIdsByEntity(projectId, entityId) {
+		if (typeof projectId !== 'string' || typeof entityId !== 'string')
+			return Promise.reject(new Error('missing_parameter'));
+
+		var view = 'inputs_by_project_entity_date',
+			opt = {include_docs: true, startkey: [projectId, entityId], endkey: [projectId, entityId, {}]},
+			Input = this.modelClass;
+
+		return this._db.callView(view, opt).then(function(result) {
+			return result.rows.map(row => new Input(row.doc));
+		});
+	}
+
+	/**
 	 * Retrieve a given input, and the previous one for the same form and entity,
 	 * This is used to populate the input page in client.
 	 */
@@ -110,7 +127,7 @@ class InputStore extends Store {
 
 			else if (result.rows.length === 1)
 				return [new Input(result.rows[0].doc)];
-			
+
 			else if (result.rows.length === 2) {
 				var first = new Input(result.rows[0].doc);
 				if (first.period === period)

@@ -17,9 +17,10 @@
 
 "use strict";
 
+require('../../mock-database');
+
 var assert   = require('assert'),
 	Variable = require('../../../resource/model/variable');
-
 
 describe('Variable', function() {
 	let variable;
