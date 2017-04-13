@@ -344,19 +344,24 @@ angular
 			}).result.then(function(updatedPartition) {
 				var sizeChanged = false;
 
+				// Partition was deleted
 				if (currentPartition && !updatedPartition) {
 					element.partitions.splice(element.partitions.indexOf(currentPartition), 1);
 					sizeChanged = true;
 				}
+				// Partition was updated
 				else if (currentPartition && updatedPartition)
 					element.partitions[element.partitions.indexOf(currentPartition)] = updatedPartition;
+				// Partition was added
 				else if (!currentPartition && updatedPartition) {
 					sizeChanged = true;
 					element.partitions.push(updatedPartition);
 				}
 
-				if (sizeChanged)
+				if (sizeChanged) {
 					element.distribution = Math.ceil(element.partitions.length / 2);
+					element.order = 0;
+				}
 			});
 		};
 
