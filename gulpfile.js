@@ -1,7 +1,6 @@
 "use strict";
 
-var async         = require('async'),
-	del           = require('del'),
+var del           = require('del'),
 	fs            = require('fs'),
 	gulp          = require('gulp'),
 	templateCache = require('gulp-angular-templatecache'),

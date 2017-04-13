@@ -38,7 +38,6 @@
     "streamqueue": "x"
   },
   "dependencies": {
-    "async": "x",
     "body-parser": "x",
     "compression": "x",
     "connect-couchdb": "x",
