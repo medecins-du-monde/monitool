@@ -408,7 +408,7 @@ var FRENCH_TRANSLATION = {
 			'	<li>Les modifications sur la structure auront des conséquence différentes selon le type de modification: référez-vous au guide d\'utilisation pour lister les différents cas de figures</li>' +
 			'</ul>',
 
-		partitions: "Partitions",
+		partitions: "Désagrégations",
 
 		add_variable: "Ajouter une variable",
 		remove_variable: "Supprimer la variable",
