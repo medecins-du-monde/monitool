@@ -222,13 +222,27 @@ angular.module('monitool.directives.formControls', [])
 				// however it's a bit overkill (will reset partitin order when we change an element name)
 				scope.$watch('partitions', function(newValue, oldValue) {
 					if (!angular.equals(oldValue, newValue)) {
-						// this will trigger orderedPartitions watch, which will redraw everything.
-						scope.orderedPartitions = scope.partitions.slice();
-						scope.table = {
-							// rows and cols for this table.
-							leftCols: itertools.range(0, scope.distribution),
-							headerRows: itertools.range(scope.distribution, scope.partitions.length)
-						};
+						
+						// Reset ordered partitions only when a partition was added or removed
+						if (oldValue.length !== newValue.length) {
+							scope.orderedPartitions = scope.partitions.slice();
+
+							scope.table = {
+								// rows and cols for this table.
+								leftCols: itertools.range(0, scope.distribution),
+								headerRows: itertools.range(scope.distribution, scope.partitions.length)
+							};
+						}
+						else {
+							// If the number of partitions was not changed, we need
+							// to recreate .orderedPartitions anyway, because partition objects can be swapped
+							// (not the same reference, even is the value is close).
+							scope.orderedPartitions = scope.orderedPartitions.map(function(partition) {
+								return scope.partitions.find(function(p) {
+									return partition.id === p.id;
+								});
+							});
+						}
 
 						updateSize();
 					}
@@ -243,9 +257,7 @@ angular.module('monitool.directives.formControls', [])
 					};
 
 					updateSize();
-				})
-
-				scope.orderedPartitions = scope.partitions.slice();
+				});
 
 				// We do not allow values to be present 2 times in the list.
 				scope.$watchCollection('orderedPartitions', function(after, before) {
