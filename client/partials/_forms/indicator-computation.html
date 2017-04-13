@@ -54,23 +54,30 @@
 						ng-model="computation.parameters[key].elementId"
 						ng-options="v.id as v.name group by v.group for v in selectElements"></select>
 
-				<p class="help-block">
-					<i class="fa fa-info-circle"></i>
-					<span translate="project.which_variable"></span>
-				</p>
 			</td>
 
 			<td ng-show="elementsById[computation.parameters[key].elementId].partitions.length">
 				<partitions-filter ng-model="computation.parameters[key].filter" element="elementsById[computation.parameters[key].elementId]"></partitions-filter>
 
+			</td>
+
+			<td ng-hide="elementsById[computation.parameters[key].elementId].partitions.length"
+				style="background-color: #f3f3f3"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.which_variable"></span>
+				</p>
+			</td>
+			<td>
 				<p class="help-block">
 					<i class="fa fa-info-circle"></i>
 					<span translate="project.which_partitions"></span>
 				</p>
 			</td>
-
-			<td ng-hide="elementsById[computation.parameters[key].elementId].partitions.length"
-				style="background-color: #f3f3f3"></td>
 		</tr>
 	</tbody>
 </table>
