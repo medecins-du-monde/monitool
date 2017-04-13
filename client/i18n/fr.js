@@ -240,6 +240,10 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		form_error_short: "Un ou plusieurs champs du formulaire sont en erreur.",
+		form_persisted_short: "vous n'avez pas réalisé de changements.",
+		form_changed_short: "Vous avez réalisé des changements.",
+
 		form_error: "Un ou plusieurs champs du formulaire sont en erreur, corrigez-les afin de pouvoir sauvegarder.",
 		form_persisted: "Vos données sont sauvegardées.",
 		form_changed: "Vous avez réalisé des changements. N'oubliez pas de cliquer sur sauvegarder.",

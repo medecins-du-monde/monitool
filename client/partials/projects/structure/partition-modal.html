@@ -183,6 +183,24 @@
 </div>
 
 <div class="modal-footer">
+	
+	<div style="float: left">
+		<p class="text-danger" ng-if="partitionForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_error_short"></span>
+		</p>
+
+		<p class="text-info" ng-if="isUnchanged() && !isNew">
+			<i class="fa fa-info-circle"></i>
+			<span translate="project.form_persisted_short"></span>
+		</p>
+
+		<p class="text-warning" ng-if="!isUnchanged() && !partitionForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_changed_short"></span>
+		</p>
+	</div>
+
 	<button ng-disabled="partitionForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
 		<i class="fa fa-table"></i>
 		<span translate="shared.apply"></span>

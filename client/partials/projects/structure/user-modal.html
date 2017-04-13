@@ -134,9 +134,32 @@
 </div>
 
 <div class="modal-footer">
-	<button ng-click="done()" ng-disabled="userForm.$invalid" class="btn btn-primary">
+
+	<div style="float: left">
+		<p class="text-danger" ng-if="userForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_error_short"></span>
+		</p>
+		
+		<p class="text-info" ng-if="isUnchanged() && !isNew">
+			<i class="fa fa-info-circle"></i>
+			<span translate="project.form_persisted_short"></span>
+		</p>
+
+		<p class="text-warning" ng-if="!isUnchanged() && !userForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_changed_short"></span>
+		</p>
+	</div>
+
+	<button ng-click="done()" ng-disabled="userForm.$invalid || isUnchanged()" class="btn btn-primary">
 		<i class="fa fa-object-group"></i>
 		<span translate="project.update_user"></span>
+	</button>
+
+	<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
 	</button>
 
 	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew">
@@ -144,3 +167,4 @@
 		<span translate="shared.delete"></span>
 	</button>
 </div>
+

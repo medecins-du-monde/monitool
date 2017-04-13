@@ -240,6 +240,10 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		form_error_short: "Some fields are invalid in the form.",
+		form_persisted_short: "You did not made changes.",
+		form_changed_short: "You made changes.",
+
 		form_error: "Some fields are invalid in the form, fix them in order to save.",
 		form_persisted: "Your data is saved.",
 		form_changed: "You made changes. Don't forget to click on Save.",

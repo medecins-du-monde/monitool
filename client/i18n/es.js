@@ -240,6 +240,10 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		form_error_short: "Algunos campos del formulario no son validos.",
+		form_persisted_short: "No ha realizado cambios.",
+		form_changed_short: "Ha realizado cambios.",
+
 		form_error: "Algunos campos del formulario no son validos, arreglelos para poder guardar.",
 		form_persisted: "Sus datos estan guardados.",
 		form_changed: "Ha realizado cambios. No olvide hacer click en Guardar.",

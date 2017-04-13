@@ -219,6 +219,16 @@ angular
 		if (!$scope.user.dataSources)
 			$scope.user.dataSources = [];
 
+		$scope.masterUser = angular.copy($scope.user);
+
+		$scope.isUnchanged = function() {
+			return angular.equals($scope.masterUser, $scope.user);
+		};
+
+		$scope.reset = function() {
+			angular.copy($scope.masterUser, $scope.user);
+		}
+
 		$scope.done = function() {
 			if ($scope.user.type == 'internal') {
 				delete $scope.user.login;
@@ -649,6 +659,15 @@ angular
 
 		if ($scope.indicator)
 			delete $scope.planning.display;
+
+		$scope.masterPlanning = angular.copy($scope.planning);
+		$scope.isUnchanged = function() {
+			return angular.equals($scope.planning, $scope.masterPlanning);
+		};
+
+		$scope.reset = function() {
+			angular.copy($scope.masterPlanning, $scope.planning);
+		};
 
 		$scope.isNew = !planning;
 
