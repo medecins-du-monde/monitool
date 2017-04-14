@@ -203,7 +203,7 @@ window.monitool.config(function($stateProvider, $urlRouterProvider) {
 	// Admin
 	///////////////////////////
 
-	if (window.user.type == 'user') {
+	if (window.user.type == 'user' && window.user.role == 'admin') {
 		$stateProvider.state('main.admin', {
 			abstract: true,
 			templateUrl: 'partials/admin/menu.html'
