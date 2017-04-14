@@ -29,6 +29,13 @@ class DataSource extends Model {
 	constructor(data, project) {
 		super(data, validate);
 
+		let entityIds = project.entities.map(e => e.id);
+
+		data.entities.forEach(function(entityId) {
+			if (entityIds.indexOf(entityId) === -1)
+				throw new Error('invalid_data');
+		});
+
 		this._project = project;
 		this.elements = this.elements.map(el => new Variable(el));
 	}
@@ -53,12 +60,7 @@ class DataSource extends Model {
 	 * Retrieve a variable by id
 	 */
 	getVariableById(id) {
-		var variable = this.elements.find(el => el.id === id);
-
-		if (!variable)
-			throw new Error('missing_variable');
-
-		return variable;
+		return this.elements.find(el => el.id === id);
 	}
 
 	getPdfDocDefinition(pageOrientation) {

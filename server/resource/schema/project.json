@@ -52,10 +52,43 @@
 						"properties": {
 							"type": {"type": "string", "pattern": "^internal$"},
 							"id": {"type": "string", "pattern": "^usr:[a-z0-9\\.\\-\\_]+$"},
+							"role": {"type": "string", "enum": ["owner", "read"]}
+						}
+					},
+					{
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["type", "name", "role", "username", "password"],
+						"properties": {
+							"type": {"type": "string", "pattern": "^partner$"},
+							"name": {"type": "string", "minLength": 1},
+							"role": {"type": "string", "enum": ["owner", "read"]},
+							"username": {"type": "string", "minLength": 1},
+							"password": {
+								"oneOf": [
+									{"type": "string", "minLength": 6},
+									{"type": "null"}
+								]
+							}
+						}
+					},
+					{
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["type", "id", "role", "entities", "dataSources"],
+						"properties": {
+							"type": {"type": "string", "pattern": "^internal$"},
+							"id": {"type": "string", "pattern": "^usr:[a-z0-9\\.\\-\\_]+$"},
 							"role": {"type": "string", "enum": ["owner", "input", "read"]},
-							"entities": {"type": "array", "items": { "$ref": "#/definitions/uuid" } },
+
+							"entities": {
+								"type": "array",
+								"uniqueItems": true,
+								"items": { "$ref": "#/definitions/uuid" }
+							},
 							"dataSources": {
 								"type": "array",
+								"uniqueItems": true,			
 								"items": { "$ref": "#/definitions/uuid" }
 							}
 						}
@@ -63,7 +96,7 @@
 					{
 						"type": "object",
 						"additionalProperties": false,
-						"required": ["name", "password", "role", "type", "username"],
+						"required": ["name", "password", "role", "type", "username", "entities", "dataSources"],
 						"properties": {
 							"type": {"type": "string", "pattern": "^partner$"},
 							"name": {"type": "string", "minLength": 1},
@@ -79,10 +112,12 @@
 
 							"entities": {
 								"type": "array",
+								"uniqueItems": true,
 								"items": { "$ref": "#/definitions/uuid" }
 							},
 							"dataSources": {
 								"type": "array",
+								"uniqueItems": true,
 								"items": { "$ref": "#/definitions/uuid" }
 							}
 						}

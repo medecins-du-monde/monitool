@@ -42,7 +42,9 @@ class Project extends DbModel {
 		super(data, validate);
 
 		// Check that entity ids exist in groups, ...
-		var entityIds = data.entities.map(e => e.id);
+		let entityIds = data.entities.map(e => e.id),
+			dataSourceIds = data.forms.map(ds => ds.id);
+
 		data.groups.forEach(function(group) {
 			group.members.forEach(function(entityId) {
 				if (entityIds.indexOf(entityId) === -1)
@@ -50,8 +52,19 @@ class Project extends DbModel {
 			});
 		});
 
-		// FIXME a lot is missing here.
+		data.users.forEach(function(user) {
+			if (user.entities)
+				user.entities.forEach(function(entityId) {
+					if (entityIds.indexOf(entityId) === -1)
+						throw new Error('invalid_data');
+				});
 
+			if (user.dataSources)
+				user.dataSources.forEach(function(dataSourceId) {
+					if (dataSourceIds.indexOf(dataSourceId) === -1)
+						throw new Error('invalid_data');	
+				});
+		});
 
 		// Create forms & logicalFrames
 		this.forms = this.forms.map(f => new DataSource(f, this));

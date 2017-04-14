@@ -30,7 +30,7 @@ describe('DataSource', function() {
 			id: "1760d546-cccf-43fe-8f28-1e40a05f23b5",
 			name: "form",
 			periodicity: "month",
-			entities: ["3b96c9d9-9b6f-4c56-a0df-bd4495fd85ef"],
+			entities: ["0c243e08-8c21-4946-9f5f-ce255106901b"],
 			start: null,
 			end: null,
 			elements: [
@@ -47,7 +47,7 @@ describe('DataSource', function() {
 					partitions: []
 				}
 			]
-		});
+		}, require('../../data/project.json'));
 	});
 
 
@@ -55,7 +55,7 @@ describe('DataSource', function() {
 		var newDataSource;
 
 		beforeEach(function() {
-			newDataSource = new DataSource(JSON.parse(JSON.stringify(dataSource)));
+			newDataSource = new DataSource(JSON.parse(JSON.stringify(dataSource)), require('../../data/project.json'));
 		});
 
 		it('renaming the form should not change anything', function() {
@@ -101,8 +101,8 @@ describe('DataSource', function() {
 			);
 		});
 
-		it('should raise an error', function() {
-			assert.throws(() => dataSource.getVariableById('unknownid'));
+		it('should return null', function() {
+			assert.equal(dataSource.getVariableById('unknownid'), null);
 		});
 
 	});

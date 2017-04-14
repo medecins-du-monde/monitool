@@ -153,9 +153,7 @@ class Input extends DbModel {
 		var newInputValues = {};
 
 		newDataSource.elements.forEach(function(newVariable) {
-			var oldVariable;
-			try { oldVariable = oldDataSource.getVariableById(newVariable.id); }
-			catch (e) {}
+			var oldVariable = oldDataSource.getVariableById(newVariable.id);
 
 			// Update only values that changed.
 			if (!oldVariable || oldVariable.signature !== newVariable.signature)
