@@ -160,6 +160,45 @@ angular
 		};
 
 		/**
+		 * Transpose a 2D array.
+		 * 
+		 * @example
+		 * var arr = [
+		 * 		[{colSpan: 2}, {colSpan: 1}],
+		 * ];
+		 *
+		 * transpose2D(arr) == [
+		 * 		[{rowSpan: 2}],
+		 * 		[{rowSpan: 1}],
+		 * ];
+		 */
+		this.transpose2D = function(rows) {
+			if (rows.length === 0)
+				return [];
+
+			var result = new Array(rows[0].length);
+
+			for (var x = 0; x < rows[0].length; ++x) {
+				result[x] = new Array(rows.length);
+
+				for (var y = 0; y < rows.length; ++y) {
+					result[x][y] = angular.copy(rows[y][x]);
+
+					if (result[x][y].colSpan) {
+						result[x][y].rowSpan = result[x][y].colSpan;
+						delete result[x][y].colSpan;
+					}
+					else if (result[x][y].rowSpan) {
+						result[x][y].colSpan = result[x][y].rowSpan;
+						delete result[x][y].rowSpan;
+					}
+				}
+			}
+
+			return result;
+		};
+
+		/**
 		 * Test two array, to see if one is a subset of the other.
 		 *
 		 * @example
