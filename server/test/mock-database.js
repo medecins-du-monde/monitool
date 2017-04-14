@@ -17,22 +17,6 @@
 
 "use strict";
 
-// Start mock couch
-let mockCouch = require('mock-couch');
-
-
 // Tell app to use it.
 let config = require('../config');
-config.couchdb.host = 'localhost';
-config.couchdb.port = 5985;
-
-let couchdb = mockCouch.createServer();
-couchdb.listen(5985);
-couchdb.addDB('monitool', [
-	{_id: 'version', 'version': 4}
-]);
-
-// start up database
-require('../resource/database');
-
-module.exports = couchdb;
+config.couchdb.bucket = 'monitool-test';

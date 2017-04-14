@@ -58,6 +58,17 @@ class Database {
 			.then(() => this._applyMigrations())
 	}
 
+	destroyBucket() {
+		if (this.bucketName.indexOf('test') === -1)
+			throw new Error('This method shall never be called on a production server.');
+
+		return new Promise(function(resolve, reject) {
+			this.nano.db.destroy(this.bucketName, function(error, result) {
+				resolve();
+			});
+		}.bind(this));
+	}
+
 	_checkConnectivity() {
 		return new Promise(function(resolve, reject) {
 			this.nano.db.list(function(error, body) {
@@ -201,12 +212,9 @@ class Database {
 					reject(error);
 				else
 					resolve();
-			}.bind(this));
+			});
 		}.bind(this));
 	}
 }
 
-
-var database = new Database(config.couchdb);
-
-module.exports = database;
+module.exports = new Database(config.couchdb);

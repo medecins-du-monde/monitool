@@ -33,7 +33,6 @@
     "karma-jasmine": "x",
     "karma-spec-reporter": "x",
     "mocha": "^3.2.0",
-    "mock-couch": "^0.1.8",
     "node-uuid": "x",
     "request": "x",
     "streamqueue": "x"

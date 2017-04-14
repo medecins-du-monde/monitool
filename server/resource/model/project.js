@@ -65,6 +65,23 @@ class Project extends DbModel {
 	}
 
 	/**
+	 * Destroy a project, and all related inputs.
+	 * 
+	 * @return {Promise}
+	 */
+	destroy() {
+		return Input.storeInstance.listByProject(this._id).then(function(inputs) {
+			inputs = inputs.map(function(input) {
+				return {_id: i._id, _rev: i._rev, _deleted: true};
+			});
+
+			let docs = [{_id: this._id, _rev: this._rev, _deleted: true}].concat(inputs);
+
+			return this._db.callBulk({docs: docs});
+		});
+	}
+
+	/**
 	 * Retrieve a datasource by id.
 	 */
 	getDataSourceById(id) {
@@ -112,7 +129,7 @@ class Project extends DbModel {
 	 * This is used to update passwords
 	 */
 	getPartnerByUsername(username) {
-		return this.users.find(function(u) { return u.username === username });
+		return this.users.find(u => u.username === username);
 	}
 
 	/**
@@ -159,9 +176,9 @@ class Project extends DbModel {
 		}, this);
 
 		// Get all entities that were deleted
-		var deletedEntitiesIds = oldProject.entities.filter(function(entity) {
-			return this.entities.find(e => e.id === entity.id);
-		}).map(entity => entity.id);
+		var deletedEntitiesIds = oldProject.entities
+			.filter(oe => !!this.entities.find(nw => nw.id === oe.id))
+			.map(entity => entity.id);
 
 		var promises =
 			changedFormsIds.map(dsId => Input.storeInstance.listByDataSource(this._id, dsId))
@@ -176,7 +193,7 @@ class Project extends DbModel {
 				});
 			});
 			
-			let inputs = Object.values(inputsById);
+			let inputs = Object.keys(inputsById).map(id => inputsById[id]);
 			inputs.forEach(input => input.update(oldProject, this));
 			return inputs;
 		}.bind(this));

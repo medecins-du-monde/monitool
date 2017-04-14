@@ -94,7 +94,7 @@ class InputStore extends Store {
 	 * Retrieve all input that are linked to a particular entity.
 	 * Used to delete inputs when matching entity is deleted.
 	 */
-	listIdsByEntity(projectId, entityId) {
+	listByEntity(projectId, entityId) {
 		if (typeof projectId !== 'string' || typeof entityId !== 'string')
 			return Promise.reject(new Error('missing_parameter'));
 
