@@ -89,6 +89,13 @@ class Project extends DbModel {
 	}
 
 	/**
+	 * Retrieve an entity by id.
+	 */
+	getEntityById(id) {
+		return this.entities.find(e => e.id === id);
+	}
+
+	/**
 	 * Retrieve the user object from the project that correspond to a user session (request.user).
 	 * User session may be a real user, or a partner.
 	 * This method does not throw if the user is not found.
@@ -137,7 +144,7 @@ class Project extends DbModel {
 	 * from it (this allows not sending them to the client back and forth).
 	 * This is used when saving the project.
 	 */
-	copyUnchangedPasswords(oldProject) {
+	_copyUnchangedPasswords(oldProject) {
 		this.users.forEach(function(user) {
 			if (user.type === 'partner') {
 				// retrieve old user.
@@ -158,7 +165,7 @@ class Project extends DbModel {
 	 * Take the previous version of the project, and compute all updates
 	 * to inputs that are needed to deal with the structural changes of the forms.
 	 */
-	computeInputsUpdates(oldProject) {
+	_computeInputsUpdates(oldProject) {
 		var changedFormsIds = [];
 
 		// Get all forms that existed before, and changed since last time.
@@ -177,7 +184,7 @@ class Project extends DbModel {
 
 		// Get all entities that were deleted
 		var deletedEntitiesIds = oldProject.entities
-			.filter(oe => !!this.entities.find(nw => nw.id === oe.id))
+			.filter(oe => !this.entities.find(nw => nw.id === oe.id))
 			.map(entity => entity.id);
 
 		var promises =
@@ -187,6 +194,8 @@ class Project extends DbModel {
 		return Promise.all(promises).then(function(result) {
 			let inputsById = {};
 
+			// there might be duplicates if an input was fetched because of
+			// both a datasource and an entity.
 			result.forEach(function(inputs) {
 				inputs.forEach(function(input) {
 					inputsById[input._id] = input;
@@ -245,10 +254,10 @@ class Project extends DbModel {
 			.then(function(oldProject) {
 				// If we are updating, copy old passwords from the old project
 				if (oldProject)
-					this.copyUnchangedPasswords(oldProject);
+					this._copyUnchangedPasswords(oldProject);
 
 				// If we are updating the project, we need to update related inputs.
-				return oldProject ? this.computeInputsUpdates(oldProject) : [];
+				return oldProject ? this._computeInputsUpdates(oldProject) : [];
 			}.bind(this))
 
 			.then(function(updates) {

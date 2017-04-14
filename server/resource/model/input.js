@@ -128,12 +128,20 @@ class Input extends DbModel {
 	 * When a project changes, update the content of this input's values.
 	 */
 	update(oldProject, newProject) {
-		var newDataSource = newProject.getDataSourceById(this.form);
+		let newDataSource = newProject.getDataSourceById(this.form),
+			newEntity     = newProject.getEntityById(this.entity);
 
-		// The data source was deleted, so we can delete the input as well.
-		if (!newDataSource) {
+		// The data source or entity was deleted, we can delete the input as well.
+		if (!newDataSource || !newEntity) {
 			this._deleted = true;
-			return true;
+			delete this.type;
+			delete this.values;
+			delete this.project;
+			delete this.entity;
+			delete this.form;
+			delete this.period;
+
+			return true; // true <=> input was modified
 		}
 
 		// No update is needed: the signature of the datasource did not change.
@@ -158,7 +166,7 @@ class Input extends DbModel {
 
 		this.values = newInputValues;
 
-		return true;
+		return true; // true <=> input was modified
 	}
 
 	/**

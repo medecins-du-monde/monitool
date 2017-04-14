@@ -58,7 +58,7 @@ class Model {
 		
 		Object.assign(obj, this);
 		for (let key in obj)
-			if (key !== '_id' && key !== '_rev' && key.substr(0, 1) === '_')
+			if (key !== '_id' && key !== '_rev' && key !== '_deleted' && key.substr(0, 1) === '_')
 				delete obj[key];
 
 		return obj;
