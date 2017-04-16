@@ -7,6 +7,7 @@ var express      = require('express'),
 	cookieParser = require('cookie-parser'),
 	session      = require('express-session'),
 	path         = require('path'),
+	winston      = require('winston'),
 	database     = require('../server/resource/database'),
 	passport     = require('../server/authentication/passport'),
 	sessionStore = require('../server/authentication/session-store'),
@@ -38,7 +39,7 @@ let application = express()
 
 	// Serve index page.
 	.use(require('../server/controllers/pages'))
-	
+
 	// Enable dynamic sessions and compression for the rest.
 	.use(cookieParser())
 	.use(session({ secret: 'cd818da5bcd0d3d9ba5a9a44e49148d2', resave: false, saveUninitialized: false, store: sessionStore }))
@@ -55,8 +56,8 @@ let application = express()
 	.use('/resources', require('../server/controllers/pdf'))		// PDF generation module
 	.use('/resources', require('../server/controllers/resources'))	// REST JSON API
 	.use('/reporting', require('../server/controllers/reporting'))	// Reporting API
-	
-	
+
+
 
 database.prepare().then(
 	function() {

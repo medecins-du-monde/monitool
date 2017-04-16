@@ -152,10 +152,10 @@ angular
 
 			if (projectUser.role === 'owner')
 				return true;
-			
+
 			if (projectUser.role === 'input') {
 				// Check if user is explicitly forbidden
-				if (projectUser.dataSources.indexOf(formId) !== -1)
+				if (projectUser.dataSources.indexOf(formId) === -1)
 					return false;
 
 				// Check if entities where user is allowed intersect with the data source.
@@ -164,7 +164,7 @@ angular
 
 				return !!itertools.intersect(form.entities, userColumns).length;
 			}
-			
+
 			return false;
 		};
 

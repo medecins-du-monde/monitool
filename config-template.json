@@ -15,15 +15,17 @@
 	},
 	"auth": {
 		"administrator": "romain.gilliotte",
-		"azureAD": {
-			"label": "Use MDM account",
-			"domain": "medecinsdumonde.net",
-			"clientId": "[enter client id]",
-			"clientSecret": "[enter client secret]"
-		},
-		"training": {
-			"label": "Use training account (admin)",
-			"account": "romain.gilliotte"
+		"providers": {
+			"azureAD": {
+				"label": "Use MDM account",
+				"domain": "medecinsdumonde.net",
+				"clientId": "[enter client id]",
+				"clientSecret": "[enter client secret]"
+			},
+			"training": {
+				"label": "Use training account (admin)",
+				"account": "romain.gilliotte"
+			}
 		}
 	}
 }
