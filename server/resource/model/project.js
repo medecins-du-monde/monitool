@@ -72,8 +72,13 @@ class Project extends DbModel {
 
 		// Replace passwords by a salted hash
 		this.users.forEach(function(user) {
-			if (user.type === 'partner' && typeof user.password === 'string' && !user.password.match('^sha1\$[0-9a-z]+$'))
-				user.password = passwordHash.generate(user.password);
+			if (user.type === 'partner') {
+				if (typeof user.password === 'string' && !user.password.match('^sha1')) {
+					user.password = passwordHash.generate(user.password);
+				}
+				else {
+				}
+			}
 		});
 	}
 
