@@ -14,8 +14,7 @@
 			<th style="width: 30px"></th>
 			<th translate="shared.name"></th>
 			<th style="width: 150px" translate="project.user_role"></th>
-			<th style="width: 30%" translate="project.collection_site_list"></th>
-			<th style="width: 30%" translate="project.collection_form_list"></th>
+			<th style="width: 60%" translate="project.authorization"></th>
 		</tr>
 	</thead>
 	<tbody ng-if="editableProject.users.length == 0">
@@ -34,8 +33,14 @@
 				</a>
 			</td>
 			<td>{{('project.user_roles.' + user.role)|translate}}</td>
-			<td>{{user.entities|getObjects:masterProject.entities|pluck:'name'|translate_list|join:', '}}</td>
-			<td>{{user.dataSources|getObjects:masterProject.forms|pluck:'name'|translate_list|join:', '}}</td>
+			<td>
+				<span ng-if="user.role == 'input'">
+					<span translate="project.collection_site_list" style="font-weight: bold"></span>:
+					{{user.entities|getObjects:masterProject.entities|pluck:'name'|translate_list|join:', '}}<br/>
+					<span translate="project.collection_form_list" style="font-weight: bold"></span>:
+					{{user.dataSources|getObjects:masterProject.forms|pluck:'name'|translate_list|join:', '}}
+				</span>
+			</td>
 		</tr>
 	</tbody>
 	<tfoot>

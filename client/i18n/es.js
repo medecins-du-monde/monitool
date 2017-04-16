@@ -240,6 +240,7 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		authorization: "Permisiones",
 		form_error_short: "Algunos campos del formulario no son validos.",
 		form_persisted_short: "No ha realizado cambios.",
 		form_changed_short: "Ha realizado cambios.",

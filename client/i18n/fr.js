@@ -240,6 +240,8 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		authorization: "Autorisation",
+
 		form_error_short: "Un ou plusieurs champs du formulaire sont en erreur.",
 		form_persisted_short: "vous n'avez pas réalisé de changements.",
 		form_changed_short: "Vous avez réalisé des changements.",

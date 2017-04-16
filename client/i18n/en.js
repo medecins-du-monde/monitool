@@ -240,6 +240,7 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		authorization: "Authorization",
 		form_error_short: "Some fields are invalid in the form.",
 		form_persisted_short: "You did not made changes.",
 		form_changed_short: "You made changes.",
