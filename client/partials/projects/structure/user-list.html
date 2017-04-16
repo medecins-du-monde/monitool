@@ -13,6 +13,7 @@
 		<tr>
 			<th style="width: 30px"></th>
 			<th translate="shared.name"></th>
+			<th translate="project.username"></th>
 			<th style="width: 150px" translate="project.user_role"></th>
 			<th style="width: 60%" translate="project.authorization"></th>
 		</tr>
@@ -28,9 +29,12 @@
 			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 			<td>
 				<a ng-click="editUser(user)">
-					<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
 					{{user.name || users[user.id].name}}
 				</a>
+			</td>
+			<td>
+				<img src="/img/logo_blue.svg" style="height: 17px" ng-if="user.type=='internal'" />
+				{{user.username}}
 			</td>
 			<td>{{('project.user_roles.' + user.role)|translate}}</td>
 			<td>
