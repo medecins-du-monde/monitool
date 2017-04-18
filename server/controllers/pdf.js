@@ -38,24 +38,24 @@ const fontDescriptors = {
  */
 const styles = {
 	header: {
-		fontSize: 22,
+		fontSize: 16,
 		bold: true,
 		alignment: 'center',
 		margin: [100, 0, 100, 0]
 	},
 	header3: {
-		fontSize: 22,
+		fontSize: 16,
 		bold: true,
 		alignment: 'center',
 		margin: [0, 0, 0, 10]
 	},
 	header2: {
-		fontSize: 18,
+		fontSize: 14,
 		bold: true,
 		margin: [0, 15, 0, 0]
 	},
 	variableName: {
-		fontSize: 12,
+		fontSize: 10,
 		bold: true,
 		margin: [0, 10, 0, 5]
 	},
@@ -63,10 +63,10 @@ const styles = {
 		bold: true
 	},
 	normal: {
-		fontSize: 11
+		fontSize: 9
 	},
 	italic: {
-		fontSize: 11,
+		fontSize: 9,
 		italics: true,
 		margin: [10, 0, 0, 0]
 	}

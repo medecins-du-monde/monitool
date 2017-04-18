@@ -70,14 +70,31 @@ class DataSource extends Model {
 
 		doc.content = [
 			{text: this.name, style: 'header'},
-			{text: "General information", style: "header2"},
-			{style: "variableName", text: "Collection site"},
-			{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
-			{style: "variableName", text: "Covered period"},
-			{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
-			{style: "variableName", text: "Collected by"},
-			{table: {headerRows: 0, widths: ['*'], body: [[' ']]}},
-			{text: "Data", style: "header2"}
+			{
+				columns: [
+					[
+						{style: "variableName", text: "Collection site"},
+						{
+							table: {headerRows: 0, widths: ['*'], body: [[{style: "normal", text: ' '}]]},
+							margin: [0, 0, 10, 0]
+						}
+					],
+					[
+						{style: "variableName", text: "Covered period"},
+						{
+							table: {headerRows: 0, widths: ['*'], body: [[{style: "normal", text: ' '}]]},
+							margin: [0, 0, 10, 0]
+						},
+					],
+					[
+						{style: "variableName", text: "Collected by"},
+						{
+							table: {headerRows: 0, widths: ['*'], body: [[{style: "normal", text: ' '}]]},
+							margin: [0, 0, 10, 0]
+						}
+					]
+				]
+			}
 		].concat(this.elements.map(el => el.getPdfDocDefinition()));
 
 		return doc;

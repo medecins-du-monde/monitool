@@ -169,7 +169,7 @@ class Variable extends Model {
 			for (var colIndex = 0; colIndex < totalCols; ++colIndex) {
 				// Add field
 				var tpe = tp.elements[(colIndex / currentColSpan) % tp.elements.length];
-				row.push({colSpan: currentColSpan, text: tpe.name});
+				row.push({colSpan: currentColSpan, style: "normal", text: tpe.name});
 
 				// Add as many fillers as the colSpan value - 1
 				var colLimit = colIndex + currentColSpan - 1;
