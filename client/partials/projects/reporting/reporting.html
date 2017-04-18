@@ -69,19 +69,20 @@
 	</div>
 </form>
 
+<div ng-hide="plots|isEmpty">
+	<button class="btn btn-primary btn-xs pull-right noprint" svg-save>
+		<i class="fa fa-download"></i>
+		<span translate="shared.download_plot"></span>
+	</button>
+	<div style="clear: both"></div>
 
-<button class="btn btn-primary btn-xs pull-right noprint" svg-save>
-	<i class="fa fa-download"></i>
-	<span translate="shared.download_plot"></span>
-</button>
-<div style="clear: both"></div>
+	<reporting-graph-adapter
+		type="['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
+		rows="rows" cols="cols" plots="plots">
+	</reporting-graph-adapter>
 
-<reporting-graph-adapter
-	type="['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
-	rows="rows" cols="cols" plots="plots">
-</reporting-graph-adapter>
-
-<div style="clear: both"></div>
+	<div style="clear: both"></div>
+</div>
 
 <button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
 	<i class="fa fa-download"></i>
@@ -125,6 +126,8 @@
 			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{1 + cols.length}}">{{row.text}}</th>
 
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
+				<i class="fa fa-arrow-circle-right" ng-if="row.isGroup"></i>
+				<label for="{{row.id}}" title="{{row.name}}">{{row.name|maxLength:50}}</label>
 				<div class="pull-right">
 					<div class="btn-toolbar">
 						<div class="btn-group btn-group-xs">
@@ -138,8 +141,6 @@
 					</div>
 				</div>
 
-				<i class="fa fa-arrow-circle-right" ng-if="row.isGroup"></i>
-				<label for="{{row.id}}" title="{{row.name}}">{{row.name|maxLength:50}}</label>
 			</td>
 
 			<td ng-repeat="col in row.cols track by $index" reporting-field></td>
