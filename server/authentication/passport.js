@@ -197,7 +197,10 @@ passport.use('partner_local', new LocalStrategy(
 				done(null, partner)
 			},
 			function(error) {
-				return done(error);
+				if (error.message === 'missing')
+					return done(null, false);
+				else
+					return done(error);
 			}
 		);
 	}
