@@ -24,39 +24,11 @@ let config;
 try {
 	// If there is a config.json file, load configuration from there.
 	config = require('../config.json');
-
 	winston.log('info', '[Config] Loading from config.json');
 }
 catch (e) {
-	// otherwise, fallback to environnement variables.
-	config = {
-		debug: process.env['monitool.debug'] === 'TRUE',
-		baseUrl: process.env['monitool.baseUrl'],
-		port: parseInt(process.env['monitool.port']),
-		couchdb: {
-			host: process.env['monitool.couchdb.host'],
-			port: parseInt(process.env['monitool.couchdb.port']),
-			bucket: process.env['monitool.couchdb.bucket'],
-			sessionBucket: process.env['monitool.couchdb.sessionBucket'],
-			username: process.env['monitool.couchdb.username'],
-			password: process.env['monitool.couchdb.password']
-		},
-		auth: {
-			azureAD: {
-				label: process.env['monitool.auth.azureAD.label'],
-				domain: process.env['monitool.auth.azureAD.domain'],
-				authUrl: process.env['monitool.auth.azureAD.authUrl'],
-				tokenUrl: process.env['monitool.auth.azureAD.tokenUrl'],
-				clientId: process.env['monitool.auth.azureAD.clientId'],
-				clientSecret: process.env['monitool.auth.azureAD.clientSecret']
-			},
-			training: {
-				label: process.env['monitool.auth.training.label']
-			}
-		}
-	};
-	
-	winston.log('info', '[Config] Loading from environnement variables');
+	winston.log('error', '[Config] config.json is missing');
+	process.exit(1);
 }
 
 // Validate that nothing is missing from the configuration file.
