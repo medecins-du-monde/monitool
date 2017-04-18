@@ -45,7 +45,6 @@
     "express": "x",
     "express-session": "x",
     "is-my-json-valid": "x",
-    "jade": "x",
     "memory-cache": "^0.1.6",
     "nano": "x",
     "oauth2orize": "x",
@@ -58,6 +57,7 @@
     "passport-oauth2-client-password": "x",
     "password-hash": "x",
     "pdfmake": "^0.1.27",
+    "pug": "^2.0.0-beta.12",
     "roboto-fontface": "^0.7.0",
     "winston": "^2.3.1"
   }

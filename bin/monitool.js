@@ -34,7 +34,7 @@ let application = express()
 	.use(require('../server/controllers/static'))
 
 	// Enable template engine.
-	.set('view engine', 'jade')
+	.set('view engine', 'pug')
 	.set('views', path.join(__dirname, '../server/views'))
 
 	// Serve index page.
