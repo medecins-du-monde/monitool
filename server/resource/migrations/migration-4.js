@@ -25,8 +25,6 @@ module.exports = function() {
 			}
 		}.toString();
 
-		console.log(ddoc)
-
 		return database.insert(ddoc);
 	});
 };
