@@ -37,7 +37,7 @@ module.exports = express.Router()
 
 		if (reporting) {
 			response.header('Content-Type', 'application/json');
-			response.end(reporting);
+			response.send(reporting);
 		}
 		else {
 			Promise
@@ -56,7 +56,7 @@ module.exports = express.Router()
 					cache.put(cacheKey, reporting, 24 * 3600 * 1000);
 
 					response.header('Content-Type', 'application/json');
-					response.end(reporting);
+					response.send(reporting);
 				})
 				.catch(response.jsonErrorPB);
 		}
