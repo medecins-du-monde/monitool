@@ -37,15 +37,15 @@ let application = express()
 	.set('view engine', 'pug')
 	.set('views', path.join(__dirname, '../server/views'))
 
-	// Serve index page.
-	.use(require('../server/controllers/pages'))
-
 	// Enable dynamic sessions and compression for the rest.
 	.use(cookieParser())
 	.use(session({ secret: 'cd818da5bcd0d3d9ba5a9a44e49148d2', resave: false, saveUninitialized: false, store: sessionStore }))
 	.use(passport.initialize())
 	.use(passport.session())
 	.use(compression())
+
+	// Serve index page.
+	.use(require('../server/controllers/pages'))
 
 	// Serve authentication related pages.
 	.use('/authentication', require('../server/controllers/authentication')) // eg: login page, ...

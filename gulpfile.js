@@ -63,9 +63,12 @@ gulp.task('copy-static', ['bower'], function() {
 			'client/favicon.ico',
 			'client/bower_components/font-awesome/fonts/*'
 		])
+		.pipe(gzip({append: false}))
 		.pipe(gulp.dest('wwwroot'));
 
-	gulp.src('client/img/*').pipe(gulp.dest('wwwroot/img'));
+	gulp.src('client/img/*')
+		.pipe(gzip({append: false}))
+		.pipe(gulp.dest('wwwroot/img'));
 });
 
 gulp.task('build-js', ['bower'], function() {

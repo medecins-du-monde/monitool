@@ -44,7 +44,7 @@ router.use(express.static(config.debug ? 'client' : 'wwwroot', {
 
 		let filename = path.substring(path.lastIndexOf('/') + 1);
 		
-		if (filename === 'monitool2.js' || filename === 'monitool2.css')
+		if (!config.debug)
 			response.header('Content-Encoding', 'gzip');
 
 		// Fonts will never change => infinite cache control
