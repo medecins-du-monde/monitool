@@ -128,51 +128,6 @@ module.exports = express.Router()
 	)
 
 	/**
-	 * This handler is called to log in users with azure oauth.
-	 * It checks if user is already logged in, and redirect to azure if not.
-	 */
-	.get(
-		'/login-azure',
-
-		// Check that user is not already logged in.
-		function(request, response, next) {
-			if (request.isAuthenticated && request.isAuthenticated() && request.user && request.user.type === 'user') {
-				// we need to check for nextUrl because authorize may have sent us here if some dark cookie+302 magic prevented him from knowing who it was speaking to.
-				if (request.session.nextUrl) {
-					response.render('redirect', {url: request.session.nextUrl});
-					delete request.session.nextUrl;
-				}
-				else
-					response.render('redirect', {url: '/'});
-			}
-			else
-				next();
-		},
-		
-		passport.authenticate('user_azure')
-	)
-
-	/**
-	 * This handler is called when users come back from azure.
-	 */
-	.get(
-		'/login-callback',
-		
-		passport.authenticate('user_azure', {
-			failureRedirect: '/'
-		}),
-		
-		function(request, response) {
-			if (request.session.nextUrl) {
-				response.render('redirect', {url: request.session.nextUrl});
-				delete request.session.nextUrl;
-			}
-			else
-				response.render('redirect', {url: '/'});
-		}
-	)
-
-	/**
 	 * Log current user out.
 	 * FIXME This query should be POST: loggin an user out is not idempotent.
 	 */
@@ -181,6 +136,56 @@ module.exports = express.Router()
 		request.logout();
 		response.redirect('/');
 	});
+
+
+if (config.auth.providers.azureAD) {
+
+	/**
+	 * This handler is called to log in users with azure oauth.
+	 * It checks if user is already logged in, and redirect to azure if not.
+	 */
+	module.exports
+		.get(
+			'/login-azure',
+
+			// Check that user is not already logged in.
+			function(request, response, next) {
+				if (request.isAuthenticated && request.isAuthenticated() && request.user && request.user.type === 'user') {
+					// we need to check for nextUrl because authorize may have sent us here if some dark cookie+302 magic prevented him from knowing who it was speaking to.
+					if (request.session.nextUrl) {
+						response.render('redirect', {url: request.session.nextUrl});
+						delete request.session.nextUrl;
+					}
+					else
+						response.render('redirect', {url: '/'});
+				}
+				else
+					next();
+			},
+			
+			passport.authenticate('user_azure')
+		)
+
+		/**
+		 * This handler is called when users come back from azure.
+		 */
+		.get(
+			'/login-callback',
+			
+			passport.authenticate('user_azure', {
+				failureRedirect: '/'
+			}),
+			
+			function(request, response) {
+				if (request.session.nextUrl) {
+					response.render('redirect', {url: request.session.nextUrl});
+					delete request.session.nextUrl;
+				}
+				else
+					response.render('redirect', {url: '/'});
+			}
+		)
+}
 
 if (config.auth.providers.training) {
 
