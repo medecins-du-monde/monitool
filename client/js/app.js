@@ -420,13 +420,13 @@ window.monitool.config(function($stateProvider, $urlRouterProvider) {
 		url: '/reporting',
 		template: '<div ui-view></div>',
 		resolve: {
-			cubes: function(Cube, project) {
-				return Cube.fetchProject(project._id).then(function(cs) {
-					var byid = {};
-					cs.forEach(function(c) { byid[c.id] = c; });
-					return byid;
-				});
-			}
+			// cubes: function(Cube, project) {
+			// 	return Cube.fetchProject(project._id).then(function(cs) {
+			// 		var byid = {};
+			// 		cs.forEach(function(c) { byid[c.id] = c; });
+			// 		return byid;
+			// 	});
+			// }
 		}
 	});
 
@@ -492,7 +492,13 @@ window.monitool.config(function($stateProvider, $urlRouterProvider) {
 });
 
 
-window.monitool.run(function($rootScope, $state) {
+window.monitool.run(function($rootScope, $window, $state) {
+
+	// Scroll to top when changing page.
+	$rootScope.$on('$stateChangeSuccess', function(e, toState, toParams, fromState, fromParams) {
+		$window.scrollTo(0, 0);
+	});
+
 	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
 		if (error.status === 401) {
 			alert("Session has expired, you need to log in again");
