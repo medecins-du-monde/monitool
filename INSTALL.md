@@ -25,10 +25,6 @@ We can simply use the version from the package manager.
 	# Install couchdb
 	> sudo apt install couchdb
 
-	# Create databases needed by Monitool to work
-	> curl -X PUT http://localhost:5984/monitool-documents
-	> curl -X PUT http://localhost:5984/monitool-sessions
-
 	# Set up administrator account to get out of CouchDB "admin party"
 	# Leave the quote as they are in this example, it is not a mistake.
 	> curl -X PUT http://localhost:5984/_config/admins/johndoe -d '"jdpassword"'
@@ -37,7 +33,7 @@ We can simply use the version from the package manager.
 
 This configuration is for HTTP only.
 
-Get a proper certificate and set it up in NGINX for a production server. Passwords and session cookies will be unencrypted in transit otherwise.
+Please use HTTPS in a production server, as partners will log in monitool using a password, which should not transit in clear text over the network.
 
 	# Install the distribution package
 	> sudo apt install nginx
@@ -67,15 +63,9 @@ Get a proper certificate and set it up in NGINX for a production server. Passwor
 
 We assume that NodeJS is already installed and running.
 
-	# Install Bower and Gulp-cli globally, to have them in the PATH
-	> sudo npm install --g bower gulp-cli
-
 	# Clone the repository and enter the folder
 	> git clone git@github.com:medecins-du-monde/monitool.git
 	> cd monitool
-
-	# Install all dependencies needed by Monitool's API
-	> npm install
 
 We now need to create a configuration file
 
@@ -85,56 +75,74 @@ We now need to create a configuration file
 	# Change document as following
 	> vi config.json
 	{
+		// Putting debug = true will prevent using the minified files for frontend,
+		// disable compression, and expose error data to users.
+		// Never use in a production server.
 		"debug": false,
+
+		// do not put a trailing slash here
+		"baseUrl": "http://monitool.yourorganization.com",
+
+		// Use the same port as in the reverse proxy configuration
 		"port": 8000,
-		"home": "http://monitool.yourorganization.com/",
+
+		// Database configuration
 		"couchdb": {
-			"url": "http://localhost:5984",
-			"bucket": "monitool-documents",
 			"host": "localhost",
+			"port": 5984,
+			
+			// Call those bucket as you wish, but don't use the same bucket for
+			// documents and sessions.
+			"bucket": "monitool",
 			"sessionBucket": "monitool-sessions",
-			"username": null,
-			"password": null
+
+			// This user accounts comes from the previous step ("installing database").
+			"username": "johndoe",
+			"password": "jdpassword"
 		},
-		"oauth": {
-			"authUrl": "https://login.windows.net/common/oauth2/authorize",
-			"tokenUrl": "https://login.windows.net/common/oauth2/token",
-			"clientId": <get application ID of azure>,
-			"clientSecret": <get key value of azure>,
-			"callbackUrl": "http://monitool.yourorganization.com/authentication/login-callback",
-			"resource": "https://graph.windows.net"
+		"api": {
+			// This API key will be used to translate indicator definitions in the settings
+			// page of monitool.
+			// If not needed, it can be left blank (but automatic translations won't work)
+			"google": "[enter google translate api key here]"
 		},
-        	"apps": [{
-                	"name"       : "monitool",
-                	"script"     : "server/app.js",
-                	"cwd"        : "/home/USER/monitool",
-                	"error_file" : "log/monitool-error.log",
-                	"out_file"   : "log/monitool-out.log",
-                	"pid_file"   : "pids/monitool.pid",
-                	"watch"      : true
-        	}]
+		"auth": {
+			// If your email account is myaccount@yourorganisation.com
+			// this line will give your account administrative priviledge
+			"administrator": "myaccount",
+
+			// Define at most one provider in a production server
+			"providers": {
+				// Use AzureAD accounts
+				"azureAD": {
+					"label": "Use MDM account",
+					"domain": "medecinsdumonde.net",
+
+					// Get those from https://azure.microsoft.com
+					"clientId": "[enter client id]",
+					"clientSecret": "[enter client secret]"
+				},
+
+				// Training accounts when enabled, allow to log in with
+				// an administrator account without password.
+				"training": {
+					"label": "Use training account (admin)",
+					"account": "romain.gilliotte"
+				}
+			}
+		}
 	}
 
+Install dependencies, and build the app
 
-The last step is to build release files, and configure the database
+	# Install all dependencies needed by Monitool's backend
+	> npm install
 
-	# Build all javascript release files in the `wwwroot` folder
-	> gulp build
+	# Install dependencies and build application for the frontend
+	> ./node_modules/.bin/gulp build
 
-	# Configure the database
-	> gulp design-docs
-	
-initialisation the first admin user
 
-	> curl -H 'Content-Type: application/json' \
-            -X POST http://127.0.0.1:5984/monitool-documents \
-            -d '{"_id":"usr:firstname.lastname","type":"user","name":"FirtsName LastName","role":"admin"}'
-	    
-anwer
-
-	{"ok":true,"id":"usr:firstname.lastname","rev":"1-910a851579dc5dd380bf757f3cd33bcd"}
-
-### Installing monitool as a service (only for production server)
+### Install monitool as a service (only for production server)
 
 An easy way to install a NodeJS application as a service is to use pm2.
 

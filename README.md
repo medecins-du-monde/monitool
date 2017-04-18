@@ -6,6 +6,8 @@ It is composed by
 - A REST API, made with NodeJS
 - A single page application, made with Angular 1
 
+A demo version can be seen at http://monitool-training.medecinsdumonde.net
+
 ## Dependencies
 
 External dependencies that should be pre-installed are:
