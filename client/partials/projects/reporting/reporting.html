@@ -96,6 +96,14 @@
 			<th ng-repeat="col in cols" style="min-width: 50px" title="{{col.title}}">{{col.name}}</th>
 		</tr>
 	</thead>
+	<tbody ng-if="!cubes">
+		<tr>
+			<td colspan="{{2 + cols.length}}">
+				<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>
+				<span translate="shared.loading"></span>	
+			</td>
+		</tr>
+	</tbody>
 	<tbody ng-repeat="(blockIndex, block) in blocks">
 		<tr ng-click="open[blockIndex] = !open[blockIndex]" style="cursor: pointer">
 			<th class="indent0" colspan="{{2 + cols.length}}">

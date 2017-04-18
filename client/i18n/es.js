@@ -164,6 +164,7 @@ var SPANISH_LOCALE = (function() {
 
 var SPANISH_TRANSLATION = {
 	shared: {
+		loading: "Cargando...",
 		portrait: "Vertical",
 		landscape: "Horizontal",
 

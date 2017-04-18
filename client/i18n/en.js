@@ -164,6 +164,7 @@ var ENGLISH_LOCALE = (function() {
 
 var ENGLISH_TRANSLATION = {
 	shared: {
+		loading: "Loading...",
 		portrait: "Portrait",
 		landscape: "Landscape",
 

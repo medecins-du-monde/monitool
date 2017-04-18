@@ -164,6 +164,7 @@ var FRENCH_LOCALE = (function() {
 
 var FRENCH_TRANSLATION = {
 	shared: {
+		loading: "Chargement en cours...",
 		portrait: "Portrait",
 		landscape: "Paysage",
 

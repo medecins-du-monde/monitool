@@ -416,18 +416,9 @@ window.monitool.config(function($stateProvider, $urlRouterProvider) {
 	///////////////////////////
 
 	$stateProvider.state('main.project.reporting', {
-		abstract: true,
 		url: '/reporting',
 		template: '<div ui-view></div>',
-		resolve: {
-			// cubes: function(Cube, project) {
-			// 	return Cube.fetchProject(project._id).then(function(cs) {
-			// 		var byid = {};
-			// 		cs.forEach(function(c) { byid[c.id] = c; });
-			// 		return byid;
-			// 	});
-			// }
-		}
+		controller: 'ProjectSharedReportingController'
 	});
 
 	$stateProvider.state('main.project.reporting.general', {

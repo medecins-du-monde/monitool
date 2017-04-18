@@ -104,11 +104,23 @@
 	<span translate="shared.download_table"></span>
 </button>
 
-<div style="clear: both">
+<div style="clear: both"></div>
 
+<div ng-if="!cubes">
+	<table class="table table-bordered" id="reporting">
+		<tbody>
+			<tr>
+				<td>
+					<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>
+					<span translate="shared.loading"></span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div ng-if="cubes">
 	<div ng-if="display.cols.length == 0 && display.rows.length == 0">
-		
-		
 		<table class="table table-bordered" id="reporting">
 			<tbody>
 				<tr>
@@ -120,4 +132,5 @@
 	</div>
 
 	<olap-grid unit="unit" colorization="colorization" cols="display.cols" rows="display.rows" data="display.data"></olap-grid>
+
 </div>
