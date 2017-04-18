@@ -88,6 +88,9 @@ angular.module('monitool.controllers.project.input', [])
 		};
 
 		$scope.save = function() {
+			if ((!$scope.isNew && $scope.isUnchanged()) || !$scope.isValid())
+				return;
+
 			pageChangeWatch()
 			$scope.currentInput.$save(function() { $state.go('main.project.input.list'); });
 		};
