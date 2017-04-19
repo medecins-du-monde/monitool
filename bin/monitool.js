@@ -2,16 +2,16 @@
 
 "use strict";
 
-var express      = require('express'),
-	compression  = require('compression'),
+let compression  = require('compression'),
 	cookieParser = require('cookie-parser'),
+	express      = require('express'),
 	session      = require('express-session'),
 	path         = require('path'),
 	winston      = require('winston'),
-	database     = require('../server/resource/database'),
+	config       = require('../server/config'),
 	passport     = require('../server/authentication/passport'),
 	sessionStore = require('../server/authentication/session-store'),
-	config       = require('../server/config');
+	database     = require('../server/resource/database');
 
 // Catch the uncaught errors that weren't wrapped in a domain or try catch statement
 process.on('uncaughtException', function(err) {
@@ -20,7 +20,10 @@ process.on('uncaughtException', function(err) {
 });
 
 let application = express()
-	.disable('x-powered-by')
+	// Basic Configuration
+	.disable('x-powered-by') // Remove useless header.
+	.set('view engine', 'pug') // Enable template engine.
+	.set('views', path.join(__dirname, '../server/views'))
 
 	// By default users should never cache anything.
 	.use(function(request, response, next) {
@@ -32,10 +35,6 @@ let application = express()
 
 	// Serve static files.
 	.use(require('../server/controllers/static'))
-
-	// Enable template engine.
-	.set('view engine', 'pug')
-	.set('views', path.join(__dirname, '../server/views'))
 
 	// Enable dynamic sessions and compression for the rest.
 	.use(cookieParser())

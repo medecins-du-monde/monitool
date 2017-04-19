@@ -18,15 +18,10 @@
 "use strict";
 
 var passport               = require('passport'),
-	BasicStrategy          = require('passport-http').BasicStrategy,
-	BearerStrategy         = require('passport-http-bearer').Strategy,
 	LocalStrategy          = require('passport-local').Strategy,
 	OAuth2Strategy         = require('passport-oauth2'),
-	ClientPasswordStrategy = require('passport-oauth2-client-password'),
 	passwordHash           = require('password-hash'),
 	User                   = require('../resource/model/user'),
-	Client                 = require('../resource/model/client'),
-	AccessToken            = require('../resource/model/access-token'),
 	config                 = require('../config');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -43,7 +38,7 @@ passport.serializeUser(function(user, done) {
 	// clients are not allowed to have sessions, so this should never be called.
 	// let's make sure of that
 	else
-		throw new Error('Clients cannot have sessions. Use bearer token or basic auth');
+		throw new Error('Invalid user');
 });
 
 passport.deserializeUser(function(id, done) {
@@ -68,7 +63,7 @@ passport.deserializeUser(function(id, done) {
 			.catch(function(error) { done(error); });
 	}
 	else
-		throw new Error('Clients cannot have sessions.');
+		throw new Error('Invalid user.');
 });
 
 
@@ -166,25 +161,7 @@ if (config.auth.providers.azureAD) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// User authentication with bearer token
-/////////////////////////////////////////////////////////////////////////////
-
-passport.use('user_accesstoken', new BearerStrategy(function(strAccessToken, done) {
-	AccessToken.storeInstance
-		.get(strAccessToken)
-		.then(function(accessToken) {
-			return User.storeInstance.get(accessToken.userId);
-		})
-		.then(function(user) {
-			done(null, user);
-		})
-		.catch(function(error) {
-			done(error);
-		});
-}));
-
-/////////////////////////////////////////////////////////////////////////////
-// User authentication with email and password (MDM partners)
+// User authentication with username and password (MDM partners)
 /////////////////////////////////////////////////////////////////////////////
 
 passport.use('partner_local', new LocalStrategy(
@@ -223,29 +200,6 @@ if (config.auth.providers.training) {
 		})
 	);
 }
-
-/////////////////////////////////////////////////////////////////////////////
-// Client log in, with passport or basic auth.
-/////////////////////////////////////////////////////////////////////////////
-
-var authenticateClient = function(clientId, clientSecret, done) {
-	Client.storeInstance.get(clientId).then(
-		function(client) {
-			// Timing attack yeah!
-			// No password hashing yeah!
-			if (client.secret !== clientSecret)
-				return done(null, false);
-
-			return done(null, client);
-		},
-		function(error) {
-			return done(error);
-		}
-	);
-};
-
-passport.use('client_basic', new BasicStrategy(authenticateClient));
-passport.use('client_password', new ClientPasswordStrategy(authenticateClient));
 
 module.exports = passport;
 
