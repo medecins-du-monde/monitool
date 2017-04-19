@@ -123,7 +123,7 @@ module.exports = express.Router()
 		bodyParser,
 		passport.authenticate('partner_local', {
 			successRedirect: '/',
-			failureRedirect: '/',
+			failureRedirect: '/?failed'
 		})
 	)
 

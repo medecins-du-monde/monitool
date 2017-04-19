@@ -45,14 +45,23 @@ function getInternetExplorerVersion() {
  * This handler is called when the Partner login button is clicked
  * It changes the display to show the login/password form.
  */
-function onParterLoginClicked(e) {
-	// rezize logo_img
-	document.getElementById('logo_img').style.width = '190px';
+function onParterLoginClicked(e, showError) {
+	// rezize logo_img, show error msg
+	if (showError) {
+		document.getElementById('wrong_login').style.display = 'block';
+		document.getElementById('logo_img').style.width = '190px';
+	}
+	else {
+		document.getElementById('wrong_login').style.display = 'none';
+		document.getElementById('logo_img').style.width = '200px';
+	}
 
 	// hide login screen, show login form
 	document.getElementById('login_buttons').style.display = 'none';
 	document.getElementById('partner_login').style.display = 'block';
-	e.preventDefault();
+
+	if (e)
+		e.preventDefault();
 }
 
 /**
@@ -156,9 +165,14 @@ function startLoginPage() {
 		document.getElementById('go_back_btn').addEventListener('click', onGoBackClicked, false);
 
 		// Send request to see if user is logged in.
-		var authReq = new XMLHttpRequest();
-		authReq.addEventListener("load", onAuthResponse, false);
-		authReq.open('GET', '/resources/myself?' + Math.random().toString().substring(2));
-		authReq.send();
+		if (window.location.href.indexOf('failed') !== -1)
+			onParterLoginClicked(null, true);
+
+		else {
+			var authReq = new XMLHttpRequest();
+			authReq.addEventListener("load", onAuthResponse, false);
+			authReq.open('GET', '/resources/myself?' + Math.random().toString().substring(2));
+			authReq.send();
+		}
 	}
 }

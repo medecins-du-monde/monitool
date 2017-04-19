@@ -416,7 +416,7 @@ ul:hover>.onrollover {
       #load-container{
         position: absolute;
         top: 50%;
-        margin-top: -200px;/* half of #content height*/
+        margin-top: -205px;/* half of #content height*/
         left: 0;
         width: 100%;
       }
@@ -425,7 +425,7 @@ ul:hover>.onrollover {
         width: 624px;
         margin-left: auto;
         margin-right: auto;
-        height: 395px;
+        height: 410px;
         text-align: center;
         background-color: #FFF;
         border: 1px solid #CCC;
