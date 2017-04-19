@@ -90,7 +90,7 @@ class DataSource extends Model {
 						{style: "variableName", text: "Collected by"},
 						{
 							table: {headerRows: 0, widths: ['*'], body: [[{style: "normal", text: ' '}]]},
-							margin: [0, 0, 10, 0]
+							margin: [0, 0, 0, 0]
 						}
 					]
 				]

@@ -128,7 +128,11 @@ class Variable extends Model {
 		// Add empty field in the top-left corner for topRows
 		topRows.forEach(function(topRow, index) {
 			for (var i = 0; i < rowPartitions.length; ++i)
-				topRow.unshift('');
+				topRow.unshift({
+					text: ' ',
+					colSpan: i == rowPartitions.length - 1 ? rowPartitions.length : 1,
+					rowSpan: index == 0 ? topRows.length : 1
+				});
 		});
 
 		body = topRows.concat(bodyRows);
@@ -139,16 +143,34 @@ class Variable extends Model {
 		for (var j = 0; j < dataColsPerRow; ++j)
 			widths.push('*');
 
-		return  [
-			{style: "variableName", text: this.name},
-			{
+		// Create stack with label and table.
+		var result = {
+			stack: [
+				{style: "variableName", text: this.name},
+				{
+					table: {
+						headerRows: colPartitions.length,
+						dontBreakRows: true,
+						widths: widths,
+						body: body
+					}
+				}
+			]
+		};
+
+		// FIXME This is not ideal at all, but the best that can be done with current pdfmake API.
+		// if table is not very long, make sure it is not cut in the middle.
+		if (body.length < 20)
+			result = {
+				layout: 'noBorders',
 				table: {
-					headerRows: colPartitions.length,
-					widths: widths,
-					body: body
+					dontBreakRows: true,
+					widths: ['*'],
+					body: [[result]]
 				}
 			}
-		];
+		
+		return result;
 	}
 
 	_makeRows(partitions) {
