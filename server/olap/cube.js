@@ -138,6 +138,18 @@ class Cube {
 			// 	data[offset + i] = source[i];
 		});
 
+		var keys = Object.keys(data);
+		keys.sort((a, b) => a * 1 - b * 1)
+		
+		for (var i = keys.length - 1; i > 0; --i) {
+			var key = keys[i - 1], nextKey = keys[i];
+
+			if (key * 1 + data[key].length == nextKey) {
+				Array.prototype.push.apply(data[key], data[nextKey]);
+				delete data[nextKey];
+			}
+		}
+
 		// Build and fill cube
 		return new Cube(element.id, dimensions, dimensionGroups, data);
 	}
