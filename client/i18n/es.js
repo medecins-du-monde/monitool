@@ -313,7 +313,7 @@ var SPANISH_TRANSLATION = {
 		partition_general: "General",
 		partition_general_placeholder: "ej: Grupos de edad, sexo, motivo de consulta, patología, ...",
 		partition_elements: "Elementos",
-		aggregation_lab: "Como agregar los elements juntos?",
+		aggregation_lab: "Como compilar los elements juntos?",
 		partition_name: "Nombre",
 		partition_name_placeholder: "ex: Menor de 12 años, hombre, consultación social, gripe, ...",
 		no_partition_elements: "Pulse \"Añadir\" para añadir un elemento en la desagregación",
@@ -427,7 +427,7 @@ var SPANISH_TRANSLATION = {
 			highest: "Número mayor",
 			lowest: "Número menor",
 			last: "Último valor",
-			none: "No es posible agregar"
+			none: "No es posible compilar"
 		},
 
 		covered_period: "Periodo cubierto",
@@ -605,8 +605,8 @@ var SPANISH_TRANSLATION = {
 		
 		variable_name_label: "Qué esta midiendo?",
 		variable_name_ph: "ej: Número de diagnosticos",
-		site_agg_label: "Como agregar entradas provenientes de diferentes lugares?",
-		time_agg_label: "Como agregar entradas provenientes de diferentes periodos?",
+		site_agg_label: "Como compilar entradas provenientes de diferentes lugares?",
+		time_agg_label: "Como compilar entradas provenientes de diferentes periodos?",
 		partitions_label: "Que desagregaciones quiere usar en esta variable?",
 		distribution_label: "Como mostrar la desagregaciones en el formulario de colecta?",
 		order_label: "En que ordén mostrar las desagregaciones en el formulario de colecta?",
