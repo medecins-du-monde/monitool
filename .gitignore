@@ -2,6 +2,7 @@
 .~*
 build
 config.json
+pm2.json
 
 # Logs
 logs
