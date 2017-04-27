@@ -25,7 +25,7 @@ var express     = require('express'),
 	Project     = require('../resource/model/project'),
 	Theme       = require('../resource/model/theme');
 
-var bodyParser = require('body-parser').json();
+var bodyParser = require('body-parser').json({limit: '1mb'});
 
 
 
