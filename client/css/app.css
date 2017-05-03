@@ -705,11 +705,11 @@ ul[ng-sortable] li *, i.fa.fa-bars {
     z-index: 5;
   }
 
-#reporting .fa-line-chart {
+.fa-thumb-tack, #reporting .fa-line-chart {
   color: #ccc;
   cursor: pointer;
 }
-#reporting .fa-line-chart:hover {
+.fa-thumb-tack:hover, #reporting .fa-line-chart:hover {
   color: #555;
 
 }

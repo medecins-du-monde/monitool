@@ -1,7 +1,12 @@
 
 <div class="input-group">
 	<div class="input-group-addon" style="vertical-align: middle;">
-		<input type="checkbox" ng-model="specifyValue" />
+		<!-- <input type="checkbox" ng-model="specifyValue" /> -->
+
+		<i class="fa fa-thumb-tack"
+		   ng-click="specifyValue=!specifyValue"
+		   ng-style="{color: specifyValue ? 'black' : 'revert'}"></i>
+
 	</div>
 
 	<input type="number"
