@@ -110,7 +110,11 @@
 		
 		<tr ng-repeat="row in block.rows">
 			<td class="noprint" style="text-align: center">
-				<input id="{{row.id}}" type="checkbox" ng-model="plots[row.id]" ng-if="row.type === 'data' && row.cols" />
+				<i class="fa fa-line-chart"
+				   ng-click="plots[row.id]=!plots[row.id]"
+				   ng-if="row.type === 'data' && row.cols"
+				   ng-style="{color: plots[row.id] ? 'black' : 'revert'}"></i>
+
 			</td>
 
 			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{1 + cols.length}}">{{row.text}}</th>

@@ -704,3 +704,12 @@ ul[ng-sortable] li *, i.fa.fa-bars {
     background-color: #f6f6f6;
     z-index: 5;
   }
+
+#reporting .fa-line-chart {
+  color: #ccc;
+  cursor: pointer;
+}
+#reporting .fa-line-chart:hover {
+  color: #555;
+
+}
