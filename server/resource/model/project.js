@@ -88,15 +88,19 @@ class Project extends DbModel {
 	 * @return {Promise}
 	 */
 	destroy() {
-		return Input.storeInstance.listByProject(this._id).then(function(inputs) {
-			inputs = inputs.map(function(input) {
-				return {_id: i._id, _rev: i._rev, _deleted: true};
+		return Input.storeInstance.listByProject(this._id)
+			.then(function(inputs) {
+				inputs = inputs.map(function(i) {
+					return {_id: i._id, _rev: i._rev, _deleted: true};
+				});
+
+				let docs = [{_id: this._id, _rev: this._rev, _deleted: true}].concat(inputs);
+
+				return this._db.callBulk({docs: docs});
+			}.bind(this))
+			.then(function(result) {
+				return {}
 			});
-
-			let docs = [{_id: this._id, _rev: this._rev, _deleted: true}].concat(inputs);
-
-			return this._db.callBulk({docs: docs});
-		});
 	}
 
 	/**
