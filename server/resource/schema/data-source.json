@@ -6,12 +6,42 @@
 	"additionalProperties": false,
 	"required": ["id", "name", "periodicity", "start", "end", "elements"],
 	"properties": {
-		"id": { "$ref": "#/definitions/uuid" },
-		"name": { "type": "string", "minLength": 1 },
-		"entities": { "type": "array", "items": { "$ref": "#/definitions/uuid" } },
-		"periodicity": { "type": "string", "enum": ["day", "week_sat", "week_sun", "week_mon", "month", "quarter", "semester", "year", "free"] },
-		"start": { "oneOf": [{"type": "null"}, { "type": "string", "format": "date" }]},
-		"end": { "oneOf": [{"type": "null"}, { "type": "string", "format": "date" }]},
+		"id": {
+			"$ref": "#/definitions/uuid"
+		},
+		"name": {
+			"type": "string",
+			"minLength": 1
+		},
+		"entities": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/uuid" }
+		},
+		"periodicity": {
+			"type": "string",
+			"enum": [
+				"day",
+				"week_sat", "week_sun", "week_mon",
+				"month_week_sat", "month_week_sun", "month_week_mon",
+				"month",
+				"quarter",
+				"semester",
+				"year",
+				"free"
+			]
+		},
+		"start": {
+			"oneOf": [
+				{"type": "null"},
+				{ "type": "string", "format": "date" }
+			]
+		},
+		"end": {
+			"oneOf": [
+				{"type": "null"},
+				{ "type": "string", "format": "date" }
+			]
+		},
 		"elements": { "type": "array" }
 	},
 

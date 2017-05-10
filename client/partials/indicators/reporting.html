@@ -51,6 +51,9 @@
 						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
 						<select class="form-control input-sm" id="group-by-input" ng-model="groupBy">
 							<option value="day" translate="shared.day"></option>
+							<option value="month_week_sat" translate="shared.month_week_sat"></option>
+							<option value="month_week_sun" translate="shared.month_week_sun"></option>
+							<option value="month_week_mon" translate="shared.month_week_mon"></option>
 							<option value="week_sat" translate="shared.week_sat"></option>
 							<option value="week_sun" translate="shared.week_sun"></option>
 							<option value="week_mon" translate="shared.week_mon"></option>
@@ -74,7 +77,7 @@
 <div style="clear: both"></div>
 
 <reporting-graph-adapter
-	type="['year', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
+	type="['year', 'quarter', 'month', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
 	rows="rows" cols="cols" plots="plots">
 </reporting-graph-adapter>
 

@@ -36,8 +36,33 @@ class TimeSlot {
 	 * ts2.value // '2010-Q4'
 	 */
 	static fromDate(utcDate, periodicity) {
+
 		if (periodicity === 'day')
 			return new TimeSlot(utcDate.toISOString().substring(0, 10));
+
+		else if (periodicity === 'month_week_sat' || periodicity === 'month_week_sun' || periodicity === 'month_week_mon') {
+			var prefix = utcDate.toISOString().substring(0, 8);
+
+			// if no sunday happened in the month OR month start with sunday, week number is one.
+			var firstDayOfMonth = new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), 1)).getUTCDay();
+
+			var firstWeekLength;
+			if (periodicity === 'month_week_sat')
+				firstWeekLength = 7 - ((firstDayOfMonth + 1) % 7);
+			else if (periodicity === 'month_week_sun')
+				firstWeekLength = 7 - firstDayOfMonth; // 1 if month start on saturday, 2 if friday, 7 if sunday
+			else
+				firstWeekLength = 7 - ((firstDayOfMonth - 1 + 7) % 7);
+			
+
+			if (utcDate.getUTCDate() <= firstWeekLength) {
+				return new TimeSlot(prefix + 'W1-' + periodicity.substr(-3));
+			}
+			else {
+				var weekNumber = Math.floor((utcDate.getUTCDate() - 1 - firstWeekLength) / 7) + 2;
+				return new TimeSlot(prefix + 'W' + weekNumber + '-' + periodicity.substr(-3));
+			}
+		}
 
 		else if (periodicity === 'week_sat' || periodicity === 'week_sun' || periodicity === 'week_mon') {
 			// Good epoch to count week is the first inferior to searched date (among next, current and last year, in that order).
@@ -199,28 +224,37 @@ class TimeSlot {
 	get periodicity() {
 		if (!this._periodicity) {
 			if (this.value.match(/^\d{4}$/))
-				this._periodicity = 'year'
+				this._periodicity = 'year';
 			
 			else if (this.value.match(/^\d{4}\-S\d$/))
 				this._periodicity = 'semester';
 
 			else if (this.value.match(/^\d{4}\-Q\d$/))
-				this._periodicity = 'quarter'
+				this._periodicity = 'quarter';
 			
 			else if (this.value.match(/^\d{4}\-\d{2}$/))
-				this._periodicity = 'month'
+				this._periodicity = 'month';
 			
 			else if (this.value.match(/^\d{4}\-W\d{2}-sat$/))
-				this._periodicity = 'week_sat'
+				this._periodicity = 'week_sat';
 			
 			else if (this.value.match(/^\d{4}\-W\d{2}-sun$/))
-				this._periodicity = 'week_sun'
+				this._periodicity = 'week_sun';
 			
 			else if (this.value.match(/^\d{4}\-W\d{2}-mon$/))
-				this._periodicity = 'week_mon'
+				this._periodicity = 'week_mon';
+
+			else if (this.value.match(/^\d{4}\-\d{2}\-W\d{1}-sat$/))
+				this._periodicity = 'month_week_sat';
 			
+			else if (this.value.match(/^\d{4}\-\d{2}\-W\d{1}-sun$/))
+				this._periodicity = 'month_week_sun';
+			
+			else if (this.value.match(/^\d{4}\-\d{2}\-W\d{1}-mon$/))
+				this._periodicity = 'month_week_mon';
+
 			else if (this.value.match(/^\d{4}\-\d{2}\-\d{2}$/))
-				this._periodicity = 'day'
+				this._periodicity = 'day';
 		}
 
 		return this._periodicity;
@@ -237,6 +271,30 @@ class TimeSlot {
 	get firstDate() {
 		if (this.periodicity === 'day')
 			return new Date(this.value + 'T00:00:00Z');
+
+		else if (this.periodicity === 'month_week_sat' || this.periodicity === 'month_week_sun' || this.periodicity === 'month_week_mon') {
+			var weekNumber = 1 * this.value.substr(9, 1);
+
+			var firstDayOfMonth = new Date(this.value.substring(0, 7) + '-01T00:00:00Z').getUTCDay();
+			if (weekNumber === 1)
+				return new Date(Date.UTC(this.value.substring(0, 4), this.value.substring(5, 7) - 1, 1));
+
+			else {
+				var firstWeekLength;
+				if (this.periodicity === 'month_week_sat')
+					firstWeekLength = 7 - ((firstDayOfMonth + 1) % 7);
+				else if (this.periodicity === 'month_week_sun')
+					firstWeekLength = 7 - firstDayOfMonth; // 1 if month start on saturday, 2 if friday, 7 if sunday
+				else
+					firstWeekLength = 7 - ((firstDayOfMonth - 1 + 7) % 7);
+				
+				return new Date(Date.UTC(
+					this.value.substring(0, 4),
+					this.value.substring(5, 7) - 1,
+					1 + firstWeekLength + (weekNumber - 2) * 7
+				));
+			}
+		}
 
 		else if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon')
 			return new Date(
@@ -277,6 +335,34 @@ class TimeSlot {
 		if (this.periodicity === 'day')
 			// last day is current day
 			return this.firstDate;
+
+		else if (this.periodicity === 'month_week_sat' || this.periodicity === 'month_week_sun' || this.periodicity === 'month_week_mon') {
+			var weekNumber = this.value.substr(9, 1);
+
+			var firstDayOfMonth = new Date(this.value.substring(0, 7) + '-01T00:00:00Z').getUTCDay();
+			var firstWeekLength;
+			if (this.periodicity === 'month_week_sat')
+				firstWeekLength = 7 - ((firstDayOfMonth + 1) % 7);
+			else if (this.periodicity === 'month_week_sun')
+				firstWeekLength = 7 - firstDayOfMonth; // 1 if month start on saturday, 2 if friday, 7 if sunday
+			else
+				firstWeekLength = 7 - ((firstDayOfMonth - 1 + 7) % 7);
+
+			if (weekNumber === 1)
+				return new Date(Date.UTC(this.value.substring(0, 4), this.value.substring(5, 7) - 1, firstWeekLength));
+			else {
+				var res = new Date(Date.UTC(
+					this.value.substring(0, 4),
+					this.value.substring(5, 7) - 1,
+					1 + 6 + firstWeekLength + (weekNumber - 2) * 7
+				));
+
+				if (res.getUTCMonth() !== this.value.substring(5, 7) - 1)
+					res.setUTCDate(0); // go to last day of previous month.
+
+				return res;
+			}
+		}
 
 		else if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon') {
 			// last day is last day of the week according to epoch
@@ -362,7 +448,10 @@ class TimeSlot {
  * @type {Object}
  */
 TimeSlot._upperSlots = {
-	'day': ['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'],
+	'day': ['month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'],
+	'month_week_sat': ['week_sat', 'month', 'quarter', 'semester', 'year'],
+	'month_week_sun': ['week_sun', 'month', 'quarter', 'semester', 'year'],
+	'month_week_mon': ['week_mon', 'month', 'quarter', 'semester', 'year'],
 	'week_sat': ['month', 'quarter', 'semester', 'year'],
 	'week_sun': ['month', 'quarter', 'semester', 'year'],
 	'week_mon': ['month', 'quarter', 'semester', 'year'],

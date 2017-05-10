@@ -42,7 +42,7 @@ angular
 		$scope.filters = {_location: "none", _start: $scope.masterProject.start, _end: $scope.masterProject.end < new Date() ? $scope.masterProject.end : new Date()};
 		
 		// default + available group by
-		$scope.periodicities = ["day", "week_sat", "week_sun", "week_mon", "month", "quarter", "semester", "year"].filter(function(periodicity) {
+		$scope.periodicities = ['day', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].filter(function(periodicity) {
 			for (var i = 0; i < $scope.masterProject.forms.length; ++i) {
 				var form = $scope.masterProject.forms[i];
 				if (form.periodicity == 'free' || form.periodicity == periodicity || TimeSlot._upperSlots[form.periodicity].indexOf(periodicity) !== -1)
@@ -234,7 +234,7 @@ angular
 				
 				// Init all filters as full
 				cube.dimensions.forEach(function(dimension) {
-					if (['day', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].indexOf(dimension.id) === -1)
+					if (['day', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].indexOf(dimension.id) === -1)
 						filters[dimension.id] = dimension.items;
 				});
 
@@ -250,7 +250,7 @@ angular
 				if (element.type === 'variable')
 					$scope.dimensions = $scope.dimensions.concat(element.element.partitions);
 
-				['day', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].forEach(function(time) {
+				['day', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].forEach(function(time) {
 					var dim = cube.dimensionsById[time] || cube.dimensionGroupsById[time];
 					if (dim)
 						$scope.dimensions.push({
@@ -267,7 +267,7 @@ angular
 
 			$scope.$watch('[dimensions, query.colDimensions, query.rowDimensions]', function() {
 				// update available rows and cols
-				var timeFields = ['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'day'],
+				var timeFields = ['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'day'],
 					timeUsedOnCols = timeFields.find(function(tf) { return $scope.query.colDimensions.indexOf(tf) !== -1; }),
 					timeUsedOnRows = timeFields.find(function(tf) { return $scope.query.rowDimensions.indexOf(tf) !== -1; });
 

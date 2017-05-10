@@ -32,6 +32,29 @@ angular
 			if (periodicity === 'day')
 				return new TimeSlot(utcDate.toISOString().substring(0, 10));
 
+			else if (periodicity === 'month_week_sat' || periodicity === 'month_week_sun' || periodicity === 'month_week_mon') {
+				var prefix = utcDate.toISOString().substring(0, 8);
+
+				// if no sunday happened in the month OR month start with sunday, week number is one.
+				var firstDayOfMonth = new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), 1)).getUTCDay();
+
+				var firstWeekLength;
+				if (periodicity === 'month_week_sat')
+					firstWeekLength = 7 - ((firstDayOfMonth + 1) % 7);
+				else if (periodicity === 'month_week_sun')
+					firstWeekLength = 7 - firstDayOfMonth; // 1 if month start on saturday, 2 if friday, 7 if sunday
+				else
+					firstWeekLength = 7 - ((firstDayOfMonth - 1 + 7) % 7);
+				
+				if (utcDate.getUTCDate() <= firstWeekLength) {
+					return new TimeSlot(prefix + 'W1-' + periodicity.substr(-3));
+				}
+				else {
+					var weekNumber = Math.floor((utcDate.getUTCDate() - 1 - firstWeekLength) / 7) + 2;
+					return new TimeSlot(prefix + 'W' + weekNumber + '-' + periodicity.substr(-3));
+				}
+			}
+
 			else if (periodicity === 'week_sat' || periodicity === 'week_sun' || periodicity === 'week_mon') {
 				// Good epoch to count week is the first inferior to searched date (among next, current and last year, in that order).
 				var year = utcDate.getUTCFullYear() + 1,
@@ -71,7 +94,10 @@ angular
 
 
 		TimeSlot._upperSlots = {
-			'day': ['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'],
+			'day': ['month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'],
+			'month_week_sat': ['week_sat', 'month', 'quarter', 'semester', 'year'],
+			'month_week_sun': ['week_sun', 'month', 'quarter', 'semester', 'year'],
+			'month_week_mon': ['week_mon', 'month', 'quarter', 'semester', 'year'],
 			'week_sat': ['month', 'quarter', 'semester', 'year'],
 			'week_sun': ['month', 'quarter', 'semester', 'year'],
 			'week_mon': ['month', 'quarter', 'semester', 'year'],
@@ -186,6 +212,15 @@ angular
 			if (slotValue.match(/^\d{4}\-W\d{2}-mon$/))
 				return 'week_mon';
 			
+			if (slotValue.match(/^\d{4}\-\d{2}\-W\d{1}-sat$/))
+				return 'month_week_sat'
+			
+			if (slotValue.match(/^\d{4}\-\d{2}\-W\d{1}-sun$/))
+				return 'month_week_sun'
+			
+			if (slotValue.match(/^\d{4}\-\d{2}\-W\d{1}-mon$/))
+				return 'month_week_mon'
+
 			if (slotValue.match(/^\d{4}\-\d{2}\-\d{2}$/))
 				return 'day';
 
@@ -195,6 +230,30 @@ angular
 		TimeSlot.prototype.getFirstDate = function() {
 			if (this.periodicity === 'day')
 				return new Date(this.value + 'T00:00:00Z');
+
+			else if (this.periodicity === 'month_week_sat' || this.periodicity === 'month_week_sun' || this.periodicity === 'month_week_mon') {
+				var weekNumber = 1 * this.value.substr(9, 1);
+
+				var firstDayOfMonth = new Date(this.value.substring(0, 7) + '-01T00:00:00Z').getUTCDay();
+				if (weekNumber === 1)
+					return new Date(Date.UTC(this.value.substring(0, 4), this.value.substring(5, 7) - 1, 1));
+
+				else {
+					var firstWeekLength;
+					if (this.periodicity === 'month_week_sat')
+						firstWeekLength = 7 - ((firstDayOfMonth + 1) % 7);
+					else if (this.periodicity === 'month_week_sun')
+						firstWeekLength = 7 - firstDayOfMonth; // 1 if month start on saturday, 2 if friday, 7 if sunday
+					else
+						firstWeekLength = 7 - ((firstDayOfMonth - 1 + 7) % 7);
+					
+					return new Date(Date.UTC(
+						this.value.substring(0, 4),
+						this.value.substring(5, 7) - 1,
+						1 + firstWeekLength + (weekNumber - 2) * 7
+					));
+				}
+			}
 
 			else if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon')
 				return new Date(
@@ -227,6 +286,34 @@ angular
 			if (this.periodicity === 'day')
 				// last day is current day
 				return this.getFirstDate();
+
+			else if (this.periodicity === 'month_week_sat' || this.periodicity === 'month_week_sun' || this.periodicity === 'month_week_mon') {
+				var weekNumber = this.value.substr(9, 1);
+
+				var firstDayOfMonth = new Date(this.value.substring(0, 7) + '-01T00:00:00Z').getUTCDay();
+				var firstWeekLength;
+				if (this.periodicity === 'month_week_sat')
+					firstWeekLength = 7 - ((firstDayOfMonth + 1) % 7);
+				else if (this.periodicity === 'month_week_sun')
+					firstWeekLength = 7 - firstDayOfMonth; // 1 if month start on saturday, 2 if friday, 7 if sunday
+				else
+					firstWeekLength = 7 - ((firstDayOfMonth - 1 + 7) % 7);
+
+				if (weekNumber === 1)
+					return new Date(Date.UTC(this.value.substring(0, 4), this.value.substring(5, 7) - 1, firstWeekLength));
+				else {
+					var res = new Date(Date.UTC(
+						this.value.substring(0, 4),
+						this.value.substring(5, 7) - 1,
+						1 + 6 + firstWeekLength + (weekNumber - 2) * 7
+					));
+
+					if (res.getUTCMonth() !== this.value.substring(5, 7) - 1)
+						res.setUTCDate(0); // go to last day of previous month.
+
+					return res;
+				}
+			}
 
 			else if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon') {
 				// last day is last day of the week according to epoch
@@ -370,11 +457,18 @@ angular
 					return $locale.DATETIME_FORMATS.STANDALONEMONTH[slot.value.substring(5, 7) - 1] + ' ' + slot.value.substring(0, 4);
 				}
 
+				else if (slot.periodicity === 'month_week_sat' || slot.periodicity === 'month_week_sun' || slot.periodicity === 'month_week_mon') {
+					if ($rootScope.language == 'fr' || $rootScope.language == 'es')
+						return 'Sem. ' + slot.value.substring(9, 10) + ' ' + $locale.DATETIME_FORMATS.STANDALONEMONTH[slot.value.substring(5, 7) - 1] + ' ' + slot.value.substring(0, 4);
+					else
+						return slot.value.substring(0, 10);
+				}
+
 				else if (slot.periodicity === 'week_sat' || slot.periodicity === 'week_sun' || slot.periodicity === 'week_mon') {
 					if ($rootScope.language == 'fr' || $rootScope.language == 'es')
 						return 'Sem. ' + slot.value.substring(6, 8) + ' ' + slot.value.substring(0, 4);
 					else
-						return slot.value.substring(0, 4) + '-W' + slot.value.substring(6, 8);
+						return slot.value.substring(0, 8);
 				}
 
 				else if (slot.periodicity === 'day') {

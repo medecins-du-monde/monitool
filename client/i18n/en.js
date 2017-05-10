@@ -207,6 +207,9 @@ var ENGLISH_TRANSLATION = {
 		members: 'Members',
 
 		day: 'Day',
+		month_week_sat: 'Week (saturday to friday / split by month)',
+		month_week_sun: 'Week (sunday to saturday / split by month)',
+		month_week_mon: 'Week (monday to sunday / split by month)',
 		week_sat: 'Week (saturday to friday)',
 		week_sun: 'Week (sunday to saturday)',
 		week_mon: 'Week (monday to sunday)',
@@ -330,6 +333,9 @@ var ENGLISH_TRANSLATION = {
 
 		dimensions: {
 			day: "Days",
+			month_week_sat: 'Weeks (saturday to friday / split by month)',
+			month_week_sun: 'Weeks (sunday to saturday / split by month)',
+			month_week_mon: 'Weeks (monday to sunday / split by month)',
 			week_sat: "Weeks (saturday to friday)",
 			week_sun: "Weeks (sunday to saturday)",
 			week_mon: "Weeks (monday to sunday)",
@@ -470,6 +476,9 @@ var ENGLISH_TRANSLATION = {
 
 		periodicities: {
 			day: "Every day",
+			month_week_sat: 'Every weeks (saturday to friday / split by month)',
+			month_week_sun: 'Every weeks (sunday to saturday / split by month)',
+			month_week_mon: 'Every weeks (monday to sunday / split by month)',
 			week_sat: "Every week (saturday to friday)",
 			week_sun: "Every week (sunday to saturday)",
 			week_mon: "Every week (monday to sunday)",

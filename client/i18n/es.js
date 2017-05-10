@@ -207,6 +207,9 @@ var SPANISH_TRANSLATION = {
 		members: 'Miembros',
 		
 		day: 'Día',
+		month_week_sat: 'Semana (sábado a viernes / cortado por mes)',
+		month_week_sun: 'Semana (domingo a sábado / cortado por mes)',
+		month_week_mon: 'Semana (lunes a domingo / cortado por mes)',
 		week_sat: 'Semana (sábado a viernes)',
 		week_sun: 'Semana (domingo a sábado)',
 		week_mon: 'Semana (lunes a domingo)',
@@ -330,6 +333,9 @@ var SPANISH_TRANSLATION = {
 
 		dimensions: {
 			day: "Días",
+			month_week_sat: 'Semana (sábado a viernes / cortado por mes)',
+			month_week_sun: 'Semana (domingo a sábado / cortado por mes)',
+			month_week_mon: 'Semana (lunes a domingo / cortado por mes)',
 			week_sat: "Semanas (sábado a viernes)",
 			week_sun: "Semanas (domingo a sábado)",
 			week_mon: "Semanas (lunes a domingo)",
@@ -470,6 +476,9 @@ var SPANISH_TRANSLATION = {
 
 		periodicities: {
 			day: 'Diario',
+			month_week_sat: 'Cada semana (sábado a viernes / cortado por mes)',
+			month_week_sun: 'Cada semana (domingo a sábado / cortado por mes)',
+			month_week_mon: 'Cada semana (lunes a domingo / cortado por mes)',
 			week_sat: 'Cada semana (sábado a viernes)',
 			week_sun: 'Cada semana (domingo a sábado)',
 			week_mon: 'Cada semana (lunes a domingo)',

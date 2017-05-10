@@ -478,10 +478,37 @@ angular
 				this.dimensionGroups.push(createDimension('week_sat', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('week_sun', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('week_mon', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('month_week_sat', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('month_week_sun', 'day', computation, cubes));
+				this.dimensionGroups.push(createDimension('month_week_mon', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('month', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('quarter', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('semester', 'day', computation, cubes));
 				this.dimensionGroups.push(createDimension('year', 'day', computation, cubes));
+			}
+			else if (dimensionIds.indexOf('month_week_sat') !== -1) {
+				this.dimensions.push(createDimension('month_week_sat', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('week_sat', 'month_week_sat', computation, cubes));
+				this.dimensionGroups.push(createDimension('month', 'month_week_sat', computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'month_week_sat', computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'month_week_sat', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'month_week_sat', computation, cubes));
+			}
+			else if (dimensionIds.indexOf('month_week_sun') !== -1) {
+				this.dimensions.push(createDimension('month_week_sun', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('week_sun', 'month_week_sun', computation, cubes));
+				this.dimensionGroups.push(createDimension('month', 'month_week_sun', computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'month_week_sun', computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'month_week_sun', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'month_week_sun', computation, cubes));
+			}
+			else if (dimensionIds.indexOf('month_week_mon') !== -1) {
+				this.dimensions.push(createDimension('month_week_mon', undefined, computation, cubes));
+				this.dimensionGroups.push(createDimension('week_mon', 'month_week_mon', computation, cubes));
+				this.dimensionGroups.push(createDimension('month', 'month_week_mon', computation, cubes));
+				this.dimensionGroups.push(createDimension('quarter', 'month_week_mon', computation, cubes));
+				this.dimensionGroups.push(createDimension('semester', 'month_week_mon', computation, cubes));
+				this.dimensionGroups.push(createDimension('year', 'month_week_mon', computation, cubes));
 			}
 			else if (dimensionIds.indexOf('week_sat') !== -1) {
 				this.dimensions.push(createDimension('week_sat', undefined, computation, cubes));

@@ -207,9 +207,12 @@ var FRENCH_TRANSLATION = {
 		members: 'Membres',
 
 		day: 'Jour',
-		week_sat: 'Semaine (samedi à vendredi)',
-		week_sun: 'Semaine (dimanche à lundi)',
-		week_mon: 'Semaine (lundi à dimanche)',
+		month_week_sat: "Semaines (samedi à vendredi / coupées par mois)",
+		month_week_sun: "Semaines (dimanche à samedi / coupées par mois)",
+		month_week_mon: "Semaines (lundi à dimanche / coupées par mois)",
+		week_sat: "Semaines (samedi à vendredi)",
+		week_sun: "Semaines (dimanche à samedi)",
+		week_mon: "Semaines (lundi à dimanche)",
 		month: 'Mois',
 		quarter: "Trimestre",
 		semester: "Semestre",
@@ -331,6 +334,9 @@ var FRENCH_TRANSLATION = {
 
 		dimensions: {
 			day: "Jours",
+			month_week_sat: "Semaines (samedi à vendredi / coupées par mois)",
+			month_week_sun: "Semaines (dimanche à samedi / coupées par mois)",
+			month_week_mon: "Semaines (lundi à dimanche / coupées par mois)",
 			week_sat: "Semaines (samedi à vendredi)",
 			week_sun: "Semaines (dimanche à samedi)",
 			week_mon: "Semaines (lundi à dimanche)",
@@ -471,6 +477,9 @@ var FRENCH_TRANSLATION = {
 
 		periodicities: {
 			day: 'Tous les jours',
+			month_week_sat: 'Toutes les semaines (samedi à vendredi / coupées par mois)',
+			month_week_sun: 'Toutes les semaines (dimanche à lundi / coupées par mois)',
+			month_week_mon: 'Toutes les semaines (lundi à dimanche / coupées par mois)',
 			week_sat: 'Toutes les semaines (samedi à vendredi)',
 			week_sun: 'Toutes les semaines (dimanche à lundi)',
 			week_mon: 'Toutes les semaines (lundi à dimanche)',
