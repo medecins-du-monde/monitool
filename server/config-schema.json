@@ -11,7 +11,7 @@
 		},
 		"baseUrl": {
 			"type": "string",
-			"pattern": "^https?://[a-z\\d\\.]+(:\\d+)?$"
+			"pattern": "^https?://[a-z\\d\\.\\-]+(:\\d+)?$"
 		},
 		"port": {
 			"type": "integer",
