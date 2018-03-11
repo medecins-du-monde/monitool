@@ -39,3 +39,4 @@ result
 wwwroot
 docs
 dist
+*.log

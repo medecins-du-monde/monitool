@@ -1,7 +1,7 @@
 {
   "name": "Monitool",
   "description": "Indicator monitoring application for Medecins du Monde",
-  "version": "2.6.0",
+  "version": "3.0.0",
   "repository": "git@github.com:medecins-du-monde/monitool.git",
   "license": "GPL-3.0+",
 
@@ -16,28 +16,9 @@
 
   "devDependencies": {
     "babel-preset-env": "^1.6.1",
-    "del": "x",
-    "event-stream": "x",
-    "gulp": "x",
-    "gulp-angular-templatecache": "x",
-    "gulp-bower": "x",
-    "gulp-clean-css": "x",
-    "gulp-concat": "x",
-    "gulp-gzip": "^1.4.0",
-    "gulp-ng-annotate": "x",
-    "gulp-rename": "x",
-    "gulp-replace": "x",
-    "gulp-uglify": "x",
-    "jasmine-core": "x",
-    "jsdoc": "^3.4.3",
-    "karma": "x",
-    "karma-chrome-launcher": "x",
-    "karma-jasmine": "x",
-    "karma-spec-reporter": "x",
     "mocha": "^3.2.0",
     "node-uuid": "x",
-    "request": "x",
-    "streamqueue": "x"
+    "request": "x"
   },
 
   "dependencies": {
@@ -61,8 +42,8 @@
   },
 
   "scripts": {
-    "start": "nodemon server/main.js --exec babel-node",
-    "build": "babel server -d dist --copy-files",
+    "start": "nodemon lib/main.js --exec babel-node",
+    "build": "babel lib -d dist --copy-files",
     "serve": "node dist/main.js",
     "test": "./node_modules/mocha/bin/mocha --compilers js:babel-register --recursive test"
   }
