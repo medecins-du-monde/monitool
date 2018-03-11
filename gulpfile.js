@@ -14,8 +14,7 @@ var del           = require('del'),
 	uglify        = require('gulp-uglify'),
 	es            = require('event-stream'),
 	request       = require('request'),
-	Queue         = require('streamqueue'),
-	config        = require('./server/config');
+	Queue         = require('streamqueue');
 
 var files = {
 	css: [

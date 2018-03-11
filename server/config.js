@@ -15,21 +15,11 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-let winston   = require('winston'),
-	validator = require('is-my-json-valid'),
-	schema = require('./config-schema');
+import winston from 'winston';
+import validator from 'is-my-json-valid';
+import schema from './config-schema.json';
+import config from '../config.json';
 
-let config;
-
-try {
-	// If there is a config.json file, load configuration from there.
-	config = require('../config.json');
-	winston.log('info', '[Config] Loading from config.json');
-}
-catch (e) {
-	winston.log('error', '[Config] config.json is missing');
-	process.exit(1);
-}
 
 // Validate that nothing is missing from the configuration file.
 let validate = validator(schema);
@@ -46,4 +36,4 @@ if (errors.length) {
 	process.exit(1);
 }
 
-module.exports = config;
+export default config;

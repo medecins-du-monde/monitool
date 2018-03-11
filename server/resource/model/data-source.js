@@ -15,16 +15,15 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import Variable from './variable';
+import validator from 'is-my-json-valid';
+import Model from './model';
+import schema from '../schema/data-source.json';
 
-var Variable  = require('./variable'),
-	validator = require('is-my-json-valid'),
-	Model     = require('./model'),
-	schema    = require('../schema/data-source.json');
 
-var validate = validator(schema);
+const validate = validator(schema);
 
-class DataSource extends Model {
+export default class DataSource extends Model {
 
 	constructor(data, project) {
 		super(data, validate);
@@ -101,5 +100,3 @@ class DataSource extends Model {
 	}
 
 }
-
-module.exports = DataSource;

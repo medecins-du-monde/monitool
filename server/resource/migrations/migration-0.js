@@ -1,7 +1,7 @@
-let database = require('../database');
 
+import database from '../database';
 
-let getDesignDoc = function() {
+const getDesignDoc = function() {
 	let ddoc = {
 		_id: '_design/monitool',
 
@@ -92,7 +92,6 @@ let getDesignDoc = function() {
 			projects_short: {
 				map: function(doc) {
 					if (doc.type === 'project') {
-						
 						emit(doc._id, {
 							_id: doc._id,
 							country: doc.country,
@@ -119,6 +118,6 @@ let getDesignDoc = function() {
 /**
  * This migration creates the initial design doc.
  */
-module.exports = function() {
+export default function() {
 	return database.insert(getDesignDoc());
 };

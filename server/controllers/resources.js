@@ -15,21 +15,19 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
-var express     = require('express'),
-	cache       = require('memory-cache'),
-	User        = require('../resource/model/user'),
-	Indicator   = require('../resource/model/indicator'),
-	Input       = require('../resource/model/input'),
-	Project     = require('../resource/model/project'),
-	Theme       = require('../resource/model/theme');
-
-var bodyParser = require('body-parser').json({limit: '1mb'});
+import express from 'express';
+import cache from 'memory-cache';
+import User from '../resource/model/user';
+import Indicator from '../resource/model/indicator';
+import Input from '../resource/model/input';
+import Project from '../resource/model/project';
+import Theme from '../resource/model/theme';
+import bodyParserModule from 'body-parser';
 
 
+const bodyParser = bodyParserModule.json({limit: '1mb'});
 
-module.exports = express.Router()
+export default express.Router()
 
 	/**
 	 * Get current logged in account information
@@ -59,7 +57,7 @@ module.exports = express.Router()
 				promise = Project.storeInstance.list();
 			else
 				promise = Promise.reject(new Error('invalid_mode'));
-			
+
 			// Filter projects for partners.
 			if (request.user.type === 'partner')
 				promise = promise.then(projects => projects.filter(p => p._id === request.user.projectId));
@@ -78,7 +76,7 @@ module.exports = express.Router()
 	.get('/project/:id', function(request, response) {
 		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
-		
+
 		Project.storeInstance.get(request.params.id)
 			.then(p => p.toAPI())
 			.then(response.jsonPB)
@@ -128,7 +126,7 @@ module.exports = express.Router()
 		// Partners cannot delete projects (that would be deleting themselves).
 		if (request.user.type !== 'user')
 			return response.jsonError(new Error('forbidden'));
-		
+
 		Project.storeInstance.get(request.params.id)
 			.then(function(project) {
 				// Ask the project if it is deletable.
@@ -145,7 +143,7 @@ module.exports = express.Router()
 
 	/**
 	 * Retrieve a list of inputs, or inputs ids.
-	 * 
+	 *
 	 * Multiple modes are supported
 	 * 		- ids_by_form: retrieve all input ids that match a given projectId and formId
 	 *		- ids_by_entity: retrieve all inputs ids that match a given projectId and entityId
@@ -159,7 +157,7 @@ module.exports = express.Router()
 			// User if trying to access forbidden ressources.
 			if (typeof q.projectId === 'string' && q.projectId !== request.user.projectId)
 				return response.jsonError(new Error('forbidden'));
-			
+
 			q.projectId = request.user.projectId;
 		}
 

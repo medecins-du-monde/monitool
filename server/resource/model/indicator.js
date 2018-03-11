@@ -15,19 +15,19 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import validator from 'is-my-json-valid';
+import DbModel from './db-model';
+import IndicatorStore from '../store/indicator';
+import Theme from './theme';
+import schema from '../schema/indicator.json';
 
-var validator      = require('is-my-json-valid'),
-	DbModel        = require('./db-model'),
-	IndicatorStore = require('../store/indicator'),
-	Theme          = require('./theme'),
-	schema         = require('../schema/indicator.json');
+import Project from './project';
 
 
 var validate = validator(schema),
 	storeInstance = new IndicatorStore();
 
-class Indicator extends DbModel {
+export default class Indicator extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 
@@ -59,8 +59,6 @@ class Indicator extends DbModel {
 	 * Delete indicator and updates all projects that are using it.
 	 */
 	destroy() {
-		var Project = require('./project'); // circular import...
-
 		return Project.storeInstance.listByIndicator(this._id, false).then(function(projects) {
 			// Delete cross cutting indicator from projects.
 			projects.forEach(function(project) {
@@ -75,5 +73,3 @@ class Indicator extends DbModel {
 		}.bind(this)).then(function() { /* do not pass couchdb result to caller */ });
 	}
 }
-
-module.exports = Indicator;

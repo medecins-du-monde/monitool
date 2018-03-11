@@ -1,9 +1,8 @@
-module.exports = {};
 
 /**
  * Compute of the n-th permutation of sequence range(i)
  */
-module.exports.computeNthPermutation = function(n, i) {
+export function computeNthPermutation(n, i) {
 	var j, k = 0,
 		fact = [],
 		perm = [];
@@ -29,7 +28,7 @@ module.exports.computeNthPermutation = function(n, i) {
 	return perm;
 };
 
-module.exports.transpose2D = function(rows) {
+export function transpose2D(rows) {
 	if (rows.length === 0)
 		return [];
 
@@ -54,3 +53,4 @@ module.exports.transpose2D = function(rows) {
 
 	return result;
 };
+

@@ -15,24 +15,25 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import Store from './store';
+import User from '../model/user';
 
-var Store = require('./store');
+export default class UserStore extends Store {
 
-class UserStore extends Store {
-
-	get modelString() { return 'user'; }
-
-	getPartner(username) {
-		return this._db.callView('partners', {key: username}).then(function(data) {
-			if (data.rows.length == 0)
-				throw new Error('missing');
-
-			return data.rows[0].value;
-		});
+	get modelString() {
+		return 'user';
 	}
-	
+
+	get modelClass() {
+		return User;
+	}
+
+	async getPartner(username) {
+		const data = await this._db.callView('partners', {key: username});
+		if (data.rows.length == 0)
+			throw new Error('missing');
+
+		return data.rows[0].value;
+	}
+
 }
-
-module.exports = UserStore;
-

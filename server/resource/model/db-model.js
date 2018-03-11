@@ -15,12 +15,10 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import Model from './model';
+import database from '../database';
 
-var Model     = require('./model'),
-	database  = require('../database');
-
-class DbModel extends Model {
+export default class DbModel extends Model {
 
 	get _db() {
 		return database;
@@ -54,5 +52,3 @@ class DbModel extends Model {
 	}
 
 }
-
-module.exports = DbModel;

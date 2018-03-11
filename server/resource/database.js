@@ -15,9 +15,11 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const nano = require('nano'),
-	config = require('../config'),
-	winston = require('winston');
+
+import nano from 'nano';
+import config from '../config';
+import winston from 'winston';
+import migrations from './migrations/index';
 
 class Database {
 
@@ -51,146 +53,141 @@ class Database {
 		this.database = this.nano.use(this.bucketName)
 	}
 
-	prepare() {
-		return this
-			._checkConnectivity()
-			.then(() => this._createBucket())
-			.then(() => this._applyMigrations())
+	async prepare() {
+		await this._checkConnectivity();
+		await this._createBucket();
+		await this._applyMigrations();
 	}
 
-	destroyBucket() {
+	async destroyBucket() {
 		if (this.bucketName.indexOf('test') === -1)
 			throw new Error('This method shall never be called on a production server.');
 
-		return new Promise(function(resolve, reject) {
+		return new Promise((resolve, reject) => {
 			this.nano.db.destroy(this.bucketName, function(error, result) {
 				resolve();
 			});
-		}.bind(this));
+		});
 	}
 
-	_checkConnectivity() {
-		return new Promise(function(resolve, reject) {
+	async _checkConnectivity() {
+		return new Promise((resolve, reject) => {
 			this.nano.db.list(function(error, body) {
 				if (error)
 					reject(new Error('Cannot connect to couchdb'));
 				else
 					resolve(body);
 			});
-		}.bind(this));
+		});
 	}
 
-	_createBucket() {
-		return new Promise(function(resolve, reject) {
+	async _createBucket() {
+		return new Promise((resolve, reject) => {
 			this.nano.db.create(this.bucketName, function(error) {
 				if (error && error.error !== 'file_exists')
 					reject(error);
 				else
 					resolve();
 			});
-		}.bind(this));
+		});
 	}
 
-	_applyMigrations() {
-
-		let applyMigration = function(versionDoc) {
-			let nextMigration;
-			try {
-				nextMigration = require('./migrations/migration-' + versionDoc.version);
-			}
-			catch (e) {
-				winston.log('info', '[Database] No more migrations. Current version is ' + versionDoc.version);
-				return;
-			}
-
-			winston.log('info', '[Database] Updating from version ' + versionDoc.version);
-			return nextMigration().then(function() {
-				versionDoc.version += 1;
-
-				return this.insert(versionDoc).then(() => applyMigration(versionDoc))
-			}.bind(this));
-		}.bind(this);
-
+	async _applyMigrations() {
 		winston.log('info', '[Database] Checking for migrations');
-		
-		return this.get('version')
-			.catch(error => ({_id: "version", version: 0})) // if version is not found => version is 0
-			.then(applyMigration);
+
+		// Retrieve current database version
+		let versionDoc;
+		try {
+			versionDoc = await this.get('version');
+		}
+		catch (error) {
+			versionDoc = {_id: "version", version: 0};
+		}
+
+		for (let i = versionDoc.version; i < migrations.length; ++i) {
+			winston.log('info', '[Database] Updating from version ' + versionDoc.version);
+
+			await migrations[i]();
+			versionDoc.version += 1;
+			await this.insert(versionDoc);
+		}
+
+		winston.log('info', '[Database] No more migrations. Current version is ' + versionDoc.version);
 	}
 
 	/**
 	 * Wrap view queries to database into a promise
-	 * 
+	 *
 	 * @protected
 	 * @param  {string} viewName
 	 * @param  {Object} options
 	 * @return {Array}
 	 */
-	callView(viewName, options) {
-		return new Promise(function(resolve, reject) {
+	async callView(viewName, options) {
+		return new Promise((resolve, reject) => {
 			this.database.view('monitool', viewName, options, function(error, result) {
 				if (error)
 					reject(error);
 				else
 					resolve(result);
 			});
-		}.bind(this));
+		});
 	}
 
 	/**
 	 * Wrap list queries to database into a promise
-	 * 
+	 *
 	 * @protected
 	 * @param  {Object} options
 	 * @return {Array}
 	 */
-	callList(options) {
-		return new Promise(function(resolve, reject) {
+	async callList(options) {
+		return new Promise((resolve, reject) => {
 			this.database.list(options, function(error, result) {
 				if (error)
 					reject(error);
 				else
 					resolve(result);
 			});
-		}.bind(this));
+		});
 	}
 
 	/**
 	 * Wrap bulk queries to database into a promise
-	 * 
+	 *
 	 * @protected
 	 * @param  {Object} options
 	 * @return {Array}
 	 */
-	callBulk(options) {
-		return new Promise(function(resolve, reject) {
+	async callBulk(options) {
+		return new Promise((resolve, reject) => {
 			this.database.bulk(options, function(error, result) {
 				if (error)
 					reject(error);
 				else
 					resolve(result);
 			});
-		}.bind(this));
+		});
 	}
 
 	/**
 	 * Retrieve a given model
-	 * 
+	 *
 	 * @return {Model}
 	 */
-	get(id) {
-		return new Promise(function(resolve, reject) {
+	async get(id) {
+		return new Promise((resolve, reject) => {
 			this.database.get(id, function(error, data) {
 				if (error)
 					reject(error);
 				else
 					resolve(data);
 			});
-		}.bind(this));
+		});
 	}
 
-	insert(doc) {
-		return new Promise(function(resolve, reject)  {
+	async insert(doc) {
+		return new Promise((resolve, reject) => {
 			this.database.insert(doc, function(error, result) {
 				if (error)
 					reject(error)
@@ -199,22 +196,22 @@ class Database {
 					resolve();
 				}
 			});
-		}.bind(this));
+		});
 	}
 
-	destroy(id, rev) {
+	async destroy(id, rev) {
 		if (typeof id !== 'string' || typeof rev !== 'string')
 			throw new Error('invalid call to destroy.');
 
-		return new Promise(function(resolve, reject) {
+		return new Promise((resolve, reject) => {
 			this.database.destroy(id, rev, function(error) {
 				if (error)
 					reject(error);
 				else
 					resolve();
 			});
-		}.bind(this));
+		});
 	}
 }
 
-module.exports = new Database(config.couchdb);
+export default new Database(config.couchdb);

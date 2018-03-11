@@ -21,7 +21,7 @@ Refer to https://nodejs.org/en/download/package-manager/ to install the stable v
 ### Installing CouchDB
 
 We can simply use the version from the package manager.
-	
+
 	# Install couchdb
 	> sudo apt install couchdb
 
@@ -43,7 +43,7 @@ Please use HTTPS in a production server, as partners will log in monitool using 
 	server {
 		listen 80;
 
-		server_name monitool.yourorganization.com;	
+		server_name monitool.yourorganization.com;
 
 		location / {
 			proxy_pass http://localhost:8000;

@@ -15,11 +15,9 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import winston from 'winston';
 
-let winston = require('winston');
-
-module.exports = function(request, response, next) {
+export default function(request, response, next) {
 	winston.log('info', '[web] ' + request.path);
 
 	next();

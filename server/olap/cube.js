@@ -15,23 +15,21 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
-var winston = require('winston'),
-	Dimension = require('./dimension'),
-	DimensionGroup = require('./dimension-group');
+import winston from 'winston';
+import Dimension from './dimension';
+import DimensionGroup from './dimension-group';
 
 /**
  * This class represents an [OLAP Cube](https://en.wikipedia.org/wiki/OLAP_cube)
  */
-class Cube {
+export default class Cube {
 
 	/**
 	 * Create a cube from the result of the serialize() method.
-	 * 
+	 *
 	 * @param {Object} obj Object retrieved by calling the serialize method on a Cube instance.
 	 * @return {Cube}
-	 * 
+	 *
 	 * @example
 	 * let c   = new Cube(...),
 	 *     str = JSON.stringify(c.serialize()),
@@ -44,16 +42,16 @@ class Cube {
 
 	/**
 	 * Create a cube from a data source element and all known inputs of the data source.
-	 * 
+	 *
 	 * @param {Project} project
 	 * @param {DataSource} form
 	 * @param {Variable} element
 	 * @param {Array.<Input>} inputs
 	 * @return {Cube}
-	 * 
+	 *
 	 * @example
 	 * let projectId = '6acefb96-a047-4b77-a698-6a9da3994306';
-	 * 
+	 *
 	 * Project.store.get(projectId).then(function(project) {
 	 *     Input.listByDataSource(projectId, project.forms[0].id).then(function(inputs) {
 	 *         let c =  = Cube.fromElement(project, project.forms[0], project.forms[0].element[0], inputs);
@@ -76,7 +74,7 @@ class Cube {
 			}
 			catch (e) {}
 		});
-		
+
 		// Location
 		dimensions.push(Dimension.createLocation(project, form, element));
 		if (project.groups.length)
@@ -131,7 +129,7 @@ class Cube {
 				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(value size mismatch expected", length, ", found", source.length, ")");
 				return;
 			}
-			
+
 			// Copy into destination table.
 			data[offset] = source;
 			// for (var i = 0; i < length; ++i)
@@ -140,7 +138,7 @@ class Cube {
 
 		var keys = Object.keys(data);
 		keys.sort((a, b) => a * 1 - b * 1)
-		
+
 		for (var i = keys.length - 1; i > 0; --i) {
 			var key = keys[i - 1], nextKey = keys[i];
 
@@ -156,16 +154,16 @@ class Cube {
 
 	/**
 	 * Build a cube from it's components
-	 * 
+	 *
 	 * @param {string} id A unique identifier for this cube across the application.
 	 * @param {Array.<Dimension>} dimensions The list of dimensions that this cube is using
 	 * @param {Array.<DimensionGroup>} dimensionGroups The list of dimension groups that this cube is using
 	 * @param {Array.<number>} data Data contained in the cube. The size of this array must be the product of the number of elements in the dimension.
-	 * 
+	 *
 	 * @example
 	 * var time = new Dimension('year', ['2013', '2014', '2015'], 'sum'),
 	 *     location = new Dimension('location', ['shopA', 'shopB'], 'sum');
-	 * 
+	 *
 	 * var c = new Cube('sells', [time, location], [], [10, 20, 30, 15, 43, 60]);
 	 */
 	constructor(id, dimensions, dimensionGroups, data) {
@@ -197,16 +195,16 @@ class Cube {
 	 *
 	 * @example
 	 * var c = new Cube(...);
-	 * 
+	 *
 	 * c.query();
 	 * // 178
-	 * 
+	 *
 	 * c.query(['year']);
 	 * // {2013: 25, 2014: 63, 2015: 90}
-	 * 
+	 *
 	 * c.query(['year', 'location']);
 	 * // {2013: {shopA: 10, shopB: 20}, 2014: {shopA: 30, shopB: 15}, 2015: {shopA: 43, shopB: 60}}
-	 * 
+	 *
 	 * c.query(['year', 'location'], {year: ['2013', '2014']}, true);
 	 * // {2013: {shopA: 10, shopB: 20, _total: 30}, 2014: {shopA: 30, shopB: 15, _total: 45}, _total: 75}
 	 */
@@ -214,7 +212,7 @@ class Cube {
 		// End condition
 		if (dimensionIds.length == 0)
 			return this._query_total(filter);
-		
+
 		var dimensionId = dimensionIds.shift();
 
 		// search dimension
@@ -235,7 +233,7 @@ class Cube {
 				// Either lines do the same. Continuing is a bit faster.
 				// filter[dimensionId] = [];
 				continue;
-			
+
 			// Compute branch of the result tree.
 			result[dimensionItem] = this.query(dimensionIds, filter);
 
@@ -262,12 +260,12 @@ class Cube {
 
 
 	/**
-	 * Retrieve the total value matching a given filter. 
-	 * 
+	 * Retrieve the total value matching a given filter.
+	 *
 	 * @private
 	 * @param {Object.<string, Array.<string>>} filter Elements that should be included by dimension. Missing dimensions are not filtered.
 	 * @return {number} total value matching the provided filter.
-	 * 
+	 *
 	 * @example
 	 * let cube = Cube.fromSerialization(...);
 	 * let result = cube._query_total({year: ['2014'], "bc4b0c3f-ee9d-4507-87ad-6eaea9102cd9": ["2d31a636-1739-4b77-98a5-bf9b7a080626"]})
@@ -287,10 +285,10 @@ class Cube {
 
 	/**
 	 * Retrieve the total value matching given indexes and read offset.
-	 * 
+	 *
 	 * @private
 	 * @todo Would be faster to use push/pop instead of shift/unshift into the indexes.
-	 * 
+	 *
 	 * @param  {Array.<Array.<number>>}
 	 * @param  {number}
 	 * @return {number|undefined}
@@ -312,7 +310,7 @@ class Cube {
 			numIndexes = indexes.length;
 
 		var result, tmp, contributions = 0;
-		
+
 		// Compute offset at this level.
 		offset *= dimension.items.length;
 
@@ -396,7 +394,7 @@ class Cube {
 	/**
 	 * When querying the cube with _query_total(), we only support
 	 * using dimensions (and not dimensionGroups).
-	 * 
+	 *
 	 * This rewrites any filter so that they use dimensions.
 	 */
 	_remove_dimension_groups(oldFilters) {
@@ -426,7 +424,7 @@ class Cube {
 					var newFilter = [];
 					oldFilter.forEach(function(v) { Array.prototype.push.apply(newFilter, dimensionGroup.mapping[v]); });
 					newFilter.sort();
-					
+
 					// If there are duplicates, remove them.
 					var i = newFilter.length - 2;
 					while (i > 0) {
@@ -492,7 +490,4 @@ class Cube {
 	}
 
 }
-
-
-module.exports = Cube;
 

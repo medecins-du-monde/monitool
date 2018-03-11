@@ -15,12 +15,10 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
 /*
  * Check that user is properly authenticated
  */
-module.exports = function(request, response, next) {
+export default function(request, response, next) {
 	if (request.isAuthenticated && request.isAuthenticated() && request.user)
 		next();
 	else

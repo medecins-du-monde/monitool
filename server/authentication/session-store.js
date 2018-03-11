@@ -16,14 +16,14 @@
  */
 
 
-let config         = require('../config'),
-	nano           = require('nano'),
-	session        = require('express-session')
-	connectCouchDB = require('connect-couchdb');
+import config from '../config';
+import nano from 'nano';
+import session from 'express-session';
+import connectCouchDB from 'connect-couchdb';
 
-let CouchSessionStore = connectCouchDB(session);
+const CouchSessionStore = connectCouchDB(session);
 
-let store = new CouchSessionStore({
+const store = new CouchSessionStore({
 	name: config.couchdb.sessionBucket,
 	host: config.couchdb.host,
 	port: config.couchdb.port,
@@ -42,4 +42,4 @@ var nn = nano(url);
 nn.db.create(config.couchdb.sessionBucket, function(error) {
 });
 
-module.exports = store;
+export default store;

@@ -15,14 +15,19 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import Store from './store';
+import Project from '../model/project';
 
-var Store = require('./store');
+export default class ProjectStore extends Store {
 
+	get modelString() {
+		return 'project';
+	}
 
-class ProjectStore extends Store {
+	get modelClass() {
+		return Project;
+	}
 
-	get modelString() { return 'project'; }
 
 	/**
 	 * Retrieve list of all projects summaries
@@ -82,7 +87,7 @@ class ProjectStore extends Store {
 					project.extraIndicators = [];
 				});
 			}
-			
+
 			return projects.map(p => new Project(p));
 		});
 	}
@@ -103,6 +108,3 @@ class ProjectStore extends Store {
 		});
 	}
 }
-
-module.exports = ProjectStore;
-

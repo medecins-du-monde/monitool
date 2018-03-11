@@ -15,15 +15,14 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
 
-var validator = require('is-my-json-valid'),
-	Model     = require('./model'),
-	schema    = require('../schema/logical-frame.json');
+import validator from 'is-my-json-valid';
+import Model from './model';
+import schema from '../schema/logical-frame.json';
 
 var validate = validator(schema);
 
-class LogicalFrame extends Model {
+export default class LogicalFrame extends Model {
 
 	constructor(data, project) {
 		super(data, validate);

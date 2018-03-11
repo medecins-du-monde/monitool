@@ -15,16 +15,14 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
-var Cube = require('./cube');
+import Cube from './cube';
 
 /**
  * A cube collection is a container that contains all cubes from the variables of a given project
- * 
+ *
  * If there is a need to implement queries across multiple cubes, it can be implemented here.
  */
-class CubeCollection {
+export default class CubeCollection {
 
 	static fromProject(project, allInputs) {
 		var cubes = [];
@@ -49,5 +47,3 @@ class CubeCollection {
 	}
 
 }
-
-module.exports = CubeCollection;

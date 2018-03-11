@@ -15,25 +15,27 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
 
-var validator  = require('is-my-json-valid'),
-	Cube       = require('../../olap/cube'),
-	Variable   = require('./variable'),
-	Dimension  = require('../../olap/dimension'),
-	TimeSlot   = require('../../olap/time-slot'),
-	InputStore = require('../store/input'),
-	DbModel    = require('./db-model'),
-	schema     = require('../schema/input.json');
+import validator from 'is-my-json-valid';
+import Cube from '../../olap/cube';
+import Variable from './variable';
+import Dimension from '../../olap/dimension';
+import TimeSlot from '../../olap/time-slot';
+import InputStore from '../store/input';
+import DbModel from './db-model';
+import schema from '../schema/input.json';
 
+import Project from './project';
 
 var validate = validator(schema),
 	storeInstance = new InputStore();
 
 
-class Input extends DbModel {
+export default class Input extends DbModel {
 
-	static get storeInstance() { return storeInstance; }
+	static get storeInstance() {
+		return storeInstance;
+	}
 
 	/**
 	 * Hydrate a Input object from a POJO.
@@ -81,7 +83,7 @@ class Input extends DbModel {
 
 				newPartitions.forEach(function(newPartition) {
 					oldVariable.partitions.unshift(newPartition);
-					
+
 					let newLength = oldValues.length * newPartition.elements.length;
 					while (oldValues.length < newLength)
 						oldValues.push(0);
@@ -173,8 +175,6 @@ class Input extends DbModel {
 	 * This allows not loosing data when we update the periodicity of a data source but will be removed.
 	 */
 	validateForeignKeys() {
-		var Project = require('./project'); // Circular import...
-
 		return Project.storeInstance.get(this.project).then(function(project) {
 			var errors = [];
 
@@ -214,7 +214,4 @@ class Input extends DbModel {
 		}.bind(this));
 	}
 }
-
-
-module.exports = Input;
 

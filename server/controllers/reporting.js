@@ -15,15 +15,14 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import express from 'express';
+import cache from 'memory-cache';
+import Input from '../resource/model/input';
+import Project from '../resource/model/project';
+import CubeCollection from '../olap/cube-collection';
 
-var express        = require('express'),
-	cache          = require('memory-cache'),
-	Input          = require('../resource/model/input'),
-	Project        = require('../resource/model/project'),
-	CubeCollection = require('../olap/cube-collection');
 
-module.exports = express.Router()
+export default express.Router()
 
 	/**
 	 * Generate the cubes for a given project

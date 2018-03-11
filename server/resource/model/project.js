@@ -15,23 +15,21 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
-var validator    = require('is-my-json-valid'),
-	passwordHash = require('password-hash'),
-	ProjectStore = require('../store/project'),
-	DbModel      = require('./db-model'),
-	LogicalFrame = require('./logical-frame'),
-	DataSource   = require('./data-source'),
-	Indicator    = require('./indicator'),
-	Input        = require('./input'),
-	Theme        = require('./theme'),
-	schema       = require('../schema/project.json');
+import validator from 'is-my-json-valid';
+import passwordHash from 'password-hash';
+import ProjectStore from '../store/project';
+import DbModel from './db-model';
+import LogicalFrame from './logical-frame';
+import DataSource from './data-source';
+import Indicator from './indicator';
+import Input from './input';
+import Theme from './theme';
+import schema from '../schema/project.json';
 
 var validate = validator(schema),
 	storeInstance = new ProjectStore();
 
-class Project extends DbModel {
+export default class Project extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 
@@ -62,7 +60,7 @@ class Project extends DbModel {
 			if (user.dataSources)
 				user.dataSources.forEach(function(dataSourceId) {
 					if (dataSourceIds.indexOf(dataSourceId) === -1)
-						throw new Error('invalid_data');	
+						throw new Error('invalid_data');
 				});
 		});
 
@@ -84,7 +82,7 @@ class Project extends DbModel {
 
 	/**
 	 * Destroy a project, and all related inputs.
-	 * 
+	 *
 	 * @return {Promise}
 	 */
 	destroy() {
@@ -223,7 +221,7 @@ class Project extends DbModel {
 					inputsById[input._id] = input;
 				});
 			});
-			
+
 			let inputs = Object.keys(inputsById).map(id => inputsById[id]);
 			inputs.forEach(input => input.update(oldProject, this));
 			return inputs;
@@ -319,5 +317,3 @@ class Project extends DbModel {
 	}
 
 }
-
-module.exports = Project;

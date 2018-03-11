@@ -15,19 +15,19 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import validator from'is-my-json-valid';
+import UserStore from'../store/user';
+import DbModel from'./db-model';
+import schema from'../schema/user.json';
 
-var validator = require('is-my-json-valid'),
-	UserStore = require('../store/user'),
-	DbModel   = require('./db-model'),
-	schema    = require('../schema/user.json');
+const validate = validator(schema);
+const storeInstance = new UserStore();
 
-var validate = validator(schema),
-	storeInstance = new UserStore();
+export default class User extends DbModel {
 
-class User extends DbModel {
-
-	static get storeInstance() { return storeInstance; }
+	static get storeInstance() {
+		return storeInstance;
+	}
 
 	/**
 	 * Deserialize and validate POJO
@@ -37,4 +37,3 @@ class User extends DbModel {
 	}
 }
 
-module.exports = User;

@@ -15,14 +15,19 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
 
-var Store = require('./store');
+import Store from './store';
+import Indicator from '../model/indicator';
 
-class IndicatorStore extends Store {
+export default class IndicatorStore extends Store {
 
-	get modelString() { return 'indicator'; }
+	get modelString() {
+		return 'indicator';
+	}
 
+	get modelClass() {
+		return Indicator;
+	}
 
 	/**
 	 * Retrieve all indicators that are associated with a given theme
@@ -34,11 +39,9 @@ class IndicatorStore extends Store {
 
 		var view = 'indicator_by_theme', opt = {key: themeId, include_docs: true},
 			Indicator = this.modelClass;
-		
+
 		return this._db.callView(view, opt).then(function(result) {
 			return result.rows.map(row => new Indicator(row.doc));
 		});
 	}
 }
-
-module.exports = IndicatorStore;

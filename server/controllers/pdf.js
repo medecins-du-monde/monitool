@@ -15,11 +15,11 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
 
-const express = require('express'),
-	  Project = require('../resource/model/project'),
-	  PdfPrinter = require('pdfmake');
+import express from 'express';
+import Project from '../resource/model/project';
+import PdfPrinter from 'pdfmake';
+
 
 /**
  * Boilerplate needed to start-up pdfmake
@@ -73,7 +73,7 @@ const styles = {
 };
 
 
-module.exports = express.Router()
+export default express.Router()
 
 	/**
 	 * Render a PDF file describing the given logical frame.
@@ -82,7 +82,7 @@ module.exports = express.Router()
 		// This document is not accessible to partners with no access to this project.
 		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
-		
+
 		Project.storeInstance.get(request.params.id)
 			.then(function(project) {
 				// Create document definition.
@@ -111,7 +111,7 @@ module.exports = express.Router()
 		// This document is not accessible to partners with no access to this project.
 		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
 			return response.jsonError(new Error('forbidden'));
-		
+
 		Project.storeInstance.get(request.params.id)
 			.then(function(project) {
 				// Create document definition.

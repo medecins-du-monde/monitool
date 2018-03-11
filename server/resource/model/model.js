@@ -15,9 +15,8 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
 
-class Model {
+export default class Model {
 
 	/**
 	 * Construct model from POJO
@@ -55,7 +54,7 @@ class Model {
 	 */
 	toJSON() {
 		var obj = {};
-		
+
 		Object.assign(obj, this);
 		for (let key in obj)
 			if (key !== '_id' && key !== '_rev' && key !== '_deleted' && key.substr(0, 1) === '_')
@@ -65,5 +64,3 @@ class Model {
 	}
 
 }
-
-module.exports = Model;

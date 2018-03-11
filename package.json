@@ -4,16 +4,18 @@
   "version": "2.6.0",
   "repository": "git@github.com:medecins-du-monde/monitool.git",
   "license": "GPL-3.0+",
-  "bin": {
-    "monitool": "./bin/monitool.js"
+
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {"targets": {"node": "current"}}
+      ]
+    ]
   },
-  "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --recursive server/test ",
-    "test-client": "./node_modules/karma/bin/karma start",
-    "doc-server": "./node_modules/.bin/jsdoc --package package.json --readme README.md -c jsdoc-server.json",
-    "doc-client": "./node_modules/.bin/jsdoc -c jsdoc-client.json"
-  },
+
   "devDependencies": {
+    "babel-preset-env": "^1.6.1",
     "del": "x",
     "event-stream": "x",
     "gulp": "x",
@@ -37,6 +39,7 @@
     "request": "x",
     "streamqueue": "x"
   },
+
   "dependencies": {
     "body-parser": "x",
     "compression": "x",
@@ -55,5 +58,13 @@
     "pug": "^2.0.0-beta.12",
     "roboto-fontface": "^0.7.0",
     "winston": "^2.3.1"
+  },
+
+  "scripts": {
+    "start": "nodemon server/main.js --exec babel-node",
+    "build": "babel server -d dist --copy-files",
+    "serve": "node dist/main.js",
+    "test": "./node_modules/mocha/bin/mocha --compilers js:babel-register --recursive test"
   }
+
 }

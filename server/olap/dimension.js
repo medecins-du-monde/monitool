@@ -15,9 +15,7 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
-var TimeSlot = require('./time-slot');
+import TimeSlot from './time-slot';
 
 function minDate(dates) {
 	return dates.reduce(function(d, memo) { return !memo || memo > d ? d : memo; });
@@ -46,7 +44,7 @@ function iterate(begin, end, periodicity) {
 };
 
 
-class Dimension {
+export default class Dimension {
 
 	static createTime(project, form, element, inputs) {
 		var periods;
@@ -92,6 +90,3 @@ class Dimension {
 		this.aggregation = aggregation;
 	}
 }
-
-
-module.exports = Dimension;

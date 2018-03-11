@@ -15,37 +15,37 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import Store from './store';
+import Theme from '../model/theme';
 
-var Store = require('./store');
 
-class ThemeStore extends Store {
+export default class ThemeStore extends Store {
 
-	get modelString() { return 'theme'; }
+	get modelString() {
+		return 'theme';
+	}
+
+	get modelClass() {
+		return Theme;
+	}
 
 	/**
 	 * Retrieve all themes with their relative usage
 	 */
-	listWithUsage() {
-		var promises = [
+	async listWithUsage() {
+		const [themes, usage] = await Promise.all([
 			this.list(),
 			this._db.callView('themes_usage', {group: true})
-		];
+		]);
 
-		return Promise.all(promises).then(function(result) {
-			var themes = result[0], usage = result[1];
+		themes.forEach(theme => {
+			var projectUsage = usage.rows.filter(row => row.key[0] === theme._id && row.key[1] === 'project'),
+				indicatorUsage = usage.rows.filter(row => row.key[0] === theme._id && row.key[1] === 'indicator');
 
-			themes.forEach(function(theme) {
-				var projectUsage = usage.rows.filter(function(row) { return row.key[0] === theme._id && row.key[1] === 'project'; }),
-					indicatorUsage = usage.rows.filter(function(row) { return row.key[0] === theme._id && row.key[1] === 'indicator'; });
-
-				theme.__projectUsage   = projectUsage.length ? projectUsage[0].value : 0;
-				theme.__indicatorUsage = indicatorUsage.length ? indicatorUsage[0].value : 0;
-			});
-
-			return themes;
+			theme.__projectUsage   = projectUsage.length ? projectUsage[0].value : 0;
+			theme.__indicatorUsage = indicatorUsage.length ? indicatorUsage[0].value : 0;
 		});
+
+		return themes;
 	}
 }
-
-module.exports = ThemeStore;

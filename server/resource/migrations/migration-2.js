@@ -1,15 +1,14 @@
-let database = require('../database'),
-	uuid = require('node-uuid');
+import database from '../database';
+import uuid from 'node-uuid';
 
 /**
  * This migration removes the fake "none" entity used to attach data
  * directly to the project.
  * The same effect is obtained by creating a fake collection site.
  */
-module.exports = function() {
+export default function() {
 	var view = 'by_type',
 		opt = {include_docs: true, key: 'project'};
-		
 
 	return Promise.all([
 		database.callView('by_type', {include_docs: true, key: 'project'}),
@@ -54,7 +53,7 @@ module.exports = function() {
 
 			if (hasProjectLevelForms)
 				project.entities.unshift({id: projectUUIDs[project._id], name: "Project", start: null, end: null});
-			
+
 			if (update)
 				documents.push(project);
 		});

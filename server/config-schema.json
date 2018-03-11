@@ -4,7 +4,7 @@
 
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["debug", "baseUrl", "port", "couchdb", "auth", "api"],
+	"required": ["debug", "baseUrl", "port", "cookieSecret", "couchdb", "auth", "api"],
 	"properties": {
 		"debug": {
 			"type": "boolean"
@@ -17,6 +17,10 @@
 			"type": "integer",
 			"minimum": 1,
 			"maximum": 65536
+		},
+		"cookieSecret": {
+			"type": "string",
+			"minimum": 6
 		},
 		"couchdb": {
 			"type": "object",

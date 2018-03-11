@@ -15,18 +15,16 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
-var nano     = require('nano'),
-	config   = require('../../config'),
-	database = require('../database');
+import nano from 'nano';
+import config from '../../config';
+import database from '../database';
 
 /**
  * Represents a collection of models.
- * 
+ *
  * This is an abstract from which all stores inherit.
  */
-class Store {
+export default class Store {
 
 	get _db() {
 		return database;
@@ -38,7 +36,7 @@ class Store {
 	 * @type {Function}
 	 */
 	get modelClass() {
-		return require('../model/' + this.modelString);
+		throw new Error('modelClass must be overriden');
 	}
 
 	/**
@@ -50,32 +48,27 @@ class Store {
 	get modelString() {
 		throw new Error('modelString must be overriden');
 	}
-	
+
 	/**
 	 * Retrieve all models of current type.
-	 * 
+	 *
 	 * @return {Array.<Model>}
 	 */
-	list() {
-		var view = 'by_type',
-			opt = {include_docs: true, key: this.modelString},
-			ModelClass = this.modelClass;
+	async list() {
+		const viewResult = await this._db.callView(
+			'by_type',
+			{include_docs: true, key: this.modelString}
+		);
 
-		return this._db.callView(view, opt).then(function(result) {
-			return result.rows.map(row => new ModelClass(row.doc));
-		});
+		return viewResult.rows.map(row => new this.modelClass(row.doc));
 	}
 
 	/**
 	 * Retrieve a given model
-	 * 
+	 *
 	 * @return {Model}
 	 */
-	get(id) {
-		return this._db.get(id).then(function(data) {
-			return new this.modelClass(data);
-		}.bind(this));
+	async get(id) {
+		return new this.modelClass(await this._db.get(id))
 	}
 }
-
-module.exports = Store;

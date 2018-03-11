@@ -15,17 +15,19 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import validator from 'is-my-json-valid';
+import ThemeStore from '../store/theme';
+import DbModel from './db-model';
+import schema from '../schema/theme.json';
 
-var validator  = require('is-my-json-valid'),
-	ThemeStore = require('../store/theme'),
-	DbModel    = require('./db-model'),
-	schema     = require('../schema/theme.json');
+import Project from './project';
+import Indicator from './indicator';
+
 
 var validate = validator(schema),
 	storeInstance = new ThemeStore();
 
-class Theme extends DbModel {
+export default class Theme extends DbModel {
 
 	static get storeInstance() { return storeInstance; }
 
@@ -41,9 +43,8 @@ class Theme extends DbModel {
 	 * This method also updates all indicators and projects that used the theme and related cross-cutting indicators.
 	 */
 	destroy() {
-		var Project = require('./project'), Indicator = require('./indicator'); // circular import...
 		var promises = [Project.storeInstance.listByTheme(this._id), Indicator.storeInstance.listByTheme(this._id)];
-		
+
 		return Promise.all(promises)
 			.then(function(res) {
 				var projects = res[0], indicators = res[1];
@@ -55,7 +56,7 @@ class Theme extends DbModel {
 					// Remove ourself from indicator.
 					indicator.themes = indicator.themes.filter(t => t !== this._id);
 				}, this);
-				
+
 				projects.forEach(function(project) {
 					// Remove ourself from project
 					project.themes = project.themes.filter(t => t !== this._id);
@@ -63,7 +64,7 @@ class Theme extends DbModel {
 					// Check if the crossCutting indicators in the projects are still relevant
 					for (var indicatorId in project.crossCutting) {
 						var indicator = indicators.find(i => i._id === indicatorId);
-						
+
 						// if the indicator is not in the list we just fetched, it won't be touched
 						// by the removal of the thematic (the indicator did not have it from the beginning, so
 						// it must be collected for another reason).
@@ -79,7 +80,7 @@ class Theme extends DbModel {
 
 				return this._db.callBulk({docs: indicators.concat(projects).concat([this])});
 			}.bind(this))
-			
+
 			.then(function(bulkResults) {
 				// bulk updates don't give us the whole document
 				var themeResult = bulkResults.find(res => res.id === this._id);
@@ -88,8 +89,5 @@ class Theme extends DbModel {
 
 			}.bind(this));
 	}
-
 }
-
-module.exports = Theme;
 

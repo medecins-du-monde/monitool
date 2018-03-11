@@ -15,15 +15,13 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
-var TimeSlot = require('./time-slot');
+import TimeSlot from './time-slot';
 
 /**
  * A DimensionGroup allows to query cubes on dimension aggregates.
  * For instance, for a cube containing a "date" dimension, then a "month" dimension group can be created.
  */
-class DimensionGroup {
+export default class DimensionGroup {
 
 	static createTime(parent, dimension) {
 		// Create DimensionGroup mapping from Dimension items.
@@ -41,7 +39,7 @@ class DimensionGroup {
 
 	static createLocation(project, form) {
 		var groups = {};
-		
+
 		project.groups.forEach(function(group) {
 			groups[group.id] = group.members.filter(function(id) {
 				return form.entities.indexOf(id) !== -1;
@@ -67,6 +65,3 @@ class DimensionGroup {
 		this.mapping = mapping;
 	}
 }
-
-module.exports = DimensionGroup;
-

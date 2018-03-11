@@ -15,11 +15,9 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import config from '../config';
 
-let config = require('../config');
-
-var statusCodes = {
+const statusCodes = {
 	wrong_type: 400,	// id collision
 	forbidden: 403,		// trying to get forbidden item
 
@@ -29,7 +27,7 @@ var statusCodes = {
 
 	// fetch
 	missing: 404,		// trying to get non existing item
-	
+
 	// put
 	id_mismatch: 400,	// id in URL and model do not match
 	invalid_data: 400,	// saving entity that did not pass validation
@@ -37,7 +35,8 @@ var statusCodes = {
 	invalid_reference: 400, // foreign key fail.
 };
 
-module.exports = function(request, response, next) {
+
+export default function(request, response, next) {
 
 	response.jsonError = function(error) {
 		response.status(statusCodes[error.message] || 500);

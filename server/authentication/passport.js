@@ -15,14 +15,14 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import passport from 'passport';
+import LocalStrategyModule from 'passport-local';
+import OAuth2Strategy from 'passport-oauth2';
+import passwordHash from 'password-hash';
+import User from '../resource/model/user';
+import config from '../config';
 
-var passport               = require('passport'),
-	LocalStrategy          = require('passport-local').Strategy,
-	OAuth2Strategy         = require('passport-oauth2'),
-	passwordHash           = require('password-hash'),
-	User                   = require('../resource/model/user'),
-	config                 = require('../config');
+const LocalStrategy = LocalStrategyModule.Strategy;
 
 /////////////////////////////////////////////////////////////////////////////
 // User serialization
@@ -90,11 +90,11 @@ if (config.auth.providers.azureAD) {
 
 				if (domain !== config.auth.providers.azureAD.domain)
 					return done(
-						"You must use an account from " + 
+						"You must use an account from " +
 						config.auth.providers.azureAD.domain + " (not " + domain + ").\n" +
 						"Try closing and reopening your browser to log in again."
 					);
-				
+
 				User.storeInstance.get(userId).then(
 					function(user) {
 						// If Oauth provider updated the name, we update as well in DB
@@ -201,5 +201,5 @@ if (config.auth.providers.training) {
 	);
 }
 
-module.exports = passport;
+export default passport;
 

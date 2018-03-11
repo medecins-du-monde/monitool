@@ -1,9 +1,9 @@
-let database = require('../database');
+import database from '../database';
 
 /**
  * This migration update a function in the design doc.
  */
-module.exports = function() {
+export default function() {
 	return database.get('_design/monitool').then(function(ddoc) {
 
 		ddoc.views.partners.map = function(doc) {

@@ -1,13 +1,13 @@
-let database = require('../database');
+import database from '../database';
 
 /**
  * This migration replaces user that had the permission "input_all",
  * by user with the permission "input", but with all entities.
  */
-module.exports = function() {
+export default function() {
 	var view = 'by_type',
 		opt = {include_docs: true, key: 'project'};
-		
+
 	return database.callView(view, opt).then(function(result) {
 		var documents = [];
 

@@ -1,12 +1,12 @@
-let database = require('../database');
+import database from '../database';
 
 /**
  * this migration add the missing "dataSources" field on all users.
  */
-module.exports = function() {
+export default function() {
 	var view = 'by_type',
 		opt = {include_docs: true, key: 'project'};
-		
+
 	return database.callView(view, opt).then(function(result) {
 		var documents = [];
 

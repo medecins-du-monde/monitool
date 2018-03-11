@@ -15,23 +15,22 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
 
 /**
  * A class representing a time slot used in monitoring.
  * This can be a given day, epidemiological week, month, quarter, ...
  */
-class TimeSlot {
+export default class TimeSlot {
 
 	/**
-	 * @param  {Date} utcDate Date which we want to build the TimeSlot around 
+	 * @param  {Date} utcDate Date which we want to build the TimeSlot around
 	 * @param  {string} periodicity One of day, week_sat, week_sun, week_mon, month, quarter, semester, year
 	 * @return {TimeSlot} The TimeSlot instance of the given periodicity containing utcDate
 	 *
 	 * @example
 	 * let ts = TimeSlot.fromDate(new Date(2010, 01, 07, 18, 34), "month");
 	 * ts.value // '2010-01'
-	 * 
+	 *
 	 * let ts2 = TimeSlot.fromDate(new Date(2010, 12, 12, 6, 21), "quarter");
 	 * ts2.value // '2010-Q4'
 	 */
@@ -53,7 +52,7 @@ class TimeSlot {
 				firstWeekLength = 7 - firstDayOfMonth; // 1 if month start on saturday, 2 if friday, 7 if sunday
 			else
 				firstWeekLength = 7 - ((firstDayOfMonth - 1 + 7) % 7);
-			
+
 
 			if (utcDate.getUTCDate() <= firstWeekLength) {
 				return new TimeSlot(prefix + 'W1-' + periodicity.substr(-3));
@@ -71,7 +70,7 @@ class TimeSlot {
 
 			while (utcDate.getTime() < epoch.getTime())
 				epoch = TimeSlot._getEpidemiologicWeekEpoch(--year, periodicity);
-			
+
 			var weekNumber = Math.floor((utcDate.getTime() - epoch.getTime()) / 1000 / 60 / 60 / 24 / 7) + 1;
 			if (weekNumber < 10)
 				weekNumber = '0' + weekNumber;
@@ -103,12 +102,12 @@ class TimeSlot {
 
 	/**
 	 * Get the date from which we should count weeks to compute the epidemiological week number.
-	 * 
+	 *
 	 * @private
 	 * @todo
 	 * This function is incredibly verbose for what it does.
 	 * Probably a single divmod could give the same result but debugging was nightmarish.
-	 * 
+	 *
 	 * @param  {number} year
 	 * @param  {string} periodicity
 	 * @return {Date}
@@ -196,7 +195,7 @@ class TimeSlot {
 	/**
 	 * Constructs a TimeSlot instance from a time slot value.
 	 * The periodicity will be automatically computed.
-	 * 
+	 *
 	 * @param  {string} value A valid TimeSlot value (those can be found calling the `value` getter).
 	 */
 	constructor(value) {
@@ -206,7 +205,7 @@ class TimeSlot {
 	/**
 	 * The value of the TimeSlot.
 	 * This is a string that uniquely identifies this timeslot.
-	 * 
+	 *
 	 * For instance: `2010`, `2010-Q1`, `2010-W07-sat`.
 	 * @type {string}
 	 */
@@ -225,31 +224,31 @@ class TimeSlot {
 		if (!this._periodicity) {
 			if (this.value.match(/^\d{4}$/))
 				this._periodicity = 'year';
-			
+
 			else if (this.value.match(/^\d{4}\-S\d$/))
 				this._periodicity = 'semester';
 
 			else if (this.value.match(/^\d{4}\-Q\d$/))
 				this._periodicity = 'quarter';
-			
+
 			else if (this.value.match(/^\d{4}\-\d{2}$/))
 				this._periodicity = 'month';
-			
+
 			else if (this.value.match(/^\d{4}\-W\d{2}-sat$/))
 				this._periodicity = 'week_sat';
-			
+
 			else if (this.value.match(/^\d{4}\-W\d{2}-sun$/))
 				this._periodicity = 'week_sun';
-			
+
 			else if (this.value.match(/^\d{4}\-W\d{2}-mon$/))
 				this._periodicity = 'week_mon';
 
 			else if (this.value.match(/^\d{4}\-\d{2}\-W\d{1}-sat$/))
 				this._periodicity = 'month_week_sat';
-			
+
 			else if (this.value.match(/^\d{4}\-\d{2}\-W\d{1}-sun$/))
 				this._periodicity = 'month_week_sun';
-			
+
 			else if (this.value.match(/^\d{4}\-\d{2}\-W\d{1}-mon$/))
 				this._periodicity = 'month_week_mon';
 
@@ -262,7 +261,7 @@ class TimeSlot {
 
 	/**
 	 * The date where this instance of TimeSlot begins.
-	 * 
+	 *
 	 * @type {Date}
 	 * @example
 	 * var t = new TimeSlot('2012-01');
@@ -287,7 +286,7 @@ class TimeSlot {
 					firstWeekLength = 7 - firstDayOfMonth; // 1 if month start on saturday, 2 if friday, 7 if sunday
 				else
 					firstWeekLength = 7 - ((firstDayOfMonth - 1 + 7) % 7);
-				
+
 				return new Date(Date.UTC(
 					this.value.substring(0, 4),
 					this.value.substring(5, 7) - 1,
@@ -298,7 +297,7 @@ class TimeSlot {
 
 		else if (this.periodicity === 'week_sat' || this.periodicity === 'week_sun' || this.periodicity === 'week_mon')
 			return new Date(
-				TimeSlot._getEpidemiologicWeekEpoch(this.value.substring(0, 4), this.periodicity).getTime() + 
+				TimeSlot._getEpidemiologicWeekEpoch(this.value.substring(0, 4), this.periodicity).getTime() +
 				(this.value.substring(6, 8) - 1) * 7 * 24 * 60 * 60 * 1000 // week numbering starts with 1
 			);
 
@@ -325,7 +324,7 @@ class TimeSlot {
 
 	/**
 	 * The date where this instance of TimeSlot ends.
-	 * 
+	 *
 	 * @type {Date}
 	 * @example
 	 * var t = new TimeSlot('2012-01');
@@ -396,10 +395,10 @@ class TimeSlot {
 
 	/**
 	 * Creates a TimeSlot instance with a longer periodicity that contains this one.
-	 * 
+	 *
 	 * @param  {string} newPeriodicity The desired periodicity
 	 * @return {TimeSlot} A new TimeSlot instance.
-	 * 
+	 *
 	 * @example
 	 * let t  = new TimeSlot('2010-07'),
 	 *     t2 = t.toUpperSlot('quarter');
@@ -413,7 +412,7 @@ class TimeSlot {
 
 		// For days, months, quarters, semesters, we can assume that getting the slot from any date works
 		var upperSlotDate = this.firstDate;
-		
+
 		// if it's a week, we need to be a bit more cautious.
 		// the month/quarter/year is not that of the first or last day, but that of the middle day of the week
 		// (which depend on the kind of week, but adding 3 days to the beginning gives the good date).
@@ -425,7 +424,7 @@ class TimeSlot {
 
 	/**
 	 * Creates a TimeSlot instance of the same periodicity than the current once, but which follows it
-	 * 
+	 *
 	 * @return {TimeSlot}
 	 * @example
 	 * var ts = new TimeSlot('2010');
@@ -461,4 +460,3 @@ TimeSlot._upperSlots = {
 	'year': []
 };
 
-module.exports = TimeSlot;

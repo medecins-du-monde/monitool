@@ -15,11 +15,10 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import express from 'express';
+import config from '../config';
 
-var express     = require('express'),
-	router      = express.Router(),
-	config      = require('../config');
+const router = express.Router();
 
 /**
  * Ping route, used to check if the service is online.
@@ -43,7 +42,7 @@ router.use(express.static(config.debug ? 'client' : 'wwwroot', {
 		// => we need to alter the header here for the browser to understand what to do with the file.
 
 		let filename = path.substring(path.lastIndexOf('/') + 1);
-		
+
 		if (!config.debug)
 			response.header('Content-Encoding', 'gzip');
 

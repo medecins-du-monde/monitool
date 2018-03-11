@@ -15,12 +15,12 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import express from 'express';
+import pkg from '../../package.json';
+import config from '../config';
 
-var express = require('express'),
-	router  = express.Router(),
-	pkg     = require('../../package.json'),
-	config  = require('../config');
+
+const router = express.Router();
 
 /**
  * Index page.
@@ -38,5 +38,4 @@ router.get('/', function(request, response) {
 });
 
 
-module.exports = router;
-
+export default router;
