@@ -17,9 +17,8 @@
 
 
 import express from 'express';
-import Project from '../resource/model/project';
 import PdfPrinter from 'pdfmake';
-
+import Project from '../resource/model/project';
 
 /**
  * Boilerplate needed to start-up pdfmake

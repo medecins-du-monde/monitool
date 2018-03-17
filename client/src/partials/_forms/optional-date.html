@@ -1,0 +1,28 @@
+<div class="input-group">
+	<div class="input-group-addon">
+		<!-- <input type="checkbox" ng-model="specifyDate" /> -->
+	
+		<i class="fa fa-thumb-tack"
+		   ng-click="specifyDate=!specifyDate"
+		   ng-style="{color: specifyDate ? 'black' : 'revert'}"></i>
+
+
+	</div>
+
+	<input type="text" 
+		   ng-if="specifyDate"
+		   uib-datepicker-popup="longDate"
+		   name="start"
+		   ng-model="container.dateLocal"
+		   is-open="chosenDateOpen"
+		   ng-click="chosenDateOpen=true"
+		   required
+		   class="form-control" />
+
+	<input type="text"
+		   ng-if="!specifyDate"
+		   value="{{message|translate}}"
+		   disabled
+		   class="form-control disabled" />
+
+</div>

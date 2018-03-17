@@ -1,0 +1,33 @@
+
+
+<ol class="breadcrumb">
+	<li class="active" translate="indicator.cross_cutting"></li>
+</ol>
+
+
+
+
+
+<div ng-repeat="theme in themes">
+	<legend ng-if="!theme.definition">{{('project.' + theme.translate)|translate}}</legend>
+	<legend ng-if="theme.definition">{{theme.definition.name[language]}}</legend>
+
+	<!-- markup is broken on purpose: do not fix -->
+	<!-- If we put spaces between tags, margins break -->
+
+	<div><div class="panel panel-default indicator-panel"
+		 ng-repeat="indicator in theme.indicators|orderBy:getName">
+
+		<div class="panel-heading" title="{{indicator.name[language]}}">{{indicator.name[language]|maxLength:90}}</div>
+		
+		<div class="panel-body">
+
+			<div>{{indicator.description[language]|maxLength:200}}</div>
+			
+			<a ui-sref="main.indicator_reporting({indicatorId: indicator._id})" class="btn btn-xxs btn-default">
+				voir les statistiques
+			</a>
+		</div>
+
+	</div></div>
+</div>

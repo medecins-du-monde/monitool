@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Monitool</title>
+
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet", type="text/css", href="monitool2.css">
+		<script type="text/javascript" src="init.js"></script>
+	</head>
+
+	<body>
+		<div ui-view></div>
+
+		<div id="version">Version </div>
+		<div id="load-container">
+			<div id="load-content">
+				<img id="logo_img" src="/img/logo_color.svg">
+
+				<div id="login_buttons" style="display: none">
+
+					<form id="training_login" action="/authentication/login-training" style="margin-bottom: 5px" method="POST">
+						<input type="hidden" name="username" value="value">
+						<input type="hidden" name="password" value="value">
+						<input type="submit" class="btn btn-primary btn-lg btn-block">
+					</form>
+
+					<a id="azure_login" href="/authentication/login-azure" class="btn btn-primary btn-lg btn-block"></a>
+					<a id="google_login" href="/authentication/login-google" class="btn btn-primary btn-lg btn-block"></a>
+					<a id="partner_login_btn" class="btn btn-default btn-lg btn-block">Use partner account</a>
+				</div>
+
+				<div id="partner_login" style="display: none">
+					<form class="form-horizontal well well-sm" action="/authentication/login-partner" method="POST">
+
+						<legend>Partner authentication</legend>
+
+						<p id="wrong_login" class="text-danger" style="display: none">
+							Wrong username or password. Please try again
+						</p>
+
+						<div class="form-group">
+							<label for="username" class="col-sm-2 control-label">Username</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="username" name="username" placeholder="Username">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="password" class="col-sm-2 control-label">Password</label>
+							<div class="col-sm-10">
+								<input type="password" class="form-control" id="password" name="password" placeholder="Password">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-6">
+								<button type="submit" class="btn btn-primary btn-block">Connect</button>
+							</div>
+
+							<div class="col-sm-6">
+								<a id="go_back_btn" class="btn btn-default btn-block">Go back</a>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<div id="ie_warning" style="display: none">
+					<h3>Monitool cannot be used with a legacy Internet Explorer version</h3>
+					<p>Please use either Chrome, Firefox, or a recent version of Internet Explorer.</p>
+				</div>
+
+				<div id="server_down" style="display: none">
+					<h3>Server seems to be down</h3>
+					<h3>Please, try again later</h3>
+				</div>
+
+				<div id="loader" style="display: none">
+					<h3>Loading</h3>
+
+					<div class="progress">
+						<div id="progress" class="progress-bar progress-bar-info", style="width: 0"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			start();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,53 @@
+<ol class="breadcrumb">
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{masterProject.name}}" ng-bind="masterProject.name|maxLength:50"></li>
+	<li class="active" translate="shared.logical_frames"></li>
+</ol>
+
+<div class="alert alert-info" translate="project.logical_frame_list_info"></div>
+
+<legend translate="shared.logical_frames"></legend>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th style="width: 30px;"></th>
+			<th translate="shared.name"></th>
+			<th translate="project.goal"></th>
+			<th style="width: 250px"></th>
+		</tr>
+	</thead>
+	<tbody ng-if="editableProject.logicalFrames.length == 0">
+		<tr>
+			<td colspan="4" style="text-align: center" translate="project.no_logical_frames"></td>
+		</tr>
+	</tbody>
+	<tbody ng-if="editableProject.logicalFrames.length != 0" ng-sortable="{handle: '.handle'}">
+		<tr ng-repeat="(index, logicalFrame) in editableProject.logicalFrames">
+			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
+			<td>
+				<a ui-sref="main.project.structure.logical_frame_edition({index: index})">
+					<span ng-show="logicalFrame.name">{{logicalFrame.name|maxLength:50}}</span>
+					<span ng-hide="logicalFrame.name" translate="project.unnamed_logframe"></span>
+				</a>
+			</td>
+			<td>{{logicalFrame.goal}}</td>
+			<td>
+				<i class="fa fa-file-pdf-o"></i>
+				<span translate="project.download_pdf"></span>
+				(<a href="/resources/project/{{editableProject._id}}/logical-frame/{{index}}.pdf?orientation=portrait" target="_blank" translate="shared.portrait"></a>,
+				<a href="/resources/project/{{editableProject._id}}/logical-frame/{{index}}.pdf?orientation=landscape" target="_blank" translate="shared.landscape"></a>)
+			</td>
+ 		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="4" style="text-align: center">
+				<a class="btn btn-default btn-xs" ng-click="createLogicalFrame()">
+					<i class="fa fa-plus"></i>
+					<span translate="shared.add"></span>
+				</a>
+			</td>
+		</tr>
+	</tfoot>
+</table>

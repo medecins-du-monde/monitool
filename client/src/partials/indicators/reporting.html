@@ -1,0 +1,148 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.indicators" translate="indicator.cross_cutting"></a></li>
+	<li class="active">{{indicator.name[language]}}</li>
+</ol>
+
+<div class="alert alert-info">
+	<dl>
+		<dt translate="shared.name"></dt>
+		<dd>{{indicator.name[language]}}</dd>
+
+		<dt translate="shared.description" ng-if="indicator.description[language]"></dt>
+		<dd ng-if="indicator.description[language]">{{indicator.description[language]}}</dd>
+
+		<dt translate="theme.themes"></dt>
+		<dd>{{indicator.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</dd>
+	</dl>
+</div>
+
+<form class="form-horizontal noprint" novalidate>
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate="shared.start"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						<utc-datepicker ng-model="filters._start" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="form-group">
+				<label for="indicator" class="col-sm-2 control-label" translate="shared.end"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						<utc-datepicker ng-model="filters._end" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="form-group">
+				<label for="group-by-input" class="col-sm-2 control-label" translate="shared.columns"></label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-columns"></i></span>
+						<select class="form-control input-sm" id="group-by-input" ng-model="groupBy">
+							<option value="day" translate="shared.day"></option>
+							<option value="month_week_sat" translate="shared.month_week_sat"></option>
+							<option value="month_week_sun" translate="shared.month_week_sun"></option>
+							<option value="month_week_mon" translate="shared.month_week_mon"></option>
+							<option value="week_sat" translate="shared.week_sat"></option>
+							<option value="week_sun" translate="shared.week_sun"></option>
+							<option value="week_mon" translate="shared.week_mon"></option>
+							<option value="month" translate="shared.month"></option>
+							<option value="quarter" translate="shared.quarter"></option>
+							<option value="semester" translate="shared.semester"></option>
+							<option value="year" translate="shared.year"></option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+
+
+<button class="btn btn-primary btn-xs pull-right noprint" svg-save>
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_plot"></span>
+</button>
+<div style="clear: both"></div>
+
+<reporting-graph-adapter
+	type="['year', 'quarter', 'month', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
+	rows="rows" cols="cols" plots="plots">
+</reporting-graph-adapter>
+
+<div style="clear: both"></div>
+
+<button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_table"></span>
+</button>
+
+<table id="reporting" class="table table-bordered table-condensed">
+	<thead>
+		<tr>
+			<th style="width: 30px" class="noprint"></th>
+			<th translate="shared.name" style="min-width: 300px"></th>
+			<th ng-repeat="col in cols" style="min-width: 50px" title="{{col.title}}">{{col.name}}</th>
+		</tr>
+	</thead>
+	
+	<tbody ng-if="blocks.length === 0">
+		<tr>
+			<td colspan="{{2 + cols.length}}" translate="indicator.not_collected"></th>
+		</tr>
+	</tbody>
+
+	<tbody ng-repeat="(blockIndex, block) in blocks">
+		<tr ng-click="open[blockIndex] = !open[blockIndex]" style="cursor: pointer">
+ 			<th class="indent0" colspan="{{2 + cols.length}}">
+				<i class="noprint" fa-open="open[blockIndex]"></i>
+				{{block.text}}
+			</th>
+		</tr>
+		
+		<tr ng-repeat="row in block.rows">
+			<td class="noprint" style="text-align: center">
+				<i class="fa fa-line-chart"
+				   ng-click="plots[row.id]=!plots[row.id]"
+				   ng-if="row.type === 'data' && row.cols"
+				   ng-style="{color: plots[row.id] ? 'black' : 'revert'}"></i>
+
+			</td>
+
+			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{1 + cols.length}}">{{row.text}}</th>
+
+			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
+				<div class="pull-right">
+					<div class="btn-toolbar">
+						<div class="btn-group btn-group-xs">
+							<button ng-repeat="p in row.partitions"
+									class="btn btn-default"
+									ng-class="{active:splits[row.id] == p.id}"
+									ng-click="onSplitClick(row.id, p.id)">
+								{{p.name}}
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<i class="fa fa-arrow-circle-right" ng-if="row.isGroup"></i>
+				<label for="{{row.id}}">{{row.name}}</label>
+			</td>
+
+			<td ng-repeat="col in row.cols track by $index" reporting-field></td>
+			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);">{{row.message|translate}}</td>
+		</tr>
+	</tbody>
+</table>
+

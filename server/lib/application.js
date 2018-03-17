@@ -10,9 +10,11 @@ import passport from './authentication/passport';
 import sessionStore from './authentication/session-store';
 
 import authenticationController from './controllers/authentication';
+import configController from './controllers/config';
 import pdfController from './controllers/pdf';
 import reportingController from './controllers/reporting';
 import resourcesController from './controllers/resources';
+import staticController from './controllers/static';
 
 import forceAuthenticationMiddleware from './middlewares/force-authentication';
 import loggerMiddleware from './middlewares/logger';
@@ -28,10 +30,13 @@ export default express()
 	// By default users should never cache anything.
 	.use(function(request, response, next) {
 		response.setHeader('Cache-Control', 'max-age=0,public');
+		response.setHeader("Access-Control-Allow-Origin", '*');
 		next();
 	})
 
 	.use(loggerMiddleware)
+	.use(configController)
+	.use(staticController)
 
 	// Enable dynamic sessions and compression for the rest.
 	.use(cookieParser())

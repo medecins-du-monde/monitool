@@ -1,0 +1,50 @@
+
+<a class="btn btn-primary pull-right" ng-click="createProject()" acl-has-project-creation>
+	<i class="fa fa-plus"></i>
+	<span translate="project.create"></span>
+</a>
+
+<div class="pull-right" acl-lacks-project-creation style="cursor: not-allowed">
+	<a class="btn btn-primary disabled">
+		<i class="fa fa-plus"></i>
+		<span translate="project.create"></span>
+	</a>
+</div>
+
+<ul class="nav nav-tabs" role="tablist">
+	<li ng-class="{active:projects == myProjects}">
+		<a ng-click="projects = myProjects">{{'project.my_projects'|translate}}</a>
+	</li>
+	<li ng-class="{active:projects == runningProjects}">
+		<a ng-click="projects = runningProjects">{{'project.running'|translate}}</a>
+	</li>
+	<li ng-class="{active:projects == finishedProjects}">
+		<a ng-click="projects = finishedProjects">{{'project.finished'|translate}}</a>
+	</li>
+</ul>
+
+<br/>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th><a ng-click="pred='country';rev=!rev">{{'shared.country'|translate}}</a></th>
+			<th><a ng-click="pred='name';rev=!rev">{{'shared.name'|translate}}</a></th>
+			<th><a ng-click="pred='themes';rev=!rev">{{'theme.themes'|translate}}</a></th>
+			<th style="width: 100px;"><a ng-click="pred='start';rev=!rev">{{'shared.start'|translate}}</a></th>
+			<th style="width: 100px;"><a ng-click="pred='end';rev=!rev">{{'shared.end'|translate}}</a></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-if="projects.length == 0">
+			<td colspan="6" style="text-align: center" translate="project.noproject">
+		</tr>
+		<tr ng-repeat="project in projects|orderBy:pred:rev">
+			<td>{{project.country}}</td>
+			<td><a ng-click="open(project)">{{project.name}}</a></td>
+			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
+			<td>{{project.start|date}}</td>
+			<td>{{project.end|date}}</td>
+		</tr>
+	</tbody>
+</table>

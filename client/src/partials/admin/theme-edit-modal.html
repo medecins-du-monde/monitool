@@ -1,0 +1,53 @@
+<div class="modal-header">
+	<h3 class="modal-title">
+		<a ng-click="cancel()" class="pull-right" style="cursor: pointer">
+			<i class="fa fa-times"></i>
+		</a>
+		<span translate="theme.edit_title"></span>
+	</h3>
+</div>
+
+<div class="modal-body">
+
+	<form class="form-horizontal" role="form" name="themeForm" novalidate>
+	
+		<div class="alert alert-info" translate="theme.info"></div>
+
+		<div class="form-group" ng-repeat="(language_code, language) in languages">
+			<label for="input-name-{{language_code}}" class="col-sm-2 control-label">
+				{{'shared.name_label_' + language_code | translate}}
+			</label>
+
+			<div class="col-sm-10">
+				<div class="input-group">
+					<span class="input-group-btn">
+						<button class="btn btn-default" ng-click="autofill(language_code)">
+							<i class="fa fa-language"></i>
+						</button>
+					</span>
+
+					<input id="input-name-{{language_code}}"
+						   type="text"
+						   class="form-control"
+						   name="name_{{language_code}}"
+						   ng-model="theme.name[language_code]"
+						   placeholder="{{'theme.name_placeholder_' + language_code|translate}}"
+						   required />
+				</div>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button ng-click="save()" ng-disabled="themeForm.$invalid || !hasChanged" class="btn btn-primary">
+		<i class="fa fa-object-group"></i>
+		<span translate="theme.save"></span>
+	</button>
+
+	<button ng-click="delete()" class="btn btn-danger" ng-if="!isNew">
+		<i class="fa fa-times"></i>
+		<span translate="shared.delete"></span>
+	</button>
+</div>

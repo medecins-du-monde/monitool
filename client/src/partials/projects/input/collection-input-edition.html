@@ -1,0 +1,90 @@
+<ol class="breadcrumb noprint">
+	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{masterProject.name}}" ng-bind="masterProject.name|maxLength:50"></li>
+	<li><a ui-sref="main.project.input.list">{{form.name|maxLength:50}}</a></li>
+	<li class="active" ng-if="inputEntityName">{{inputEntityName|maxLength:50|translate}}</li>
+	<li class="active">{{currentInput.period|formatSlot}}</li>
+</ol>
+
+<div id="formblock">
+
+	<form class="form-horizontal">
+		<legend translate="project.general_informations"></legend>
+
+		<div class="form-group">
+			<label class="col-sm-2 control-label" translate="shared.name"></label>
+
+			<div class="col-sm-10">
+				<input class="form-control disabled" disabled ng-value="form.name" />
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label" translate="project.collection_site"></label>
+
+			<div class="col-sm-10">
+				<input class="form-control disabled" disabled ng-value="inputEntityName|translate" />
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-2 control-label" translate="project.covered_period"></label>
+
+			<div class="col-sm-10">
+				<input class="form-control disabled" disabled ng-value="currentInput.period|formatSlotLong" />
+			</div>
+		</div>
+
+		<legend>
+			<a ng-if="lastInput" ng-click="copy()" class="btn btn-default btn-xs noprint pull-right">
+				<i class="fa fa-magic"></i>
+				{{'project.fill_with_last_input'|translate}}
+			</a>
+
+			{{'project.data'|translate}}
+		</legend>
+
+		<div class="form-group" ng-repeat="element in form.elements">
+			<label class="col-sm-2 control-label">{{element.name}}</label>
+
+			<div class="col-sm-10">
+				<input-grid ng-model="currentInput.values[element.id]" element="element"></input-grid>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+<div id="saveblock" class="noprint">
+	<div class="pull-right">
+		<p class="text-danger" ng-if="!isValid()">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_error"></span>
+		</p>
+
+		<p class="text-info" ng-if="!isNew && isUnchanged()">
+			<i class="fa fa-info-circle"></i>
+			<span translate="project.form_persisted"></span>
+		</p>
+
+		<p class="text-warning" ng-if="!isUnchanged() && isValid()">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_changed"></span>
+		</p>
+	</div>
+
+	<a class="btn btn-primary" ng-click="save()" ng-disabled="(!isNew && isUnchanged()) || !isValid()">
+		<i class="fa fa-floppy-o"></i>
+		<span translate="shared.save"></span>
+	</a>
+
+	<a ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</a>
+
+	<a class="btn btn-danger" ng-click="delete()" ng-if="!isNew">
+		<i class="fa fa-remove"></i>
+		<span translate="shared.delete"></span>
+	</a>
+</div>

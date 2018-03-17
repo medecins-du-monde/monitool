@@ -1,0 +1,52 @@
+{
+  "name": "monitool-angularjs-client",
+  "description": "AngularJS client for Monitool API",
+  "version": "2.6.0",
+  "license": "GPL-3.0+",
+  "dependencies": {
+    "@bower_components/Sortable": "RubaXa/Sortable#~1.4.2",
+    "@bower_components/angular": "angular/bower-angular#~1.5.8",
+    "@bower_components/angular-bootstrap": "angular-ui/bootstrap-bower#~2.0.2",
+    "@bower_components/angular-cookies": "angular/bower-angular-cookies#~1.5.8",
+    "@bower_components/angular-i18n": "angular/bower-angular-i18n#~1.5.8",
+    "@bower_components/angular-mocks": "angular/bower-angular-mocks#~1.5.8",
+    "@bower_components/angular-resource": "angular/bower-angular-resource#~1.5.8",
+    "@bower_components/angular-translate": "PascalPrecht/bower-angular-translate#~2.11.1",
+    "@bower_components/angular-translate-storage-cookie": "PascalPrecht/bower-angular-translate-storage-cookie#~2.11.1",
+    "@bower_components/angular-translate-storage-local": "PascalPrecht/bower-angular-translate-storage-local#~2.11.1",
+    "@bower_components/angular-ui-router": "angular-ui/angular-ui-router-bower#~0.3.1",
+    "@bower_components/angular-ui-select": "angular-ui/ui-select#~0.19.1",
+    "@bower_components/blob": "eligrey/Blob.js#master",
+    "@bower_components/bootstrap-css-only": "fyockm/bootstrap-css-only#~3.3.6",
+    "@bower_components/c3": "masayuki0812/c3#~0.4.11",
+    "@bower_components/canvas-to-Blob.js": "eligrey/canvas-toBlob.js#master",
+    "@bower_components/d3": "mbostock-bower/d3-bower#~3.5.0",
+    "@bower_components/file-saver": "eligrey/FileSaver.js#master",
+    "@bower_components/font-awesome": "FortAwesome/Font-Awesome#~4.6.3",
+    "@bower_components/handsontable": "handsontable/handsontable#~0.26.1",
+    "@bower_components/moment": "moment/moment#^2.13.0",
+    "@bower_components/numbro": "BenjaminVanRyseghem/numbro#^1.8.0",
+    "@bower_components/pikaday": "dbushell/Pikaday#^1.4.0",
+    "@bower_components/zeroclipboard": "zeroclipboard/zeroclipboard#^2.2.0"
+  },
+  "devDependencies": {
+    "del": "x",
+    "event-stream": "x",
+    "gulp": "x",
+    "gulp-angular-templatecache": "x",
+    "gulp-clean-css": "x",
+    "gulp-concat": "x",
+    "gulp-gzip": "^1.4.0",
+    "gulp-ng-annotate": "x",
+    "gulp-rename": "x",
+    "gulp-replace": "x",
+    "gulp-uglify": "x",
+    "streamqueue": "x"
+  },
+  "engines": {
+    "yarn": ">= 1.0.0"
+  },
+  "scripts": {
+    "build": "gulp"
+  }
+}

@@ -1,6 +1,7 @@
 import application from './application';
 import config from './config';
 import database from './resource/database';
+import winston from 'winston';
 
 database.prepare().then(
 	function() {
