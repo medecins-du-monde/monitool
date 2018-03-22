@@ -57,14 +57,14 @@ gulp.task('clean', function(cb) {
 gulp.task('copy-static', [], function() {
 	gulp.src([
 			'src/index.html',
-			'src/js/init.js',
-			'src/favicon.ico',
+			'src/init.js',
+			'src/assets/favicon.ico',
 			'node_modules/@bower_components/font-awesome/fonts/*'
 		])
 		// .pipe(gzip({append: false}))
 		.pipe(gulp.dest('dist'));
 
-	gulp.src('src/img/*')
+	gulp.src('src/assets/img/*')
 		// .pipe(gzip({append: false}))
 		.pipe(gulp.dest('dist/img'));
 });
@@ -81,7 +81,7 @@ gulp.task('build-js', [], function() {
 
 	// js are annotated, uglified
 	queue.queue(
-		gulp.src(['src/js/**/*.js', 'src/i18n/**/*.js', '!src/js/**/*_test.js', '!src/js/init.js'])
+		gulp.src(['src/**/*.js', '!src/**/*_test.js', '!src/init.js'])
 			.pipe(ngAnnotate())
 			.pipe(uglify())
 	);
@@ -104,7 +104,7 @@ gulp.task('build-js', [], function() {
 gulp.task('build-css', [], function() {
 	var queue = new Queue({ objectMode: true });
 	queue.queue(gulp.src(files.css));
-	queue.queue(gulp.src('src/css/**/*.css').pipe(cleanCSS()));
+	queue.queue(gulp.src('src/**/*.css').pipe(cleanCSS()));
 
 	return queue.done()
 				.pipe(concat('monitool2.css'))
