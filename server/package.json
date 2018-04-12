@@ -4,23 +4,25 @@
   "version": "3.0.0",
   "repository": "git@github.com:medecins-du-monde/monitool.git",
   "license": "GPL-3.0+",
-
   "babel": {
     "presets": [
       [
         "env",
-        {"targets": {"node": "current"}}
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
       ]
     ]
   },
-
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "mocha": "^3.2.0",
     "node-uuid": "x",
     "request": "x"
   },
-
   "dependencies": {
     "body-parser": "x",
     "compression": "x",
@@ -40,12 +42,10 @@
     "roboto-fontface": "^0.7.0",
     "winston": "^2.3.1"
   },
-
   "scripts": {
     "start": "nodemon lib/main.js --exec babel-node",
-    "build": "babel lib -d dist --copy-files",
+    "build": "./node_modules/.bin/babel lib -d dist --copy-files",
     "serve": "node dist/main.js",
     "test": "./node_modules/mocha/bin/mocha --compilers js:babel-register --recursive test"
   }
-
 }
