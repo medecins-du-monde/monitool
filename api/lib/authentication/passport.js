@@ -20,7 +20,7 @@ import LocalStrategyModule from 'passport-local';
 import OAuth2Strategy from 'passport-oauth2';
 import passwordHash from 'password-hash';
 import User from '../resource/model/user';
-import config from '../config';
+import config from '../config/config';
 
 const LocalStrategy = LocalStrategyModule.Strategy;
 

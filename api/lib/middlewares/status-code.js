@@ -15,7 +15,7 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import config from '../config';
+import config from '../config/config';
 
 const statusCodes = {
 	wrong_type: 400,	// id collision

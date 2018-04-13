@@ -5,7 +5,7 @@ import express from 'express';
 import session from 'express-session';
 import path from 'path';
 
-import config from './config';
+import config from './config/config';
 import passport from './authentication/passport';
 import sessionStore from './authentication/session-store';
 

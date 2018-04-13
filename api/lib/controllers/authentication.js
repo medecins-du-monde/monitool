@@ -17,7 +17,7 @@
 
 import express from 'express';
 import passport from '../authentication/passport';
-import config from '../config';
+import config from '../config/config';
 import bodyParser from 'body-parser';
 
 const router = express.Router();

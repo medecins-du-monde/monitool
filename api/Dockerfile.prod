@@ -1,0 +1,23 @@
+# We use the nodejs base image to build
+FROM node:8 as builder
+WORKDIR /app
+
+# Install build dependencies
+COPY package.json yarn.lock ./
+RUN yarn install
+
+# Build the app
+COPY lib ./lib
+RUN yarn run build
+
+# Switch to a clean image
+FROM node:8
+WORKDIR /app
+
+# Retrieve the files that need to be hosted
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+
+# Run monitool API
+EXPOSE 80
+ENTRYPOINT node ./dist/main.js

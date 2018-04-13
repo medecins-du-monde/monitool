@@ -17,7 +17,7 @@
 
 import express from 'express';
 import pkg from '../../package.json';
-import config from '../config';
+import config from '../config/config';
 
 const router = express.Router();
 

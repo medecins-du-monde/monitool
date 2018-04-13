@@ -16,7 +16,7 @@
  */
 
 
-import config from '../config';
+import config from '../config/config';
 import nano from 'nano';
 import session from 'express-session';
 import connectCouchDB from 'connect-couchdb';

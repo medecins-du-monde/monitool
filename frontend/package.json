@@ -47,6 +47,6 @@
     "yarn": ">= 1.0.0"
   },
   "scripts": {
-    "build": "gulp"
+    "build": "./node_modules/.bin/gulp"
   }
 }

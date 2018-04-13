@@ -17,8 +17,8 @@
 
 
 import nano from 'nano';
-import config from '../config';
 import winston from 'winston';
+import config from '../config/config';
 import migrations from './migrations/index';
 
 class Database {

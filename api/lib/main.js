@@ -1,5 +1,5 @@
 import application from './application';
-import config from './config';
+import config from './config/config';
 import database from './resource/database';
 import winston from 'winston';
 

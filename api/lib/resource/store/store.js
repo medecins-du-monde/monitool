@@ -15,8 +15,6 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import nano from 'nano';
-import config from '../../config';
 import database from '../database';
 
 /**
