@@ -1,3 +1,7 @@
+# Build API
+docker image build -t romaingilliotte/monitool-api:latest api
+docker image push romaingilliotte/monitool-api
 
-docker image build -t romaingilliotte/monitool-api:latest -f api/Dockerfile.prod api
-docker image build -t romaingilliotte/monitool-frontend:latest -f frontend/Dockerfile.prod frontend
+# Build frontend
+docker image build -t romaingilliotte/monitool-frontend:latest frontend
+docker image push romaingilliotte/monitool-frontend

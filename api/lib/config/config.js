@@ -17,7 +17,7 @@
 
 import winston from 'winston';
 import validator from 'is-my-json-valid';
-import schema from './config-schema.json';
+import schema from './schema.json';
 import fs from 'fs';
 
 const toBool = function(str) {
@@ -34,7 +34,7 @@ const readFile = function(secret) {
 };
 
 const config = {
-	"debug": toBool(process.env.MONITOOL_DEBUG),
+	"debug": toBool(process.env.MONITOOL_DEBUG) || false,
 	"baseUrl": process.env.MONITOOL_BASE_URL || "http://localhost:8000",
 	"port": parseInt(process.env.MONITOOL_PORT) || 8000,
 	"cookieSecret":

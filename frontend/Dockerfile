@@ -13,7 +13,8 @@ COPY src ./src
 RUN yarn run build
 
 # Switch to the nginx image
-FROM nginx:latest
+FROM nginx:stable
 
 # Retrieve the files that need to be hosted
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html

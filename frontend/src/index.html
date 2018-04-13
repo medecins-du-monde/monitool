@@ -20,19 +20,18 @@
 
 				<div id="login_buttons" style="display: none">
 
-					<form id="training_login" action="/authentication/login-training" style="margin-bottom: 5px" method="POST">
+					<form id="training_login" action="/api/authentication/login-training" style="margin-bottom: 5px" method="POST">
 						<input type="hidden" name="username" value="value">
 						<input type="hidden" name="password" value="value">
 						<input type="submit" class="btn btn-primary btn-lg btn-block">
 					</form>
 
-					<a id="azure_login" href="/authentication/login-azure" class="btn btn-primary btn-lg btn-block"></a>
-					<a id="google_login" href="/authentication/login-google" class="btn btn-primary btn-lg btn-block"></a>
+					<a id="azure_login" href="/api/authentication/login-azure" class="btn btn-primary btn-lg btn-block"></a>
 					<a id="partner_login_btn" class="btn btn-default btn-lg btn-block">Use partner account</a>
 				</div>
 
 				<div id="partner_login" style="display: none">
-					<form class="form-horizontal well well-sm" action="/authentication/login-partner" method="POST">
+					<form class="form-horizontal well well-sm" action="/api/authentication/login-partner" method="POST">
 
 						<legend>Partner authentication</legend>
 

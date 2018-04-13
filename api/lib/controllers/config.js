@@ -30,7 +30,6 @@ router.get('/config', function(request, response) {
 		version: pkg.version,
 		trainingLabel: config.auth.providers.training ? config.auth.providers.training.label : null,
 		azureLabel: config.auth.providers.azureAD ? config.auth.providers.azureAD.label : null,
-		googleLabel: config.auth.providers.google ? config.auth.providers.google.label : null,
 		googleKey: config.api.google
 	});
 });

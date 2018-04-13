@@ -18,9 +18,6 @@
 "use strict";
 
 window.monitool = angular.module('monitool.app', [
-
-	'monitool.components',
-
 	'monitool.controllers.admin',
 	'monitool.controllers.helper',
 	'monitool.controllers.indicator',

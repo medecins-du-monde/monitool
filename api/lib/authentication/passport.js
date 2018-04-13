@@ -45,8 +45,18 @@ passport.deserializeUser(function(id, done) {
 	var type = id.substring(0, id.indexOf(':'));
 
 	if (type === 'usr') {
-		User.storeInstance
-			.get(id)
+		let userPromise;
+		if (config.auth.providers.training && id === 'usr:' + config.auth.providers.training.account)
+			userPromise = Promise.resolve(new User({
+				_id: 'usr:' + config.auth.providers.training.account,
+				type: 'user',
+				name: "Training account",
+				role: 'common'
+			}));
+		else
+			userPromise = User.storeInstance.get(id);
+
+		userPromise
 			.then(function(user) {
 				// Upgrade user to administrator if specified in the configuration file.
 				if ('usr:' + config.auth.administrator === user._id)
@@ -190,13 +200,14 @@ passport.use('partner_local', new LocalStrategy(
 if (config.auth.providers.training) {
 	passport.use('training_local', new LocalStrategy(
 		function(username, password, done) {
-			User.storeInstance.get('usr:' + config.auth.providers.training.account)
-				.then(function(user) {
-					done(null, user);
-				})
-				.catch(function(error) {
-					done(error);
-				});
+			let trainingUser = new User({
+				_id: 'usr:' + config.auth.providers.training.account,
+				type: 'user',
+				name: "Training account",
+				role: 'common'
+			});
+
+			done(null, trainingUser);
 		})
 	);
 }

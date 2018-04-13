@@ -1,18 +1,24 @@
 version: "3.6"
-services:
 
+services:
   frontend:
-    image: romaingilliotte/monitool-frontend:dev
+    image: romaingilliotte/monitool-frontend:latest
+    networks:
+      - frontend
     ports:
       - "80:80"
+    depends_on:
+      - api
 
   api:
-    image: romaingilliotte/monitool-api:dev
-    ports:
-      - "80:80"
+    image: romaingilliotte/monitool-api:latest
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      - couchdb
     environment:
-      MONITOOL_DEBUG: "TRUE"
-      MONITOOL_BASE_URL: "http://localhost:80"
+      MONITOOL_DEBUG: "FALSE"
       MONITOOL_PORT: "80"
       MONITOOL_COOKIE_SECRET: "123456789"
       MONITOOL_COUCHDB_HOST: "couchdb"
@@ -23,14 +29,24 @@ services:
       MONITOOL_AUTH_PROVIDERS_TRAINING_ACCOUNT: "training"
     secrets:
       - google_client_api_key
-      - monitool_cookie
 
-  database:
-    image: couchdb
+  couchdb:
+    image: couchdb:1
+    networks:
+      - backend
     environment:
       COUCHDB_USER: "admin"
       COUCHDB_PASSWORD: ""
+    volumes:
+      - couchdb-data:/usr/local/var/lib/couchdb
+
+networks:
+  frontend:
+  backend:
 
 secrets:
   google_client_api_key:
     external: true
+
+volumes:
+  couchdb-data:

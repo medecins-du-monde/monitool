@@ -18,12 +18,11 @@
 "use strict";
 
 angular
-	
 	.module('monitool.services.models.input', ['ngResource', 'monitool.services.utils.input-slots'])
 	.factory('Input', function($resource, $q, InputSlots) {
 
 		// Create $resource
-		var Input = $resource('/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
+		var Input = $resource('/api/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
 		Input.fetchFormStatus = function(project, formId) {
 			var form = project.forms.find(function(f) {return f.id == formId; });

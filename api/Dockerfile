@@ -15,8 +15,9 @@ FROM node:8
 WORKDIR /app
 
 # Retrieve the files that need to be hosted
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
 
 # Run monitool API
 EXPOSE 80

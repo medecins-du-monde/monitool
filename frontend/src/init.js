@@ -171,7 +171,7 @@ function startLoginPage() {
 		else {
 			var authReq = new XMLHttpRequest();
 			authReq.addEventListener("load", onAuthResponse, false);
-			authReq.open('GET', '/resources/myself?' + Math.random().toString().substring(2));
+			authReq.open('GET', '/api/resources/myself?' + Math.random().toString().substring(2));
 			authReq.send();
 		}
 	}
@@ -193,12 +193,6 @@ function onConfigResponse(e) {
 		else
 			azureLogin.parentNode.removeChild(azureLogin);
 
-		let googleLogin = document.getElementById('google_login');
-		if (window.config.googleLabel)
-			googleLogin.innerHTML = window.config.googleLabel;
-		else
-			googleLogin.parentNode.removeChild(googleLogin);
-
 		let trainingLogin = document.getElementById('training_login');
 		if (window.config.trainingLabel)
 			trainingLogin.querySelector('[type=submit]').value = window.config.trainingLabel;
@@ -212,6 +206,6 @@ function onConfigResponse(e) {
 function start() {
 	var authReq = new XMLHttpRequest();
 	authReq.addEventListener("load", onConfigResponse, false);
-	authReq.open('GET', '/config?' + Math.random().toString().substring(2));
+	authReq.open('GET', '/api/config?' + Math.random().toString().substring(2));
 	authReq.send();
 }

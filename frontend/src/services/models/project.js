@@ -21,7 +21,7 @@ angular
 	.module('monitool.services.models.project', ['ngResource'])
 	.factory('Project', function($resource, $q, $rootScope, $filter, uuid, itertools, Parser) {
 
-		var Project = $resource('/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
+		var Project = $resource('/api/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
 		/**
 		 * Retrieve all indicators and variables in list
