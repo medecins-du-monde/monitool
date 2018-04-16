@@ -31,14 +31,11 @@
   },
   "devDependencies": {
     "del": "x",
-    "event-stream": "x",
     "gulp": "x",
     "gulp-angular-templatecache": "x",
     "gulp-clean-css": "x",
     "gulp-concat": "x",
-    "gulp-gzip": "^1.4.0",
     "gulp-ng-annotate": "x",
-    "gulp-rename": "x",
     "gulp-replace": "x",
     "gulp-uglify": "x",
     "streamqueue": "x"

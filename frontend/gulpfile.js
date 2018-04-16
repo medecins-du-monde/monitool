@@ -1,17 +1,13 @@
 "use strict";
 
 var del           = require('del'),
-	fs            = require('fs'),
 	gulp          = require('gulp'),
 	templateCache = require('gulp-angular-templatecache'),
 	concat        = require('gulp-concat'),
 	cleanCSS      = require('gulp-clean-css'),
-	gzip          = require('gulp-gzip'),
 	ngAnnotate    = require('gulp-ng-annotate'),
-	rename        = require('gulp-rename'),
 	replace       = require('gulp-replace'),
 	uglify        = require('gulp-uglify'),
-	es            = require('event-stream'),
 	Queue         = require('streamqueue');
 
 var files = {
@@ -66,11 +62,9 @@ gulp.task('copy-static', [], function() {
 			'src/assets/favicon.ico',
 			'node_modules/@bower_components/font-awesome/fonts/*'
 		])
-		// .pipe(gzip({append: false}))
 		.pipe(gulp.dest('dist'));
 
 	gulp.src('src/assets/img/*')
-		// .pipe(gzip({append: false}))
 		.pipe(gulp.dest('dist/img'));
 });
 
@@ -102,7 +96,6 @@ gulp.task('build-js', [], function() {
 	// concat it all.
 	return queue.done()
 				.pipe(concat('monitool2.js'))
-				// .pipe(gzip({append: false}))
 				.pipe(gulp.dest('dist'));
 });
 
@@ -114,7 +107,6 @@ gulp.task('build-css', [], function() {
 	return queue.done()
 				.pipe(concat('monitool2.css'))
 				.pipe(replace(/\.\.\/fonts\//g, ''))
-				// .pipe(gzip({append: false}))
 				.pipe(gulp.dest('dist'));
 });
 
