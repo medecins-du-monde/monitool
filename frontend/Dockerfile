@@ -1,3 +1,7 @@
+###################################
+# Builder stage
+###################################
+
 # We use the nodejs base image to build
 FROM node:8 as builder
 
@@ -12,9 +16,12 @@ COPY gulpfile.js ./
 COPY src ./src
 RUN yarn run build
 
+###################################
+# Production stage
+###################################
+
 # Switch to the nginx image
 FROM nginx:stable
 
 # Retrieve the files that need to be hosted
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html

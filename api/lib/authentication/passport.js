@@ -89,7 +89,7 @@ if (config.auth.providers.azureAD) {
 			tokenURL: "https://login.windows.net/common/oauth2/token",
 			clientID: config.auth.providers.azureAD.clientId,
 			clientSecret: config.auth.providers.azureAD.clientSecret,
-			callbackURL: config.baseUrl + '/authentication/login-callback'
+			callbackURL: config.baseUrl + '/api/authentication/login-callback'
 		},
 		// This method is invoked upon auth sequence completion
 		// Its the hook to cache the access/refresh tokens, post-process the Azure profile, etc.

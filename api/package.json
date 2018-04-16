@@ -20,12 +20,10 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "mocha": "^3.2.0",
-    "node-uuid": "x",
-    "request": "x"
+    "nodemon": "x"
   },
   "dependencies": {
     "body-parser": "x",
-    "compression": "x",
     "connect-couchdb": "x",
     "cookie-parser": "x",
     "express": "x",
@@ -33,6 +31,7 @@
     "is-my-json-valid": "x",
     "memory-cache": "^0.1.6",
     "nano": "x",
+    "node-uuid": "x",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.4.0",
@@ -43,7 +42,7 @@
     "winston": "^2.3.1"
   },
   "scripts": {
-    "start": "nodemon lib/main.js --exec babel-node",
+    "start": "./node_modules/.bin/nodemon lib/main.js --exec ./node_modules/.bin/babel-node",
     "build": "./node_modules/.bin/babel lib -d dist --copy-files",
     "serve": "node dist/main.js",
     "test": "./node_modules/mocha/bin/mocha --compilers js:babel-register --recursive test"

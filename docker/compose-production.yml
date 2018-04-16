@@ -1,0 +1,77 @@
+version: "3.6"
+
+services:
+
+  reverse_proxy:
+    image: romaingilliotte/monitool-frontend:latest
+    networks:
+      - frontend
+    ports:
+      # Production machine is running nginx on the host with certbot for TLS support.
+      # It should be moved to docker at a further point.
+      - "8000:80"
+    depends_on:
+      - api
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  api:
+    image: romaingilliotte/monitool-api:latest
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      - couchdb
+    environment:
+      MONITOOL_DEBUG: "FALSE"
+      MONITOOL_PORT: "80"
+      MONITOOL_BASE_URL: "https://monitool.medecinsdumonde.net"
+      MONITOOL_COOKIE_SECRET_FILE: "/var/run/secrets/monitool_cookiesecret"
+      MONITOOL_COUCHDB_HOST: "couchdb"
+      MONITOOL_COUCHDB_USER: "monitool_couchdb"
+      MONITOOL_COUCHDB_PASS_FILE: "/var/run/secrets/monitool_dbpassword"
+      MONITOOL_API_GOOGLE_FILE: "/var/run/secrets/googletranslate_apikey"
+      MONITOOL_AUTH_ADMINISTRATOR: "romain.gilliotte"
+      MONITOOL_AUTH_PROVIDERS_AZUREAD: "TRUE"
+      MONITOOL_AUTH_PROVIDERS_AZUREAD_LABEL: "Use MDM account"
+      MONITOOL_AUTH_PROVIDERS_AZUREAD_DOMAIN: "medecinsdumonde.net"
+      MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTID_FILE: "/var/run/secrets/azuread_clientid"
+      MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTSECRET_FILE: "/var/run/secrets/azuread_clientsecret"
+      MONITOOL_AUTH_PROVIDERS_TRAINING: "FALSE"
+    secrets:
+      - azuread_clientid
+      - azuread_clientsecret
+      - googletranslate_apikey
+      - monitool_cookiesecret
+      - monitool_dbpassword
+
+  couchdb:
+    image: romaingilliotte/couchdb:1.7.1
+    networks:
+      - backend
+    environment:
+      COUCHDB_USER: "monitool_couchdb"
+      COUCHDB_PASSWORD_FILE: "/var/run/secrets/monitool_dbpassword"
+    volumes:
+      - couchdb-data:/usr/local/var/lib/couchdb
+    secrets:
+      - monitool_dbpassword
+
+networks:
+  frontend:
+  backend:
+
+secrets:
+  azuread_clientid:
+    external: true
+  azuread_clientsecret:
+    external: true
+  googletranslate_apikey:
+    external: true
+  monitool_cookiesecret:
+    external: true
+  monitool_dbpassword:
+    external: true
+
+volumes:
+  couchdb-data:

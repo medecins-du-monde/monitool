@@ -47,6 +47,7 @@
     "yarn": ">= 1.0.0"
   },
   "scripts": {
-    "build": "./node_modules/.bin/gulp"
+    "build": "./node_modules/.bin/gulp",
+    "watch": "./node_modules/.bin/gulp watch"
   }
 }

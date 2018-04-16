@@ -48,7 +48,12 @@ var files = {
 //////////////////////////////////////////////////////////
 
 gulp.task('default', ['build']);
+
 gulp.task('build', ['build-js', 'build-css', 'copy-static']);
+
+gulp.task('watch', function(cb) {
+	return gulp.watch('src/**/*', ['build']);
+});
 
 gulp.task('clean', function(cb) {
 	del(['dist/**/*'], cb);

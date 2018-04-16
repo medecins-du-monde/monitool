@@ -95,7 +95,7 @@ if (config.auth.providers.azureAD) {
 			else
 				response.render('redirect', {url: '/'});
 		}
-	)
+	);
 }
 
 if (config.auth.providers.training) {

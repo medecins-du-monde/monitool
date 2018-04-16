@@ -1,5 +1,4 @@
 
-import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import session from 'express-session';
@@ -14,7 +13,6 @@ import configController from './controllers/config';
 import pdfController from './controllers/pdf';
 import reportingController from './controllers/reporting';
 import resourcesController from './controllers/resources';
-import staticController from './controllers/static';
 
 import forceAuthenticationMiddleware from './middlewares/force-authentication';
 import loggerMiddleware from './middlewares/logger';
@@ -25,7 +23,7 @@ export default express()
 	// Basic Configuration
 	.disable('x-powered-by') // Remove useless header.
 	.set('view engine', 'pug') // Enable template engine.
-	.set('views', path.join(__dirname, '../server/views'))
+	.set('views', path.join(__dirname, 'views'))
 
 	// By default users should never cache anything.
 	.use(function(request, response, next) {
@@ -36,14 +34,12 @@ export default express()
 
 	.use(loggerMiddleware)
 	.use(configController)
-	.use(staticController)
 
-	// Enable dynamic sessions and compression for the rest.
+	// Enable dynamic sessions for the rest.
 	.use(cookieParser())
 	.use(session({secret: config.cookieSecret, resave: false, saveUninitialized: false, store: sessionStore}))
 	.use(passport.initialize())
 	.use(passport.session())
-	.use(compression())
 
 	// Serve authentication related pages.
 	.use('/authentication', authenticationController) // eg: login page, ...

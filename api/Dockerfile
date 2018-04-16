@@ -1,24 +1,34 @@
-# We use the nodejs base image to build
+###################################
+# Builder stage
+###################################
+
+# Switch to a clean image
 FROM node:8 as builder
 WORKDIR /app
 
-# Install build dependencies
+# Install prod + dev dependencies
 COPY package.json yarn.lock ./
 RUN yarn install
 
-# Build the app
+# Build source code
 COPY lib ./lib
 RUN yarn run build
 
+###################################
+# Production stage
+###################################
+
 # Switch to a clean image
-FROM node:8
+FROM node:8-slim as production
 WORKDIR /app
 
-# Retrieve the files that need to be hosted
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
+# Install prod dependencies only
+COPY package.json yarn.lock ./
+RUN yarn install --production
+
+# Retrieve pre-built source code from previous stage
 COPY --from=builder /app/dist ./dist
 
 # Run monitool API
 EXPOSE 80
-ENTRYPOINT node ./dist/main.js
+CMD node ./dist/main.js
