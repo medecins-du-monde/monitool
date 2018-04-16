@@ -71,9 +71,8 @@ if (toBool(process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD))
 	config.auth.providers.azureAD = {
 		"label": process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD_LABEL || "Use azure account",
 		"domain": process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD_DOMAIN || "hotmail.com",
-		"clientId":
-			process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTID ||
-			readFile(process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTID_FILE),
+		"tenantId": process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD_TENANTID || "common",
+		"clientId": process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTID,
 		"clientSecret":
 			process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTSECRET ||
 			readFile(process.env.MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTSECRET_FILE),

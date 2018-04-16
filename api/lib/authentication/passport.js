@@ -85,8 +85,8 @@ passport.deserializeUser(function(id, done) {
 if (config.auth.providers.azureAD) {
 	var strategy = new OAuth2Strategy(
 		{
-			authorizationURL: "https://login.windows.net/common/oauth2/authorize",
-			tokenURL: "https://login.windows.net/common/oauth2/token",
+			authorizationURL: "https://login.windows.net/" + config.auth.providers.azureAD.tenantId + "/oauth2/authorize",
+			tokenURL: "https://login.windows.net/" + config.auth.providers.azureAD.tenantId + "/oauth2/token",
 			clientID: config.auth.providers.azureAD.clientId,
 			clientSecret: config.auth.providers.azureAD.clientSecret,
 			callbackURL: config.baseUrl + '/api/authentication/login-callback'

@@ -35,11 +35,11 @@ services:
       MONITOOL_AUTH_PROVIDERS_AZUREAD: "TRUE"
       MONITOOL_AUTH_PROVIDERS_AZUREAD_LABEL: "Use MDM account"
       MONITOOL_AUTH_PROVIDERS_AZUREAD_DOMAIN: "medecinsdumonde.net"
-      MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTID_FILE: "/var/run/secrets/azuread_clientid"
+      MONITOOL_AUTH_PROVIDERS_AZUREAD_TENANTID: "3c3a3c6a-8d0a-446a-ae82-cee5b605904e"
+      MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTID: "ec380c9b-e98c-4de9-a311-9fa2495e6daf"
       MONITOOL_AUTH_PROVIDERS_AZUREAD_CLIENTSECRET_FILE: "/var/run/secrets/azuread_clientsecret"
       MONITOOL_AUTH_PROVIDERS_TRAINING: "FALSE"
     secrets:
-      - azuread_clientid
       - azuread_clientsecret
       - googletranslate_apikey
       - monitool_cookiesecret
@@ -62,8 +62,6 @@ networks:
   backend:
 
 secrets:
-  azuread_clientid:
-    external: true
   azuread_clientsecret:
     external: true
   googletranslate_apikey:
