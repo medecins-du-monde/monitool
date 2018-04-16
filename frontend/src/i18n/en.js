@@ -642,7 +642,10 @@ var ENGLISH_TRANSLATION = {
 		help: {
 			show: "Show help for this field",
 			hide: "Hide help for this field"
-		}
+		},
+
+		create_blank: "Create a blank logical framework",
+		create_copy: "Create a copy of {{name}}"
 	},
 	theme: {
 		new_theme: "New thematic",

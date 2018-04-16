@@ -44,10 +44,24 @@
 	<tfoot>
 		<tr>
 			<td colspan="4" style="text-align: center">
-				<a class="btn btn-default btn-xs" ng-click="createLogicalFrame()">
-					<i class="fa fa-plus"></i>
-					<span translate="shared.add"></span>
-				</a>
+				<div uib-dropdown style="display: inline-block;">
+					<a class="btn btn-default btn-xs" href="#" uib-dropdown-toggle>
+						<i class="fa fa-plus"></i>
+						<span translate="shared.add"></span>
+						<span class="caret"></span>
+					</a>
+
+					<ul class="dropdown-menu">
+						<li>
+							<a ng-click="createLogicalFrame()" translate="form.create_blank"></a>
+							<a
+								ng-repeat="logicalFrame in editableProject.logicalFrames"
+								ng-click="createLogicalFrame(logicalFrame)"
+								translate="form.create_copy"
+								translate-values="{name: logicalFrame.name}"></a>
+						</li>
+					</ul>
+				</div>
 			</td>
 		</tr>
 	</tfoot>

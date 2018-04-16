@@ -459,12 +459,18 @@ angular
 
 
 	.controller('ProjectLogicalFrameListController', function($scope, $state) {
-		$scope.createLogicalFrame = function() {
-			var newLogicalFrame = {name: '', goal: '', indicators: [], purposes: []};
+
+		$scope.createLogicalFrame = function(logicalFrame) {
+			var newLogicalFrame;
+			if (!logicalFrame)
+				newLogicalFrame = {name: '', goal: '', indicators: [], purposes: []};
+			else
+				newLogicalFrame = angular.copy(logicalFrame);
 
 			$scope.editableProject.logicalFrames.push(newLogicalFrame);
 			$state.go('main.project.structure.logical_frame_edition', {index: $scope.editableProject.logicalFrames.length - 1});
 		};
+
 	})
 
 	.controller('ProjectLogicalFrameEditController', function($scope, $state, $stateParams, $filter, $timeout, $uibModal) {

@@ -643,7 +643,10 @@ var FRENCH_TRANSLATION = {
 		help: {
 			show: "Afficher l'aide sur ce champ",
 			hide: "Cacher l'aide sur ce champ"
-		}
+		},
+
+		create_blank: "Créer un cadre logique vierge",
+		create_copy: "Créer une copie du cadre logique {{name}}"
 	},
 	theme: {
 		new_theme: "Nouvelle thématique",

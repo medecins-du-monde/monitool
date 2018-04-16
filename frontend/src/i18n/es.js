@@ -642,7 +642,10 @@ var SPANISH_TRANSLATION = {
 		help: {
 			show: "Mostrar ayuda para este campo",
 			hide: "Esconder ayuda para este campo"
-		}
+		},
+
+		create_blank: "Añadir un marco lógico en blanco",
+		create_copy: "Añadir una copia del marco lógico {{name}}"
 	},
 	theme: {
 		new_theme: "Nueva temática",
