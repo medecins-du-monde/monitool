@@ -528,22 +528,18 @@ angular
 		};
 
 		// handle indicator add, edit and remove are handled in a modal window.
-		$scope.editIndicator = function(planning, parent) {
+		$scope.addIndicator = function(parent) {
 			var promise = $uibModal.open({
 				controller: 'ProjectIndicatorEditionModalController',
 				templateUrl: 'partials/projects/structure/edition-modal.html',
 				size: 'lg',
 				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
-				resolve: {planning: function() { return planning; }, indicator: function() { return null; }}
+				resolve: {planning: function() { return null; }, indicator: function() { return null; }}
 			}).result;
 
 			promise.then(function(newPlanning) {
-				if (planning && !newPlanning)
-					parent.splice(parent.indexOf(planning), 1);
-				else if (!planning && newPlanning)
+				if (newPlanning)
 					parent.push(newPlanning);
-				else if (planning && newPlanning)
-					parent.splice(parent.indexOf(planning), 1, newPlanning);
 			});
 		};
 
@@ -629,22 +625,18 @@ angular
 	})
 
 	.controller('ProjectExtraIndicators', function($scope, $uibModal) {
-		$scope.editIndicator = function(planning) {
+		$scope.addIndicator = function() {
 			var promise = $uibModal.open({
 				controller: 'ProjectIndicatorEditionModalController',
 				templateUrl: 'partials/projects/structure/edition-modal.html',
 				size: 'lg',
 				scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
-				resolve: {planning: function() { return planning; }, indicator: function() { return null; }}
+				resolve: {planning: function() { return null; }, indicator: function() { return null; }}
 			}).result;
 
 			promise.then(function(newPlanning) {
-				if (planning && !newPlanning)
-					$scope.editableProject.extraIndicators.splice($scope.editableProject.extraIndicators.indexOf(planning), 1);
-				else if (!planning && newPlanning)
+				if (newPlanning)
 					$scope.editableProject.extraIndicators.push(newPlanning);
-				else if (planning && newPlanning)
-					$scope.editableProject.extraIndicators.splice($scope.editableProject.extraIndicators.indexOf(planning), 1, newPlanning);
 			});
 		};
 	})

@@ -19,6 +19,44 @@
 
 angular.module('monitool.directives.formControls', [])
 
+
+	.directive('indicator', function($uibModal) {
+		return {
+			restrict: 'E',
+			templateUrl: "partials/_forms/indicator.html",
+			scope: {
+				indicator: '=',
+				indicatorList: '=',
+				editableProject: '=project'
+			},
+			link: function($scope) {
+				$scope.editIndicator = function() {
+					var promise = $uibModal.open({
+						controller: 'ProjectIndicatorEditionModalController',
+						templateUrl: 'partials/projects/structure/edition-modal.html',
+						size: 'lg',
+						scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
+						resolve: {
+							planning: function() { return $scope.indicator; },
+							indicator: function() { return null; }
+						}
+					}).result;
+
+					promise.then(function(newIndicator) {
+						var indicator = $scope.indicator;
+
+						if (indicator && !newIndicator)
+							$scope.indicatorList.splice($scope.indicatorList.indexOf(indicator), 1);
+						else if (!indicator && newIndicator)
+							$scope.indicatorList.push(newIndicator);
+						else if (indicator && newIndicator)
+							$scope.indicatorList.splice($scope.indicatorList.indexOf(indicator), 1, newIndicator);
+					});
+				};
+			}
+		}
+	})
+
 	// Work around bug in angular ui datepicker
 	// https://github.com/angular-ui/bootstrap/issues/6140
 	.directive('utcDatepicker', function() {
