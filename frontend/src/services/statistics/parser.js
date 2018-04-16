@@ -416,8 +416,8 @@ angular.module('monitool.services.statistics.parser', [])
 			};
 
 			this.consts = {
-				"E": Math.E,
-				"PI": Math.PI
+				// "E": Math.E,
+				// "PI": Math.PI
 			};
 		}
 
@@ -454,8 +454,8 @@ angular.module('monitool.services.statistics.parser', [])
 			pyt: pyt,
 			pow: Math.pow,
 			atan2: Math.atan2,
-			E: Math.E,
-			PI: Math.PI
+			// E: Math.E,
+			// PI: Math.PI
 		};
 
 		var PRIMARY      = 1 << 0;
