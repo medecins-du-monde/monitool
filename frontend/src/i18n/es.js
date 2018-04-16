@@ -221,9 +221,8 @@ var SPANISH_TRANSLATION = {
 		choose: 'Elegir',
 		cancel: 'Cancelar',
 		logical_frames: 'Marcos lógicos',
-		reporting: 'Estadísticas',
-		reporting_general: 'Estadísticas generales',
-		reporting_analysis: "Análisis descriptivo",
+		reporting: 'Informe',
+		reporting_general: 'Informe general',
 		columns: "Columnas",
 		colorize: 'Colorear',
 		display: 'Mostrar',
@@ -293,7 +292,7 @@ var SPANISH_TRANSLATION = {
 		choose_sites_for_user: "Elija los lugares en los que este usuario puede entrar datos",
 
 		partition_edit: "Edición desagregación",
-		partition_help_name: "Este nombre aparecera en varias tablas de estadísticas. Identifica la desagregación que desea crear en su variable",
+		partition_help_name: "Este nombre aparecera en varios informes. Identifica la desagregación que desea crear en su variable",
 		partition_help_elements: 'Los elementos de la desagregación deben ser mutualmente exclusivos, y se debe poder calcular el valor total agregandolos.',
 		partition_help_aggregation: 'Como calcular el valor total agregando los elementos describidos?',
 		partition_help_groups: 'Los grupos permiten hacer agregaciones intermediarias',
@@ -631,7 +630,7 @@ var SPANISH_TRANSLATION = {
 		indicator_help_display: "Nombre su indicador. Es preferible obtener el nombre a partir de un catalogo para ser consistente con otros proyectos.",
 		indicator_help_baseline: "Cual era el valor del indicador antes de empezar la actividades? Marque la casilla para especificar un valor.",
 		indicator_help_target: "Cual es el objectivo para este indicador? Marque la casilla para especificar un valor.",
-		indicator_help_colorize: "Desea tener colores (rojo, naranja, verde) en estadísticas para este indicador?",
+		indicator_help_colorize: "Desea tener colores (rojo, naranja, verde) en informes para este indicador?",
 		indicator_help_computation: "Como se calcula este indicador a partir de las variables que ha colectado en fuentes de datos?"
 	},
 
@@ -675,7 +674,7 @@ var SPANISH_TRANSLATION = {
 			own_all_projects: "Editar los datos y estructura de todos los proyectos",
 			create_projects: "Crear proyectos",
 			edit_projects: "Editar los datos y la estructura de proyecto donde se ha autorizado explicitamente",
-			see_reporting: "Ver la estadísticas de todos los proyectos"
+			see_reporting: "Ver los informes de todos los proyectos"
 		}
 	},
 
@@ -712,7 +711,9 @@ var SPANISH_TRANSLATION = {
 		extra: "Indicadores adicionales",
 		new_indicator: "Nuevo indicador",
 		create_new: 'Crear un nuevo indicador',
-		
+
+		see_report: "Ver el informe",
+
 		cross_cutting: "Indicadores transversales",
 		select_themes: 'Selectione una o varias temáticas',
 

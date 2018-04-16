@@ -221,9 +221,8 @@ var FRENCH_TRANSLATION = {
 		choose: 'Choisir',
 		cancel: 'Annuler',
 		logical_frames: 'Cadres logiques',
-		reporting: 'Statistiques',
-		reporting_general: 'Statistiques générales',
-		reporting_analysis: "Analyse descriptive",
+		reporting: 'Rapport',
+		reporting_general: 'Rapport général',
 		columns: "Colonnes",
 		colorize: 'Colorer',
 		display: 'Afficher',
@@ -294,7 +293,7 @@ var FRENCH_TRANSLATION = {
 		choose_sites_for_user: "Choisir les structures sur lesquelles cet utilisateur pourra saisir des données",
 
 		partition_edit: "Édition désagrégation",
-		partition_help_name: "Ce nom apparaîtra dans divers tableaux de statistiques. Il nomme la désagrégation que vous voulez créer sur votre donnée",
+		partition_help_name: "Ce nom apparaîtra dans divers rapports. Il nomme la désagrégation que vous voulez créer sur votre donnée",
 		partition_help_elements: 'Les éléments de la désagrégation doivent être mutuellement exclusifs, et il doit être possible de trouver la valeur totale en les aggrégant.',
 		partition_help_aggregation: 'Comment trouver la valeur totale en agrégeant les éléments décrits?',
 		partition_help_groups: 'Les groupes permettent de faire des aggrégations intermédiaires',
@@ -632,7 +631,7 @@ var FRENCH_TRANSLATION = {
 		indicator_help_display: "Nommez votre indicateur. Le nom doit provenir d'un catalogue d'indicateur, afin d'être cohérent avec les autres projets.",
 		indicator_help_baseline: "Combien valait cet indicateur avant le début du projet? Cochez la case pour spécifier cette valeur.",
 		indicator_help_target: "Quel est l'objectif à atteindre sur cet indicateur?  Cochez la case pour spécifier cette valeur.",
-		indicator_help_colorize: "Voulez-vous ajouter des couleurs (rouge, orange, vert) sur les tableaux de statistiques pour cet indicateur?",
+		indicator_help_colorize: "Voulez-vous ajouter des couleurs (rouge, orange, vert) sur les rapports pour cet indicateur?",
 		indicator_help_computation: "Comment calculer cet indicateur à partir des données que vous avez collecté dans les sources de données?"
 	},
 
@@ -676,7 +675,7 @@ var FRENCH_TRANSLATION = {
 			own_all_projects: "Éditer la structure et les données de tous les projets",
 			create_projects: "Créer des projets",
 			edit_projects: "Éditer la structure et les données de certains projets",
-			see_reporting: "Voir les statistiques de tous les projets"
+			see_reporting: "Voir les rapports de tous les projets"
 		}
 	},
 
@@ -713,6 +712,8 @@ var FRENCH_TRANSLATION = {
 		extra: "Indicateurs annexés",
 		new_indicator: "Nouvel indicateur",
 		create_new: 'Créer un nouvel indicateur',
+
+		see_report: "Voir le rapport",
 
 		cross_cutting: "Indicateurs transversaux",
 		select_themes: 'ex: Soins de santé primaire',

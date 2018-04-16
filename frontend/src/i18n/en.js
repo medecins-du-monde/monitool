@@ -223,7 +223,6 @@ var ENGLISH_TRANSLATION = {
 		logical_frames: 'Logical Frames',
 		reporting: 'Reporting',
 		reporting_general: 'General reporting',
-		reporting_analysis: 'Descriptive Analysis',
 		columns: "Columns",
 		colorize: 'Colorize',
 		display: 'Display',
@@ -712,6 +711,8 @@ var ENGLISH_TRANSLATION = {
 		extra: "Extra indicators",
 		new_indicator: "New indicator",
 		create_new: 'Create a new indicator',
+
+		see_report: "See report",
 
 		cross_cutting: "Cross-cutting indicators",
 		select_themes: 'i.e. Primary health care',
