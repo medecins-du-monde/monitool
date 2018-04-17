@@ -1,7 +1,7 @@
 import database from '../database';
 
 /**
- * this migration add the missing "dataSources" field on all users.
+ * this migration add the missing "dataSources" field on all projects.
  */
 export default async function() {
 	var view = 'by_type',
