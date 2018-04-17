@@ -217,7 +217,7 @@ var ENGLISH_TRANSLATION = {
 		quarter: "Quarter",
 		semester: "Semester",
 		year: "Year",
-		
+
 		choose: 'Choose',
 		cancel: 'Cancel',
 		logical_frames: 'Logical Frames',
@@ -297,7 +297,7 @@ var ENGLISH_TRANSLATION = {
 		partition_help_aggregation: 'How to find the total value by aggregating the elements described above?',
 		partition_help_groups: 'Groups allow making intermediary aggregations',
 		logical_frame: "Logical frame",
-		
+
 		structure: "Structure",
 		no_data: "This data is not available",
 		not_available_by_entity: "This data is not available by site",
@@ -411,12 +411,12 @@ var ENGLISH_TRANSLATION = {
 		full_project: "Full project",
 		select_filters: "Select filters",
 
-		collection_form_warning: 
-			'<strong>Take care, if you make changes to this page, you risk losing data</strong><br/>' + 
-			'{{num_inputs}} inputs were made with the form as it is.' + 
-			'<ul>' + 
-			'	<li>Modifications on the planning (periodicity, dates) will cause old inputs to be put apart (with no data loss)</li>' + 
-			'	<li>Modifications on the data structure will have variable consequences: please refer to the user guide</li>' + 
+		collection_form_warning:
+			'<strong>Take care, if you make changes to this page, you risk losing data</strong><br/>' +
+			'{{num_inputs}} inputs were made with the form as it is.' +
+			'<ul>' +
+			'	<li>Modifications on the planning (periodicity, dates) will cause old inputs to be put apart (with no data loss)</li>' +
+			'	<li>Modifications on the data structure will have variable consequences: please refer to the user guide</li>' +
 			'</ul>',
 
 		partitions: "Disaggregations",
@@ -487,7 +487,7 @@ var ENGLISH_TRANSLATION = {
 			year: "Every year",
 			free: 'Free'
 		},
-		
+
 		no_input_entities: 'No collection site was created yet!',
 		no_input_groups: 'No collection group was created yet!',
 		no_users: 'No user was added yet!',
@@ -500,7 +500,7 @@ var ENGLISH_TRANSLATION = {
 
 		goal: 'General objective',
 		intervention_logic: 'Description',
-		
+
 		start_date: "Begin date",
 		end_date: "End date",
 		country_ph: 'For instance: CAR',
@@ -537,7 +537,7 @@ var ENGLISH_TRANSLATION = {
 
 		users: "Users",
 		owners: "Owners",
-	
+
 		basics_info: "<p>Basics allow to file your project among the others of the NGO.</p>",
 		basics_help_country: "In which country does your project takes place? If it's a regional project enter the name of the region.",
 		basics_help_name: "The project's name allow finding your project in Monitool. Choose something that is informative enought, or copy the general objective.",
@@ -546,15 +546,15 @@ var ENGLISH_TRANSLATION = {
 		basics_help_end: "The end date is the moment when your project closes its data collection. If unknown, enter a date far into the future.",
 
 		collection_site_info:
-			"<p>When a project have the same activities on different sites, those activities need to be followed-up by site, groups of sites, and at project level.</p>" + 
-			"<p>Enter here:</p>" + 
-			"<ul>" + 
-				"<li>The list of sites where your project works (i.e. the list of health centers)</li>" + 
-				"<li>Groups that will be used during monitoring (i.e. by region, or type of structure)</li>" + 
+			"<p>When a project have the same activities on different sites, those activities need to be followed-up by site, groups of sites, and at project level.</p>" +
+			"<p>Enter here:</p>" +
+			"<ul>" +
+				"<li>The list of sites where your project works (i.e. the list of health centers)</li>" +
+				"<li>Groups that will be used during monitoring (i.e. by region, or type of structure)</li>" +
 			"</ul>",
 
 		users_list_info:
-			"<p>Many people take part in setting-up and monitoring a project: coordination, M&E staff, data entry operators, partners, ...</p>" + 
+			"<p>Many people take part in setting-up and monitoring a project: coordination, M&E staff, data entry operators, partners, ...</p>" +
 			"<p>Enter here all users that need to have access to the monitoring of the project.</p>",
 
 		user_help_type: "Choose \"MDM Account\" if the user has a xxx@medecinsdumonde.net email address. Choose \"Partner account\" otherwise.",
@@ -567,8 +567,8 @@ var ENGLISH_TRANSLATION = {
 		user_help_datasources: "For which data sources will this user enter data?",
 
 		collection_form_list_info:
-			"<p>The data sources are the different supports where the data needed for monitoring are available (tally sheets, medical records, excel files, ...).</p>" + 
-			"<p>In Monitool, all the data avaiable on the data sources does not need to be entered, but only what is relevat to the project's monitorings</p>" + 
+			"<p>The data sources are the different supports where the data needed for monitoring are available (tally sheets, medical records, excel files, ...).</p>" +
+			"<p>In Monitool, all the data avaiable on the data sources does not need to be entered, but only what is relevat to the project's monitorings</p>" +
 			"<p>To ease the data collection planning, data sources should correspond to real tools used on the field.</p>",
 
 		collection_edit_help_name: "What is the name of the data source that you want to extract data from? i.e. \"Electronic medical record\", \"Health center tally sheet\", \"NHIS report\", ...",
@@ -585,19 +585,19 @@ var ENGLISH_TRANSLATION = {
 		collection_edit_help_order: "How do you wish to show the disaggregations on the input form?",
 
 		logical_frame_list_info:
-			"<p>A logical frame is a document that describe objectives, expected results, and actities to achieve them, as well as indicators to monitor the advancement of each of those elements</p>" + 
+			"<p>A logical frame is a document that describe objectives, expected results, and actities to achieve them, as well as indicators to monitor the advancement of each of those elements</p>" +
 			"<p>All indicators have to be computable from the data described in data sources</p>",
 
 		cross_cutting_list_info:
-			"<p>Cross-cutting indicators are determined from the list of thematics in \"Basics\".</p>" + 
+			"<p>Cross-cutting indicators are determined from the list of thematics in \"Basics\".</p>" +
 			"<p>This list contains all cross-cutting indicators that your project need to collect</p>",
 
 		input_list_info:
 			"<p>This input calendar list all the inputs that were programmed for the data source \"{{name}}\"</p>" +
-			"<p>To limit data entry errors, the preferred course is to do the data entry close from the site where the data is extracted, directly on monitool.</p>" + 
+			"<p>To limit data entry errors, the preferred course is to do the data entry close from the site where the data is extracted, directly on monitool.</p>" +
 			"<p>If not attainable, a PDF version of the form is provided.</p>",
 
-		extra_indicators_list_info: 
+		extra_indicators_list_info:
 			"<p>Extra indicators are indicators that are not in any logical frame.</p>" +
 			"<p>Those allow to monitor specific elements of the project (medical data, logistics, ...)</p>",
 
@@ -610,7 +610,7 @@ var ENGLISH_TRANSLATION = {
 		data: "Data",
 		general_informations: "General informations",
 		fill_with_last_input: "Fill with data from the previous entry",
-		
+
 		variable_name_label: "What are your measuring?",
 		variable_name_ph: "ex: Number of diagnostics",
 		site_agg_label: "How to group entries from different sites?",
@@ -631,9 +631,16 @@ var ENGLISH_TRANSLATION = {
 		indicator_help_baseline: "What was the value of the indicator before the first activities? Tick the checkbox to specify.",
 		indicator_help_target: "What is the target for this indicator? Tick the checkbox to specify.",
 		indicator_help_colorize: "Do you wish to have colors (red, orange, green) on reporting for this indicator?",
-		indicator_help_computation: "How to compute this indicator from the variables that you collected in data sources?"
+		indicator_help_computation: "How to compute this indicator from the variables that you collected in data sources?",
+
+		activity: "Activity",
+		add_activity: "Add a new activity",
+		delete_activity: "Delete activity",
+		activity_desc_ph: "e.g. Awareness sessions on HIV transmission",
+		logframe_help_activity_desc: "Activity realized by the NGO",
+		logframe_help_activity_indicators: "Enter here the indicators that allows to measure the activity progress"
 	},
-	
+
 	form: {
 		mandatory: "This field is mandatory",
 		start_lower_than_end: 'Begin date must be lower than end date',
@@ -656,9 +663,9 @@ var ENGLISH_TRANSLATION = {
 		fullname: "Full name",
 		role: "Role",
 		save: "Save user",
-		
-		list_info: 
-			"<p>This page contains the list of all users that connected at least once on Monitool</p>" + 
+
+		list_info:
+			"<p>This page contains the list of all users that connected at least once on Monitool</p>" +
 			"<p>It is not needed to create new account for users that have a xxx@medecinsdumonde.net email address: they will automatically appear here once they connect once. For partners, it is possible to create account from the project management pages.</p>",
 
 		edit_info:
@@ -682,7 +689,7 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	theme: {
-		list_info: 
+		list_info:
 			"<p>This page contains the list of thematics handled by the NGO.</p>" +
 			"<p>Projects and cross-cutting indicators can be linked to thematics.</p>",
 
@@ -700,7 +707,7 @@ var ENGLISH_TRANSLATION = {
 		name_placeholder_es: "i.e. Salud Sexual y reproductiva",
 		name_placeholder_en: "i.e. Sexual and Reproductive Health",
 
-		info: 
+		info:
 			"<p>Enter here the name of the thematic in all languages used by your organisation.</p>" +
 			"<p>If you cannot translate to all languages:</p>" +
 			"<ol>" +
@@ -731,12 +738,12 @@ var ENGLISH_TRANSLATION = {
 		description_placeholder_en: "We are not talking about health education, but training of medical staff. Count the number of entries and not the number of different people who attended these trainings.",
 		description_placeholder_es: "No se trata de educación para la salud, sino de formación para el personal sanitario. Se cuenta el número de participaciones y no el número de personas distintas que hayan participado.",
 
-		list_info: 
-			"<p>This page contain the list of all the cross-cutting indicators of the NGO.<br/>Collecting each indicator is mandatory for all projects that have at least one thematic in common with it.</p>" + 
+		list_info:
+			"<p>This page contain the list of all the cross-cutting indicators of the NGO.<br/>Collecting each indicator is mandatory for all projects that have at least one thematic in common with it.</p>" +
 			"<p>To allow projects to plan for their data collection, avoid changing this list often.</p>",
 
-		edit_info: 
-			"<p>This page allows changing the definition of a cross-cutting indicator. If you make changes, take care to update all languages.</p>" + 
+		edit_info:
+			"<p>This page allows changing the definition of a cross-cutting indicator. If you make changes, take care to update all languages.</p>" +
 			"<p>If you cannot translate to all language:</p>" +
 			"<ol>" +
 				"<li>Translate all languages that you can</li>" +

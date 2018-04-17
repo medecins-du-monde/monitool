@@ -88,6 +88,24 @@ export default class LogicalFrame extends Model {
 			}, this);
 		}, this);
 
+		this.purposes.forEach(function(purpose, purposeIndex) {
+			purpose.outputs.forEach(function(output, outputIndex) {
+				output.activities.forEach(function(activity, activityIndex) {
+
+					table.body.push([
+						[
+							{text: "Activity " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) + '.' : "") + (outputIndex + 1) + '.' + (activityIndex + 1), style: "bold"},
+							{text: activity.description, style: 'normal'}
+						],
+						{ul: activity.indicators.map(i => i.display), style: 'normal'},
+						{ul: this._computeSources(activity.indicators), style: 'normal'},
+						" "
+					]);
+				}, this);
+			}, this);
+		}, this);
+
+
 		doc.content.push({table: table});
 		return doc;
 	}

@@ -205,7 +205,7 @@ var SPANISH_TRANSLATION = {
 		'delete': 'Suprimir',
 
 		members: 'Miembros',
-		
+
 		day: 'Día',
 		month_week_sat: 'Semana (sábado a viernes / cortado por mes)',
 		month_week_sun: 'Semana (domingo a sábado / cortado por mes)',
@@ -297,7 +297,7 @@ var SPANISH_TRANSLATION = {
 		partition_help_aggregation: 'Como calcular el valor total agregando los elementos describidos?',
 		partition_help_groups: 'Los grupos permiten hacer agregaciones intermediarias',
 		logical_frame: "Marco lógico",
-		
+
 		structure: "Estructura",
 		no_data: "Datos no disponibles",
 		not_available_by_entity: "Datos no disponibles por lugar de colecta",
@@ -411,12 +411,12 @@ var SPANISH_TRANSLATION = {
 		full_project: "Proyecto completo",
 		select_filters: "Seleccione filtros",
 
-		collection_form_warning: 
-			'<strong>Cuidado, si hace cambios en esta página, perdera datos</strong><br/>' + 
-			'{{num_inputs}} entradas han sido realizadas en esta fuente de datos.' + 
-			'<ul>' + 
-			'	<li>Los cambios sobre el calendario (periodicidad, fechas) pondra de lado todas las entradas que no entren en las nuevas fechas (sin perder los datos)</li>' + 
-			'	<li>Los cambios sobre la estructura de datos tendran consequencias diferentes según el tipo de cambio: lea la guía del usuario</li>' + 
+		collection_form_warning:
+			'<strong>Cuidado, si hace cambios en esta página, perdera datos</strong><br/>' +
+			'{{num_inputs}} entradas han sido realizadas en esta fuente de datos.' +
+			'<ul>' +
+			'	<li>Los cambios sobre el calendario (periodicidad, fechas) pondra de lado todas las entradas que no entren en las nuevas fechas (sin perder los datos)</li>' +
+			'	<li>Los cambios sobre la estructura de datos tendran consequencias diferentes según el tipo de cambio: lea la guía del usuario</li>' +
 			'</ul>',
 
 		partitions: "Desagregaciones",
@@ -546,15 +546,15 @@ var SPANISH_TRANSLATION = {
 		basics_help_end: "La fecha de fin es el momento en el que termina la colecta de datos. Si no es conocida, entre una fecha en el futuro.",
 
 		collection_site_info:
-			"<p>Cuando un proyecto tiene las mismas actividades en varios lugares, se deben seguir por lugar, grupos de lugares y a nivel de proyecto.</p>" + 
-			"<p>Entre aqui:</p>" + 
-			"<ul>" + 
-				"<li>La lista de lugares donde su proyecto trabaja (ej: la lista de centros de salud)</li>" + 
-				"<li>los grupos que se usuran durante la vida del proyecto (ej: por región, o tipo de estructura)</li>" + 
+			"<p>Cuando un proyecto tiene las mismas actividades en varios lugares, se deben seguir por lugar, grupos de lugares y a nivel de proyecto.</p>" +
+			"<p>Entre aqui:</p>" +
+			"<ul>" +
+				"<li>La lista de lugares donde su proyecto trabaja (ej: la lista de centros de salud)</li>" +
+				"<li>los grupos que se usuran durante la vida del proyecto (ej: por región, o tipo de estructura)</li>" +
 			"</ul>",
 
 		users_list_info:
-			"<p>Muchas personas diferentes participan en crear y seguir un proyecto: coordination, equipo M&E, operadores de entrada de datos, partnerarios, ...</p>" + 
+			"<p>Muchas personas diferentes participan en crear y seguir un proyecto: coordination, equipo M&E, operadores de entrada de datos, partnerarios, ...</p>" +
 			"<p>Entre aqui la lista de todos los usuarios que deben tener acceso a los datos del programa.</p>",
 
 		user_help_type: "Elija \"Cuenta MDM\" si el usuario tiene una dirección email xxx@medecinsdumonde.net. Elija \"Cuenta partnerio\" sino.",
@@ -567,8 +567,8 @@ var SPANISH_TRANSLATION = {
 		user_help_datasources: "Para que fuentes de datos podra este usuario entrar datos?",
 
 		collection_form_list_info:
-			"<p>Las fuentes de datos son los diferentes soportes donde se encuentran los datos necesarios para seguir el proyecto (fichas de colecta, historiales clínicos, ficheros excel, ...).</p>" + 
-			"<p>En Monitool, no hace falta entrar todos los datos disponibles en las fuentes de datos: solo lo que es relevante</p>" + 
+			"<p>Las fuentes de datos son los diferentes soportes donde se encuentran los datos necesarios para seguir el proyecto (fichas de colecta, historiales clínicos, ficheros excel, ...).</p>" +
+			"<p>En Monitool, no hace falta entrar todos los datos disponibles en las fuentes de datos: solo lo que es relevante</p>" +
 			"<p>Para que sea mas facil entrar los datos, la fuentes deben corresponder a herramientas reales usadas en el terreno.</p>",
 
 		collection_edit_help_name: "Cual es el nombre de la fuente de datos de la que quiere extraer datos? ej. \"Historiales clínicos electronicos\", \"Fichas de colecta\", \"Informe SNIS\", ...",
@@ -585,19 +585,19 @@ var SPANISH_TRANSLATION = {
 		collection_edit_help_order: "En que ordén quiere que aparescan la desagregaciones en las tablas de entrada de datos?",
 
 		logical_frame_list_info:
-			"<p>Un marco lógico es un documento que describe los objectivos, resultados y actividades de un proyecto, asi como indicadores para seguir el progreso de cada uno de ellos</p>" + 
+			"<p>Un marco lógico es un documento que describe los objectivos, resultados y actividades de un proyecto, asi como indicadores para seguir el progreso de cada uno de ellos</p>" +
 			"<p>Todos los indicadores deben ser calculables a partir de los datos describidos en las fuentes de datos</p>",
 
 		cross_cutting_list_info:
-			"<p>Los indicadores transversales se deciden según la lista de temáticas en \"Datos basicos\".</p>" + 
+			"<p>Los indicadores transversales se deciden según la lista de temáticas en \"Datos basicos\".</p>" +
 			"<p>Esta lista contiene todos los indicadores transversales que su proyecto debe colectar</p>",
 
 		input_list_info:
 			"<p>Este calendario de entrada hace la lista de todas las entradas de datos programadas para la fuente de datos \"{{name}}\"</p>" +
-			"<p>Para limitar los errores de entrada, es preferible entrar los datos cerca de donde se colectaron, directamente en Monitool.</p>" + 
+			"<p>Para limitar los errores de entrada, es preferible entrar los datos cerca de donde se colectaron, directamente en Monitool.</p>" +
 			"<p>Si no es posible, una versión PDF del formulario esta provista.</p>",
 
-		extra_indicators_list_info: 
+		extra_indicators_list_info:
 			"<p>Los indicadores adicionales son indicadores que no estan en ningún marco lógico.</p>" +
 			"<p>Permiten seguir elementos especificos del proyecto (datos medicales, logisticos, ...)</p>",
 
@@ -610,7 +610,7 @@ var SPANISH_TRANSLATION = {
 		data: "Datos",
 		general_informations: "Informaciones generales",
 		fill_with_last_input: "Rellenar con los datos de la última entrada",
-		
+
 		variable_name_label: "Qué esta midiendo?",
 		variable_name_ph: "ej: Número de diagnosticos",
 		site_agg_label: "Como compilar entradas provenientes de diferentes lugares?",
@@ -631,14 +631,21 @@ var SPANISH_TRANSLATION = {
 		indicator_help_baseline: "Cual era el valor del indicador antes de empezar la actividades? Marque la casilla para especificar un valor.",
 		indicator_help_target: "Cual es el objectivo para este indicador? Marque la casilla para especificar un valor.",
 		indicator_help_colorize: "Desea tener colores (rojo, naranja, verde) en informes para este indicador?",
-		indicator_help_computation: "Como se calcula este indicador a partir de las variables que ha colectado en fuentes de datos?"
+		indicator_help_computation: "Como se calcula este indicador a partir de las variables que ha colectado en fuentes de datos?",
+
+		activity: "Actividad",
+		add_activity: "Añadir una actividad",
+		delete_activity: "Suprimir la actividad",
+		activity_desc_ph: "ej. Realizar sesiones de sensibilización sobre la transmision del VIH",
+		logframe_help_activity_desc: "Actividad realizada por la ONG",
+		logframe_help_activity_indicators: "Entre los indicadores que permiten medir la actividad"
 	},
 
 	form: {
 		mandatory: "Este campo es obligatorio",
 		start_lower_than_end: 'La fecha de inicio tiene que ser inferior a la de fin',
 		end_greater_than_start: 'la fecha de fin tiene que ser superior a la de inicio',
-	
+
 		help: {
 			show: "Mostrar ayuda para este campo",
 			hide: "Esconder ayuda para este campo"
@@ -656,9 +663,9 @@ var SPANISH_TRANSLATION = {
 		fullname: "Nombre completo",
 		role: "Tipo",
 		save: "Guardar usuario",
-		
-		list_info: 
-			"<p>Esta página contiene la lista de todos los usuarios que se han conectado por lo menos una vez a Monitool</p>" + 
+
+		list_info:
+			"<p>Esta página contiene la lista de todos los usuarios que se han conectado por lo menos una vez a Monitool</p>" +
 			"<p>No es necesario crear cuentas para usuario con una dirección de correo xxx@medecinsdumonde.net: apareceran automáticamente una vez se hayan conectado una vez. Para socios, es posible crear cuentas desde la páginas dedicadas a cada proyecto.</p>",
 
 		edit_info:
@@ -682,7 +689,7 @@ var SPANISH_TRANSLATION = {
 	},
 
 	theme: {
-		list_info: 
+		list_info:
 			"<p>Esta página contiene la lista de las temáticas tratadas por la ONG.</p>" +
 			"<p>Los proyectos y los indicadores transversales se pueden conectar a temáticas.</p>",
 
@@ -700,7 +707,7 @@ var SPANISH_TRANSLATION = {
 		name_placeholder_es: "i.e. Salud Sexual y reproductiva",
 		name_placeholder_en: "i.e. Sexual and Reproductive Health",
 
-		info: 
+		info:
 			"<p>Entre aqui el nombre de la temática en todos los idiomas usados por su organización.</p>" +
 			"<p>Si no puede traducir a todos los idiomas:</p>" +
 			"<ol>" +
@@ -731,12 +738,12 @@ var SPANISH_TRANSLATION = {
 		description_placeholder_en: "We are not talking about health education, but training of medical staff. Count the number of entries and not the number of different people who attended these trainings.",
 		description_placeholder_es: "No se trata de educación para la salud, sino de formación para el personal sanitario. Se cuenta el número de participaciones y no el número de personas distintas que hayan participado.",
 
-		list_info: 
-			"<p>Esta página contiene la lista de todos los indicadores transversales de la ONG.<br/>Colectar estos indicadores es obligatorio para todos los proyectos que tengan por los menos una temática en común con ese.</p>" + 
+		list_info:
+			"<p>Esta página contiene la lista de todos los indicadores transversales de la ONG.<br/>Colectar estos indicadores es obligatorio para todos los proyectos que tengan por los menos una temática en común con ese.</p>" +
 			"<p>Para ayudar los proyectos a planificar su colecta de datos, evite cambiar esta lista a menudo.</p>",
 
-		edit_info: 
-			"<p>Esta página permite cambiar la definicion de un indicador transversal. Si have cambios, tenga cuidado en poner todos los idiomas a día.</p>" + 
+		edit_info:
+			"<p>Esta página permite cambiar la definicion de un indicador transversal. Si have cambios, tenga cuidado en poner todos los idiomas a día.</p>" +
 			"<p>Si no puede traducir a todos los idiomas:</p>" +
 			"<ol>" +
 				"<li>Entre manualmente todos los idiomas que pueda</li>" +

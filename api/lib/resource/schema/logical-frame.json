@@ -24,11 +24,23 @@
 						"items": {
 							"type": "object",
 							"additionalProperties": false,
-							"required": ["description", "assumptions", "indicators"],
+							"required": ["description", "assumptions", "indicators", "activities"],
 							"properties": {
 								"description": { "type": "string" },
 								"assumptions": { "type": "string" },
-								"indicators": { "$ref": "#/definitions/indicators" }
+								"indicators": { "$ref": "#/definitions/indicators" },
+								"activities": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"additionalProperties": false,
+										"required": ["description", "indicators"],
+										"properties": {
+											"description": { "type": "string" },
+											"indicators": { "$ref": "#/definitions/indicators" }
+										}
+									}
+								}
 							}
 						}
 					}

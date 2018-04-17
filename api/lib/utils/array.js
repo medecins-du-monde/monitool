@@ -27,30 +27,3 @@ export function computeNthPermutation(n, i) {
 
 	return perm;
 };
-
-export function transpose2D(rows) {
-	if (rows.length === 0)
-		return [];
-
-	var result = new Array(rows[0].length);
-
-	for (var x = 0; x < rows[0].length; ++x) {
-		result[x] = new Array(rows.length);
-
-		for (var y = 0; y < rows.length; ++y) {
-			result[x][y] = JSON.parse(JSON.stringify(rows[y][x]));
-
-			if (result[x][y].colSpan) {
-				result[x][y].rowSpan = result[x][y].colSpan;
-				delete result[x][y].colSpan;
-			}
-			else if (result[x][y].rowSpan) {
-				result[x][y].colSpan = result[x][y].rowSpan;
-				delete result[x][y].rowSpan;
-			}
-		}
-	}
-
-	return result;
-};
-

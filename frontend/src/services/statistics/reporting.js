@@ -276,7 +276,7 @@ angular
 
 			logicalFrame.purposes.forEach(function(purpose, purposeIndex) {
 				rows.push({type: 'header', text: purpose.description, indent: 1});
-				
+
 				purpose.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
 					var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicatorPlanning);
 					row.id = 'pp_' + purposeIndex + '.ind_' + indicatorIndex;
@@ -285,11 +285,21 @@ angular
 
 				purpose.outputs.forEach(function(output, outputIndex) {
 					rows.push({type: 'header', text: output.description, indent: 2});
-					
+
 					output.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
 						var row = this._makeIndicatorRow(cubes, 2, groupBy, viewFilters, columns, indicatorPlanning);
 						row.id = 'pp_' + purposeIndex + 'out_' + outputIndex + '.ind_' + indicatorIndex;
 						rows.push(row);
+					}, this);
+
+					output.activities.forEach(function(activity, activityIndex) {
+						rows.push({type: 'header', text: activity.description, indent: 3});
+
+						activity.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+							var row = this._makeIndicatorRow(cubes, 3, groupBy, viewFilters, columns, indicatorPlanning);
+							row.id = 'pp_' + purposeIndex + 'out_' + outputIndex + 'act_' + activityIndex + '.ind_' + indicatorIndex;
+							rows.push(row);
+						}, this);
 					}, this);
 				}, this);
 			}, this);

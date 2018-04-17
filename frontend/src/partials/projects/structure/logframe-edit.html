@@ -289,6 +289,96 @@
 
 									</ng-form>
 
+									<!-- [Activities] -->
+									<div
+										ng-sortable="activitySortOptions"
+										ng-mouseenter="onSortableMouseEvent('activities', true)"
+										ng-mouseleave="onSortableMouseEvent('activities', false)">
+
+										<!-- [Activity repeat] -->
+										<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities">
+											<div class="panel-heading">
+												<div class="panel-title">
+													<span class="pull-right">
+														<a class="btn btn-danger btn-xs" ng-click="remove(activity, output.activities)">
+															<i class="fa fa-remove"></i>
+															<span translate="project.delete_activity"></span>
+														</a>
+													</span>
+													<i class="fa fa-sort fa-fw activity-handle"></i>
+													{{'project.activity'|translate}} {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}
+												</div>
+											</div>
+
+											<div class="panel-body">
+												<ng-form name="activityForm">
+
+													<!-- [Activity description] -->
+													<div class="form-group" show-errors>
+														<label
+															for="activity-desc-{{purposeId}}-{{outputId}}-{{activityId}}-input"
+															class="col-sm-2 control-label"
+															translate="project.output"></label>
+
+														<div class="col-sm-10">
+															<textarea
+																auto-resize
+																class="form-control"
+																id="activity-desc-{{purposeId}}-{{outputId}}-{{activityId}}-input"
+																name="description"
+																placeholder="{{'project.activity_desc_ph'|translate}}"
+																ng-model="activity.description"></textarea>
+
+															<span class="help-block">
+																<i class="fa fa-info-circle"></i>
+																<span translate="project.logframe_help_activity_desc"></span>
+															</span>
+														</div>
+													</div>
+													<!-- [/Activity description] -->
+
+													<!-- [Activity indicators] -->
+													<div class="form-group">
+														<label class="col-sm-2 control-label" translate="shared.indicators"></label>
+														<div class="col-sm-10">
+															<div class="form-control-static">
+
+																<div
+																	class="drag-destination"
+																	ng-sortable="indicatorsSortOptions"
+																	ng-mouseenter="onSortableMouseEvent('indicators', true)"
+																	ng-mouseleave="onSortableMouseEvent('indicators', false)"><indicator
+																		ng-repeat="indicator in activity.indicators"
+																		indicator="indicator"
+																		indicator-list="activity.indicators"
+																		project="editableProject"></indicator></div>
+
+																<p>
+																	<a class="btn btn-default btn-sm" ng-click="addIndicator(activity.indicators)">
+																		<i class="fa fa-plus"></i>
+																		{{"project.add_indicator"|translate}}
+																	</a>
+																</p>
+
+																<span class="help-block">
+																	<i class="fa fa-info-circle"></i>
+																	<span translate="project.logframe_help_activity_indicators"></span>
+																</span>
+															</div>
+														</div>
+													</div>
+													<!-- [/Activity indicators] -->
+												</ng-form>
+											</div>
+										</div>
+										<!-- [/Activity repeat] -->
+									</div>
+
+									<a class="btn btn-default" ng-click="addActivity(output)">
+										<i class="fa fa-plus"></i>
+										<span translate="project.add_activity"></span>
+									</a>
+									<!-- [/Activities] -->
 
 								</div>
 							</div>

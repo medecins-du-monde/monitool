@@ -18,7 +18,6 @@
 import validator from 'is-my-json-valid';
 import Model from './model';
 import schema from '../schema/variable.json';
-import arrayUtils from '../../utils/array';
 
 const validate = validator(schema);
 
@@ -60,8 +59,8 @@ export default class Variable extends Model {
 		var colPartitions = partitions.slice(this.distribution),
 			rowPartitions = partitions.slice(0, this.distribution);
 
-		var topRows = this._makeRows(colPartitions),
-			bodyRows = arrayUtils.transpose2D(this._makeRows(rowPartitions));
+		var topRows = this._makeTopRows(colPartitions),
+			bodyRows = this._makeLeftCols(rowPartitions);
 
 		if (!bodyRows.length)
 			bodyRows.push([])
@@ -122,7 +121,7 @@ export default class Variable extends Model {
 		return result;
 	}
 
-	_makeRows(partitions) {
+	_makeTopRows(partitions) {
 		var totalCols = partitions.reduce(function(memo, tp) { return memo * tp.elements.length; }, 1),
 			currentColSpan = totalCols;
 
@@ -155,4 +154,31 @@ export default class Variable extends Model {
 		return body;
 	}
 
+	_makeLeftCols(partitions) {
+		let rows = this._makeTopRows(partitions);
+
+		if (rows.length === 0)
+			return [];
+
+		var result = new Array(rows[0].length);
+
+		for (var x = 0; x < rows[0].length; ++x) {
+			result[x] = new Array(rows.length);
+
+			for (var y = 0; y < rows.length; ++y) {
+				result[x][y] = JSON.parse(JSON.stringify(rows[y][x]));
+
+				if (result[x][y].colSpan) {
+					result[x][y].rowSpan = result[x][y].colSpan;
+					delete result[x][y].colSpan;
+				}
+				else if (result[x][y].rowSpan) {
+					result[x][y].colSpan = result[x][y].rowSpan;
+					delete result[x][y].rowSpan;
+				}
+			}
+		}
+
+		return result;
+	}
 }

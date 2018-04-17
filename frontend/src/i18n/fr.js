@@ -611,7 +611,7 @@ var FRENCH_TRANSLATION = {
 		data: "Données",
 		general_informations: "Informations génerales",
 		fill_with_last_input: "Remplir avec les données de la période précédente",
-		
+
 		variable_name_label: "Que mesurez-vous?",
 		variable_name_ph: "ex: Nombre de diagnostics effectués",
 		site_agg_label: "Comment grouper les saisies entre sites?",
@@ -632,7 +632,14 @@ var FRENCH_TRANSLATION = {
 		indicator_help_baseline: "Combien valait cet indicateur avant le début du projet? Cochez la case pour spécifier cette valeur.",
 		indicator_help_target: "Quel est l'objectif à atteindre sur cet indicateur?  Cochez la case pour spécifier cette valeur.",
 		indicator_help_colorize: "Voulez-vous ajouter des couleurs (rouge, orange, vert) sur les rapports pour cet indicateur?",
-		indicator_help_computation: "Comment calculer cet indicateur à partir des données que vous avez collecté dans les sources de données?"
+		indicator_help_computation: "Comment calculer cet indicateur à partir des données que vous avez collecté dans les sources de données?",
+
+		activity: "Activité",
+		add_activity: "Ajouter une activité",
+		delete_activity: "Supprimer l'activité",
+		activity_desc_ph: "ex: Réalisation de sessions de sensibilisation sur la transmission du VIH",
+		logframe_help_activity_desc: "Activité réalisée par l'ONG",
+		logframe_help_activity_indicators: "Rentrez ici les indicateurs permettant de mesurer l'avancement de l'activité"
 	},
 
 	form: {

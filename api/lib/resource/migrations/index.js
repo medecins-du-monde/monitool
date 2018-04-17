@@ -4,11 +4,13 @@ import migration1 from './migration-1';
 import migration2 from './migration-2';
 import migration3 from './migration-3';
 import migration4 from './migration-4';
+import migration5 from './migration-5';
 
 export default [
 	migration0,
 	migration1,
 	migration2,
 	migration3,
-	migration4
+	migration4,
+	migration5
 ];

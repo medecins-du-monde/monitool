@@ -484,6 +484,7 @@ angular
 
 		$scope.purposeSortOptions = {group:'purposes', handle: '.purpose-handle'};
 		$scope.outputSortOptions = {group:'outputs', handle: '.output-handle'};
+		$scope.activitySortOptions = {group:'activities', handle: '.activity-handle'};
 		$scope.indicatorsSortOptions = {
 			group:'indicators',
 			handle: '.indicator-handle',
@@ -494,9 +495,11 @@ angular
 		$scope.onSortableMouseEvent = function(group, enter) {
 			if (group == 'outputs')
 				$scope.purposeSortOptions.disabled = enter;
-			else if (group == 'indicators')
+			else if (group == 'activities')
 				$scope.purposeSortOptions.disabled = $scope.outputSortOptions.disabled = enter;
-		}
+			else if (group == 'indicators')
+				$scope.purposeSortOptions.disabled = $scope.outputSortOptions.disabled = $scope.activitySortOptions = enter;
+		};
 
 		/////////////////////
 		// Pass the form to the shared controller over it, to be able
@@ -515,12 +518,20 @@ angular
 
 		$scope.addPurpose = function() {
 			$scope.editableProject.logicalFrames[$scope.logicalFrameIndex].purposes.push({
-				description: "", assumptions: "", indicators: [], outputs: []});
+				description: "", assumptions: "", indicators: [], outputs: []
+			});
 		};
 
 		$scope.addOutput = function(purpose) {
 			purpose.outputs.push({
-				description: "", assumptions: "", indicators: []});
+				description: "", activities: [], assumptions: "", indicators: []
+			});
+		};
+
+		$scope.addActivity = function(output) {
+			output.activities.push({
+				description: "", indicators: []
+			});
 		};
 
 		$scope.remove = function(element, list) {

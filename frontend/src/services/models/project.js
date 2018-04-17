@@ -30,7 +30,7 @@ angular
 		Project.prototype.getAllIndicators = function(indicators) {
 			var elementOptions = [];
 			this.logicalFrames.forEach(function(logicalFrame, i0) {
-				var fn = function(i) { 
+				var fn = function(i) {
 					return {
 						name: i.display,
 						type: "indicator",
@@ -40,10 +40,13 @@ angular
 				};
 
 				Array.prototype.push.apply(elementOptions, logicalFrame.indicators.map(fn));
-				logicalFrame.purposes.forEach(function(purpose, i1) {
+				logicalFrame.purposes.forEach(function(purpose) {
 					Array.prototype.push.apply(elementOptions, purpose.indicators.map(fn));
-					purpose.outputs.forEach(function(output, i2) {
+					purpose.outputs.forEach(function(output) {
 						Array.prototype.push.apply(elementOptions, output.indicators.map(fn));
+						output.activities.forEach(function(activity) {
+							Array.prototype.push.apply(elementOptions, activity.indicators.map(fn));
+						}, this);
 					}, this);
 				}, this);
 			}, this);
@@ -309,6 +312,9 @@ angular
 					purpose.indicators.forEach(this.sanitizeIndicator, this);
 					purpose.outputs.forEach(function(output) {
 						output.indicators.forEach(this.sanitizeIndicator, this);
+						output.activities.forEach(function(activity) {
+							activity.indicators.forEach(this.sanitizeIndicator, this);
+						}, this);
 					}, this);
 				}, this);
 			}, this);
