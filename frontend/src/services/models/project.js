@@ -279,7 +279,17 @@ angular
 			var entityIds = this.entities.pluck('id'),
 				entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
 
+			// Remove deleted entities
 			form.entities = form.entities.filter(entityIdFilter);
+
+			// Sanitize order and distribution
+			form.elements.forEach(function(element) {
+				if (element.distribution < 0 || element.distribution > element.partitions.length)
+					element.distribution = Math.floor(element.partitions.length / 2);
+
+				if (element.order < 0 || element.order >= Math.factorial(element.partitions.length))
+					element.order = 0;
+			});
 		};
 
 		/**
@@ -332,16 +342,3 @@ angular
 
 		return Project;
 	});
-
-
-			// Sanitize order and distribution
-			//
-			// this.forms.forEach(function(form) {
-			// 	form.elements.forEach(function(element) {
-			// 		if (element.distribution < 0 || element.distribution > element.partitions.length)
-			// 			element.distribution = 0;
-			//
-			// 		if (element.order < 0 || element.order >= Math.factorial(element.partitions.length))
-			// 			element.order = 0;
-			// 	});
-			// });
