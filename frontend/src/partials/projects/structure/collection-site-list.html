@@ -9,7 +9,7 @@
 <div class="alert alert-info" translate="project.collection_site_info"></div>
 
 <form name="projectForm" novalidate>
-	
+
 	<legend translate="project.collection_site_list"></legend>
 
 	<table class="table table-bordered table-stripped table-condensed">
@@ -18,13 +18,13 @@
 				<th style="width: 30px"></th>
 				<th translate="project.entity_name"></th>
 				<th style="width: 200px" translate="project.specific_start"></th>
-				<th style="width: 200px" translate="project.specific_end"></th>				
+				<th style="width: 200px" translate="project.specific_end"></th>
 				<th style="width: 30px"></th>
 			</tr>
 		</thead>
 		<tbody ng-if="editableProject.entities.length == 0">
 			<tr>
-				<td colspan="4" style="text-align: center" translate="project.no_input_entities"></td>
+				<td colspan="5" style="text-align: center" translate="project.no_input_entities"></td>
 			</tr>
 		</tbody>
 		<tbody ng-if="editableProject.entities.length != 0" ng-sortable="{handle: '.handle'}">
@@ -100,7 +100,7 @@
 						</div>
 					</ng-form>
 				</td>
-				
+
 				<td>
 					<ui-select multiple ng-model="inputGroup.members" theme="bootstrap">
 						<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
