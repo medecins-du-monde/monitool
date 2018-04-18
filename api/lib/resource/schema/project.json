@@ -3,7 +3,22 @@
 	"title": "Monitool project schema",
 	"type": "object",
 	"additionalProperties": false,
-	"required": [ "_id", "type", "name", "themes", "start", "end", "entities", "groups", "forms", "crossCutting", "logicalFrames", "users", "extraIndicators"],
+	"required": [
+		"_id",
+		"type",
+		"name",
+		"themes",
+		"start",
+		"end",
+		"visibility",
+		"entities",
+		"groups",
+		"forms",
+		"crossCutting",
+		"logicalFrames",
+		"users",
+		"extraIndicators"
+	],
 
 	"properties": {
 		"_id": { "$ref": "#/definitions/uuid" },
@@ -13,6 +28,7 @@
 		"name": { "type": "string", "minLength": 1 },
 		"start": { "type": "string", "format": "date" },
 		"end": { "type": "string", "format": "date" },
+		"visibility": { "type": "string", "enum": ["public", "private"]},
 
 		"entities": {
 			"type": "array",
@@ -88,7 +104,7 @@
 							},
 							"dataSources": {
 								"type": "array",
-								"uniqueItems": true,			
+								"uniqueItems": true,
 								"items": { "$ref": "#/definitions/uuid" }
 							}
 						}

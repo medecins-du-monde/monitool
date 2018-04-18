@@ -28,6 +28,7 @@
 <table class="table table-bordered table-stripped table-condensed">
 	<thead>
 		<tr>
+			<th style="width: 50px"></th>
 			<th><a ng-click="pred='country';rev=!rev">{{'shared.country'|translate}}</a></th>
 			<th><a ng-click="pred='name';rev=!rev">{{'shared.name'|translate}}</a></th>
 			<th><a ng-click="pred='themes';rev=!rev">{{'theme.themes'|translate}}</a></th>
@@ -40,6 +41,15 @@
 			<td colspan="6" style="text-align: center" translate="project.noproject">
 		</tr>
 		<tr ng-repeat="project in projects|orderBy:pred:rev">
+			<td style="text-align: center">
+				<i	class="fa fa-fw fa-eye-slash"
+					ng-if="project.visibility == 'private'"
+					title="{{'project.visibility.private'|translate}}"></i>
+
+				<i	class="fa fa-fw fa-eye"
+					ng-if="project.visibility == 'public'"
+					title="{{'project.visibility.public'|translate}}"></i>
+			</td>
 			<td>{{project.country}}</td>
 			<td><a ng-click="open(project)">{{project.name}}</a></td>
 			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>

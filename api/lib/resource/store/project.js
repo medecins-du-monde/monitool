@@ -28,6 +28,29 @@ export default class ProjectStore extends Store {
 		return Project;
 	}
 
+	async listVisibleIds(user) {
+		if (user.type === 'partner')
+			return [user.projectId];
+
+		else if (user.type === 'user') {
+			let dbResults;
+			if (user.role === 'admin')
+				dbResults = (await this._db.callView('by_type', {key: 'project'})).rows;
+			else {
+				const [publicIds, privateIds] = await Promise.all([
+					this._db.callView('projects_public'),
+					this._db.callView('projects_private', {key: user._id})
+				]);
+
+				dbResults = [...publicIds.rows, ...privateIds.rows];
+			}
+
+			return dbResults.map(row => row.id);
+		}
+
+		else
+			throw new Error('invalid_user');
+	}
 
 	/**
 	 * Retrieve list of all projects summaries

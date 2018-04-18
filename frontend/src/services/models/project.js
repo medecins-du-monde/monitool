@@ -187,6 +187,7 @@ angular
 			this.groups = [];
 			this.forms = [];
 			this.users = [];
+			this.visibility = 'public';
 		};
 
 
@@ -299,6 +300,10 @@ angular
 		 * inside the project to ensure that there are no broken links and repair them if needed.
 		 */
 		Project.prototype.sanitize = function(indicators) {
+
+			if (this.visibility !== 'private' && this.visibility !== 'public')
+				this.visibility = 'private';
+
 			//////////////////
 			// Sanitize links to input entities
 			//////////////////

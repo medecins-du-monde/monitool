@@ -243,6 +243,13 @@ var ENGLISH_TRANSLATION = {
 	},
 
 	project: {
+		visibility: {
+			visibility: "Visibility",
+			public: "Visible for all users (besides partners)",
+			private: "Visible only to members of this project",
+			help: "Outside of specific cases, all projects should be visible for all users."
+		},
+
 		authorization: "Authorization",
 		form_error_short: "Some fields are invalid in the form.",
 		form_persisted_short: "You did not made changes.",

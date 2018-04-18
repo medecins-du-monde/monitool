@@ -46,99 +46,113 @@ export default express.Router()
 	 *		- ?mode=crossCutting&indicatorId=123: Retrieve projects that collect indicator 123 (bare minimum to compute indicator from cubes).
 	 */
 	.get('/project', function(request, response) {
-		var promise;
-		if (request.user.type === 'user' && request.query.mode === 'short')
-			promise = Project.storeInstance.listShort(request.user._id);
+		Promise.resolve().then(async () => {
+			const visibleIds = await Project.storeInstance.listVisibleIds(request.user);
 
-		else {
-			if (request.query.mode === 'crossCutting')
-				promise = Project.storeInstance.listByIndicator(request.query.indicatorId, true);
-			else if (request.query.mode === undefined)
-				promise = Project.storeInstance.list();
-			else
-				promise = Promise.reject(new Error('invalid_mode'));
+			let projects;
+			if (request.user.type === 'user' && request.query.mode === 'short')
+				projects = await Project.storeInstance.listShort(request.user._id);
 
-			// Filter projects for partners.
-			if (request.user.type === 'partner')
-				promise = promise.then(projects => projects.filter(p => p._id === request.user.projectId));
+			else {
+				if (request.query.mode === 'crossCutting')
+					projects = await Project.storeInstance.listByIndicator(request.query.indicatorId, true);
+				else if (request.query.mode === undefined)
+					projects = await Project.storeInstance.list();
+				else
+					throw new Error('invalid_mode');
 
-			// listShort, listByIndicator and list require a post processing step
-			// to hide passwords (which is not the case for listShort)
-			promise = promise.then(projects => projects.map(p => p.toAPI()))
-		}
+				// listShort, listByIndicator and list require a post processing step
+				// to hide passwords (which is not the case for listShort)
+				projects = projects.map(p => p.toAPI())
+			}
 
-		promise.then(response.jsonPB).catch(response.jsonErrorPB);
+			// Filter projects depending on ACL.
+			projects = projects.filter(p => visibleIds.indexOf(p._id) !== -1);
+
+			return projects;
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
 	 * Retrieve one project
 	 */
 	.get('/project/:id', function(request, response) {
-		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
-			return response.jsonError(new Error('forbidden'));
+		Promise.resolve().then(async () => {
+			let project = await Project.storeInstance.get(request.params.id);
 
-		Project.storeInstance.get(request.params.id)
-			.then(p => p.toAPI())
-			.then(response.jsonPB)
-			.catch(response.jsonErrorPB);
+			const visibleIds = await Project.storeInstance.listVisibleIds(request.user);
+			if (visibleIds.indexOf(request.params.id) === -1)
+				throw new Error('forbidden');
+
+			return project.toAPI();
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
 	 * Save a project
 	 */
 	.put('/project/:id', bodyParser, function(request, response) {
-		// Validate that the _id in the payload is the same as the id in the URL.
-		if (request.body._id !== request.params.id)
-			return response.jsonError(new Error('id_mismatch'));
+		Promise.resolve().then(async () => {
+			// Validate that the _id in the payload is the same as the id in the URL.
+			if (request.body._id !== request.params.id)
+				throw new Error('id_mismatch');
 
-		// Get old project to check ACLs
-		Project.storeInstance.get(request.params.id)
-			.then(
-				// project was found, we raise an error if user is not allowed, otherwise we return the project.
-				function(project) {
-					if ('owner' !== project.getRole(request.user))
-						throw new Error('forbidden');
-				},
-				// project was not found, we check if user can create projects, and raise error otherwise
-				// if the error was something else, reraise it.
-				function(error) {
-					var u = request.user;
-					if (error.message === 'missing' && !(u.type === 'user' && (u.role === 'admin' || u.role === 'project')))
-						throw new Error('forbidden'); // Cannot create project
-					else if (error.message !== 'missing')
-						throw error; // any other database error.
-				}
-			)
-			.then(function() {
-				cache.del('reporting:project:' + request.params.id);
+			// Get old project
+			let oldProject;
+			try {
+				oldProject = await Project.storeInstance.get(request.params.id);
+			}
+			catch (error) {
+				if (error.message === 'missing')
+					oldProject = null;
+				else
+					throw error;
+			}
 
-				return new Project(request.body).save();
-			})
-			.then(p => p.toAPI())
-			.then(response.jsonPB)
-			.catch(response.jsonErrorPB);
+			// Check ACLS
+			if (oldProject) {
+				// This is a project update, we need to make sure that user is owner.
+				if ('owner' !== oldProject.getRole(request.user))
+					throw new Error('forbidden');
+			}
+			else {
+				// This is a project creation, make sure that user is not a partner and has permission.
+				let u = request.user;
+				let isAllowed = u.type === 'user' && (u.role === 'admin' || u.role === 'project');
+				if (!isAllowed)
+					throw new Error('forbidden');
+			}
+
+			// Create the project.
+			cache.del('reporting:project:' + request.params.id); // This empties the reporting cache
+
+			const newProject = new Project(request.body);
+			await newProject.save();
+
+			return newProject.toAPI();
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
 	 * Delete a project
 	 */
 	.delete('/project/:id', function(request, response) {
-		// Partners cannot delete projects (that would be deleting themselves).
-		if (request.user.type !== 'user')
-			return response.jsonError(new Error('forbidden'));
+		Promise.resolve().then(async () => {
+			// Partners cannot delete projects (that would be deleting themselves).
+			if (request.user.type !== 'user')
+				throw new Error('forbidden');
 
-		Project.storeInstance.get(request.params.id)
-			.then(function(project) {
-				// Ask the project if it is deletable.
-				if (project.getRole(request.user) !== 'owner')
-					throw new Error("forbidden");
+			const project = await Project.storeInstance.get(request.params.id);
 
-				cache.del('reporting:project:' + request.params.id);
+			// Ask the project if it is deletable.
+			if (project.getRole(request.user) !== 'owner')
+				throw new Error("forbidden");
 
-				return project.destroy();
-			})
-			.then(response.jsonPB)
-			.catch(response.jsonErrorPB);
+			cache.del('reporting:project:' + request.params.id);
+
+			return project.destroy();
+
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
@@ -150,120 +164,111 @@ export default express.Router()
 	 * 		- current+last: retrieve a given input and the previous one (with projectId, formId, entityId & period)
 	 */
 	.get('/input', function(request, response) {
-		var promise, q = request.query;
+		Promise.resolve().then(async () => {
+			const visibleIds = await Project.storeInstance.listVisibleIds(request.user);
+			const q = request.query;
 
-		// If user is a partner, force him to have a projectId filter.
-		if (request.user.type === 'partner') {
-			// User if trying to access forbidden ressources.
-			if (typeof q.projectId === 'string' && q.projectId !== request.user.projectId)
-				return response.jsonError(new Error('forbidden'));
+			if (q.mode && q.mode.startsWith('ids_by_')) {
+				let ids;
+				if (q.mode === 'ids_by_form')
+					ids = await Input.storeInstance.listIdsByDataSource(q.projectId, q.formId);
+				else if (mode === 'ids_by_entity')
+					ids = await Input.storeInstance.listIdsByEntity(q.projectId, q.entityId);
+				else
+					throw new Error('invalid_mode');
 
-			q.projectId = request.user.projectId;
-		}
+				return ids.filter(id => visibleIds.indexOf(id.substring(0, 36)) !== -1);
+			}
+			else {
+				let inputs;
+				if (q.mode === 'current+last')
+					inputs = await Input.storeInstance.getLasts(q.projectId, q.formId, q.entityId, q.period);
+				else if (q.mode === undefined && typeof q.projectId === 'string')
+					inputs = await Input.storeInstance.listByProject(q.projectId);
+				else if (q.mode === undefined)
+					inputs = await Input.storeInstance.list();
+				else
+					throw new Error('invalid_mode');
 
-		if (q.mode === 'ids_by_form' || q.mode === 'ids_by_entity') {
-			if (q.mode === 'ids_by_form')
-				promise = Input.storeInstance.listIdsByDataSource(q.projectId, q.formId);
-			else // mode === 'ids_by_entity'
-				promise = Input.storeInstance.listIdsByEntity(q.projectId, q.entityId);
-		}
-		else {
-			if (q.mode === 'current+last')
-				promise = Input.storeInstance.getLasts(q.projectId, q.formId, q.entityId, q.period);
-			else if (q.mode !== undefined)
-				promise = Promise.reject(new Error('invalid_mode'));
-			else if (typeof q.projectId === 'string')
-				promise = Input.storeInstance.listByProject(q.projectId);
-			else
-				promise = Input.storeInstance.list(); // get all from all projects, never happens for partners.
-		}
-
-		promise.then(response.jsonPB)
-			   .catch(response.jsonErrorPB);
+				return inputs.filter(input => visibleIds.indexOf(input.project) !== -1);
+			}
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
 	 * Retrieve one input by id
 	 */
 	.get('/input/:id', function(request, response) {
-		var projectId = request.params.id.split(':')[0];
-		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
-			return response.jsonError(new Error('forbidden'));
+		Promise.resolve().then(async () => {
+			const input = await Input.storeInstance.get(request.params.id);
 
-		Input.storeInstance.get(request.params.id)
-			.then(response.jsonPB)
-			.catch(response.jsonErrorPB);
+			const visibleIds = await Project.storeInstance.listVisibleIds(request.user);
+			if (visibleIds.indexOf(input.project) === -1)
+				throw new Error('forbidden');
+
+			return input;
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
 	 * Save an input
 	 */
 	.put('/input/:id', bodyParser, function(request, response) {
-		// Validate that the _id in the payload is the same as the id in the URL.
-		if (request.body._id !== request.params.id)
-			return response.jsonError(new Error('id_mismatch'));
+		Promise.resolve().then(async () => {
+			// Validate that the _id in the payload is the same as the id in the URL.
+			if (request.body._id !== request.params.id)
+				throw new Error('id_mismatch');
 
-		// Create new Input
-		var input;
-		try { input = new Input(request.body); }
-		catch (e) { return response.jsonError(e); }
+			const input = new Input(request.body);
+			const project = await Project.storeInstance.get(input.project);
 
-		// Get project to check ACLs and format
-		Project.storeInstance.get(input.project)
-			.then(function(project) {
-				// Check ACLs
-				var projectUser = project.getProjectUser(request.user),
-					projectRole = project.getRole(request.user);
+			// Check ACLs
+			var projectUser = project.getProjectUser(request.user),
+				projectRole = project.getRole(request.user);
 
-				var allowed = false;
-				if (projectRole === 'owner')
-					allowed = true;
-				else if (projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1 && projectUser.dataSources.indexOf(input.form) !== -1)
-					allowed = true;
+			var allowed = false;
+			if (projectRole === 'owner')
+				allowed = true;
+			else if (projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1 && projectUser.dataSources.indexOf(input.form) !== -1)
+				allowed = true;
 
-				if (!allowed)
-					throw new Error('forbidden');
+			if (!allowed)
+				throw new Error('forbidden');
 
-				cache.del('reporting:project:' + input.project);
+			cache.del('reporting:project:' + input.project);
 
-				return input.save();
-			})
-			.then(response.jsonPB)
-			.catch(response.jsonErrorPB);
+			return input.save();
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**
 	 * Delete an input.
 	 */
 	.delete('/input/:id', function(request, response) {
-		var projectId = request.params.id.split(':')[0];
-		if (request.user.type === 'partner' && request.params.id !== request.user.projectId)
-			return response.jsonError(new Error('forbidden'));
+		Promise.resolve().then(async () => {
+			const [project, input] = await Promise.all([
+				Project.storeInstance.get(request.params.id.split(':')[0]),
+				Input.storeInstance.get(request.params.id)
+			]);
 
-		Promise
-			.all([Project.storeInstance.get(projectId), Input.storeInstance.get(request.params.id)])
-			.then(function(res) {
-				var project = res[0], input = res[1];
+			// Check ACLs
+			var projectUser = project.getProjectUser(request.user),
+				projectRole = project.getRole(request.user);
 
-				// Check ACLs
-				var projectUser = project.getProjectUser(request.user),
-					projectRole = project.getRole(request.user);
+			var allowed = false;
+			if (projectRole === 'owner')
+				allowed = true;
+			else if (projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1 && projectUser.dataSources.indexOf(input.form) !== -1)
+				allowed = true;
 
-				var allowed = false;
-				if (projectRole === 'owner')
-					allowed = true;
-				else if (projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1 && projectUser.dataSources.indexOf(input.form) !== -1)
-					allowed = true;
+			if (!allowed)
+				throw new Error('forbidden');
 
-				if (!allowed)
-					throw new Error('forbidden');
+			cache.del('reporting:project:' + input.project);
 
-				cache.del('reporting:project:' + input.project);
+			return input.destroy();
 
-				return input.destroy();
-			})
-			.then(response.jsonPB)
-			.catch(response.jsonErrorPB);
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
 	/**

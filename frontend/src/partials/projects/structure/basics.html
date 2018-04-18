@@ -11,7 +11,6 @@
 
 <form class="form-horizontal noprint" role="form" name="projectForm" novalidate>
 	<fieldset>
-
 		<div class="form-group" show-errors>
 			<label for="input-country" class="col-sm-2 control-label" translate="shared.country"></label>
 			<div class="col-sm-10">
@@ -22,7 +21,7 @@
 					   ng-model="editableProject.country"
 					   placeholder="{{'project.country_ph'|translate}}"
 					   required />
-				
+
 				<p class="help-block">
 					<i class="fa fa-info-circle"></i>
 					{{'project.basics_help_country'|translate}}
@@ -105,6 +104,29 @@
 					<i class="fa fa-exclamation-triangle"></i>
 					{{"form.end_greater_than_start"|translate}}
 				</p> -->
+			</div>
+		</div>
+
+
+		<div class="form-group" show-errors>
+			<label for="input-visibility" class="col-sm-2 control-label" translate="project.visibility.visibility"></label>
+			<div class="col-sm-10">
+
+				<select
+					id="input-visibility"
+					type="text"
+					class="form-control"
+					name="visibility"
+					ng-model="editableProject.visibility"
+					required>
+					<option value="public" translate="project.visibility.public"></option>
+					<option value="private" translate="project.visibility.private"></option>
+				</select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.visibility.help'|translate}}
+				</p>
 			</div>
 		</div>
 

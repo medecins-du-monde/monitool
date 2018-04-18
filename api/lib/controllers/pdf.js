@@ -78,57 +78,57 @@ export default express.Router()
 	 * Render a PDF file describing the given logical frame.
 	 */
 	.get('/project/:id/logical-frame/:index.pdf', function(request, response) {
-		// This document is not accessible to partners with no access to this project.
-		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
-			return response.jsonError(new Error('forbidden'));
+		Promise.resolve().then(async () => {
+			const [project, visibleIds] = await Promise.all([
+				Project.storeInstance.get(request.params.id),
+				Project.storeInstance.listVisibleIds(request.user)
+			]);
 
-		Project.storeInstance.get(request.params.id)
-			.then(function(project) {
-				// Create document definition.
-				let docDef = project.logicalFrames[request.params.index].getPdfDocDefinition(request.query.orientation);
-				docDef.styles = styles;
+			if (visibleIds.indexOf(project._id) === -1)
+				throw new Error('forbidden');
 
-				// Transform definition to pdf stream.
-				var printer = new PdfPrinter(fontDescriptors);
-				var doc = printer.createPdfKitDocument(docDef);
+			// Create document definition.
+			let docDef = project.logicalFrames[request.params.index].getPdfDocDefinition(request.query.orientation);
+			docDef.styles = styles;
 
-				// Send to user.
-				response.header("Content-Type", 'application/pdf');
-				doc.pipe(response);
-				doc.end();
-			})
-			.catch(function(error) {
-				// Should we give a PDF document instead of JSON error?
-				response.jsonError(error);
-			});
+			// Transform definition to pdf stream.
+			var printer = new PdfPrinter(fontDescriptors);
+			var doc = printer.createPdfKitDocument(docDef);
+
+			// Send to user.
+			response.header("Content-Type", 'application/pdf');
+			doc.pipe(response);
+			doc.end();
+
+		}).catch(response.jsonErrorPB);
 	})
 
 	/**
 	 * Render a PDF file containing a sample paper form (for a datasource).
 	 */
 	.get('/project/:id/data-source/:dataSourceId.pdf', function(request, response) {
-		// This document is not accessible to partners with no access to this project.
-		if (request.user.type == 'partner' && request.params.id !== request.user.projectId)
-			return response.jsonError(new Error('forbidden'));
+		Promise.resolve().then(async () => {
+			const [project, visibleIds] = await Promise.all([
+				Project.storeInstance.get(request.params.id),
+				Project.storeInstance.listVisibleIds(request.user)
+			]);
 
-		Project.storeInstance.get(request.params.id)
-			.then(function(project) {
-				// Create document definition.
-				let docDef = project.getDataSourceById(request.params.dataSourceId).getPdfDocDefinition(request.query.orientation);
-				docDef.styles = styles;
+			if (visibleIds.indexOf(project._id) === -1)
+				throw new Error('forbidden');
 
-				// Transform definition to pdf stream.
-				var printer = new PdfPrinter(fontDescriptors);
-				var doc = printer.createPdfKitDocument(docDef);
+			// Create document definition.
+			let docDef = project.getDataSourceById(request.params.dataSourceId).getPdfDocDefinition(request.query.orientation);
+			docDef.styles = styles;
 
-				// Send to user.
-				response.header("Content-Type", 'application/pdf');
-				doc.pipe(response);
-				doc.end();
-			})
-			.catch(function(error) {
-				// Should we give a PDF document instead of JSON error?
-				response.jsonError(error);
-			});
+			// Transform definition to pdf stream.
+			var printer = new PdfPrinter(fontDescriptors);
+			var doc = printer.createPdfKitDocument(docDef);
+
+			// Send to user.
+			response.header("Content-Type", 'application/pdf');
+			doc.pipe(response);
+			doc.end();
+
+		}).catch(response.jsonErrorPB);
 	});
 

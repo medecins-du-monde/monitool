@@ -6,6 +6,7 @@ import migration3 from './migration-3';
 import migration4 from './migration-4';
 import migration5 from './migration-5';
 import migration6 from './migration-6';
+import migration7 from './migration-7';
 
 export default [
 	migration0,
@@ -14,5 +15,6 @@ export default [
 	migration3,
 	migration4,
 	migration5,
-	migration6
+	migration6,
+	migration7
 ];

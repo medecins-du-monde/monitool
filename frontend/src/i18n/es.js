@@ -243,6 +243,13 @@ var SPANISH_TRANSLATION = {
 	},
 
 	project: {
+		visibility: {
+			visibility: "Visibilidad",
+			public: "Visible para todos los usuarios",
+			private: "Visible solo para miembros de este proyecto",
+			help: "Fuera de casos particulares todos los proyectos deben dejarse visibles para todos los usuarios."
+		},
+
 		authorization: "Permisiones",
 		form_error_short: "Algunos campos del formulario no son validos.",
 		form_persisted_short: "No ha realizado cambios.",

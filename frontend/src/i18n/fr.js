@@ -243,6 +243,13 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
+		visibility: {
+			visibility: "Visibilité",
+			public: "Visible par tous les utilisateurs (hors partenaires)",
+			private: "Visible uniquement par les membres de ce projet",
+			help: "Sauf besoin particulier, tous les projets doivent être laissé visibles par tous les utilisateurs."
+		},
+
 		authorization: "Autorisation",
 
 		form_error_short: "Un ou plusieurs champs du formulaire sont en erreur.",
