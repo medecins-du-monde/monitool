@@ -32,6 +32,7 @@ angular
 			this.logicalFrames.forEach(function(logicalFrame, i0) {
 				var fn = function(i) {
 					return {
+						logicalFrameIndex: i0,
 						name: i.display,
 						type: "indicator",
 						group: $filter('translate')('project.logical_frame') + ": " + logicalFrame.name,
@@ -55,15 +56,16 @@ angular
 			indicators.forEach(function(indicator) {
 				if (itertools.intersect(indicator.themes, this.themes).length === 0)
 					return;
-				
+
 				elementOptions.push({
+					logicalFrameIndex: null,
 					name: indicator.name[$rootScope.language],
 					type: "indicator",
 					group: $filter('translate')('indicator.cross_cutting'),
 					indicator: this.crossCutting[indicator._id] || {
 						display: indicator.name[$rootScope.language],
 						baseline: null,
-						target: null, 
+						target: null,
 						computation: null
 					}
 				});
@@ -92,7 +94,7 @@ angular
 
 			return elementOptions;
 		};
-		
+
 		/**
 		 * Does it makes sense to display links for input and reporting?
 		 */
@@ -102,7 +104,7 @@ angular
 				if (form.elements.length && form.entities.length)
 					return true;
 			}
-			
+
 			return false;
 		}
 
@@ -112,7 +114,7 @@ angular
 		Project.prototype.createEntity = function() {
 			this.entities.push({id: uuid.v4(), name: '', start: null, end: null});
 		};
-		
+
 		/**
 		 * Remove an entity from the project, with all related dependencies.
 		 */

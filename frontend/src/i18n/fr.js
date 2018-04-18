@@ -217,7 +217,7 @@ var FRENCH_TRANSLATION = {
 		quarter: "Trimestre",
 		semester: "Semestre",
 		year: "Année",
-		
+
 		choose: 'Choisir',
 		cancel: 'Annuler',
 		logical_frames: 'Cadres logiques',
@@ -287,7 +287,7 @@ var FRENCH_TRANSLATION = {
 		same_as_start: "Idem début du projet",
 		same_as_end: "Idem fin du projet",
 
-		specific_start: "Date de lancement spécifique",
+		specific_start: "Date de début spécifique",
 		specific_end: "Date de fin spécifique",
 		choose_sites_for_form: "Choisir les structures pour lesquelles cette source de données s'applique",
 		choose_sites_for_user: "Choisir les structures sur lesquelles cet utilisateur pourra saisir des données",
@@ -298,7 +298,7 @@ var FRENCH_TRANSLATION = {
 		partition_help_aggregation: 'Comment trouver la valeur totale en agrégeant les éléments décrits?',
 		partition_help_groups: 'Les groupes permettent de faire des aggrégations intermédiaires',
 		logical_frame: "Cadre logique",
-		
+
 		structure: "Structure",
 		no_data: "Les données ne sont pas disponibles",
 		not_available_by_entity: "Ces données ne sont pas disponibles par lieu de collecte",
@@ -413,8 +413,8 @@ var FRENCH_TRANSLATION = {
 		select_filters: "Sélectionnez les désagrégations désirées",
 
 		collection_form_warning:
-			'<strong>Attention, en modifiant cette page vous risquez de perdre des données.</strong><br/>' + 
-			'{{num_inputs}} saisies ont déjà été réalisées sur cette source de données.' + 
+			'<strong>Attention, en modifiant cette page vous risquez de perdre des données.</strong><br/>' +
+			'{{num_inputs}} saisies ont déjà été réalisées sur cette source de données.' +
 			'<ul>' +
 			'	<li>Les modifications sur le calendrier (périodicité, dates) mettront de côté les saisies non concernées par le nouveau planning (sans perte de données)</li>' +
 			'	<li>Les modifications sur la structure auront des conséquence différentes selon le type de modification: référez-vous au guide d\'utilisation pour lister les différents cas de figures</li>' +
@@ -547,15 +547,15 @@ var FRENCH_TRANSLATION = {
 		basics_help_end: "La date de fin représente le moment où le projet finale sa collecte de données. Si cette date n'est pas connu à l'avance, rentrer une date lointaine dans le futur.",
 
 		collection_site_info:
-			"<p>Lorsqu'un projet réalise les même activités dans plusieurs lieux, celles-ci doivent pouvoir être suivi individuellements, par groupes, et tous ensembles.</p>" + 
-			"<p>Rentrez ici:</p>" + 
-			"<ul>" + 
-				"<li>La liste des lieux sur lesquels le projet travaille (par exemple: une liste des centres de santé)</li>" + 
-				"<li>Des groupements qui seront utilisé lors du suivi (par exemple: des régions, des types de structure)</li>" + 
+			"<p>Lorsqu'un projet réalise les même activités dans plusieurs lieux, celles-ci doivent pouvoir être suivi individuellements, par groupes, et tous ensembles.</p>" +
+			"<p>Rentrez ici:</p>" +
+			"<ul>" +
+				"<li>La liste des lieux sur lesquels le projet travaille (par exemple: une liste des centres de santé)</li>" +
+				"<li>Des groupements qui seront utilisé lors du suivi (par exemple: des régions, des types de structure)</li>" +
 			"</ul>",
 
 		users_list_info:
-			"<p>Plusieurs types d'utilisateurs interviennent dans la mise en place et dans le suivi d'un projet: coordination, staff M&E, opérateurs de saisie, partenaires, ...</p>" + 
+			"<p>Plusieurs types d'utilisateurs interviennent dans la mise en place et dans le suivi d'un projet: coordination, staff M&E, opérateurs de saisie, partenaires, ...</p>" +
 			"<p>Listez ici tous les utilisateurs qui doivent avoir accès au monitoring de ce projet.</p>",
 
 		user_help_type: "Choisissez \"Compte MDM\" si l'utilisateur possède une adresse email xxx@medecinsdumonde.net, et compte partenaire sinon.",
@@ -568,8 +568,8 @@ var FRENCH_TRANSLATION = {
 		user_help_datasources: "Sur quels sources de données cet utilisateur pourra-t'il saisir?",
 
 		collection_form_list_info:
-			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont extraites (fiches de suivi, dossiers patient, fichiers Excel, ...)</p>" + 
-			"<p>Au sein de monitool, on ne décrira pas l'intégralité des données existantes, mais uniquement la partie qui va être extraite pour le suivi du projet</p>" + 
+			"<p>Les sources de données sont les différents supports desquels les données nécessaires au monitoring du projet sont extraites (fiches de suivi, dossiers patient, fichiers Excel, ...)</p>" +
+			"<p>Au sein de monitool, on ne décrira pas l'intégralité des données existantes, mais uniquement la partie qui va être extraite pour le suivi du projet</p>" +
 			"<p>Afin de faciliter l'organisation de la saisie, les sources doivent correspondre à des outils réels utilisés sur le terrain.</p>",
 
 		collection_edit_help_name: "Comment s'apelle la source de laquelle vous voulez extraire des données? Par exemple: \"Dossier patient informatisé\", \"Registre des centre de santé\", \"Rapport du système national d'information sanitaire\", ...",
@@ -586,19 +586,19 @@ var FRENCH_TRANSLATION = {
 		collection_edit_help_order: "Dans quel ordre voulez vous placer vos désagrégations dans les différentes lignes et colonnes?",
 
 		logical_frame_list_info:
-			"<p>Un cadre logique est un document qui décrit les objectifs, les résultats attendus, et les activités misent en oeuvre pour y parvenir, ainsi que les indicateurs qui permette de suivre l'avancement de chaque élément</p>" + 
+			"<p>Un cadre logique est un document qui décrit les objectifs, les résultats attendus, et les activités misent en oeuvre pour y parvenir, ainsi que les indicateurs qui permette de suivre l'avancement de chaque élément</p>" +
 			"<p>Tous les indicateurs présents dans les cadres logiques doivent être calculables à partir des données décrites dans les sources de données</p>",
 
 		cross_cutting_list_info:
-			"<p>Les indicateurs transversaux a collecter sont déterminés à partir de la liste de thématiques renseignée dans les données de bases.</p>" + 
+			"<p>Les indicateurs transversaux a collecter sont déterminés à partir de la liste de thématiques renseignée dans les données de bases.</p>" +
 			"<p>Cette liste contient tous les indicateurs qui doivent être collectés pour réaliser le suivi transversal</p>",
 
 		input_list_info:
 			"<p>Ce planning liste toutes les saisies qui ont été programmées pour la source de données \"{{name}}\"</p>" +
-			"<p>Afin de limiter les erreurs, il est préférable de réaliser la saisie au plus près du lieu d'où sont extraites les données, directement sur Monitool.</p>" + 
+			"<p>Afin de limiter les erreurs, il est préférable de réaliser la saisie au plus près du lieu d'où sont extraites les données, directement sur Monitool.</p>" +
 			"<p>Si ce n'est pas possible, une version PDF à imprimer du formulaire est disponible.</p>",
 
-		extra_indicators_list_info: 
+		extra_indicators_list_info:
 			"<p>Les indicateurs annexés sont des indicateurs complémentaires qui ne figurent dans aucun cadre logique.</p>" +
 			"<p>Ils permettent de suivre des éléments spécifiques du projet (données médicales, logistiques, ...)</p>",
 
@@ -639,7 +639,10 @@ var FRENCH_TRANSLATION = {
 		delete_activity: "Supprimer l'activité",
 		activity_desc_ph: "ex: Réalisation de sessions de sensibilisation sur la transmission du VIH",
 		logframe_help_activity_desc: "Activité réalisée par l'ONG",
-		logframe_help_activity_indicators: "Rentrez ici les indicateurs permettant de mesurer l'avancement de l'activité"
+		logframe_help_activity_indicators: "Rentrez ici les indicateurs permettant de mesurer l'avancement de l'activité",
+
+		logframe_edit_help_start: "Si ce cadre logique n'est pas valable à partir du début du projet indiquez le ici, sinon laisser 'Idem début du projet'",
+		logframe_edit_help_end: "Si ce cadre logique n'est pas valable jusqu'à la fin du projet indiquez le ici, sinon laisser 'Idem fin du projet'"
 	},
 
 	form: {
@@ -665,8 +668,8 @@ var FRENCH_TRANSLATION = {
 		role: "Rôle",
 		save: "Sauvegarder l'utilisateur",
 
-		list_info: 
-			"<p>Cette page contient la liste de tous les utilisateurs qui se sont connectés au moins une fois sur Monitool</p>" + 
+		list_info:
+			"<p>Cette page contient la liste de tous les utilisateurs qui se sont connectés au moins une fois sur Monitool</p>" +
 			"<p>Il n'est pas nécessaire de créer de comptes pour les nouveaux utilisateurs si ceux-ci possède un compte Médecins du Monde: après leur première connexion ils apparaitront automatiquement ici. Pour les utilisateurs hors MDM, il est possible de créer des comptes partenaires depuis l'interface de gestion des projets.</p>",
 
 		edit_info:
@@ -690,7 +693,7 @@ var FRENCH_TRANSLATION = {
 	},
 
 	theme: {
-		list_info: 
+		list_info:
 			"<p>Cette page contient la liste des thématiques traitées par l'ONG.</p>" +
 			"<p>Il est possible d'attribuer une ou plusieurs thématiques à chaque projet et indicateur transversal.</p>",
 
@@ -708,7 +711,7 @@ var FRENCH_TRANSLATION = {
 		name_placeholder_es: "ex: Salud Sexual y reproductiva",
 		name_placeholder_en: "ex: Sexual and Reproductive Health",
 
-		info: 
+		info:
 			"<p>Rentrez ici le nom de la thématique dans toutes les langues utilisées par votre organisation.</p>" +
 			"<p>Si vous ne pouvez pas traduire vers toutes les langues:</p>" +
 			"<ol>" +
@@ -730,7 +733,7 @@ var FRENCH_TRANSLATION = {
 
 		edit_title: "Édition indicateur",
 		themes_label: "Thématiques",
-		
+
 		name_placeholder_fr: "Volume de formation",
 		name_placeholder_en: "Training volume",
 		name_placeholder_es: "Volumen de formación",
@@ -739,12 +742,12 @@ var FRENCH_TRANSLATION = {
 		description_placeholder_en: "We are not talking about health education, but training of medical staff. Count the number of entries and not the number of different people who attended these trainings.",
 		description_placeholder_es: "No se trata de educación para la salud, sino de formación para el personal sanitario. Se cuenta el número de participaciones y no el número de personas distintas que hayan participado.",
 
-		list_info: 
-			"<p>Cette page contient la liste de tous les indicateurs transversaux de l'ONG.<br/>La collecte de chaque indicateur est obligatoire pour les projets qui ont au moins une thématique en commun celui-ci.</p>" + 
+		list_info:
+			"<p>Cette page contient la liste de tous les indicateurs transversaux de l'ONG.<br/>La collecte de chaque indicateur est obligatoire pour les projets qui ont au moins une thématique en commun celui-ci.</p>" +
 			"<p>Afin de permettre aux projets de planifier leur collecte, merci de ne pas changer régulièrement cette liste.</p>",
 
-		edit_info: 
-			"<p>Cette page vous permet de modifier la définition d'un indicateur transversal. Si vous réalisez des changements, attention de bien mettre à jour les champs dans toutes les langues.</p>" + 
+		edit_info:
+			"<p>Cette page vous permet de modifier la définition d'un indicateur transversal. Si vous réalisez des changements, attention de bien mettre à jour les champs dans toutes les langues.</p>" +
 			"<p>Si vous ne pouvez pas traduire vers toutes les langues:</p>" +
 			"<ol>" +
 				"<li>Remplissez les langues que vous pouvez</li>" +

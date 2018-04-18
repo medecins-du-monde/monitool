@@ -4,10 +4,22 @@
 
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["name", "goal", "indicators", "purposes"],
+	"required": ["name", "goal", "start", "end", "indicators", "purposes"],
 	"properties": {
 		"name": { "type": "string" },
 		"goal": { "type": "string" },
+		"start": {
+			"oneOf": [
+				{"type": "null"},
+				{ "type": "string", "format": "date" }
+			]
+		},
+		"end": {
+			"oneOf": [
+				{"type": "null"},
+				{ "type": "string", "format": "date" }
+			]
+		},
 		"indicators": { "$ref": "#/definitions/indicators" },
 		"purposes": {
 			"type": "array",

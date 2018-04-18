@@ -638,7 +638,10 @@ var SPANISH_TRANSLATION = {
 		delete_activity: "Suprimir la actividad",
 		activity_desc_ph: "ej. Realizar sesiones de sensibilización sobre la transmision del VIH",
 		logframe_help_activity_desc: "Actividad realizada por la ONG",
-		logframe_help_activity_indicators: "Entre los indicadores que permiten medir la actividad"
+		logframe_help_activity_indicators: "Entre los indicadores que permiten medir la actividad",
+
+		logframe_edit_help_start: "Si este marco lógico no es valido desde el principio del proyecto indique lo aqui, sino deje el valor por defecto",
+		logframe_edit_help_end: "Si este marco lógico no es valido hasta el final del proyecto indique lo aqui, sino deje el valor por defecto"
 	},
 
 	form: {

@@ -133,6 +133,17 @@ angular
 
 			var filters = {_start: $scope.masterProject.start, _end: new Date() < $scope.masterProject.end ? new Date() : $scope.masterProject.end};
 
+			// Hack: Same as a bit lower: change the default dates when chosing an indicator from a logicalframework
+			// This depends on another hack inserted in services/models/project.js:getAllIndicators()
+			if (typeof element.logicalFrameIndex === 'number') {
+				var lfStart = $scope.masterProject.logicalFrames[element.logicalFrameIndex].start;
+				var lfEnd = $scope.masterProject.logicalFrames[element.logicalFrameIndex].end;
+				if (lfStart && filters._start < lfStart)
+					filters._start = lfStart;
+				if (lfEnd && lfEnd < filters._end)
+					filters._end = lfEnd;
+			}
+
 			// default group by
 			var groupBy;
 			if (mtReporting.getColumns('month', filters._start, filters._end).length < 15)
@@ -153,15 +164,21 @@ angular
 					});
 				});
 
-				// make default query.
-				$scope.query = { type: 'variable', element: element.element, filters: filters, groupBy: groupBy };
-
 				// filters
 				$scope.dimensions = element.element.partitions;
+
+				// make default query.
+				$scope.query = {type: 'variable', element: element.element, filters: filters, groupBy: groupBy};
 			}
 			else {
-				$scope.query = { type: 'indicator', indicator: element.indicator, filters: filters, groupBy: groupBy};
 				$scope.dimensions = [];
+
+				// Hack: we copy logical frame index to the element, to be able to pass it to mtReporting.
+				// It was written in there initially in services/models/project.js:getAllIndicators()
+				// This is done to be able to fix #54 & #80: adding dates to logical frameworks.
+				var ind = angular.copy(element.indicator);
+				ind.logicalFrameIndex = element.logicalFrameIndex;
+				$scope.query = {type: 'indicator', indicator: ind, filters: filters, groupBy: groupBy};
 			}
 		});
 
@@ -216,6 +233,17 @@ angular
 					$scope.query = {element: element, colDimensions: [], rowDimensions: [], filters: filters};
 					$scope.dimensions = [];
 					return;
+				}
+
+				// Hack: Same as previous controller: change the default dates when chosing an indicator from a logicalframework
+				// This depends on another hack inserted in services/models/project.js:getAllIndicators()
+				if (typeof element.logicalFrameIndex === 'number') {
+					var lfStart = $scope.masterProject.logicalFrames[element.logicalFrameIndex].start;
+					var lfEnd = $scope.masterProject.logicalFrames[element.logicalFrameIndex].end;
+					if (lfStart && filters._start < lfStart)
+						filters._start = lfStart;
+					if (lfEnd && lfEnd < filters._end)
+						filters._end = lfEnd;
 				}
 
 				////////////////////////////////////////

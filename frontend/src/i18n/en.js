@@ -638,7 +638,10 @@ var ENGLISH_TRANSLATION = {
 		delete_activity: "Delete activity",
 		activity_desc_ph: "e.g. Awareness sessions on HIV transmission",
 		logframe_help_activity_desc: "Activity realized by the NGO",
-		logframe_help_activity_indicators: "Enter here the indicators that allows to measure the activity progress"
+		logframe_help_activity_indicators: "Enter here the indicators that allows to measure the activity progress",
+
+		logframe_edit_help_start: "If this logical framework is not valid since the start of the project enter the date here, otherwise, leave the default value",
+		logframe_edit_help_end: "If this logical framework is not valid up to the end of the project enter the date here, otherwise, leave the default value"
 	},
 
 	form: {

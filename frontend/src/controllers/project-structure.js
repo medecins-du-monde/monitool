@@ -463,7 +463,7 @@ angular
 		$scope.createLogicalFrame = function(logicalFrame) {
 			var newLogicalFrame;
 			if (!logicalFrame)
-				newLogicalFrame = {name: '', goal: '', indicators: [], purposes: []};
+				newLogicalFrame = {name: '', goal: '', start: null, end: null, indicators: [], purposes: []};
 			else
 				newLogicalFrame = angular.copy(logicalFrame);
 

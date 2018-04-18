@@ -56,7 +56,7 @@ angular
 				var slots = InputSlots.iterate(start, end, groupBy).map(function(slot) {
 					return {id: slot, name: $filter('formatSlot')(slot), title: $filter('formatSlotRange')(slot)};
 				});
-				
+
 				slots.push({id:'_total', name: "Total"});
 
 				return slots;
@@ -137,7 +137,7 @@ angular
 			// handle colorization
 			if (planning.colorize && planning.baseline !== null && planning.target !== null)
 				row.colorization = {baseline: planning.baseline, target: planning.target};
-	
+
 			if (planning.computation === null)
 				row.message = 'project.indicator_computation_missing';
 
@@ -145,7 +145,7 @@ angular
 				row.cols = columns.map(function(col) { return parseInt(planning.computation.formula); });
 
 			else {
-				
+
 				try {
 					// row.unit should not be inside the try/catch, but better safe than sorry
 					if (/1000/.test(planning.computation.formula))
@@ -196,7 +196,7 @@ angular
 			// Create a filter that explicitely allows everything!
 			var cubeFilters = angular.copy(viewFilters);
 			var timeDimension = cube.dimensions[0]; // hack. We do this because we know the internals of Cube.
-			
+
 			for (var key in cubeFilters) {
 				if (key.substring(0, 1) !== '_')
 					continue;
@@ -231,7 +231,7 @@ angular
 					if (viewFilters._location.substring(0, 4) === 'ent_') {
 						if (!cubeFilters.entity)
 							cubeFilters.entity = cube.dimensionsById.entity.items;
-						
+
 						cubeFilters.entity = cubeFilters.entity.filter(function(dimItem) {
 							return dimItem == viewFilters._location.substring(4);
 						});
@@ -264,6 +264,13 @@ angular
 		this.computeLogicalFrameReporting = function(cubes, project, logicalFrame, groupBy, viewFilters) {
 			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project),
 				rows = [];
+
+			// Restrict logical frame dates to be as much the real dates.
+			viewFilters = angular.copy(viewFilters);
+			if (logicalFrame.start && viewFilters._start < logicalFrame.start)
+				viewFilters._start = logicalFrame.start;
+			if (logicalFrame.end && logicalFrame.end < viewFilters._end)
+				viewFilters._end = logicalFrame.end;
 
 			if (logicalFrame.goal)
 				rows.push({type: 'header', text: logicalFrame.goal, indent: 0});
@@ -358,7 +365,7 @@ angular
 				row.partitions = element.partitions;
 				row.isGroup = false;
 				rows.push(row);
-				
+
 				if (splits[row.id] !== undefined) {
 					var partition = element.partitions.find(function(p) { return p.id == splits[row.id]; });
 
@@ -416,8 +423,18 @@ angular
 
 		this.computeIndicatorReporting = function(cubes, project, indicator, groupBy, viewFilters) {
 			var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project);
-			var rows = []
 
+			// Restrict logical frame dates to be as much the real dates.
+			if (typeof indicator.logicalFrameIndex === 'number') {
+				var logicalFrame = project.logicalFrames[indicator.logicalFrameIndex];
+				viewFilters = angular.copy(viewFilters);
+				if (logicalFrame.start && viewFilters._start < logicalFrame.start)
+					viewFilters._start = logicalFrame.start;
+				if (logicalFrame.end && logicalFrame.end < viewFilters._end)
+					viewFilters._end = logicalFrame.end;
+			}
+
+			var rows = []
 			var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicator)
 			row.id = 'all_project'; // Override default id so that graphs don't disapear when filtering or changing variables.
 			row.name = row.fullname = $filter('translate')('project.full_project');
@@ -440,7 +457,7 @@ angular
 
 			project.groups.forEach(function(group) {
 				viewFilters.group = [group.id];
-				
+
 				var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicator);
 				row.id = group.id; // Override default id so that graphs don't disapear when filtering.
 				row.name = row.fullname = group.name;
@@ -465,7 +482,7 @@ angular
 
 			project.entities.forEach(function(entity) {
 				viewFilters.entity = [entity.id];
-				
+
 				var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
 				row.id = entity.id; // Override default id so that graphs don't disapear when filtering.
 				row.name = row.fullname = entity.name; // Replace default name by collection site name.
@@ -478,7 +495,7 @@ angular
 
 			project.groups.forEach(function(group) {
 				viewFilters.group = [group.id];
-				
+
 				var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
 				row.id = group.id; // Override default id so that graphs don't disapear when filtering.
 				row.name = row.fullname = group.name; // Replace default name by group name.
@@ -489,6 +506,6 @@ angular
 
 			return this.deduplicateRows(rows);
 		};
-		
+
 	});
 
