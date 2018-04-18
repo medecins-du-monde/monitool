@@ -70,10 +70,12 @@ angular
 		});
 
 		// save, reset and isUnchanged are all defined here, because those are shared between all project views.
-		$scope.save = function() {
+		$scope.save = function(force) {
 			// When button is disabled, do not execute action.
-			if (!$scope.projectSavable || $scope.projectSaveRunning)
-				return;
+			if (!force) {
+				if (!$scope.projectSavable || $scope.projectSaveRunning)
+					return;
+			}
 
 			$scope.projectSaveRunning = true;
 			$scope.editableProject.sanitize(indicators);
@@ -314,7 +316,7 @@ angular
 
 				// Give some time for the watches to update the flags
 				$timeout(function() {
-					$scope.$parent.save().then(function() {
+					$scope.$parent.save(true).then(function() {
 						$state.go('main.project.structure.collection_form_list');
 					});
 				});
@@ -586,12 +588,8 @@ angular
 
 				// Remove the form
 				$scope.editableProject.logicalFrames.splice($scope.logicalFrameIndex, 1);
-
-				// Give some time for the watches to update the flags
-				$timeout(function() {
-					$scope.$parent.save().then(function() {
-						$state.go('main.project.structure.logical_frame_list');
-					});
+				$scope.$parent.save(true).then(function() {
+					$state.go('main.project.structure.logical_frame_list');
 				});
 			}
 		};
