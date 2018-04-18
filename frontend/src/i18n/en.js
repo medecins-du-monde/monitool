@@ -220,7 +220,7 @@ var ENGLISH_TRANSLATION = {
 
 		choose: 'Choose',
 		cancel: 'Cancel',
-		logical_frames: 'Logical Frames',
+		logical_frames: 'Logical Frameworks',
 		reporting: 'Reporting',
 		reporting_general: 'General reporting',
 		columns: "Columns",
@@ -296,7 +296,7 @@ var ENGLISH_TRANSLATION = {
 		partition_help_elements: 'Elements from the disaggregation must be mutually exclusive, and it should be possible to find the total value by aggregating them.',
 		partition_help_aggregation: 'How to find the total value by aggregating the elements described above?',
 		partition_help_groups: 'Groups allow making intermediary aggregations',
-		logical_frame: "Logical frame",
+		logical_frame: "Logical framework",
 
 		structure: "Structure",
 		no_data: "This data is not available",
@@ -311,7 +311,7 @@ var ENGLISH_TRANSLATION = {
 		not_available_min_year: "This data is available by year",
 
 		saving_failed: "Monitool was unable to save the changes.",
-		no_logical_frames: "No logical frame was created yet for this project.",
+		no_logical_frames: "No logical framework was created yet for this project.",
 		partition_general: "General",
 		partition_general_placeholder: "ex: Age group, gender, motive for consultation, pathology, referral status, ...",
 		partition_elements: "Elements",
@@ -373,9 +373,9 @@ var ENGLISH_TRANSLATION = {
 
 		parameter: "Parameter",
 		all_selected: "No filter",
-		create_logframe: "Add a logical frame",
+		create_logframe: "Add a logical framework",
 		reporting_compare_sites: "Compare sites",
-		unnamed_logframe: "Unnamed logical frame",
+		unnamed_logframe: "Unnamed logical framework",
 
 		edit_indicator: "Edit indicator",
 		display: "Name",
@@ -522,7 +522,7 @@ var ENGLISH_TRANSLATION = {
 		output_assumptions_ph: '',
 		logframe_ph_name: "e.g. ECHO",
 
-		logframe_help_name: "Name this logical frame to be able to identify it easily. For instance, with the name of the relevant donor",
+		logframe_help_name: "Name this logical framework to be able to identify it easily. For instance, with the name of the relevant donor",
 		logframe_help_goal: "Describe the project\'s contribution on a program or policy",
 		logframe_help_goal_indicators: "Enter here the indicators that allow to measure the general objective",
 		logframe_help_purpose_desc: "Describe the tangible advantages that are provided to the beneficiaries",
@@ -585,7 +585,7 @@ var ENGLISH_TRANSLATION = {
 		collection_edit_help_order: "How do you wish to show the disaggregations on the input form?",
 
 		logical_frame_list_info:
-			"<p>A logical frame is a document that describe objectives, expected results, and actities to achieve them, as well as indicators to monitor the advancement of each of those elements</p>" +
+			"<p>A logical framework is a document that describe objectives, expected results, and actities to achieve them, as well as indicators to monitor the advancement of each of those elements</p>" +
 			"<p>All indicators have to be computable from the data described in data sources</p>",
 
 		cross_cutting_list_info:
@@ -598,7 +598,7 @@ var ENGLISH_TRANSLATION = {
 			"<p>If not attainable, a PDF version of the form is provided.</p>",
 
 		extra_indicators_list_info:
-			"<p>Extra indicators are indicators that are not in any logical frame.</p>" +
+			"<p>Extra indicators are indicators that are not in any logical framework.</p>" +
 			"<p>Those allow to monitor specific elements of the project (medical data, logistics, ...)</p>",
 
 		download_portrait: "Download PDF (portrait)",
@@ -620,7 +620,7 @@ var ENGLISH_TRANSLATION = {
 		order_label: "In which order should the disaggregations be shown?",
 		no_indicator: "No indicator is defined. Click on \"Add an indicator\"",
 		delete_form: "Delete data source",
-		delete_logical_frame: "Delete logical frame",
+		delete_logical_frame: "Delete logical framework",
 		delete_purpose: "Delete specific objective",
 		delete_result: "Delete result",
 
