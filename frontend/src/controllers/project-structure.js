@@ -381,7 +381,7 @@ angular
 		};
 	})
 
-	.controller('PartitionEditionModalController', function($scope, $uibModalInstance, currentPartition, uuid) {
+	.controller('PartitionEditionModalController', function($scope, $uibModalInstance, $filter, currentPartition, uuid) {
 		$scope.isNew = false;
 		if (!currentPartition) {
 			currentPartition = {
@@ -397,6 +397,7 @@ angular
 		$scope.master = currentPartition;
 		$scope.partition = angular.copy(currentPartition);
 		$scope.useGroups = !!$scope.partition.groups.length;
+		$scope.closedOnPurpose = false;
 
 		$scope.$watch('useGroups', function(value) {
 			if (!value)
@@ -412,6 +413,7 @@ angular
 		};
 
 		$scope.save = function() {
+			$scope.closedOnPurpose = true;
 			$uibModalInstance.close($scope.partition);
 		};
 
@@ -449,14 +451,26 @@ angular
 		};
 
 		$scope.delete = function() {
+			$scope.closedOnPurpose = true;
 			$uibModalInstance.close(null);
 		};
 
 		$scope.closeModal = function() {
 			$uibModalInstance.dismiss(null);
 		};
-	})
 
+		$scope.$on('modal.closing', function(event) {
+			var hasChanged = !$scope.isUnchanged();
+			var closedOnPurpose = $scope.closedOnPurpose;
+
+			if (hasChanged && !closedOnPurpose) {
+				var question = $filter('translate')('shared.sure_to_leave');
+				var isSure = window.confirm(question);
+				if (!isSure)
+					event.preventDefault();
+			}
+		});
+	})
 
 	.controller('ProjectLogicalFrameListController', function($scope, $state) {
 
