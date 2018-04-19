@@ -33,15 +33,12 @@ export default class IndicatorStore extends Store {
 	 * Retrieve all indicators that are associated with a given theme
 	 * This is used to update the indicators when deleting a theme
 	 */
-	listByTheme(themeId) {
+	async listByTheme(themeId) {
 		if (typeof themeId !== 'string')
-			return Promise.reject(new Error("missing_parameter"));
+			throw new Error("missing_parameter");
 
-		var view = 'indicator_by_theme', opt = {key: themeId, include_docs: true},
-			Indicator = this.modelClass;
+		const result = await this._db.callView('indicator_by_theme', {key: themeId, include_docs: true});
 
-		return this._db.callView(view, opt).then(function(result) {
-			return result.rows.map(row => new Indicator(row.doc));
-		});
+		return result.rows.map(row => new Indicator(row.doc));
 	}
 }

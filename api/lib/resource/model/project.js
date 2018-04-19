@@ -85,20 +85,22 @@ export default class Project extends DbModel {
 	 *
 	 * @return {Promise}
 	 */
-	destroy() {
-		return Input.storeInstance.listByProject(this._id)
-			.then(function(inputs) {
-				inputs = inputs.map(function(i) {
+	async destroy() {
+		let inputs = await Input.storeInstance.listByProject(this._id);
+
+		await this._db.callBulk({
+			docs: [
+				// Delete project
+				{_id: this._id, _rev: this._rev, _deleted: true},
+
+				// Delete associated inputs.
+				...inputs.map(i => {
 					return {_id: i._id, _rev: i._rev, _deleted: true};
-				});
+				})
+			]
+		});
 
-				let docs = [{_id: this._id, _rev: this._rev, _deleted: true}].concat(inputs);
-
-				return this._db.callBulk({docs: docs});
-			}.bind(this))
-			.then(function(result) {
-				return {}
-			});
+		return {};
 	}
 
 	/**
@@ -185,7 +187,7 @@ export default class Project extends DbModel {
 	 * Take the previous version of the project, and compute all updates
 	 * to inputs that are needed to deal with the structural changes of the forms.
 	 */
-	_computeInputsUpdates(oldProject) {
+	async _computeInputsUpdates(oldProject) {
 		var changedFormsIds = [];
 
 		// Get all forms that existed before, and changed since last time.
@@ -207,44 +209,44 @@ export default class Project extends DbModel {
 			.filter(oe => !this.entities.find(nw => nw.id === oe.id))
 			.map(entity => entity.id);
 
-		var promises =
-			changedFormsIds.map(dsId => Input.storeInstance.listByDataSource(this._id, dsId))
-			.concat(deletedEntitiesIds.map(eId => Input.storeInstance.listByEntity(this._id, eId)));
+		const result = await Promise.all([
+			...changedFormsIds.map(dsId => Input.storeInstance.listByDataSource(this._id, dsId)),
+			...deletedEntitiesIds.map(eId => Input.storeInstance.listByEntity(this._id, eId))
+		])
 
-		return Promise.all(promises).then(function(result) {
-			let inputsById = {};
+		let inputsById = {};
 
-			// there might be duplicates if an input was fetched because of
-			// both a datasource and an entity.
-			result.forEach(function(inputs) {
-				inputs.forEach(function(input) {
-					inputsById[input._id] = input;
-				});
+		// there might be duplicates if an input was fetched because of
+		// both a datasource and an entity.
+		result.forEach(function(inputs) {
+			inputs.forEach(function(input) {
+				inputsById[input._id] = input;
 			});
+		});
 
-			let inputs = Object.keys(inputsById).map(id => inputsById[id]);
-			inputs.forEach(input => input.update(oldProject, this));
-			return inputs;
-		}.bind(this));
+		let inputs = Object.keys(inputsById).map(id => inputsById[id]);
+		inputs.forEach(input => input.update(oldProject, this));
+		return inputs;
 	}
 
 	/**
 	 * Validate that project does not make references to indicators and themes that don't exist.
 	 */
-	validateForeignKeys() {
-		return Promise.all([Indicator.storeInstance.list(), Theme.storeInstance.list()]).then(function(res) {
-			var indicators = res[0], themes = res[1];
+	async validateForeignKeys() {
+		const [indicators, themes] = await Promise.all([
+			Indicator.storeInstance.list(),
+			Theme.storeInstance.list()
+		]);
 
-			Object.keys(this.crossCutting).forEach(function(indicatorId) {
-				if (indicators.filter(i => i._id === indicatorId).length === 0)
-					throw new Error('invalid_reference');
-			});
+		Object.keys(this.crossCutting).forEach(indicatorId => {
+			if (!indicators.find(i => i._id === indicatorId))
+				throw new Error('invalid_reference');
+		});
 
-			this.themes.forEach(function(themeId) {
-				if (themes.filter(t => t._id === themeId).length === 0)
-					throw new Error('invalid_reference');
-			});
-		}.bind(this));
+		this.themes.forEach(themeId => {
+			if (!themes.find(t => t._id === themeId))
+				throw new Error('invalid_reference');
+		});
 	}
 
 	/**
@@ -255,50 +257,49 @@ export default class Project extends DbModel {
 	 *	- copy the passwords that were not changed for partners.
 	 *	- update all inputs that need a change (depending on structural changes in data sources).
 	 */
-	save(skipChecks) {
+	async save(skipChecks) {
 		// If we skip checks, because we know what we are doing, just delegate to parent class.
 		if (skipChecks)
 			return super.save(true);
 
-		return this.validateForeignKeys()
+		// Before doing anything, check that the project is valid.
+		await this.validateForeignKeys();
 
-			// Get former project or null if missing.
-			.then(function() {
-				return Project.storeInstance.get(this._id).catch(function(error) {
-					// if we can't get former project for some other reason than "missing" we are done.
-					return error.message === 'missing' ? null : Promise.reject(error);
-				});
-			}.bind(this))
+		// Get former project or null if missing.
+		let oldProject = null;
+		try {
+			oldProject = await Project.storeInstance.get(this._id);
+		}
+		catch (error) {
+			// if we can't get former project for some other reason than "missing" we are done.
+			if (error.message !== 'missing')
+				throw error;
+		}
 
-			// Handle partner passwords & input structure
-			.then(function(oldProject) {
-				// If we are updating, copy old passwords from the old project
-				if (oldProject)
-					this._copyUnchangedPasswords(oldProject);
+		// Handle partner passwords & input structure
+		let documents = [this];
 
-				// If we are updating the project, we need to update related inputs.
-				return oldProject ? this._computeInputsUpdates(oldProject) : [];
-			}.bind(this))
+		if (oldProject) {
+			// Copy old passwords from the old project
+			this._copyUnchangedPasswords(oldProject);
 
-			.then(function(updates) {
-				updates.push(this);
+			// If we are updating the project, we need to update related inputs.
+			documents = documents.concat(await this._computeInputsUpdates(oldProject));
+		}
 
-				// FIXME
-				// Bulk operations are not really atomic in a couchdb database.
-				// if someone else is playing with the database at the same time, we might leave the database in an inconsistent state.
-				// This can be easily fixed http://stackoverflow.com/questions/29491618/transaction-like-update-of-two-documents-using-couchdb
-				return this._db.callBulk({docs: updates});
-			}.bind(this))
+		// FIXME
+		// Bulk operations are not really atomic in a couchdb database.
+		// if someone else is playing with the database at the same time, we might leave the database in an inconsistent state.
+		// This can be easily fixed http://stackoverflow.com/questions/29491618/transaction-like-update-of-two-documents-using-couchdb
+		const bulkResults = await this._db.callBulk({docs: updates});
 
-			.then(function(bulkResults) {
-				// bulk updates don't give us the whole document
-				var projectResult = bulkResults.find(res => res.id === this._id);
-				if (projectResult.error)
-					throw new Error(projectResult.error);
+		// bulk updates don't give us the whole document
+		var projectResult = bulkResults.find(res => res.id === this._id);
+		if (projectResult.error)
+			throw new Error(projectResult.error);
 
-				this._rev = projectResult.rev;
-				return this; // return updated document.
-			}.bind(this));
+		this._rev = projectResult.rev;
+		return this; // return updated document.
 	}
 
 	toAPI() {

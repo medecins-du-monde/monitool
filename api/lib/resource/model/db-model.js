@@ -28,7 +28,7 @@ export default class DbModel extends Model {
 	 * Delete the model from the database.
 	 * No checks are performed to ensure that database integrity is not lost!
 	 */
-	destroy() {
+	async destroy() {
 		return this._db.destroy(this._id, this._rev);
 	}
 
@@ -36,19 +36,17 @@ export default class DbModel extends Model {
 	 * Validate that all foreign keys in this model are valid in current database.
 	 * Child classes must override this method when relevant.
 	 */
-	validateForeignKeys() {
-		return Promise.resolve();
+	async validateForeignKeys() {
 	}
 
 	/**
 	 * Save model in database after checking that foreign keys are valid.
 	 */
-	save(skipChecks) {
-		var canSave = skipChecks ? Promise.resolve() : this.validateForeignKeys();
+	async save(skipChecks) {
+		if (!skipChecks)
+			await this.validateForeignKeys();
 
-		return canSave.then(function() {
-			return this._db.insert(this);
-		}.bind(this));
+		return this._db.insert(this);
 	}
 
 }

@@ -23,7 +23,6 @@ import schema from '../schema/indicator.json';
 
 import Project from './project';
 
-
 var validate = validator(schema),
 	storeInstance = new IndicatorStore();
 
@@ -41,35 +40,34 @@ export default class Indicator extends DbModel {
 	/**
 	 * Validate that indicator does not make references to themes that don't exist
 	 */
-	validateForeignKeys() {
+	async validateForeignKeys() {
 		// If no themes are defined, early quit
 		if (this.themes.length === 0)
-			return Promise.resolve();
+			return;
 
 		// Otherwise we just fetch all themes and check.
-		return Theme.storeInstance.list().then(function(themes) {
-			this.themes.forEach(function(themeId) {
-				if (themes.filter(t => t._id === themeId).length === 0)
-					throw new Error('invalid_reference');
-			}.bind(this));
-		}.bind(this));
+		const themes = await Theme.storeInstance.list();
+
+		this.themes.forEach(themeId => {
+			if (!themes.find(t => t._id === themeId))
+				throw new Error('invalid_reference');
+		});
 	}
 
 	/**
 	 * Delete indicator and updates all projects that are using it.
 	 */
-	destroy() {
-		return Project.storeInstance.listByIndicator(this._id, false).then(function(projects) {
-			// Delete cross cutting indicator from projects.
-			projects.forEach(function(project) {
-				delete project.crossCutting[this._id];
-			}, this);
+	async destroy() {
+		const projects = await Project.storeInstance.listByIndicator(this._id, false);
 
-			// Mark ourself as deleted
-			this._deleted = true;
+		// Delete cross cutting indicator from projects.
+		projects.forEach(project => delete project.crossCutting[this._id]);
 
-			// Save everything in on request
-			return this._db.callBulk({docs: projects.concat([this])});
-		}.bind(this)).then(function() { /* do not pass couchdb result to caller */ });
+		// Mark ourself as deleted
+		this._deleted = true;
+
+		// Save everything in on request
+		await this._db.callBulk({docs: [this, ...projects]});
 	}
 }
+

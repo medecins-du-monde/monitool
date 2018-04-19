@@ -174,44 +174,44 @@ export default class Input extends DbModel {
 	 * We don't check for valid periodicity and entity because the client supports having inputs that are "out of calendar".
 	 * This allows not loosing data when we update the periodicity of a data source but will be removed.
 	 */
-	validateForeignKeys() {
-		return Project.storeInstance.get(this.project).then(function(project) {
-			var errors = [];
+	async validateForeignKeys() {
+		const project = await Project.storeInstance.get(this.project);
 
-			// entity must exist in the project
-			if (project.entities.filter(e => this.entity === e.id).length === 0)
-				errors.push('unknown_entity');
+		var errors = [];
 
-			var dataSource = project.getDataSourceById(this.form);
-			if (dataSource) {
-				// Check that all variables exist and have the proper length
-				for (var i = 0; i < dataSource.elements.length; ++i) {
-					var variable = dataSource.elements[i];
+		// entity must exist in the project
+		if (!project.entities.find(e => this.entity === e.id))
+			errors.push('unknown_entity');
 
-					if (!this.values[variable.id])
-						errors.push('missing_variable_' + variable.id);
-					else if (this.values[variable.id].length !== variable.numValues)
-						errors.push('variable_length_mismatch_' + variable.id);
-				}
+		var dataSource = project.getDataSourceById(this.form);
+		if (dataSource) {
+			// Check that all variables exist and have the proper length
+			for (var i = 0; i < dataSource.elements.length; ++i) {
+				var variable = dataSource.elements[i];
 
-				// Check that there are no extra variables.
-				for (var variableId in this.values) {
-					var variable = dataSource.getVariableById(variableId);
-					if (!variable)
-						errors.push('extra_variable_' + variable.id);
-				}
+				if (!this.values[variable.id])
+					errors.push('missing_variable_' + variable.id);
+				else if (this.values[variable.id].length !== variable.numValues)
+					errors.push('variable_length_mismatch_' + variable.id);
 			}
-			else
-				// Data source must exist
-				errors.push('unknown_datasource');
 
-			if (errors.length) {
-				var exc = new Error('invalid_reference');
-				exc.model = this;
-				exc.detail = errors;
-				throw exc;
+			// Check that there are no extra variables.
+			for (var variableId in this.values) {
+				var variable = dataSource.getVariableById(variableId);
+				if (!variable)
+					errors.push('extra_variable_' + variable.id);
 			}
-		}.bind(this));
+		}
+		else
+			// Data source must exist
+			errors.push('unknown_datasource');
+
+		if (errors.length) {
+			var exc = new Error('invalid_reference');
+			exc.model = this;
+			exc.detail = errors;
+			throw exc;
+		}
 	}
 }
 
