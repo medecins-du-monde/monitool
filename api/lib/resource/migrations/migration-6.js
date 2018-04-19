@@ -5,19 +5,12 @@ import database from '../database';
  */
 export default async function() {
 	let result = await database.callView('by_type', {include_docs: true, key: 'project'});
-	let documents = [];
 
 	result.rows.forEach(row => {
-		var update = false;
-		var project = row.doc;
-
-		project.logicalFrames.forEach(logframe => {
+		row.doc.logicalFrames.forEach(logframe => {
 			logframe.start = logframe.end = null;
 		});
-
-		if (update)
-			documents.push(project);
 	});
 
-	return database.callBulk({docs: documents});
+	return database.callBulk({docs: result.rows.map(row => row.doc)});
 };
