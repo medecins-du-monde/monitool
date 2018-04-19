@@ -68,8 +68,10 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string')
 			throw new Error('missing_parameter');
 
-		var opt = {include_docs: true, startkey: projectId + ':!', endkey: projectId + ':~'},
-			Input = this.modelClass;
+		var opt = {
+			include_docs: true,
+			startkey: 'input:' + projectId + ':!',
+			endkey: 'input:' + projectId + ':~'};
 
 		const result = await this._db.callList(opt);
 		return result.rows.map(row => new Input(row.doc));
@@ -84,8 +86,7 @@ export default class InputStore extends Store {
 			throw new Error('missing_parameter');
 
 		var view = 'inputs_by_project_form_date',
-			opt = {include_docs: true, startkey: [projectId, formId], endkey: [projectId, formId, {}]},
-			Input = this.modelClass;
+			opt = {include_docs: true, startkey: [projectId, formId], endkey: [projectId, formId, {}]};
 
 		const result = await this._db.callView(view, opt);
 		return result.rows.map(row => new Input(row.doc));
@@ -115,9 +116,9 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string' || typeof formId !== 'string' || typeof entityId !== 'string' || typeof period !== 'string')
 			throw new Error('missing_parameter');
 
-		var id       = [projectId, entityId, formId, period].join(':'),
+		var id       = ['input', projectId, entityId, formId, period].join(':'),
 			startKey = id,
-			endKey   = [projectId, entityId, formId].join(':'),
+			endKey   = ['input', projectId, entityId, formId].join(':'),
 			options  = {startkey: startKey, endkey: endKey, descending: true, limit: 2, include_docs: true},
 			Input    = this.modelClass;
 

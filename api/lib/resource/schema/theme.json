@@ -6,9 +6,18 @@
 	"required": [ "_id", "type", "name" ],
 
 	"properties": {
-		"_id":  { "$ref": "#/definitions/uuid" },
-		"_rev": { "$ref": "#/definitions/revision" },
-		"type": { "type": "string", "pattern": "^theme$" },
+		"_id": {
+			"type": "string",
+			"pattern": "^theme:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+		},
+		"_rev": {
+			"type": "string",
+			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
+		},
+		"type": {
+			"type": "string",
+			"pattern": "^theme$"
+		},
 		"name": {
 			"type": "object",
 			"additionalProperties": false,
@@ -17,16 +26,6 @@
 				"fr": { "type": "string", "minLength": 1 },
 				"es": { "type": "string", "minLength": 1 }
 			}
-		}
-	},
-	"definitions": {
-		"uuid": {
-			"type": "string",
-			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
-		},
-		"revision": {
-			"type": "string",
-			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
 		}
 	}
 }

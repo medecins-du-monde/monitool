@@ -45,8 +45,8 @@ export default class Input extends DbModel {
 		super(data, validate);
 
 		// check that id decomposition matches what's in the rest of document.
-		var parts = this._id.split(':');
-		if (parts.length !== 4 || parts[0] !== this.project || parts[1] !== this.entity || parts[2] !== this.form || parts[3] !== this.period)
+		let isValid = this._id === ['input', this.project, this.entity, this.form, this.period].join(':');
+		if (!isValid)
 			throw new Error('invalid_id');
 
 		// Check that timeslot is valid

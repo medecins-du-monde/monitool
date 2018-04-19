@@ -44,11 +44,11 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(id, done) {
 	var type = id.substring(0, id.indexOf(':'));
 
-	if (type === 'usr') {
+	if (type === 'user') {
 		let userPromise;
-		if (config.auth.providers.training && id === 'usr:' + config.auth.providers.training.account)
+		if (config.auth.providers.training && id === 'user:' + config.auth.providers.training.account)
 			userPromise = Promise.resolve(new User({
-				_id: 'usr:' + config.auth.providers.training.account,
+				_id: 'user:' + config.auth.providers.training.account,
 				type: 'user',
 				name: "Training account",
 				role: 'common'
@@ -59,7 +59,7 @@ passport.deserializeUser(function(id, done) {
 		userPromise
 			.then(function(user) {
 				// Upgrade user to administrator if specified in the configuration file.
-				if ('usr:' + config.auth.administrator === user._id)
+				if ('user:' + config.auth.administrator === user._id)
 					user.role = 'admin';
 
 				done(null, user);
@@ -95,7 +95,7 @@ if (config.auth.providers.azureAD) {
 		// Its the hook to cache the access/refresh tokens, post-process the Azure profile, etc.
 		function (accessToken, refreshToken, profile, done) {
 			try {
-				var userId = 'usr:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
+				var userId = 'user:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
 					domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
 				if (domain !== config.auth.providers.azureAD.domain)
@@ -201,7 +201,7 @@ if (config.auth.providers.training) {
 	passport.use('training_local', new LocalStrategy(
 		function(username, password, done) {
 			let trainingUser = new User({
-				_id: 'usr:' + config.auth.providers.training.account,
+				_id: 'user:' + config.auth.providers.training.account,
 				type: 'user',
 				name: "Training account",
 				role: 'common'

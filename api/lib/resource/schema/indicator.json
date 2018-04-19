@@ -4,20 +4,38 @@
 	"type": "object",
 	"additionalProperties": false,
 	"required": [
-		"_id", "type", "name", "description", "themes"
+		"_id",
+		"type",
+		"name",
+		"description",
+		"themes"
 	],
 	"properties": {
-		"_id": { "$ref": "#/definitions/uuid" },
-		"_rev": { "$ref": "#/definitions/revision" },
+		"_id": {
+			"type": "string",
+			"pattern": "^indicator:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+		},
+		"_rev": {
+			"type": "string",
+			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
+		},
+		"type": {
+			"type": "string",
+			"pattern": "^indicator$"
+		},
+
 		"description": { "$ref": "#/definitions/translated" },
 		"name": { "$ref": "#/definitions/translated_req" },
-		"type": { "type": "string", "pattern": "^indicator$" },
 		"themes": {
 			"type": "array",
 			"uniqueItems": true,
-			"items": { "$ref": "#/definitions/uuid" }
+			"items": {
+				"type": "string",
+				"pattern": "^theme:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+			}
 		}
 	},
+
 	"definitions": {
 		"translated_req": {
 			"type": "object",
@@ -37,15 +55,6 @@
 				"fr": { "type": "string" },
 				"es": { "type": "string" }
 			}
-		},
-
-		"uuid": {
-			"type": "string",
-			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
-		},
-		"revision": {
-			"type": "string",
-			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
 		}
 	}
 }

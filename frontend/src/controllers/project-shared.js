@@ -42,7 +42,7 @@ angular.module(
 		$scope.projects = $scope.myProjects;
 
 		$scope.createProject = function() {
-			$state.go('main.project.structure.basics', {projectId: uuid.v4()});
+			$state.go('main.project.structure.basics', {projectId: 'project:' + uuid.v4()});
 		};
 
 		$scope.open = function(project) {

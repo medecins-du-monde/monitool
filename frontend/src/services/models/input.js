@@ -32,8 +32,8 @@ angular
 
 				inputsDone.forEach(function(inputId) {
 					var splitted      = inputId.split(':'),
-						inputEntityId = splitted[1],
-						strPeriod     = splitted[3];
+						inputEntityId = splitted[3],
+						strPeriod     = splitted[5];
 
 					prj[strPeriod] = prj[strPeriod] || {};
 					prj[strPeriod][inputEntityId] = 'outofschedule';
@@ -80,14 +80,14 @@ angular
 				formId: formId,
 				period: period
 			}).$promise.then(function(result) {
-				var currentInputId = [project._id, entityId, formId, period].join(':');
+				var currentInputId = ['input', project._id, entityId, formId, period].join(':');
 
 				// both where found
-				if (result.length === 2) 
+				if (result.length === 2)
 					return { current: result[0], previous: result[1], isNew: false };
 
 				// only the current one was found
-				else if (result.length === 1 && result[0]._id === currentInputId) 
+				else if (result.length === 1 && result[0]._id === currentInputId)
 					return { current: result[0], previous: null, isNew: false };
 
 				var current = new Input({
@@ -99,7 +99,7 @@ angular
 				form.elements.forEach(function(element) {
 					var numFields = 1;
 					element.partitions.forEach(function(partition) { numFields *= partition.elements.length; });
-					
+
 					current.values[element.id] = new Array(numFields);
 					for (var i = 0; i < numFields; ++i)
 						current.values[element.id][i] = 0;

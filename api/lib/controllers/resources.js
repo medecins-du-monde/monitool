@@ -177,7 +177,7 @@ export default express.Router()
 				else
 					throw new Error('invalid_mode');
 
-				return ids.filter(id => visibleIds.indexOf(id.substring(0, 36)) !== -1);
+				return ids.filter(id => visibleIds.indexOf(id.substr(6, 44)) !== -1);
 			}
 			else {
 				let inputs;
@@ -246,10 +246,8 @@ export default express.Router()
 	 */
 	.delete('/input/:id', function(request, response) {
 		Promise.resolve().then(async () => {
-			const [project, input] = await Promise.all([
-				Project.storeInstance.get(request.params.id.split(':')[0]),
-				Input.storeInstance.get(request.params.id)
-			]);
+			const input = await Input.storeInstance.get(request.params.id);
+			const project = await Project.storeInstance.get(input.project);
 
 			// Check ACLs
 			var projectUser = project.getProjectUser(request.user),

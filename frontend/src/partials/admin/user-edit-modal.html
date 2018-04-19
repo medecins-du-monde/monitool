@@ -16,7 +16,7 @@
 			<label for="email-input" class="col-sm-2 control-label" translate="user.email"></label>
 			<div class="col-sm-10">
 				<p class="form-control-static">
-					{{user._id.substring(4)}}@medecinsdumonde.net
+					{{user._id.substring(5)}}@medecinsdumonde.net
 				</p>
 			</div>
 		</div>
@@ -42,10 +42,10 @@
 					<span ng-if="!toogleTable" translate="form.help.show"></span>
 					<span ng-if="toogleTable" translate="form.help.hide"></span>
 				</a>
-				
+
 				<div ng-show="toogleTable">
 					<br/><br/>
-					
+
 					<table class="table table-bordered table-stripped table-condensed">
 						<thead>
 							<tr>

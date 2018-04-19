@@ -21,8 +21,14 @@
 	],
 
 	"properties": {
-		"_id": { "$ref": "#/definitions/uuid" },
-		"_rev": { "$ref": "#/definitions/revision" },
+		"_id": {
+			"type": "string",
+			"pattern": "^project:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+		},
+		"_rev": {
+			"type": "string",
+			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
+		},
 		"type": { "type": "string", "pattern": "^project$" },
 		"country": { "type": "string", "minLength": 1 },
 		"name": { "type": "string", "minLength": 1 },
@@ -67,7 +73,7 @@
 						"required": ["type", "id", "role"],
 						"properties": {
 							"type": {"type": "string", "pattern": "^internal$"},
-							"id": {"type": "string", "pattern": "^usr:[a-z0-9\\.\\-\\_]+$"},
+							"id": {"type": "string", "pattern": "^user:[a-z0-9\\.\\-\\_]+$"},
 							"role": {"type": "string", "enum": ["owner", "read"]}
 						}
 					},
@@ -94,7 +100,7 @@
 						"required": ["type", "id", "role", "entities", "dataSources"],
 						"properties": {
 							"type": {"type": "string", "pattern": "^internal$"},
-							"id": {"type": "string", "pattern": "^usr:[a-z0-9\\.\\-\\_]+$"},
+							"id": {"type": "string", "pattern": "^user:[a-z0-9\\.\\-\\_]+$"},
 							"role": {"type": "string", "enum": ["owner", "input", "read"]},
 
 							"entities": {
@@ -145,7 +151,10 @@
 		"themes": {
 			"type": "array",
 			"uniqueItems": true,
-			"items": { "$ref": "#/definitions/uuid" }
+			"items": {
+				"type": "string",
+				"pattern": "^theme:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+			}
 		},
 
 		"logicalFrames": {
@@ -157,7 +166,7 @@
 			"type": "object",
 			"additionalProperties": false,
 			"patternProperties": {
-				"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$": {
+				"^indicator:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$": {
 					"$ref": "#/definitions/cc_indicator"
 				}
 			}
@@ -173,10 +182,6 @@
 		"uuid": {
 			"type": "string",
 			"pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
-		},
-		"revision": {
-			"type": "string",
-			"pattern": "^[0-9]+\\-[0-9a-f]{32}$"
 		},
 
 		"computation": {

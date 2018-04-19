@@ -91,7 +91,7 @@ angular
 
 		$scope.create = function() {
 			var theme = new Theme();
-			theme._id = uuid.v4();
+			theme._id = 'theme:' + uuid.v4();
 			theme.reset();
 
 			createModal(theme, true)
@@ -195,7 +195,7 @@ angular
 
 		$scope.create = function() {
 			var indicator = new Indicator();
-			indicator._id = uuid.v4();
+			indicator._id = 'indicator:' + uuid.v4();
 			indicator.reset();
 
 			createModal(indicator, true)
