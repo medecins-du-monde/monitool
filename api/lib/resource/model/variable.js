@@ -28,22 +28,6 @@ export default class Variable extends Model {
 	}
 
 	/**
-	 * Signature that changes when the storage of this variable changes.
-	 */
-	get signature() {
-		// the order of partition elements matters => to not sort!
-		return JSON.stringify(
-			this.partitions.map(function(partition) {
-				return [partition.id].concat(
-					partition.elements.map(function(partitionElement) {
-						return partitionElement.id;
-					})
-				);
-			})
-		);
-	}
-
-	/**
 	 * Number of fields this variable's storage.
 	 */
 	get numValues() {
