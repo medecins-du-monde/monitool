@@ -95,28 +95,30 @@
 		<tr>
 			<th style="width: 30px" class="noprint"></th>
 			<th translate="shared.name" style="min-width: 300px"></th>
+			<th translate="project.baseline" style="width: 60px"></th>
+			<th translate="project.target" style="width: 60px"></th>
 			<th ng-repeat="col in cols" style="min-width: 50px" title="{{col.title}}">{{col.name}}</th>
 		</tr>
 	</thead>
 	<tbody ng-if="!cubes">
 		<tr>
-			<td colspan="{{2 + cols.length}}">
+			<td colspan="{{4 + cols.length}}">
 				<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>
-				<span translate="shared.loading"></span>	
+				<span translate="shared.loading"></span>
 			</td>
 		</tr>
 	</tbody>
 	<tbody ng-repeat="(blockIndex, block) in blocks">
 		<tr ng-click="open[blockIndex] = !open[blockIndex]" style="cursor: pointer">
-			<th class="indent0" colspan="{{2 + cols.length}}">
+			<th class="indent0" colspan="{{4 + cols.length}}">
 				<i class="noprint" fa-open="open[blockIndex]"></i>
 				{{block.text}}
 			</th>
 		</tr>
-		
+
 		<tr ng-if="open[blockIndex] && !block.rows.length">
 			<td class="noprint"></td>
-			<td colspan="{{1 + cols.length}}" translate="project.reporting_empty"></td>
+			<td colspan="{{3 + cols.length}}" translate="project.reporting_empty"></td>
 		</tr>
 
 		<tr ng-repeat="row in block.rows" ng-if="open[blockIndex]">
@@ -129,11 +131,13 @@
 
 			</td>
 
-			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{1 + cols.length}}">{{row.text}}</th>
+			<th ng-if="row.type === 'header'" class="indent{{row.indent}}" colspan="{{3 + cols.length}}">{{row.text}}</th>
 
 			<td ng-if="row.type === 'data'" class="indent{{row.indent}}">
 				<i class="fa fa-arrow-circle-right" ng-if="row.isGroup"></i>
 				<label for="{{row.id}}" title="{{row.name}}">{{row.name|maxLength:50}}</label>
+				<!-- {{row}} -->
+
 				<div class="pull-right">
 					<div class="btn-toolbar">
 						<div class="btn-group btn-group-xs">
@@ -146,8 +150,10 @@
 						</div>
 					</div>
 				</div>
-
 			</td>
+
+			<td ng-if="row.type === 'data'" ng-class="{empty: row.baseline === null}"><span>{{row.baseline}}{{row.unit}}</span></td>
+			<td ng-if="row.type === 'data'" ng-class="{empty: row.target === null}"><span>{{row.target}}{{row.unit}}</span></td>
 
 			<td ng-repeat="col in row.cols track by $index" reporting-field></td>
 			<td ng-if="row.type === 'data' && !row.cols" colspan="{{cols.length}}" style="background-color: rgb(238, 238, 238);">{{row.message|translate}}</td>

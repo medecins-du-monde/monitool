@@ -194,10 +194,19 @@ angular
 			$scope.$watch('query', function(query) {
 				$scope.cols = mtReporting.getColumns($scope.query.groupBy, $scope.query.filters._start, $scope.query.filters._end);
 
-				if (query.type == 'variable')
+				if (query.type == 'variable') {
 					$scope.rows = mtReporting.computeVariableReporting(cubes, $scope.masterProject, $scope.query.element, $scope.query.groupBy, $scope.query.filters);
-				else
+
+					$scope.baseline = null;
+					$scope.target = null;
+					$scope.unit = null;
+				}
+				else {
 					$scope.rows = mtReporting.computeIndicatorReporting(cubes, $scope.masterProject, $scope.query.indicator, $scope.query.groupBy, $scope.query.filters);
+					$scope.baseline = $scope.rows[0].baseline;
+					$scope.target = $scope.rows[0].target;
+					$scope.unit = $scope.rows[0].unit;
+				}
 
 			}, true);
 		});
@@ -346,14 +355,20 @@ angular
 				var cube;
 				if (query.element.type == 'variable') {
 					cube = cubes[query.element.element.id];
+
+					// Dirty patch for colorization
 					$scope.colorization = null;
 					$scope.unit = null;
+
+					// Dirty patch to display baseline and target
+					$scope.baseline = $scope.target = null;
 				}
 				else {
 					var planning = query.element.indicator;
 
 					cube = new CompoundCube(planning.computation, cubes);
 
+					// Dirty patch for colorization
 					if (planning.colorize && planning.baseline !== null && planning.target !== null)
 						$scope.colorization = {baseline: planning.baseline, target: planning.target};
 					else
@@ -369,6 +384,10 @@ angular
 					}
 					else
 						$scope.unit = undefined;
+
+					// Dirty patch to display baseline and target
+					$scope.baseline = planning.baseline;
+					$scope.target = planning.target;
 				}
 
 				var cubeDimensions = $scope.query.colDimensions.concat($scope.query.rowDimensions),

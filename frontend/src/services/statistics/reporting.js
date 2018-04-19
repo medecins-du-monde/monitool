@@ -98,7 +98,17 @@ angular
 		this._makeActivityRow = function(cubes, indent, groupBy, viewFilters, columns, element) {
 			// Retrieve cube & create filter.
 			var cube = cubes[element.id],
-				row = {id: uuid.v4(), name: element.name, fullname: element.name, type: 'data', family: 'activity', indent: indent};
+				row = {
+					id: uuid.v4(),
+					name: element.name,
+					fullname: element.name,
+					type: 'data',
+					family: 'activity',
+					indent: indent,
+					colorize: false,
+					baseline: null,
+					target: null
+				};
 
 			// Handle invalid groupBy
 			if (groupBy == 'entity' && !cube.dimensionsById.entity)
@@ -132,11 +142,17 @@ angular
 
 
 		this._makeIndicatorRow = function(cubes, indent, groupBy, viewFilters, columns, planning) {
-			var row = {id: uuid.v4(), name: planning.display, fullname: planning.display, type: 'data', family: 'indicator', indent: indent};
-
-			// handle colorization
-			if (planning.colorize && planning.baseline !== null && planning.target !== null)
-				row.colorization = {baseline: planning.baseline, target: planning.target};
+			var row = {
+				id: uuid.v4(),
+				name: planning.display,
+				fullname: planning.display,
+				type: 'data',
+				family: 'indicator',
+				indent: indent,
+				colorize: planning.colorize,
+				baseline: planning.baseline,
+				target: planning.target
+			};
 
 			if (planning.computation === null)
 				row.message = 'project.indicator_computation_missing';

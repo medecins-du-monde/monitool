@@ -7,7 +7,7 @@
 
 <div class="panel panel-default">
 	<div class="panel-heading" ng-click="selectionOpen=!selectionOpen" style="cursor: pointer" ng-init="selectionOpen=true">
-		<i fa-open="selectionOpen"></i> 
+		<i fa-open="selectionOpen"></i>
 		<span translate="project.data_selection"></span>
 	</div>
 	<div class="panel-body" ng-if="selectionOpen">
@@ -91,11 +91,11 @@
 			<div class="form-group" ng-repeat="dimension in dimensions" ng-if="dimension.id != 'day' && dimension.id != 'month_week_sat' && dimension.id != 'month_week_sun' && dimension.id != 'month_week_mon' && dimension.id != 'week_sat' && dimension.id != 'week_sun' && dimension.id != 'week_mon' && dimension.id != 'month' && dimension.id != 'quarter' && dimension.id != 'semester' && dimension.id != 'year'">
 				<label for="{{dimension.id}}-input" class="col-sm-1 control-label">{{dimension.name|translate}}</label>
 				<div class="col-sm-11">
-					
+
 					<element-filter ng-model="query.filters[dimension.id]" elements="dimension.elements" groups="dimension.groups"></element-filter>
  				</div>
 			</div>
-			
+
 		</form>
 	</div>
 </div>
@@ -104,6 +104,11 @@
 	<i class="fa fa-download"></i>
 	<span translate="shared.download_table"></span>
 </button>
+
+<div>
+	<span ng-if="baseline !== null">Baseline: {{baseline}}{{unit}}</span>
+	<span ng-if="target !== null">Target: {{target}}{{unit}}</span>
+</div>
 
 <div style="clear: both"></div>
 

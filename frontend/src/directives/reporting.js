@@ -176,8 +176,8 @@ angular.module('monitool.directives.reporting', [])
 					else if (typeof value === "number") {
 						// Do we use colors?
 						var colorization;
-						if ($scope.row && $scope.row.colorization)
-							colorization = $scope.row.colorization;
+						if ($scope.row && $scope.row.colorize && $scope.row.baseline !== null && $scope.row.target !== null)
+							colorization = {baseline: $scope.row.baseline, target: $scope.row.target};
 						else if ($scope.colorization)
 							colorization = $scope.colorization;
 

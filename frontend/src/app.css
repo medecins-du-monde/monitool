@@ -713,3 +713,12 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   color: #555;
 
 }
+
+
+td.empty {
+  background-color: #eee;
+}
+
+td.empty > span {
+  display: none;
+}

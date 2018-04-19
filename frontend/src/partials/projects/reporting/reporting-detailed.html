@@ -120,6 +120,13 @@
 	<span translate="shared.download_table"></span>
 </button>
 
+<div>
+	<span ng-if="baseline !== null">Baseline: {{baseline}}{{unit}}</span>
+	<span ng-if="target !== null">Target: {{target}}{{unit}}</span>
+</div>
+
+<div style="clear: both"></div>
+
 <table id="reporting" class="table table-bordered table-condensed">
 	<thead>
 		<tr>
