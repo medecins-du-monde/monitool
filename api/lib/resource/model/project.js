@@ -154,82 +154,6 @@ export default class Project extends DbModel {
 	}
 
 	/**
-	 * Retrieve a partner account from its username.
-	 * This is used to update passwords
-	 */
-	getPartnerByUsername(username) {
-		return this.users.find(u => u.username === username);
-	}
-
-	/**
-	 * Take the previous version of the project, and copies all password hashes
-	 * from it (this allows not sending them to the client back and forth).
-	 * This is used when saving the project.
-	 */
-	_copyUnchangedPasswords(oldProject) {
-		this.users.forEach(function(user) {
-			if (user.type === 'partner') {
-				// retrieve old user.
-				var oldUser = oldProject.getPartnerByUsername(user.username);
-
-				// copy hash or raise error
-				if (user.password === null) {
-					if (oldUser)
-						user.password = oldUser.password;
-					else
-						throw new Error('invalid_data');
-				}
-			}
-		});
-	}
-
-	/**
-	 * Take the previous version of the project, and compute all updates
-	 * to inputs that are needed to deal with the structural changes of the forms.
-	 */
-	async _computeInputsUpdates(oldProject) {
-		var changedFormsIds = [];
-
-		// Get all forms that existed before, and changed since last time.
-		this.forms.forEach(function(newForm) {
-			var oldForm = oldProject.getDataSourceById(newForm.id);
-
-			if (oldForm && oldForm.signature !== newForm.signature)
-				changedFormsIds.push(newForm.id)
-		});
-
-		// Get all forms that were deleted.
-		oldProject.forms.forEach(function(oldForm) {
-			if (!this.getDataSourceById(oldForm.id))
-				changedFormsIds.push(oldForm.id);
-		}, this);
-
-		// Get all entities that were deleted
-		var deletedEntitiesIds = oldProject.entities
-			.filter(oe => !this.entities.find(nw => nw.id === oe.id))
-			.map(entity => entity.id);
-
-		const result = await Promise.all([
-			...changedFormsIds.map(dsId => Input.storeInstance.listByDataSource(this._id, dsId)),
-			...deletedEntitiesIds.map(eId => Input.storeInstance.listByEntity(this._id, eId))
-		])
-
-		let inputsById = {};
-
-		// there might be duplicates if an input was fetched because of
-		// both a datasource and an entity.
-		result.forEach(function(inputs) {
-			inputs.forEach(function(input) {
-				inputsById[input._id] = input;
-			});
-		});
-
-		let inputs = Object.keys(inputsById).map(id => inputsById[id]);
-		inputs.forEach(input => input.update(oldProject, this));
-		return inputs;
-	}
-
-	/**
 	 * Validate that project does not make references to indicators and themes that don't exist.
 	 */
 	async validateForeignKeys() {
@@ -253,22 +177,25 @@ export default class Project extends DbModel {
 	 * Save the project.
 	 *
 	 * This method makes many checks do deal with the fact that there are no foreign keys nor update method.
-	 * 	- validate that all foreign keys exist.
 	 *	- copy the passwords that were not changed for partners.
-	 *	- update all inputs that need a change (depending on structural changes in data sources).
+	 * 	- validate that all foreign keys exist.
 	 */
 	async save(skipChecks) {
 		// If we skip checks, because we know what we are doing, just delegate to parent class.
 		if (skipChecks)
 			return super.save(true);
 
-		// Before doing anything, check that the project is valid.
-		await this.validateForeignKeys();
-
-		// Get former project or null if missing.
-		let oldProject = null;
+		// Copy passwords from old project.
 		try {
-			oldProject = await Project.storeInstance.get(this._id);
+			let oldProject = await Project.storeInstance.get(this._id);
+
+			this.users.forEach(newUser => {
+				if (newUser.type !== 'partner' || newUser.password !== null)
+					return;
+
+				var oldUser = oldProject.users.find(u => u.username === newUser.username);
+				newUser.password = oldUser.password;
+			});
 		}
 		catch (error) {
 			// if we can't get former project for some other reason than "missing" we are done.
@@ -276,30 +203,7 @@ export default class Project extends DbModel {
 				throw error;
 		}
 
-		// Handle partner passwords & input structure
-		let documents = [this];
-
-		if (oldProject) {
-			// Copy old passwords from the old project
-			this._copyUnchangedPasswords(oldProject);
-
-			// If we are updating the project, we need to update related inputs.
-			documents = documents.concat(await this._computeInputsUpdates(oldProject));
-		}
-
-		// FIXME
-		// Bulk operations are not really atomic in a couchdb database.
-		// if someone else is playing with the database at the same time, we might leave the database in an inconsistent state.
-		// This can be easily fixed http://stackoverflow.com/questions/29491618/transaction-like-update-of-two-documents-using-couchdb
-		const bulkResults = await this._db.callBulk({docs: documents});
-
-		// bulk updates don't give us the whole document
-		var projectResult = bulkResults.find(res => res.id === this._id);
-		if (projectResult.error)
-			throw new Error(projectResult.error);
-
-		this._rev = projectResult.rev;
-		return this; // return updated document.
+		return super.save(false);
 	}
 
 	toAPI() {

@@ -17,6 +17,7 @@
 
 import Store from './store';
 import Input from '../model/input';
+import Project from '../model/project';
 
 export default class InputStore extends Store {
 
@@ -38,10 +39,11 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
 			throw new Error('missing_parameter');
 
-		var view = 'inputs_by_project_form_date',
-			opt = {startkey: [projectId, formId], endkey: [projectId, formId, {}]};
+		const result = await this._db.callView(
+			'inputs_by_project_form_date',
+			{startkey: [projectId, formId], endkey: [projectId, formId, {}]}
+		);
 
-		const result = await this._db.callView(view, opt);
 		return result.rows.map(item => item.id);
 	}
 
@@ -53,66 +55,88 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string' || typeof entityId !== 'string')
 			throw new Error('missing_parameter');
 
-		var view = 'inputs_by_project_entity_date',
-			opt = {startkey: [projectId, entityId], endkey: [projectId, entityId, {}]};
+		const result = await this._db.callView(
+			'inputs_by_project_entity_date',
+			{startkey: [projectId, entityId], endkey: [projectId, entityId, {}]}
+		);
 
-		const result = await this._db.callView(view, opt);
 		return result.rows.map(item => item.id);
+	}
+
+	async list(update=false) {
+		const inputs = await super.list();
+
+		if (update) {
+			const projects = await Project.storeInstance.list();
+
+			inputs.forEach(input => {
+				const project = projects.find(p => p._id === input.project);
+				const dataSource = project.getDataSourceById(input.form);
+
+				input.update(dataSource.structure)
+			});
+		}
+
+		return inputs;
 	}
 
 	/**
 	 * Retrieve all inputs of a given project
 	 * Used to generate cubes (for project reporting), or fetch partner inputs.
 	 */
-	async listByProject(projectId) {
+	async listByProject(projectId, update=false) {
 		if (typeof projectId !== 'string')
 			throw new Error('missing_parameter');
 
-		var opt = {
+		const result = await this._db.callList({
 			include_docs: true,
 			startkey: 'input:' + projectId + ':!',
-			endkey: 'input:' + projectId + ':~'};
+			endkey: 'input:' + projectId + ':~'
+		});
 
-		const result = await this._db.callList(opt);
-		return result.rows.map(row => new Input(row.doc));
+		const inputs = result.rows.map(row => new Input(row.doc));
+		if (update) {
+			const project = await Project.storeInstance.get(projectId);
+
+			inputs.forEach(input => {
+				const dataSource = project.getDataSourceById(input.form);
+				input.update(dataSource.structure)
+			});
+		}
+
+		return inputs;
 	}
 
 	/**
 	 * Retrieve all inputs of a given data source
-	 * Used to generate cubes (for indicator reporting), or update inputs when project is mutated.
+	 * Used to generate cubes (for indicator reporting)
 	 */
-	async listByDataSource(projectId, formId) {
+	async listByDataSource(projectId, formId, update=false) {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
 			throw new Error('missing_parameter');
 
-		var view = 'inputs_by_project_form_date',
-			opt = {include_docs: true, startkey: [projectId, formId], endkey: [projectId, formId, {}]};
+		const result = await this._db.callView(
+			'inputs_by_project_form_date',
+			{include_docs: true, startkey: [projectId, formId], endkey: [projectId, formId, {}]}
+		);
 
-		const result = await this._db.callView(view, opt);
-		return result.rows.map(row => new Input(row.doc));
-	}
+		const inputs = result.rows.map(row => new Input(row.doc));
 
-	/**
-	 * Retrieve all input that are linked to a particular entity.
-	 * Used to delete inputs when matching entity is deleted.
-	 */
-	async listByEntity(projectId, entityId) {
-		if (typeof projectId !== 'string' || typeof entityId !== 'string')
-			throw new Error('missing_parameter');
+		if (update) {
+			const project = await Project.storeInstance.get(projectId);
+			const dataSource = project.getDataSourceById(formId);
 
-		var view = 'inputs_by_project_entity_date',
-			opt = {include_docs: true, startkey: [projectId, entityId], endkey: [projectId, entityId, {}]},
-			Input = this.modelClass;
+			inputs.forEach(input => input.update(dataSource.structure));
+		}
 
-		const result = await this._db.callView(view, opt);
-		return result.rows.map(row => new Input(row.doc));
+		return inputs;
 	}
 
 	/**
 	 * Retrieve a given input, and the previous one for the same form and entity,
 	 * This is used to populate the input page in client.
 	 */
-	async getLasts(projectId, formId, entityId, period) {
+	async getLasts(projectId, formId, entityId, period, update=false) {
 		if (typeof projectId !== 'string' || typeof formId !== 'string' || typeof entityId !== 'string' || typeof period !== 'string')
 			throw new Error('missing_parameter');
 
@@ -123,22 +147,32 @@ export default class InputStore extends Store {
 			Input    = this.modelClass;
 
 		const result = await this._db.callList(options);
+		let inputs;
 
 		if (result.rows.length === 0)
-			return [];
+			inputs = [];
 
 		else if (result.rows.length === 1)
-			return [new Input(result.rows[0].doc)];
+			inputs = [new Input(result.rows[0].doc)];
 
 		else if (result.rows.length === 2) {
 			var first = new Input(result.rows[0].doc);
 			if (first.period === period)
-				return [first, new Input(result.rows[1].doc)];
+				inputs = [first, new Input(result.rows[1].doc)];
 			else
-				return [first];
+				inputs = [first];
 		}
 		else
 			throw new Error('couchdb did not respect limit=2');
+
+		if (update) {
+			const project = await Project.storeInstance.get(projectId);
+			const dataSource = project.getDataSourceById(formId);
+
+			inputs.forEach(input => input.update(dataSource.structure));
+		}
+
+		return inputs;
 	}
 }
 

@@ -98,14 +98,12 @@ export default express.Router()
 				throw new Error('id_mismatch');
 
 			// Get old project
-			let oldProject;
+			let oldProject = null;
 			try {
 				oldProject = await Project.storeInstance.get(request.params.id);
 			}
 			catch (error) {
-				if (error.message === 'missing')
-					oldProject = null;
-				else
+				if (error.message !== 'missing')
 					throw error;
 			}
 
@@ -182,15 +180,17 @@ export default express.Router()
 			else {
 				let inputs;
 				if (q.mode === 'current+last')
-					inputs = await Input.storeInstance.getLasts(q.projectId, q.formId, q.entityId, q.period);
+					inputs = await Input.storeInstance.getLasts(q.projectId, q.formId, q.entityId, q.period, true);
 				else if (q.mode === undefined && typeof q.projectId === 'string')
-					inputs = await Input.storeInstance.listByProject(q.projectId);
+					inputs = await Input.storeInstance.listByProject(q.projectId, true);
 				else if (q.mode === undefined)
-					inputs = await Input.storeInstance.list();
+					inputs = await Input.storeInstance.list(true);
 				else
 					throw new Error('invalid_mode');
 
-				return inputs.filter(input => visibleIds.indexOf(input.project) !== -1);
+				return inputs
+					.filter(input => visibleIds.indexOf(input.project) !== -1)
+					.map(input => input.toAPI());
 			}
 		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
@@ -202,11 +202,16 @@ export default express.Router()
 		Promise.resolve().then(async () => {
 			const input = await Input.storeInstance.get(request.params.id);
 
+			// Update the input before sending
+			const project = await Project.storeInstance.get(input.project);
+			input.update(project.getDataSourceById(input.form).structure);
+
+			// Check if user is allowed (lazy way).
 			const visibleIds = await Project.storeInstance.listVisibleIds(request.user);
 			if (visibleIds.indexOf(input.project) === -1)
 				throw new Error('forbidden');
 
-			return input;
+			return input.toAPI();
 		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 

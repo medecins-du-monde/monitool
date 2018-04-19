@@ -55,6 +55,12 @@ export default class DataSource extends Model {
 		);
 	}
 
+	get structure() {
+		let s = {};
+		this.elements.forEach(element => s[element.id] = element.structure);
+		return s;
+	}
+
 	/**
 	 * Retrieve a variable by id
 	 */

@@ -18,7 +18,6 @@
 
 import validator from 'is-my-json-valid';
 import Cube from '../../olap/cube';
-import Variable from './variable';
 import Dimension from '../../olap/dimension';
 import TimeSlot from '../../olap/time-slot';
 import InputStore from '../store/input';
@@ -55,71 +54,87 @@ export default class Input extends DbModel {
 	}
 
 	/**
+	 * When a project changes, update the content of this input's values.
+	 */
+	update(newDsStructure) {
+		var newValues = {};
+
+		for (let variableId in newDsStructure) {
+			const oldStructure = this.structure[variableId];
+			const newStructure = newDsStructure[variableId];
+
+			if (!oldStructure)
+				newValues[variableId] = this._createBlankRecord(newStructure);
+
+			else if (JSON.stringify(oldStructure) !== JSON.stringify(newStructure))
+				newValues[variableId] = this._migrateRecord(oldStructure, newStructure, this.values[variableId]);
+
+			else
+				newValues[variableId] = this.values[variableId];
+		}
+
+		this.values = newValues;
+	}
+
+	_createBlankRecord(newStructure) {
+		const newLength = newStructure.reduce((m, p) => m * p.items.length, 1);
+		const newValues = new Array(newLength);
+		newValues.fill(0);
+
+		return newValues;
+	}
+
+	/**
 	 * Compute the new value of an input variable according to the changes that were made
 	 * in the partitions of a variable.
 	 */
-	_computeUpdatedValuesKey(oldVariable, newVariable) {
-		// Result will be an array of size numValues
-		let oldValues = this.values[newVariable.id],
-			newValues = new Array(newVariable.numValues);
+	_migrateRecord(oldStructure, newStructure, oldValues) {
+		const newLength = newStructure.reduce((m, p) => m * p.items.length, 1);
+		const newValues = new Array(newLength);
 
-		// If the variable did not exist before, fill with zeros.
-		if (!oldVariable) {
-			for (let fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex)
-				newValues[fieldIndex] = 0;
+		//////////////
+		// Step 1: Start by adding zero until we have all elements of newStructure in the old one.
+		//////////////
+
+		// Search for new partitions.
+		for (let i = 0; i < newStructure.length; ++i) {
+			let newPartition = newStructure[i];
+
+			// This partition already existed in the past, we can skip it.
+			if (!oldStructure.find(p => p.id === newPartition.id)) {
+				// Unshift the partition, and put zeros in oldValues to have to good length.
+				oldStructure.unshift(newPartition);
+				let newLength = oldValues.length * newPartition.items.length;
+				while (oldValues.length < newLength)
+					oldValues.push(0);
+			}
 		}
-		// If the variable changed, recompute.
-		else {
-			// Search for new partitions.
-			var newPartitions = newVariable.partitions.filter(function(nvp) {
-				return !oldVariable.partitions.find(ovp => ovp.id === nvp.id);
-			});
 
-			// partitions were created, let's handle this first.
-			if (newPartitions.length) {
-				// we create an intermediary variable with the new partitions.
-				oldVariable = new Variable(JSON.parse(JSON.stringify(oldVariable)));
-				oldValues = oldValues.slice();
+		//////////////
+		// Step 2: We'll now fill a blank Array from the data in oldValues using a cube.
+		//////////////
 
-				newPartitions.forEach(function(newPartition) {
-					oldVariable.partitions.unshift(newPartition);
+		// Create an olap cube from the old values.
+		let dimensions = oldStructure.map(p => new Dimension(p.id, p.items, p.aggregation)),
+			cube = new Cube('someid', dimensions, [], oldValues);
 
-					let newLength = oldValues.length * newPartition.elements.length;
-					while (oldValues.length < newLength)
-						oldValues.push(0);
-				});
+		// Fill the new values from the cube.
+		for (let fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex) {
+			// Build a filter targeting this specific value.
+			let peIds = this._computePartitionElementIds(newStructure, fieldIndex),
+				filter = {};
+
+			for (let i = 0; i < newStructure.length; ++i)
+				filter[newStructure[i].id] = [peIds[i]];
+
+			// Try to retrieve the value from the cube.
+			try {
+				newValues[fieldIndex] = cube.query([], filter);
 			}
-			else {
-				// nothing in this case.
-				// - Partition removal, or partition element removal will be handled
-				//   natively by the cube.
-				// - partition element add will be detected by catching exception when
-				//   querying the cube.
-			}
-
-			// Create an olap cube from the old values.
-			let dimensions = oldVariable.partitions.map(p => Dimension.createPartition(p)),
-				cube = new Cube(oldVariable.id, dimensions, [], oldValues);
-
-			// Fill the new values from the cube.
-			for (let fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex) {
-				// Build a filter targeting this specific value.
-				let peIds = newVariable.computePartitionElementIds(fieldIndex),
-					filter = {};
-
-				for (let i = 0; i < newVariable.partitions.length; ++i)
-					filter[newVariable.partitions[i].id] = [peIds[i]];
-
-				// Try to retrieve the value from the cube.
-				try {
-					newValues[fieldIndex] = cube.query([], filter);
-				}
-
-				// The cube raised an error, this means that we asked for an inexistent
-				// partitionElementId in the cube (which is made from former data).
-				catch (e) {
-					newValues[fieldIndex] = 0;
-				}
+			// The cube raised an error, this means that we asked for an inexistent
+			// partitionElementId in the cube (which is made from former data).
+			catch (e) {
+				newValues[fieldIndex] = 0;
 			}
 		}
 
@@ -127,46 +142,25 @@ export default class Input extends DbModel {
 	}
 
 	/**
-	 * When a project changes, update the content of this input's values.
+	 * Convert an index in the storage array to a list of partition elements ids.
+	 * 232 => ['8655ac1c-2c43-43f6-b4d0-177ad2d3eb8e', '1847b479-bc08-4ced-9fc3-a569b168a764']
 	 */
-	update(oldProject, newProject) {
-		let newDataSource = newProject.getDataSourceById(this.form),
-			newEntity     = newProject.getEntityById(this.entity);
+	_computePartitionElementIds(structure, fieldIndex) {
+		var numPartitions = structure.length,
+			partitionElementIds = new Array(numPartitions);
 
-		// The data source or entity was deleted, we can delete the input as well.
-		if (!newDataSource || !newEntity) {
-			this._deleted = true;
-			delete this.type;
-			delete this.values;
-			delete this.project;
-			delete this.entity;
-			delete this.form;
-			delete this.period;
+		if (fieldIndex < 0)
+			throw new Error('Invalid field index (negative)')
 
-			return true; // true <=> input was modified
+		for (var i = numPartitions - 1; i >= 0; --i) {
+			partitionElementIds[i] = structure[i].items[fieldIndex % structure[i].items.length];
+			fieldIndex = Math.floor(fieldIndex / structure[i].items.length);
 		}
 
-		// No update is needed: the signature of the datasource did not change.
-		var oldDataSource = oldProject.getDataSourceById(this.form);
-		if (oldDataSource.signature === newDataSource.signature)
-			return false;
+		if (fieldIndex !== 0)
+			throw new Error('Invalid field index (too large)')
 
-		// We need to update the values.
-		var newInputValues = {};
-
-		newDataSource.elements.forEach(function(newVariable) {
-			var oldVariable = oldDataSource.getVariableById(newVariable.id);
-
-			// Update only values that changed.
-			if (!oldVariable || oldVariable.signature !== newVariable.signature)
-				newInputValues[newVariable.id] = this._computeUpdatedValuesKey(oldVariable, newVariable);
-			else
-				newInputValues[newVariable.id] = this.values[newVariable.id];
-		}, this);
-
-		this.values = newInputValues;
-
-		return true; // true <=> input was modified
+		return partitionElementIds;
 	}
 
 	/**
@@ -174,8 +168,9 @@ export default class Input extends DbModel {
 	 * We don't check for valid periodicity and entity because the client supports having inputs that are "out of calendar".
 	 * This allows not loosing data when we update the periodicity of a data source but will be removed.
 	 */
-	async validateForeignKeys() {
-		const project = await Project.storeInstance.get(this.project);
+	async validateForeignKeys(project=null) {
+		if (!project)
+			project = await Project.storeInstance.get(this.project);
 
 		var errors = [];
 
@@ -212,6 +207,23 @@ export default class Input extends DbModel {
 			exc.detail = errors;
 			throw exc;
 		}
+	}
+
+	toAPI() {
+		let result = super.toJSON();
+		delete result.structure;
+		return result;
+	}
+
+	async save(skipChecks) {
+		if (skipChecks)
+			return super.save(true);
+
+		const project = await Project.storeInstance.get(this.project);
+		await this.validateForeignKeys(project);
+		this.structure = project.getDataSourceById(this.form).structure;
+
+		return super.save(true);
 	}
 }
 

@@ -51,6 +51,9 @@
 					"minItems": 1
 				}
 			}
+		},
+		"structure": {
+			"type": "object"
 		}
 	}
 }

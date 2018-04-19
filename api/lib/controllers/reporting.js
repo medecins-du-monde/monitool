@@ -45,7 +45,7 @@ export default express.Router()
 			else {
 				const [project, inputs] = await Promise.all([
 					Project.storeInstance.get(request.params.id),
-					Input.storeInstance.listByProject(request.params.id)
+					Input.storeInstance.listByProject(request.params.id, true)
 				]);
 
 				var reporting = JSON.stringify({
@@ -87,7 +87,7 @@ export default express.Router()
 			const inputsByProject = await Promise.all(
 				projects.map(async function(project) {
 					const inputsByDataSource = await Promise.all(
-						project.forms.map(form => Input.storeInstance.listByDataSource(project._id, form.id))
+						project.forms.map(form => Input.storeInstance.listByDataSource(project._id, form.id, true))
 					);
 
 					return inputsByDataSource.reduce((memo, arr) => memo.concat(arr), []);

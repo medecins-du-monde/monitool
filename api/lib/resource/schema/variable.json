@@ -18,7 +18,7 @@
 				"properties": {
 					"id": { "$ref": "#/definitions/uuid" },
 					"name": { "type": "string", "minLength": 1 },
-					"aggregation": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
+					"aggregation": { "type": "string", "enum": ["sum", "average", "highest", "lowest", "last"] },
 					"elements": {
 						"type": "array",
 						"items": {
