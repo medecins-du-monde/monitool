@@ -20,6 +20,93 @@ import Project from '../model/project';
 import jsonpatch from 'fast-json-patch';
 
 
+var hashFunction = function(obj) {
+	if (typeof obj === 'string')
+		return obj;
+	else
+		return obj.id || obj.username || obj.display || obj.name;
+};
+
+/**
+ * Compare two arrays of objects, and create remove, add and move operations
+ * to patch from the first to the second.
+ */
+var compareArray = function(before, after, changes, prefix) {
+	var beforeIds = before.map(hashFunction),
+		afterIds = after.map(hashFunction);
+
+	// if the hash function is not working, DO NOT TRY
+	// jsonpatch will take over
+	if (beforeIds.indexOf(undefined) !== -1 || afterIds.indexOf(undefined) !== -1)
+		return;
+
+	// start by removing items
+	for (var beforeIndex = 0; beforeIndex < beforeIds.length; ++beforeIndex) {
+		var id = beforeIds[beforeIndex], afterIndex = afterIds.indexOf(id);
+
+		if (afterIndex === -1) {
+			// element was removed
+			beforeIds.splice(beforeIndex, 1);
+			before.splice(beforeIndex, 1);
+			changes.push({op: 'remove', path: prefix + beforeIndex});
+			beforeIndex--; // we need to recheck the same place in the table.
+		}
+	}
+
+	// add missing items at the end
+	for (var afterIndex = 0; afterIndex < afterIds.length; ++afterIndex) {
+		var id = afterIds[afterIndex], beforeIndex = beforeIds.indexOf(id);
+
+		if (beforeIndex === -1) {
+			// element was added
+			beforeIds.push(id);
+			before.push(after[afterIndex]);
+			changes.push({op: 'add', path: prefix + beforeIds.length, value: after[afterIndex]});
+		}
+	}
+
+	// reorder items
+	for (var afterIndex = 0; afterIndex < afterIds.length; ++afterIndex) {
+		var id = afterIds[afterIndex], beforeIndex = beforeIds.indexOf(id);
+
+		if (afterIndex !== beforeIndex) {
+			// vire l'item de before
+			var item = before.splice(beforeIndex, 1)[0];
+			beforeIds.splice(beforeIndex, 1);
+
+			// le remet au bon endroit
+			before.splice(afterIndex, 0, item);
+			beforeIds.splice(afterIndex, 0, id);
+			changes.push({op: 'move', from: prefix + beforeIndex, path: prefix + afterIndex})
+		}
+	}
+};
+
+
+var compareRec = function(before, after, changes, prefix='/') {
+	if (Array.isArray(before) && Array.isArray(after)) {
+		compareArray(before, after, changes, prefix);
+
+		for (var i = 0; i < before.length; ++i)
+			compareRec(before[i], after[i], changes, prefix + i + '/')
+	}
+	else if (typeof before === 'object' && typeof after === 'object') {
+		for (var key in before)
+			if (after[key])
+				compareRec(before[key], after[key], changes, prefix + key + '/');
+	}
+};
+
+var compare = function(before, after) {
+	before = JSON.parse(JSON.stringify(before)); // clone
+
+	let moves = [];
+	compareRec(before, after, moves, '/');
+
+	return moves.concat(jsonpatch.compare(before, after));
+};
+
+
 export default class ProjectStore extends Store {
 
 	get modelString() {
@@ -81,7 +168,8 @@ export default class ProjectStore extends Store {
 				diffs.push({
 					time: time,
 					user: user,
-					backwards: jsonpatch.compare(revisions.rows[i - 1].doc, doc)
+					backwards: compare(revisions.rows[i - 1].doc, doc),
+					forwards: compare(doc, revisions.rows[i - 1].doc)
 				});
 		}
 

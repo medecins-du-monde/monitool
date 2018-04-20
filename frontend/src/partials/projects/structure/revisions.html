@@ -5,7 +5,7 @@
 	<li class="active" translate="project.revisions"></li>
 </ol>
 
-<div class="alert alert-info" translate="project.revisions_info"></div>
+<div class="alert alert-info" translate="project.revision_info"></div>
 
 <legend translate="project.revisions"></legend>
 
@@ -14,24 +14,32 @@
 		<tr>
 			<th style="width: 15%" translate="project.revision_datetime"></th>
 			<th translate="project.revision_changes"></th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="revision in revisions">
+		<tr ng-repeat="(revIndex, revision) in revisions">
 			<td>
 				{{::revision.time|date:'medium'}}<br/>
 				{{::revision.user|formatUser}}
 			</td>
 			<td ng-bind-html="::revision|humanizePatch"></td>
+			<td>
+				<a
+					class="btn btn-xxs"
+					ng-class="{'btn-default': revIndex != selectedIndex, 'btn-primary': revIndex == selectedIndex}"
+					ng-click="restore(revIndex)"
+					translate="project.revision_restore"></a>
+			</td>
 		</tr>
 		<tr ng-if="::!revisions.length">
-			<td style="text-align: center" colspan="2" translate="project.revisions_none"></td>
+			<td style="text-align: center" colspan="3" translate="project.revision_none"></td>
 		</tr>
 	</tbody>
 	<tfoot>
 		<tr ng-if="revisions.length && !finished">
-			<td style="text-align: center" colspan="2">
-				<a ng-click="showMore()" translate="project.show_more_revisions"></a>
+			<td style="text-align: center" colspan="3">
+				<a ng-click="showMore()" translate="project.revision_show_more"></a>
 			</td>
 		</tr>
 	</tfoot>

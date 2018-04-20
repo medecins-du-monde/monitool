@@ -245,7 +245,7 @@ var FRENCH_TRANSLATION = {
 	project: {
 
 		revisions: "Historique",
-		revisions_info: "L'historique des modifications vous permet de consulter la liste des modifications faites sur la structure de votre projet.",
+		revision_info: "L'historique des modifications vous permet de consulter la liste des modifications faites sur la structure de votre projet.",
 
 		history: {
 			name_replace: "Renomme le project de <code>{{before}}</code> vers <code>{{after}}</code>",
@@ -331,6 +331,8 @@ var FRENCH_TRANSLATION = {
 			logicalFrames_remove: "Supprime le cadre logique <code>{{item.name}}</code>",
 			logicalFrames_name_replace: "Renomme le cadre logique <code>{{before}}</code> en <code>{{after}}</code>",
 			logicalFrames_goal_replace: "Change l'objectif général <code>{{before}}</code> en <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
+			logicalFrames_start_replace: "Change la date de début <code>{{before}}</code> en <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
+			logicalFrames_end_replace: "Change la date de fin <code>{{before}}</code> en <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
 
 			logicalFrames_purposes_add: "Ajoute l'objectif spécifique <code>{{item.description}}</code> au cadre logique <code>{{logicalFrame.name}}</code>",
 			logicalFrames_purposes_move: "Reordonne les objectifs spécifiques du cadre logique <code>{{logicalFrame.name}}</code>",

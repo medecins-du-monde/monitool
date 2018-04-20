@@ -703,17 +703,18 @@ angular
 	})
 
 
-	.controller('ProjectRevisions', function($scope, Revision, revisions, projectCompare) {
+	.controller('ProjectRevisions', function($scope, Revision, revisions) {
 		// Note to self: this has nothing to do in the controller.
-		var recomputeRevision = function() {
+		var recomputeRevision = function(fromIndex) {
 			// Complete the information by computing afterState, beforeState, and forward patches.
-			for (var i = 0; i < $scope.revisions.length; ++i) {
+			for (var i = fromIndex; i < $scope.revisions.length; ++i) {
 				// Compute before and after state
-				$scope.revisions[i].after = i === 0 ? JSON.parse(angular.toJson($scope.masterProject)) : $scope.revisions[i - 1].before;
-				$scope.revisions[i].before = jsonpatch.applyPatch(jsonpatch.deepClone($scope.revisions[i].after), $scope.revisions[i].backwards).newDocument;
+				$scope.revisions[i].after = i === 0 ? $scope.masterProject : $scope.revisions[i - 1].before;
 
-				// Compute forwardPatch (needed to compute a human readable diff).
-				$scope.revisions[i].forwards = projectCompare($scope.revisions[i].before, $scope.revisions[i].after);
+				$scope.revisions[i].before = jsonpatch.applyPatch(
+					jsonpatch.deepClone($scope.revisions[i].after),
+					$scope.revisions[i].backwards
+				).newDocument;
 			}
 		};
 
@@ -723,7 +724,7 @@ angular
 		$scope.revisions = revisions;
 		$scope.finished = revisions.length < pageSize;
 
-		recomputeRevision();
+		recomputeRevision(currentOffset);
 
 		$scope.showMore = function() {
 			currentOffset = currentOffset + pageSize;
@@ -731,8 +732,15 @@ angular
 				$scope.finished = newRevisions.length < pageSize;
 
 				$scope.revisions = $scope.revisions.concat(newRevisions);
-				recomputeRevision();
+				recomputeRevision(currentOffset);
 			});
+		};
+
+		$scope.restore = function(index) {
+			$scope.selectedIndex = index;
+			var project = $scope.revisions[index].before;
+			for (var key in project)
+				$scope.editableProject[key] = project[key];
 		};
 	})
 
