@@ -27,7 +27,8 @@
     "@bower_components/moment": "moment/moment#^2.13.0",
     "@bower_components/numbro": "BenjaminVanRyseghem/numbro#^1.8.0",
     "@bower_components/pikaday": "dbushell/Pikaday#^1.4.0",
-    "@bower_components/zeroclipboard": "zeroclipboard/zeroclipboard#^2.2.0"
+    "@bower_components/zeroclipboard": "zeroclipboard/zeroclipboard#^2.2.0",
+    "fast-json-patch": "^2.0.6"
   },
   "devDependencies": {
     "del": "x",

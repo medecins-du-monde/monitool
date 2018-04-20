@@ -33,6 +33,7 @@ var files = {
 		"node_modules/@bower_components/angular-translate-storage-local/angular-translate-storage-local.min.js",
 		"node_modules/@bower_components/d3/d3.min.js",
 		"node_modules/@bower_components/c3/c3.min.js",
+		"node_modules/fast-json-patch/dist/fast-json-patch.min.js",
 		"node_modules/@bower_components/handsontable/dist/handsontable.full.min.js",
 		"node_modules/@bower_components/Sortable/Sortable.min.js",
 		"node_modules/@bower_components/Sortable/ng-sortable.js"

@@ -701,3 +701,19 @@ angular
 		$scope.delete = function() { $uibModalInstance.close(null); };
 		$scope.cancel = function() { $uibModalInstance.dismiss(); };
 	})
+
+
+	.controller('ProjectRevisions', function($scope, revisions, projectCompare) {
+		// Complete the information by computing afterState, beforeState, and forward patches.
+		for (var i = 0; i < revisions.length; ++i) {
+			// Compute before and after state
+			revisions[i].after = i === 0 ? JSON.parse(angular.toJson($scope.masterProject)) : revisions[i - 1].before;
+			revisions[i].before = jsonpatch.applyPatch(jsonpatch.deepClone(revisions[i].after), revisions[i].backwards).newDocument;
+
+			// Compute forwardPatch (needed to compute a human readable diff).
+			revisions[i].forwards = projectCompare(revisions[i].before, revisions[i].after);
+		}
+
+		$scope.revisions = revisions;
+	})
+

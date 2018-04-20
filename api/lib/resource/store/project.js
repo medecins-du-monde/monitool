@@ -17,6 +17,8 @@
 
 import Store from './store';
 import Project from '../model/project';
+import jsonpatch from 'fast-json-patch';
+
 
 export default class ProjectStore extends Store {
 
@@ -26,6 +28,48 @@ export default class ProjectStore extends Store {
 
 	get modelClass() {
 		return Project;
+	}
+
+	async listRevisions(projectId, offset, limit) {
+		if (typeof projectId !== 'string')
+			throw new Error('missing_parameter');
+
+		if (Number.isNaN(offset * 1))
+			offset = 0;
+
+		if (Number.isNaN(limit * 1))
+			limit = 20;
+
+		let [project, revisions] = await Promise.all([
+			this.get(projectId),
+			this._db.callList({
+				include_docs: true,
+				startkey: 'rev:' + projectId + ':9999999999999999',
+				endkey: 'rev:' + projectId + ':0000000000000000',
+				descending: true
+			})
+		]);
+
+		let editionTimes = revisions.rows.map(row => new Date(parseInt(row.doc._id.substr(-16))));
+
+		revisions = revisions.rows.map(row => {
+			row.doc._id = project._id;
+			row.doc._rev = project._rev;
+			row.doc.type = project.type;
+			return row.doc;
+		});
+		revisions.unshift(project);
+
+
+
+		// handle offset and limit???
+
+
+		let diffs = [];
+		for (let i = 0; i < revisions.length - 1; ++i)
+			diffs.push({time: editionTimes[i], backwards: jsonpatch.compare(revisions[i], revisions[i + 1])});
+
+		return diffs;
 	}
 
 	async listVisibleIds(user) {

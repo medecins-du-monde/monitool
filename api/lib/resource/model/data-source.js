@@ -35,7 +35,6 @@ export default class DataSource extends Model {
 				throw new Error('invalid_data');
 		});
 
-		this._project = project;
 		this.elements = this.elements.map(el => new Variable(el));
 	}
 

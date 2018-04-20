@@ -28,6 +28,7 @@
     "cookie-parser": "x",
     "express": "x",
     "express-session": "x",
+    "fast-json-patch": "^2.0.6",
     "is-my-json-valid": "x",
     "memory-cache": "^0.1.6",
     "nano": "x",

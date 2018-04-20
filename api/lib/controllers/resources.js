@@ -78,7 +78,7 @@ export default express.Router()
 	 */
 	.get('/project/:id', function(request, response) {
 		Promise.resolve().then(async () => {
-			let project = await Project.storeInstance.get(request.params.id);
+			const project = await Project.storeInstance.get(request.params.id);
 
 			const visibleIds = await Project.storeInstance.listVisibleIds(request.user);
 			if (visibleIds.indexOf(request.params.id) === -1)
@@ -87,6 +87,22 @@ export default express.Router()
 			return project.toAPI();
 		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
+
+	/**
+	 * Retrieve one project
+	 */
+	.get('/project/:id/revisions', function(request, response) {
+		Promise.resolve().then(async () => {
+			const revisions = await Project.storeInstance.listRevisions(request.params.id, request.query.offset, request.query.limit);
+
+			const visibleIds = await Project.storeInstance.listVisibleIds(request.user);
+			if (visibleIds.indexOf(request.params.id) === -1)
+				throw new Error('forbidden');
+
+			return revisions;
+		}).then(response.jsonPB).catch(response.jsonErrorPB);
+	})
+
 
 	/**
 	 * Save a project
@@ -170,7 +186,7 @@ export default express.Router()
 				let ids;
 				if (q.mode === 'ids_by_form')
 					ids = await Input.storeInstance.listIdsByDataSource(q.projectId, q.formId);
-				else if (mode === 'ids_by_entity')
+				else if (q.mode === 'ids_by_entity')
 					ids = await Input.storeInstance.listIdsByEntity(q.projectId, q.entityId);
 				else
 					throw new Error('invalid_mode');

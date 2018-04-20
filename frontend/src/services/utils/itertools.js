@@ -222,5 +222,191 @@ angular
 			});
 		};
 
+	})
+
+	.factory('projectCompare', function() {
+		var hashFunction = function(obj) {
+			if (typeof obj === 'string')
+				return obj;
+			else
+				return obj.id || obj.username || obj.display || obj.name;
+		};
+
+		/**
+		 * Compare two arrays of objects, and create remove, add and move operations
+		 * to patch from the first to the second.
+		 */
+		var compareArray = function(before, after, changes, prefix) {
+			var beforeIds = before.map(hashFunction), afterIds = after.map(hashFunction);
+
+			// start by removing items
+			for (var beforeIndex = 0; beforeIndex < beforeIds.length; ++beforeIndex) {
+				var id = beforeIds[beforeIndex], afterIndex = afterIds.indexOf(id);
+
+				if (afterIndex === -1) {
+					// element was removed
+					beforeIds.splice(beforeIndex, 1);
+					before.splice(beforeIndex, 1);
+					changes.push({op: 'remove', path: prefix + beforeIndex});
+					beforeIndex--; // we need to recheck the same place in the table.
+				}
+			}
+
+			// add missing items at the end
+			for (var afterIndex = 0; afterIndex < afterIds.length; ++afterIndex) {
+				var id = afterIds[afterIndex], beforeIndex = beforeIds.indexOf(id);
+
+				if (beforeIndex === -1) {
+					// element was added
+					beforeIds.push(id);
+					before.push(after[afterIndex]);
+					changes.push({op: 'add', path: prefix + beforeIds.length, value: after[afterIndex]});
+				}
+			}
+
+			// reorder items
+			for (var afterIndex = 0; afterIndex < afterIds.length; ++afterIndex) {
+				var id = afterIds[afterIndex], beforeIndex = beforeIds.indexOf(id);
+
+				if (afterIndex !== beforeIndex) {
+					// vire l'item de before
+					var item = before.splice(beforeIndex, 1)[0];
+					beforeIds.splice(beforeIndex, 1);
+
+					// le remet au bon endroit
+					before.splice(afterIndex, 0, item);
+					beforeIds.splice(afterIndex, 0, id);
+					changes.push({op: 'move', from: prefix + beforeIndex, path: prefix + afterIndex})
+				}
+			}
+		};
+
+		// We can't use jsonpatch.compare to generate human readable patches
+		// because it's not smart enougth to see when element moved
+		return function(before, after) {
+			before = JSON.parse(angular.toJson(before)); // clone
+
+			var changes = [];
+
+			// Entities
+			compareArray(before.entities, after.entities, changes, '/entities/');
+			compareArray(before.themes, after.themes, changes, '/themes/');
+
+			// Groups
+			compareArray(before.groups, after.groups, changes, '/groups/');
+			for (var groupIndex = 0; groupIndex < before.groups.length; ++groupIndex)
+				compareArray(
+					before.groups[groupIndex].members,
+					after.groups[groupIndex].members,
+					changes,
+					/groups/ + groupIndex + '/members/'
+				);
+
+			// Forms
+			compareArray(before.forms, after.forms, changes, '/forms/');
+			for (var formIndex = 0; formIndex < before.forms.length; ++formIndex) {
+				compareArray(
+					before.forms[formIndex].entities,
+					after.forms[formIndex].entities,
+					changes,
+					'/forms/' + formIndex + '/entities/'
+				);
+
+				compareArray(
+					before.forms[formIndex].elements,
+					after.forms[formIndex].elements,
+					changes,
+					'/forms/' + formIndex + '/elements/'
+				);
+
+				for (var elementIndex = 0; elementIndex < before.forms[formIndex].elements.length; ++elementIndex) {
+					compareArray(
+						before.forms[formIndex].elements[elementIndex].partitions,
+						after.forms[formIndex].elements[elementIndex].partitions,
+						changes,
+						'/forms/' + formIndex + '/elements/' + elementIndex + '/partitions/'
+					);
+
+					for (var partitionIndex = 0; partitionIndex < before.forms[formIndex].elements[elementIndex].partitions.length; ++partitionIndex) {
+						compareArray(
+							before.forms[formIndex].elements[elementIndex].partitions[partitionIndex].elements,
+							after.forms[formIndex].elements[elementIndex].partitions[partitionIndex].elements,
+							changes,
+							'/forms/' + formIndex + '/elements/' + elementIndex + '/partitions/' + partitionIndex + '/elements/'
+						);
+
+						compareArray(
+							before.forms[formIndex].elements[elementIndex].partitions[partitionIndex].groups,
+							after.forms[formIndex].elements[elementIndex].partitions[partitionIndex].groups,
+							changes,
+							'/forms/' + formIndex + '/elements/' + elementIndex + '/partitions/' + partitionIndex + '/groups/'
+						);
+
+						for (var pGroupIndex = 0; pGroupIndex < before.forms[formIndex].elements[elementIndex].partitions[partitionIndex].groups.length; ++pGroupIndex) {
+							compareArray(
+								before.forms[formIndex].elements[elementIndex].partitions[partitionIndex].groups[pGroupIndex].members,
+								after.forms[formIndex].elements[elementIndex].partitions[partitionIndex].groups[pGroupIndex].members,
+								changes,
+								'/forms/' + formIndex + '/elements/' + elementIndex + '/partitions/' + partitionIndex + '/groups/' + pGroupIndex + '/members/'
+							);
+						}
+					}
+				}
+			}
+
+			compareArray(before.logicalFrames, after.logicalFrames, changes, '/logicalFrames/');
+			for (var logFrameId = 0; logFrameId < before.logicalFrames.length; ++logFrameId) {
+				compareArray(
+					before.logicalFrames[logFrameId].indicators,
+					after.logicalFrames[logFrameId].indicators,
+					changes,
+					'/logicalFrames/' + logFrameId + '/indicators/'
+				);
+
+				for (var purposeId = 0; purposeId < before.logicalFrames[logFrameId].purposes.length; ++purposeId) {
+					compareArray(
+						before.logicalFrames[logFrameId].purposes[purposeId].indicators,
+						after.logicalFrames[logFrameId].purposes[purposeId].indicators,
+						changes,
+						'/logicalFrames/' + logFrameId + '/purposes/' + purposeId + '/indicators/'
+					);
+
+					for (var outputId = 0; outputId < before.logicalFrames[logFrameId].purposes[purposeId].outputs.length; ++outputId) {
+						compareArray(
+							before.logicalFrames[logFrameId].purposes[purposeId].outputs[outputId].indicators,
+							after.logicalFrames[logFrameId].purposes[purposeId].outputs[outputId].indicators,
+							changes,
+							'/logicalFrames/' + logFrameId + '/purposes/' + purposeId + '/outputs/' + outputId + '/indicators/'
+						);
+					}
+				}
+			}
+
+			compareArray(before.extraIndicators, after.extraIndicators, changes, '/extraIndicators/');
+
+			// Users
+			compareArray(before.users, after.users, changes, '/users/');
+			for (var userIndex = 0; userIndex < before.users.length; ++userIndex) {
+				if (before.users[userIndex].role == 'input' && after.users[userIndex].role == 'input') {
+					compareArray(
+						before.users[userIndex].entities,
+						after.users[userIndex].entities,
+						changes,
+						/users/ + userIndex + '/entities/'
+					);
+
+					compareArray(
+						before.users[userIndex].dataSources,
+						after.users[userIndex].dataSources,
+						changes,
+						/users/ + userIndex + '/dataSources/'
+					);
+				}
+			}
+
+
+
+			return changes.concat(jsonpatch.compare(before, after));
+		};
 	});
 

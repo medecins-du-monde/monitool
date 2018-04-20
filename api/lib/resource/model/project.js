@@ -186,8 +186,9 @@ export default class Project extends DbModel {
 			return super.save(true);
 
 		// Copy passwords from old project.
+		let oldProject;
 		try {
-			let oldProject = await Project.storeInstance.get(this._id);
+			oldProject = await Project.storeInstance.get(this._id);
 
 			this.users.forEach(newUser => {
 				if (newUser.type !== 'partner' || newUser.password !== null)
@@ -203,7 +204,21 @@ export default class Project extends DbModel {
 				throw error;
 		}
 
-		return super.save(false);
+		// Save with the relevant checks
+		let result = await super.save(false);
+
+		// Save history if all the rest succeded (errors will raise exceptions).
+		if (oldProject) {
+			let time = (+new Date()).toString().padStart(16, '0')
+
+			delete oldProject._rev;
+			oldProject._id = 'rev:' + oldProject._id + ':' + time;
+			oldProject.type = 'rev:project';
+			await this._db.insert(oldProject);
+		}
+
+		// the user want the result of the save operation, not the revision.
+		return result;
 	}
 
 	toAPI() {

@@ -26,8 +26,6 @@ export default class LogicalFrame extends Model {
 
 	constructor(data, project) {
 		super(data, validate);
-
-		this._project = project;
 	}
 
 	getPdfDocDefinition(pageOrientation) {
