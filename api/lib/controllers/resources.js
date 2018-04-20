@@ -141,7 +141,7 @@ export default express.Router()
 			cache.del('reporting:project:' + request.params.id); // This empties the reporting cache
 
 			const newProject = new Project(request.body);
-			await newProject.save();
+			await newProject.save(false, request.user);
 
 			return newProject.toAPI();
 		}).then(response.jsonPB).catch(response.jsonErrorPB);

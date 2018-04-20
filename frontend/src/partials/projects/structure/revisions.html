@@ -12,15 +12,28 @@
 <table class="table table-bordered table-condensed">
 	<thead>
 		<tr>
-			<th style="width: 15%">Date / Heure</th>
-			<th>Modification apportées</th>
+			<th style="width: 15%" translate="project.revision_datetime"></th>
+			<th translate="project.revision_changes"></th>
 		</tr>
 	</thead>
-	<tbody ng-repeat="revision in ::revisions">
-		<tr>
-			<td>{{::revision.time|date:'medium'}}</td>
+	<tbody>
+		<tr ng-repeat="revision in revisions">
+			<td>
+				{{::revision.time|date:'medium'}}<br/>
+				{{::revision.user|formatUser}}
+			</td>
 			<td ng-bind-html="::revision|humanizePatch"></td>
 		</tr>
+		<tr ng-if="::!revisions.length">
+			<td style="text-align: center" colspan="2" translate="project.revisions_none"></td>
+		</tr>
 	</tbody>
+	<tfoot>
+		<tr ng-if="revisions.length && !finished">
+			<td style="text-align: center" colspan="2">
+				<a ng-click="showMore()" translate="project.show_more_revisions"></a>
+			</td>
+		</tr>
+	</tfoot>
 </table>
 

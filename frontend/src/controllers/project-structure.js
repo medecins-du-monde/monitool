@@ -703,17 +703,36 @@ angular
 	})
 
 
-	.controller('ProjectRevisions', function($scope, revisions, projectCompare) {
-		// Complete the information by computing afterState, beforeState, and forward patches.
-		for (var i = 0; i < revisions.length; ++i) {
-			// Compute before and after state
-			revisions[i].after = i === 0 ? JSON.parse(angular.toJson($scope.masterProject)) : revisions[i - 1].before;
-			revisions[i].before = jsonpatch.applyPatch(jsonpatch.deepClone(revisions[i].after), revisions[i].backwards).newDocument;
+	.controller('ProjectRevisions', function($scope, Revision, revisions, projectCompare) {
+		// Note to self: this has nothing to do in the controller.
+		var recomputeRevision = function() {
+			// Complete the information by computing afterState, beforeState, and forward patches.
+			for (var i = 0; i < $scope.revisions.length; ++i) {
+				// Compute before and after state
+				$scope.revisions[i].after = i === 0 ? JSON.parse(angular.toJson($scope.masterProject)) : $scope.revisions[i - 1].before;
+				$scope.revisions[i].before = jsonpatch.applyPatch(jsonpatch.deepClone($scope.revisions[i].after), $scope.revisions[i].backwards).newDocument;
 
-			// Compute forwardPatch (needed to compute a human readable diff).
-			revisions[i].forwards = projectCompare(revisions[i].before, revisions[i].after);
-		}
+				// Compute forwardPatch (needed to compute a human readable diff).
+				$scope.revisions[i].forwards = projectCompare($scope.revisions[i].before, $scope.revisions[i].after);
+			}
+		};
+
+		var currentOffset = 0,
+			pageSize = 10; // @hack This is hardcoded in app.js, do not update here only
 
 		$scope.revisions = revisions;
+		$scope.finished = revisions.length < pageSize;
+
+		recomputeRevision();
+
+		$scope.showMore = function() {
+			currentOffset = currentOffset + pageSize;
+			Revision.query({projectId: $scope.masterProject._id, offset: currentOffset, limit: pageSize}).$promise.then(function(newRevisions) {
+				$scope.finished = newRevisions.length < pageSize;
+
+				$scope.revisions = $scope.revisions.concat(newRevisions);
+				recomputeRevision();
+			});
+		};
 	})
 

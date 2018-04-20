@@ -108,6 +108,13 @@ angular.module('monitool.filters.shared', [])
 		};
 	})
 
+	.filter('formatUser', function() {
+		return function(user) {
+			if (user)
+				return user.substring(user.indexOf(':') + 1);
+		};
+	})
+
 	.filter('humanizePatch', function($sce, $filter) {
 
 
@@ -142,7 +149,7 @@ angular.module('monitool.filters.shared', [])
 				.replace(/\/\d+$/, '')
 				.replace(/\/[a-z]+:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/, '')
 
-			// Special case for indicators: we ask as if all logframe indicators are on the general objective.
+			// Special case for indicators: we do as if all logframe indicators were on the general objective.
 			var indicatorMatch = edited_field.match(/^logicalFrames.*indicators(.*)$/);
 			if (indicatorMatch)
 				edited_field = 'logicalFrames_indicators' + indicatorMatch[1];

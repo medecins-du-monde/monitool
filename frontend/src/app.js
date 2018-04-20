@@ -38,6 +38,7 @@ window.monitool = angular.module('monitool.app', [
 	'monitool.services.models.indicator',
 	'monitool.services.models.input',
 	'monitool.services.models.project',
+	'monitool.services.models.revision',
 	'monitool.services.models.theme',
 	'monitool.services.models.user',
 
@@ -384,9 +385,8 @@ window.monitool.config(function($stateProvider, $urlRouterProvider) {
 		templateUrl: 'partials/projects/structure/revisions.html',
 		controller: 'ProjectRevisions',
 		resolve: {
-			revisions: function($resource, $stateParams) {
-				var Revision = $resource('/api/resources/project/:projectId/revisions', {projectId: $stateParams.projectId});
-				return Revision.query().$promise;
+			revisions: function(Revision, project) {
+				return Revision.query({projectId: project._id, limit: 10}).$promise;
 			}
 		}
 	});

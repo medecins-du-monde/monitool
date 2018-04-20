@@ -34,40 +34,56 @@ export default class ProjectStore extends Store {
 		if (typeof projectId !== 'string')
 			throw new Error('missing_parameter');
 
-		if (Number.isNaN(offset * 1))
-			offset = 0;
+		offset = Number.isNaN(offset * 1) ? 0 : offset * 1;
+		limit = Number.isNaN(limit * 1) ? 20 : limit * 1;
 
-		if (Number.isNaN(limit * 1))
-			limit = 20;
-
-		let [project, revisions] = await Promise.all([
-			this.get(projectId),
-			this._db.callList({
+		// Get revisions.
+		// There is a special case to handle when offset = 0 (we need current project).
+		let revisions;
+		if (offset === 0) {
+			let project;
+			[project, revisions] = await Promise.all([
+				this.get(projectId),
+				this._db.callList({
+					include_docs: true,
+					startkey: 'rev:' + projectId + ':9999999999999999',
+					endkey: 'rev:' + projectId + ':0000000000000000',
+					descending: true,
+					limit: limit
+				})
+			]);
+			revisions.rows.unshift({id: project._id, doc: project});
+		}
+		else
+			revisions = await this._db.callList({
 				include_docs: true,
 				startkey: 'rev:' + projectId + ':9999999999999999',
 				endkey: 'rev:' + projectId + ':0000000000000000',
-				descending: true
-			})
-		]);
+				descending: true,
+				skip: offset - 1,
+				limit: limit + 1
+			});
 
-		let editionTimes = revisions.rows.map(row => new Date(parseInt(row.doc._id.substr(-16))));
-
-		revisions = revisions.rows.map(row => {
-			row.doc._id = project._id;
-			row.doc._rev = project._rev;
-			row.doc.type = project.type;
-			return row.doc;
-		});
-		revisions.unshift(project);
-
-
-
-		// handle offset and limit???
-
-
+		// Compute diffs over time.
 		let diffs = [];
-		for (let i = 0; i < revisions.length - 1; ++i)
-			diffs.push({time: editionTimes[i], backwards: jsonpatch.compare(revisions[i], revisions[i + 1])});
+		for (let i = 0; i < revisions.rows.length; ++i) {
+			const doc = revisions.rows[i].doc;
+			const time = new Date(parseInt(doc._id.substr(-16)));
+			const user = doc.modifiedBy;
+
+			// Clear fields that are different on revisions and projects to avoid messing with the patches.
+			delete doc._id;
+			delete doc.type;
+			delete doc._rev;
+			delete doc.modifiedBy;
+
+			if (i > 0)
+				diffs.push({
+					time: time,
+					user: user,
+					backwards: jsonpatch.compare(revisions.rows[i - 1].doc, doc)
+				});
+		}
 
 		return diffs;
 	}
