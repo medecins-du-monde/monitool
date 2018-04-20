@@ -68,11 +68,15 @@ angular.module('monitool.directives.formControls', [])
 			link: function(scope, element, attributes, ngModelController) {
 
 				ngModelController.$formatters.push(function(modelValue) {
-					return new Date(modelValue.getTime() + modelValue.getTimezoneOffset() * 60 * 1000);
+					modelValue = new Date(modelValue + 'T00:00:00Z');
+					modelValue = new Date(modelValue.getTime() + modelValue.getTimezoneOffset() * 60 * 1000);
+					return modelValue;
 				});
 
 				ngModelController.$parsers.push(function(viewValue) {
-					return new Date(viewValue.getTime() - viewValue.getTimezoneOffset() * 60 * 1000);
+					viewValue = new Date(viewValue.getTime() - viewValue.getTimezoneOffset() * 60 * 1000);
+					viewValue = viewValue.toISOString().substring(0, 10);
+					return viewValue;
 				});
 
 				ngModelController.$render = function() {
@@ -95,9 +99,19 @@ angular.module('monitool.directives.formControls', [])
 				defaultUTC: '=default'
 			},
 			link: function(scope, element, attributes, ngModelController) {
+
+				ngModelController.$formatters.push(function(modelValue) {
+					return modelValue ? new Date(modelValue + 'T00:00:00Z') : null;
+				});
+
+				ngModelController.$parsers.push(function(viewValue) {
+					return viewValue ? viewValue.toISOString().substring(0, 10) : null;
+				});
+
 				scope.message = attributes.message;
 
 				scope.$watch('defaultUTC', function(defaultUTC) {
+					defaultUTC = new Date(defaultUTC + 'T00:00:00Z');
 					scope.defaultLocal = new Date(defaultUTC.getTime() + defaultUTC.getTimezoneOffset() * 60 * 1000);
 				});
 
@@ -130,7 +144,7 @@ angular.module('monitool.directives.formControls', [])
 						return;
 
 					if (newValue) {
-						var dateUTC = scope.defaultUTC;
+						var dateUTC = new Date(scope.defaultUTC + 'T00:00:00Z');
 						scope.container.dateLocal = new Date(dateUTC.getTime() + dateUTC.getTimezoneOffset() * 60 * 1000);
 					}
 					else {

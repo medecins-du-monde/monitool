@@ -24,6 +24,8 @@ angular.module(
 	])
 
 	.controller('ProjectListController', function($scope, $state, projects, uuid, themes) {
+		var now = new Date().toISOString().substring(0, 10);
+
 		$scope.themes = themes;
 		$scope.pred = 'country'; // default sorting predicate
 
@@ -32,11 +34,11 @@ angular.module(
 		});
 
 		$scope.runningProjects = projects.filter(function(p) {
-			return $scope.myProjects.indexOf(p) === -1 && p.end >= new Date()
+			return $scope.myProjects.indexOf(p) === -1 && p.end >= now
 		});
 
 		$scope.finishedProjects = projects.filter(function(p) {
-			return $scope.myProjects.indexOf(p) === -1 && p.end < new Date()
+			return $scope.myProjects.indexOf(p) === -1 && p.end < now
 		});
 
 		$scope.projects = $scope.myProjects;

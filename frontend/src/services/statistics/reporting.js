@@ -221,7 +221,7 @@ angular
 					if (!cubeFilters[timeDimension.id])
 						cubeFilters[timeDimension.id] = timeDimension.items;
 
-					var start = TimeSlot.fromDate(viewFilters._start, timeDimension.id).value;
+					var start = TimeSlot.fromDate(new Date(viewFilters._start + 'T00:00:00Z'), timeDimension.id).value;
 
 					// This is O(n), but should not be. Can do O(logn)
 					cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(function(dimItem) { return start <= dimItem; });
@@ -233,7 +233,7 @@ angular
 					if (!cubeFilters[timeDimension.id])
 						cubeFilters[timeDimension.id] = timeDimension.items;
 
-					var end = TimeSlot.fromDate(viewFilters._end, timeDimension.id).value;
+					var end = TimeSlot.fromDate(new Date(viewFilters._end + 'T00:00:00Z'), timeDimension.id).value;
 
 					// This is O(n), but should not be. Can do O(logn)
 					cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(function(dimItem) { return dimItem <= end; });

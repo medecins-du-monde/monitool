@@ -63,7 +63,7 @@ angular
 		$scope.indicator = indicator;
 		$scope.open = {};
 		$scope.plots = {};
-		$scope.filters = {_location: "none", _start: new Date('9999-01-01T00:00:00Z'), _end: new Date('0000-01-01T00:00:00Z')};
+		$scope.filters = {_location: "none", _start: '9999-01-01', _end: '0000-01-01'};
 		for (var i = 0; i < projects.length; ++i) {
 			if (projects[i].start < $scope.filters._start)
 				$scope.filters._start = projects[i].start;

@@ -39,7 +39,12 @@ angular
 	.controller('ProjectReportingController', function($scope, $filter, TimeSlot, mtReporting, indicators) {
 
 		// Create default filter so that all inputs are used.
-		$scope.filters = {_location: "none", _start: $scope.masterProject.start, _end: $scope.masterProject.end < new Date() ? $scope.masterProject.end : new Date()};
+		var now = new Date().toISOString().substring(0, 10);
+		$scope.filters = {
+			_location: "none",
+			_start: $scope.masterProject.start,
+			_end: now < $scope.masterProject.end ? now : $scope.masterProject.end
+		};
 
 		// default + available group by
 		$scope.periodicities = ['day', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].filter(function(periodicity) {
@@ -130,8 +135,11 @@ angular
 			////////////////////////////////////////
 			// Create default query for this elementId
 			////////////////////////////////////////
-
-			var filters = {_start: $scope.masterProject.start, _end: new Date() < $scope.masterProject.end ? new Date() : $scope.masterProject.end};
+			var now = new Date().toISOString().substring(0, 10);
+			var filters = {
+				_start: $scope.masterProject.start,
+				_end: now < $scope.masterProject.end ? now : $scope.masterProject.end
+			};
 
 			// Hack: Same as a bit lower: change the default dates when chosing an indicator from a logicalframework
 			// This depends on another hack inserted in services/models/project.js:getAllIndicators()
@@ -235,7 +243,11 @@ angular
 				return;
 
 			$scope.$watch('wrap.chosenElement', function(element) {
-				var filters = {_start: $scope.masterProject.start, _end: new Date() < $scope.masterProject.end ? new Date() : $scope.masterProject.end};
+				var now = new Date().toISOString().substring(0, 10);
+				var filters = {
+					_start: $scope.masterProject.start,
+					_end: now < $scope.masterProject.end ? now : $scope.masterProject.end
+				};
 
 				// Work around invalid indicators (those w/o computation)
 				if (element.type === 'indicator' && !element.indicator.computation) {

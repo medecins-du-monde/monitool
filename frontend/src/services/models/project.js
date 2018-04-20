@@ -175,10 +175,12 @@ angular
 
 
 		Project.prototype.reset = function() {
+			var now = new Date().toISOString().substring(0, 10);
+
 			this.type = "project";
 			this.name = "";
-			this.start = new Date(86400000 * Math.floor(Date.now() / 86400000));
-			this.end = new Date(86400000 * Math.floor(Date.now() / 86400000));
+			this.start = now;
+			this.end = now;
 			this.themes = [];
 			this.crossCutting = {};
 			this.extraIndicators = [];
