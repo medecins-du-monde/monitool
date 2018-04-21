@@ -209,8 +209,10 @@ angular.module('monitool.filters.shared', [])
 			if (operation.op === 'add') {
 				translation_data.item = operation.value;
 
-				// it's an entity => return the entity
-				if (edited_field === 'groups_members' || edited_field === 'forms_entities')
+				if (edited_field === 'users_dataSources')
+					translation_data.item = before.forms.find(function(e) { return e.id === translation_data.item; });
+
+				if (edited_field === 'groups_members' || edited_field === 'forms_entities' || edited_field === 'users_entities')
 					translation_data.item = before.entities.find(function(e) { return e.id === translation_data.item; });
 
 				if (edited_field === 'forms_elements_partitions_groups_members')
@@ -221,23 +223,16 @@ angular.module('monitool.filters.shared', [])
 				translation_data.before = before;
 				for (var j = 0; j < splpath.length; j += 1)
 					translation_data.before = translation_data.before[splpath[j]];
-
-				if (edited_field === 'groups_members' || edited_field === 'forms_entities') {
-					translation_data.before = before.entities.find(function(e) { return e.id === translation_data.before; });
-					translation_data.after = before.entities.find(function(e) { return e.id === translation_data.after; });
-				}
-
-				if (edited_field === 'forms_elements_partitions_groups_members') {
-					translation_data.before = translation_data.partition.elements.find(function(e) {return e.id == translation_data.before; });
-					translation_data.after = translation_data.partition.elements.find(function(e) {return e.id == translation_data.after; });
-				}
 			}
 			else if (operation.op === 'remove') {
 				translation_data.item = before;
 				for (var j = 0; j < splpath.length; j += 1)
 					translation_data.item = translation_data.item[splpath[j]];
 
-				if (edited_field === 'groups_members' || edited_field === 'forms_entities')
+				if (edited_field === 'users_dataSources')
+					translation_data.item = before.forms.find(function(e) { return e.id === translation_data.item; });
+
+				if (edited_field === 'groups_members' || edited_field === 'forms_entities' || edited_field === 'users_entities')
 					translation_data.item = before.entities.find(function(e) { return e.id === translation_data.item; });
 
 				if (edited_field === 'forms_elements_partitions_groups_members')

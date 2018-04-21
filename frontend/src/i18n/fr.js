@@ -262,7 +262,6 @@ var FRENCH_TRANSLATION = {
 			themes_add: "Ajoute une thématique au projet",
 			themes_move: "Reordonne les thématiques du projet",
 			themes_remove: "Retire une thématique du projet",
-			themes_replace: "Remplace une thématique du projet",
 
 			entities_add: "Ajoute le site <code>{{item.name}}</code>",
 			entities_move: "Reordonne les sites du projet",
@@ -276,9 +275,8 @@ var FRENCH_TRANSLATION = {
 			groups_remove: "Supprime le groupe <code>{{item.name}}</code>",
 			groups_name_replace: "Renomme le groupe <code>{{before}}</code> en <code>{{after}}</code>",
 			groups_members_add: "Ajoute le site <code>{{item.name}}</code> au groupe <code>{{group.name}}</code>",
-			groups_members_replace: "Remplace le site <code>{{before.name}}</code> par <code>{{after.name}}</code> dans le groupe <code>{{group.name}}</code>",
-			groups_members_remove: "Retire le site <code>{{item.name}}</code> du groupe <code>{{group.name}}</code>",
 			groups_members_move: "Reordonne les sites du groupe <code>{{group.name}}</code>",
+			groups_members_remove: "Retire le site <code>{{item.name}}</code> du groupe <code>{{group.name}}</code>",
 
 			users_add: "Ajoute l'utilisateur <code>{{item.id || item.username}}</code> au projet",
 			users_move: "Reordonne les utilisateurs du projet",
@@ -286,8 +284,12 @@ var FRENCH_TRANSLATION = {
 			users_name_replace: "Renomme le partenaire de <code>{{before}}</code> vers <code>{{after}}</code>",
 			users_password_replace: "Change le mot de passe de <code>{{user.id || user.username}}</code>",
 			users_role_replace: "Change le role de <code>{{user.id || user.username}}</code> de <code>{{before}}</code> vers <code>{{after}}</code>",
-			users_entities_add: "Ajoute le site <code>{{item.name}}</code> à l'utilisateur <code>{{user.id || user.username}}</code>",
-			users_entities_remove: "Retire le site <code>{{item.name}}</code> de l'utilisateur <code>{{user.id || user.username}}</code>",
+			users_entities_add: "Autorise <code>{{user.id || user.username}}</code> à saisir sur le site <code>{{item.name}}</code>",
+			users_entities_move: "Reordonne les sites associés à l'utilisateur <code>{{user.id || user.username}}</code>",
+			users_entities_remove: "Retire l'autorisation de saisir sur <code>{{item.name}}</code> à l'utilisateur <code>{{user.id || user.username}}</code>",
+			users_dataSources_add: "Autorise <code>{{user.id || user.username}}</code> à saisir sur la source de données <code>{{item.name}}</code>",
+			users_dataSources_move: "Reordonne les sources de données associées à l'utilisateur <code>{{user.id || user.username}}</code>",
+			users_dataSources_remove: "Retire l'autorisation de saisir sur <code>{{item.name}}</code> à l'utilisateur <code>{{user.id || user.username}}</code>",
 
 			forms_add: "Ajoute la source de données <code>{{item.name}}</code>",
 			forms_move: "Reordonne les sources de données du projet",
@@ -301,7 +303,6 @@ var FRENCH_TRANSLATION = {
 			forms_entities_add: "Ajoute le site <code>{{item.name}}</code> à la source de données <code>{{form.name}}</code>",
 			forms_entities_move: "Reordonne les sites de la source de données <code>{{form.name}}</code>",
 			forms_entities_remove: "Retire le site <code>{{item.name}}</code> de la source de données <code>{{form.name}}</code>",
-			forms_entities_replace: "Remplace le site <code>{{before.name}}</code> par <code>{{after.name}}</code> dans la source de données <code>{{form.name}}</code>",
 
 			forms_elements_add: "Ajoute la variable <code>{{item.name}}</code> dans <code>{{form.name}}</code>",
 			forms_elements_move: "Reordonne les variables de la source de données <code>{{form.name}}</code>",
@@ -352,7 +353,7 @@ var FRENCH_TRANSLATION = {
 			logicalFrames_purposes_outputs_assumptions_replace: "Change les hypothèses du resultat <code>{{output.description}}</code> de <code>{{before}}</code> vers <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
 
 			logicalFrames_purposes_outputs_activities_add: "Ajoute l'activité <code>{{item.description}}</code> au cadre logique <code>{{logicalFrame.name}}</code>",
-			logicalFrames_purposes_outputs_move: "Reordonne des activités dans le cadre logique <code>{{logicalFrame.name}}</code>",
+			logicalFrames_purposes_outputs_activities_move: "Reordonne des activités dans le cadre logique <code>{{logicalFrame.name}}</code>",
 			logicalFrames_purposes_outputs_activities_remove: "Supprime l'activité <code>{{item.description}}</code> du cadre logique <code>{{logicalFrame.name}}</code>",
 			logicalFrames_purposes_outputs_activities_description_replace: "Change la description de l'activité <code>{{before}}</code> en <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
 
