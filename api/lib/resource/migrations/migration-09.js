@@ -7,25 +7,7 @@ export default async function() {
 	let projects = await database.callView('by_type', {include_docs: true, key: 'project'}),
 		inputs = await database.callView('by_type', {include_docs: true, key: 'input'});
 
-	inputs.rows.forEach(row => {
-		let input = row.doc,
-			project = projects.rows.find(row => row.id === input.project).doc,
-			dataSource = project.forms.find(ds => ds.id === input.form);
-
-		input.structure = {};
-
-		dataSource.elements.forEach(e => {
-			input.structure[e.id] = e.partitions.map(partition => {
-				return {
-					id: partition.id,
-					items: partition.elements.map(pe => pe.id),
-					aggregation: partition.aggregation
-				};
-			});
-		});
-	});
-
-	let docsToUpdate = inputs.rows.map(row => row.doc);
+	let docsToUpdate = [];
 
 	projects.rows.forEach(row => {
 		let project = row.doc;
@@ -46,6 +28,26 @@ export default async function() {
 
 		if (update)
 			docsToUpdate.push(project);
+	});
+
+	inputs.rows.forEach(row => {
+		let input = row.doc,
+			project = projects.rows.find(row => row.id === input.project).doc,
+			dataSource = project.forms.find(ds => ds.id === input.form);
+
+		input.structure = {};
+
+		dataSource.elements.forEach(e => {
+			input.structure[e.id] = e.partitions.map(partition => {
+				return {
+					id: partition.id,
+					items: partition.elements.map(pe => pe.id),
+					aggregation: partition.aggregation
+				};
+			});
+		});
+
+		docsToUpdate.push(input);
 	});
 
 	return database.callBulk({docs: docsToUpdate});
