@@ -454,12 +454,6 @@ var SPANISH_TRANSLATION = {
 		collection_form_planning: "Calendario",
 		collection_form_structure: "Estructura",
 
-		delete_form_easy: "¿Esta seguro que quiere suprimir esta fuente de datos?",
-		delete_form_hard: "Si suprime esta fuente de datos, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
-		delete_form_hard_answer: "Suprimir las {{num_inputs}} entradas",
-		delete_entity: "Si suprime este lugar de colecta, todas las entradas asociadas seran suprimidas tambien. Entre \"Suprimir las {{num_inputs}} entradas\" para confirmar",
-		delete_entity_answer: "Suprimir las {{num_inputs}} entradas",
-
 		running: "Proyectos en progreso",
 		finished: "Proyectos terminados",
 		noproject: "Ningún proyecto corresponde a este criterio",

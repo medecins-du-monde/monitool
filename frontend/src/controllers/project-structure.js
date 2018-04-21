@@ -286,7 +286,6 @@ angular
 		// The number of inputs is used to show a warning message to user if they risk loosing data.
 		$scope.numInputs = formUsage.length;
 
-		// The delete button ask for confirmation when data will be lost.
 		$scope.deleteForm = function() {
 			// Kill the watches
 			w1(); w3();
@@ -557,20 +556,14 @@ angular
 		});
 
 		$scope.deleteLogicalFrame = function() {
-			// Translate confirmation messages.
-			var easy_question = $filter('translate')('project.delete_logical_frame');
+			// Kill the watches
+			w1();
 
-			// Ask confirmation to user
-			if (window.confirm(easy_question)) {
-				// Kill the watches
-				w1();
-
-				// Remove the form
-				$scope.editableProject.logicalFrames.splice($scope.logicalFrameIndex, 1);
-				$scope.$parent.save(true).then(function() {
-					$state.go('main.project.structure.logical_frame_list');
-				});
-			}
+			// Remove the form
+			$scope.editableProject.logicalFrames.splice($scope.logicalFrameIndex, 1);
+			$scope.$parent.save(true).then(function() {
+				$state.go('main.project.structure.logical_frame_list');
+			});
 		};
 	})
 
