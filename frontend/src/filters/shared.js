@@ -117,7 +117,6 @@ angular.module('monitool.filters.shared', [])
 
 	.filter('humanizePatch', function($sce, $filter) {
 
-
 		/**
 		 * There are a big number of possible things that can be edited in a project.
 		 * To avoid having to write a translation string for each one of them, we don't go into too much details for
@@ -198,25 +197,13 @@ angular.module('monitool.filters.shared', [])
 			}
 
 			//////////////////////////
-			// For certain particular cases, the previous step was not enough, because the modification in the project
-			// was in an opaque reference.
-			// For instance, adding a site to a datasource will only add an id.
-			// => We need to have the name of the entity.
-			//
-			// This piece of code takes care of all the special cases.
+			// Get the actual item that got modified.
+			// For replace operations, we define both the "before" and "after" keys
+			// Otherwise, just the "item".
 			//////////////////////////
 
 			if (operation.op === 'add') {
 				translation_data.item = operation.value;
-
-				if (edited_field === 'users_dataSources')
-					translation_data.item = before.forms.find(function(e) { return e.id === translation_data.item; });
-
-				if (edited_field === 'groups_members' || edited_field === 'forms_entities' || edited_field === 'users_entities')
-					translation_data.item = before.entities.find(function(e) { return e.id === translation_data.item; });
-
-				if (edited_field === 'forms_elements_partitions_groups_members')
-					translation_data.item = translation_data.partition.elements.find(function(e) {return e.id == translation_data.item; });
 			}
 			else if (operation.op === 'replace') {
 				translation_data.after = operation.value;
@@ -228,7 +215,22 @@ angular.module('monitool.filters.shared', [])
 				translation_data.item = before;
 				for (var j = 0; j < splpath.length; j += 1)
 					translation_data.item = translation_data.item[splpath[j]];
+			}
+			else if (operation.op === 'move') {
+				translation_data.item = before;
 
+				var splpath2 = operation.from.split('/').slice(1);
+				for (var j = 0; j < splpath2.length; j += 1)
+					translation_data.item = translation_data.item[splpath2[j]];
+			}
+
+			//////////////////////////
+			// When the modification is adding or removing ids that refer to something else, we
+			// replace the id by the actual value it refers to, to allow proper printing
+			// i.e. Avoid "Added 347b57e7-a8e0-441c-a673-419b2aefb6f8 to sites in form x"
+			//////////////////////////
+
+			if (operation.op === 'add' || operation.op === 'remove') {
 				if (edited_field === 'users_dataSources')
 					translation_data.item = before.forms.find(function(e) { return e.id === translation_data.item; });
 
@@ -237,13 +239,6 @@ angular.module('monitool.filters.shared', [])
 
 				if (edited_field === 'forms_elements_partitions_groups_members')
 					translation_data.item = translation_data.partition.elements.find(function(e) {return e.id == translation_data.item; });
-			}
-			else if (operation.op === 'move') {
-				translation_data.item = before;
-
-				var splpath2 = operation.from.split('/').slice(1);
-				for (var j = 0; j < splpath2.length; j += 1)
-					translation_data.item = translation_data.item[splpath2[j]];
 			}
 
 			return translation_data;

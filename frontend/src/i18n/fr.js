@@ -243,7 +243,6 @@ var FRENCH_TRANSLATION = {
 	},
 
 	project: {
-
 		revisions: "Historique",
 		revision_info: "L'historique des modifications vous permet de consulter la liste des modifications faites sur la structure de votre projet.",
 		revision_datetime: "Date & Utilisateur",
@@ -251,22 +250,24 @@ var FRENCH_TRANSLATION = {
 		revision_restore: "Revenir à ce point",
 		revision_save_to_confirm: "Sauvegardez pour confirmer de revenir à ce point",
 		revision_is_equivalent: "Ce point est équivalent à l'état actuel du projet",
+		revision_none: "Pas d'historique disponible sur ce projet",
+		revision_show_more: "Voir plus de modifications",
 
 		history: {
-			name_replace: "Renomme le project de <code>{{before}}</code> vers <code>{{after}}</code>",
+			name_replace: "Renomme le projet de <code>{{before}}</code> vers <code>{{after}}</code>",
 			start_replace: "Modifie la date de début du projet de <code>{{before|date}}</code> vers <code>{{after|date}}</code>",
 			end_replace: "Modifie la date de fin du projet de <code>{{before|date}}</code> vers <code>{{after|date}}</code>",
-			country_replace: "Modifie le pays du project de <code>{{before}}</code> vers <code>{{after}}</code>",
-			visibility_replace: "Modifie la visibilité du project de <code>{{before}}</code> vers <code>{{after}}</code>",
+			country_replace: "Modifie le pays du projet de <code>{{before}}</code> vers <code>{{after}}</code>",
+			visibility_replace: "Modifie la visibilité du projet de <code>{{before}}</code> vers <code>{{after}}</code>",
 
 			themes_add: "Ajoute une thématique au projet",
 			themes_move: "Reordonne les thématiques du projet",
 			themes_remove: "Retire une thématique du projet",
 
-			entities_add: "Ajoute le site <code>{{item.name}}</code>",
-			entities_move: "Reordonne les sites du projet",
-			entities_remove: "Supprime le site <code>{{item.name}}</code>",
-			entities_name_replace: "Renomme le site <code>{{before}}</code> en <code>{{after}}</code>",
+			entities_add: "Ajoute le lieu <code>{{item.name}}</code>",
+			entities_move: "Reordonne les lieux du projet",
+			entities_remove: "Supprime le lieu <code>{{item.name}}</code>",
+			entities_name_replace: "Renomme le lieu <code>{{before}}</code> en <code>{{after}}</code>",
 			entities_start_replace: "Change la date de début du lieu <code>{{entity.name}}</code> de <code>{{before|date}}</code> vers <code>{{after|date}}</code>",
 			entities_end_replace: "Change la date de fin du lieu <code>{{entity.name}}</code> de <code>{{before|date}}</code> vers <code>{{after|date}}</code>",
 
@@ -274,9 +275,9 @@ var FRENCH_TRANSLATION = {
 			groups_move: "Reordonne les groupes du projet",
 			groups_remove: "Supprime le groupe <code>{{item.name}}</code>",
 			groups_name_replace: "Renomme le groupe <code>{{before}}</code> en <code>{{after}}</code>",
-			groups_members_add: "Ajoute le site <code>{{item.name}}</code> au groupe <code>{{group.name}}</code>",
-			groups_members_move: "Reordonne les sites du groupe <code>{{group.name}}</code>",
-			groups_members_remove: "Retire le site <code>{{item.name}}</code> du groupe <code>{{group.name}}</code>",
+			groups_members_add: "Ajoute le lieu <code>{{item.name}}</code> au groupe <code>{{group.name}}</code>",
+			groups_members_move: "Reordonne les lieux du groupe <code>{{group.name}}</code>",
+			groups_members_remove: "Retire le lieu <code>{{item.name}}</code> du groupe <code>{{group.name}}</code>",
 
 			users_add: "Ajoute l'utilisateur <code>{{item.id || item.username}}</code> au projet",
 			users_move: "Reordonne les utilisateurs du projet",
@@ -284,8 +285,8 @@ var FRENCH_TRANSLATION = {
 			users_name_replace: "Renomme le partenaire de <code>{{before}}</code> vers <code>{{after}}</code>",
 			users_password_replace: "Change le mot de passe de <code>{{user.id || user.username}}</code>",
 			users_role_replace: "Change le role de <code>{{user.id || user.username}}</code> de <code>{{before}}</code> vers <code>{{after}}</code>",
-			users_entities_add: "Autorise <code>{{user.id || user.username}}</code> à saisir sur le site <code>{{item.name}}</code>",
-			users_entities_move: "Reordonne les sites associés à l'utilisateur <code>{{user.id || user.username}}</code>",
+			users_entities_add: "Autorise <code>{{user.id || user.username}}</code> à saisir sur le lieu <code>{{item.name}}</code>",
+			users_entities_move: "Reordonne les lieux associés à l'utilisateur <code>{{user.id || user.username}}</code>",
 			users_entities_remove: "Retire l'autorisation de saisir sur <code>{{item.name}}</code> à l'utilisateur <code>{{user.id || user.username}}</code>",
 			users_dataSources_add: "Autorise <code>{{user.id || user.username}}</code> à saisir sur la source de données <code>{{item.name}}</code>",
 			users_dataSources_move: "Reordonne les sources de données associées à l'utilisateur <code>{{user.id || user.username}}</code>",
@@ -296,13 +297,12 @@ var FRENCH_TRANSLATION = {
 			forms_remove: "Supprime la source de données <code>{{item.name}}</code>",
 			forms_name_replace: "Renomme la source de données <code>{{before}}</code> en <code>{{after}}</code>",
 			forms_periodicity_replace: "Change la périodicité de <code>{{form.name}}</code> de <code>{{before}}</code> vers <code>{{after}}</code>",
-			forms_collect_replace: "Change le mode de collecte de <code>{{form.name}}</code> de <code>{{before}}</code> vers <code>{{after}}</code>",
 			forms_start_replace: "Change la date de début de <code>{{form.name}}</code> de <code>{{before|date}}</code> vers <code>{{after|date}}</code>",
 			forms_end_replace: "Change la date de fin de <code>{{form.name}}</code> de <code>{{before|date}}</code> vers <code>{{after|date}}</code>",
 
-			forms_entities_add: "Ajoute le site <code>{{item.name}}</code> à la source de données <code>{{form.name}}</code>",
-			forms_entities_move: "Reordonne les sites de la source de données <code>{{form.name}}</code>",
-			forms_entities_remove: "Retire le site <code>{{item.name}}</code> de la source de données <code>{{form.name}}</code>",
+			forms_entities_add: "Ajoute le lieu <code>{{item.name}}</code> à la source de données <code>{{form.name}}</code>",
+			forms_entities_move: "Reordonne les lieux de la source de données <code>{{form.name}}</code>",
+			forms_entities_remove: "Retire le lieu <code>{{item.name}}</code> de la source de données <code>{{form.name}}</code>",
 
 			forms_elements_add: "Ajoute la variable <code>{{item.name}}</code> dans <code>{{form.name}}</code>",
 			forms_elements_move: "Reordonne les variables de la source de données <code>{{form.name}}</code>",
@@ -310,30 +310,30 @@ var FRENCH_TRANSLATION = {
 			forms_elements_name_replace: "Renomme la variable <code>{{before}}</code> en <code>{{after}}</code>",
 			forms_elements_geoAgg_replace: "Change la règle d'aggrégation (lieux) de <code>{{variable.name}}</code> de <code>{{before}}</code> vers <code>{{after}}</code>",
 			forms_elements_timeAgg_replace: "Change la règle d'aggrégation (temps) de <code>{{variable.name}}</code> de <code>{{before}}</code> vers <code>{{after}}</code>",
-			forms_elements_order_replace: "Change l'ordre des lignes et colonnes de <code>{{variable.name}}</code>",
-			forms_elements_distribution_replace: "Change la distribution des lignes et colonnes de <code>{{variable.name}}</code>",
+			forms_elements_order_replace: "Change la présentation de la saisie de la variable <code>{{variable.name}}</code>",
+			forms_elements_distribution_replace: "Change la présentation de la saisie de la variable <code>{{variable.name}}</code>",
 
-			forms_elements_partitions_add: "Ajoute la partition <code>{{item.name}}</code> dans <code>{{variable.name}}</code>",
-			forms_elements_partitions_move: "Reordonne les partitions de <code>{{variable.name}}</code>",
-			forms_elements_partitions_remove: "Supprime la partition <code>{{item.name}}</code> de <code>{{variable.name}}</code>",
-			forms_elements_partitions_name_replace: "Renomme la partition <code>{{before}}</code> en <code>{{after}}</code> dans la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_aggregation_replace: "Change l'aggrégation de <code>{{before}}</code> vers <code>{{after}}</code> pour la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_add: "Ajoute la désagrégation <code>{{item.name}}</code> dans <code>{{variable.name}}</code>",
+			forms_elements_partitions_move: "Reordonne les désagrégations de <code>{{variable.name}}</code>",
+			forms_elements_partitions_remove: "Supprime la désagrégation <code>{{item.name}}</code> de <code>{{variable.name}}</code>",
+			forms_elements_partitions_name_replace: "Renomme la désagrégation <code>{{before}}</code> en <code>{{after}}</code> dans la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_aggregation_replace: "Change la règle d'aggrégation de <code>{{before}}</code> vers <code>{{after}}</code> pour la variable <code>{{variable.name}}</code>",
 
-			forms_elements_partitions_elements_add: "Ajoute l'élément <code>{{item.name}}</code> dans la partition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_elements_move: "Reordonne les éléments de la partitition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_elements_remove: "Supprime l'élément <code>{{item.name}}</code> dans la partition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_elements_name_replace: "Renomme l'élément de partition <code>{{before}}</code> en <code>{{after}}</code> dans la partitition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_elements_add: "Ajoute l'élément <code>{{item.name}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_elements_move: "Reordonne les éléments de la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_elements_remove: "Supprime l'élément <code>{{item.name}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_elements_name_replace: "Renomme <code>{{before}}</code> en <code>{{after}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
 
-			forms_elements_partitions_groups_add: "Ajoute le groupe <code>{{item.name}}</code> dans la partition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_groups_move: "Reordonne les groupes de la partition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_groups_remove: "Supprime le groupe <code>{{item.name}}</code> dans la partition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_groups_name_replace: "Renomme le groupe de partition <code>{{before}}</code> en <code>{{after}}</code> dans la partitition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_groups_members_add: "Ajoute le membre <code>{{item.name}}</code> au groupe de partition <code>{{group.name}}</code> dans la partitition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_groups_members_move: "Reordonne les membres du groupe de partition <code>{{group.name}}</code> dans la partitition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
-			forms_elements_partitions_groups_members_remove: "Retire le membre <code>{{item.name}}</code> du groupe de partition <code>{{group.name}}</code> dans la partitition <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_groups_add: "Ajoute le groupe <code>{{item.name}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_groups_move: "Reordonne les groupes de la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_groups_remove: "Supprime le groupe <code>{{item.name}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_groups_name_replace: "Renomme le groupe <code>{{before}}</code> en <code>{{after}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_groups_members_add: "Ajoute <code>{{item.name}}</code> au groupe <code>{{group.name}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_groups_members_move: "Reordonne les membres du groupe <code>{{group.name}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
+			forms_elements_partitions_groups_members_remove: "Retire <code>{{item.name}}</code> du groupe <code>{{group.name}}</code> dans la désagrégation <code>{{partition.name}}</code> de la variable <code>{{variable.name}}</code>",
 
 			logicalFrames_add: "Ajoute le cadre logique <code>{{item.name}}</code>",
-			logicalFrames_move: "Déplace le cadre logique <code>{{item.name}}</code>",
+			logicalFrames_move: "Reordonne les cadres logiques",
 			logicalFrames_remove: "Supprime le cadre logique <code>{{item.name}}</code>",
 			logicalFrames_name_replace: "Renomme le cadre logique <code>{{before}}</code> en <code>{{after}}</code>",
 			logicalFrames_goal_replace: "Change l'objectif général <code>{{before}}</code> en <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
@@ -350,7 +350,7 @@ var FRENCH_TRANSLATION = {
 			logicalFrames_purposes_outputs_move: "Reordonne des résultats dans le cadre logique <code>{{logicalFrame.name}}</code>",
 			logicalFrames_purposes_outputs_remove: "Supprime le résultat <code>{{item.description}}</code> du cadre logique <code>{{logicalFrame.name}}</code>",
 			logicalFrames_purposes_outputs_description_replace: "Change la description du résultat <code>{{before}}</code> en <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
-			logicalFrames_purposes_outputs_assumptions_replace: "Change les hypothèses du resultat <code>{{output.description}}</code> de <code>{{before}}</code> vers <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
+			logicalFrames_purposes_outputs_assumptions_replace: "Change les hypothèses du résultat <code>{{output.description}}</code> de <code>{{before}}</code> vers <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
 
 			logicalFrames_purposes_outputs_activities_add: "Ajoute l'activité <code>{{item.description}}</code> au cadre logique <code>{{logicalFrame.name}}</code>",
 			logicalFrames_purposes_outputs_activities_move: "Reordonne des activités dans le cadre logique <code>{{logicalFrame.name}}</code>",
@@ -380,7 +380,7 @@ var FRENCH_TRANSLATION = {
 			crossCutting_baseline_replace: "Change la valeur initiale d'un indicateur transversal de <code>{{before}}</code> vers <code>{{after}}</code>",
 			crossCutting_target_replace: "Change la cible d'un indicateur transversal de <code>{{before}}</code> vers <code>{{after}}</code>",
 			crossCutting_colorize_replace: "Change la colorisation d'un indicateur transversal de <code>{{before}}</code> vers <code>{{after}}</code>",
-			crossCutting_computation_replace: "Change le calcul d'un indicateur transversal",
+			crossCutting_computation_replace: "Change le calcul d'un indicateur transversal"
 		},
 
 		visibility: {
@@ -407,7 +407,7 @@ var FRENCH_TRANSLATION = {
 		general_info: "Information génerales",
 		collected_by: "Information collectée par",
 		reporting_empty: "Aucun indicateur n'a été ajouté dans cette section.",
-		no_cross_cutting: "Ce project n'a besoin de collecter aucun indicateur transversal. Avez-vous bien renseigné vos thématiques?",
+		no_cross_cutting: "Ce projet n'a besoin de collecter aucun indicateur transversal. Avez-vous bien renseigné vos thématiques?",
 		indicator_computation_missing: "Calcul absent",
 		delete_input: "Êtes-vous sûr de vouloir supprimer cette saisie?",
 		zero_theme_indicator: "Sans thématique",
@@ -815,7 +815,7 @@ var FRENCH_TRANSLATION = {
 			"<p>Il n'est pas nécessaire de créer de comptes pour les nouveaux utilisateurs si ceux-ci possède un compte Médecins du Monde: après leur première connexion ils apparaitront automatiquement ici. Pour les utilisateurs hors MDM, il est possible de créer des comptes partenaires depuis l'interface de gestion des projets.</p>",
 
 		edit_info:
-			"<p>Vous pouvez ici éditer les permissions d'autres utilisateurs que vous sur le site. Cliquez sur \"Afficher l'aide sur ce champ\" pour avoir plus de détails sur les différents niveaux d'autorisation disponibles</p>",
+			"<p>Vous pouvez ici éditer les permissions d'autres utilisateurs que vous sur le lieu. Cliquez sur \"Afficher l'aide sur ce champ\" pour avoir plus de détails sur les différents niveaux d'autorisation disponibles</p>",
 
 		roles_short: {
 			admin: "Administrateur",
