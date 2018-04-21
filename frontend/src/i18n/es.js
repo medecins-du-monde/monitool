@@ -248,7 +248,7 @@ var SPANISH_TRANSLATION = {
 		revision_datetime: "Fecha & Usuario",
 		revision_changes: "Cambios",
 		revision_restore: "Volver a este punto",
-		revision_save_to_confirm: "Salve para confirmar que desea volver a este punto",
+		revision_save_to_confirm: "Guarde para confirmar que desea volver a este punto",
 		revision_is_equivalent: "Este punto es equivalente al estado actual del proyecto",
 		revision_none: "No hay historial en este proyecto",
 		revision_show_more: "Ver cambios mas antiguos",
