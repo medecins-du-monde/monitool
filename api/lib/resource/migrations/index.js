@@ -1,14 +1,14 @@
 
-import migration0 from './migration-0';
-import migration1 from './migration-1';
-import migration2 from './migration-2';
-import migration3 from './migration-3';
-import migration4 from './migration-4';
-import migration5 from './migration-5';
-import migration6 from './migration-6';
-import migration7 from './migration-7';
-import migration8 from './migration-8';
-import migration9 from './migration-9';
+import migration0 from './migration-00';
+import migration1 from './migration-01';
+import migration2 from './migration-02';
+import migration3 from './migration-03';
+import migration4 from './migration-04';
+import migration5 from './migration-05';
+import migration6 from './migration-06';
+import migration7 from './migration-07';
+import migration8 from './migration-08';
+import migration9 from './migration-09';
 
 export default [
 	migration0,
