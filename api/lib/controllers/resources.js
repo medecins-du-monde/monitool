@@ -185,9 +185,7 @@ export default express.Router()
 			if (q.mode && q.mode.startsWith('ids_by_')) {
 				let ids;
 				if (q.mode === 'ids_by_form')
-					ids = await Input.storeInstance.listIdsByDataSource(q.projectId, q.formId);
-				else if (q.mode === 'ids_by_entity')
-					ids = await Input.storeInstance.listIdsByEntity(q.projectId, q.entityId);
+					ids = await Input.storeInstance.listIdsByDataSource(q.projectId, q.formId, true);
 				else
 					throw new Error('invalid_mode');
 

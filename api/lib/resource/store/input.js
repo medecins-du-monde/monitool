@@ -35,7 +35,7 @@ export default class InputStore extends Store {
 	 *		- Populate datasource planning (/projects/xxx/input).
 	 *		- Display warning message when data source is deleted.
 	 */
-	async listIdsByDataSource(projectId, formId) {
+	async listIdsByDataSource(projectId, formId, update=false) {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
 			throw new Error('missing_parameter');
 
@@ -44,31 +44,34 @@ export default class InputStore extends Store {
 			{startkey: [projectId, formId], endkey: [projectId, formId, {}]}
 		);
 
-		return result.rows.map(item => item.id);
-	}
+		let inputIds = result.rows.map(item => item.id);
+		if (update) {
+			const project = await Project.storeInstance.get(projectId);
+			const dataSource = project.getDataSourceById(formId);
 
-	/**
-	 * Retrieve all input ids that are linked to a particular entity.
-	 * Used to display warning message when entity is deleted.
-	 */
-	async listIdsByEntity(projectId, entityId) {
-		if (typeof projectId !== 'string' || typeof entityId !== 'string')
-			throw new Error('missing_parameter');
+			// Remove inputs that are no longer relevant
+			if (dataSource)
+				inputIds = inputIds.filter(id => project.getEntityById(id.substr(51, 36)));
+			else
+				inputIds = [];
+		}
 
-		const result = await this._db.callView(
-			'inputs_by_project_entity_date',
-			{startkey: [projectId, entityId], endkey: [projectId, entityId, {}]}
-		);
-
-		return result.rows.map(item => item.id);
+		return inputIds;
 	}
 
 	async list(update=false) {
-		const inputs = await super.list();
+		let inputs = await super.list();
 
 		if (update) {
 			const projects = await Project.storeInstance.list();
 
+			// Remove inputs that are no longer relevant
+			inputs = inputs.filter(input => {
+				const project = projects.find(p => p._id === input.project);
+				return project.getDataSourceById(input.form) && project.getEntityById(input.entity);
+			});
+
+			// Update structure
 			inputs.forEach(input => {
 				const project = projects.find(p => p._id === input.project);
 				const dataSource = project.getDataSourceById(input.form);
@@ -94,10 +97,16 @@ export default class InputStore extends Store {
 			endkey: 'input:' + projectId + ':~'
 		});
 
-		const inputs = result.rows.map(row => new Input(row.doc));
+		let inputs = result.rows.map(row => new Input(row.doc));
 		if (update) {
 			const project = await Project.storeInstance.get(projectId);
 
+			// Remove inputs that are no longer relevant
+			inputs = inputs.filter(input => {
+				return project.getDataSourceById(input.form) && project.getEntityById(input.entity);
+			});
+
+			// Update structure
 			inputs.forEach(input => {
 				const dataSource = project.getDataSourceById(input.form);
 				input.update(dataSource.structure)
@@ -120,12 +129,13 @@ export default class InputStore extends Store {
 			{include_docs: true, startkey: [projectId, formId], endkey: [projectId, formId, {}]}
 		);
 
-		const inputs = result.rows.map(row => new Input(row.doc));
+		let inputs = result.rows.map(row => new Input(row.doc));
 
 		if (update) {
 			const project = await Project.storeInstance.get(projectId);
 			const dataSource = project.getDataSourceById(formId);
 
+			inputs = inputs.filter(input => dataSource && project.getEntityById(input.entity));
 			inputs.forEach(input => input.update(dataSource.structure));
 		}
 
@@ -147,8 +157,8 @@ export default class InputStore extends Store {
 			Input    = this.modelClass;
 
 		const result = await this._db.callList(options);
-		let inputs;
 
+		let inputs;
 		if (result.rows.length === 0)
 			inputs = [];
 

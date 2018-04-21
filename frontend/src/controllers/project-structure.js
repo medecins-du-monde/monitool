@@ -139,17 +139,7 @@ angular
 		};
 
 		$scope.deleteEntity = function(entityId) {
-			// Fetch this forms inputs.
-			Input.query({mode: "ids_by_entity", projectId: $scope.editableProject._id, entityId: entityId}).$promise.then(function(inputIds) {
-				var question = $filter('translate')('project.delete_entity', {num_inputs: inputIds.length}),
-					answer   = $filter('translate')('project.delete_entity_answer', {num_inputs: inputIds.length});
-
-				var really = inputIds.length == 0 || (inputIds.length && window.prompt(question) == answer);
-
-				// If there are none, just confirm that the user wants to do this for real.
-				if (really)
-					$scope.editableProject.removeEntity(entityId);
-			});
+			$scope.editableProject.removeEntity(entityId);
 		};
 
 		$scope.createGroup = function() {
@@ -298,30 +288,18 @@ angular
 
 		// The delete button ask for confirmation when data will be lost.
 		$scope.deleteForm = function() {
-			// Translate confirmation messages.
-			var easy_question = $filter('translate')('project.delete_form_easy'),
-				hard_question = $filter('translate')('project.delete_form_hard', {num_inputs: formUsage.length}),
-				answer = $filter('translate')('project.delete_form_hard_answer', {num_inputs: formUsage.length});
+			// Kill the watches
+			w1(); w3();
 
-			// Ask confirmation to user (simple confirmation if no inputs were entered, copy a string if inputs will be lost).
-			var really = (formUsage.length == 0 && window.confirm(easy_question))
-				|| (formUsage.length && window.prompt(hard_question) == answer);
+			// Remove the form
+			$scope.editableProject.forms.splice($scope.currentFormIndex, 1);
 
-			// If user is OK with the data lost, remove the form, save and go back to the list of forms.
-			if (really) {
-				// Kill the watches
-				w1(); w3();
-
-				// Remove the form
-				$scope.editableProject.forms.splice($scope.currentFormIndex, 1);
-
-				// Give some time for the watches to update the flags
-				$timeout(function() {
-					$scope.$parent.save(true).then(function() {
-						$state.go('main.project.structure.collection_form_list');
-					});
+			// Give some time for the watches to update the flags
+			$timeout(function() {
+				$scope.$parent.save(true).then(function() {
+					$state.go('main.project.structure.collection_form_list');
 				});
-			}
+			});
 		};
 
 		// Watch currentForm. If undefined, means that user clicked "cancel changes" on a new project.
