@@ -80,21 +80,21 @@ angular
 			$scope.projectSaveRunning = true;
 			$scope.editableProject.sanitize(indicators);
 
-			return $scope.editableProject.$save().then(function() {
-				angular.copy($scope.editableProject, $scope.masterProject);
-				$scope.projectChanged = false;
-				$scope.projectSavable = false;
-				$scope.projectSaveRunning = false;
+			return $scope.editableProject.$save()
+				.then(function() {
+					angular.copy($scope.editableProject, $scope.masterProject);
+					$scope.projectChanged = false;
+					$scope.projectSavable = false;
+					$scope.projectSaveRunning = false;
+					$scope.$broadcast('projectSaved');
+				})
+				.catch(function(error) {
+					// Display message to tell user that it's not possible to save.
+					var translate = $filter('translate');
+					alert(translate('project.saving_failed'));
 
-			}).catch(function(error) {
-				// Display message to tell user that it's not possible to save.
-				var translate = $filter('translate');
-				alert(translate('project.saving_failed'));
-
-				$scope.projectSaveRunning = false;
-				// reload page.
-				// window.location.reload();
-			});
+					$scope.projectSaveRunning = false;
+				});
 		};
 
 		$scope.reset = function() {
@@ -104,6 +104,7 @@ angular
 
 			// Clone last saved version of project.
 			angular.copy($scope.masterProject, $scope.editableProject);
+			$scope.$broadcast('projectReset');
 		};
 	})
 
@@ -702,45 +703,46 @@ angular
 		$scope.cancel = function() { $uibModalInstance.dismiss(); };
 	})
 
+	.controller('ProjectRevisions', function($scope, Revision) {
+		var currentOffset = 0, pageSize = 10;
 
-	.controller('ProjectRevisions', function($scope, Revision, revisions) {
-		// Note to self: this has nothing to do in the controller.
-		var recomputeRevision = function(fromIndex) {
-			// Complete the information by computing afterState, beforeState, and forward patches.
-			for (var i = fromIndex; i < $scope.revisions.length; ++i) {
-				// Compute before and after state
-				$scope.revisions[i].after = i === 0 ? $scope.masterProject : $scope.revisions[i - 1].before;
+		$scope.loading = false;
+		$scope.revisions = [];
 
-				$scope.revisions[i].before = jsonpatch.applyPatch(
-					jsonpatch.deepClone($scope.revisions[i].after),
-					$scope.revisions[i].backwards
-				).newDocument;
-			}
-		};
+		// Listen to the project reset event to reset selectedIndex.
+		$scope.$on('projectReset', function() {
+			$scope.selectedIndex = -1;
+		});
 
-		var currentOffset = 0,
-			pageSize = 10; // @hack This is hardcoded in app.js, do not update here only
-
-		$scope.revisions = revisions;
-		$scope.finished = revisions.length < pageSize;
-
-		recomputeRevision(currentOffset);
+		// Listen to the project saved event to reload
+		$scope.$on('projectSaved', function() {
+			currentOffset = 0;
+			$scope.selectedIndex = -1;
+			$scope.revisions = [];
+			$scope.showMore();
+		});
 
 		$scope.showMore = function() {
-			currentOffset = currentOffset + pageSize;
-			Revision.query({projectId: $scope.masterProject._id, offset: currentOffset, limit: pageSize}).$promise.then(function(newRevisions) {
-				$scope.finished = newRevisions.length < pageSize;
+			if ($scope.loading)
+				return;
 
+			var params = {projectId: $scope.masterProject._id, offset: currentOffset, limit: pageSize};
+			currentOffset = currentOffset + pageSize;
+			$scope.loading = true;
+
+			Revision.query(params).$promise.then(function(newRevisions) {
+				$scope.loading = false;
+				$scope.finished = newRevisions.length < pageSize;
 				$scope.revisions = $scope.revisions.concat(newRevisions);
-				recomputeRevision(currentOffset);
+				Revision.enrich($scope.masterProject, $scope.revisions);
 			});
 		};
 
 		$scope.restore = function(index) {
 			$scope.selectedIndex = index;
-			var project = $scope.revisions[index].before;
-			for (var key in project)
-				$scope.editableProject[key] = project[key];
+			angular.copy($scope.revisions[index].before, $scope.editableProject);
 		};
+
+		$scope.showMore();
 	})
 

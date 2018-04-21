@@ -246,6 +246,11 @@ var FRENCH_TRANSLATION = {
 
 		revisions: "Historique",
 		revision_info: "L'historique des modifications vous permet de consulter la liste des modifications faites sur la structure de votre projet.",
+		revision_datetime: "Date & Utilisateur",
+		revision_changes: "Modifications apportées au projet",
+		revision_restore: "Revenir à ce point",
+		revision_save_to_confirm: "Sauvegardez pour confirmer de revenir à ce point",
+		revision_is_equivalent: "Ce point est équivalent à l'état actuel du projet",
 
 		history: {
 			name_replace: "Renomme le project de <code>{{before}}</code> vers <code>{{after}}</code>",

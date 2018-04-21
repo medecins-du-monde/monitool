@@ -302,12 +302,7 @@ window.monitool.config(function($stateProvider, $urlRouterProvider) {
 	$stateProvider.state('main.project.structure.revisions', {
 		url: '/revisions',
 		templateUrl: 'partials/projects/structure/revisions.html',
-		controller: 'ProjectRevisions',
-		resolve: {
-			revisions: function(Revision, project) {
-				return Revision.query({projectId: project._id, limit: 10}).$promise;
-			}
-		}
+		controller: 'ProjectRevisions'
 	});
 
 	///////////////////////////

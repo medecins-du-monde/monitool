@@ -722,3 +722,16 @@ td.empty {
 td.empty > span {
   display: none;
 }
+
+
+  .revtbody .restore {
+    display: none;
+  }
+
+  .revtbody:HOVER .restore, .revtbody .selected {
+    display: table-row;
+  }
+
+  .table>tbody.revtbody+tbody.revtbody {
+    border-top-width: 1px;
+  }
