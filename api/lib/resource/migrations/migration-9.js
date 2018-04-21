@@ -1,7 +1,7 @@
 import database from '../database';
 
 /**
- * this migration add the missing "dataSources" field on all projects.
+ * Add structure to all inputs to make it possible to update them at fetch time.
  */
 export default async function() {
 	let projects = await database.callView('by_type', {include_docs: true, key: 'project'}),

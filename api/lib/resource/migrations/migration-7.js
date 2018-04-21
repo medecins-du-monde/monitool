@@ -1,7 +1,7 @@
 import database from '../database';
 
 /**
- * this migration add the missing "visibility" field on all projects.
+ * Add "visibility" field on projects.
  */
 export default async function() {
 	let ddoc = await database.get('_design/monitool')

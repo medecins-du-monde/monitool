@@ -1,7 +1,7 @@
 import database from '../database';
 
 /**
- * this migration add the missing "dataSources" field on all projects.
+ * Add logicalframe start/end dates.
  */
 export default async function() {
 	let result = await database.callView('by_type', {include_docs: true, key: 'project'});
