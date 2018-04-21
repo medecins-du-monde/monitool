@@ -642,7 +642,8 @@ var SPANISH_TRANSLATION = {
 		logframe_help_activity_indicators: "Entre los indicadores que permiten medir la actividad",
 
 		logframe_edit_help_start: "Si este marco lógico no es valido desde el principio del proyecto indique lo aqui, sino deje el valor por defecto",
-		logframe_edit_help_end: "Si este marco lógico no es valido hasta el final del proyecto indique lo aqui, sino deje el valor por defecto"
+		logframe_edit_help_end: "Si este marco lógico no es valido hasta el final del proyecto indique lo aqui, sino deje el valor por defecto",
+		form_is_not_associated_with_site: "Esta fuente de datos no esta asociada a ningún lugar de colecta."
 	},
 
 	form: {

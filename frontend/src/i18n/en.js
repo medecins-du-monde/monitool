@@ -642,7 +642,8 @@ var ENGLISH_TRANSLATION = {
 		logframe_help_activity_indicators: "Enter here the indicators that allows to measure the activity progress",
 
 		logframe_edit_help_start: "If this logical framework is not valid since the start of the project enter the date here, otherwise, leave the default value",
-		logframe_edit_help_end: "If this logical framework is not valid up to the end of the project enter the date here, otherwise, leave the default value"
+		logframe_edit_help_end: "If this logical framework is not valid up to the end of the project enter the date here, otherwise, leave the default value",
+		form_is_not_associated_with_site: "This data source is not associated with any collection site."
 	},
 
 	form: {

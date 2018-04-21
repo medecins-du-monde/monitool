@@ -25,7 +25,11 @@
 
 <legend>{{::form.name}}</legend>
 
-<div id="input-list">
+<div ng-if="!form.entities.length">
+	<span translate="project.form_is_not_associated_with_site"></span>
+</div>
+
+<div id="input-list" ng-if="form.entities.length">
 
 	<div id="table1-container">
 		<table id="table1" class="table table-bordered table-stripped table-condensed">

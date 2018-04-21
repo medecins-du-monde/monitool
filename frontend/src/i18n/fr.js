@@ -783,7 +783,8 @@ var FRENCH_TRANSLATION = {
 		logframe_help_activity_indicators: "Rentrez ici les indicateurs permettant de mesurer l'avancement de l'activité",
 
 		logframe_edit_help_start: "Si ce cadre logique n'est pas valable à partir du début du projet indiquez le ici, sinon laisser 'Idem début du projet'",
-		logframe_edit_help_end: "Si ce cadre logique n'est pas valable jusqu'à la fin du projet indiquez le ici, sinon laisser 'Idem fin du projet'"
+		logframe_edit_help_end: "Si ce cadre logique n'est pas valable jusqu'à la fin du projet indiquez le ici, sinon laisser 'Idem fin du projet'",
+		form_is_not_associated_with_site: "Cette source de données n'est associé à aucun lieu de collecte."
 	},
 
 	form: {
