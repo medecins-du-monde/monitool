@@ -31,18 +31,16 @@ export default class InputStore extends Store {
 
 	/**
 	 * Retrieve all input ids that are linked to a particular data source.
-	 * Usage
-	 *		- Populate datasource planning (/projects/xxx/input).
-	 *		- Display warning message when data source is deleted.
+	 * Used to populate datasource planning (/projects/xxx/input).
 	 */
 	async listIdsByDataSource(projectId, formId, update=false) {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
 			throw new Error('missing_parameter');
 
-		const result = await this._db.callView(
-			'inputs_by_project_form_date',
-			{startkey: [projectId, formId], endkey: [projectId, formId, {}]}
-		);
+		const result = await this._db.callList({
+			startkey: "input:" + projectId + ":" + formId + ":!",
+			endkey: "input:" + projectId + ":" + formId + ":~"
+		});
 
 		let inputIds = result.rows.map(item => item.id);
 		if (update) {
@@ -51,7 +49,7 @@ export default class InputStore extends Store {
 
 			// Remove inputs that are no longer relevant
 			if (dataSource)
-				inputIds = inputIds.filter(id => project.getEntityById(id.substr(51, 36)));
+				inputIds = inputIds.filter(id => project.getEntityById(id.substr(88, 36)));
 			else
 				inputIds = [];
 		}
@@ -124,10 +122,11 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
 			throw new Error('missing_parameter');
 
-		const result = await this._db.callView(
-			'inputs_by_project_form_date',
-			{include_docs: true, startkey: [projectId, formId], endkey: [projectId, formId, {}]}
-		);
+		const result = await this._db.callView({
+			include_docs: true,
+			startkey: "input:" + projectId + ":" + formId + ":!",
+			endkey: "input:" + projectId + ":" + formId + ":~"
+		});
 
 		let inputs = result.rows.map(row => new Input(row.doc));
 
@@ -150,13 +149,14 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string' || typeof formId !== 'string' || typeof entityId !== 'string' || typeof period !== 'string')
 			throw new Error('missing_parameter');
 
-		var id       = ['input', projectId, entityId, formId, period].join(':'),
-			startKey = id,
-			endKey   = ['input', projectId, entityId, formId].join(':'),
-			options  = {startkey: startKey, endkey: endKey, descending: true, limit: 2, include_docs: true},
-			Input    = this.modelClass;
-
-		const result = await this._db.callList(options);
+		const id = 'input:' + projectId + ":" + formId + ":" + entityId + ":" + period;
+		const result = await this._db.callList({
+			startkey: id,
+			endkey: 'input:' + projectId + ":" + formId + ":" + entityId,
+			descending: true,
+			limit: 2,
+			include_docs: true
+		});
 
 		let inputs;
 		if (result.rows.length === 0)

@@ -32,7 +32,7 @@ angular
 
 				inputsDone.forEach(function(inputId) {
 					var splitted      = inputId.split(':'),
-						inputEntityId = splitted[3],
+						inputEntityId = splitted[4],
 						strPeriod     = splitted[5];
 
 					prj[strPeriod] = prj[strPeriod] || {};
@@ -80,7 +80,7 @@ angular
 				formId: formId,
 				period: period
 			}).$promise.then(function(result) {
-				var currentInputId = ['input', project._id, entityId, formId, period].join(':');
+				var currentInputId = ['input', project._id, formId, entityId, period].join(':');
 
 				// both where found
 				if (result.length === 2)

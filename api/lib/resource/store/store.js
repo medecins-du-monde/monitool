@@ -53,10 +53,11 @@ export default class Store {
 	 * @return {Array.<Model>}
 	 */
 	async list() {
-		const viewResult = await this._db.callView(
-			'by_type',
-			{include_docs: true, key: this.modelString}
-		);
+		const viewResult = await this._db.callList({
+			include_docs: true,
+			startkey: this.modelString + ":!",
+			endkey: this.modelString + ":~"
+		});
 
 		return viewResult.rows.map(row => new this.modelClass(row.doc));
 	}

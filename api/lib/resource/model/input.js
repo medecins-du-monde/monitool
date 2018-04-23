@@ -44,7 +44,7 @@ export default class Input extends DbModel {
 		super(data, validate);
 
 		// check that id decomposition matches what's in the rest of document.
-		let isValid = this._id === ['input', this.project, this.entity, this.form, this.period].join(':');
+		let isValid = this._id === ['input', this.project, this.form, this.entity, this.period].join(':');
 		if (!isValid)
 			throw new Error('invalid_id');
 

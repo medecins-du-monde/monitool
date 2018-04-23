@@ -4,6 +4,11 @@ const migrateDesignDoc = async () => {
 	// Update design document.
 	const ddoc = await database.get('_design/monitool');
 
+	delete ddoc.views.by_type;
+	delete ddoc.views.inputs_by_project_date;
+	delete ddoc.views.inputs_by_project_entity_date;
+	delete ddoc.views.inputs_by_project_form_date;
+
 	ddoc.views.projects_short = {
 		map: function(doc) {
 			if (doc.type === 'project') {
@@ -147,7 +152,7 @@ const migrateInputs = async () => {
 		const input = await database.get(dbResults.rows[i].id);
 		const deleted = {_id: input._id, _rev: input._rev, _deleted: true};
 
-		input._id = 'input:project:' + input._id;
+		input._id = 'input:project:' + input.project + ":" + input.form + ":" + input.entity + ":" + input.period;
 		delete input._rev;
 		input.project = 'project:' + input.project;
 		input.structure = {};
@@ -231,10 +236,10 @@ const migrateUsers = async () => {
  * Add activities to projects.
  */
 export default async function() {
-	await migrateDesignDoc();
 	await migrateProjects();
 	await migrateInputs();
 	await migrateIndicators();
 	await migrateThemes();
 	await migrateUsers();
+	await migrateDesignDoc();
 };

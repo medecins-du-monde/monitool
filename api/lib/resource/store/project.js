@@ -181,19 +181,22 @@ export default class ProjectStore extends Store {
 			return [user.projectId];
 
 		else if (user.type === 'user') {
-			let dbResults;
-			if (user.role === 'admin')
-				dbResults = (await this._db.callView('by_type', {key: 'project'})).rows;
+			let dbRows;
+
+			if (user.role === 'admin') {
+				const dbResult = await this._db.callList({startkey: 'project:!', endkey: 'project:~'});
+				dbRows = dbResult.rows;
+			}
 			else {
 				const [publicIds, privateIds] = await Promise.all([
 					this._db.callView('projects_public'),
 					this._db.callView('projects_private', {key: user._id})
 				]);
 
-				dbResults = [...publicIds.rows, ...privateIds.rows];
+				dbRows = [...publicIds.rows, ...privateIds.rows];
 			}
 
-			return dbResults.map(row => row.id);
+			return dbRows.map(row => row.id);
 		}
 
 		else
