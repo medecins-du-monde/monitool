@@ -125,11 +125,10 @@ const migrateProjects = async () => {
 			documents.push(project);
 		}
 
+		// Insert 20 by 20 to avoid killing the database
+		while (documents.length)
+			await database.callBulk({docs: documents.splice(0, 20)});
 	}
-
-	// Insert 20 by 20 to avoid killing the database
-	while (documents.length)
-		await database.callBulk({docs: documents.splice(0, 20)});
 };
 
 const migrateInputs = async () => {
@@ -238,6 +237,4 @@ export default async function() {
 	await migrateIndicators();
 	await migrateThemes();
 	await migrateUsers();
-
-	// throw new Error();
 };

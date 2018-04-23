@@ -6,19 +6,19 @@ import uuid from 'node-uuid';
  * directly to the project.
  * The same effect is obtained by creating a fake collection site.
  */
-export default async function() {
+export default async () => {
 	const projectResult = await database.callView('by_type', {include_docs: true, key: 'project'});
 	const documents = [];
 	const projectUUIDs = {};
 
 	// Start by updating projects.
-	projectResult.rows.forEach(function(row) {
+	projectResult.rows.forEach(row => {
 		var update = false, hasProjectLevelForms = false;
 		var project = row.doc;
 
 		projectUUIDs[project._id] = uuid.v4();
 
-		project.forms.forEach(function(form) {
+		project.forms.forEach(form => {
 			if (form.collect === 'project') {
 				hasProjectLevelForms = true;
 				form.entities = [projectUUIDs[project._id]];
@@ -31,7 +31,7 @@ export default async function() {
 			update = true;
 		});
 
-		project.users.forEach(function(user) {
+		project.users.forEach(user => {
 			if (user.role === 'input') {
 				var index = user.entities.indexOf('none');
 
@@ -54,7 +54,7 @@ export default async function() {
 	// Then inputs.
 	const inputResult = await database.callView('by_type', {include_docs: true, key: 'input'});
 
-	inputResult.rows.forEach(function(row) {
+	inputResult.rows.forEach(row => {
 		var input = row.doc;
 
 		if (input.entity === 'none') {
