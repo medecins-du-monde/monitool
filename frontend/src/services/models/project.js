@@ -108,36 +108,6 @@ angular
 			return false;
 		}
 
-		/**
-		 * Add an entity to the project.
-		 */
-		Project.prototype.createEntity = function() {
-			this.entities.push({id: uuid.v4(), name: '', start: null, end: null});
-		};
-
-		/**
-		 * Remove an entity from the project, with all related dependencies.
-		 */
-		Project.prototype.removeEntity = function(entityId) {
-			this.entities = this.entities.filter(function(e) { return e.id !== entityId; });
-			this.sanitize();
-		};
-
-
-		/**
-		 * Add a group to the project.
-		 */
-		 Project.prototype.createGroup = function() {
-			this.groups.push({id: uuid.v4(), name: '', members: []});
-		};
-
-		/**
-		 * Remove a group from the project, with all related dependencies.
-		 */
-		Project.prototype.removeGroup = function(groupId) {
-			this.groups = this.groups.filter(function(group) { return group.id !== groupId; });
-		};
-
 		Project.prototype.canInputForm = function(projectUser, formId) {
 			if (!projectUser)
 				return false;

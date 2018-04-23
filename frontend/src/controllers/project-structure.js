@@ -121,21 +121,22 @@ angular
 	 * Controller used by the "main.project.structure.collection_site_list" state.
 	 * Allows to change entities and groups.
 	 */
-	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input) {
+	.controller('ProjectCollectionSiteListController', function($scope, uuid) {
 		$scope.createEntity = function() {
-			$scope.editableProject.createEntity();
+			$scope.editableProject.entities.push({id: uuid.v4(), name: '', start: null, end: null});
 		};
 
 		$scope.deleteEntity = function(entityId) {
-			$scope.editableProject.removeEntity(entityId);
+			$scope.editableProject.entities = $scope.editableProject.entities.filter(function(e) { return e.id !== entityId; });
+			$scope.editableProject.sanitize();
 		};
 
 		$scope.createGroup = function() {
-			$scope.editableProject.createGroup();
+			$scope.editableProject.groups.push({id: uuid.v4(), name: '', members: []});
 		};
 
 		$scope.deleteGroup = function(groupId) {
-			$scope.editableProject.removeGroup(groupId);
+			$scope.editableProject.groups = $scope.editableProject.groups.filter(function(group) { return group.id !== groupId; });
 		};
 	})
 
