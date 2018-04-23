@@ -3,7 +3,7 @@ import database from '../database';
 /**
  * This migration update a function in the design doc.
  */
-export default function() {
+export default async function() {
 	return database.get('_design/monitool').then(function(ddoc) {
 
 		ddoc.views.partners.map = function(doc) {

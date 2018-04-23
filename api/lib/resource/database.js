@@ -175,9 +175,9 @@ class Database {
 	 *
 	 * @return {Model}
 	 */
-	async get(id) {
+	async get(id, params=undefined) {
 		return new Promise((resolve, reject) => {
-			this.database.get(id, function(error, data) {
+			this.database.get(id, params, function(error, data) {
 				if (error)
 					reject(error);
 				else
