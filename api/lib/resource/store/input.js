@@ -122,7 +122,7 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string' || typeof formId !== 'string')
 			throw new Error('missing_parameter');
 
-		const result = await this._db.callView({
+		const result = await this._db.callList({
 			include_docs: true,
 			startkey: "input:" + projectId + ":" + formId + ":!",
 			endkey: "input:" + projectId + ":" + formId + ":~"
