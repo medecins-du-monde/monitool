@@ -8,6 +8,7 @@ const migrateDesignDoc = async () => {
 	delete ddoc.views.inputs_by_project_date;
 	delete ddoc.views.inputs_by_project_entity_date;
 	delete ddoc.views.inputs_by_project_form_date;
+	delete ddoc.views.themes_usage;
 
 	ddoc.views.projects_short = {
 		map: function(doc) {

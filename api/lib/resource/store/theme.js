@@ -29,23 +29,4 @@ export default class ThemeStore extends Store {
 		return Theme;
 	}
 
-	/**
-	 * Retrieve all themes with their relative usage
-	 */
-	async listWithUsage() {
-		const [themes, usage] = await Promise.all([
-			this.list(),
-			this._db.callView('themes_usage', {group: true})
-		]);
-
-		themes.forEach(theme => {
-			var projectUsage = usage.rows.filter(row => row.key[0] === theme._id && row.key[1] === 'project'),
-				indicatorUsage = usage.rows.filter(row => row.key[0] === theme._id && row.key[1] === 'indicator');
-
-			theme.__projectUsage   = projectUsage.length ? projectUsage[0].value : 0;
-			theme.__indicatorUsage = indicatorUsage.length ? indicatorUsage[0].value : 0;
-		});
-
-		return themes;
-	}
 }
