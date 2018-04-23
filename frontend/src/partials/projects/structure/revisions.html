@@ -1,6 +1,6 @@
 <ol class="breadcrumb noprint">
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
-	<li class="active" title="{{masterProject.country}}" ng-bind="masterProject.country|maxLength:50"></li>
+	<li class="active" title="{{masterProject.country}}" ng-bind="masterProject.country|maxLength:20"></li>
 	<li class="active" title="{{masterProject.name}}" ng-bind="masterProject.name|maxLength:50"></li>
 	<li class="active" translate="project.revisions"></li>
 </ol>
