@@ -498,7 +498,6 @@ var ENGLISH_TRANSLATION = {
 			time: "Dates"
 		},
 
-		please_enter_new_name: "Enter a name for the new project",
 		edit_user: "User edition",
 		update_user: "Update the user",
 		user_type: "Type",
@@ -534,6 +533,7 @@ var ENGLISH_TRANSLATION = {
 		field_distribution: "Distribution",
 		cant_create: "You are not allowed to create new projects",
 		my_projects: "My projects",
+		are_you_sure_to_clone: "This action will clone this project, and all related input. Confirm to continue.",
 		are_you_sure_to_delete: "Please type: 'Yes, I do want to delete this project' to confirm",
 		are_you_sure_to_delete_answer: "Yes, I do want to delete this project",
 		data_selection: "Data selection",

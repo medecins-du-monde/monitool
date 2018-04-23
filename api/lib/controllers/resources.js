@@ -109,41 +109,89 @@ export default express.Router()
 	 */
 	.put('/project/:id', bodyParser, function(request, response) {
 		Promise.resolve().then(async () => {
-			// Validate that the _id in the payload is the same as the id in the URL.
-			if (request.body._id !== request.params.id)
-				throw new Error('id_mismatch');
+			// User is cloning a project
+			if (request.query.from) {
+				// Check that destination id is valid.
+				if (!/^project:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(request.params.id))
+					throw new Error('invalid_data');
 
-			// Get old project
-			let oldProject = null;
-			try {
-				oldProject = await Project.storeInstance.get(request.params.id);
-			}
-			catch (error) {
-				if (error.message !== 'missing')
-					throw error;
-			}
-
-			// Check ACLS
-			if (oldProject) {
-				// This is a project update, we need to make sure that user is owner.
-				if ('owner' !== oldProject.getRole(request.user))
-					throw new Error('forbidden');
-			}
-			else {
 				// This is a project creation, make sure that user is not a partner and has permission.
-				let u = request.user;
-				let isAllowed = u.type === 'user' && (u.role === 'admin' || u.role === 'project');
+				const u = request.user;
+				const isAllowed = u.type === 'user' && (u.role === 'admin' || u.role === 'project');
 				if (!isAllowed)
 					throw new Error('forbidden');
+
+				// If the destination id is taken, this is forbidden (we won't overwrite).
+				try {
+					await Project.storeInstance.get(request.params.id);
+					throw new Error('forbidden');
+				}
+				catch (error) {
+					if (error.message !== 'missing')
+						throw error;
+				}
+
+				// Let fetch the origin project, and check that our user can access it legally
+				const project = await Project.storeInstance.get(request.query.from);
+				if (project.visibility === 'private' && !project.users.find(u => u.id === request.user._id))
+					throw new Error('forbidden');
+
+				// Clone the project
+				project._id = request.params.id;
+				delete project._rev;
+				project.users = [{type: "internal", id: request.user._id, role: "owner"}];
+				await project.save();
+
+				// Recreate all inputs asynchronously. No need to have the user waiting.
+				if (request.query.with_data == 'true')
+					Input.storeInstance.listByProject(request.query.from).then(inputs => {
+						inputs.forEach(input => {
+							input._id = 'input:' + project._id + ':' + input.form + ':' + input.entity + ':' + input.period;
+							delete input._rev;
+							input.project = project._id;
+						});
+
+						Input.storeInstance.bulkSave(inputs);
+					});
 			}
+			// User is saving a project
+			else {
+				// Validate that the _id in the payload is the same as the id in the URL.
+				if (request.body._id !== request.params.id)
+					throw new Error('id_mismatch');
 
-			// Create the project.
-			cache.del('reporting:project:' + request.params.id); // This empties the reporting cache
+				// Get old project
+				let oldProject = null;
+				try {
+					oldProject = await Project.storeInstance.get(request.params.id);
+				}
+				catch (error) {
+					if (error.message !== 'missing')
+						throw error;
+				}
 
-			const newProject = new Project(request.body);
-			await newProject.save(false, request.user);
+				// Check ACLS
+				if (oldProject) {
+					// This is a project update, we need to make sure that user is owner.
+					if ('owner' !== oldProject.getRole(request.user))
+						throw new Error('forbidden');
+				}
+				else {
+					// This is a project creation, make sure that user is not a partner and has permission.
+					let u = request.user;
+					let isAllowed = u.type === 'user' && (u.role === 'admin' || u.role === 'project');
+					if (!isAllowed)
+						throw new Error('forbidden');
+				}
 
-			return newProject.toAPI();
+				// Create the project.
+				cache.del('reporting:project:' + request.params.id); // This empties the reporting cache
+
+				const newProject = new Project(request.body);
+				await newProject.save(false, request.user);
+
+				return newProject.toAPI();
+			}
 		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 

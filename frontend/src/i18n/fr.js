@@ -499,7 +499,6 @@ var FRENCH_TRANSLATION = {
 			time: "Dates"
 		},
 
-		please_enter_new_name: "Entrez un nom pour le nouveau projet",
 		edit_user: "Édition utilisateur",
 		update_user: "Mettre à jour l'utilisateur",
 		user_type: "Type",
@@ -535,6 +534,7 @@ var FRENCH_TRANSLATION = {
 		field_distribution: "Distribution",
 		cant_create: "Vous n'êtes pas autorisé à créer de nouveaux projets",
 		my_projects: "Mes projets",
+		are_you_sure_to_clone: "Cette action va cloner ce projet et toutes ses saisies. Confimez pour continuer.",
 		are_you_sure_to_delete: "Tapez: 'Je suis sûr de vouloir supprimer ce projet' pour confirmer",
 		are_you_sure_to_delete_answer: "Je suis sûr de vouloir supprimer ce projet",
 		data_selection: "Selection des données",

@@ -138,19 +138,6 @@ angular
 			this.groups = this.groups.filter(function(group) { return group.id !== groupId; });
 		};
 
-		/**
-		 * Clone project
-		 */
-		Project.prototype.clone = function(newName, userId) {
-			var newProject = angular.copy(this);
-			newProject._id = 'project:' + uuid.v4();
-			newProject.name = newName; // Change name
-			delete newProject._rev; // Delete revision
-			newProject.users = [{type: "internal", id: userId, role: "owner"}]; // Change users
-
-			return newProject;
-		};
-
 		Project.prototype.canInputForm = function(projectUser, formId) {
 			if (!projectUser)
 				return false;

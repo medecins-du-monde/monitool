@@ -60,7 +60,9 @@ angular.module(
 		};
 	})
 
-	.controller('ProjectMenuController', function($scope, $filter, $state, $rootScope, project) {
+	.controller('ProjectMenuController', function($scope, $filter, $state, project, $http, uuid) {
+		var translate = $filter('translate');
+
 		$scope.masterProject = project;
 
 		// When master changes, update menu elements
@@ -69,25 +71,33 @@ angular.module(
 		}, true);
 
 		$scope.cloneProject = function() {
-			var newName = window.prompt($filter('translate')('project.please_enter_new_name'));
+			var question = translate('project.are_you_sure_to_clone');
 
-			if (newName) {
-				var newProject = $scope.masterProject.clone(newName, $rootScope.userCtx._id);
+			if (window.confirm(question)) {
+				var newProjectId = 'project:' + uuid.v4();
+				var options = {
+					method: 'PUT',
+					url: '/api/resources/project/' + newProjectId,
+					params: {
+						from: $scope.masterProject._id,
+						with_data: 'true'
+					}
+				};
 
-				newProject.$save()
-					.then(function() {
-						$state.go('main.project.structure.basics', {projectId: newProject._id});
-					})
-					.catch(function(error) {
+				$http(options).then(
+					function() {
+						$state.go('main.project.structure.basics', {projectId: newProjectId});
+					},
+					function(error) {
 						$scope.error = error;
-					});
+					}
+				);
 			}
 		};
 
 		$scope.deleteProject = function() {
-			var translate = $filter('translate'),
-				question  = translate('project.are_you_sure_to_delete'),
-				answer    = translate('project.are_you_sure_to_delete_answer');
+			var question = translate('project.are_you_sure_to_delete'),
+				answer = translate('project.are_you_sure_to_delete_answer');
 
 			if (window.prompt(question) === answer)
 				project.$delete(function() { $state.go('main.projects'); });

@@ -184,5 +184,12 @@ export default class InputStore extends Store {
 
 		return inputs;
 	}
+
+	async bulkSave(inputs) {
+		inputs = inputs.slice();
+
+		while (inputs.length)
+			await this._db.callBulk({docs: inputs.splice(0, 40)});
+	}
 }
 

@@ -498,7 +498,6 @@ var SPANISH_TRANSLATION = {
 			time: "Fechas"
 		},
 
-		please_enter_new_name: "Entre un nombre para el nuevo proyecto",
 		edit_user: "Editar usuario",
 		update_user: "Actualizar el usuario",
 		user_type: "Tipo",
@@ -534,6 +533,7 @@ var SPANISH_TRANSLATION = {
 		field_distribution: "Distribución",
 		cant_create: "No esta autorizado a crear nuevos proyectos",
 		my_projects: "Mis proyectos",
+		are_you_sure_to_clone: "Va a clonar este proyecto, y todas sus entradas de datos. Confirme para continuar.",
 		are_you_sure_to_delete: "Por favor entre: 'Estoy seguro de querer suprimir este proyecto' para confirmar.",
 		are_you_sure_to_delete_answer: "Estoy seguro de querer suprimir este proyecto",
 		data_selection: "Seleccione los datos",
