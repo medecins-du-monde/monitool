@@ -71,11 +71,8 @@ export default class Project extends DbModel {
 		// Replace passwords by a salted hash
 		this.users.forEach(function(user) {
 			if (user.type === 'partner') {
-				if (typeof user.password === 'string' && !user.password.match('^sha1')) {
+				if (typeof user.password === 'string' && !user.password.match('^sha1'))
 					user.password = passwordHash.generate(user.password);
-				}
-				else {
-				}
 			}
 		});
 	}
@@ -86,7 +83,10 @@ export default class Project extends DbModel {
 	 * @return {Promise}
 	 */
 	async destroy() {
-		let inputs = await Input.storeInstance.listByProject(this._id);
+		const inputIds = await this._db.callList({
+			startkey: 'input:' + this._id + ':!',
+			endkey: 'input:' + this._id + ':~'
+		});
 
 		await this._db.callBulk({
 			docs: [
@@ -94,8 +94,8 @@ export default class Project extends DbModel {
 				{_id: this._id, _rev: this._rev, _deleted: true},
 
 				// Delete associated inputs.
-				...inputs.map(i => {
-					return {_id: i._id, _rev: i._rev, _deleted: true};
+				...inputIds.rows.map(i => {
+					return {_id: i.id, _rev: i.value.rev, _deleted: true};
 				})
 			]
 		});
