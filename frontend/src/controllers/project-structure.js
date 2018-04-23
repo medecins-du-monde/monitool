@@ -35,19 +35,19 @@ angular
 	.controller('ProjectEditController', function($scope, $filter, indicators) {
 		$scope.editableProject = angular.copy($scope.masterProject);	// Current version of project.
 		$scope.projectSaveRunning = false;				// We are not currently saving.
-		$scope.formContainer = {currentForm: null};
+		$scope.forms = {current: undefined};
 
 		// When project changes, update save flags
 		var onProjectChange = function() {
 			$scope.projectChanged = !angular.equals($scope.masterProject, $scope.editableProject);
 
 			$scope.projectSavable = $scope.projectChanged;
-			if ($scope.formContainer.currentForm)
-				$scope.projectSavable = $scope.projectSavable && $scope.formContainer.currentForm.$valid;
+			if ($scope.forms.current)
+				$scope.projectSavable = $scope.projectSavable && $scope.forms.current.$valid;
 		};
 
 		var projectWatch = $scope.$watch('editableProject', onProjectChange, true);
-		var formWatch = $scope.$watch('formContainer.currentForm.$valid', onProjectChange);
+		var formWatch = $scope.$watch('forms.current.$valid', onProjectChange);
 
 		// Restore $scope.master to avoid unsaved changes from a given page to pollute changes to another one.
 		$scope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
@@ -65,8 +65,6 @@ angular
 				else
 					e.preventDefault();
 			}
-
-			$scope.formContainer.currentForm = null;
 		});
 
 		// save, reset and isUnchanged are all defined here, because those are shared between all project views.
@@ -116,11 +114,6 @@ angular
 		$scope.themes = themes;
 		$scope.startDateOptions = {maxDate: $scope.editableProject.end};
 		$scope.endDateOptions = {minDate: $scope.editableProject.start};
-
-		// Pass form to parent controller for validation (a bit hacky)
-		$scope.$watch('projectForm', function(projectForm) {
-			$scope.formContainer.currentForm = projectForm;
-		});
 	})
 
 
@@ -129,11 +122,6 @@ angular
 	 * Allows to change entities and groups.
 	 */
 	.controller('ProjectCollectionSiteListController', function($scope, $filter, Input) {
-		// Pass form to parent controller for validation (a bit hacky)
-		$scope.$watch('projectForm', function(projectForm) {
-			$scope.formContainer.currentForm = projectForm;
-		});
-
 		$scope.createEntity = function() {
 			$scope.editableProject.createEntity();
 		};
@@ -156,8 +144,8 @@ angular
 	 * Allows to list and reorder users that can access/edit the project.
 	 */
 	.controller('ProjectUserListController', function($scope, $uibModal, $filter, users) {
-
 		$scope.users = {};
+
 		users.forEach(function(user) { $scope.users[user._id] = user});
 
 		$scope.editUser = function(user) {
@@ -248,7 +236,6 @@ angular
 	 * Allows to list and reorder data sources.
 	 */
 	.controller('ProjectCollectionFormListController', function($scope, $state, $filter, uuid) {
-
 		$scope.availableEntities = $scope.masterProject.entities;
 
 		$scope.createForm = function() {
@@ -276,9 +263,6 @@ angular
 		// Pass the form to the shared controller over it, to be able
 		// to enable and disable the save button.
 		/////////////////////
-		$scope.$watch('dataSourceForm', function(dataSourceForm) {
-			$scope.formContainer.currentForm = dataSourceForm;
-		});
 
 		// Put the form index in the scope to be able to access it without searching each time.
 		$scope.currentFormIndex = $scope.editableProject.forms.findIndex(function(f) { return f.id == $stateParams.formId; });
@@ -312,7 +296,7 @@ angular
 		// Watch form to invalidate HTML form on some conditions
 		var w3 = $scope.$watch('editableProject.forms[currentFormIndex].elements.length', function(length) {
 			// A datasource is valid only when containing one or more variables.
-			$scope.dataSourceForm.$setValidity('elementsLength', length >= 1);
+			$scope.forms.current.$setValidity('elementsLength', length >= 1);
 		});
 
 		$scope.editPartition = function(element, currentPartition) {
@@ -494,15 +478,6 @@ angular
 			else if (group == 'indicators')
 				$scope.purposeSortOptions.disabled = $scope.outputSortOptions.disabled = $scope.activitySortOptions = enter;
 		};
-
-		/////////////////////
-		// Pass the form to the shared controller over it, to be able
-		// to enable and disable the save button.
-		/////////////////////
-
-		var unwatch = $scope.$watch('projectForm', function(projectForm) {
-			$scope.formContainer.currentForm = projectForm;
-		});
 
 		$scope.logicalFrameIndex = $stateParams.index;
 

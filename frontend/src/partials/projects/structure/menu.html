@@ -4,7 +4,7 @@
 	<div id="saveblock" class="noprint">
 
 		<div class="pull-right">
-			<p class="text-danger" ng-if="formContainer.currentForm.$invalid">
+			<p class="text-danger" ng-if="forms.current.$invalid">
 				<i class="fa fa-exclamation-triangle"></i>
 				<span translate="project.form_error"></span>
 			</p>
@@ -14,7 +14,7 @@
 				<span translate="project.form_persisted"></span>
 			</p>
 
-			<p class="text-warning" ng-if="projectChanged && !formContainer.currentForm.$invalid">
+			<p class="text-warning" ng-if="projectChanged && !forms.current.$invalid">
 				<i class="fa fa-exclamation-triangle"></i>
 				<span translate="project.form_changed"></span>
 			</p>

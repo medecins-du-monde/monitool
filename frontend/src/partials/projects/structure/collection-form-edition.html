@@ -10,7 +10,7 @@
 	 <span ng-bind-html="'project.collection_form_warning'|translate:{num_inputs:formUsage.length}|unsafe"></span>
 </div>
 
-<form class="form-horizontal" role="form" name="dataSourceForm" novalidate>
+<form class="form-horizontal" role="form" name="forms.current" novalidate>
 	<legend translate="project.collection_form_planning"></legend>
 	
 	<!-- [name] -->
@@ -30,7 +30,7 @@
 				<i class="fa fa-info-circle"></i>
 				{{'project.collection_edit_help_name'|translate}}
 			</span>
-			<!-- <p class="help-block" ng-if="dataSourceForm.name.$error.required" translate="form.mandatory"></p> -->
+			<!-- <p class="help-block" ng-if="forms.current.name.$error.required" translate="form.mandatory"></p> -->
 		</div>
 	</div>
 	<!-- [/name] -->

@@ -9,7 +9,7 @@
 
 <legend translate="project.basics"></legend>
 
-<form class="form-horizontal noprint" role="form" name="projectForm" novalidate>
+<form class="form-horizontal noprint" role="form" name="forms.current" novalidate>
 	<fieldset>
 		<div class="form-group" show-errors>
 			<label for="input-country" class="col-sm-2 control-label" translate="shared.country"></label>
@@ -27,7 +27,7 @@
 					{{'project.basics_help_country'|translate}}
 				</p>
 
-				<!-- <p class="help-block" ng-if="projectForm.country.$error.required">
+				<!-- <p class="help-block" ng-if="forms.current.country.$error.required">
 					<i class="fa fa-exclamation-triangle"></i>
 					{{'form.mandatory'|translate}}
 				</p> -->
@@ -50,7 +50,7 @@
 					{{'project.basics_help_name'|translate}}
 				</p>
 
-				<!-- <p class="help-block" ng-if="projectForm.name.$error.required">
+				<!-- <p class="help-block" ng-if="forms.current.name.$error.required">
 					<i class="fa fa-exclamation-triangle"></i>
 					{{'form.mandatory'|translate}}
 				</p> -->
@@ -83,7 +83,7 @@
 					{{'project.basics_help_begin'|translate}}
 				</p>
 
-				<!-- <p class="help-block" ng-if="projectForm.start.$error.lowerThan">
+				<!-- <p class="help-block" ng-if="forms.current.start.$error.lowerThan">
 					<i class="fa fa-exclamation-triangle"></i>
 					{{"form.start_lower_than_end"|translate}}
 				</p> -->
@@ -100,7 +100,7 @@
 					{{'project.basics_help_end'|translate}}
 				</p>
 
-				<!-- <p class="help-block" ng-if="projectForm.end.$error.greaterThan">
+				<!-- <p class="help-block" ng-if="forms.current.end.$error.greaterThan">
 					<i class="fa fa-exclamation-triangle"></i>
 					{{"form.end_greater_than_start"|translate}}
 				</p> -->
