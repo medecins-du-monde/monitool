@@ -15,51 +15,55 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import angular from 'angular';
 
-angular
-	.module('monitool.services.utils.translate', [])
+const module = angular.module(
+	'monitool.services.utils.translate',
+	[]
+);
 
-	/**
-	 * This service allows calling the google translate API to translate strings.
-	 * A valid API key should be included in the config.json file for the service to work.
-	 *
-	 * @example
-	 * googleTranslation.translate('Hello', 'fr', 'en') == 'bonjour'
-	 * googleTranslation.translate('Hello', 'es', 'en') == 'buenos dias'
-	 *
-	 * // google translate can guess source language.
-	 * googleTranslation.translate('Hello', 'fr') == 'bonjour'
-	 */
-	.service('googleTranslation', function($http) {
-		var CONFIG = {
-			url: 'https://www.googleapis.com/language/translate/v2',
-			method: 'GET',
-			params: {
-				key: window.GOOGLE_TRANSLATE_KEY
-			}
-		};
 
-		this.translate = function(text, targetLanguage, sourceLanguage) {
-			var config = angular.copy(CONFIG);
-			config.params.q = text.replace(/\n/g, '<br/>');
-			config.params.target = targetLanguage;
-			if (sourceLanguage)
-				config.params.source = sourceLanguage
+/**
+ * This service allows calling the google translate API to translate strings.
+ * A valid API key should be included in the config.json file for the service to work.
+ *
+ * @example
+ * googleTranslation.translate('Hello', 'fr', 'en') == 'bonjour'
+ * googleTranslation.translate('Hello', 'es', 'en') == 'buenos dias'
+ *
+ * // google translate can guess source language.
+ * googleTranslation.translate('Hello', 'fr') == 'bonjour'
+ */
+module.service('googleTranslation', function($http) {
+	var CONFIG = {
+		url: 'https://www.googleapis.com/language/translate/v2',
+		method: 'GET',
+		params: {
+			key: window.GOOGLE_TRANSLATE_KEY
+		}
+	};
 
-			return $http(config).then(function(result) {
-				var translation = result.data.data.translations[0].translatedText;
+	this.translate = function(text, targetLanguage, sourceLanguage) {
+		var config = angular.copy(CONFIG);
+		config.params.q = text.replace(/\n/g, '<br/>');
+		config.params.target = targetLanguage;
+		if (sourceLanguage)
+			config.params.source = sourceLanguage
 
-				// restore line breaks
-				translation = translation.replace(/ *<br *\/? *> */g, "\n");
+		return $http(config).then(function(result) {
+			var translation = result.data.data.translations[0].translatedText;
 
-				// remove escaped chars
-				translation = translation.replace(/&#(\d+);/g, function(_, match) {
-					return String.fromCharCode(match);
-				});
+			// restore line breaks
+			translation = translation.replace(/ *<br *\/? *> */g, "\n");
 
-				return translation;
+			// remove escaped chars
+			translation = translation.replace(/&#(\d+);/g, function(_, match) {
+				return String.fromCharCode(match);
 			});
-		};
-	});
 
+			return translation;
+		});
+	};
+});
+
+export default module;

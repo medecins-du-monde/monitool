@@ -15,10 +15,18 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import angular from 'angular';
+import ngResource from 'angular-resource';
 
-angular
-	.module('monitool.services.models.user', ['ngResource'])
-	.factory('User', function($resource) {
-		return $resource('/api/resources/user/:id', { id: "@_id" }, { save: { method: "PUT" }});
-	});
+const module = angular.module(
+	'monitool.services.models.user',
+	[
+		ngResource
+	]
+);
+
+module.factory('User', function($resource) {
+	return $resource('/api/resources/user/:id', { id: "@_id" }, { save: { method: "PUT" }});
+});
+
+export default module;

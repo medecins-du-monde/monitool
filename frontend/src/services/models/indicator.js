@@ -15,24 +15,33 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import angular from 'angular';
+import ngResource from 'angular-resource';
 
-angular
-	.module('monitool.services.models.indicator', ['ngResource'])
-	.factory('Indicator', function($resource) {
 
-		var Indicator = $resource('/api/resources/indicator/:id', { id: "@_id" }, { save: { method: "PUT" }});
+const module = angular.module(
+	'monitool.services.models.indicator',
+	[
+		ngResource
+	]
+);
 
-		Indicator.fetchForProject = function(project) {
-			return Indicator.query({mode: "project_indicators", projectId: project._id}).$promise;
-		};
+module.factory('Indicator', function($resource) {
 
-		Indicator.prototype.reset = function() {
-			this.type = "indicator";
-			this.name = {en: '', fr: '', es: ''};
-			this.description = {en: '', fr: '', es: ''};
-			this.themes = [];
-		};
+	var Indicator = $resource('/api/resources/indicator/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
-		return Indicator;
-	});
+	Indicator.fetchForProject = function(project) {
+		return Indicator.query({mode: "project_indicators", projectId: project._id}).$promise;
+	};
+
+	Indicator.prototype.reset = function() {
+		this.type = "indicator";
+		this.name = {en: '', fr: '', es: ''};
+		this.description = {en: '', fr: '', es: ''};
+		this.themes = [];
+	};
+
+	return Indicator;
+});
+
+export default module;

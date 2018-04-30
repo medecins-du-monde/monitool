@@ -15,102 +15,115 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import angular from 'angular';
+import ngResource from 'angular-resource';
 
-angular
-	.module('monitool.services.models.input', ['ngResource', 'monitool.services.utils.input-slots'])
-	.factory('Input', function($resource, $q, InputSlots) {
+import mtInputSlots from '../utils/input-slots';
 
-		// Create $resource
-		var Input = $resource('/api/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
-		Input.fetchFormStatus = function(project, formId) {
-			var form = project.forms.find(function(f) {return f.id == formId; });
+const module = angular.module(
+	'monitool.services.models.input',
+	[
+		ngResource,
+		mtInputSlots.name
+	]
+);
 
-			return Input.query({mode: 'ids_by_form', projectId: project._id, formId: formId}).$promise.then(function(inputsDone) {
-				var prj = {};
+module.factory('Input', function($resource, $q, InputSlots) {
 
-				inputsDone.forEach(function(inputId) {
-					var splitted      = inputId.split(':'),
-						inputEntityId = splitted[4],
-						strPeriod     = splitted[5];
+	// Create $resource
+	var Input = $resource('/api/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
+	Input.fetchFormStatus = function(project, formId) {
+		var form = project.forms.find(function(f) {return f.id == formId; });
+
+		return Input.query({mode: 'ids_by_form', projectId: project._id, formId: formId}).$promise.then(function(inputsDone) {
+			var prj = {};
+
+			inputsDone.forEach(function(inputId) {
+				var splitted      = inputId.split(':'),
+					inputEntityId = splitted[4],
+					strPeriod     = splitted[5];
+
+				prj[strPeriod] = prj[strPeriod] || {};
+				prj[strPeriod][inputEntityId] = 'outofschedule';
+			});
+
+			form.entities.forEach(function(entityId) {
+				var strPeriods;
+				if (form.periodicity === 'free')
+					strPeriods = Object.keys(prj);
+				else {
+					var entity = project.entities.find(function(entity) { return entity.id == entityId; });
+					strPeriods = InputSlots.getList(project, entity, form);
+				}
+
+				strPeriods.forEach(function(strPeriod) {
 					prj[strPeriod] = prj[strPeriod] || {};
-					prj[strPeriod][inputEntityId] = 'outofschedule';
+
+					if (prj[strPeriod][entityId] == 'outofschedule')
+						prj[strPeriod][entityId] = 'done';
+					else
+						prj[strPeriod][entityId] = 'expected';
 				});
-
-				form.entities.forEach(function(entityId) {
-					var strPeriods;
-					if (form.periodicity === 'free')
-						strPeriods = Object.keys(prj);
-					else {
-						var entity = project.entities.find(function(entity) { return entity.id == entityId; });
-						strPeriods = InputSlots.getList(project, entity, form);
-					}
-
-					strPeriods.forEach(function(strPeriod) {
-						prj[strPeriod] = prj[strPeriod] || {};
-
-						if (prj[strPeriod][entityId] == 'outofschedule')
-							prj[strPeriod][entityId] = 'done';
-						else
-							prj[strPeriod][entityId] = 'expected';
-					});
-				});
-
-				// Sort periods alphabetically
-				var periods = Object.keys(prj);
-				periods.sort();
-
-				var newObj = {};
-				periods.forEach(function(period) { newObj[period] = prj[period]; })
-				prj = newObj;
-
-				return prj;
 			});
-		};
 
-		Input.fetchLasts = function(project, entityId, formId, period) {
-			var form = project.forms.find(function(f) { return f.id == formId; });
+			// Sort periods alphabetically
+			var periods = Object.keys(prj);
+			periods.sort();
 
-			return Input.query({
-				mode: "current+last",
-				projectId: project._id,
-				entityId: entityId,
-				formId: formId,
-				period: period
-			}).$promise.then(function(result) {
-				var currentInputId = ['input', project._id, formId, entityId, period].join(':');
+			var newObj = {};
+			periods.forEach(function(period) { newObj[period] = prj[period]; })
+			prj = newObj;
 
-				// both where found
-				if (result.length === 2)
-					return { current: result[0], previous: result[1], isNew: false };
+			return prj;
+		});
+	};
 
-				// only the current one was found
-				else if (result.length === 1 && result[0]._id === currentInputId)
-					return { current: result[0], previous: null, isNew: false };
+	Input.fetchLasts = function(project, entityId, formId, period) {
+		var form = project.forms.find(function(f) { return f.id == formId; });
 
-				var current = new Input({
-					_id: currentInputId, type: "input",
-					project: project._id, form: formId, period: period, entity: entityId,
-					values: {}
-				});
+		return Input.query({
+			mode: "current+last",
+			projectId: project._id,
+			entityId: entityId,
+			formId: formId,
+			period: period
+		}).$promise.then(function(result) {
+			var currentInputId = ['input', project._id, formId, entityId, period].join(':');
 
-				form.elements.forEach(function(element) {
-					var numFields = 1;
-					element.partitions.forEach(function(partition) { numFields *= partition.elements.length; });
+			// both where found
+			if (result.length === 2)
+				return { current: result[0], previous: result[1], isNew: false };
 
-					current.values[element.id] = new Array(numFields);
-					for (var i = 0; i < numFields; ++i)
-						current.values[element.id][i] = 0;
-				});
+			// only the current one was found
+			else if (result.length === 1 && result[0]._id === currentInputId)
+				return { current: result[0], previous: null, isNew: false };
 
-				// the current one was not found (and we may or not have found the previous one).
-				return {current: current, previous: result.length ? result[0] : null, isNew: true};
+			var current = new Input({
+				_id: currentInputId, type: "input",
+				project: project._id, form: formId, period: period, entity: entityId,
+				values: {}
 			});
-		};
+
+			form.elements.forEach(function(element) {
+				var numFields = 1;
+				element.partitions.forEach(function(partition) { numFields *= partition.elements.length; });
+
+				current.values[element.id] = new Array(numFields);
+				for (var i = 0; i < numFields; ++i)
+					current.values[element.id][i] = 0;
+			});
+
+			// the current one was not found (and we may or not have found the previous one).
+			return {current: current, previous: result.length ? result[0] : null, isNew: true};
+		});
+	};
 
 
 
-		return Input;
-	});
+	return Input;
+});
+
+
+export default module;

@@ -3,8 +3,8 @@
  * - user authentication in monitool
  * - loading the angular application.
  */
-
-
+import 'bootstrap/dist/css/bootstrap.css';
+import "./app.css";
 
 
 /**
@@ -96,20 +96,15 @@ function onAuthResponse(e) {
 		// Pass fetched user to app by a global
 		window.user = JSON.parse(authReq.responseText);
 
-		if (window.monitool) {
-			startApplication();
-		}
-		else {
-			// Show loader
-			document.getElementById('loader').style.display = 'block';
+		// Show loader
+		document.getElementById('loader').style.display = 'block';
 
-			// Start loading app
-			var appReq = new XMLHttpRequest();
-			appReq.addEventListener("progress", onAppProgress, false);
-			appReq.addEventListener("load", onAppLoaded, false);
-			appReq.open("GET", "/monitool2.js");
-			appReq.send();
-		}
+		// Start loading app
+		var appReq = new XMLHttpRequest();
+		appReq.addEventListener("progress", onAppProgress, false);
+		appReq.addEventListener("load", onAppLoaded, false);
+		appReq.open("GET", "/monitool2-application.js");
+		appReq.send();
 	}
 	// User is not logged on
 	else if (authReq.status === 401)
@@ -133,26 +128,17 @@ function onAppProgress(e) {
 function onAppLoaded(e) {
 	var appReq = e.currentTarget;
 
-	// append main script to document.
-	var s = document.createElement("script");
-	s.innerHTML = appReq.responseText;
-	document.body.appendChild(s);
-
-	startApplication();
-}
-
-/**
- * Start angular application
- */
-function startApplication() {
 	// Remove modal and change background color
 	document.body.style.backgroundColor = 'white';
 	document.body.removeChild(document.getElementById('load-container'));
 	document.body.removeChild(document.getElementById('version'));
 
-	// Startup application
-	angular.bootstrap(document, ['monitool.app']);
+	// append main script to document.
+	var s = document.createElement("script");
+	s.innerHTML = appReq.responseText;
+	document.body.appendChild(s);
 }
+
 
 function startLoginPage() {
 	var ieVersion = getInternetExplorerVersion();
@@ -209,3 +195,6 @@ function start() {
 	authReq.open('GET', '/api/config?' + Math.random().toString().substring(2));
 	authReq.send();
 }
+
+
+window.start = start;

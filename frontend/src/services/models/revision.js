@@ -15,31 +15,41 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import angular from 'angular';
+import jsonpatch from 'fast-json-patch';
+import ngResource from 'angular-resource';
 
-angular
-	.module('monitool.services.models.revision', ['ngResource'])
-	.factory('Revision', function($resource) {
-		var Revision = $resource('/api/resources/project/:projectId/revisions');
 
-		Revision.enrich = function(project, revisions) {
-			// Complete the information by computing afterState, beforeState, and forward patches.
-			for (var i = 0; i < revisions.length; ++i) {
-				if (revisions[i].before || revisions[i].after)
-					continue;
+const module = angular.module(
+	'monitool.services.models.revision',
+	[
+		ngResource
+	]
+);
 
-				// Compute before and after state
-				revisions[i].after = i === 0 ? project : revisions[i - 1].before;
+module.factory('Revision', function($resource) {
+	var Revision = $resource('/api/resources/project/:projectId/revisions');
 
-				revisions[i].before = jsonpatch.applyPatch(
-					jsonpatch.deepClone(revisions[i].after),
-					revisions[i].backwards
-				).newDocument;
+	Revision.enrich = function(project, revisions) {
+		// Complete the information by computing afterState, beforeState, and forward patches.
+		for (var i = 0; i < revisions.length; ++i) {
+			if (revisions[i].before || revisions[i].after)
+				continue;
 
-				revisions[i].isEquivalent = angular.equals(project, revisions[i].before);
-			}
+			// Compute before and after state
+			revisions[i].after = i === 0 ? project : revisions[i - 1].before;
+
+			revisions[i].before = jsonpatch.applyPatch(
+				jsonpatch.deepClone(revisions[i].after),
+				revisions[i].backwards
+			).newDocument;
+
+			revisions[i].isEquivalent = angular.equals(project, revisions[i].before);
 		}
+	}
 
 
-		return Revision;
-	});
+	return Revision;
+});
+
+export default module;

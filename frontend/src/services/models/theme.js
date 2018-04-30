@@ -15,17 +15,25 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import angular from 'angular';
+import ngResource from 'angular-resource';
 
-angular
-	.module('monitool.services.models.theme', ['ngResource'])
-	.factory('Theme', function($resource) {
-		var Theme = $resource('/api/resources/theme/:id', { id: "@_id" }, { save: { method: "PUT" }});
+const module = angular.module(
+	'monitool.services.models.theme',
+	[
+		ngResource
+	]
+);
 
-		Theme.prototype.reset = function() {
-			this.name = {fr: '', en: '', es: ''};
-			this.type = 'theme';
-		}
+module.factory('Theme', function($resource) {
+	var Theme = $resource('/api/resources/theme/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
-		return Theme;
-	});
+	Theme.prototype.reset = function() {
+		this.name = {fr: '', en: '', es: ''};
+		this.type = 'theme';
+	}
+
+	return Theme;
+});
+
+export default module;

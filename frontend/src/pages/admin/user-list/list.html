@@ -1,0 +1,20 @@
+<ol class="breadcrumb">
+	<li class="active" translate="shared.settings"></li>
+	<li class="active" translate="shared.users"></li>
+</ol>
+
+<div class="alert alert-info" translate="user.list_info"></div>
+
+<div>
+	<div class="panel panel-default indicator-panel" ng-repeat="user in users track by user._id">
+		<div class="panel-body">
+			{{user.name}}<br/>
+
+			<i class="fa fa-circle text-primary" ng-if="user.role == 'admin'"> <span translate="user.roles_short.admin"></span></i>
+			<i class="fa fa-circle text-success" ng-if="user.role == 'project'"> <span translate="user.roles_short.project"></span></i>
+			<i class="fa fa-circle text-warning" ng-if="user.role == 'common'"> <span translate="user.roles_short.common"></span></i>
+
+			<a ng-click="edit(user)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
+		</div>
+	</div>
+</div>
