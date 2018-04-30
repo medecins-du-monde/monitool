@@ -9,9 +9,6 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - frontend_dist:/usr/share/nginx/html:ro
-    depends_on:
-      - frontend_watch
-      - api
 
   frontend_watch:
     image: node:8
@@ -25,14 +22,10 @@ services:
   api:
     image: node:8
     working_dir: /app
-
-    # Give 5 seconds for couchdb to start
-    command: sh -c "yarn install && sleep 5 && yarn run start"
+    command: sh -c "yarn install && yarn run start"
     volumes:
       - ../api:/app
       - api_node_modules:/app/node_modules
-    depends_on:
-      - couchdb
     environment:
       MONITOOL_DEBUG: "TRUE"
       MONITOOL_PORT: "80"
