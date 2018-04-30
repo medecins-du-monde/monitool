@@ -111,15 +111,15 @@ function onAuthResponse(e) {
 		// Run the app
 		myApplication
 			.then(startApplication => {
-				inter();
+				clearInterval(inter);
 
 				document.body.style.backgroundColor = 'white';
 				document.body.removeChild(document.getElementById('load-container'));
 				document.body.removeChild(document.getElementById('version'));
 
-				startApplication();
+				startApplication.default();
 			})
-			.catch(error => 'An error occurred while loading the component');
+			.catch(error => console.log(error));
 	}
 	// User is not logged on
 	else if (authReq.status === 401)

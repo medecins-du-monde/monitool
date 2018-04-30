@@ -82,14 +82,13 @@ module.exports = {
 		new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /(fr|es|en)\.js/),
 
 		new HtmlWebpackPlugin({
-			filename: 'index.html',
 			template: 'src/index.html',
-			chunks: ['initscript']
+			chunks: ['initscript'],
+			inject: 'head'
 		}),
 
         // new BundleAnalyzerPlugin({
         //     analyzerMode: 'static'
         // })
-
 	]
 };

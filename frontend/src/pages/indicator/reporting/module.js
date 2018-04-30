@@ -40,9 +40,10 @@ const module = angular.module(
 );
 
 
-if (window.user.type == 'user') {
 
-	module.config(function($stateProvider) {
+module.config(function($stateProvider) {
+
+	if (window.user.type == 'user') {
 		$stateProvider.state('main.indicator_reporting', {
 			url: '/indicator/:indicatorId',
 			template: require('./reporting.html'),
@@ -62,54 +63,55 @@ if (window.user.type == 'user') {
 				}
 			}
 		});
+	}
+});
+
+
+module.controller('IndicatorReportingController', function($scope, Cube, mtReporting, indicator, projects, cubes, themes) {
+	$scope.themes = themes;
+	$scope.indicator = indicator;
+	$scope.open = {};
+	$scope.plots = {};
+	$scope.filters = {_location: "none", _start: '9999-01-01', _end: '0000-01-01'};
+	for (var i = 0; i < projects.length; ++i) {
+		if (projects[i].start < $scope.filters._start)
+			$scope.filters._start = projects[i].start;
+		if (projects[i].end > $scope.filters._end)
+			$scope.filters._end = projects[i].end;
+	}
+
+	// default group by
+	if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
+		$scope.groupBy = 'month';
+	else if (mtReporting.getColumns('quarter', $scope.filters._start, $scope.filters._end).length < 15)
+		$scope.groupBy = 'quarter';
+	else if (mtReporting.getColumns('semester', $scope.filters._start, $scope.filters._end).length < 15)
+		$scope.groupBy = 'semester';
+	else
+		$scope.groupBy = 'year';
+
+	$scope.blocks = projects.map(function(project) {
+		return {text: project.name + " (" + project.country + ')', project: project};
 	});
 
-	module.controller('IndicatorReportingController', function($scope, Cube, mtReporting, indicator, projects, cubes, themes) {
-		$scope.themes = themes;
-		$scope.indicator = indicator;
-		$scope.open = {};
-		$scope.plots = {};
-		$scope.filters = {_location: "none", _start: '9999-01-01', _end: '0000-01-01'};
-		for (var i = 0; i < projects.length; ++i) {
-			if (projects[i].start < $scope.filters._start)
-				$scope.filters._start = projects[i].start;
-			if (projects[i].end > $scope.filters._end)
-				$scope.filters._end = projects[i].end;
-		}
+	$scope.$watch('[filters, groupBy, splits, open]', function() {
+		$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, null, null)
 
-		// default group by
-		if (mtReporting.getColumns('month', $scope.filters._start, $scope.filters._end).length < 15)
-			$scope.groupBy = 'month';
-		else if (mtReporting.getColumns('quarter', $scope.filters._start, $scope.filters._end).length < 15)
-			$scope.groupBy = 'quarter';
-		else if (mtReporting.getColumns('semester', $scope.filters._start, $scope.filters._end).length < 15)
-			$scope.groupBy = 'semester';
-		else
-			$scope.groupBy = 'year';
+		$scope.blocks.forEach(function(block, index) {
+			var fakeInd = block.project.crossCutting[indicator._id];
+			var c = {};
+			cubes[projects[index]._id].forEach(function(a) { c[a.id] = a; });
 
-		$scope.blocks = projects.map(function(project) {
-			return {text: project.name + " (" + project.country + ')', project: project};
+			block.rows = $scope.open[index] ?
+				mtReporting.computeIndicatorReporting(c, projects[index], fakeInd, $scope.groupBy, $scope.filters) :
+				null;
 		});
 
-		$scope.$watch('[filters, groupBy, splits, open]', function() {
-			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, null, null)
+		// Work around graph bug
+		$scope.rows = [];
+		$scope.blocks.forEach(function(block) { if (block.rows) $scope.rows = $scope.rows.concat(block.rows); });
+	}, true);
 
-			$scope.blocks.forEach(function(block, index) {
-				var fakeInd = block.project.crossCutting[indicator._id];
-				var c = {};
-				cubes[projects[index]._id].forEach(function(a) { c[a.id] = a; });
-
-				block.rows = $scope.open[index] ?
-					mtReporting.computeIndicatorReporting(c, projects[index], fakeInd, $scope.groupBy, $scope.filters) :
-					null;
-			});
-
-			// Work around graph bug
-			$scope.rows = [];
-			$scope.blocks.forEach(function(block) { if (block.rows) $scope.rows = $scope.rows.concat(block.rows); });
-		}, true);
-
-	});
-}
+});
 
 export default module;

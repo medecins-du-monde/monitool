@@ -35,9 +35,8 @@ const module = angular.module(
 );
 
 
-if (window.user.type == 'user') {
-
-	module.config(function($stateProvider) {
+module.config(function($stateProvider) {
+	if (window.user.type == 'user') {
 		$stateProvider.state('main.projects', {
 			url: '/projects',
 			template: require('./list.html'),
@@ -51,45 +50,46 @@ if (window.user.type == 'user') {
 				}
 			}
 		});
+	}
+});
+
+
+module.controller('ProjectListController', function($scope, $state, projects, themes) {
+	var now = new Date().toISOString().substring(0, 10);
+
+	$scope.themes = themes;
+	$scope.pred = 'country'; // default sorting predicate
+
+	$scope.myProjects = projects.filter(function(p) {
+		return p.users.find(function(u) { return u.id == $scope.userCtx._id; });
 	});
 
+	$scope.runningProjects = projects.filter(function(p) {
+		return $scope.myProjects.indexOf(p) === -1 && p.end >= now
+	});
 
-	module.controller('ProjectListController', function($scope, $state, projects, themes) {
-		var now = new Date().toISOString().substring(0, 10);
+	$scope.finishedProjects = projects.filter(function(p) {
+		return $scope.myProjects.indexOf(p) === -1 && p.end < now
+	});
 
-		$scope.themes = themes;
-		$scope.pred = 'country'; // default sorting predicate
+	$scope.projects = $scope.myProjects;
 
-		$scope.myProjects = projects.filter(function(p) {
-			return p.users.find(function(u) { return u.id == $scope.userCtx._id; });
+	$scope.createProject = function() {
+		$state.go('main.project.structure.basics', {projectId: 'project:' + uuid()});
+	};
+
+	$scope.open = function(project) {
+		var projectUser = project.users.find(function(u) {
+			return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
+				   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
 		});
 
-		$scope.runningProjects = projects.filter(function(p) {
-			return $scope.myProjects.indexOf(p) === -1 && p.end >= now
-		});
+		if (projectUser && projectUser.role == 'owner')
+			$state.go("main.project.structure.basics", {projectId: project._id});
+		else
+			$state.go("main.project.reporting.general", {projectId: project._id});
+	};
+});
 
-		$scope.finishedProjects = projects.filter(function(p) {
-			return $scope.myProjects.indexOf(p) === -1 && p.end < now
-		});
-
-		$scope.projects = $scope.myProjects;
-
-		$scope.createProject = function() {
-			$state.go('main.project.structure.basics', {projectId: 'project:' + uuid()});
-		};
-
-		$scope.open = function(project) {
-			var projectUser = project.users.find(function(u) {
-				return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
-					   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
-			});
-
-			if (projectUser && projectUser.role == 'owner')
-				$state.go("main.project.structure.basics", {projectId: project._id});
-			else
-				$state.go("main.project.reporting.general", {projectId: project._id});
-		};
-	})
-}
 
 export default module;

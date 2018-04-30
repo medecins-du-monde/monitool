@@ -32,10 +32,10 @@ const module = angular.module(
 	]
 );
 
-if (window.user.type == 'user') {
 
-	module.config(function($stateProvider) {
+module.config(function($stateProvider) {
 
+	if (window.user.type == 'user') {
 		$stateProvider.state('main.indicators', {
 			url: '/indicators',
 			template: require('./list.html'),
@@ -49,39 +49,40 @@ if (window.user.type == 'user') {
 				}
 			}
 		});
+	}
+});
+
+
+module.controller('IndicatorListController', function($scope, indicators, themes) {
+	$scope.themes = [];
+
+	var noThematicsIndicators = indicators.filter(function(indicator) {
+		return indicator.themes.length == 0;
+	});
+	if (noThematicsIndicators.length)
+		$scope.themes.push({definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators});
+
+	// Create a category with indicators that match project on 2 thematics or more
+	var manyThematicsIndicators = indicators.filter(function(indicator) {
+		return indicator.themes.length > 1;
+	});
+	if (manyThematicsIndicators.length)
+		$scope.themes.push({definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators});
+
+	// Create a category with indicators that match project on exactly 1 thematic
+	themes.forEach(function(theme) {
+		var themeIndicators = indicators.filter(function(indicator) {
+			return indicator.themes.length === 1 && indicator.themes[0] === theme._id;
+		});
+
+		if (themeIndicators.length !== 0)
+			$scope.themes.push({definition: theme, indicators: themeIndicators});
 	});
 
-	module.controller('IndicatorListController', function($scope, indicators, themes) {
-		$scope.themes = [];
-
-		var noThematicsIndicators = indicators.filter(function(indicator) {
-			return indicator.themes.length == 0;
-		});
-		if (noThematicsIndicators.length)
-			$scope.themes.push({definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators});
-
-		// Create a category with indicators that match project on 2 thematics or more
-		var manyThematicsIndicators = indicators.filter(function(indicator) {
-			return indicator.themes.length > 1;
-		});
-		if (manyThematicsIndicators.length)
-			$scope.themes.push({definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators});
-
-		// Create a category with indicators that match project on exactly 1 thematic
-		themes.forEach(function(theme) {
-			var themeIndicators = indicators.filter(function(indicator) {
-				return indicator.themes.length === 1 && indicator.themes[0] === theme._id;
-			});
-
-			if (themeIndicators.length !== 0)
-				$scope.themes.push({definition: theme, indicators: themeIndicators});
-		});
-
-		// This getter will be used by the orderBy directive to sort indicators in the partial.
-		$scope.getName = function(indicator) {
-			return indicator.name[$scope.language];
-		};
-	});
-}
+	// This getter will be used by the orderBy directive to sort indicators in the partial.
+	$scope.getName = function(indicator) {
+		return indicator.name[$scope.language];
+	};
+});
 
 export default module;
