@@ -13,19 +13,23 @@ services:
   frontend_watch:
     image: node:8
     working_dir: /app
-    command: sh -c "yarn install && yarn run build && yarn run watch"
+    command: sh -c "yarn install && yarn run watch"
     volumes:
-      - ../frontend:/app
+      - ../frontend/src:/app/src:ro
+      - ../frontend/package.json:/app/package.json:ro
+      - ../frontend/webpack.config.js:/app/webpack.config.js:ro
+      - ../frontend/yarn.lock:/app/yarn.lock:ro
       - frontend_dist:/app/dist
       - frontend_node_modules:/app/node_modules
 
   api:
     image: node:8
     working_dir: /app
-
     command: sh -c "yarn install && yarn run start"
     volumes:
-      - ../api:/app
+      - ../api/lib:/app/lib:ro
+      - ../api/package.json:/app/package.json:ro
+      - ../api/yarn.lock:/app/yarn.lock:ro
       - api_node_modules:/app/node_modules
     environment:
       MONITOOL_DEBUG: "TRUE"

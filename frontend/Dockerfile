@@ -12,7 +12,7 @@ COPY package.json yarn.lock ./
 RUN yarn install
 
 # Build the app
-COPY gulpfile.js ./
+COPY webpack.config.js ./
 COPY src ./src
 RUN yarn run build
 

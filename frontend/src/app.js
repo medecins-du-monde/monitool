@@ -61,5 +61,6 @@ module.run(function($rootScope, $window, $state) {
 });
 
 
-angular.bootstrap(document, [module.name]);
-
+export default () => {
+	angular.bootstrap(document, [module.name]);
+};

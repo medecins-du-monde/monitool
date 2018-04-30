@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
 	// No need for minification etc.
@@ -10,14 +10,13 @@ module.exports = {
 
 	// Import polyfills, then our code
 	entry: {
-		initscript: './src/init.js',
-		application: './src/app.js',
+		initscript: './src/init.js'
 	},
 
 	// Output everything as a big bunder
 	output: {
 		path: path.resolve('dist'),
-		filename :'monitool2-[name].js'
+		filename :'monitool2-[name]-[chunkhash].js'
 	},
 
 	module: {
@@ -30,7 +29,10 @@ module.exports = {
 						loader: 'babel-loader',
 						options: {
 							"presets": ["env"],
-							"plugins": ["angularjs-annotate"]
+							"plugins": [
+								"angularjs-annotate",
+								"syntax-dynamic-import"
+							]
 						}
 					}
 				]
@@ -41,7 +43,7 @@ module.exports = {
 					{
 						loader: 'html-loader',
 						options: {
-							minimize: true
+							// minimize: true
 						}
 					}
 				]
@@ -78,5 +80,16 @@ module.exports = {
 
 	plugins: [
 		new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /(fr|es|en)\.js/),
+
+		new HtmlWebpackPlugin({
+			filename: 'index.html',
+			template: 'src/index.html',
+			chunks: ['initscript']
+		}),
+
+        // new BundleAnalyzerPlugin({
+        //     analyzerMode: 'static'
+        // })
+
 	]
 };

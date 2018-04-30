@@ -6,6 +6,14 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import "./app.css";
 
+/**
+ * Start loading the application right now
+ */
+const myApplication = import(
+	/* webpackChunkName: "mainapp" */
+	'./app'
+);
+
 
 /**
  * If user is using IE, return the major version
@@ -98,13 +106,20 @@ function onAuthResponse(e) {
 
 		// Show loader
 		document.getElementById('loader').style.display = 'block';
+		let inter = setInterval(onAppProgress, 400);
 
-		// Start loading app
-		var appReq = new XMLHttpRequest();
-		appReq.addEventListener("progress", onAppProgress, false);
-		appReq.addEventListener("load", onAppLoaded, false);
-		appReq.open("GET", "/monitool2-application.js");
-		appReq.send();
+		// Run the app
+		myApplication
+			.then(startApplication => {
+				inter();
+
+				document.body.style.backgroundColor = 'white';
+				document.body.removeChild(document.getElementById('load-container'));
+				document.body.removeChild(document.getElementById('version'));
+
+				startApplication();
+			})
+			.catch(error => 'An error occurred while loading the component');
 	}
 	// User is not logged on
 	else if (authReq.status === 401)
@@ -115,28 +130,12 @@ function onAuthResponse(e) {
 		document.getElementById('server_down').style.display = 'block';
 }
 
+let progress = 1;
 function onAppProgress(e) {
-	// Firefox reports compressed sizes (ex: e.loaded = 120kB, e.total = 1.3MB)
-	// Chrome reports uncompressed loaded, but no total (ex: e.loaded = 2.3MB, e.total = 0)
-	// IE ?
+	progress = progress + 0.1 * (100 - progress)
 
-	// This hack should work at least for Firefox and Chrome (as long as the bundle size does not change too much).
-	var total = e.total || 1593763;
-	document.getElementById('progress').style.width = Math.round(100 * e.loaded / total) + '%';
-}
-
-function onAppLoaded(e) {
-	var appReq = e.currentTarget;
-
-	// Remove modal and change background color
-	document.body.style.backgroundColor = 'white';
-	document.body.removeChild(document.getElementById('load-container'));
-	document.body.removeChild(document.getElementById('version'));
-
-	// append main script to document.
-	var s = document.createElement("script");
-	s.innerHTML = appReq.responseText;
-	document.body.appendChild(s);
+	console.log(progress)
+	document.getElementById('progress').style.width = Math.round(progress) + '%';
 }
 
 
@@ -189,12 +188,8 @@ function onConfigResponse(e) {
 	}
 }
 
-function start() {
-	var authReq = new XMLHttpRequest();
-	authReq.addEventListener("load", onConfigResponse, false);
-	authReq.open('GET', '/api/config?' + Math.random().toString().substring(2));
-	authReq.send();
-}
 
-
-window.start = start;
+var authReq = new XMLHttpRequest();
+authReq.addEventListener("load", onConfigResponse, false);
+authReq.open('GET', '/api/config?' + Math.random().toString().substring(2));
+authReq.send();
