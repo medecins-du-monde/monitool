@@ -25,13 +25,6 @@ export default express()
 	.set('view engine', 'pug') // Enable template engine.
 	.set('views', path.join(__dirname, 'views'))
 
-	// By default users should never cache anything.
-	.use(function(request, response, next) {
-		response.setHeader('Cache-Control', 'max-age=0,public');
-		response.setHeader("Access-Control-Allow-Origin", '*');
-		next();
-	})
-
 	.use(loggerMiddleware)
 	.use(configController)
 

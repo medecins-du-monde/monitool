@@ -3,7 +3,7 @@ version: "3.6"
 services:
 
   reverse_proxy:
-    image: nginx
+    image: fholzer/nginx-brotli
     ports:
       - "80:80"
     volumes:
