@@ -18,14 +18,24 @@
 import angular from 'angular';
 
 import uiRouter from '@uirouter/angularjs';
+import uiModal from 'angular-ui-bootstrap/src/modal/index';
 import 'angular-legacy-sortablejs-maintained';
+
+import mtComponentIndicatorDisplay from '../../../../../components/indicator/display';
+import mtComponentIndicatorModal from '../../../../../components/indicator/edition-modal';
+import mtDirectiveAutoresize from '../../../../../directives/helpers/autoresize';
 
 
 const module = angular.module(
 	'monitool.pages.project.structure.logicalframe.edit',
 	[
 		uiRouter, // for $stateProvider
-		'ng-sortable'
+		uiModal, // for $uibModal
+		'ng-sortable',
+
+		mtDirectiveAutoresize.name,
+		mtComponentIndicatorDisplay.name,
+		mtComponentIndicatorModal.name,
 	]
 );
 

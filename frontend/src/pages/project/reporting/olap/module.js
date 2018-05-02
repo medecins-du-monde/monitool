@@ -22,12 +22,15 @@ import uiSelect from 'ui-select';
 
 import 'ui-select/dist/select.min.css';
 
+import mtServiceItertools from '../../../../services/utils/itertools';
 
 const module = angular.module(
 	'monitool.pages.project.reporting.olap',
 	[
 		uiRouter, // for $stateProvider
-		uiSelect
+		uiSelect,
+
+		mtServiceItertools.name,
 	]
 );
 

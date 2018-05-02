@@ -26,6 +26,22 @@ import 'ui-select/dist/select.min.css';
 
 import mtComponentsOptionalDate from '../../../../../components/form/optional-date';
 import mtComponentsElementFilter from '../../../../../components/form/element-filter';
+import mtServiceItertools from '../../../../../services/utils/itertools';
+
+/**
+ * Compute a range. End value is not included.
+ *
+ * @example
+ * > range(10, 20)
+ * [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+ */
+const range = function(start, end) {
+	var integerRange = [];
+	for (var i = start; i < end; ++i)
+		integerRange.push(i);
+	return integerRange;
+};
+
 
 
 const module = angular.module(
@@ -35,8 +51,10 @@ const module = angular.module(
 		'ng-sortable',
 
 		uiSelect, // for partition group members
+
 		mtComponentsOptionalDate.name, // Datepicker start & end
 		mtComponentsElementFilter.name, // Sites & groups associated with form
+		mtServiceItertools.name,
 	]
 );
 
@@ -241,7 +259,7 @@ module.controller('PartitionEditionModalController', function($scope, $uibModalI
 });
 
 
-module.directive('partitionDistribution', function(itertools) {
+module.directive('partitionDistribution', function() {
 	return {
 		restrict: "E",
 		require: "ngModel",
@@ -284,8 +302,8 @@ module.directive('partitionDistribution', function(itertools) {
 						uniqueIdentifier: 'i_' + Math.random().toString().slice(2),
 
 						// rows and cols for this table.
-						leftCols: itertools.range(0, distribution),
-						headerRows: itertools.range(distribution, numPartitions)
+						leftCols: range(0, distribution),
+						headerRows: range(distribution, numPartitions)
 					});
 				}
 			});
@@ -324,8 +342,8 @@ module.directive('partitionOrder', function(itertools) {
 
 						scope.table = {
 							// rows and cols for this table.
-							leftCols: itertools.range(0, scope.distribution),
-							headerRows: itertools.range(scope.distribution, scope.partitions.length)
+							leftCols: range(0, scope.distribution),
+							headerRows: range(scope.distribution, scope.partitions.length)
 						};
 					}
 					else {
@@ -347,8 +365,8 @@ module.directive('partitionOrder', function(itertools) {
 			scope.$watch('distribution', function() {
 				scope.table = {
 					// rows and cols for this table.
-					leftCols: itertools.range(0, scope.distribution),
-					headerRows: itertools.range(scope.distribution, scope.partitions.length)
+					leftCols: range(0, scope.distribution),
+					headerRows: range(scope.distribution, scope.partitions.length)
 				};
 
 				updateSize();

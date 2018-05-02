@@ -132,9 +132,7 @@ function onAuthResponse(e) {
 
 let progress = 1;
 function onAppProgress(e) {
-	progress = progress + 0.1 * (100 - progress)
-
-	console.log(progress)
+	progress = progress + 0.1 * (100 - progress);
 	document.getElementById('progress').style.width = Math.round(progress) + '%';
 }
 

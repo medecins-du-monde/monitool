@@ -31,7 +31,7 @@ const module = angular.module(
 
 // TODO profiling this piece of code for perfs could not hurt.
 // we will see how bad if performs on the wild.
-module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube, InputSlots, itertools) {
+module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube, InputSlots) {
 
 	this.deduplicateRows = function(rows) {
 		var names = {};
@@ -350,7 +350,8 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube, 
 			rows = [];
 
 		indicators.forEach(function(indicator) {
-			if (itertools.intersect(indicator.themes, project.themes).length === 0)
+			var commonThemes = indicator.themes.filter(t => project.themes.indexOf(t) !== -1);
+			if (commonThemes.length === 0)
 				return;
 
 			var planning = {};

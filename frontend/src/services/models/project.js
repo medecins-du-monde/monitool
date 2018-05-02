@@ -21,18 +21,15 @@ import factorial from 'factorial';
 
 import ngResource from 'angular-resource';
 
-import mtItertools from '../utils/itertools';
-
 const module = angular.module(
 	'monitool.services.models.project',
 	[
 		ngResource,
-		mtItertools.name
 	]
 );
 
 
-module.factory('Project', function($resource, $q, $rootScope, $filter, itertools) {
+module.factory('Project', function($resource, $q, $rootScope, $filter) {
 
 	var Project = $resource('/api/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
@@ -67,7 +64,8 @@ module.factory('Project', function($resource, $q, $rootScope, $filter, itertools
 
 		indicators.sort(function(a, b) { return a.name[$rootScope.language].localeCompare(b.name[$rootScope.language]); });
 		indicators.forEach(function(indicator) {
-			if (itertools.intersect(indicator.themes, this.themes).length === 0)
+			// If there no theme in common
+			if (indicator.themes.filter(t => this.themes.indexOf(t) !== -1).length === 0)
 				return;
 
 			elementOptions.push({
@@ -134,10 +132,9 @@ module.factory('Project', function($resource, $q, $rootScope, $filter, itertools
 				return false;
 
 			// Check if entities where user is allowed intersect with the data source.
-			var form = this.forms.find(function(f) { return f.id == formId; });
-			var userColumns = projectUser.entities;
+			var form = this.forms.find(f => f.id === formId);
 
-			return !!itertools.intersect(form.entities, userColumns).length;
+			return !!projectUser.entities.filter(e => form.entities.indexOf(e) !== -1).length;
 		}
 
 		return false;
@@ -313,7 +310,8 @@ module.factory('Project', function($resource, $q, $rootScope, $filter, itertools
 		if (indicators) {
 			for (var indicatorId in this.crossCutting) {
 				var indicator = indicators.find(i => i._id == indicatorId);
-				if (!indicator || itertools.intersect(indicator.themes, this.themes).length === 0)
+				var commonThemes = indicator.themes.filter(t => this.themes.indexOf(t) !== -1);
+				if (!indicator || commonThemes.length === 0)
 					delete this.crossCutting[indicatorId];
 			}
 		}

@@ -50,22 +50,6 @@ module.service('itertools', function() {
 	};
 
 	/**
-	 * Compute a range. End value is not included.
-	 *
-	 * @example
-	 * var arr;
-	 *
-	 * arr = range(10, 20)
-	 * // arr == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-	 */
-	this.range = function(start, end) {
-		var integerRange = [];
-		for (var i = start; i < end; ++i)
-			integerRange.push(i);
-		return integerRange;
-	};
-
-	/**
 	 * Compute the product of multiple arrays.
 	 *
 	 * @example
@@ -201,29 +185,6 @@ module.service('itertools', function() {
 		return result;
 	};
 
-	/**
-	 * Test two array, to see if one is a subset of the other.
-	 *
-	 * @example
-	 * isSubset([1, 2, 3], [3, 1]) == true
-	 * isSubset([1, 2, 3], [4, 1]) == false
-	 */
-	this.isSubset = function(superset, subset) {
-		return this.intersect(subset, superset).length === subset.length;
-	};
-
-	/**
-	 * Intersect two arrays.
-	 *
-	 * @example
-	 * intersect([1, 2, 3], [3, 1]) == [1, 3]
-	 * intersect([1, 2, 3], [4, 1]) == [1]
-	 */
-	this.intersect = function(array1, array2) {
-		return array1.filter(function(el) {
-			return array2.indexOf(el) !== -1;
-		});
-	};
 });
 
 

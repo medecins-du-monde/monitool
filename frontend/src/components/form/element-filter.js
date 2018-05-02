@@ -26,10 +26,22 @@ const module = angular.module(
 
 
 /**
+ * Test two array, to see if one is a subset of the other.
+ *
+ * @example
+ * isSubset([1, 2, 3], [3, 1]) == true
+ * isSubset([1, 2, 3], [4, 1]) == false
+ */
+const isSubset = function(superset, subset) {
+	return subset.filter(e => superset.indexOf(e) !== -1).length === subset.length;
+};
+
+
+/**
  * This directive is a form control that allows to select multiple elements in a list.
  * To make thing faster than selecting one by one, it allows to select groups at once.
  */
-module.directive('elementFilter', function(itertools, $filter) {
+module.directive('elementFilter', function($filter) {
 
 	/**
 	 * Convert the model value to the array that will be used in the view.
@@ -52,7 +64,7 @@ module.directive('elementFilter', function(itertools, $filter) {
 
 		// retrieve all groups that are in the list.
 		var selectedGroups = groups.filter(function(group) {
-			return itertools.isSubset(model, group.members);
+			return isSubset(model, group.members);
 		});
 		var numSelectedGroups = selectedGroups.length;
 

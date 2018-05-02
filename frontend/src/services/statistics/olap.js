@@ -464,7 +464,7 @@ module.factory("CompoundCube", function(Cube) {
 			dimensionIds.push(dimensions);
 		}
 
-		// intersect them to know which dimensions we have left (FIXME: why not depend on itertools.intersect?).
+		// intersect them to know which dimensions we have left.
 		dimensionIds = dimensionIds.reduce(function(memo, arr) {
 			return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
 		}, null) || [];

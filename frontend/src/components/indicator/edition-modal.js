@@ -18,10 +18,16 @@
 import angular from 'angular';
 import exprEval from 'expr-eval';
 
+import uiModal from 'angular-ui-bootstrap/src/modal/index';
+
+import mtComponentsOptionalNumber from '../form/optional-number';
 
 const module = angular.module(
 	'monitool.components.indicator.editionmodal',
 	[
+		uiModal, // for $uibModal
+
+		mtComponentsOptionalNumber.name
 	]
 );
 
@@ -64,7 +70,7 @@ module.controller('ProjectIndicatorEditionModalController', function($scope, $ui
 });
 
 
-module.directive('indicatorComputation', function(itertools) {
+module.directive('indicatorComputation', function() {
 
 	var PERCENTAGE_FORMULA = '100 * numerator / denominator',
 		PERMILLE_FORMULA   = '1000 * numerator / denominator',

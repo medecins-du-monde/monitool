@@ -24,14 +24,16 @@ import uiRouter from '@uirouter/angularjs';
 
 import mtInputModel from '../../../../services/models/input';
 import mtFilterTimeSlot from '../../../../filters/time-slot';
-
+import mtServiceItertools from '../../../../services/utils/itertools';
 
 const module = angular.module(
 	'monitool.pages.project.input.edit',
 	[
 		uiRouter, // for $stateProvider
+
 		mtInputModel.name,
-		mtFilterTimeSlot.name
+		mtFilterTimeSlot.name,
+		mtServiceItertools.name
 	]
 );
 

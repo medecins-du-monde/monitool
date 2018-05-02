@@ -17,11 +17,14 @@
 
 import angular from 'angular';
 
+import uiModal from 'angular-ui-bootstrap/src/modal/index';
+
 import editionModal from './edition-modal';
 
 const module = angular.module(
 	'monitool.components.indicator.display',
 	[
+		uiModal, // for $uibModal
 		editionModal.name
 	]
 );

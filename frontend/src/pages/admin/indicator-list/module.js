@@ -24,10 +24,10 @@ import uiSelect from 'ui-select';
 
 import 'ui-select/dist/select.min.css';
 
-import mtIndicatorModel from '../../../services/models/indicator';
-import mtThemeModel from '../../../services/models/theme';
-import mtGoogleTranslation from '../../../services/utils/translate';
-
+import mtDirectiveAutoresize from '../../../directives/helpers/autoresize';
+import mtModelIndicator from '../../../services/models/indicator';
+import mtModelTheme from '../../../services/models/theme';
+import mtServiceTranslation from '../../../services/utils/translate';
 
 const module = angular.module(
 	'monitool.pages.admin.indicatorlist',
@@ -36,9 +36,10 @@ const module = angular.module(
 		uiModal, // for $uibModal
 		uiSelect, // for <ui-select>
 
-		mtIndicatorModel.name,
-		mtThemeModel.name,
-		mtGoogleTranslation.name
+		mtDirectiveAutoresize.name,
+		mtModelIndicator.name,
+		mtModelTheme.name,
+		mtServiceTranslation.name
 	]
 );
 
