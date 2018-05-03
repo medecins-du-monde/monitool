@@ -22,15 +22,13 @@ import uiSelect from 'ui-select';
 
 import 'ui-select/dist/select.min.css';
 
-import mtServiceItertools from '../../../../services/utils/itertools';
+import {product} from '../../../../helpers/array';
 
 const module = angular.module(
 	'monitool.pages.project.reporting.olap',
 	[
 		uiRouter, // for $stateProvider
 		uiSelect,
-
-		mtServiceItertools.name,
 	]
 );
 
@@ -248,7 +246,7 @@ module.controller('ProjectOlapController', function($scope, $filter, CompoundCub
 
 
 
-module.directive('olapGrid', function(itertools) {
+module.directive('olapGrid', function() {
 	return {
 		restrict: 'E',
 		scope: {
@@ -292,11 +290,11 @@ module.directive('olapGrid', function(itertools) {
 					$scope.rowspans[i] = rowspan;
 				}
 
-				itertools.product($scope.rows).forEach(function(headers) {
+				product($scope.rows).forEach(function(headers) {
 					grid.body.push({
 						headerCols: headers,
 						dataCols:
-							itertools.product(
+							product(
 								$scope.cols.concat(headers.map(function(a) { return [a]; }))
 							).map(function(els) {
 								try {

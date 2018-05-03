@@ -103,8 +103,7 @@ module.filter('formatSlotLong', function($filter) {
 		else
 			return $filter('formatSlot')(slotValue) + ' (' + $filter('formatSlotRange')(slotValue) + ')';
 	}
-})
-
+});
 
 
 export default module;

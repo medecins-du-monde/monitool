@@ -24,7 +24,9 @@ import uiRouter from '@uirouter/angularjs';
 
 import mtInputModel from '../../../../services/models/input';
 import mtFilterTimeSlot from '../../../../filters/time-slot';
-import mtServiceItertools from '../../../../services/utils/itertools';
+import {transpose2D, computeNthPermutation} from '../../../../helpers/array';
+
+
 
 const module = angular.module(
 	'monitool.pages.project.input.edit',
@@ -33,7 +35,6 @@ const module = angular.module(
 
 		mtInputModel.name,
 		mtFilterTimeSlot.name,
-		mtServiceItertools.name
 	]
 );
 
@@ -115,7 +116,7 @@ module.controller('ProjectCollectionInputEditionController', function($scope, $s
 });
 
 
-module.directive('inputGrid', function(itertools) {
+module.directive('inputGrid', function() {
 	var headerOptions = {
 		readOnly: true,
 		renderer: function(instance, td, row, col, prop, value, cellProperties) {
@@ -167,7 +168,7 @@ module.directive('inputGrid', function(itertools) {
 	 */
 	var permutateDataIndex = function(element, originalIndex) {
 		// Compute the order in which the partition are permutated. We need that later.
-		var permutation = itertools.computeNthPermutation(element.partitions.length, element.order);
+		var permutation = computeNthPermutation(element.partitions.length, element.order);
 
 		// Use divmod operations to know which elements originalIndex comes from.
 		var originalIdxs = new Array(element.partitions.length);
@@ -231,7 +232,7 @@ module.directive('inputGrid', function(itertools) {
 					return [modelValue];
 
 				// We need the permutation later on.
-				var permutation = itertools.computeNthPermutation(scope.element.partitions.length, scope.element.order);
+				var permutation = computeNthPermutation(scope.element.partitions.length, scope.element.order);
 
 				var viewValue = [];
 
@@ -242,7 +243,7 @@ module.directive('inputGrid', function(itertools) {
 					rowPartitions = partitions.slice(0, scope.element.distribution);
 
 				var topRows = makeRows(colPartitions),
-					bodyRows = itertools.transpose2D(makeRows(rowPartitions));
+					bodyRows = transpose2D(makeRows(rowPartitions));
 
 				if (!bodyRows.length)
 					bodyRows.push([])

@@ -26,22 +26,7 @@ import 'ui-select/dist/select.min.css';
 
 import mtComponentsOptionalDate from '../../../../../components/form/optional-date';
 import mtComponentsElementFilter from '../../../../../components/form/element-filter';
-import mtServiceItertools from '../../../../../services/utils/itertools';
-
-/**
- * Compute a range. End value is not included.
- *
- * @example
- * > range(10, 20)
- * [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
- */
-const range = function(start, end) {
-	var integerRange = [];
-	for (var i = start; i < end; ++i)
-		integerRange.push(i);
-	return integerRange;
-};
-
+import {computePermutationIndex, computeNthPermutation, range} from '../../../../../helpers/array';
 
 
 const module = angular.module(
@@ -54,7 +39,6 @@ const module = angular.module(
 
 		mtComponentsOptionalDate.name, // Datepicker start & end
 		mtComponentsElementFilter.name, // Sites & groups associated with form
-		mtServiceItertools.name,
 	]
 );
 
@@ -312,7 +296,7 @@ module.directive('partitionDistribution', function() {
 });
 
 
-module.directive('partitionOrder', function(itertools) {
+module.directive('partitionOrder', function() {
 	return {
 		restrict: "E",
 		require: "ngModel",
@@ -411,7 +395,7 @@ module.directive('partitionOrder', function(itertools) {
 			};
 
 			ngModelController.$parsers.push(function(viewValue) {
-				return itertools.computePermutationIndex(
+				return computePermutationIndex(
 					scope.orderedPartitions.map(function(partition) {
 						return scope.partitions.indexOf(partition);
 					})
@@ -419,8 +403,8 @@ module.directive('partitionOrder', function(itertools) {
 			});
 
 			ngModelController.$formatters.push(function(modelValue) {
-				return itertools.computeNthPermutation(scope.partitions.length, modelValue)
-								.map(function(index) { return scope.partitions[index]; });
+				return computeNthPermutation(scope.partitions.length, modelValue)
+					.map(function(index) { return scope.partitions[index]; });
 			});
 		}
 	};

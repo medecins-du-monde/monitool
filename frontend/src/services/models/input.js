@@ -18,18 +18,17 @@
 import angular from 'angular';
 import ngResource from 'angular-resource';
 
-import mtInputSlots from '../utils/input-slots';
+import {getList} from '../../helpers/input-slots';
 
 
 const module = angular.module(
 	'monitool.services.models.input',
 	[
-		ngResource,
-		mtInputSlots.name
+		ngResource
 	]
 );
 
-module.factory('Input', function($resource, $q, InputSlots) {
+module.factory('Input', function($resource, $q) {
 
 	// Create $resource
 	var Input = $resource('/api/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
@@ -55,7 +54,7 @@ module.factory('Input', function($resource, $q, InputSlots) {
 					strPeriods = Object.keys(prj);
 				else {
 					var entity = project.entities.find(function(entity) { return entity.id == entityId; });
-					strPeriods = InputSlots.getList(project, entity, form);
+					strPeriods = getList(project, entity, form);
 				}
 
 				strPeriods.forEach(function(strPeriod) {

@@ -20,6 +20,8 @@ import uuid from 'uuid/v4';
 import TimeSlot from 'timeslot-dag';
 
 import mtOlap from './olap';
+import {iterate} from '../../helpers/input-slots';
+
 
 const module = angular.module(
 	'monitool.services.statistics.reporting',
@@ -31,7 +33,7 @@ const module = angular.module(
 
 // TODO profiling this piece of code for perfs could not hurt.
 // we will see how bad if performs on the wild.
-module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube, InputSlots) {
+module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) {
 
 	this.deduplicateRows = function(rows) {
 		var names = {};
@@ -55,7 +57,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube, 
 
 	this.getColumns = function(groupBy, start, end, location, project) {
 		if (['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'day'].indexOf(groupBy) !== -1) {
-			var slots = InputSlots.iterate(start, end, groupBy).map(function(slot) {
+			var slots = iterate(start, end, groupBy).map(function(slot) {
 				return {id: slot, name: $filter('formatSlot')(slot), title: $filter('formatSlotRange')(slot)};
 			});
 
