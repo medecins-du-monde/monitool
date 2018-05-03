@@ -93,6 +93,15 @@ module.exports = {
 			inject: 'head'
 		}),
 
+        // new BundleAnalyzerPlugin({
+        //     analyzerMode: 'static'
+        // })
+	]
+};
+
+
+if (process.argv.indexOf('-p') !== -1) {
+	module.exports.plugins.push(
 		new ZopfliPlugin({
 			asset: "[path].gz[query]",
 			algorithm: "zopfli",
@@ -106,10 +115,6 @@ module.exports = {
 			test: /\.(css|html|js|svg|ttf)$/,
 			threshold: 0,
 			minRatio: 0.8
-		}),
-
-        // new BundleAnalyzerPlugin({
-        //     analyzerMode: 'static'
-        // })
-	]
-};
+		})
+	);
+}
