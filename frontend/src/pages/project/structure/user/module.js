@@ -50,8 +50,7 @@ module.config(function($stateProvider) {
  */
 module.controller('ProjectUserListController', function($scope, $uibModal, $filter, users) {
 	$scope.users = {};
-
-	users.forEach(function(user) { $scope.users[user._id] = user});
+	users.forEach(user => $scope.users[user._id] = user);
 
 	$scope.editUser = function(user) {
 		var promise = $uibModal.open({
@@ -81,15 +80,15 @@ module.controller('ProjectUserListController', function($scope, $uibModal, $filt
 module.controller('ProjectUserModalController', function($scope, $uibModalInstance, allUsers, projectUser) {
 	// Build the list of users that are available on the select box
 	// Available users are user that are not already taken (besides current one).
-	$scope.availableUsers = allUsers.filter(function(user) {
-		var isTakenInProject = $scope.editableProject.users.find(function(u) { return u.id == user._id; }),
+	$scope.availableUsers = allUsers.filter(user => {
+		var isTakenInProject = $scope.editableProject.users.find(u => u.id == user._id),
 			isTakenByMe      = projectUser && projectUser.id === user._id;
 
 		return isTakenByMe || !isTakenInProject;
 	});
 
 	// Build the list of forbidden usernames if creating a partner account.
-	$scope.partners = $scope.editableProject.users.filter(function(u) {
+	$scope.partners = $scope.editableProject.users.filter(u => {
 		if (projectUser)
 			return u.type == 'partner' && u.username !== projectUser.username;
 		else

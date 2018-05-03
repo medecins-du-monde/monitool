@@ -86,8 +86,8 @@ module.directive('indicatorComputation', function() {
 		link: function(scope, element, attributes, ngModelController) {
 			scope.selectElements = [];
 			scope.elementsById = {};
-			scope.forms.forEach(function(form) {
-				form.elements.forEach(function(element) {
+			scope.forms.forEach(form => {
+				form.elements.forEach(element => {
 					scope.elementsById[element.id] = element; // Use to find partition on view
 					scope.selectElements.push({id: element.id, name: element.name, group: form.name}); // Used by selectbox
 				});
@@ -105,10 +105,10 @@ module.directive('indicatorComputation', function() {
 				catch (e) { newSymbols = []; }
 
 				if (!angular.equals(newSymbols, oldSymbols)) {
-					var addedSymbols = newSymbols.filter(function(s) { return oldSymbols.indexOf(s) === -1; });
+					var addedSymbols = newSymbols.filter(s => !oldSymbols.includes(s));
 
 					// Add new symbols to formula
-					addedSymbols.forEach(function(s) {
+					addedSymbols.forEach(s => {
 						scope.computation.parameters[s] = {elementId: null, filter: {}};
 					});
 				}
@@ -197,7 +197,7 @@ module.directive('partitionsFilter', function() {
 				else if (element !== oldElement) {
 					scope.filter = {};
 
-					element.partitions.forEach(function(partition) {
+					element.partitions.forEach(partition => {
 						scope.filter[partition.id] = partition.elements.map(e => e.id);
 					});
 				}
@@ -207,7 +207,7 @@ module.directive('partitionsFilter', function() {
 				var modelValue = {};
 
 				if (scope.element)
-					scope.element.partitions.forEach(function(partition) {
+					scope.element.partitions.forEach(partition => {
 						if (viewValue[partition.id].length !== partition.elements.length)
 							modelValue[partition.id] = viewValue[partition.id];
 					});
@@ -219,7 +219,7 @@ module.directive('partitionsFilter', function() {
 				var viewValue = {};
 
 				if (scope.element)
-					scope.element.partitions.forEach(function(partition) {
+					scope.element.partitions.forEach(partition => {
 						if (modelValue[partition.id])
 							viewValue[partition.id] = modelValue[partition.id];
 						else

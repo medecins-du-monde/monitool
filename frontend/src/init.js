@@ -112,7 +112,7 @@ async function configure() {
 	document.getElementById('go_back_btn').addEventListener('click', onGoBackClicked, false);
 
 	// Show partner login page if we entered a wrong password.
-	if (window.location.href.indexOf('failed') !== -1)
+	if (window.location.href.includes('failed'))
 		onParterLoginClicked(null, true);
 }
 
@@ -160,5 +160,3 @@ async function init() {
 }
 
 init().catch(console.error);
-
-console.log('coucou')

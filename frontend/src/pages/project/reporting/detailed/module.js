@@ -87,10 +87,8 @@ module.controller('ProjectDetailedReportingController', function($scope, $filter
 		// extra filters if variable is selected.
 		if (element.type == 'variable') {
 
-			element.element.partitions.forEach(function(partition) {
-				filters[partition.id] = partition.elements.map(function(pe) {
-					return pe.id;
-				});
+			element.element.partitions.forEach(partition => {
+				filters[partition.id] = partition.elements.map(pe => pe.id);
 			});
 
 			// filters

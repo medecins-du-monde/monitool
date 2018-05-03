@@ -56,25 +56,18 @@ module.config(function($stateProvider) {
 module.controller('IndicatorListController', function($scope, indicators, themes) {
 	$scope.themes = [];
 
-	var noThematicsIndicators = indicators.filter(function(indicator) {
-		return indicator.themes.length == 0;
-	});
+	var noThematicsIndicators = indicators.filter(indicator => indicator.themes.length == 0);
 	if (noThematicsIndicators.length)
 		$scope.themes.push({definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators});
 
 	// Create a category with indicators that match project on 2 thematics or more
-	var manyThematicsIndicators = indicators.filter(function(indicator) {
-		return indicator.themes.length > 1;
-	});
+	var manyThematicsIndicators = indicators.filter(indicator => indicator.themes.length > 1);
 	if (manyThematicsIndicators.length)
 		$scope.themes.push({definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators});
 
 	// Create a category with indicators that match project on exactly 1 thematic
-	themes.forEach(function(theme) {
-		var themeIndicators = indicators.filter(function(indicator) {
-			return indicator.themes.length === 1 && indicator.themes[0] === theme._id;
-		});
-
+	themes.forEach(theme => {
+		var themeIndicators = indicators.filter(i => i.themes.length === 1 && i.themes[0] === theme._id);
 		if (themeIndicators.length !== 0)
 			$scope.themes.push({definition: theme, indicators: themeIndicators});
 	});

@@ -31,7 +31,7 @@ module.directive('forbiddenValues', function() {
 		link: function($scope, element, attributes, ngModelController) {
 			ngModelController.$validators.forbiddenValues = function(modelValue, viewValue) {
 				var values = $scope.$eval(attributes.forbiddenValues);
-				return values.indexOf(viewValue) === -1;
+				return !values.includes(viewValue);
 			};
 		}
 	};

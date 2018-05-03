@@ -77,7 +77,7 @@
 <div style="clear: both"></div>
 
 <reporting-graph-adapter
-	type="['year', 'quarter', 'month', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'day'].indexOf(groupBy) !== -1 ? 'line' : 'bar'"
+	type="['year', 'quarter', 'month', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'day'].includes(groupBy) ? 'line' : 'bar'"
 	rows="rows" cols="cols" plots="plots">
 </reporting-graph-adapter>
 
@@ -96,7 +96,7 @@
 			<th ng-repeat="col in cols" style="min-width: 50px" title="{{col.title}}">{{col.name}}</th>
 		</tr>
 	</thead>
-	
+
 	<tbody ng-if="blocks.length === 0">
 		<tr>
 			<td colspan="{{2 + cols.length}}" translate="indicator.not_collected"></th>
@@ -110,7 +110,7 @@
 				{{block.text}}
 			</th>
 		</tr>
-		
+
 		<tr ng-repeat="row in block.rows">
 			<td class="noprint" style="text-align: center">
 				<i class="fa fa-line-chart"

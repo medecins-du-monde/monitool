@@ -49,34 +49,24 @@ module.config(function($stateProvider) {
 
 
 module.controller('ProjectCollectionInputListController', function($scope, $state, $stateParams, inputsStatus, Input) {
-	$scope.form = $scope.masterProject.forms.find(function(f) { return f.id == $stateParams.formId; });
+	$scope.form = $scope.masterProject.forms.find(f => f.id == $stateParams.formId);
 
 	//////
 	// Create planning.
 	//////
 	$scope.inputsStatus = inputsStatus;
-	$scope.columns = $scope.masterProject.entities.filter(function(e) {
-		// If unexpected entries need to be deleted / sorted out, display the column.
-		for (var period in $scope.inputsStatus)
-			if ($scope.inputsStatus[period][e.id] === 'outofschedule')
-				return true;
-
-		// Otherwise, display the column only if specified by the form.
-		return $scope.form.entities.indexOf(e.id) !== -1;
-	});
+	$scope.columns = $scope.masterProject.entities.filter(e => $scope.form.entities.includes(e.id));
 
 	// => restrict columns depending on user permissions
 	if ($scope.userCtx.role !== 'admin') {
-		var projectUser = $scope.masterProject.users.find(function(u) {
+		var projectUser = $scope.masterProject.users.find(u => {
 			return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
 				   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
 		});
 
 		if (projectUser.role === 'input') {
 			// This will happen regardless of unexpected entries.
-			$scope.columns = $scope.columns.filter(function(column) {
-				return projectUser.entities.indexOf(column.id) !== -1;
-			});
+			$scope.columns = $scope.columns.filter(e => projectUser.entities.includes(e.id));
 		}
 	}
 
@@ -84,7 +74,7 @@ module.controller('ProjectCollectionInputListController', function($scope, $stat
 	$scope.hiddenStatus = Object.keys($scope.inputsStatus).slice(0, -10);
 
 	$scope.showMore = function() {
-		$scope.visibleStatus = $scope.hiddenStatus.slice(-10).concat($scope.visibleStatus);
+		$scope.visibleStatus = [...$scope.hiddenStatus.slice(-10), ...$scope.visibleStatus];
 		$scope.hiddenStatus.splice(-10, 10);
 	};
 
@@ -98,8 +88,11 @@ module.controller('ProjectCollectionInputListController', function($scope, $stat
 		};
 
 		$scope.addInput = function(entityId) {
-			var period = $scope.newInputDate.date;
-			$state.go('main.project.input.edit', {period: period, formId: $scope.form.id, entityId: entityId});
+			$state.go('main.project.input.edit', {
+				period: $scope.newInputDate.date,
+				formId: $scope.form.id,
+				entityId: entityId
+			});
 		};
 	}
 });

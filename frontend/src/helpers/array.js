@@ -146,7 +146,7 @@ export function productSingle(a, b) {
 
 	for (var i = 0; i < lengthA; ++i)
 		for (var j = 0; j < lengthB; ++j)
-			result[k++] = a[i].concat([b[j]]);
+			result[k++] = [...a[i], b[j]];
 
 	return result;
 };
@@ -162,7 +162,7 @@ export function product(list) {
 	if (list.length == 0)
 		return [];
 
-	var memo = list[0].map(function(el) { return [el]; });
+	var memo = list[0].map(el => [el]);
 	for (var i = 1; i < list.length; ++i)
 		memo = productSingle(memo, list[i]);
 

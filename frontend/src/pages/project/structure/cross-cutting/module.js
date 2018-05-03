@@ -41,21 +41,18 @@ module.controller('ProjectCrossCuttingController', function($scope, $uibModal, i
 	$scope.themes = [];
 
 	// Create a category with indicators that match project on 2 thematics or more
-	var manyThematicsIndicators = indicators.filter(function(indicator) {
-		return indicator.themes.length > 1 && indicator.themes.filter(function(themeId) {
-			return $scope.masterProject.themes.indexOf(themeId) !== -1;
-		}).length > 0;
+	var manyThematicsIndicators = indicators.filter(indicator => {
+		const commonThemes = indicator.themes.filter(themeId => $scope.masterProject.themes.includes(themeId));
+		return indicator.themes.length > 1 && commonThemes.length > 0;
 	});
+
 	if (manyThematicsIndicators.length)
 		$scope.themes.push({definition: null, indicators: manyThematicsIndicators});
 
 	// Create a category with indicators that match project on exactly 1 thematic
-	themes.forEach(function(theme) {
-		if ($scope.masterProject.themes.indexOf(theme._id) !== -1) {
-			var themeIndicators = indicators.filter(function(indicator) {
-				return indicator.themes.length === 1 && indicator.themes[0] === theme._id;
-			});
-
+	themes.forEach(theme => {
+		if ($scope.masterProject.themes.includes(theme._id)) {
+			var themeIndicators = indicators.filter(i => i.themes.length === 1 && i.themes[0] === theme._id);
 			if (themeIndicators.length !== 0)
 				$scope.themes.push({definition: theme, indicators: themeIndicators});
 		}
@@ -75,8 +72,8 @@ module.controller('ProjectCrossCuttingController', function($scope, $uibModal, i
 			size: 'lg',
 			scope: $scope, // give our $scope to give it access to userCtx, project and indicatorsById.
 			resolve: {
-				planning: function() { return planning; },
-				indicator: function() { return indicators.find(function(i) { return i._id == indicatorId; }); }
+				planning: () => planning,
+				indicator: () => indicators.find(i => i._id == indicatorId)
 			}
 		}).result;
 

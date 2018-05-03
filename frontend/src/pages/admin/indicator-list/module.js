@@ -72,17 +72,18 @@ module.controller("AdminIndicatorListController", function($scope, $uibModal, In
 	// give a color to each theme
 	// give to indicators the color of the first theme
 	var classes = ["text-primary", "text-success", "text-info", "text-warning", "text-danger"];
-	$scope.themes.forEach(function(theme, index) { theme.class = classes[index % classes.length]; });
+	$scope.themes.forEach((theme, index) => theme.class = classes[index % classes.length]);
 
 	var sortIndicators = function() {
-		$scope.themes.sort(function(a, b) {
+		$scope.themes.sort((a, b) => {
 			return a.name[$scope.language].localeCompare(b.name[$scope.language]);
 		});
 
-		$scope.indicators.sort(function(a, b) {
+		$scope.indicators.sort((a, b) => {
 			return a.name[$scope.language].localeCompare(b.name[$scope.language]);
 		});
 	};
+
 	sortIndicators();
 
 	var createModal = function(indicator, isNew) {

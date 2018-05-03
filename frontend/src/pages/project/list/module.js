@@ -60,17 +60,9 @@ module.controller('ProjectListController', function($scope, $state, projects, th
 	$scope.themes = themes;
 	$scope.pred = 'country'; // default sorting predicate
 
-	$scope.myProjects = projects.filter(function(p) {
-		return p.users.find(function(u) { return u.id == $scope.userCtx._id; });
-	});
-
-	$scope.runningProjects = projects.filter(function(p) {
-		return $scope.myProjects.indexOf(p) === -1 && p.end >= now
-	});
-
-	$scope.finishedProjects = projects.filter(function(p) {
-		return $scope.myProjects.indexOf(p) === -1 && p.end < now
-	});
+	$scope.myProjects = projects.filter(p => p.users.find(u => u.id == $scope.userCtx._id));
+	$scope.runningProjects = projects.filter(p => !$scope.myProjects.includes(p) && p.end >= now);
+	$scope.finishedProjects = projects.filter(p => !$scope.myProjects.includes(p) && p.end < now);
 
 	$scope.projects = $scope.myProjects;
 
@@ -79,7 +71,7 @@ module.controller('ProjectListController', function($scope, $state, projects, th
 	};
 
 	$scope.open = function(project) {
-		var projectUser = project.users.find(function(u) {
+		var projectUser = project.users.find(u => {
 			return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
 				   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
 		});

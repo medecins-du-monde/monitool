@@ -90,17 +90,17 @@ module.controller('IndicatorReportingController', function($scope, Cube, mtRepor
 	else
 		$scope.groupBy = 'year';
 
-	$scope.blocks = projects.map(function(project) {
+	$scope.blocks = projects.map(project => {
 		return {text: project.name + " (" + project.country + ')', project: project};
 	});
 
 	$scope.$watch('[filters, groupBy, splits, open]', function() {
 		$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, null, null)
 
-		$scope.blocks.forEach(function(block, index) {
+		$scope.blocks.forEach((block, index) => {
 			var fakeInd = block.project.crossCutting[indicator._id];
 			var c = {};
-			cubes[projects[index]._id].forEach(function(a) { c[a.id] = a; });
+			cubes[projects[index]._id].forEach(a => c[a.id] = a);
 
 			block.rows = $scope.open[index] ?
 				mtReporting.computeIndicatorReporting(c, projects[index], fakeInd, $scope.groupBy, $scope.filters) :
@@ -109,7 +109,10 @@ module.controller('IndicatorReportingController', function($scope, Cube, mtRepor
 
 		// Work around graph bug
 		$scope.rows = [];
-		$scope.blocks.forEach(function(block) { if (block.rows) $scope.rows = $scope.rows.concat(block.rows); });
+		$scope.blocks.forEach(block => {
+			if (block.rows)
+				$scope.rows.push(...block.rows);
+		});
 	}, true);
 
 });

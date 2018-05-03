@@ -54,7 +54,7 @@ module.config(function($stateProvider) {
 
 module.controller('ThemeListController', function($scope, $uibModal, Theme, themes) {
 	var sortThemes = function() {
-		$scope.themes.sort(function(a, b) {
+		$scope.themes.sort((a, b) => {
 			return a.name[$scope.language].localeCompare(b.name[$scope.language]);
 		});
 	};

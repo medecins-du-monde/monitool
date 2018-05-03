@@ -34,12 +34,12 @@ module.factory('Input', function($resource, $q) {
 	var Input = $resource('/api/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
 
 	Input.fetchFormStatus = function(project, formId) {
-		var form = project.forms.find(function(f) {return f.id == formId; });
+		var form = project.forms.find(f => f.id == formId);
 
 		return Input.query({mode: 'ids_by_form', projectId: project._id, formId: formId}).$promise.then(function(inputsDone) {
 			var prj = {};
 
-			inputsDone.forEach(function(inputId) {
+			inputsDone.forEach(inputId => {
 				var splitted      = inputId.split(':'),
 					inputEntityId = splitted[4],
 					strPeriod     = splitted[5];
@@ -48,16 +48,16 @@ module.factory('Input', function($resource, $q) {
 				prj[strPeriod][inputEntityId] = 'outofschedule';
 			});
 
-			form.entities.forEach(function(entityId) {
+			form.entities.forEach(entityId => {
 				var strPeriods;
 				if (form.periodicity === 'free')
 					strPeriods = Object.keys(prj);
 				else {
-					var entity = project.entities.find(function(entity) { return entity.id == entityId; });
+					var entity = project.entities.find(entity => entity.id == entityId);
 					strPeriods = getList(project, entity, form);
 				}
 
-				strPeriods.forEach(function(strPeriod) {
+				strPeriods.forEach(strPeriod => {
 					prj[strPeriod] = prj[strPeriod] || {};
 
 					if (prj[strPeriod][entityId] == 'outofschedule')
@@ -72,7 +72,7 @@ module.factory('Input', function($resource, $q) {
 			periods.sort();
 
 			var newObj = {};
-			periods.forEach(function(period) { newObj[period] = prj[period]; })
+			periods.forEach(period => newObj[period] = prj[period])
 			prj = newObj;
 
 			return prj;
@@ -80,7 +80,7 @@ module.factory('Input', function($resource, $q) {
 	};
 
 	Input.fetchLasts = function(project, entityId, formId, period) {
-		var form = project.forms.find(function(f) { return f.id == formId; });
+		var form = project.forms.find(f => f.id == formId);
 
 		return Input.query({
 			mode: "current+last",
@@ -105,9 +105,8 @@ module.factory('Input', function($resource, $q) {
 				values: {}
 			});
 
-			form.elements.forEach(function(element) {
-				var numFields = 1;
-				element.partitions.forEach(function(partition) { numFields *= partition.elements.length; });
+			form.elements.forEach(element => {
+				const numFields = element.partitions.reduce((p, memo) => memo * p.elements.length, 1);
 
 				current.values[element.id] = new Array(numFields);
 				for (var i = 0; i < numFields; ++i)

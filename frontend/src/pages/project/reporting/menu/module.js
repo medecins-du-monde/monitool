@@ -41,7 +41,7 @@ module.controller('ProjectSharedReportingController', function($scope, Cube) {
 	Cube.fetchProject($scope.masterProject._id).then(function(cs) {
 		// Index cubes by id.
 		var cubes = {};
-		cs.forEach(function(c) { cubes[c.id] = c; });
+		cs.forEach(c => cubes[c.id] = c);
 
 		$scope.cubes = cubes;
 	});

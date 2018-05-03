@@ -29,7 +29,7 @@ const isAllowedForm = function(userCtx, scope, element, attributes) {
 		askedFormId = scope.$eval(attributes.aclHasInputForm) || scope.$eval(attributes.aclLacksInputForm);
 
 	if (userCtx.type === 'user') {
-		var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
+		var internalUser = project.users.find(u => u.id == userCtx._id);
 		return userCtx.role === 'admin' || project.canInputForm(internalUser, askedFormId);
 	}
 	else if (userCtx.type === 'partner')

@@ -55,13 +55,13 @@ module.config(function($stateProvider) {
 
 
 module.controller('ProjectCollectionInputEditionController', function($scope, $state, $transitions, $filter, $stateParams, inputs) {
-	$scope.form          = $scope.masterProject.forms.find(function(f) { return f.id == $stateParams.formId; });
+	$scope.form          = $scope.masterProject.forms.find(f => f.id == $stateParams.formId);
 	$scope.isNew         = inputs.isNew;
 	$scope.currentInput  = inputs.current;
 	$scope.lastInput     = inputs.previous;
 	$scope.master        = angular.copy($scope.currentInput)
 
-	var entity   = $scope.masterProject.entities.find(function(e) { return e.id == $scope.currentInput.entity; });
+	var entity   = $scope.masterProject.entities.find(e => e.id == $scope.currentInput.entity);
 	$scope.inputEntityName = entity ? entity.name : 'shared.project';
 
 	$scope.copy = function() {
@@ -136,13 +136,13 @@ module.directive('inputGrid', function() {
 
 	/** This is a slightly changed version of pdf-export.js, we should refactor this */
 	var makeRows = function(partitions) {
-		var totalCols = partitions.reduce(function(memo, tp) { return memo * tp.elements.length; }, 1),
+		var totalCols = partitions.reduce((memo, tp) => memo * tp.elements.length, 1),
 			currentColSpan = totalCols;
 
 		var body = [];
 
 		// Create header rows for top partitions
-		partitions.forEach(function(tp) {
+		partitions.forEach(tp => {
 			// Update currentColSpan
 			currentColSpan /= tp.elements.length;
 
@@ -243,7 +243,7 @@ module.directive('inputGrid', function() {
 				var viewValue = [];
 
 				// Start by creating the headers.
-				var partitions = permutation.map(function(index) { return scope.element.partitions[index]; });
+				var partitions = permutation.map(index => scope.element.partitions[index]);
 
 				var colPartitions = partitions.slice(scope.element.distribution),
 					rowPartitions = partitions.slice(0, scope.element.distribution);
@@ -258,17 +258,17 @@ module.directive('inputGrid', function() {
 
 				// Add data fields to bodyRows
 				var permutatedData = permutateData(scope.element, modelValue)
-				bodyRows.forEach(function(bodyRow) {
+				bodyRows.forEach(bodyRow => {
 					Array.prototype.push.apply(bodyRow, permutatedData.splice(0, dataColsPerRow));
 				});
 
 				// Add empty field in the top-left corner for topRows
-				topRows.forEach(function(topRow, index) {
+				topRows.forEach((topRow, index) => {
 					for (var i = 0; i < rowPartitions.length; ++i)
 						topRow.unshift('');
 				});
 
-				return topRows.concat(bodyRows);
+				return [...topRows, ...bodyRows];
 			});
 
 			ngModelController.$parsers.push(function(viewValue) {
@@ -310,7 +310,7 @@ module.directive('inputGrid', function() {
 							// @see http://docs.handsontable.com/0.15.0-beta3/Hooks.html#event:afterChange
 							if (changes) {
 								// if the data that was entered is a formula (eg: 1+2) replace by evaluated value.
-								changes.forEach(function(change) {
+								changes.forEach(change => {
 									var x = change[0], y = change[1], val = change[3];
 
 									if (typeof val != 'number') {

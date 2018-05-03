@@ -61,7 +61,12 @@ module.controller('ProjectReportingController', function($scope, $filter, mtRepo
 	};
 
 	// default + available group by
-	$scope.periodicities = ['day', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].filter(function(periodicity) {
+	const timePeriodicities = [
+		'day', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun',
+		'week_mon', 'month', 'quarter', 'semester', 'year'
+	];
+
+	$scope.periodicities = timePeriodicities.filter(periodicity => {
 		for (var i = 0; i < $scope.masterProject.forms.length; ++i) {
 			var form = $scope.masterProject.forms[i];
 
@@ -103,36 +108,60 @@ module.controller('ProjectReportingController', function($scope, $filter, mtRepo
 			return;
 
 		// Create blocks
-		$scope.blocks = $scope.masterProject.logicalFrames.map(function(logicalFrame, index) {
-			return {text: $filter('translate')('project.logical_frame') + ": " + logicalFrame.name};
-		})
-		.concat([{text: $filter('translate')('indicator.cross_cutting')}])
-		.concat([{text: $filter('translate')('indicator.extra')}])
-		.concat($scope.masterProject.forms.map(function(form, index) {
-			return {text: $filter('translate')('project.collection_form') + ": " + form.name};
-		}));
-		$scope.open = $scope.blocks.map(function(_, index) { return false; });
+		$scope.blocks = [
+			...$scope.masterProject.logicalFrames.map(logicalFrame => {
+				return {text: $filter('translate')('project.logical_frame') + ": " + logicalFrame.name};
+			}),
+
+			{text: $filter('translate')('indicator.cross_cutting')},
+			{text: $filter('translate')('indicator.extra')},
+
+			...$scope.masterProject.forms.map(form => {
+				return {text: $filter('translate')('project.collection_form') + ": " + form.name};
+			})
+		];
+
+		$scope.open = $scope.blocks.map(() => false);
 
 		// Watch form controls to update the view.
 		$scope.$watch('[filters, groupBy, splits, open]', function() {
+			// Set columns in the scope
 			$scope.cols = mtReporting.getColumns($scope.groupBy, $scope.filters._start, $scope.filters._end, $scope.filters._location, $scope.masterProject)
 
-			$scope.masterProject.logicalFrames.forEach(function(logicalFrame, index) {
-				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeLogicalFrameReporting(cubes, $scope.masterProject, logicalFrame, $scope.groupBy, $scope.filters) : null;
+			// Create rows for open blocks in the same order than the blocks.
+			let index = 0;
+			$scope.masterProject.logicalFrames.forEach(logicalFrame => {
+				$scope.blocks[index].rows = $scope.open[index] ?
+					mtReporting.computeLogicalFrameReporting(cubes, $scope.masterProject, logicalFrame, $scope.groupBy, $scope.filters) :
+					null;
+
+				index++;
 			});
 
-			var index = $scope.masterProject.logicalFrames.length;
-			$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeCrossCuttingReporting(cubes, $scope.masterProject, indicators, $scope.groupBy, $scope.filters) : null;
-			$scope.blocks[index + 1].rows = $scope.open[index + 1] ? mtReporting.computeExtraReporting(cubes, $scope.masterProject, $scope.groupBy, $scope.filters) : null;
+			$scope.blocks[index].rows = $scope.open[index] ?
+				mtReporting.computeCrossCuttingReporting(cubes, $scope.masterProject, indicators, $scope.groupBy, $scope.filters) :
+				null;
+			index++;
 
-			$scope.masterProject.forms.forEach(function(form, index) {
-				index += $scope.masterProject.logicalFrames.length + 2;
-				$scope.blocks[index].rows = $scope.open[index] ? mtReporting.computeDataSourceReporting(cubes, $scope.masterProject, form, $scope.groupBy, $scope.filters, $scope.splits) : null;
+			$scope.blocks[index].rows = $scope.open[index] ?
+				mtReporting.computeExtraReporting(cubes, $scope.masterProject, $scope.groupBy, $scope.filters) :
+				null;
+			index++;
+
+			$scope.masterProject.forms.forEach(form => {
+				// index += $scope.masterProject.logicalFrames.length + 2;
+				$scope.blocks[index].rows = $scope.open[index] ?
+					mtReporting.computeDataSourceReporting(cubes, $scope.masterProject, form, $scope.groupBy, $scope.filters, $scope.splits) :
+					null;
+				index++;
 			});
 
-			// Work around graph bug
+			// Work around graph bug. Not sure what this does.
 			$scope.rows = [];
-			$scope.blocks.forEach(function(block) { if (block.rows) $scope.rows = $scope.rows.concat(block.rows); });
+			$scope.blocks.forEach(block => {
+				if (block.rows)
+					$scope.rows.push(...block.rows);
+			});
 			mtReporting.deduplicateRows($scope.rows);
 		}, true);
 	});

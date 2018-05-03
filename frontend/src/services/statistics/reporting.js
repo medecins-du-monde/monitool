@@ -38,7 +38,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 	this.deduplicateRows = function(rows) {
 		var names = {};
 
-		rows.forEach(function(row) {
+		rows.forEach(row => {
 			if (row.type === 'data') {
 				var index = 2, newName = row.fullname;
 
@@ -56,43 +56,58 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 	};
 
 	this.getColumns = function(groupBy, start, end, location, project) {
-		if (['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'day'].indexOf(groupBy) !== -1) {
-			var slots = iterate(start, end, groupBy).map(function(slot) {
-				return {id: slot, name: $filter('formatSlot')(slot), title: $filter('formatSlotRange')(slot)};
-			});
+		const timeGroupBy = [
+			'year', 'semester', 'quarter', 'month',
+			'week_sat', 'week_sun', 'week_mon',
+			'month_week_sat', 'month_week_sun', 'month_week_mon',
+			'day'
+		];
 
-			slots.push({id:'_total', name: "Total"});
-
-			return slots;
+		if (timeGroupBy.includes(groupBy)) {
+			return [
+				...iterate(start, end, groupBy).map(slot => {
+					return {id: slot, name: $filter('formatSlot')(slot), title: $filter('formatSlotRange')(slot)};
+				}),
+				{id:'_total', name: "Total"}
+			];
 		}
 		else if (groupBy === 'entity' || groupBy === 'group') {
 			var type;
 			if (location === 'none')
 				type = 'project';
-			else if (project.groups.find(function(g) { return 'grp_' + g.id === location }))
+			else if (project.groups.find(g => 'grp_' + g.id === location))
 				type = 'group';
 			else
 				type = 'entity';
 
 			if (groupBy === 'entity') {
 				if (type === 'project')
-					return project.entities.concat([{id: '_total', name: 'Total'}]);
+					return [
+						...project.entities,
+						{id: '_total', name: 'Total'}
+					];
+
 				else if (type === 'entity')
-					return project.entities.filter(function(e) { return 'ent_' + e.id === location })
-												.concat([{id: '_total', name: 'Total'}]);
-				else  if (type === 'group') {
-					var group = project.groups.find(function(g) { return 'grp_' + g.id === location });
-					return project.entities.filter(function(e) { return group.members.indexOf(e.id) !== -1 })
-												.concat([{id: '_total', name: 'Total'}]);
+					return [
+						...project.entities.filter(e => 'ent_' + e.id === location),
+						{id: '_total', name: 'Total'}
+					];
+
+				else if (type === 'group') {
+					var group = project.groups.find(g => 'grp_' + g.id === location);
+					return [
+						...project.entities.filter(e => group.members.includes(e.id)),
+						{id: '_total', name: 'Total'}
+					];
 				}
 			}
 			else {
 				if (type === 'project')
 					return project.groups;
 				else if (type === 'entity')
-					return project.groups.filter(function(g) { return g.members.indexOf(location.substring(4)) !== -1 });
+					return project.groups.filter(g => g.members.includes(location.substring(4)));
 				else if (type === 'group')
-					return project.groups.filter(function(g) { return 'grp_' + g.id === location });
+					return project.groups.filter(g => 'grp_' + g.id === location);
 			}
 		}
 		else
@@ -130,7 +145,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 
 				try {
 					var values = cube.query([groupBy], cubeFilters, true);
-					row.cols = columns.map(function(col) { return values[col.id]; });
+					row.cols = columns.map(col => values[col.id]);
 				}
 				catch (e) {
 					row.message = 'project.no_data';
@@ -162,7 +177,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 			row.message = 'project.indicator_computation_missing';
 
 		else if (!isNaN(planning.computation.formula))
-			row.cols = columns.map(function(col) { return parseInt(planning.computation.formula); });
+			row.cols = columns.map(col => parseInt(planning.computation.formula));
 
 		else {
 
@@ -188,7 +203,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 				else {
 					try {
 						var values = cube.query([groupBy], cubeFilters, true);
-						row.cols = columns.map(function(col) { return values[col.id]; });
+						row.cols = columns.map(col => values[col.id]);
 					}
 					catch (e) {
 						row.message = 'project.no_data';
@@ -228,7 +243,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 				var start = TimeSlot.fromDate(new Date(viewFilters._start + 'T00:00:00Z'), timeDimension.id).value;
 
 				// This is O(n), but should not be. Can do O(logn)
-				cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(function(dimItem) { return start <= dimItem; });
+				cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(dimItem => start <= dimItem);
 
 				delete cubeFilters._start;
 			}
@@ -240,7 +255,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 				var end = TimeSlot.fromDate(new Date(viewFilters._end + 'T00:00:00Z'), timeDimension.id).value;
 
 				// This is O(n), but should not be. Can do O(logn)
-				cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(function(dimItem) { return dimItem <= end; });
+				cubeFilters[timeDimension.id] = cubeFilters[timeDimension.id].filter(dimItem => dimItem <= end);
 
 				delete cubeFilters._end;
 			}
@@ -252,7 +267,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 					if (!cubeFilters.entity)
 						cubeFilters.entity = cube.dimensionsById.entity.items;
 
-					cubeFilters.entity = cubeFilters.entity.filter(function(dimItem) {
+					cubeFilters.entity = cubeFilters.entity.filter(dimItem => {
 						return dimItem == viewFilters._location.substring(4);
 					});
 				}
@@ -261,7 +276,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 					if (!cubeFilters.group)
 						cubeFilters.group = cube.dimensionGroupsById.group.items;
 
-					cubeFilters.group = cubeFilters.group.filter(function(dimItem) {
+					cubeFilters.group = cubeFilters.group.filter(dimItem => {
 						return dimItem == viewFilters._location.substring(4);
 					});
 				}
@@ -295,41 +310,41 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 		if (logicalFrame.goal)
 			rows.push({type: 'header', text: logicalFrame.goal, indent: 0});
 
-		logicalFrame.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+		logicalFrame.indicators.forEach((indicatorPlanning, indicatorIndex) => {
 			var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicatorPlanning);
 			row.id = 'go_' + indicatorIndex;
 			rows.push(row);
-		}, this);
+		});
 
-		logicalFrame.purposes.forEach(function(purpose, purposeIndex) {
+		logicalFrame.purposes.forEach((purpose, purposeIndex) => {
 			rows.push({type: 'header', text: purpose.description, indent: 1});
 
-			purpose.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+			purpose.indicators.forEach((indicatorPlanning, indicatorIndex) => {
 				var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicatorPlanning);
 				row.id = 'pp_' + purposeIndex + '.ind_' + indicatorIndex;
 				rows.push(row);
-			}, this);
+			});
 
-			purpose.outputs.forEach(function(output, outputIndex) {
+			purpose.outputs.forEach((output, outputIndex) => {
 				rows.push({type: 'header', text: output.description, indent: 2});
 
-				output.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+				output.indicators.forEach((indicatorPlanning, indicatorIndex) => {
 					var row = this._makeIndicatorRow(cubes, 2, groupBy, viewFilters, columns, indicatorPlanning);
 					row.id = 'pp_' + purposeIndex + 'out_' + outputIndex + '.ind_' + indicatorIndex;
 					rows.push(row);
-				}, this);
+				});
 
-				output.activities.forEach(function(activity, activityIndex) {
+				output.activities.forEach((activity, activityIndex) => {
 					rows.push({type: 'header', text: activity.description, indent: 3});
 
-					activity.indicators.forEach(function(indicatorPlanning, indicatorIndex) {
+					activity.indicators.forEach((indicatorPlanning, indicatorIndex) => {
 						var row = this._makeIndicatorRow(cubes, 3, groupBy, viewFilters, columns, indicatorPlanning);
 						row.id = 'pp_' + purposeIndex + 'out_' + outputIndex + 'act_' + activityIndex + '.ind_' + indicatorIndex;
 						rows.push(row);
-					}, this);
-				}, this);
-			}, this);
-		}, this);
+					});
+				});
+			});
+		});
 
 		return this.deduplicateRows(rows);
 	};
@@ -338,11 +353,11 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 		var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project),
 			rows = [];
 
-		project.extraIndicators.forEach(function(indicatorPlanning, indicatorIndex) {
+		project.extraIndicators.forEach((indicatorPlanning, indicatorIndex) => {
 			var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, indicatorPlanning);
 			row.id = 'ext_' + indicatorIndex;
 			rows.push(row);
-		}, this);
+		});
 
 		return this.deduplicateRows(rows);
 	};
@@ -351,8 +366,8 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 		var columns = this.getColumns(groupBy, viewFilters._start, viewFilters._end, viewFilters._location, project),
 			rows = [];
 
-		indicators.forEach(function(indicator) {
-			var commonThemes = indicator.themes.filter(t => project.themes.indexOf(t) !== -1);
+		indicators.forEach(indicator => {
+			var commonThemes = indicator.themes.filter(t => project.themes.includes(t));
 			if (commonThemes.length === 0)
 				return;
 
@@ -367,9 +382,9 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 			var row = this._makeIndicatorRow(cubes, 0, groupBy, viewFilters, columns, planning);
 			row.id = 'cc_' + indicator._id;
 			rows.push(row);
-		}, this);
+		});
 
-		rows.sort(function(a, b) { return a.name.localeCompare(b.name); });
+		rows.sort((a, b) => a.name.localeCompare(b.name));
 
 		return this.deduplicateRows(rows);
 	};
@@ -380,7 +395,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 
 		// Create rows.
 		var rows = [];
-		form.elements.forEach(function(element) {
+		form.elements.forEach(element => {
 			var row = this._makeActivityRow(cubes, 0, groupBy, viewFilters, columns, element);
 			row.id = element.id;
 			row.partitions = element.partitions;
@@ -388,10 +403,10 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 			rows.push(row);
 
 			if (splits[row.id] !== undefined) {
-				var partition = element.partitions.find(function(p) { return p.id == splits[row.id]; });
+				var partition = element.partitions.find(p => p.id == splits[row.id]);
 
-				[partition.groups, partition.elements].forEach(function(elements) {
-					elements.forEach(function(partitionElement) {
+				[partition.groups, partition.elements].forEach(elements => {
+					elements.forEach(partitionElement => {
 						var partitionId = partition.id + (partitionElement.members !== undefined ? '_g' : '');
 
 						// add filter
@@ -410,10 +425,10 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 						rows.push(childRow)
 
 						if (splits[childRow.id] !== undefined) {
-							var childPartition = element.partitions.find(function(p) { return p.id == splits[childRow.id]; });
+							var childPartition = element.partitions.find(p => p.id == splits[childRow.id]);
 
-							[childPartition.groups, childPartition.elements].forEach(function(elements) {
-								elements.forEach(function(subPartitionElement) {
+							[childPartition.groups, childPartition.elements].forEach(elements => {
+								elements.forEach(subPartitionElement => {
 									var childPartitionId = childPartition.id + (subPartitionElement.members !== undefined ? '_g' : '');
 
 									// add filter
@@ -428,16 +443,16 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 
 									// remove filter
 									delete viewFilters[childPartitionId];
-								}, this);
-							}, this);
+								});
+							});
 						}
 
 						// remove filter
 						delete viewFilters[partitionId];
-					}, this);
-				}, this);
+					});
+				});
 			}
-		}, this);
+		});
 
 		return this.deduplicateRows(rows);
 	};
@@ -463,7 +478,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 
 		rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
-		project.entities.forEach(function(entity) {
+		project.entities.forEach(entity => {
 			viewFilters.entity = [entity.id];
 
 			var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicator);
@@ -472,11 +487,11 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 			rows.push(row);
 
 			delete viewFilters.entity;
-		}, this);
+		});
 
 		rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
-		project.groups.forEach(function(group) {
+		project.groups.forEach(group => {
 			viewFilters.group = [group.id];
 
 			var row = this._makeIndicatorRow(cubes, 1, groupBy, viewFilters, columns, indicator);
@@ -485,7 +500,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 			rows.push(row);
 
 			delete viewFilters.group;
-		}, this);
+		});
 
 		return this.deduplicateRows(rows);
 	};
@@ -501,7 +516,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 		rows.push(row)
 		rows.push({type: 'header', text: $filter('translate')('project.collection_site_list')})
 
-		project.entities.forEach(function(entity) {
+		project.entities.forEach(entity => {
 			viewFilters.entity = [entity.id];
 
 			var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
@@ -510,11 +525,11 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 			rows.push(row);
 
 			delete viewFilters.entity;
-		}, this);
+		});
 
 		rows.push({type: 'header', text: $filter('translate')('project.groups')})
 
-		project.groups.forEach(function(group) {
+		project.groups.forEach(group => {
 			viewFilters.group = [group.id];
 
 			var row = this._makeActivityRow(cubes, 1, groupBy, viewFilters, columns, element);
@@ -523,7 +538,7 @@ module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) 
 			rows.push(row);
 
 			delete viewFilters.group;
-		}, this);
+		});
 
 		return this.deduplicateRows(rows);
 	};

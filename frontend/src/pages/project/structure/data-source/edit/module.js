@@ -73,7 +73,7 @@ module.controller('ProjectCollectionFormEditionController', function($scope, $st
 	/////////////////////
 
 	// Put the form index in the scope to be able to access it without searching each time.
-	$scope.currentFormIndex = $scope.editableProject.forms.findIndex(function(f) { return f.id == $stateParams.formId; });
+	$scope.currentFormIndex = $scope.editableProject.forms.findIndex(f => f.id == $stateParams.formId);
 
 	$scope.deleteForm = function() {
 		// Kill the watches
@@ -144,7 +144,7 @@ module.controller('ProjectCollectionFormEditionController', function($scope, $st
 	};
 
 	$scope.remove = function(item, target) {
-		var index = target.findIndex(function(arrItem) { return item.id === arrItem.id; });
+		var index = target.findIndex(arrItem => item.id === arrItem.id);
 		if (index !== -1)
 			target.splice(index, 1)
 	};
@@ -196,17 +196,13 @@ module.controller('PartitionEditionModalController', function($scope, $uibModalI
 		$scope.partition.elements.push({id: uuid(), name: ''});
 	};
 
-	$scope.deletePartitionElement = function(partitionElementId) {
+	$scope.deletePartitionElement = function(peId) {
 		// Remove from element list
-		$scope.partition.elements = $scope.partition.elements.filter(function(element) {
-			return element.id !== partitionElementId;
-		});
+		$scope.partition.elements = $scope.partition.elements.filter(e => e.id !== peId);
 
 		// Remove from all groups
-		$scope.partition.groups.forEach(function(group) {
-			group.members = group.members.filter(function(member) {
-				return member !== partitionElementId;
-			});
+		$scope.partition.groups.forEach(group => {
+			group.members = group.members.filter(id => id !== peId);
 		});
 	};
 
@@ -214,10 +210,8 @@ module.controller('PartitionEditionModalController', function($scope, $uibModalI
 		$scope.partition.groups.push({id: uuid(), name: '', members: []});
 	};
 
-	$scope.deleteGroup = function(partitionGroupId) {
-		$scope.partition.groups = $scope.partition.groups.filter(function(group) {
-			return group.id !== partitionGroupId;
-		});
+	$scope.deleteGroup = function(pgId) {
+		$scope.partition.groups = $scope.partition.groups.filter(g => g.id !== pgId);
 	};
 
 	$scope.delete = function() {
@@ -307,10 +301,11 @@ module.directive('partitionOrder', function() {
 		template: require('./partition-order.html'),
 		link: function(scope, element, attributes, ngModelController) {
 			var updateSize = function() {
+				// FIXME this is clearly bugged
 				// update the size value
 				var width = 1, height = 1;
-				scope.table.headerRows.forEach(function(index) { width *= scope.orderedPartitions[index].elements.length; });
-				scope.table.leftCols.forEach(function(index) { height *= scope.orderedPartitions[index].elements.length; });
+				scope.table.headerRows.forEach(index => width *= scope.orderedPartitions[index].elements.length);
+				scope.table.leftCols.forEach(index => height *= scope.orderedPartitions[index].elements.length);
 				scope.size = width + ' x ' + height;
 			};
 
@@ -334,10 +329,8 @@ module.directive('partitionOrder', function() {
 						// If the number of partitions was not changed, we need
 						// to recreate .orderedPartitions anyway, because partition objects can be swapped
 						// (not the same reference, even is the value is close).
-						scope.orderedPartitions = scope.orderedPartitions.map(function(partition) {
-							return scope.partitions.find(function(p) {
-								return partition.id === p.id;
-							});
+						scope.orderedPartitions = scope.orderedPartitions.map(partition => {
+							return scope.partitions.find(p => partition.id === p.id);
 						});
 					}
 
@@ -396,7 +389,7 @@ module.directive('partitionOrder', function() {
 
 			ngModelController.$parsers.push(function(viewValue) {
 				return computePermutationIndex(
-					scope.orderedPartitions.map(function(partition) {
+					scope.orderedPartitions.map(partition => {
 						return scope.partitions.indexOf(partition);
 					})
 				);
@@ -404,7 +397,7 @@ module.directive('partitionOrder', function() {
 
 			ngModelController.$formatters.push(function(modelValue) {
 				return computeNthPermutation(scope.partitions.length, modelValue)
-					.map(function(index) { return scope.partitions[index]; });
+					.map(index => scope.partitions[index]);
 			});
 		}
 	};

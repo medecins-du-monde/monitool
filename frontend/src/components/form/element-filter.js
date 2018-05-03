@@ -26,18 +26,6 @@ const module = angular.module(
 
 
 /**
- * Test two array, to see if one is a subset of the other.
- *
- * @example
- * isSubset([1, 2, 3], [3, 1]) == true
- * isSubset([1, 2, 3], [4, 1]) == false
- */
-const isSubset = function(superset, subset) {
-	return subset.filter(e => superset.indexOf(e) !== -1).length === subset.length;
-};
-
-
-/**
  * This directive is a form control that allows to select multiple elements in a list.
  * To make thing faster than selecting one by one, it allows to select groups at once.
  */
@@ -63,19 +51,18 @@ module.directive('elementFilter', function($filter) {
 			return ['all'];
 
 		// retrieve all groups that are in the list.
-		var selectedGroups = groups.filter(function(group) {
-			return isSubset(model, group.members);
-		});
-		var numSelectedGroups = selectedGroups.length;
-
-		var additionalElements = model.filter(function(partitionElementId) {
-			for (var i = 0; i < numSelectedGroups; ++i)
-				if (selectedGroups[i].members.indexOf(partitionElementId) !== -1)
-					return false;
-			return true;
+		var selectedGroups = groups.filter(group => {
+			return group.members.every(id => model.includes(id));
 		});
 
-		return selectedGroups.map(e => e.id).concat(additionalElements);
+		var additionalIds = model.filter(id => {
+			return selectedGroups.every(group => !group.members.includes(id));
+		});
+
+		return [
+			...selectedGroups.map(e => e.id),
+			...additionalIds
+		];
 	};
 
 	/**
@@ -94,14 +81,14 @@ module.directive('elementFilter', function($filter) {
 
 		var model = {};
 
-		view.forEach(function(id) {
+		view.forEach(id => {
 			if (id == 'all')
-				elements.forEach(function(e) { model[e.id] = true; });
+				elements.forEach(e => model[e.id] = true);
 
 			else {
-				var group = groups.find(function(g) { return g.id == id; });
+				var group = groups.find(g => g.id == id);
 				if (group)
-					group.members.forEach(function(m) { model[m] = true; });
+					group.members.forEach(m => model[m] = true);
 				else
 					model[id] = true;
 			}
@@ -126,14 +113,14 @@ module.directive('elementFilter', function($filter) {
 			scope.$watchGroup(['elements', 'groups'], function(newValues, oldValues) {
 				// Reset the list of selectable elements.
 				scope.selectableElements = [
-					{id: 'all', name: $filter('translate')('project.all_elements')}
-				].concat(scope.groups || []).concat(scope.elements);
+					{id: 'all', name: $filter('translate')('project.all_elements')},
+					...(scope.groups || []),
+					...scope.elements
+				];
 
 				// Check that all selected elements are still valid.
-				scope.container.selectedElements = scope.container.selectedElements.filter(function(id) {
-					return !!scope.selectableElements.find(function(selectableElement) {
-						return selectableElement.id == id;
-					});
+				scope.container.selectedElements = scope.container.selectedElements.filter(id => {
+					return !!scope.selectableElements.find(selectable => selectable.id == id);
 				});
 			});
 

@@ -73,7 +73,7 @@ module.controller('ProjectRevisions', function($scope, Revision) {
 		Revision.query(params).$promise.then(function(newRevisions) {
 			$scope.loading = false;
 			$scope.finished = newRevisions.length < pageSize;
-			$scope.revisions = $scope.revisions.concat(newRevisions);
+			$scope.revisions = [...$scope.revisions, ...newRevisions];
 			Revision.enrich($scope.masterProject, $scope.revisions);
 		});
 	};
@@ -212,13 +212,13 @@ module.filter('humanizePatch', function($sce, $filter) {
 
 		if (operation.op === 'add' || operation.op === 'remove') {
 			if (edited_field === 'users_dataSources')
-				translation_data.item = before.forms.find(function(e) { return e.id === translation_data.item; });
+				translation_data.item = before.forms.find(e => e.id === translation_data.item);
 
 			if (edited_field === 'groups_members' || edited_field === 'forms_entities' || edited_field === 'users_entities')
-				translation_data.item = before.entities.find(function(e) { return e.id === translation_data.item; });
+				translation_data.item = before.entities.find(e => e.id === translation_data.item);
 
 			if (edited_field === 'forms_elements_partitions_groups_members')
-				translation_data.item = translation_data.partition.elements.find(function(e) {return e.id == translation_data.item; });
+				translation_data.item = translation_data.partition.elements.find(e => e.id == translation_data.item);
 		}
 
 		return translation_data;
@@ -242,7 +242,7 @@ module.filter('humanizePatch', function($sce, $filter) {
 				getTranslationData(operation, before, after)
 			);
 
-			if (humanizedPatches.indexOf(str) === -1)
+			if (!humanizedPatches.includes(str))
 				humanizedPatches.push(str);
 
 			before = jsonpatch.applyOperation(before, operation).newDocument;

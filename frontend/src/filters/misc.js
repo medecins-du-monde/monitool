@@ -48,7 +48,7 @@ module.filter('pluck', function() {
 
 		property = String(property);
 
-		return objects.map(function(object) {
+		return objects.map(object => {
 			// just in case
 			object = Object(object);
 
@@ -76,7 +76,7 @@ module.filter('getObjects', function() {
 			objectsById[obj.id || obj._id] = obj;
 		}
 
-		return ids.map(function(id) { return objectsById[id]; });
+		return ids.map(id => objectsById[id]);
 	}
 });
 

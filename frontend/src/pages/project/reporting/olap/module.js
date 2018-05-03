@@ -46,6 +46,10 @@ module.config(function($stateProvider) {
 // FIXME this need a complete rewrite with proper object oriented stuff
 module.controller('ProjectOlapController', function($scope, $filter, CompoundCube, mtReporting, indicators) {
 
+	const timeGroupBy = [
+		'year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'day'
+	]
+
 	////////////////////////////////////////////////////
 	// Initialization code.
 	////////////////////////////////////////////////////
@@ -106,29 +110,31 @@ module.controller('ProjectOlapController', function($scope, $filter, CompoundCub
 
 			// Init all filters as full
 			cube.dimensions.forEach(function(dimension) {
-				if (['day', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].indexOf(dimension.id) === -1)
+				if (!timeGroupBy.includes(dimension.id))
 					filters[dimension.id] = dimension.items;
 			});
 
 			// Add entity dimension
 			if (cube.dimensionsById.entity) {
-				var entities = $scope.masterProject.entities.filter(function(e) { return cube.dimensionsById.entity.items.indexOf(e.id) !== -1; }),
-					groups   = $scope.masterProject.groups.filter(function(g) { return cube.dimensionGroupsById.group && cube.dimensionGroupsById.group.items.indexOf(g.id) !== -1; });
+				var entities = $scope.masterProject.entities.filter(e => cube.dimensionsById.entity.items.includes(e.id)),
+					groups   = $scope.masterProject.groups.filter(g => cube.dimensionGroupsById.group && cube.dimensionGroupsById.group.items.includes(g.id));
 
 				$scope.dimensions.push({id: "entity", name: 'project.dimensions.entity', elements: entities, groups: groups});
 			}
 
 			// Add partitions
 			if (element.type === 'variable')
-				$scope.dimensions = $scope.dimensions.concat(element.element.partitions);
+				$scope.dimensions.push(...element.element.partitions);
 
-			['day', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].forEach(function(time) {
+			timeGroupBy.forEach(function(time) {
 				var dim = cube.dimensionsById[time] || cube.dimensionGroupsById[time];
 				if (dim)
 					$scope.dimensions.push({
 						id: time,
 						name: 'project.dimensions.' + time,
-						elements: dim.items.map(function(i) { return {id: i, name: $filter('formatSlot')(i), title: $filter('formatSlotRange')(i) }; })
+						elements: dim.items.map(i => {
+							return {id: i, name: $filter('formatSlot')(i), title: $filter('formatSlotRange')(i) };
+						})
 					});
 			});
 		});
@@ -139,22 +145,21 @@ module.controller('ProjectOlapController', function($scope, $filter, CompoundCub
 
 		$scope.$watch('[dimensions, query.colDimensions, query.rowDimensions]', function() {
 			// update available rows and cols
-			var timeFields = ['year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'day'],
-				timeUsedOnCols = timeFields.find(function(tf) { return $scope.query.colDimensions.indexOf(tf) !== -1; }),
-				timeUsedOnRows = timeFields.find(function(tf) { return $scope.query.rowDimensions.indexOf(tf) !== -1; });
+			var timeUsedOnCols = timeGroupBy.find(tf => $scope.query.colDimensions.includes(tf)),
+				timeUsedOnRows = timeGroupBy.find(tf => $scope.query.rowDimensions.includes(tf));
 
-			$scope.availableCols = $scope.dimensions.filter(function(dimension) {
-				if (timeFields.indexOf(dimension.id) !== -1)
+			$scope.availableCols = $scope.dimensions.filter(dimension => {
+				if (timeGroupBy.includes(dimension.id))
 					return timeUsedOnCols == dimension.id || (!timeUsedOnRows && !timeUsedOnCols);
 				else
-					return $scope.query.rowDimensions.indexOf(dimension.id) == -1;
+					return !$scope.query.rowDimensions.includes(dimension.id);
 			});
 
-			$scope.availableRows = $scope.dimensions.filter(function(dimension) {
-				if (timeFields.indexOf(dimension.id) !== -1)
+			$scope.availableRows = $scope.dimensions.filter(dimension => {
+				if (timeGroupBy.includes(dimension.id))
 					return timeUsedOnRows == dimension.id || (!timeUsedOnRows && !timeUsedOnCols);
 				else
-					return $scope.query.colDimensions.indexOf(dimension.id) == -1;
+					return !$scope.query.colDimensions.includes(dimension.id);
 			});
 		}, true);
 
@@ -175,7 +180,7 @@ module.controller('ProjectOlapController', function($scope, $filter, CompoundCub
 			}
 
 			var makeRowCol = function(selectedDimId) {
-				var dimension = $scope.dimensions.find(function(dim) { return dim.id == selectedDimId; });
+				var dimension = $scope.dimensions.find(dim => dim.id == selectedDimId);
 
 				var rowcolInfo = [];
 				Array.prototype.push.apply(rowcolInfo, dimension.groups);
@@ -225,7 +230,7 @@ module.controller('ProjectOlapController', function($scope, $filter, CompoundCub
 				$scope.target = planning.target;
 			}
 
-			var cubeDimensions = $scope.query.colDimensions.concat($scope.query.rowDimensions),
+			var cubeDimensions = [...$scope.query.colDimensions, ...$scope.query.rowDimensions],
 				cubeFilters = mtReporting.createCubeFilter(cube, $scope.query.filters);
 
 			$scope.display = {
@@ -265,7 +270,7 @@ module.directive('olapGrid', function() {
 				var grid = {header: [], body: []};
 
 				// Create header rows.
-				var totalCols = $scope.cols.reduce(function(memo, col) { return memo * col.length; }, 1),
+				var totalCols = $scope.cols.reduce((memo, col) => memo * col.length, 1),
 					colspan = totalCols, // current colspan is total number of columns.
 					numCols = 1; // current numCols is 1.
 
@@ -284,23 +289,23 @@ module.directive('olapGrid', function() {
 
 				// Create data rows.
 				$scope.rowspans = [];
-				var rowspan = $scope.rows.reduce(function(memo, row) { return memo * row.length; }, 1);
+				var rowspan = $scope.rows.reduce((memo, row) => memo * row.length, 1);
 				for (var i = 0; i < $scope.rows.length; ++i) {
 					rowspan /= $scope.rows[i].length;
 					$scope.rowspans[i] = rowspan;
 				}
 
-				product($scope.rows).forEach(function(headers) {
+				product($scope.rows).forEach(headers => {
 					grid.body.push({
 						headerCols: headers,
 						dataCols:
 							product(
-								$scope.cols.concat(headers.map(function(a) { return [a]; }))
-							).map(function(els) {
+								[...$scope.cols, ...headers.map(a => [a])]
+							).map(els => {
 								try {
 									var result = $scope.data;
 									var numEls = els.length;
-									for (var i =0 ; i < numEls; ++i)
+									for (var i = 0 ; i < numEls; ++i)
 										result = result[els[i].id];
 									return result;
 								}

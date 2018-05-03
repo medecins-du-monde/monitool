@@ -58,7 +58,7 @@ module.controller('ProjectCollectionSiteListController', function($scope) {
 	};
 
 	$scope.deleteEntity = function(entityId) {
-		$scope.editableProject.entities = $scope.editableProject.entities.filter(function(e) { return e.id !== entityId; });
+		$scope.editableProject.entities = $scope.editableProject.entities.filter(e => e.id !== entityId);
 		$scope.editableProject.sanitize();
 	};
 
@@ -67,7 +67,7 @@ module.controller('ProjectCollectionSiteListController', function($scope) {
 	};
 
 	$scope.deleteGroup = function(groupId) {
-		$scope.editableProject.groups = $scope.editableProject.groups.filter(function(group) { return group.id !== groupId; });
+		$scope.editableProject.groups = $scope.editableProject.groups.filter(group => group.id !== groupId);
 	};
 });
 

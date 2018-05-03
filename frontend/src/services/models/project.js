@@ -39,7 +39,7 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 	 */
 	Project.prototype.getAllIndicators = function(indicators) {
 		var elementOptions = [];
-		this.logicalFrames.forEach(function(logicalFrame, i0) {
+		this.logicalFrames.forEach((logicalFrame, i0) => {
 			var fn = function(i) {
 				return {
 					logicalFrameIndex: i0,
@@ -51,21 +51,21 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 			};
 
 			Array.prototype.push.apply(elementOptions, logicalFrame.indicators.map(fn));
-			logicalFrame.purposes.forEach(function(purpose) {
+			logicalFrame.purposes.forEach(purpose => {
 				Array.prototype.push.apply(elementOptions, purpose.indicators.map(fn));
-				purpose.outputs.forEach(function(output) {
+				purpose.outputs.forEach(output => {
 					Array.prototype.push.apply(elementOptions, output.indicators.map(fn));
-					output.activities.forEach(function(activity) {
+					output.activities.forEach(activity => {
 						Array.prototype.push.apply(elementOptions, activity.indicators.map(fn));
-					}, this);
-				}, this);
-			}, this);
-		}, this);
+					});
+				});
+			});
+		});
 
-		indicators.sort(function(a, b) { return a.name[$rootScope.language].localeCompare(b.name[$rootScope.language]); });
-		indicators.forEach(function(indicator) {
+		indicators.sort((a, b) => a.name[$rootScope.language].localeCompare(b.name[$rootScope.language]));
+		indicators.forEach(indicator => {
 			// If there no theme in common
-			if (indicator.themes.filter(t => this.themes.indexOf(t) !== -1).length === 0)
+			if (indicator.themes.filter(t => this.themes.includes(t)).length === 0)
 				return;
 
 			elementOptions.push({
@@ -80,9 +80,9 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 					computation: null
 				}
 			});
-		}, this);
+		});
 
-		this.extraIndicators.forEach(function(planning) {
+		this.extraIndicators.forEach(planning => {
 			elementOptions.push({
 				name: planning.display,
 				type: "indicator",
@@ -91,8 +91,8 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 			});
 		});
 
-		this.forms.forEach(function(form) {
-			form.elements.forEach(function(element) {
+		this.forms.forEach(form => {
+			form.elements.forEach(element => {
 				elementOptions.push({
 					name: element.name,
 					type: "variable",
@@ -110,14 +110,8 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 	 * Does it makes sense to display links for input and reporting?
 	 */
 	Project.prototype.isReadyForReporting = function() {
-		for (var formIndex = 0; formIndex < this.forms.length; ++formIndex) {
-			var form = this.forms[formIndex];
-			if (form.elements.length && form.entities.length)
-				return true;
-		}
-
-		return false;
-	}
+		return this.forms.some(f => f.elements.length && f.entities.length);
+	};
 
 	Project.prototype.canInputForm = function(projectUser, formId) {
 		if (!projectUser)
@@ -128,13 +122,13 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 
 		if (projectUser.role === 'input') {
 			// Check if user is explicitly forbidden
-			if (projectUser.dataSources.indexOf(formId) === -1)
+			if (!projectUser.dataSources.includes(formId))
 				return false;
 
 			// Check if entities where user is allowed intersect with the data source.
 			var form = this.forms.find(f => f.id === formId);
 
-			return !!projectUser.entities.filter(e => form.entities.indexOf(e) !== -1).length;
+			return !!projectUser.entities.filter(e => form.entities.includes(e)).length;
 		}
 
 		return false;
@@ -182,7 +176,7 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 
 		for (var key in indicator.computation.parameters) {
 			// This key is useless.
-			if (symbols.indexOf(key) === -1) {
+			if (!symbols.includes(key)) {
 				delete indicator.computation.parameters[key];
 				continue;
 			}
@@ -190,8 +184,8 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 			var parameter = indicator.computation.parameters[key];
 			var element = null;
 
-			this.forms.forEach(function(f) {
-				f.elements.forEach(function(e) {
+			this.forms.forEach(f => {
+				f.elements.forEach(e => {
 					if (e.id === parameter.elementId)
 						element = e;
 				});
@@ -204,7 +198,7 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 			}
 
 			for (var partitionId in parameter.filter) {
-				var partition = element.partitions.find(function(p) { return p.id === partitionId; });
+				var partition = element.partitions.find(p => p.id === partitionId);
 				if (!partition) {
 					indicator.computation = null;
 					return;
@@ -212,7 +206,7 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 
 				var elementIds = parameter.filter[partitionId];
 				for (var i = 0; i < elementIds.length; ++i) {
-					if (!partition.elements.find(function(e) { return e.id === elementIds[i]; })) {
+					if (!partition.elements.find(e => e.id === elementIds[i])) {
 						indicator.computation = null;
 						return;
 					}
@@ -227,13 +221,13 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 	 */
 	Project.prototype.sanitizeUser = function(user) {
 		if (user.role === 'input') {
-			user.entities = user.entities.filter(function(entityId) {
-				return !!this.entities.find(function(entity) { return entity.id === entityId; });
-			}.bind(this));
+			user.entities = user.entities.filter(entityId => {
+				return !!this.entities.find(entity => entity.id === entityId);
+			});
 
-			user.dataSources = user.dataSources.filter(function(dataSourceId) {
-				return !!this.forms.find(function(form) { return form.id === dataSourceId; });
-			}.bind(this));
+			user.dataSources = user.dataSources.filter(dataSourceId => {
+				return !!this.forms.find(form => form.id === dataSourceId);
+			});
 
 			if (user.entities.length == 0 || user.dataSources.length == 0) {
 				delete user.entities;
@@ -248,14 +242,13 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 	};
 
 	Project.prototype.sanitizeForm = function(form) {
-		var entityIds = this.entities.map(e => e.id),
-			entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
+		var entityIds = this.entities.map(e => e.id);
 
 		// Remove deleted entities
-		form.entities = form.entities.filter(entityIdFilter);
+		form.entities = form.entities.filter(e => entityIds.includes(e));
 
 		// Sanitize order and distribution
-		form.elements.forEach(function(element) {
+		form.elements.forEach(element => {
 			if (element.distribution < 0 || element.distribution > element.partitions.length)
 				element.distribution = Math.floor(element.partitions.length / 2);
 
@@ -277,12 +270,11 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 		// Sanitize links to input entities
 		//////////////////
 
-		var entityIds = this.entities.map(e => e.id),
-			entityIdFilter = function(g) { return entityIds.indexOf(g) !== -1; };
+		var entityIds = this.entities.map(e => e.id);
 
 		// Filter groups members
-		this.groups.forEach(function(group) {
-			group.members = group.members.filter(entityIdFilter);
+		this.groups.forEach(group => {
+			group.members = group.members.filter(e => entityIds.includes(e))
 		});
 
 		this.users.forEach(this.sanitizeUser, this);
@@ -292,25 +284,24 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 		// Sanitize links to variables from indicators
 		/////////////
 
-		this.logicalFrames.forEach(function(logicalFrame) {
+		this.logicalFrames.forEach(logicalFrame => {
 			logicalFrame.indicators.forEach(this.sanitizeIndicator, this);
-			logicalFrame.purposes.forEach(function(purpose) {
+			logicalFrame.purposes.forEach(purpose => {
 				purpose.indicators.forEach(this.sanitizeIndicator, this);
-				purpose.outputs.forEach(function(output) {
+				purpose.outputs.forEach(output => {
 					output.indicators.forEach(this.sanitizeIndicator, this);
-					output.activities.forEach(function(activity) {
+					output.activities.forEach(activity => {
 						activity.indicators.forEach(this.sanitizeIndicator, this);
-					}, this);
-				}, this);
-			}, this);
-		}, this);
-
+					});
+				});
+			});
+		});
 
 		// Sanitize indicators only if the list is provided.
 		if (indicators) {
 			for (var indicatorId in this.crossCutting) {
 				var indicator = indicators.find(i => i._id == indicatorId);
-				var commonThemes = indicator.themes.filter(t => this.themes.indexOf(t) !== -1);
+				var commonThemes = indicator.themes.filter(t => this.themes.includes(t));
 				if (!indicator || commonThemes.length === 0)
 					delete this.crossCutting[indicatorId];
 			}

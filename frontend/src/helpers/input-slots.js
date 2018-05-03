@@ -18,11 +18,11 @@
 import TimeSlot from 'timeslot-dag';
 
 function minDate(dates) {
-	return dates.reduce(function(d, memo) { return !memo || memo > d ? d : memo; });
+	return dates.reduce((d, memo) => !memo || memo > d ? d : memo);
 }
 
 function maxDate(dates) {
-	return dates.reduce(function(d, memo) { return !memo || memo < d ? d : memo; });
+	return dates.reduce((d, memo) => !memo || memo < d ? d : memo);
 }
 
 export function iterate(begin, end, periodicity) {

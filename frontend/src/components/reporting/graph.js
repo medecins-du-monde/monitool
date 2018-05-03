@@ -47,7 +47,7 @@ module.directive('reportingGraphAdapter', function() {
 
 				$scope.data = {
 					cols: $scope.cols,
-					rows: angular.copy($scope.originalRows).filter(function(row) {
+					rows: angular.copy($scope.originalRows).filter(row => {
 						return $scope.plots[row.id] && row.type == 'data' && row.cols;
 					})
 				};
@@ -60,11 +60,11 @@ module.directive('reportingGraphAdapter', function() {
 module.directive('reportingGraph', function($rootScope) {
 	// This helper function allow us to get the data without totals.
 	var getStatsWithoutTotal = function(stats) {
-		var totalIndex = stats.cols.findIndex(function(e) { return e.id === '_total' });
+		var totalIndex = stats.cols.findIndex(e => e.id === '_total');
 
 		if (totalIndex !== -1) {
 			var newStats = angular.copy(stats);
-			newStats.rows.forEach(function(row) { row.cols.splice(totalIndex, 1); });
+			newStats.rows.forEach(row => row.cols.splice(totalIndex, 1));
 			newStats.cols.splice(totalIndex, 1);
 		}
 
@@ -96,29 +96,38 @@ module.directive('reportingGraph', function($rootScope) {
 			// Watch all scope parameters that could make the graph to change
 			var unwatch = $scope.$watch('data', function(newStats, oldStats) {
 				// leave if we are loading and stats is not defined yet.
-				if (newStats) {
-					// Retrieve stats + list rows that we want, and those that exit the current graph
-					var stats = getStatsWithoutTotal(newStats);
+				if (!newStats)
+					return;
 
-					// Create Y series
-					var xSerie  = ['x'].concat(stats.cols.map(function(e) { return e.name; })),
-						ySeries = stats.rows.map(function(row) {
-							var values = row.cols.map(function(v) { return v === undefined ? null : v; });
+				// Retrieve stats + list rows that we want, and those that exit the current graph
+				var stats = getStatsWithoutTotal(newStats);
 
-							return [row.fullname].concat(values);
-						});
+				// Create X/Y series
+				var xSerie = [
+					'x',
+					...stats.cols.map(e => e.name)
+				];
 
-					// compute which rows are leaving.
-					var exitingRowNames = [];
-					if (oldStats)
-						exitingRowNames = oldStats.rows.filter(function(oldRow) {
-							return !stats.rows.find(function(newRow) { return newRow.fullname === oldRow.fullname; });
-						}).map(function(row) {
-							return row.fullname;
-						});
+				var ySeries = stats.rows.map(row => [
+					row.fullname,
+					...row.cols.map(v => v === undefined ? null : v)
+				]);
 
-					chart.load({ type: $scope.type, unload: exitingRowNames, columns: [xSerie].concat(ySeries) });
+				// compute which rows are leaving.
+				var exitingRowNames = [];
+				if (oldStats) {
+					let exitingRows = oldStats.rows.filter(oldRow => {
+						return !stats.rows.find(newRow => newRow.fullname === oldRow.fullname);
+					});
+
+					exitingRowNames = exitingRows.map(row => row.fullname);
 				}
+
+				chart.load({
+					type: $scope.type,
+					unload: exitingRowNames,
+					columns: [xSerie, ...ySeries]
+				});
 			}, true);
 
 			// cleanup when done

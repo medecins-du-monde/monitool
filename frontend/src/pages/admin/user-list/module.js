@@ -52,8 +52,8 @@ module.controller('UserListController', function($scope, $uibModal, users) {
 		if (!userCtx)
 			return;
 
-		$scope.users = users.filter(function(user) { return user._id !== userCtx._id; });
-		$scope.users.sort(function(a, b) { return a._id < b._id ? -1 : 1; });
+		$scope.users = users.filter(user => user._id !== userCtx._id);
+		$scope.users.sort((a, b) => a._id < b._id ? -1 : 1);
 	});
 
 	$scope.edit = function(user) {

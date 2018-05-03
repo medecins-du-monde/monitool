@@ -35,7 +35,7 @@ const isAllowedProject = function(userCtx, scope, element, attributes) {
 
 	if (askedRole === 'owner') {
 		if (userCtx.type === 'user') {
-			var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
+			var internalUser = project.users.find(u => u.id == userCtx._id);
 			return userCtx.role === 'admin' || (internalUser && internalUser.role === 'owner');
 		}
 
@@ -48,12 +48,12 @@ const isAllowedProject = function(userCtx, scope, element, attributes) {
 	}
 	else if (askedRole === 'input') {
 		if (userCtx.type === 'user') {
-			var internalUser = project.users.find(function(u) { return u.id == userCtx._id; });
-			return userCtx.role === 'admin' || internalUser && ['owner', 'input'].indexOf(internalUser.role) !== -1;
+			var internalUser = project.users.find(u => u.id == userCtx._id);
+			return userCtx.role === 'admin' || internalUser && ['owner', 'input'].includes(internalUser.role);
 		}
 
 		else if (userCtx.type === 'partner')
-			return userCtx.projectId === project._id && ['owner', 'input'].indexOf(userCtx.role) !== -1;
+			return userCtx.projectId === project._id && ['owner', 'input'].includes(userCtx.role);
 
 		else
 			throw new Error('Invalid userCtx.type value');
