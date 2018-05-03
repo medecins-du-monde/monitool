@@ -19,8 +19,6 @@ import angular from 'angular';
 import fileSaver from 'file-saver';
 import diacritics from 'diacritics';
 
-import '@bower_components/blob/Blob.js';
-
 
 const module = angular.module(
 	'monitool.components.reporting.exportcsv',

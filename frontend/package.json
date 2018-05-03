@@ -4,7 +4,6 @@
   "version": "2.7.0",
   "license": "GPL-3.0+",
   "dependencies": {
-    "@bower_components/blob": "eligrey/Blob.js#master",
     "@bower_components/font-awesome": "FortAwesome/Font-Awesome#~4.6.3",
     "@uirouter/angularjs": "^1.0.15",
     "angular": "^1.6.10",
