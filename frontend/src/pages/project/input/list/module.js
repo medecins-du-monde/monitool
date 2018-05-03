@@ -93,10 +93,12 @@ module.controller('ProjectCollectionInputListController', function($scope, $stat
 	//////
 	if ($scope.form.periodicity === 'free') {
 		$scope.displayFooter = true;
-		$scope.newInputDate = {date: new Date(Math.floor(Date.now() / 86400000) * 86400000)};
+		$scope.newInputDate = {
+			date: new Date(Math.floor(Date.now() / 86400000) * 86400000).toISOString().substring(0, 10)
+		};
 
 		$scope.addInput = function(entityId) {
-			var period = $scope.newInputDate.date.toISOString().substring(0, 10);
+			var period = $scope.newInputDate.date;
 			$state.go('main.project.input.edit', {period: period, formId: $scope.form.id, entityId: entityId});
 		};
 	}
