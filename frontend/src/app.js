@@ -43,20 +43,20 @@ module.config(function($urlRouterProvider) {
 });
 
 
-module.run(function($rootScope, $window, $state) {
+module.run(function($rootScope, $window, $transitions) {
 	// Scroll to top when changing page.
-	$rootScope.$on('$stateChangeSuccess', function(e, toState, toParams, fromState, fromParams) {
+	$transitions.onSuccess({}, function(transition) {
 		$window.scrollTo(0, 0);
 	});
 
-	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-		if (error.status === 401) {
+	$transitions.onError({}, function(transition) {
+		const error = transition.error();
+		console.log(error)
+
+		if (error.detail && error.detail.status === 401) {
 			alert("Session has expired, you need to log in again");
 			window.location.reload();
 		}
-
-		console.log(error)
-		console.log(error.stack)
 	});
 });
 

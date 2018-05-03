@@ -44,7 +44,7 @@ module.config(function($stateProvider) {
  * 		- A warning when the user try to change current page without saving changes.
  *		- Form validation + save & reset" buttons
  */
-module.controller('ProjectEditController', function($scope, $filter, indicators) {
+module.controller('ProjectEditController', function($scope, $filter, $transitions, indicators) {
 	$scope.editableProject = angular.copy($scope.masterProject);	// Current version of project.
 	$scope.projectSaveRunning = false;				// We are not currently saving.
 	$scope.forms = {current: undefined};
@@ -62,21 +62,24 @@ module.controller('ProjectEditController', function($scope, $filter, indicators)
 	var formWatch = $scope.$watch('forms.current.$valid', onProjectChange);
 
 	// Restore $scope.master to avoid unsaved changes from a given page to pollute changes to another one.
-	$scope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
+	let cancelListener = $transitions.onStart({}, function(transition) {
 		// If project is currently saving, disable all links
 		if ($scope.projectSaveRunning) {
-			e.preventDefault();
+			transition.abort();
 			return;
 		}
 
 		// If project is changed, warn user that changes will be lost.
-		if ($scope.projectChanged) {
-			// then ask the user if he meant it
-			if (window.confirm($filter('translate')('shared.sure_to_leave')))
-				$scope.reset();
-			else
-				e.preventDefault();
+		if ($scope.projectChanged && !window.confirm($filter('translate')('shared.sure_to_leave'))) {
+			transition.abort();
+			return;
 		}
+
+		// Either project has not changed, or the user is OK with loosing changes.
+		// => We are leaving.
+		$scope.reset();
+		if (transition.to().name.substr(0, 'main.project.structure'.length) !== 'main.project.structure')
+			cancelListener();
 	});
 
 	// save, reset and isUnchanged are all defined here, because those are shared between all project views.

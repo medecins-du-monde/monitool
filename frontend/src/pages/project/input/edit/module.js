@@ -54,7 +54,7 @@ module.config(function($stateProvider) {
 });
 
 
-module.controller('ProjectCollectionInputEditionController', function($scope, $state, $filter, $stateParams, inputs) {
+module.controller('ProjectCollectionInputEditionController', function($scope, $state, $transitions, $filter, $stateParams, inputs) {
 	$scope.form          = $scope.masterProject.forms.find(function(f) { return f.id == $stateParams.formId; });
 	$scope.isNew         = inputs.isNew;
 	$scope.currentInput  = inputs.current;
@@ -105,13 +105,19 @@ module.controller('ProjectCollectionInputEditionController', function($scope, $s
 		}
 	};
 
-	var pageChangeWatch = $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-		// if unsaved changes were made
-		if (!angular.equals($scope.master, $scope.currentInput)) {
-			// then ask the user if he meant it
-			if (!window.confirm($filter('translate')('shared.sure_to_leave')))
-				event.preventDefault();
+	var pageChangeWatch = $transitions.onStart({}, transition => {
+		// if changes were made.
+		const hasChanged = !angular.equals($scope.master, $scope.currentInput);
+		if (hasChanged) {
+			// then ask the user if he meant to abandon changes
+			const hasConfirmed = window.confirm($filter('translate')('shared.sure_to_leave'))
+			if (!hasConfirmed) {
+				transition.abort();
+				return;
+			}
 		}
+
+		pageChangeWatch();
 	});
 });
 
