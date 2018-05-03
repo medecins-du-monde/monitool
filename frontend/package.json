@@ -1,7 +1,7 @@
 {
   "name": "monitool-angularjs-client",
   "description": "AngularJS client for Monitool API",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "license": "GPL-3.0+",
   "dependencies": {
     "@bower_components/blob": "eligrey/Blob.js#master",
@@ -25,8 +25,7 @@
     "sortablejs": "^1.7.0",
     "timeslot-dag": "^0.1.0",
     "ui-select": "^0.19.8",
-    "uuid": "^3.2.1",
-    "zopfli-webpack-plugin": "^0.1.0"
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "babel-loader": "^7.1.4",
@@ -40,7 +39,8 @@
     "style-loader": "^0.21.0",
     "webpack": "^4.6.0",
     "webpack-bundle-analyzer": "^2.11.1",
-    "webpack-cli": "^2.0.15"
+    "webpack-cli": "^2.0.15",
+    "zopfli-webpack-plugin": "^0.1.0"
   },
   "engines": {
     "yarn": ">= 1.0.0"
