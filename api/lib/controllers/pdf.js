@@ -88,7 +88,8 @@ export default express.Router()
 				throw new Error('forbidden');
 
 			// Create document definition.
-			let docDef = project.logicalFrames[request.params.index].getPdfDocDefinition(request.query.orientation);
+			const logicalFrame = project.logicalFrames[request.params.index];
+			const docDef = logicalFrame.getPdfDocDefinition(request.query.orientation, project.forms);
 			docDef.styles = styles;
 
 			// Transform definition to pdf stream.

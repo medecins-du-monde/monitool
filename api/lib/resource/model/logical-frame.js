@@ -28,7 +28,7 @@ export default class LogicalFrame extends Model {
 		super(data, validate);
 	}
 
-	getPdfDocDefinition(pageOrientation) {
+	getPdfDocDefinition(pageOrientation, dataSources) {
 		var doc = {};
 		doc.pageSize = "A4";
 		doc.pageOrientation = pageOrientation;
@@ -56,7 +56,7 @@ export default class LogicalFrame extends Model {
 				{text: this.goal, style: 'normal'}
 			],
 			{ul: this.indicators.map(i => i.display), style: 'normal'},
-			{ul: this._computeSources(this.indicators), style: 'normal'},
+			{ul: this._computeSources(this.indicators, dataSources), style: 'normal'},
 			""
 		]);
 
@@ -67,7 +67,7 @@ export default class LogicalFrame extends Model {
 					{text: purpose.description, style: 'normal'}
 				],
 				{ul: purpose.indicators.map(i => i.display), style: 'normal'},
-				{ul: this._computeSources(purpose.indicators), style: 'normal'},
+				{ul: this._computeSources(purpose.indicators, dataSources), style: 'normal'},
 				{text: purpose.assumptions, style: 'normal'}
 			]);
 		}, this);
@@ -80,7 +80,7 @@ export default class LogicalFrame extends Model {
 						{text: output.description, style: 'normal'}
 					],
 					{ul: output.indicators.map(i => i.display), style: 'normal'},
-					{ul: this._computeSources(output.indicators), style: 'normal'},
+					{ul: this._computeSources(output.indicators, dataSources), style: 'normal'},
 					{text: output.assumptions, style: 'normal'}
 				]);
 			}, this);
@@ -96,7 +96,7 @@ export default class LogicalFrame extends Model {
 							{text: activity.description, style: 'normal'}
 						],
 						{ul: activity.indicators.map(i => i.display), style: 'normal'},
-						{ul: this._computeSources(activity.indicators), style: 'normal'},
+						{ul: this._computeSources(activity.indicators, dataSources), style: 'normal'},
 						" "
 					]);
 				}, this);
@@ -108,25 +108,25 @@ export default class LogicalFrame extends Model {
 		return doc;
 	}
 
-	_computeSources(indicators) {
+	_computeSources(indicators, dataSources) {
 		var sources = {};
 
-		indicators.forEach(function(indicator) {
+		indicators.forEach(indicator => {
 			if (indicator.computation) {
 				for (var key in indicator.computation.parameters) {
 					var elementId = indicator.computation.parameters[key].elementId,
-						form = this._project.forms.find(function(form) {
-							return !!form.elements.find(el => el.id === elementId);
+						dataSource = dataSources.find(ds => {
+							return !!ds.elements.find(el => el.id === elementId);
 						}),
-						element = form.elements.find(el => el.id === elementId);
+						element = dataSource.elements.find(el => el.id === elementId);
 
-					if (!sources[form.name])
-						sources[form.name] = {};
+					if (!sources[dataSource.name])
+						sources[dataSource.name] = {};
 
-					sources[form.name][element.name] = true;
+					sources[dataSource.name][element.name] = true;
 				}
 			}
-		}, this);
+		});
 
 		return Object.keys(sources).map(function(source) {
 			return [source, {ol: Object.keys(sources[source]), style: 'italic'}];
