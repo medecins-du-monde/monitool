@@ -30,7 +30,7 @@
 
 						<a ui-sref="main.project.structure.collection_form_list"
 						   class="list-group-item"
-						   ng-class="{active: $state.is('main.project.structure.collection_form_list') || $state.is('main.project.structure.collection_form_edition')}"
+						   ui-sref-active="active"
 						   disable-if="!masterProject._rev">
 
 							<span class="label label-default pull-right">{{masterProject.forms.length}}</span>
@@ -39,7 +39,7 @@
 						</a>
 
 						<a ui-sref="main.project.structure.logical_frame_list"
-						   ng-class="{active: $state.is('main.project.structure.logical_frame_list') || $state.is('main.project.structure.logical_frame_edition')}"
+						   ui-sref-active="active"
 						   class="list-group-item"
 						   disable-if="!masterProject._rev">
 
