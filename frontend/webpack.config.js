@@ -11,9 +11,7 @@ module.exports = {
 	mode: 'development',
 
 	// Import polyfills, then our code
-	entry: {
-		initscript: './src/init.js'
-	},
+	entry: ["babel-polyfill", "./src/init.js"],
 
 	// Output everything as a big bunder
 	output: {
@@ -31,10 +29,7 @@ module.exports = {
 						loader: 'babel-loader',
 						options: {
 							"presets": ["env"],
-							"plugins": [
-								"angularjs-annotate",
-								"syntax-dynamic-import"
-							]
+							"plugins": ["angularjs-annotate", "syntax-dynamic-import"]
 						}
 					}
 				]
@@ -44,29 +39,21 @@ module.exports = {
 				use: [
 					{
 						loader: 'html-loader',
-						options: {
-							minimize: true
-						}
+						options: {minimize: true}
 					}
 				]
 			},
 			{
 				test: /\.css$/,
 				use: [
-					{
-						loader: 'style-loader'
-					},
-					{
-						loader: 'css-loader'
-					}
+					{loader: 'style-loader'},
+					{loader: 'css-loader'}
 				]
 			},
 			{
 				test: /\.(svg|eot|woff|woff2|ttf)$/,
 				use: [
-					{
-						loader: 'file-loader'
-					}
+					{loader: 'file-loader'}
 				]
 			}
 		]
@@ -74,9 +61,7 @@ module.exports = {
 
 	optimization: {
 		minimizer: [
-			new UglifyJsPlugin({
-				extractComments: true
-			})
+			new UglifyJsPlugin({extractComments: true})
 		]
 	},
 
@@ -89,7 +74,6 @@ module.exports = {
 		new HtmlWebpackPlugin({
 			favicon: 'src/favicon.ico',
 			template: 'src/index.html',
-			chunks: ['initscript'],
 			inject: 'head'
 		}),
 

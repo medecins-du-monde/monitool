@@ -3,16 +3,11 @@
  * - user authentication in monitool
  * - loading the angular application.
  */
+
+import axios from 'axios';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import "./app.css";
-
-/**
- * Start loading the application right now
- */
-const myApplication = import(
-	/* webpackChunkName: "mainapp" */
-	'./app'
-);
 
 
 /**
@@ -86,49 +81,6 @@ function onGoBackClicked(e) {
 	e.preventDefault();
 }
 
-/**
- * When this init script is run, the first thing it does it to check if the user
- * already have a valid cookie.
- *
- * This handler is called to either:
- * - Load the application if the user is logged in, but the application is not loaded (production mode).
- * - Start the application if the user is logged in, and the app is loaded (development mode).
- * - Show the login GUI if the cookie is not valid.
- * - Show an error if the server is not reachable.
- */
-function onAuthResponse(e) {
-	var authReq = e.currentTarget;
-
-	// User is logged on
-	if (authReq.status === 200) {
-		// Pass fetched user to app by a global
-		window.user = JSON.parse(authReq.responseText);
-
-		// Show loader
-		document.getElementById('loader').style.display = 'block';
-		let inter = setInterval(onAppProgress, 400);
-
-		// Run the app
-		myApplication
-			.then(startApplication => {
-				clearInterval(inter);
-
-				document.body.style.backgroundColor = 'white';
-				document.body.removeChild(document.getElementById('load-container'));
-				document.body.removeChild(document.getElementById('version'));
-
-				startApplication.default();
-			})
-			.catch(error => console.log(error));
-	}
-	// User is not logged on
-	else if (authReq.status === 401)
-		// show login screen
-		document.getElementById('login_buttons').style.display = 'block';
-	else
-		// show error
-		document.getElementById('server_down').style.display = 'block';
-}
 
 let progress = 1;
 function onAppProgress(e) {
@@ -137,57 +89,76 @@ function onAppProgress(e) {
 }
 
 
-function startLoginPage() {
-	var ieVersion = getInternetExplorerVersion();
+async function configure() {
+	// Fill missing data on page with content of configuration from API
+	window.config = (await axios.get('/api/config')).data;
 
+	document.getElementById('version').innerHTML = 'Version ' + window.config.version;
+
+	let azureLogin = document.getElementById('azure_login');
+	if (window.config.azureLabel)
+		azureLogin.innerHTML = window.config.azureLabel;
+	else
+		azureLogin.parentNode.removeChild(azureLogin);
+
+	let trainingLogin = document.getElementById('training_login');
+	if (window.config.trainingLabel)
+		trainingLogin.querySelector('[type=submit]').value = window.config.trainingLabel;
+	else
+		trainingLogin.parentNode.removeChild(trainingLogin);
+
+	// Configure event listeners, and buttons
+	document.getElementById('partner_login_btn').addEventListener('click', onParterLoginClicked, false);
+	document.getElementById('go_back_btn').addEventListener('click', onGoBackClicked, false);
+
+	// Show partner login page if we entered a wrong password.
+	if (window.location.href.indexOf('failed') !== -1)
+		onParterLoginClicked(null, true);
+}
+
+
+async function init() {
+	var ieVersion = getInternetExplorerVersion();
 	if (ieVersion !== false && ieVersion < 10) {
 		document.getElementById('ie_warning').style.display = 'block';
+		return;
 	}
-	else {
-		document.getElementById('partner_login_btn').addEventListener('click', onParterLoginClicked, false);
-		document.getElementById('go_back_btn').addEventListener('click', onGoBackClicked, false);
 
-		// Send request to see if user is logged in.
-		if (window.location.href.indexOf('failed') !== -1)
-			onParterLoginClicked(null, true);
+	try {
+		await configure();
 
-		else {
-			var authReq = new XMLHttpRequest();
-			authReq.addEventListener("load", onAuthResponse, false);
-			authReq.open('GET', '/api/resources/myself?' + Math.random().toString().substring(2));
-			authReq.send();
+		window.user = (await axios.get('/api/resources/myself')).data;
+
+		// Show loader
+		document.getElementById('loader').style.display = 'block';
+		let inter = setInterval(onAppProgress, 400);
+
+		// Run the app
+		const startApplication = await import(
+			/* webpackChunkName: "mainapp" */
+			'./app'
+		);
+
+		clearInterval(inter);
+
+		document.body.style.backgroundColor = 'white';
+		document.body.removeChild(document.getElementById('load-container'));
+		document.body.removeChild(document.getElementById('version'));
+
+		startApplication.default();
+	}
+	catch (error) {
+		if (error.response) {
+			if (error.response.status === 401)
+				document.getElementById('login_buttons').style.display = 'block';
+			else
+				document.getElementById('server_down').style.display = 'block';
 		}
+		else
+			console.log(error)
 	}
 }
 
-function onConfigResponse(e) {
-	var configReq = e.currentTarget;
+init().catch(console.error);
 
-	// User is logged on
-	if (configReq.status === 200) {
-		// Pass fetched user to app by a global
-		window.config = JSON.parse(configReq.responseText);
-
-		document.getElementById('version').innerHTML = 'Version ' + window.config.version;
-
-		let azureLogin = document.getElementById('azure_login');
-		if (window.config.azureLabel)
-			azureLogin.innerHTML = window.config.azureLabel;
-		else
-			azureLogin.parentNode.removeChild(azureLogin);
-
-		let trainingLogin = document.getElementById('training_login');
-		if (window.config.trainingLabel)
-			trainingLogin.querySelector('[type=submit]').value = window.config.trainingLabel;
-		else
-			trainingLogin.parentNode.removeChild(trainingLogin);
-
-		startLoginPage();
-	}
-}
-
-
-var authReq = new XMLHttpRequest();
-authReq.addEventListener("load", onConfigResponse, false);
-authReq.open('GET', '/api/config?' + Math.random().toString().substring(2));
-authReq.send();
+console.log('coucou')
