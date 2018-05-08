@@ -22,26 +22,18 @@ const module = angular.module(
 	[]
 );
 
-module.directive('faOpen', function() {
-	return {
-		restrict: 'AE',
-		scope: { v: "=faOpen" },
-		link: function($scope, element) {
-			element.addClass('fa');
 
-			$scope.$watch('v', function(newValue) {
-				if (newValue) {
-					element.removeClass('fa-plus-circle');
-					element.addClass('fa-minus-circle');
-				}
-				else {
-					element.removeClass('fa-minus-circle');
-					element.addClass('fa-plus-circle');
-				}
-			});
-		}
-	}
-});
+module.component('faOpen', {
+	bindings: {
+		value: '<'
+	},
+	template: `
+		<i class="fa noprint"
+		   ng-class="{\'fa-minus-circle\': $ctrl.value, \'fa-plus-circle\': !$ctrl.value}">
+		</i>
+	`
+})
+
 
 export default module;
 

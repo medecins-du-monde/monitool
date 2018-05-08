@@ -9,7 +9,7 @@
 
 	<div class="panel panel-default">
 		<div class="panel-heading" ng-click="selectionOpen=!selectionOpen" style="cursor: pointer" ng-init="selectionOpen=true">
-			<i fa-open="selectionOpen"></i>
+			<fa-open value="selectionOpen"></fa-open>
 			<span translate="project.data_selection"></span>
 		</div>
 		<div class="panel-body" ng-if="selectionOpen">
@@ -58,7 +58,7 @@
 
 	<div class="panel panel-default">
 		<div class="panel-heading" ng-click="filterOpen=!filterOpen" style="cursor: pointer" ng-init="filterOpen=false">
-			<i fa-open="filterOpen"></i>
+			<fa-open value="filterOpen"></fa-open>
 			<span translate="project.filters"></span>
 		</div>
 		<div class="panel-body" ng-if="filterOpen">
