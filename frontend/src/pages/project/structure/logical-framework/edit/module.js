@@ -33,9 +33,9 @@ const module = angular.module(
 		uiModal, // for $uibModal
 		'ng-sortable',
 
-		mtDirectiveAutoresize.name,
 		mtComponentIndicatorDisplay.name,
 		mtComponentIndicatorModal.name,
+		mtDirectiveAutoresize.name,
 	]
 );
 
@@ -135,9 +135,10 @@ module.controller('ProjectLogicalFrameEditController', function($scope, $state, 
 
 		// Remove the form
 		$scope.editableProject.logicalFrames.splice($scope.logicalFrameIndex, 1);
-		$scope.$parent.save(true).then(function() {
-			$state.go('main.project.structure.logical_frame_list');
-		});
+
+		$scope.$parent
+			.save(true)
+			.then(() => $state.go('main.project.structure.logical_frame_list'));
 	};
 });
 
