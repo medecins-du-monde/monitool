@@ -3,7 +3,7 @@
 	<li class="active" title="{{masterProject.country}}" ng-bind="masterProject.country|maxLength:20"></li>
 	<li class="active" title="{{masterProject.name}}" ng-bind="masterProject.name|maxLength:50"></li>
 	<li><a ui-sref="main.project.input.list">{{form.name|maxLength:50}}</a></li>
-	<li class="active" ng-if="inputEntityName">{{inputEntityName|maxLength:50|translate}}</li>
+	<li class="active">{{inputEntityName|maxLength:50}}</li>
 	<li class="active">{{currentInput.period|formatSlot}}</li>
 </ol>
 
@@ -19,12 +19,12 @@
 				<input class="form-control disabled" disabled ng-value="form.name" />
 			</div>
 		</div>
-		
+
 		<div class="form-group">
 			<label class="col-sm-2 control-label" translate="project.collection_site"></label>
 
 			<div class="col-sm-10">
-				<input class="form-control disabled" disabled ng-value="inputEntityName|translate" />
+				<input class="form-control disabled" disabled ng-value="inputEntityName" />
 			</div>
 		</div>
 

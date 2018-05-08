@@ -15,25 +15,42 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import ngResource from 'angular-resource';
+import axios from 'axios';
+import uuid from 'uuid/v4';
 
-const module = angular.module(
-	'monitool.services.models.theme',
-	[
-		ngResource
-	]
-);
+export default class Theme {
 
-module.factory('Theme', function($resource) {
-	var Theme = $resource('/api/resources/theme/:id', { id: "@_id" }, { save: { method: "PUT" }});
-
-	Theme.prototype.reset = function() {
-		this.name = {fr: '', en: '', es: ''};
-		this.type = 'theme';
+	static async fetchAll() {
+		const response = await axios.get('/api/resources/theme');
+		return response.data.map(i => new Theme(i));
 	}
 
-	return Theme;
-});
+	static async get(id) {
+		const response = await axios.get('/api/resources/theme/' + id);
+		return new Theme(response.data);
+	}
 
-export default module;
+	constructor(data=null) {
+		this._id = 'theme:' + uuid();
+		this.type = "theme";
+		this.name = {en: '', fr: '', es: ''};
+
+		if (data)
+			Object.assign(this, data);
+	}
+
+	async save() {
+		const response = await axios.put(
+			'/api/resources/theme/' + this._id,
+			JSON.parse(angular.toJson(this))
+		);
+
+		Object.assign(this, response.data);
+	}
+
+	async delete() {
+		return axios.delete('/api/resources/theme/' + this._id);
+	}
+
+}
+

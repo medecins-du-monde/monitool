@@ -18,16 +18,15 @@
 import angular from 'angular';
 import jsonpatch from 'fast-json-patch';
 
+import Revision from '../../../../services/models/revision';
+
 import uiRouter from '@uirouter/angularjs';
 
-import mtModelRevision from '../../../../services/models/revision';
 
 const module = angular.module(
 	'monitool.pages.project.structure.revision',
 	[
 		uiRouter, // for $stateProvider
-
-		mtModelRevision.name
 	]
 );
 
@@ -43,7 +42,7 @@ module.config(function($stateProvider) {
 });
 
 
-module.controller('ProjectRevisions', function($scope, Revision) {
+module.controller('ProjectRevisions', function($scope) {
 	var currentOffset = 0, pageSize = 10;
 
 	$scope.loading = false;
@@ -66,15 +65,17 @@ module.controller('ProjectRevisions', function($scope, Revision) {
 		if ($scope.loading)
 			return;
 
-		var params = {projectId: $scope.masterProject._id, offset: currentOffset, limit: pageSize};
+		const promise = Revision.fetch($scope.masterProject._id, currentOffset, pageSize)
 		currentOffset = currentOffset + pageSize;
 		$scope.loading = true;
 
-		Revision.query(params).$promise.then(function(newRevisions) {
-			$scope.loading = false;
-			$scope.finished = newRevisions.length < pageSize;
-			$scope.revisions = [...$scope.revisions, ...newRevisions];
-			Revision.enrich($scope.masterProject, $scope.revisions);
+		promise.then(newRevisions => {
+			$scope.$apply(() => {
+				$scope.loading = false;
+				$scope.finished = newRevisions.length < pageSize;
+				$scope.revisions = [...$scope.revisions, ...newRevisions];
+				Revision.enrich($scope.masterProject, $scope.revisions);
+			});
 		});
 	};
 

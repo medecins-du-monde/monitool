@@ -18,17 +18,14 @@
 import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 
-import mtIndicatorModel from '../../../services/models/indicator';
-import mtThemeModel from '../../../services/models/theme';
+import Indicator from '../../../services/models/indicator';
+import Theme from '../../../services/models/theme';
 
 
 const module = angular.module(
 	'monitool.pages.indicator.list',
 	[
 		uiRouter, // for $stateProvider
-
-		mtIndicatorModel.name,
-		mtThemeModel.name
 	]
 );
 
@@ -41,12 +38,8 @@ module.config(function($stateProvider) {
 			template: require('./list.html'),
 			controller: 'IndicatorListController',
 			resolve: {
-				indicators: function(Indicator) {
-					return Indicator.query().$promise;
-				},
-				themes: function(Theme) {
-					return Theme.query().$promise;
-				}
+				indicators: () => Indicator.fetchAll(),
+				themes: () => Theme.fetchAll()
 			}
 		});
 	}
@@ -56,12 +49,12 @@ module.config(function($stateProvider) {
 module.controller('IndicatorListController', function($scope, indicators, themes) {
 	$scope.themes = [];
 
-	var noThematicsIndicators = indicators.filter(indicator => indicator.themes.length == 0);
+	var noThematicsIndicators = indicators.filter(i => i.themes.length == 0);
 	if (noThematicsIndicators.length)
 		$scope.themes.push({definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators});
 
 	// Create a category with indicators that match project on 2 thematics or more
-	var manyThematicsIndicators = indicators.filter(indicator => indicator.themes.length > 1);
+	var manyThematicsIndicators = indicators.filter(i => i.themes.length > 1);
 	if (manyThematicsIndicators.length)
 		$scope.themes.push({definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators});
 

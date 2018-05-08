@@ -73,10 +73,6 @@ angular-legacy-sortablejs-maintained@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/angular-legacy-sortablejs-maintained/-/angular-legacy-sortablejs-maintained-0.6.1.tgz#b2779f4c5ac4cb348bed7efcebbdf07147ae7a60"
 
-angular-resource@^1.6.10:
-  version "1.6.10"
-  resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.6.10.tgz#28c1834e9fa623467d2f9894716a4e6c7e077459"
-
 angular-translate-storage-cookie@~2.17.1:
   version "2.17.1"
   resolved "https://registry.yarnpkg.com/angular-translate-storage-cookie/-/angular-translate-storage-cookie-2.17.1.tgz#72cb2def16232213d73ad0b87c4e0a2a4ff5df9e"

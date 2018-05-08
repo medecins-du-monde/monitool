@@ -17,9 +17,10 @@
 
 import angular from 'angular';
 
+import Input from '../../../../services/models/input';
+
 import uiRouter from '@uirouter/angularjs';
 
-import mtModelInput from '../../../../services/models/input';
 import mtFilterTimeSlot from '../../../../filters/time-slot';
 
 const module = angular.module(
@@ -27,7 +28,6 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtModelInput.name,
 		mtFilterTimeSlot.name
 	]
 );
@@ -40,7 +40,7 @@ module.config(function($stateProvider) {
 		template: require('./collection-input-list.html'),
 		controller: 'ProjectCollectionInputListController',
 		resolve: {
-			inputsStatus: function(Input, project, $stateParams) {
+			inputsStatus: function(project, $stateParams) {
 				return Input.fetchFormStatus(project, $stateParams.formId);
 			}
 		}
@@ -48,7 +48,7 @@ module.config(function($stateProvider) {
 });
 
 
-module.controller('ProjectCollectionInputListController', function($scope, $state, $stateParams, inputsStatus, Input) {
+module.controller('ProjectCollectionInputListController', function($scope, $state, $stateParams, inputsStatus) {
 	$scope.form = $scope.masterProject.forms.find(f => f.id == $stateParams.formId);
 
 	//////

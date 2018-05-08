@@ -83,7 +83,7 @@ module.controller('ProjectEditController', function($scope, $filter, $transition
 	});
 
 	// save, reset and isUnchanged are all defined here, because those are shared between all project views.
-	$scope.save = function(force) {
+	$scope.save = async function(force) {
 		// When button is disabled, do not execute action.
 		if (!force) {
 			if (!$scope.projectSavable || $scope.projectSaveRunning)
@@ -93,21 +93,25 @@ module.controller('ProjectEditController', function($scope, $filter, $transition
 		$scope.projectSaveRunning = true;
 		$scope.editableProject.sanitize(indicators);
 
-		return $scope.editableProject.$save()
-			.then(function() {
+		try {
+			await $scope.editableProject.save()
+
+			$scope.$apply(() => {
 				angular.copy($scope.editableProject, $scope.masterProject);
 				$scope.projectChanged = false;
 				$scope.projectSavable = false;
 				$scope.projectSaveRunning = false;
 				$scope.$broadcast('projectSaved');
-			})
-			.catch(function(error) {
+			});
+		}
+		catch (error) {
+			$scope.$apply(() => {
 				// Display message to tell user that it's not possible to save.
 				var translate = $filter('translate');
 				alert(translate('project.saving_failed'));
-
 				$scope.projectSaveRunning = false;
 			});
+		}
 	};
 
 	$scope.reset = function() {

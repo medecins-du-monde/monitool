@@ -304,7 +304,8 @@ export default express.Router()
 
 			cache.del('reporting:project:' + input.project);
 
-			return input.save();
+			await input.save();
+			return input.toAPI();
 		}).then(response.jsonPB).catch(response.jsonErrorPB);
 	})
 
@@ -376,7 +377,7 @@ export default express.Router()
 		var model;
 		try {
 			model = new Model(request.body);
-			model.save().then(response.jsonPB).catch(response.jsonErrorPB);
+			model.save().then(() => model.toAPI()).then(response.jsonPB).catch(response.jsonErrorPB);
 		}
 		catch (e) {
 			return response.jsonError(e);

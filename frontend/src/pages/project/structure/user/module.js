@@ -20,6 +20,8 @@ import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 import 'angular-legacy-sortablejs-maintained';
 
+import User from '../../../../services/models/user';
+
 const module = angular.module(
 	'monitool.pages.project.structure.user',
 	[
@@ -36,9 +38,7 @@ module.config(function($stateProvider) {
 		template: require('./user-list.html'),
 		controller: 'ProjectUserListController',
 		resolve: {
-			users: function(User) {
-				return User.query().$promise;
-			}
+			users: () => User.fetchAll()
 		}
 	});
 });

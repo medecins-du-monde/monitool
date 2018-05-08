@@ -18,19 +18,16 @@
 import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
-import uuid from 'uuid/v4';
 
-import mtThemeModel from '../../../services/models/theme';
-import mtGoogleTranslation from '../../../services/utils/translate';
+import Theme from '../../../services/models/theme';
+import {translate} from '../../../services/utils/translate';
+
 
 const module = angular.module(
 	'monitool.pages.admin.themelist',
 	[
 		uiRouter, // for $stateProvider
 		uiModal, // for $uibModal
-
-		mtThemeModel.name,
-		mtGoogleTranslation.name
 	]
 );
 
@@ -43,16 +40,14 @@ module.config(function($stateProvider) {
 			template: require('./list.html'),
 			controller: 'ThemeListController',
 			resolve: {
-				themes: function(Theme) {
-					return Theme.query().$promise;
-				}
+				themes: () => Theme.fetchAll()
 			}
 		});
 	}
 });
 
 
-module.controller('ThemeListController', function($scope, $uibModal, Theme, themes) {
+module.controller('ThemeListController', function($scope, $uibModal, themes) {
 	var sortThemes = function() {
 		$scope.themes.sort((a, b) => {
 			return a.name[$scope.language].localeCompare(b.name[$scope.language]);
@@ -65,8 +60,8 @@ module.controller('ThemeListController', function($scope, $uibModal, Theme, them
 			template: require('./edit-modal.html'),
 			size: 'lg', scope: $scope,
 			resolve: {
-				theme: function() { return theme; },
-				isNew: function() { return isNew; }
+				theme: () => theme,
+				isNew: () => isNew
 			}
 		}).result;
 	};
@@ -76,15 +71,13 @@ module.controller('ThemeListController', function($scope, $uibModal, Theme, them
 
 	$scope.create = function() {
 		var theme = new Theme();
-		theme._id = 'theme:' + uuid();
-		theme.reset();
 
 		createModal(theme, true)
 			.then(function(action) {
 				if (action === '$save') {
 					$scope.themes.push(theme);
 					sortThemes();
-					theme.$save();
+					theme.save();
 				}
 			});
 	};
@@ -94,12 +87,15 @@ module.controller('ThemeListController', function($scope, $uibModal, Theme, them
 
 		createModal(theme, false)
 			.then(function(action) {
-				theme[action]();
-				if (action === '$save')
+				if (action === '$save') {
 					sortThemes();
+					theme.save();
+				}
 
-				if (action === '$delete')
+				if (action === '$delete') {
 					$scope.themes.splice($scope.themes.indexOf(theme), 1);
+					theme.delete();
+				}
 			})
 			.catch(function() {
 				angular.copy(backup, theme);
@@ -134,8 +130,10 @@ module.controller('ThemeEditModalController', function($scope, $uibModalInstance
 			var input = $scope.theme.name[readLanguageCode];
 
 			if (readLanguageCode !== writeLanguageCode && input.length) {
-				googleTranslation.translate(input, writeLanguageCode, readLanguageCode).then(function(result) {
-					$scope.theme.name[writeLanguageCode] = result;
+				translate(input, writeLanguageCode, readLanguageCode).then(result => {
+					$scope.$apply(() => {
+						$scope.theme.name[writeLanguageCode] = result;
+					})
 				});
 
 				break;

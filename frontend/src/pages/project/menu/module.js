@@ -16,16 +16,16 @@
  */
 
 import angular from 'angular';
-import uuid from 'uuid/v4';
+
+import Indicator from '../../../services/models/indicator';
+import Theme from '../../../services/models/theme';
+import Project from '../../../services/models/project';
 
 import uiRouter from '@uirouter/angularjs';
 
 import mtDirectiveAclProjectCreation from '../../../directives/acl/project-creation';
 import mtDirectiveAclProjectRole from '../../../directives/acl/project-role';
 import mtDirectiveAclProjectInput from '../../../directives/acl/project-input';
-import mtModelProject from '../../../services/models/project';
-import mtModelIndicator from '../../../services/models/indicator';
-import mtModelTheme from '../../../services/models/theme';
 
 
 const module = angular.module(
@@ -36,9 +36,6 @@ const module = angular.module(
 		mtDirectiveAclProjectCreation.name,
 		mtDirectiveAclProjectRole.name,
 		mtDirectiveAclProjectInput.name,
-		mtModelProject.name,
-		mtModelIndicator.name,
-		mtModelTheme.name
 	]
 );
 
@@ -51,28 +48,23 @@ module.config(function($stateProvider) {
 		controller: 'ProjectMenuController',
 		template: require('./menu.html'),
 		resolve: {
-			project: function(Project, $rootScope, $stateParams, $q) {
+			project: function($rootScope, $stateParams, $q) {
 				// If partner account, we retrieve the projectId from profile, else from URL.
 				var projectId = $rootScope.userCtx.type === 'user' ? $stateParams.projectId : $rootScope.userCtx.projectId;
 
-				return Project.get({id: projectId}).$promise.catch(function(e) {
+				return Project.get(projectId).catch(function(e) {
 					// Project creation
 					if (e.status !== 404)
 						return $q.reject(e);
 
 					var project = new Project();
 					project._id = projectId;
-					project.reset();
 					project.users.push({ type: "internal", id: $rootScope.userCtx._id, role: "owner" });
 					return $q.when(project);
 				});
 			},
-			indicators: function(Indicator) {
-				return Indicator.query().$promise;
-			},
-			themes: function(Theme) {
-				return Theme.query().$promise;
-			}
+			indicators: () => Indicator.fetchAll(),
+			themes: () => Theme.fetchAll()
 		}
 	});
 });
@@ -85,31 +77,15 @@ module.controller('ProjectMenuController', function($scope, $filter, $state, pro
 
 	// When master changes, update menu elements
 	$scope.$watch('masterProject', function() {
-		$scope.projectReadyForReporting = $scope.masterProject.isReadyForReporting();
+		$scope.projectReadyForReporting = $scope.masterProject.isReadyForReporting;
 	}, true);
 
-	$scope.cloneProject = function() {
+	$scope.cloneProject = async function() {
 		var question = translate('project.are_you_sure_to_clone');
 
 		if (window.confirm(question)) {
-			var newProjectId = 'project:' + uuid();
-			var options = {
-				method: 'PUT',
-				url: '/api/resources/project/' + newProjectId,
-				params: {
-					from: $scope.masterProject._id,
-					with_data: 'true'
-				}
-			};
-
-			$http(options).then(
-				function() {
-					$state.go('main.project.structure.basics', {projectId: newProjectId});
-				},
-				function(error) {
-					$scope.error = error;
-				}
-			);
+			const newProjectId = await $scope.masterProject.clone();
+			$state.go('main.project.structure.basics', {projectId: newProjectId});
 		}
 	};
 
@@ -118,7 +94,7 @@ module.controller('ProjectMenuController', function($scope, $filter, $state, pro
 			answer = translate('project.are_you_sure_to_delete_answer');
 
 		if (window.prompt(question) === answer)
-			project.$delete(function() { $state.go('main.projects'); });
+			project.delete(() => $state.go('main.projects'));
 	};
 });
 

@@ -19,7 +19,7 @@ import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
 
-import mtUserModel from '../../../services/models/user';
+import User from '../../../services/models/user';
 
 
 const module = angular.module(
@@ -27,8 +27,6 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 		uiModal, // for $uibModal
-
-		mtUserModel.name
 	]
 );
 
@@ -39,9 +37,7 @@ module.config(function($stateProvider) {
 			url: '/admin/users',
 			template: require('./list.html'),
 			resolve: {
-				users: function(User) {
-					return User.query().$promise;
-				}
+				users: () => User.fetchAll()
 			}
 		});
 	}
@@ -63,11 +59,11 @@ module.controller('UserListController', function($scope, $uibModal, users) {
 			template: require('./edit-modal.html'),
 			size: 'lg',
 			scope: $scope,
-			resolve: { user: function() { return user; } }
+			resolve: {user: () => user}
 		}).result;
 
 		promise
-			.then(function() { user.$save(); })
+			.then(function() { user.save(); })
 			.catch(function() { angular.copy(backup, user); })
 	};
 });

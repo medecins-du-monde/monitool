@@ -20,9 +20,10 @@ import exprEval from 'expr-eval';
 import Handsontable from 'handsontable/dist/handsontable.js';
 import 'handsontable/dist/handsontable.css';
 
+import Input from '../../../../services/models/input';
+
 import uiRouter from '@uirouter/angularjs';
 
-import mtInputModel from '../../../../services/models/input';
 import mtFilterTimeSlot from '../../../../filters/time-slot';
 import {transpose2D, computeNthPermutation} from '../../../../helpers/array';
 
@@ -32,8 +33,6 @@ const module = angular.module(
 	'monitool.pages.project.input.edit',
 	[
 		uiRouter, // for $stateProvider
-
-		mtInputModel.name,
 		mtFilterTimeSlot.name,
 	]
 );
@@ -46,7 +45,7 @@ module.config(function($stateProvider) {
 		template: require('./collection-input-edition.html'),
 		controller: 'ProjectCollectionInputEditionController',
 		resolve: {
-			inputs: function(Input, $stateParams, project) {
+			inputs: function($stateParams, project) {
 				return Input.fetchLasts(project, $stateParams.entityId, $stateParams.formId, $stateParams.period);
 			}
 		}
@@ -62,18 +61,19 @@ module.controller('ProjectCollectionInputEditionController', function($scope, $s
 	$scope.master        = angular.copy($scope.currentInput)
 
 	var entity   = $scope.masterProject.entities.find(e => e.id == $scope.currentInput.entity);
-	$scope.inputEntityName = entity ? entity.name : 'shared.project';
+	$scope.inputEntityName = entity.name;
 
 	$scope.copy = function() {
 		angular.copy($scope.lastInput.values, $scope.currentInput.values);
 	};
 
-	$scope.save = function() {
+	$scope.save = async function() {
 		if ((!$scope.isNew && $scope.isUnchanged()) || !$scope.isValid())
 			return;
 
 		pageChangeWatch()
-		$scope.currentInput.$save(function() { $state.go('main.project.input.list'); });
+		await $scope.currentInput.save();
+		$state.go('main.project.input.list');
 	};
 
 	$scope.reset = function() {
@@ -99,9 +99,7 @@ module.controller('ProjectCollectionInputEditionController', function($scope, $s
 
 		if (window.confirm(easy_question)) {
 			pageChangeWatch(); // remove the change page watch, because it will trigger otherwise.
-			$scope.currentInput.$delete(function() {
-				$state.go('main.project.input.list');
-			});
+			$scope.currentInput.delete(() => $state.go('main.project.input.list'));
 		}
 	};
 
@@ -259,7 +257,7 @@ module.directive('inputGrid', function() {
 				// Add data fields to bodyRows
 				var permutatedData = permutateData(scope.element, modelValue)
 				bodyRows.forEach(bodyRow => {
-					Array.prototype.push.apply(bodyRow, permutatedData.splice(0, dataColsPerRow));
+					bodyRow.push(...permutatedData.splice(0, dataColsPerRow));
 				});
 
 				// Add empty field in the top-left corner for topRows
@@ -278,7 +276,7 @@ module.directive('inputGrid', function() {
 
 				var modelValue = [];
 				for (var y = scope.element.partitions.length - scope.element.distribution; y < viewValue.length; ++y) {
-					Array.prototype.push.apply(modelValue, viewValue[y].slice(scope.element.distribution));
+					modelValue.push(...viewValue[y].slice(scope.element.distribution));
 				}
 
 				return unpermutateData(scope.element, modelValue);

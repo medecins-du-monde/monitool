@@ -15,105 +15,63 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import axios from 'axios';
 import exprEval from 'expr-eval';
 import factorial from 'factorial';
-
-import ngResource from 'angular-resource';
-
-const module = angular.module(
-	'monitool.services.models.project',
-	[
-		ngResource,
-	]
-);
+import uuid from 'uuid/v4';
 
 
-module.factory('Project', function($resource, $q, $rootScope, $filter) {
+export default class Project {
 
-	var Project = $resource('/api/resources/project/:id', { id: "@_id" }, { save: { method: "PUT" }});
+	static async fetchCrossCutting(indicatorId) {
+		const response = await axios.get(
+			'/api/resources/project',
+			{params: {mode: 'crossCutting', indicatorId: indicatorId}}
+		);
 
-	/**
-	 * Retrieve all indicators and variables in list
-	 * eg: fill <select> on detailed reporting pages.
-	 */
-	Project.prototype.getAllIndicators = function(indicators) {
-		var elementOptions = [];
-		this.logicalFrames.forEach((logicalFrame, i0) => {
-			var fn = function(i) {
-				return {
-					logicalFrameIndex: i0,
-					name: i.display,
-					type: "indicator",
-					group: $filter('translate')('project.logical_frame') + ": " + logicalFrame.name,
-					indicator: i
-				};
-			};
+		return response.data.map(i => new Project(i));
+	}
 
-			Array.prototype.push.apply(elementOptions, logicalFrame.indicators.map(fn));
-			logicalFrame.purposes.forEach(purpose => {
-				Array.prototype.push.apply(elementOptions, purpose.indicators.map(fn));
-				purpose.outputs.forEach(output => {
-					Array.prototype.push.apply(elementOptions, output.indicators.map(fn));
-					output.activities.forEach(activity => {
-						Array.prototype.push.apply(elementOptions, activity.indicators.map(fn));
-					});
-				});
-			});
-		});
+	static async fetchShort() {
+		const response = await axios.get('/api/resources/project?mode=short');
+		return response.data;
+	}
 
-		indicators.sort((a, b) => a.name[$rootScope.language].localeCompare(b.name[$rootScope.language]));
-		indicators.forEach(indicator => {
-			// If there no theme in common
-			if (indicator.themes.filter(t => this.themes.includes(t)).length === 0)
-				return;
-
-			elementOptions.push({
-				logicalFrameIndex: null,
-				name: indicator.name[$rootScope.language],
-				type: "indicator",
-				group: $filter('translate')('indicator.cross_cutting'),
-				indicator: this.crossCutting[indicator._id] || {
-					display: indicator.name[$rootScope.language],
-					baseline: null,
-					target: null,
-					computation: null
-				}
-			});
-		});
-
-		this.extraIndicators.forEach(planning => {
-			elementOptions.push({
-				name: planning.display,
-				type: "indicator",
-				group: $filter('translate')('indicator.extra'),
-				indicator: planning
-			});
-		});
-
-		this.forms.forEach(form => {
-			form.elements.forEach(element => {
-				elementOptions.push({
-					name: element.name,
-					type: "variable",
-					group: $filter('translate')('project.collection_form') + ": " + form.name,
-					element: element,
-					form: form
-				});
-			});
-		});
-
-		return elementOptions;
-	};
+	static async get(id) {
+		const response = await axios.get('/api/resources/project/' + id);
+		return new Project(response.data);
+	}
 
 	/**
 	 * Does it makes sense to display links for input and reporting?
 	 */
-	Project.prototype.isReadyForReporting = function() {
+	get isReadyForReporting() {
 		return this.forms.some(f => f.elements.length && f.entities.length);
-	};
+	}
 
-	Project.prototype.canInputForm = function(projectUser, formId) {
+	constructor(data) {
+		var now = new Date().toISOString().substring(0, 10);
+		this._id = uuid()
+		this.type = "project";
+		this.name = "";
+		this.start = now;
+		this.end = now;
+		this.themes = [];
+		this.crossCutting = {};
+		this.extraIndicators = [];
+		this.logicalFrames = [];
+		this.entities = [];
+		this.groups = [];
+		this.forms = [];
+		this.users = [];
+		this.visibility = 'public';
+
+		if (data)
+			Object.assign(this, data);
+	}
+
+
+	canInputForm(projectUser, formId) {
 		if (!projectUser)
 			return false;
 
@@ -132,34 +90,70 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 		}
 
 		return false;
-	};
+	}
 
 
-	Project.prototype.reset = function() {
-		var now = new Date().toISOString().substring(0, 10);
+	/**
+	 * Scan all internal references to entities, variables, partitions, and partitions elements
+	 * inside the project to ensure that there are no broken links and repair them if needed.
+	 */
+	sanitize(indicators) {
+		if (!['private', 'public'].includes(this.visibility))
+			this.visibility = 'private';
 
-		this.type = "project";
-		this.name = "";
-		this.start = now;
-		this.end = now;
-		this.themes = [];
-		this.crossCutting = {};
-		this.extraIndicators = [];
-		this.logicalFrames = [];
-		this.entities = [];
-		this.groups = [];
-		this.forms = [];
-		this.users = [];
-		this.visibility = 'public';
-	};
+		//////////////////
+		// Sanitize links to input entities
+		//////////////////
 
+		var entityIds = this.entities.map(e => e.id);
+
+		// Filter groups members
+		this.groups.forEach(group => {
+			group.members = group.members.filter(e => entityIds.includes(e))
+		});
+
+		this.users.forEach(this._sanitizeUser, this);
+		this.forms.forEach(this._sanitizeForm, this);
+
+		/////////////
+		// Sanitize links to variables from indicators
+		/////////////
+
+		this.logicalFrames.forEach(logicalFrame => {
+			logicalFrame.indicators.forEach(this._sanitizeIndicator, this);
+			logicalFrame.purposes.forEach(purpose => {
+				purpose.indicators.forEach(this._sanitizeIndicator, this);
+				purpose.outputs.forEach(output => {
+					output.indicators.forEach(this._sanitizeIndicator, this);
+					output.activities.forEach(activity => {
+						activity.indicators.forEach(this._sanitizeIndicator, this);
+					});
+				});
+			});
+		});
+
+		// Sanitize indicators only if the list is provided.
+		if (indicators) {
+			for (var indicatorId in this.crossCutting) {
+				var indicator = indicators.find(i => i._id == indicatorId);
+				var commonThemes = indicator.themes.filter(t => this.themes.includes(t));
+				if (!indicator || commonThemes.length === 0)
+					delete this.crossCutting[indicatorId];
+			}
+		}
+
+		for (var indicatorId in this.crossCutting)
+			this._sanitizeIndicator(this.crossCutting[indicatorId]);
+
+		this.extraIndicators.forEach(this._sanitizeIndicator, this);
+	}
 
 	/**
 	 * Scan all references to variables, partitions and partitions elements
 	 * inside a given indicator to ensure that there are no broken links
 	 * and repair them if needed.
 	 */
-	Project.prototype.sanitizeIndicator = function(indicator) {
+	_sanitizeIndicator(indicator) {
 		if (indicator.computation === null)
 			return;
 
@@ -213,13 +207,13 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 				}
 			}
 		}
-	};
+	}
 
 	/**
 	 * Scan references to entities and remove broken links
 	 * If no valid links remain, change the user to read only mode
 	 */
-	Project.prototype.sanitizeUser = function(user) {
+	_sanitizeUser(user) {
 		if (user.role === 'input') {
 			user.entities = user.entities.filter(entityId => {
 				return !!this.entities.find(entity => entity.id === entityId);
@@ -239,9 +233,9 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 			delete user.entities;
 			delete user.dataSources;
 		}
-	};
+	}
 
-	Project.prototype.sanitizeForm = function(form) {
+	_sanitizeForm(form) {
 		var entityIds = this.entities.map(e => e.id);
 
 		// Remove deleted entities
@@ -255,66 +249,36 @@ module.factory('Project', function($resource, $q, $rootScope, $filter) {
 			if (element.order < 0 || element.order >= factorial(element.partitions.length))
 				element.order = 0;
 		});
-	};
+	}
 
-	/**
-	 * Scan all internal references to entities, variables, partitions, and partitions elements
-	 * inside the project to ensure that there are no broken links and repair them if needed.
-	 */
-	Project.prototype.sanitize = function(indicators) {
+	async clone() {
+		const newProjectId = 'project:' + uuid();
 
-		if (this.visibility !== 'private' && this.visibility !== 'public')
-			this.visibility = 'private';
-
-		//////////////////
-		// Sanitize links to input entities
-		//////////////////
-
-		var entityIds = this.entities.map(e => e.id);
-
-		// Filter groups members
-		this.groups.forEach(group => {
-			group.members = group.members.filter(e => entityIds.includes(e))
-		});
-
-		this.users.forEach(this.sanitizeUser, this);
-		this.forms.forEach(this.sanitizeForm, this);
-
-		/////////////
-		// Sanitize links to variables from indicators
-		/////////////
-
-		this.logicalFrames.forEach(logicalFrame => {
-			logicalFrame.indicators.forEach(this.sanitizeIndicator, this);
-			logicalFrame.purposes.forEach(purpose => {
-				purpose.indicators.forEach(this.sanitizeIndicator, this);
-				purpose.outputs.forEach(output => {
-					output.indicators.forEach(this.sanitizeIndicator, this);
-					output.activities.forEach(activity => {
-						activity.indicators.forEach(this.sanitizeIndicator, this);
-					});
-				});
-			});
-		});
-
-		// Sanitize indicators only if the list is provided.
-		if (indicators) {
-			for (var indicatorId in this.crossCutting) {
-				var indicator = indicators.find(i => i._id == indicatorId);
-				var commonThemes = indicator.themes.filter(t => this.themes.includes(t));
-				if (!indicator || commonThemes.length === 0)
-					delete this.crossCutting[indicatorId];
+		await axios.put(
+			'/api/resources/project/' + newProjectId,
+			null,
+			{
+				params: {
+					from: this._id,
+					with_data: 'true'
+				}
 			}
-		}
+		);
 
-		for (var indicatorId in this.crossCutting)
-			this.sanitizeIndicator(this.crossCutting[indicatorId]);
+		return newProjectId;
+	}
 
-		this.extraIndicators.forEach(this.sanitizeIndicator, this);
-	};
+	async save() {
+		const response = await axios.put(
+			'/api/resources/project/' + this._id,
+			JSON.parse(angular.toJson(this))
+		);
 
-	return Project;
-});
+		Object.assign(this, response.data);
+	}
 
-export default module;
+	async delete() {
+		return axios.delete('/api/resources/project/' + this._id);
+	}
 
+}

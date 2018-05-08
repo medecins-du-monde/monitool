@@ -15,22 +15,21 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
 import jsonpatch from 'fast-json-patch';
-import ngResource from 'angular-resource';
 
 
-const module = angular.module(
-	'monitool.services.models.revision',
-	[
-		ngResource
-	]
-);
+export default class Revision {
 
-module.factory('Revision', function($resource) {
-	var Revision = $resource('/api/resources/project/:projectId/revisions');
+	static async fetch(projectId, offset, limit) {
+		const response = axios.get(
+			'/api/resources/project/' + projectId + '/revisions',
+			{params: {projectId: projectId, offset: offset, limit: limit}}
+		);
 
-	Revision.enrich = function(project, revisions) {
+		return response.data.map(r => new Revision(r));
+	}
+
+	static enrich(project, revisions) {
 		// Complete the information by computing afterState, beforeState, and forward patches.
 		for (var i = 0; i < revisions.length; ++i) {
 			if (revisions[i].before || revisions[i].after)
@@ -47,9 +46,4 @@ module.factory('Revision', function($resource) {
 			revisions[i].isEquivalent = angular.equals(project, revisions[i].before);
 		}
 	}
-
-
-	return Revision;
-});
-
-export default module;
+}

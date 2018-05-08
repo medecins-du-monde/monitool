@@ -16,112 +16,124 @@
  */
 
 import angular from 'angular';
-import ngResource from 'angular-resource';
+import axios from 'axios';
 
 import {getList} from '../../helpers/input-slots';
 
 
-const module = angular.module(
-	'monitool.services.models.input',
-	[
-		ngResource
-	]
-);
+export default class Input {
 
-module.factory('Input', function($resource, $q) {
+	static async fetchFormStatus(project, formId) {
+		const response = await axios.get(
+			'/api/resources/input',
+			{params: {mode: 'ids_by_form', projectId: project._id, formId: formId}}
+		);
 
-	// Create $resource
-	var Input = $resource('/api/resources/input/:id', { id: "@_id" }, { save: { method: "PUT" }});
+		const inputsDone = response.data;
+		const form = project.forms.find(f => f.id === formId);
+		var prj = {};
 
-	Input.fetchFormStatus = function(project, formId) {
-		var form = project.forms.find(f => f.id == formId);
+		inputsDone.forEach(inputId => {
+			var splitted      = inputId.split(':'),
+				inputEntityId = splitted[4],
+				strPeriod     = splitted[5];
 
-		return Input.query({mode: 'ids_by_form', projectId: project._id, formId: formId}).$promise.then(function(inputsDone) {
-			var prj = {};
+			prj[strPeriod] = prj[strPeriod] || {};
+			prj[strPeriod][inputEntityId] = 'outofschedule';
+		});
 
-			inputsDone.forEach(inputId => {
-				var splitted      = inputId.split(':'),
-					inputEntityId = splitted[4],
-					strPeriod     = splitted[5];
+		form.entities.forEach(entityId => {
+			var strPeriods;
+			if (form.periodicity === 'free')
+				strPeriods = Object.keys(prj);
+			else {
+				var entity = project.entities.find(entity => entity.id == entityId);
+				strPeriods = getList(project, entity, form);
+			}
 
+			strPeriods.forEach(strPeriod => {
 				prj[strPeriod] = prj[strPeriod] || {};
-				prj[strPeriod][inputEntityId] = 'outofschedule';
-			});
 
-			form.entities.forEach(entityId => {
-				var strPeriods;
-				if (form.periodicity === 'free')
-					strPeriods = Object.keys(prj);
-				else {
-					var entity = project.entities.find(entity => entity.id == entityId);
-					strPeriods = getList(project, entity, form);
+				if (prj[strPeriod][entityId] == 'outofschedule')
+					prj[strPeriod][entityId] = 'done';
+				else
+					prj[strPeriod][entityId] = 'expected';
+			});
+		});
+
+		// Sort periods alphabetically
+		var periods = Object.keys(prj);
+		periods.sort();
+
+		var newObj = {};
+		periods.forEach(period => newObj[period] = prj[period])
+		prj = newObj;
+
+		return prj;
+	}
+
+	static async fetchLasts(project, entityId, formId, period) {
+		const response = await axios.get(
+			'/api/resources/input',
+			{
+				params: {
+					mode: "current+last",
+					projectId: project._id,
+					entityId: entityId,
+					formId: formId,
+					period: period
 				}
+			}
+		);
 
-				strPeriods.forEach(strPeriod => {
-					prj[strPeriod] = prj[strPeriod] || {};
+		const result = response.data.map(i => new Input(i));
 
-					if (prj[strPeriod][entityId] == 'outofschedule')
-						prj[strPeriod][entityId] = 'done';
-					else
-						prj[strPeriod][entityId] = 'expected';
-				});
-			});
-
-			// Sort periods alphabetically
-			var periods = Object.keys(prj);
-			periods.sort();
-
-			var newObj = {};
-			periods.forEach(period => newObj[period] = prj[period])
-			prj = newObj;
-
-			return prj;
-		});
-	};
-
-	Input.fetchLasts = function(project, entityId, formId, period) {
 		var form = project.forms.find(f => f.id == formId);
+		var currentInputId = ['input', project._id, formId, entityId, period].join(':');
 
-		return Input.query({
-			mode: "current+last",
-			projectId: project._id,
-			entityId: entityId,
-			formId: formId,
-			period: period
-		}).$promise.then(function(result) {
-			var currentInputId = ['input', project._id, formId, entityId, period].join(':');
+		// both where found
+		if (result.length === 2)
+			return { current: result[0], previous: result[1], isNew: false };
 
-			// both where found
-			if (result.length === 2)
-				return { current: result[0], previous: result[1], isNew: false };
+		// only the current one was found
+		else if (result.length === 1 && result[0]._id === currentInputId)
+			return { current: result[0], previous: null, isNew: false };
 
-			// only the current one was found
-			else if (result.length === 1 && result[0]._id === currentInputId)
-				return { current: result[0], previous: null, isNew: false };
-
-			var current = new Input({
-				_id: currentInputId, type: "input",
-				project: project._id, form: formId, period: period, entity: entityId,
-				values: {}
-			});
-
-			form.elements.forEach(element => {
-				const numFields = element.partitions.reduce((p, memo) => memo * p.elements.length, 1);
-
-				current.values[element.id] = new Array(numFields);
-				for (var i = 0; i < numFields; ++i)
-					current.values[element.id][i] = 0;
-			});
-
-			// the current one was not found (and we may or not have found the previous one).
-			return {current: current, previous: result.length ? result[0] : null, isNew: true};
+		var current = new Input({
+			_id: currentInputId, type: "input",
+			project: project._id, form: formId, period: period, entity: entityId,
+			values: {}
 		});
-	};
+
+		form.elements.forEach(element => {
+			const numFields = element.partitions.reduce((p, memo) => memo * p.elements.length, 1);
+
+			current.values[element.id] = new Array(numFields);
+			for (var i = 0; i < numFields; ++i)
+				current.values[element.id][i] = 0;
+		});
+
+		// the current one was not found (and we may or not have found the previous one).
+		return {current: current, previous: result.length ? result[0] : null, isNew: true};
+	}
 
 
+	constructor(data=null) {
+		Object.assign(this, data);
+	}
 
-	return Input;
-});
+	async save() {
+		const response = await axios.put(
+			'/api/resources/input/' + this._id,
+			JSON.parse(angular.toJson(this))
+		);
 
+		Object.assign(this, response.data);
+	}
 
-export default module;
+	async delete() {
+		return axios.delete('/api/resources/input/' + this._id);
+	}
+
+}
+

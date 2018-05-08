@@ -15,33 +15,44 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import ngResource from 'angular-resource';
+import axios from 'axios';
+import uuid from 'uuid/v4';
 
 
-const module = angular.module(
-	'monitool.services.models.indicator',
-	[
-		ngResource
-	]
-);
+export default class Indicator {
 
-module.factory('Indicator', function($resource) {
+	static async fetchAll() {
+		const response = await axios.get('api/resources/indicator');
+		return response.data.map(i => new Indicator(i));
+	}
 
-	var Indicator = $resource('/api/resources/indicator/:id', { id: "@_id" }, { save: { method: "PUT" }});
+	static async get(id) {
+		const response = await axios.get('api/resources/indicator/' + id);
+		return new Indicator(response.data);
+	}
 
-	Indicator.fetchForProject = function(project) {
-		return Indicator.query({mode: "project_indicators", projectId: project._id}).$promise;
-	};
-
-	Indicator.prototype.reset = function() {
+	constructor(data=null) {
+		this._id = 'indicator:' + uuid();
 		this.type = "indicator";
 		this.name = {en: '', fr: '', es: ''};
 		this.description = {en: '', fr: '', es: ''};
 		this.themes = [];
-	};
 
-	return Indicator;
-});
+		if (data)
+			Object.assign(this, data);
+	}
 
-export default module;
+	async save() {
+		const response = await axios.put(
+			'/api/resources/theme/' + this._id,
+			JSON.parse(angular.toJson(this))
+		);
+
+		Object.assign(this, response.data);
+	}
+
+	async delete() {
+		return axios.delete('/api/resources/theme/' + this._id);
+	}
+}
+

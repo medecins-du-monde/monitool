@@ -19,9 +19,10 @@ import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 import uuid from 'uuid/v4';
 
+import Project from '../../../services/models/project';
+import Theme from '../../../services/models/theme';
+
 import mtDirectiveAclProjectCreation from '../../../directives/acl/project-creation';
-import mtModelProject from '../../../services/models/project';
-import mtModelTheme from '../../../services/models/theme';
 
 const module = angular.module(
 	'monitool.pages.project.list',
@@ -29,8 +30,6 @@ const module = angular.module(
 		uiRouter, // for $stateProvider
 
 		mtDirectiveAclProjectCreation.name,
-		mtModelProject.name,
-		mtModelTheme.name,
 	]
 );
 
@@ -42,12 +41,8 @@ module.config(function($stateProvider) {
 			template: require('./list.html'),
 			controller: 'ProjectListController',
 			resolve: {
-				projects: function(Project) {
-					return Project.query({mode: 'short'}).$promise;
-				},
-				themes: function(Theme) {
-					return Theme.query().$promise;
-				}
+				projects: () => Project.fetchShort(),
+				themes: () => Theme.fetchAll()
 			}
 		});
 	}

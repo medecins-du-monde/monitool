@@ -15,18 +15,27 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import ngResource from 'angular-resource';
+import axios from 'axios';
 
-const module = angular.module(
-	'monitool.services.models.user',
-	[
-		ngResource
-	]
-);
+export default class User {
 
-module.factory('User', function($resource) {
-	return $resource('/api/resources/user/:id', { id: "@_id" }, { save: { method: "PUT" }});
-});
+	static async fetchAll() {
+		const response = await axios.get('/api/resources/user');
+		return response.data.map(i => new User(i));
+	}
 
-export default module;
+	constructor(data) {
+		Object.assign(this, data);
+	}
+
+	async save() {
+		const response = await axios.put(
+			'/api/resources/user/' + this._id,
+			JSON.parse(angular.toJson(this))
+		);
+
+		Object.assign(this, response.data);
+	}
+
+}
+

@@ -19,9 +19,10 @@ import angular from 'angular';
 
 import uiRouter from '@uirouter/angularjs';
 
-import mtThemeModel from '../../../services/models/theme';
-import mtIndicatorModel from '../../../services/models/theme';
-import mtProjectModel from '../../../services/models/theme';
+import Theme from '../../../services/models/theme';
+import Indicator from '../../../services/models/indicator';
+import Project from '../../../services/models/project';
+
 import mtOlap from '../../../services/statistics/olap';
 import mtReporting from '../../../services/statistics/reporting';
 
@@ -31,14 +32,10 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtThemeModel.name,
-		mtIndicatorModel.name,
-		mtProjectModel.name,
 		mtOlap.name,
 		mtReporting.name,
 	]
 );
-
 
 
 module.config(function($stateProvider) {
@@ -49,15 +46,9 @@ module.config(function($stateProvider) {
 			template: require('./reporting.html'),
 			controller: 'IndicatorReportingController',
 			resolve: {
-				themes: function(Theme) {
-					return Theme.query().$promise;
-				},
-				indicator: function(Indicator, $q, $stateParams) {
-					return Indicator.get({id: $stateParams.indicatorId}).$promise;
-				},
-				projects: function(Project, indicator) {
-					return Project.query({mode: 'crossCutting', indicatorId: indicator._id});
-				},
+				themes: () => Theme.fetchAll(),
+				indicator: ($stateParams) => Indicator.get($stateParams.indicatorId),
+				projects: ($stateParams) => Project.fetchCrossCutting($stateParams.indicatorId),
 				cubes: function(Cube, indicator) {
 					return Cube.fetchIndicator(indicator._id);
 				}
@@ -67,7 +58,7 @@ module.config(function($stateProvider) {
 });
 
 
-module.controller('IndicatorReportingController', function($scope, Cube, mtReporting, indicator, projects, cubes, themes) {
+module.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, cubes, themes) {
 	$scope.themes = themes;
 	$scope.indicator = indicator;
 	$scope.open = {};

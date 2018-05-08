@@ -16,7 +16,9 @@
  */
 
 import angular from 'angular';
-import uuid from 'uuid/v4';
+import Indicator from '../../../services/models/indicator';
+import Theme from '../../../services/models/theme';
+import {translate} from '../../../services/utils/translate';
 
 import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
@@ -25,9 +27,6 @@ import uiSelect from 'ui-select';
 import 'ui-select/dist/select.min.css';
 
 import mtDirectiveAutoresize from '../../../directives/helpers/autoresize';
-import mtModelIndicator from '../../../services/models/indicator';
-import mtModelTheme from '../../../services/models/theme';
-import mtServiceTranslation from '../../../services/utils/translate';
 
 const module = angular.module(
 	'monitool.pages.admin.indicatorlist',
@@ -36,10 +35,7 @@ const module = angular.module(
 		uiModal, // for $uibModal
 		uiSelect, // for <ui-select>
 
-		mtDirectiveAutoresize.name,
-		mtModelIndicator.name,
-		mtModelTheme.name,
-		mtServiceTranslation.name
+		mtDirectiveAutoresize.name
 	]
 );
 
@@ -53,19 +49,15 @@ module.config(function($stateProvider) {
 			template: require('./list.html'),
 			controller: 'AdminIndicatorListController',
 			resolve: {
-				indicators: function(Indicator) {
-					return Indicator.query().$promise;
-				},
-				themes: function(Theme) {
-					return Theme.query().$promise;
-				}
+				indicators: () => Indicator.fetchAll(),
+				themes: () => Theme.fetchAll()
 			}
 		});
 	}
 });
 
 
-module.controller("AdminIndicatorListController", function($scope, $uibModal, Indicator, indicators, themes) {
+module.controller("AdminIndicatorListController", function($scope, $uibModal, indicators, themes) {
 	$scope.indicators = indicators;
 	$scope.themes = themes;
 
@@ -92,7 +84,7 @@ module.controller("AdminIndicatorListController", function($scope, $uibModal, In
 			template: require('./edit-modal.html'),
 			size: 'lg', scope: $scope,
 			resolve: {
-				themes: function() { return themes; },
+				themes: function() { return $scope.themes; },
 				indicator: function() { return indicator; },
 				isNew: function() { return isNew; }
 			}
@@ -103,17 +95,14 @@ module.controller("AdminIndicatorListController", function($scope, $uibModal, In
 
 	$scope.create = function() {
 		var indicator = new Indicator();
-		indicator._id = 'indicator:' + uuid();
-		indicator.reset();
 
-		createModal(indicator, true)
-			.then(function(action) {
-				if (action === '$save') {
-					$scope.indicators.push(indicator);
-					sortIndicators();
-					indicator.$save();
-				}
-			});
+		createModal(indicator, true).then(function(action) {
+			if (action === '$save') {
+				$scope.indicators.push(indicator);
+				sortIndicators();
+				indicator.save();
+			}
+		});
 	};
 
 	$scope.edit = function(indicator) {
@@ -121,12 +110,15 @@ module.controller("AdminIndicatorListController", function($scope, $uibModal, In
 
 		createModal(indicator, false)
 			.then(function(action) {
-				indicator[action]();
-				if (action === '$save')
+				if (action === '$save') {
 					sortIndicators();
+					indicator.save();
+				}
 
-				if (action === '$delete')
+				if (action === '$delete') {
 					$scope.indicators.splice($scope.indicators.indexOf(indicator), 1);
+					indicator.delete();
+				}
 			})
 			.catch(function() {
 				angular.copy(backup, indicator);
@@ -159,11 +151,11 @@ module.controller('IndicatorEditModalController', function($uibModalInstance, $s
 			var source = indicator[key][sourceLanguage];
 
 			if (sourceLanguage != destLanguage && source && source.length) {
-				googleTranslation
-					.translate(source, destLanguage, sourceLanguage)
-					.then(function(result) {
+				translate(source, destLanguage, sourceLanguage).then(function(result) {
+					$scope.$apply(() => {
 						indicator[key][destLanguage] = result;
 					});
+				});
 
 				break;
 			}
