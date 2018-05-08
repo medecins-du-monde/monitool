@@ -18,10 +18,13 @@
 import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 
+import mtComponentIndicatorSelect from '../../../../components/reporting/indicator-select';
+
 const module = angular.module(
 	'monitool.pages.project.reporting.detailed',
 	[
-		uiRouter // for $stateProvider
+		uiRouter, // for $stateProvider
+		mtComponentIndicatorSelect.name
 	]
 );
 
@@ -33,29 +36,24 @@ module.config(function($stateProvider) {
 		template: require('./reporting-detailed.html'),
 		controller: 'ProjectDetailedReportingController'
 	});
+
 });
 
 
 module.controller('ProjectDetailedReportingController', function($scope, $filter, mtReporting, indicators) {
+	// Initialization code
 	$scope.plots = {};
-
-	////////////////////////////////////////////////////
-	// Initialization code.
-	////////////////////////////////////////////////////
-
-	// Create array with ngOptions for the list of variables, and init select value.
-	$scope.elementOptions = $scope.masterProject.getAllIndicators(indicators);
-	$scope.wrap = {chosenElement: $scope.elementOptions[0]};
+	$scope.indicators = indicators;
 
 	////////////////////////////////////////////////////
 	// Each time the element is changed, initialize the query object.
 	////////////////////////////////////////////////////
-
-	$scope.$watch('wrap.chosenElement', function(element) {
+	$scope.onChosenElementUpdate = function(element) {
 
 		////////////////////////////////////////
 		// Create default query for this elementId
 		////////////////////////////////////////
+
 		var now = new Date().toISOString().substring(0, 10);
 		var filters = {
 			_start: $scope.masterProject.start,
@@ -107,7 +105,7 @@ module.controller('ProjectDetailedReportingController', function($scope, $filter
 			ind.logicalFrameIndex = element.logicalFrameIndex;
 			$scope.query = {type: 'indicator', indicator: ind, filters: filters, groupBy: groupBy};
 		}
-	});
+	};
 
 	$scope.$watch('cubes', function(cubes) {
 		if (!cubes)

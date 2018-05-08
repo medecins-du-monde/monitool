@@ -23,12 +23,15 @@ import uiSelect from 'ui-select';
 import 'ui-select/dist/select.min.css';
 
 import {product} from '../../../../helpers/array';
+import mtComponentIndicatorSelect from '../../../../components/reporting/indicator-select';
 
 const module = angular.module(
 	'monitool.pages.project.reporting.olap',
 	[
 		uiRouter, // for $stateProvider
 		uiSelect,
+
+		mtComponentIndicatorSelect.name
 	]
 );
 
@@ -50,13 +53,15 @@ module.controller('ProjectOlapController', function($scope, $filter, CompoundCub
 		'year', 'semester', 'quarter', 'month', 'week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'day'
 	]
 
+	$scope.indicators = indicators;
+
 	////////////////////////////////////////////////////
 	// Initialization code.
 	////////////////////////////////////////////////////
 
 	// Create array with ngOptions for the list of variables, and init select value.
-	$scope.elementOptions = $scope.masterProject.getAllIndicators(indicators);
-	$scope.wrap = {chosenElement: $scope.elementOptions[0]};
+	// $scope.elementOptions = $scope.masterProject.getAllIndicators(indicators);
+	$scope.wrap = {chosenElement: null};
 
 	// init objects that we will need to render query controls in the ux.
 	$scope.query = {element: null, colDimensions: null, rowDimensions: null, filters: null};
@@ -64,6 +69,10 @@ module.controller('ProjectOlapController', function($scope, $filter, CompoundCub
 	////////////////////////////////////////////////////
 	// Each time the element is changed, initialize the query object.
 	////////////////////////////////////////////////////
+
+	$scope.onChosenElementUpdate = function(element) {
+		$scope.wrap.chosenElement = element;
+	};
 
 	$scope.$watch('cubes', function(cubes) {
 		if (!cubes)
