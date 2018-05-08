@@ -100,22 +100,14 @@
 </form>
 
 <div ng-hide="plots|isEmpty">
-
-	<button class="btn btn-primary btn-xs pull-right noprint" svg-save>
-		<i class="fa fa-download"></i>
-		<span translate="shared.download_plot"></span>
-	</button>
-	<div style="clear: both"></div>
+	<export-svg></export-svg>
 
 	<reporting-graph-adapter type="'line'" rows="rows" cols="cols" plots="plots"></reporting-graph-adapter>
 
 	<div style="clear: both"></div>
 </div>
 
-<button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
-	<i class="fa fa-download"></i>
-	<span translate="shared.download_table"></span>
-</button>
+<export-csv></export-csv>
 
 <div>
 	<span ng-if="baseline !== null">Baseline: {{baseline}}{{unit}}</span>

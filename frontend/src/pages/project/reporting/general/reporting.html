@@ -71,11 +71,7 @@
 </form>
 
 <div ng-hide="plots|isEmpty">
-	<button class="btn btn-primary btn-xs pull-right noprint" svg-save>
-		<i class="fa fa-download"></i>
-		<span translate="shared.download_plot"></span>
-	</button>
-	<div style="clear: both"></div>
+	<export-svg></export-svg>
 
 	<reporting-graph-adapter
 		type="['year', 'semester', 'quarter', 'month', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'week_sat', 'week_sun', 'week_mon', 'day'].includes(groupBy) ? 'line' : 'bar'"
@@ -85,10 +81,7 @@
 	<div style="clear: both"></div>
 </div>
 
-<button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
-	<i class="fa fa-download"></i>
-	<span translate="shared.download_table"></span>
-</button>
+<export-csv></export-csv>
 
 <table id="reporting" class="table table-bordered table-condensed">
 	<thead>

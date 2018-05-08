@@ -26,69 +26,66 @@ const module = angular.module(
 	]
 );
 
+var uri = 'data:application/vnd.ms-excel;base64,',
+	template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
+	base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) },
+	format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
 
-module.directive('csvSave', function() {
-	// From https://gist.github.com/insin/1031969
-	var tableToExcel = (function() {
-		var uri = 'data:application/vnd.ms-excel;base64,',
-			template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
-			base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) },
-			format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+// From https://gist.github.com/insin/1031969
+const tableToExcel = function(table, name) {
+	if (!table.nodeType)
+		table = document.getElementById(table)
 
-		return function(table, name) {
-			if (!table.nodeType)
-				table = document.getElementById(table)
+	var innerHTML = table.innerHTML;
+	innerHTML = innerHTML.replace(/<!--[\s\S]*?-->/g, ''); // remove comments
+	innerHTML = innerHTML.replace(/<i class.*?<\/i>/g, ''); // remove pictograms
 
-			var innerHTML = table.innerHTML;
-			innerHTML = innerHTML.replace(/<!--[\s\S]*?-->/g, ''); // remove comments
-			innerHTML = innerHTML.replace(/<i class.*?<\/i>/g, ''); // remove pictograms
+	// remove checkboxes
+	innerHTML = innerHTML.replace(/<input.*?>/g, '');
+	innerHTML = innerHTML.replace(/<div class="btn-group btn-group-xs">[\s\S]*?<\/div>/g, '');
+	innerHTML = innerHTML.replace(/<div class="btn-toolbar">[\s\S]*?<\/div>/g, '');
+	innerHTML = innerHTML.replace(/<div class="btn-toolbar">[\s\S]*?<\/div>/g, '');
+	innerHTML = innerHTML.replace(/<div class="pull-right">[\s\S]*?<\/div>/g, '');
 
-			// remove checkboxes
-			innerHTML = innerHTML.replace(/<input.*?>/g, '');
-			innerHTML = innerHTML.replace(/<div class="btn-group btn-group-xs">[\s\S]*?<\/div>/g, '');
-			innerHTML = innerHTML.replace(/<div class="btn-toolbar">[\s\S]*?<\/div>/g, '');
-			innerHTML = innerHTML.replace(/<div class="btn-toolbar">[\s\S]*?<\/div>/g, '');
-			innerHTML = innerHTML.replace(/<div class="pull-right">[\s\S]*?<\/div>/g, '');
+	// Replace label by complete content
+	innerHTML = innerHTML.replace(/<label for=".*?" title="(.*?)" class="ng-binding">.*?<\/label>/g, function(match, title) {
+		return title;
+	});
 
-			// Replace label by complete content
-			innerHTML = innerHTML.replace(/<label for=".*?" title="(.*?)" class="ng-binding">.*?<\/label>/g, function(match, title) {
-				return title;
-			});
+	// Remove separators from numbers
+	innerHTML = innerHTML.replace(/>(\d+.)+\d+</g, function(match) {
+		var numbers = match.match(/\d+/g);
+		return '>' + numbers.join('') + '<';
+	});
 
-			// Remove separators from numbers
-			innerHTML = innerHTML.replace(/>(\d+.)+\d+</g, function(match) {
-				var numbers = match.match(/\d+/g);
-				return '>' + numbers.join('') + '<';
-			});
+	// remove angular, classes, styles attrs
+	innerHTML = innerHTML.replace(/ (ng-[a-z]+?|class|style|reporting-field|title|translate)=".*?"/g, '');
 
-			// remove angular, classes, styles attrs
-			innerHTML = innerHTML.replace(/ (ng-[a-z]+?|class|style|reporting-field|title|translate)=".*?"/g, '');
+	// DIRTY: Remove accents, because there is no way to have encoding working.
+	innerHTML = diacritics.remove(innerHTML);
 
-			// DIRTY: Remove accents, because there is no way to have encoding working.
-			innerHTML = diacritics.remove(innerHTML);
-
-			var ctx = {worksheet: name || 'Worksheet', table: innerHTML};
+	var ctx = {worksheet: name || 'Worksheet', table: innerHTML};
 
 
-			var blob = new Blob([format(template, ctx)], {type: "application/vnd.ms-excel"});
-			fileSaver.saveAs(blob, 'export.xls');
+	var blob = new Blob([format(template, ctx)], {type: "application/vnd.ms-excel"});
+	fileSaver.saveAs(blob, 'export.xls');
+};
+
+
+module.component('exportCsv', {
+	bindings: {},
+	template: `
+		<button ng-click="$ctrl.onClick()" class="btn btn-primary btn-xs pull-right noprint" style="margin-bottom: 10px;">
+			<i class="fa fa-download"></i>
+			<span translate="shared.download_table"></span>
+		</button>
+	`,
+	controller: function() {
+		this.onClick = function() {
+			console.log('ehh')
+			tableToExcel('reporting');
 		};
-	})()
-
-	return {
-		restrict: 'A',
-		link: function($scope, element, attributes) {
-			element.on('click', function(e) {
-				tableToExcel('reporting');
-				e.preventDefault();
-			});
-
-			// <-- event handler leak
-			// $scope.on('$destroy', function() {
-			// 	element.off('click');
-			// });
-		}
-	};
+	}
 });
 
 export default module;
