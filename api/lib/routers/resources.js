@@ -333,7 +333,7 @@ router.get('/resources/:modelName(indicator|theme|user)/:id', async ctx => {
 	const Model = {indicator: Indicator, theme: Theme, user: User}[ctx.params.modelName];
 
 	const model = Model.storeInstance.get(ctx.params.id);
-	ctx.response.body = model.toAPI();
+	ctx.response.body = model;
 })
 
 /**

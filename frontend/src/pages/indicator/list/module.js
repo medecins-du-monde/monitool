@@ -29,14 +29,12 @@ const module = angular.module(
 	]
 );
 
-
 module.config(function($stateProvider) {
 
 	if (window.user.type == 'user') {
 		$stateProvider.state('main.indicators', {
 			url: '/indicators',
-			template: require('./list.html'),
-			controller: 'IndicatorListController',
+			component: 'crossCuttingIndicatorList',
 			resolve: {
 				indicators: () => Indicator.fetchAll(),
 				themes: () => Theme.fetchAll()
@@ -46,29 +44,39 @@ module.config(function($stateProvider) {
 });
 
 
-module.controller('IndicatorListController', function($scope, indicators, themes) {
-	$scope.themes = [];
+module.component('crossCuttingIndicatorList', {
+	bindings: {
+		indicators: '<',
+		themes: '<'
+	},
+	template: require('./list.html'),
+	controller: function($rootScope) {
+		// This getter will be used by the orderBy directive to sort indicators in the partial.
+		this.getName = function(indicator) {
+			return indicator.name[$rootScope.language];
+		};
 
-	var noThematicsIndicators = indicators.filter(i => i.themes.length == 0);
-	if (noThematicsIndicators.length)
-		$scope.themes.push({definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators});
+		this.$onChanges = changes => {
+			this.categories = [];
 
-	// Create a category with indicators that match project on 2 thematics or more
-	var manyThematicsIndicators = indicators.filter(i => i.themes.length > 1);
-	if (manyThematicsIndicators.length)
-		$scope.themes.push({definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators});
+			var noThematicsIndicators = this.indicators.filter(i => i.themes.length == 0);
+			if (noThematicsIndicators.length)
+				this.categories.push({definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators});
 
-	// Create a category with indicators that match project on exactly 1 thematic
-	themes.forEach(theme => {
-		var themeIndicators = indicators.filter(i => i.themes.length === 1 && i.themes[0] === theme._id);
-		if (themeIndicators.length !== 0)
-			$scope.themes.push({definition: theme, indicators: themeIndicators});
-	});
+			// Create a category with indicators that match project on 2 thematics or more
+			var manyThematicsIndicators = this.indicators.filter(i => i.themes.length > 1);
+			if (manyThematicsIndicators.length)
+				this.categories.push({definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators});
 
-	// This getter will be used by the orderBy directive to sort indicators in the partial.
-	$scope.getName = function(indicator) {
-		return indicator.name[$scope.language];
-	};
+			// Create a category with indicators that match project on exactly 1 thematic
+			this.themes.forEach(theme => {
+				var themeIndicators = this.indicators.filter(i => i.themes.length === 1 && i.themes[0] === theme._id);
+				if (themeIndicators.length !== 0)
+					this.categories.push({definition: theme, indicators: themeIndicators});
+			});
+		}
+	}
 });
+
 
 export default module;

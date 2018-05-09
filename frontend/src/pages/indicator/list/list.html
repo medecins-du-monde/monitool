@@ -4,27 +4,24 @@
 	<li class="active" translate="indicator.cross_cutting"></li>
 </ol>
 
-
-
-
-
-<div ng-repeat="theme in themes">
-	<legend ng-if="!theme.definition">{{('project.' + theme.translate)|translate}}</legend>
-	<legend ng-if="theme.definition">{{theme.definition.name[language]}}</legend>
+<div ng-repeat="category in $ctrl.categories">
+	<legend ng-if="!category.definition">{{('project.' + category.translate)|translate}}</legend>
+	<legend ng-if="category.definition">{{category.definition.name[$root.language]}}</legend>
 
 	<!-- markup is broken on purpose: do not fix -->
 	<!-- If we put spaces between tags, margins break -->
 
 	<div><div class="panel panel-default indicator-panel"
-		 ng-repeat="indicator in theme.indicators|orderBy:getName">
+		 ng-repeat="indicator in category.indicators|orderBy:$ctrl.getName">
 
-		<div class="panel-heading" title="{{indicator.name[language]}}">{{indicator.name[language]|maxLength:90}}</div>
-		
+		<div class="panel-heading" title="{{indicator.name[$root.language]}}">{{indicator.name[$root.language]|maxLength:90}}</div>
+
 		<div class="panel-body">
+			<div>{{indicator.description[$root.language]|maxLength:200}}</div>
 
-			<div>{{indicator.description[language]|maxLength:200}}</div>
-			
-			<a ui-sref="main.indicator_reporting({indicatorId: indicator._id})" class="btn btn-xxs btn-default" translate="indicator.see_report"></a>
+			<a ui-sref="main.indicator_reporting({indicatorId: indicator._id})"
+			   class="btn btn-xxs btn-default"
+			   translate="indicator.see_report"></a>
 		</div>
 
 	</div></div>
