@@ -30,12 +30,12 @@ const module = angular.module(
 	]
 );
 
+
 module.config(function($stateProvider) {
 	if (window.user.type == 'user' && window.user.role == 'admin') {
 		$stateProvider.state('main.admin.users', {
-			controller: 'UserListController',
+			component: 'userList',
 			url: '/admin/users',
-			template: require('./list.html'),
 			resolve: {
 				users: () => User.fetchAll()
 			}
@@ -43,30 +43,35 @@ module.config(function($stateProvider) {
 	}
 });
 
-module.controller('UserListController', function($scope, $uibModal, users) {
-	$scope.$watch('userCtx', function(userCtx) {
-		if (!userCtx)
-			return;
 
-		$scope.users = users.filter(user => user._id !== userCtx._id);
-		$scope.users.sort((a, b) => a._id < b._id ? -1 : 1);
-	});
+module.component('userList', {
+	bindings: {
+		'users': '<'
+	},
+	template: require('./list.html'),
 
-	$scope.edit = function(user) {
-		var backup = angular.copy(user);
-		var promise = $uibModal.open({
-			controller: 'UserEditModalController',
-			template: require('./edit-modal.html'),
-			size: 'lg',
-			scope: $scope,
-			resolve: {user: () => user}
-		}).result;
+	controller: function($rootScope, $uibModal) {
+		this.onChanges = () => {
+			this.users = users.filter(user => user._id !== $rootScope.userCtx._id);
+			this.users.sort((a, b) => a._id < b._id ? -1 : 1);
+		};
 
-		promise
-			.then(function() { user.save(); })
-			.catch(function() { angular.copy(backup, user); })
-	};
+		this.edit = user => {
+			var backup = angular.copy(user);
+			var promise = $uibModal.open({
+				controller: 'UserEditModalController',
+				template: require('./edit-modal.html'),
+				size: 'lg',
+				resolve: {user: () => user}
+			}).result;
+
+			promise
+				.then(function() { user.save(); })
+				.catch(function() { angular.copy(backup, user); })
+		};
+	}
 });
+
 
 module.controller("UserEditModalController", function($scope, $uibModalInstance, user) {
 	$scope.user = user;
