@@ -16,7 +16,7 @@
  */
 
 import Router from 'koa-router';
-import passport from '../authentication/passport';
+import passport from '../passport';
 import config from '../config/config';
 
 const router = new Router();

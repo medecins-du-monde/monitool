@@ -20,7 +20,7 @@ import bodyParser from 'koa-bodyparser';
 import session from 'koa-session'
 
 import config from './config/config';
-import passport from './authentication/passport';
+import passport from './passport';
 
 import authenticationRouter from './routers/authentication';
 import configRouter from './routers/config';

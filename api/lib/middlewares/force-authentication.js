@@ -15,6 +15,8 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import Project from '../resource/model/project';
+
 /*
  * Check that user is properly authenticated
  */
