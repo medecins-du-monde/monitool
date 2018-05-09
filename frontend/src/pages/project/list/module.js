@@ -38,8 +38,7 @@ module.config(function($stateProvider) {
 	if (window.user.type == 'user') {
 		$stateProvider.state('main.projects', {
 			url: '/projects',
-			template: require('./list.html'),
-			controller: 'ProjectListController',
+			component: 'projectList',
 			resolve: {
 				projects: () => Project.fetchShort(),
 				themes: () => Theme.fetchAll()
@@ -49,34 +48,58 @@ module.config(function($stateProvider) {
 });
 
 
-module.controller('ProjectListController', function($scope, $state, projects, themes) {
-	var now = new Date().toISOString().substring(0, 10);
+module.component('projectList', {
+	bindings: {
+		'projects': '<',
+		'themes': '<',
+	},
 
-	$scope.themes = themes;
-	$scope.pred = 'country'; // default sorting predicate
+	template: require('./list.html'),
 
-	$scope.myProjects = projects.filter(p => p.users.find(u => u.id == $scope.userCtx._id));
-	$scope.runningProjects = projects.filter(p => !$scope.myProjects.includes(p) && p.end >= now);
-	$scope.finishedProjects = projects.filter(p => !$scope.myProjects.includes(p) && p.end < now);
+	controller: function($rootScope, $state) {
 
-	$scope.projects = $scope.myProjects;
+		this.$onChanges = changes => {
+			this.changeTab('my');
+		};
 
-	$scope.createProject = function() {
-		$state.go('main.project.structure.basics', {projectId: 'project:' + uuid()});
-	};
+		this.$onInit = () => {
+			this.pred = 'country'; // default sorting predicate
+		};
 
-	$scope.open = function(project) {
-		var projectUser = project.users.find(u => {
-			return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
-				   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
-		});
+		this.changeTab = tab => {
+			this.tab = tab;
 
-		if (projectUser && projectUser.role == 'owner')
-			$state.go("main.project.structure.basics", {projectId: project._id});
-		else
-			$state.go("main.project.reporting.general", {projectId: project._id});
-	};
+			const now = new Date().toISOString().substring(0, 10);
+
+			switch (tab) {
+				case 'my':
+					this.displayedProjects = this.projects.filter(p => p.users.find(u => u.id == $rootScope.userCtx._id));
+					break;
+				case 'running':
+					this.displayedProjects = this.projects.filter(p => p.end >= now);
+					break;
+				case 'finished':
+					this.displayedProjects = this.projects.filter(p => p.end < now);
+					break;
+			}
+		};
+
+		this.createProject = () => {
+			$state.go('main.project.structure.basics', {projectId: 'project:' + uuid()});
+		};
+
+		this.open = project => {
+			var projectUser = project.users.find(u => {
+				return ($rootScope.userCtx.type == 'user' && u.id == $rootScope.userCtx._id) ||
+					   ($rootScope.userCtx.type == 'partner' && u.username == $rootScope.userCtx.username);
+			});
+
+			if (projectUser && projectUser.role == 'owner')
+				$state.go("main.project.structure.basics", {projectId: project._id});
+			else
+				$state.go("main.project.reporting.general", {projectId: project._id});
+		};
+	}
 });
-
 
 export default module;

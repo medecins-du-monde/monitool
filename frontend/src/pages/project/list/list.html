@@ -1,5 +1,5 @@
 
-<a class="btn btn-primary pull-right" ng-click="createProject()" acl-has-project-creation>
+<a class="btn btn-primary pull-right" ng-click="$ctrl.createProject()" acl-has-project-creation>
 	<i class="fa fa-plus"></i>
 	<span translate="project.create"></span>
 </a>
@@ -12,14 +12,14 @@
 </div>
 
 <ul class="nav nav-tabs" role="tablist">
-	<li ng-class="{active:projects == myProjects}">
-		<a ng-click="projects = myProjects">{{'project.my_projects'|translate}}</a>
+	<li ng-class="{active:$ctrl.tab == 'my'}">
+		<a ng-click="$ctrl.changeTab('my')">{{'project.my_projects'|translate}}</a>
 	</li>
-	<li ng-class="{active:projects == runningProjects}">
-		<a ng-click="projects = runningProjects">{{'project.running'|translate}}</a>
+	<li ng-class="{active:$ctrl.tab == 'running'}">
+		<a ng-click="$ctrl.changeTab('running')">{{'project.running'|translate}}</a>
 	</li>
-	<li ng-class="{active:projects == finishedProjects}">
-		<a ng-click="projects = finishedProjects">{{'project.finished'|translate}}</a>
+	<li ng-class="{active:$ctrl.tab == 'finished'}">
+		<a ng-click="$ctrl.changeTab('finished')">{{'project.finished'|translate}}</a>
 	</li>
 </ul>
 
@@ -29,18 +29,18 @@
 	<thead>
 		<tr>
 			<th style="width: 50px"></th>
-			<th><a ng-click="pred='country';rev=!rev">{{'shared.country'|translate}}</a></th>
-			<th><a ng-click="pred='name';rev=!rev">{{'shared.name'|translate}}</a></th>
-			<th><a ng-click="pred='themes';rev=!rev">{{'theme.themes'|translate}}</a></th>
-			<th style="width: 100px;"><a ng-click="pred='start';rev=!rev">{{'shared.start'|translate}}</a></th>
-			<th style="width: 100px;"><a ng-click="pred='end';rev=!rev">{{'shared.end'|translate}}</a></th>
+			<th><a ng-click="$ctrl.pred='country';rev=!rev">{{'shared.country'|translate}}</a></th>
+			<th><a ng-click="$ctrl.pred='name';rev=!rev">{{'shared.name'|translate}}</a></th>
+			<th><a ng-click="$ctrl.pred='themes';rev=!rev">{{'theme.themes'|translate}}</a></th>
+			<th style="width: 100px;"><a ng-click="$ctrl.pred='start';rev=!rev">{{'shared.start'|translate}}</a></th>
+			<th style="width: 100px;"><a ng-click="$ctrl.pred='end';rev=!rev">{{'shared.end'|translate}}</a></th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-if="projects.length == 0">
+		<tr ng-if="$ctrl.displayedProjects.length == 0">
 			<td colspan="6" style="text-align: center" translate="project.noproject">
 		</tr>
-		<tr ng-repeat="project in projects|orderBy:pred:rev">
+		<tr ng-repeat="project in $ctrl.displayedProjects|orderBy:$ctrl.pred:rev">
 			<td style="text-align: center">
 				<i	class="fa fa-fw fa-eye-slash"
 					ng-if="project.visibility == 'private'"
@@ -51,8 +51,8 @@
 					title="{{'project.visibility.public'|translate}}"></i>
 			</td>
 			<td>{{project.country}}</td>
-			<td><a ng-click="open(project)">{{project.name}}</a></td>
-			<td>{{project.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</td>
+			<td><a ng-click="$ctrl.open(project)">{{project.name}}</a></td>
+			<td>{{project.themes|getObjects:$ctrl.themes|pluck:'name'|pluck:$root.language|join:', '}}</td>
 			<td>{{project.start|date}}</td>
 			<td>{{project.end|date}}</td>
 		</tr>
