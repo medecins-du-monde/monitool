@@ -54,7 +54,7 @@ module.config(function($stateProvider) {
 
 				return Project.get(projectId).catch(function(e) {
 					// Project creation
-					if (e.status !== 404)
+					if (e.response.status !== 404)
 						return $q.reject(e);
 
 					var project = new Project();

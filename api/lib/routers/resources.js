@@ -69,28 +69,30 @@ router.get('/resources/project', async ctx => {
  * Retrieve one project
  */
 router.get('/resources/project/:id', async ctx => {
+	const project = await Project.storeInstance.get(ctx.params.id);
+
 	if (!ctx.visibleProjectIds.has(ctx.params.id))
 		throw new Error('forbidden');
 
-	const project = await Project.storeInstance.get(ctx.params.id);
 	ctx.response.body = project.toAPI();
-})
+});
+
 
 /**
  * Retrieve one project
  */
 router.get('/resources/project/:id/revisions', async ctx => {
-	if (!ctx.visibleProjectIds.has(ctx.params.id))
-		throw new Error('forbidden');
-
 	const revisions = await Project.storeInstance.listRevisions(
 		ctx.params.id,
 		ctx.request.query.offset,
 		ctx.request.query.limit
 	);
 
+	if (!ctx.visibleProjectIds.has(ctx.params.id))
+		throw new Error('forbidden');
+
 	ctx.response.body = revisions;
-})
+});
 
 
 /**
