@@ -48,15 +48,16 @@ const tableToExcel = function(table, name) {
 	innerHTML = innerHTML.replace(/<div class="pull-right">[\s\S]*?<\/div>/g, '');
 
 	// Replace label by complete content
-	innerHTML = innerHTML.replace(/<label for=".*?" title="(.*?)" class="ng-binding">.*?<\/label>/g, function(match, title) {
-		return title;
-	});
+	innerHTML = innerHTML.replace(
+		/<label for=".*?" title="(.*?)" class="ng-binding">.*?<\/label>/g,
+		(match, title) => title
+	);
 
 	// Remove separators from numbers
-	innerHTML = innerHTML.replace(/>(\d+.)+\d+</g, function(match) {
-		var numbers = match.match(/\d+/g);
-		return '>' + numbers.join('') + '<';
-	});
+	innerHTML = innerHTML.replace(
+		/>(\d+.)+\d+</g,
+		match => '>' + match.match(/\d+/g).join('') + '<'
+	);
 
 	// remove angular, classes, styles attrs
 	innerHTML = innerHTML.replace(/ (ng-[a-z]+?|class|style|reporting-field|title|translate)=".*?"/g, '');
@@ -65,7 +66,6 @@ const tableToExcel = function(table, name) {
 	innerHTML = diacritics.remove(innerHTML);
 
 	var ctx = {worksheet: name || 'Worksheet', table: innerHTML};
-
 
 	var blob = new Blob([format(template, ctx)], {type: "application/vnd.ms-excel"});
 	fileSaver.saveAs(blob, 'export.xls');
@@ -82,7 +82,6 @@ module.component('exportCsv', {
 	`,
 	controller: function() {
 		this.onClick = function() {
-			console.log('ehh')
 			tableToExcel('reporting');
 		};
 	}
