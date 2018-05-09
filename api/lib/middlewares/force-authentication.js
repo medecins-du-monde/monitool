@@ -19,9 +19,10 @@
  * Check that user is properly authenticated
  */
 export default async (ctx, next) => {
-	if (ctx.isAuthenticated())
+	if (ctx.isAuthenticated()) {
+		ctx.visibleProjectIds = new Set(await Project.storeInstance.listVisibleIds(ctx.state.user));
 		await next();
-
+	}
 	else {
 		ctx.response.body = {
 			error: "credentials_required",

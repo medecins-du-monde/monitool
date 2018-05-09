@@ -44,8 +44,6 @@ router.get('/resources/myself', async ctx => {
  *		- ?mode=crossCutting&indicatorId=123: Retrieve projects that collect indicator 123 (bare minimum to compute indicator from cubes).
  */
 router.get('/resources/project', async ctx => {
-	const visibleIds = await Project.storeInstance.listVisibleIds(ctx.state.user);
-
 	let projects;
 	if (ctx.state.user.type === 'user' && ctx.request.query.mode === 'short')
 		projects = await Project.storeInstance.listShort(ctx.state.user._id);
@@ -64,19 +62,17 @@ router.get('/resources/project', async ctx => {
 	}
 
 	// Filter projects depending on ACL.
-	ctx.response.body = projects.filter(p => visibleIds.indexOf(p._id) !== -1);
+	ctx.response.body = projects.filter(p => ctx.visibleProjectIds.has(p._id));
 })
 
 /**
  * Retrieve one project
  */
 router.get('/resources/project/:id', async ctx => {
-	const project = await Project.storeInstance.get(ctx.params.id);
-
-	const visibleIds = await Project.storeInstance.listVisibleIds(ctx.state.user);
-	if (visibleIds.indexOf(ctx.params.id) === -1)
+	if (!ctx.visibleProjectIds.has(ctx.params.id))
 		throw new Error('forbidden');
 
+	const project = await Project.storeInstance.get(ctx.params.id);
 	ctx.response.body = project.toAPI();
 })
 
@@ -84,11 +80,14 @@ router.get('/resources/project/:id', async ctx => {
  * Retrieve one project
  */
 router.get('/resources/project/:id/revisions', async ctx => {
-	const revisions = await Project.storeInstance.listRevisions(ctx.params.id, ctx.request.query.offset, ctx.request.query.limit);
-
-	const visibleIds = await Project.storeInstance.listVisibleIds(ctx.state.user);
-	if (visibleIds.indexOf(ctx.params.id) === -1)
+	if (!ctx.visibleProjectIds.has(ctx.params.id))
 		throw new Error('forbidden');
+
+	const revisions = await Project.storeInstance.listRevisions(
+		ctx.params.id,
+		ctx.request.query.offset,
+		ctx.request.query.limit
+	);
 
 	ctx.response.body = revisions;
 })
@@ -214,7 +213,6 @@ router.delete('/resources/project/:id', async ctx => {
  * 		- current+last: retrieve a given input and the previous one (with projectId, formId, entityId & period)
  */
 router.get('/resources/input', async ctx => {
-	const visibleIds = await Project.storeInstance.listVisibleIds(ctx.state.user);
 	const q = ctx.request.query;
 
 	if (q.mode && q.mode.startsWith('ids_by_')) {
@@ -224,7 +222,7 @@ router.get('/resources/input', async ctx => {
 		else
 			throw new Error('invalid_mode');
 
-		ctx.response.body = ids.filter(id => visibleIds.indexOf(id.substr(6, 44)) !== -1);
+		ctx.response.body = ids.filter(id => ctx.visibleProjectIds.has(id.substr(6, 44)));
 	}
 	else {
 		let inputs;
@@ -238,7 +236,7 @@ router.get('/resources/input', async ctx => {
 			throw new Error('invalid_mode');
 
 		ctx.response.body = inputs
-			.filter(input => visibleIds.indexOf(input.project) !== -1)
+			.filter(input => ctx.visibleProjectIds.has(input.project))
 			.map(input => input.toAPI());
 	}
 });
@@ -255,8 +253,7 @@ router.get('/resources/input/:id', async ctx => {
 	input.update(project.getDataSourceById(input.form).structure);
 
 	// Check if user is allowed (lazy way).
-	const visibleIds = await Project.storeInstance.listVisibleIds(ctx.state.user);
-	if (visibleIds.indexOf(input.project) === -1)
+	if (!ctx.visibleProjectIds.has(input.project))
 		throw new Error('forbidden');
 
 	ctx.response.body = input.toAPI();
@@ -278,11 +275,9 @@ router.put('/resources/input/:id', async ctx => {
 	var projectUser = project.getProjectUser(ctx.state.user),
 		projectRole = project.getRole(ctx.state.user);
 
-	var allowed = false;
-	if (projectRole === 'owner')
-		allowed = true;
-	else if (projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1 && projectUser.dataSources.indexOf(input.form) !== -1)
-		allowed = true;
+	var allowed =
+		(projectRole === 'owner') ||
+		(projectRole === 'input' && projectUser.entities.includes(input.entity) && projectUser.dataSources.includes(input.form));
 
 	if (!allowed)
 		throw new Error('forbidden');

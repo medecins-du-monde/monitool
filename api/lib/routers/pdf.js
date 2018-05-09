@@ -80,13 +80,10 @@ const printer = new PdfPrinter({
  * Render a PDF file describing the given logical frame.
  */
 router.get('/resources/project/:id/logical-frame/:index.pdf', async ctx => {
-	const [project, visibleIds] = await Promise.all([
-		Project.storeInstance.get(ctx.params.id),
-		Project.storeInstance.listVisibleIds(ctx.state.user)
-	]);
-
-	if (visibleIds.indexOf(project._id) === -1)
+	if (!ctx.visibleProjectIds.has(ctx.params.id))
 		throw new Error('forbidden');
+
+	const project = await Project.storeInstance.get(ctx.params.id);
 
 	// Create document definition.
 	const logicalFrame = project.logicalFrames[ctx.params.index];
@@ -103,13 +100,10 @@ router.get('/resources/project/:id/logical-frame/:index.pdf', async ctx => {
  * Render a PDF file containing a sample paper form (for a datasource).
  */
 router.get('/resources/project/:id/data-source/:dataSourceId.pdf', async ctx => {
-	const [project, visibleIds] = await Promise.all([
-		Project.storeInstance.get(ctx.params.id),
-		Project.storeInstance.listVisibleIds(ctx.state.user)
-	]);
-
-	if (visibleIds.indexOf(project._id) === -1)
+	if (!ctx.visibleProjectIds.has(ctx.params.id))
 		throw new Error('forbidden');
+
+	const project = await Project.storeInstance.get(ctx.params.id);
 
 	// Create document definition.
 	let docDef = project

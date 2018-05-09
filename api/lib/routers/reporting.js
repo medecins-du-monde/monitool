@@ -30,8 +30,7 @@ const router = new Router();
  */
 router.get('/reporting/project/:id', async ctx => {
 	// Early quit if user is not allowed to access this project.
-	const visibleIds = await Project.storeInstance.listVisibleIds(ctx.state.user);
-	if (visibleIds.indexOf(ctx.params.id) === -1)
+	if (!ctx.visibleProjectIds.has(ctx.params.id))
 		throw new Error('forbidden');
 
 	// Try serving from cache
@@ -73,13 +72,10 @@ router.get('/reporting/indicator/:id', async ctx => {
 	// Retrieve all stripped down projects that compute this indicator
 	// (those contain only the cross-cutting indicator we want, and have all unnecessary
 	// forms and variables removed).
-	let [projects, visibleIds] = await Promise.all([
-		Project.storeInstance.listByIndicator(ctx.params.id, true),
-		Project.storeInstance.listVisibleIds(ctx.state.user)
-	])
+	let projects = await Project.storeInstance.listByIndicator(ctx.params.id, true);
 
 	// Remove projects that are not allowed for our user.
-	projects = projects.filter(p => visibleIds.indexOf(p._id) !== -1);
+	projects = projects.filter(p => ctx.visibleProjectIds.has(p._id));
 
 	// Retrieve all inputs from the data sources of the stripped down projects
 	// (all inputs that are no use for this particular indicator won't be fetched)
