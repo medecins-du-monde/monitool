@@ -42,7 +42,7 @@ const config = {
 		readFile(process.env.MONITOOL_COOKIE_SECRET_FILE),
 
 	"couchdb": {
-		"host": process.env.MONITOOL_COUCHDB_HOST || "couchdb",
+		"host": process.env.MONITOOL_COUCHDB_HOST || "localhost",
 		"port": parseInt(process.env.MONITOOL_COUCHDB_PORT) || 5984,
 		"bucket": process.env.MONITOOL_COUCHDB_DATABUCKET || "monitool",
 		"sessionBucket": process.env.MONITOOL_COUCHDB_SESSIONBUCKET || "monitool-sessions",

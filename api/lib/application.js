@@ -1,45 +1,60 @@
+/*!
+ * This file is part of Monitool.
+ *
+ * Monitool is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Monitool is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-import cookieParser from 'cookie-parser';
-import express from 'express';
-import session from 'express-session';
-import path from 'path';
+import Koa from 'koa';
+import bodyParser from 'koa-bodyparser';
+import session from 'koa-session'
 
 import config from './config/config';
 import passport from './authentication/passport';
-import sessionStore from './authentication/session-store';
 
-import authenticationController from './controllers/authentication';
-import configController from './controllers/config';
-import pdfController from './controllers/pdf';
-import reportingController from './controllers/reporting';
-import resourcesController from './controllers/resources';
+import authenticationRouter from './routers/authentication';
+import configRouter from './routers/config';
+import pdfRouter from './routers/pdf';
+import reportingRouter from './routers/reporting';
+import resourcesRouter from './routers/resources';
 
 import forceAuthenticationMiddleware from './middlewares/force-authentication';
-import loggerMiddleware from './middlewares/logger';
-import statusCodeMiddleware from './middlewares/status-code';
+import responseTimeMiddleware from 'koa-response-time';
+import errorHandlerMiddleware from './middlewares/error-handler';
 
+const app = new Koa();
+app.use(responseTimeMiddleware());
 
-export default express()
-	// Basic Configuration
-	.disable('x-powered-by') // Remove useless header.
-	.set('view engine', 'pug') // Enable template engine.
-	.set('views', path.join(__dirname, 'views'))
+// We use sessions & body parser
+app.use(session({}, app))
+app.use(bodyParser({jsonLimit: '1mb'}))
 
-	.use(loggerMiddleware)
-	.use(configController)
+// Serve the client-side config request, before authentication.
+app.use(configRouter.routes());
 
-	// Enable dynamic sessions for the rest.
-	.use(cookieParser())
-	.use(session({secret: config.cookieSecret, resave: false, saveUninitialized: false, store: sessionStore}))
-	.use(passport.initialize())
-	.use(passport.session())
+// Enable authentication for the rest.
+app.keys = [config.cookieSecret]
+app.use(passport.initialize())
+app.use(passport.session())
 
-	// Serve authentication related pages.
-	.use('/authentication', authenticationController) // eg: login page, ...
+// Serve authentication related pages.
+app.use(authenticationRouter.routes()) // eg: login page, ...
 
-	// Serve API
-	.use(forceAuthenticationMiddleware)		// From now on, all pages require auth
-	.use(statusCodeMiddleware)				// Add helpers to the response object
-	.use('/resources', pdfController)		// PDF generation module
-	.use('/resources', resourcesController)	// REST JSON API
-	.use('/reporting', reportingController)	// Reporting API
+// Serve API
+app.use(forceAuthenticationMiddleware)	// From now on, all pages require auth
+app.use(errorHandlerMiddleware)			// Add helpers to the response object
+app.use(pdfRouter.routes())				// PDF generation module
+app.use(resourcesRouter.routes())		// REST JSON API
+app.use(reportingRouter.routes())		// Reporting API
+
+export default app;

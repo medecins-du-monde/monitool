@@ -15,12 +15,11 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import express from 'express';
+import Router from 'koa-router';
 import passport from '../authentication/passport';
 import config from '../config/config';
-import bodyParser from 'body-parser';
 
-const router = express.Router();
+const router = new Router();
 
 ///////////////////////////////////////////////////////////////
 // Configure Login/Logout routes.
@@ -31,8 +30,7 @@ const router = express.Router();
  * This handler is POSTed to validate the username and password of partners
  */
 router.post(
-	'/login-partner',
-	bodyParser.urlencoded({extended: false}),
+	'/authentication/login-partner',
 	passport.authenticate('partner_local', {
 		successRedirect: '/',
 		failureRedirect: '/?failed'
@@ -43,10 +41,9 @@ router.post(
  * Log current user out.
  * FIXME This query should be POST: loggin an user out is not idempotent.
  */
-router.get('/logout', function(request, response) {
-	request.session.destroy();
-	request.logout();
-	response.redirect('/');
+router.get('/authentication/logout', async ctx => {
+	ctx.logout();
+	ctx.response.redirect('/');
 });
 
 
@@ -57,44 +54,22 @@ if (config.auth.providers.azureAD) {
 	 * It checks if user is already logged in, and redirect to azure if not.
 	 */
 	router.get(
-		'/login-azure',
-
-		// Check that user is not already logged in.
-		function(request, response, next) {
-			if (request.isAuthenticated && request.isAuthenticated() && request.user && request.user.type === 'user') {
-				// we need to check for nextUrl because authorize may have sent us here if some dark cookie+302 magic prevented him from knowing who it was speaking to.
-				if (request.session.nextUrl) {
-					response.render('redirect', {url: request.session.nextUrl});
-					delete request.session.nextUrl;
-				}
-				else
-					response.render('redirect', {url: '/'});
-			}
-			else
-				next();
-		},
-
-		passport.authenticate('user_azure')
+		'/authentication/login-azure',
+		passport.authenticate('user_azure', {
+			successRedirect: '/',
+			failureRedirect: '/'
+		})
 	);
 
 	/**
 	 * This handler is called when users come back from azure.
 	 */
 	router.get(
-		'/login-callback',
-
+		'/authentication/login-callback',
 		passport.authenticate('user_azure', {
+			successRedirect: '/',
 			failureRedirect: '/'
-		}),
-
-		function(request, response) {
-			if (request.session.nextUrl) {
-				response.render('redirect', {url: request.session.nextUrl});
-				delete request.session.nextUrl;
-			}
-			else
-				response.render('redirect', {url: '/'});
-		}
+		})
 	);
 }
 
@@ -104,8 +79,7 @@ if (config.auth.providers.training) {
 	 * Log user in, without asking for a password
 	 */
 	router.post(
-		'/login-training',
-		bodyParser.urlencoded({extended: false}),
+		'/authentication/login-training',
 		passport.authenticate('training_local', {
 			successRedirect: '/',
 			failureRedirect: '/',

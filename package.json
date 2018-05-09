@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "koa-session": "^5.8.1"
+  }
+}

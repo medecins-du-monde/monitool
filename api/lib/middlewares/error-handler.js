@@ -36,19 +36,16 @@ const statusCodes = {
 };
 
 
-export default function(request, response, next) {
-
-	response.jsonError = function(error) {
-		response.status(statusCodes[error.message] || 500);
+export default async (ctx, next) => {
+	try {
+		await next();
+	}
+	catch (error) {
+		ctx.response.status = statusCodes[error.message] || 500;
 
 		if (config.debug)
-			response.json(error);
+			ctx.response.body = error;
 		else
-			response.json({message: error.message});
-	};
-
-	response.jsonErrorPB = response.jsonError.bind(response);
-	response.jsonPB = response.json.bind(response);
-
-	next();
+			ctx.response.body = {message: error.message};
+	}
 };

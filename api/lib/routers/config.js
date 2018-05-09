@@ -15,23 +15,23 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import express from 'express';
+import Router from 'koa-router';
 import pkg from '../../package.json';
 import config from '../config/config';
 
-const router = express.Router();
+const router = new Router();
 
 /**
  * Index page.
  * Content will depend on the auth providers and debug mode.
  */
-router.get('/config', function(request, response) {
-	response.json({
+router.get('/config', ctx => {
+	ctx.response.body = {
 		version: pkg.version,
 		trainingLabel: config.auth.providers.training ? config.auth.providers.training.label : null,
 		azureLabel: config.auth.providers.azureAD ? config.auth.providers.azureAD.label : null,
 		googleKey: config.api.google
-	});
+	};
 });
 
 

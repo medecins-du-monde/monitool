@@ -15,10 +15,11 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import passport from 'passport';
+import passport from 'koa-passport';
 import LocalStrategyModule from 'passport-local';
 import OAuth2Strategy from 'passport-oauth2';
 import passwordHash from 'password-hash';
+
 import User from '../resource/model/user';
 import config from '../config/config';
 
@@ -165,7 +166,6 @@ if (config.auth.providers.azureAD) {
 			done(ex, null);
 		}
 	};
-
 
 	passport.use('user_azure', strategy);
 }

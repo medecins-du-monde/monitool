@@ -18,13 +18,16 @@
 /*
  * Check that user is properly authenticated
  */
-export default function(request, response, next) {
-	if (request.isAuthenticated && request.isAuthenticated() && request.user)
-		next();
-	else
-		response.status(401).json({
+export default async (ctx, next) => {
+	if (ctx.isAuthenticated())
+		await next();
+
+	else {
+		ctx.response.body = {
 			error: "credentials_required",
 			message: "Please provide either session cookie or an access token."
-		});
-};
+		};
 
+		ctx.response.status = 401;
+	}
+};
