@@ -40,8 +40,8 @@ const module = angular.module(
 
 module.config(function($stateProvider) {
 
-	$stateProvider.state('main.project.input.edit', {
-		url: '/edit/:period/:entityId',
+	$stateProvider.state('main.project.input_edit', {
+		url: '/input/:formId/edit/:period/:entityId',
 		template: require('./collection-input-edition.html'),
 		controller: 'ProjectCollectionInputEditionController',
 		resolve: {

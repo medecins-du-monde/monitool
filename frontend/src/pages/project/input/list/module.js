@@ -35,8 +35,8 @@ const module = angular.module(
 
 module.config(function($stateProvider) {
 
-	$stateProvider.state('main.project.input.list', {
-		url: '/list',
+	$stateProvider.state('main.project.input_list', {
+		url: '/input/:formId/list',
 		component: 'projectInputList',
 		resolve: {
 			formId: ($stateParams) => $stateParams.formId,

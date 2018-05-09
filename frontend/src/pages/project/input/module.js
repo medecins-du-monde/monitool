@@ -19,14 +19,12 @@ import angular from 'angular';
 
 import listPage from './list/module';
 import editPage from './edit/module';
-import menuPage from './menu/module';
 
 
 export default angular.module(
 	'monitool.pages.project.input',
 	[
 		listPage.name,
-		menuPage.name,
 		editPage.name
 	]
 );
