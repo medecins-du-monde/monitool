@@ -15,8 +15,8 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import exprEval from 'expr-eval';
+
+import axios from 'axios';
 
 /**
  * Incredibly ineficient OLAP cube implementation.
@@ -28,20 +28,36 @@ import exprEval from 'expr-eval';
  * Also, we should rename methods so that their names make sense to someone that uses olap cubes
  * (facts, measures, dimensions, slice, dice, ... instead of filter, query, etc)
  */
-const module = angular.module(
-	'monitool.services.statistics.olap',
-	[
-	]
-);
+export default class Cube {
 
-module.factory('Cube', function($http) {
+	static async fetchProject(projectId) {
+		const response = await axios.get('/api/reporting/project/' + projectId);
+
+		return response.data.cubes.map(c => {
+			return new Cube(c.id, c.dimensions, c.dimensionGroups, c.data);
+		});
+	}
+
+	static async fetchIndicator(indicatorId) {
+		const response = await axios.get('/api/reporting/indicator/' + indicatorId);
+		const cubes = response.data.cubes;
+
+		var res = {};
+		for (var projectId in cubes) {
+			res[projectId] = cubes[projectId].map(function(c) {
+				return new Cube(c.id, c.dimensions, c.dimensionGroups, c.data);
+			});
+		}
+
+		return res;
+	}
 
 	/**
 	 * id = "a2b442c9-1dde-42dd-9a04-773818d75e71" (variableId from form)
 	 * dimensions = [Dimension(...), Dimension(...), Dimension(...), ...]
 	 * data = [0, 1, 2, 3, ...]
 	 */
-	var Cube = function(id, dimensions, dimensionGroups, data) {
+	constructor(id, dimensions, dimensionGroups, data) {
 		this.id = id;
 		this.dimensions = dimensions;
 		this.dimensionGroups = dimensionGroups;
@@ -67,32 +83,9 @@ module.factory('Cube', function($http) {
 			for (var i = 0; i < lstLength; ++i)
 				this.data[offset + i] = lst[i];
 		}
-	};
+	}
 
-	Cube.fetchProject = function(projectId) {
-		return $http({url: '/api/reporting/project/' + projectId}).then(function(cubes) {
-			return cubes.data.cubes.map(function(c) {
-				return new Cube(c.id, c.dimensions, c.dimensionGroups, c.data);
-			})
-		});
-	};
-
-	Cube.fetchIndicator = function(indicatorId) {
-		return $http({url: '/api/reporting/indicator/' + indicatorId}).then(function(cubes) {
-			cubes = cubes.data.cubes;
-
-			var res = {};
-			for (var projectId in cubes) {
-				res[projectId] = cubes[projectId].map(function(c) {
-					return new Cube(c.id, c.dimensions, c.dimensionGroups, c.data);
-				});
-			}
-
-			return res;
-		});
-	};
-
-	Cube.prototype.query = function(dimensionIds, filter, withTotals) {
+	query(dimensionIds, filter, withTotals) {
 		// End condition
 		if (dimensionIds.length == 0)
 			return this._query_total(filter);
@@ -140,9 +133,9 @@ module.factory('Cube', function($http) {
 		dimensionIds.unshift(dimensionId);
 
 		return contributions ? result : undefined;
-	};
+	}
 
-	Cube.prototype.flatQuery = function(dimensionIds, filter) {
+	flatQuery(dimensionIds, filter) {
 		// End condition
 		if (dimensionIds.length == 0)
 			return this._query_total(filter);
@@ -216,13 +209,13 @@ module.factory('Cube', function($http) {
 		dimensionIds.unshift(dimensionId);
 
 		return contributions ? result : undefined;
-	};
+	}
 
 	/**
 	 * filter = {year: ['2014'], partition1: ["2d31a636-1739-4b77-98a5-bf9b7a080626"]}
 	 * returns integers
 	 */
-	Cube.prototype._query_total = function(filter) {
+	_query_total(filter) {
 		// rewrite the filter so that it contains only dimensions.
 		filter = this._remove_dimension_groups(filter);
 		filter = this._rewrite_as_indexes(filter);
@@ -233,10 +226,10 @@ module.factory('Cube', function($http) {
 		catch (e) {
 			return e.message;
 		}
-	};
+	}
 
 	// FIXME we need to push/pop instead of shift/unshift (it's 10 times faster).
-	Cube.prototype._query_rec = function(allIndexes, offset) {
+	_query_rec(allIndexes, offset) {
 		if (allIndexes.length == 0)
 			return this.data[offset];
 
@@ -324,7 +317,7 @@ module.factory('Cube', function($http) {
 		allIndexes.unshift(indexes)
 
 		return result;
-	};
+	}
 
 
 	/**
@@ -333,7 +326,7 @@ module.factory('Cube', function($http) {
 	 *
 	 * This rewrites any filter so that they use dimensions.
 	 */
-	Cube.prototype._remove_dimension_groups = function(oldFilters) {
+	_remove_dimension_groups(oldFilters) {
 		var newFilters = {};
 
 		for (var dimensionId in oldFilters) {
@@ -384,9 +377,9 @@ module.factory('Cube', function($http) {
 		}
 
 		return newFilters;
-	};
+	}
 
-	Cube.prototype._rewrite_as_indexes = function(filter) {
+	_rewrite_as_indexes(filter) {
 		// Rewrite the filter again in the form of integers.
 		// We don't want to rewrite it into the _query_rec function, because it is
 		// more efficient to do it only once here, instead of many times on the rec function.
@@ -414,189 +407,6 @@ module.factory('Cube', function($http) {
 
 			return result;
 		});
-	};
+	}
 
-	return Cube;
-})
-
-module.factory("CompoundCube", function(Cube) {
-
-	var createDimension = function(dimensionId, childDimension, computation, cubes) {
-		// Take all lists of items from the real dimensions
-		var itemsLists = [];
-		for (var key in computation.parameters) {
-			var cube = cubes[computation.parameters[key].elementId],
-				dimension = cube.dimensionsById[dimensionId] || cube.dimensionGroupsById[dimensionId];
-
-			itemsLists.push(dimension.items);
-		}
-
-		// union them
-		var items = itemsLists.reduce(function(memo, arr) {
-			return memo == null ? arr.slice() : memo.concat(arr.filter(function(el) { return memo.indexOf(el) === -1; }));
-		}, null) || [];
-
-		// sort what remains (why? those the display order depends on this one?)
-		items.sort();
-
-		// our new dimension is the intersection of all the others (child dimension might be undefined but that's ok)
-		return {id: dimensionId, childDimension: childDimension, items: items};
-	};
-
-	var CompoundCube = function(computation, cubes) {
-		this.computation = computation;
-
-		this.cubes = {}; // we could leave everything here, but it's easier to debug with less clutter.
-		for (key in computation.parameters)
-			this.cubes[computation.parameters[key].elementId] = cubes[computation.parameters[key].elementId];
-
-		this.dimensions = [];
-		this.dimensionGroups = [];
-
-		// The dimensions that our CompoundCube will have is the intersection of the dimensions
-		// of all of the other cubes => compute that.
-		// first: retrieve all dimensions and groups for parameters of computation
-		var dimensionIds = [];
-		for (var key in computation.parameters) {
-			var cube = cubes[computation.parameters[key].elementId],
-				dimensions = Object.keys(cube.dimensionsById).concat(Object.keys(cube.dimensionGroupsById));
-
-			dimensionIds.push(dimensions);
-		}
-
-		// intersect them to know which dimensions we have left.
-		dimensionIds = dimensionIds.reduce(function(memo, arr) {
-			return memo == null ? arr.slice() : memo.filter(function(el) { return arr.indexOf(el) !== -1; });
-		}, null) || [];
-
-		// create fake dimensions and groups to mimic the intersection of the cubes.
-		if (dimensionIds.indexOf('day') !== -1) {
-			this.dimensions.push(createDimension('day', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('week_sat', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('week_sun', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('week_mon', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('month_week_sat', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('month_week_sun', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('month_week_mon', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('month', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('quarter', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'day', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'day', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('month_week_sat') !== -1) {
-			this.dimensions.push(createDimension('month_week_sat', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('week_sat', 'month_week_sat', computation, cubes));
-			this.dimensionGroups.push(createDimension('month', 'month_week_sat', computation, cubes));
-			this.dimensionGroups.push(createDimension('quarter', 'month_week_sat', computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'month_week_sat', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'month_week_sat', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('month_week_sun') !== -1) {
-			this.dimensions.push(createDimension('month_week_sun', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('week_sun', 'month_week_sun', computation, cubes));
-			this.dimensionGroups.push(createDimension('month', 'month_week_sun', computation, cubes));
-			this.dimensionGroups.push(createDimension('quarter', 'month_week_sun', computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'month_week_sun', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'month_week_sun', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('month_week_mon') !== -1) {
-			this.dimensions.push(createDimension('month_week_mon', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('week_mon', 'month_week_mon', computation, cubes));
-			this.dimensionGroups.push(createDimension('month', 'month_week_mon', computation, cubes));
-			this.dimensionGroups.push(createDimension('quarter', 'month_week_mon', computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'month_week_mon', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'month_week_mon', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('week_sat') !== -1) {
-			this.dimensions.push(createDimension('week_sat', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('month', 'week_sat', computation, cubes));
-			this.dimensionGroups.push(createDimension('quarter', 'week_sat', computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'week_sat', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'week_sat', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('week_sun') !== -1) {
-			this.dimensions.push(createDimension('week_sun', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('month', 'week_sun', computation, cubes));
-			this.dimensionGroups.push(createDimension('quarter', 'week_sun', computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'week_sun', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'week_sun', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('week_mon') !== -1) {
-			this.dimensions.push(createDimension('week_mon', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('month', 'week_mon', computation, cubes));
-			this.dimensionGroups.push(createDimension('quarter', 'week_mon', computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'week_mon', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'week_mon', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('month') !== -1) {
-			this.dimensions.push(createDimension('month', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('quarter', 'month', computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'month', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'month', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('quarter') !== -1) {
-			this.dimensions.push(createDimension('quarter', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('semester', 'quarter', computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'quarter', computation, cubes));
-		}
-		else if (dimensionIds.indexOf('semester') !== -1) {
-			this.dimension.push(createDimension('semester', undefined, computation, cubes));
-			this.dimensionGroups.push(createDimension('year', 'semester', computation, cubes));
-		}
-		else {
-			this.dimensions.push(createDimension('year', undefined, computation, cubes));
-		}
-
-		if (dimensionIds.indexOf('entity') !== -1) {
-			this.dimensions.push(createDimension('entity', undefined, computation, cubes));
-
-			if (dimensionIds.indexOf('group') !== -1)
-				this.dimensionGroups.push(createDimension('group', 'entity', computation, cubes));
-		}
-
-		// Index dimensions and dimensionGroups by id
-		this.dimensionsById = {};
-		this.dimensionGroupsById = {};
-		this.dimensions.forEach(function(d) { this.dimensionsById[d.id] = d; }.bind(this));
-		this.dimensionGroups.forEach(function(d) { this.dimensionGroupsById[d.id] = d; }.bind(this));
-	};
-
-	CompoundCube.prototype.query = Cube.prototype.query;
-
-	CompoundCube.prototype.flatQuery = Cube.prototype.flatQuery;
-
-	CompoundCube.prototype._query_total = function(filter) {
-		var localScope = {};
-
-		for (var key in this.computation.parameters) {
-			var parameter = this.computation.parameters[key],
-				cube = this.cubes[parameter.elementId];
-
-			var finalFilter = angular.copy(filter)
-			for (var key2 in parameter.filter)
-				finalFilter[key2] = parameter.filter[key2];
-
-			try {
-				localScope[key] = cube._query_total(finalFilter);
-			}
-			catch (e) {
-				localScope[key] = undefined;
-			}
-
-			if (typeof localScope[key] === 'string') // 'AGGREGATION_FORBIDDEN', 'INVALID_AGGREGATION_MODE'
-				return localScope[key];
-		}
-
-		try {
-			var result = exprEval.Parser.evaluate(this.computation.formula, localScope);
-			return typeof result === "number" && isNaN(result) ? 'MISSING_DATA' : result;
-		}
-		catch (e) {
-			return 'INVALID_FORMULA';
-		}
-	};
-
-	return CompoundCube;
-})
-
-export default module;
+}

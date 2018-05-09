@@ -22,8 +22,8 @@ import uiRouter from '@uirouter/angularjs';
 import Theme from '../../../services/models/theme';
 import Indicator from '../../../services/models/indicator';
 import Project from '../../../services/models/project';
+import Cube from '../../../services/statistics/cube';
 
-import mtOlap from '../../../services/statistics/olap';
 import mtReporting from '../../../services/statistics/reporting';
 
 
@@ -32,7 +32,6 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtOlap.name,
 		mtReporting.name,
 	]
 );
@@ -49,9 +48,7 @@ module.config(function($stateProvider) {
 				themes: () => Theme.fetchAll(),
 				indicator: ($stateParams) => Indicator.get($stateParams.indicatorId),
 				projects: ($stateParams) => Project.fetchCrossCutting($stateParams.indicatorId),
-				cubes: function(Cube, indicator) {
-					return Cube.fetchIndicator(indicator._id);
-				}
+				cubes: ($stateParams) => Cube.fetchIndicator($stateParams.indicatorId)
 			}
 		});
 	}

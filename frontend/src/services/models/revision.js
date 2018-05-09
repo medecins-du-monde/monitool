@@ -15,6 +15,7 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import axios from 'axios';
 import jsonpatch from 'fast-json-patch';
 
 

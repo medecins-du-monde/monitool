@@ -19,21 +19,20 @@ import angular from 'angular';
 import uuid from 'uuid/v4';
 import TimeSlot from 'timeslot-dag';
 
-import mtOlap from './olap';
+import CompoundCube from './compound-cube';
 import {iterate} from '../../helpers/input-slots';
 
 
 const module = angular.module(
 	'monitool.services.statistics.reporting',
 	[
-		mtOlap.name
 	]
 );
 
 
 // TODO profiling this piece of code for perfs could not hurt.
 // we will see how bad if performs on the wild.
-module.service('mtReporting', function($filter, $rootScope, CompoundCube, Cube) {
+module.service('mtReporting', function($filter, $rootScope) {
 
 	this.deduplicateRows = function(rows) {
 		var names = {};

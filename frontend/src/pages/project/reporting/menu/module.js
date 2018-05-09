@@ -17,7 +17,7 @@
 
 import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
-
+import Cube from '../../../../services/statistics/cube';
 
 const module = angular.module(
 	'monitool.pages.project.reporting.menu',
@@ -37,13 +37,14 @@ module.config(function($stateProvider) {
 
 });
 
-module.controller('ProjectSharedReportingController', function($scope, Cube) {
-	Cube.fetchProject($scope.masterProject._id).then(function(cs) {
-		// Index cubes by id.
-		var cubes = {};
-		cs.forEach(c => cubes[c.id] = c);
-
-		$scope.cubes = cubes;
+module.controller('ProjectSharedReportingController', function($scope) {
+	Cube.fetchProject($scope.masterProject._id).then(cs => {
+		$scope.$apply(() => {
+			// Index cubes by id.
+			var cubes = {};
+			cs.forEach(c => cubes[c.id] = c);
+			$scope.cubes = cubes;
+		});
 	});
 });
 

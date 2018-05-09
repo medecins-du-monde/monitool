@@ -28,6 +28,19 @@ const module = angular.module(
 
 
 module.directive('reportingGraphAdapter', function() {
+	// This helper function allow us to get the data without totals.
+	var getStatsWithoutTotal = function(stats) {
+		var totalIndex = stats.cols.findIndex(e => e.id === '_total');
+
+		if (totalIndex !== -1) {
+			var newStats = angular.copy(stats);
+			newStats.rows.forEach(row => row.cols.splice(totalIndex, 1));
+			newStats.cols.splice(totalIndex, 1);
+		}
+
+		return newStats || stats;
+	};
+
 	return {
 		restrict: 'AE',
 		scope: {
@@ -45,12 +58,12 @@ module.directive('reportingGraphAdapter', function() {
 				if (!$scope.originalRows)
 					return;
 
-				$scope.data = {
-					cols: $scope.cols,
-					rows: angular.copy($scope.originalRows).filter(row => {
-						return $scope.plots[row.id] && row.type == 'data' && row.cols;
-					})
-				};
+				let rows;
+				rows = angular.copy($scope.originalRows);
+				rows = rows.filter(row => $scope.plots[row.id] && row.type == 'data' && row.cols)
+
+				$scope.data = {cols: $scope.cols, rows: rows};
+				$scope.data = getStatsWithoutTotal($scope.data);
 			}, true);
 		}
 	};
@@ -58,18 +71,7 @@ module.directive('reportingGraphAdapter', function() {
 
 
 module.directive('reportingGraph', function($rootScope) {
-	// This helper function allow us to get the data without totals.
-	var getStatsWithoutTotal = function(stats) {
-		var totalIndex = stats.cols.findIndex(e => e.id === '_total');
 
-		if (totalIndex !== -1) {
-			var newStats = angular.copy(stats);
-			newStats.rows.forEach(row => row.cols.splice(totalIndex, 1));
-			newStats.cols.splice(totalIndex, 1);
-		}
-
-		return newStats || stats;
-	};
 
 	return {
 		restrict: 'AE',
@@ -100,7 +102,7 @@ module.directive('reportingGraph', function($rootScope) {
 					return;
 
 				// Retrieve stats + list rows that we want, and those that exit the current graph
-				var stats = getStatsWithoutTotal(newStats);
+				var stats = newStats;
 
 				// Create X/Y series
 				var xSerie = [
