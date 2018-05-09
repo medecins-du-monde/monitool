@@ -37,64 +37,66 @@ module.config(function($stateProvider) {
 
 	$stateProvider.state('main.project.input.list', {
 		url: '/list',
-		template: require('./collection-input-list.html'),
-		controller: 'ProjectCollectionInputListController',
+		component: 'projectInputList',
 		resolve: {
-			inputsStatus: function(project, $stateParams) {
-				return Input.fetchFormStatus(project, $stateParams.formId);
-			}
+			formId: ($stateParams) => $stateParams.formId,
+			inputsStatus: (project, formId) => Input.fetchFormStatus(project, formId)
 		}
 	});
 });
 
 
-module.controller('ProjectCollectionInputListController', function($scope, $state, $stateParams, inputsStatus) {
-	$scope.form = $scope.masterProject.forms.find(f => f.id == $stateParams.formId);
+module.component('projectInputList', {
+	bindings: {
+		'project': '<',
+		'formId': '<',
+		'inputsStatus': '<'
+	},
+	template: require('./collection-input-list.html'),
 
-	//////
-	// Create planning.
-	//////
-	$scope.inputsStatus = inputsStatus;
-	$scope.columns = $scope.masterProject.entities.filter(e => $scope.form.entities.includes(e.id));
+	controller: function($rootScope, $state) {
+		this.$onChanges = changes => {
+			// Define form
+			this.form = this.project.forms.find(f => f.id === this.formId);
 
-	// => restrict columns depending on user permissions
-	if ($scope.userCtx.role !== 'admin') {
-		var projectUser = $scope.masterProject.users.find(u => {
-			return ($scope.userCtx.type == 'user' && u.id == $scope.userCtx._id) ||
-				   ($scope.userCtx.type == 'partner' && u.username == $scope.userCtx.username);
-		});
+			// Define columns (depending on user permissions)
+			this.columns = this.project.entities.filter(e => this.form.entities.includes(e.id));
+			if ($rootScope.userCtx.role !== 'admin') {
+				const projectUser = this.project.users.find(u => {
+					return ($rootScope.userCtx.type == 'user' && u.id == $rootScope.userCtx._id) ||
+						   ($rootScope.userCtx.type == 'partner' && u.username == $rootScope.userCtx.username);
+				});
 
-		if (projectUser.role === 'input') {
-			// This will happen regardless of unexpected entries.
-			$scope.columns = $scope.columns.filter(e => projectUser.entities.includes(e.id));
-		}
-	}
+				if (projectUser.role === 'input')
+					// This will happen regardless of unexpected entries.
+					this.columns = this.columns.filter(e => projectUser.entities.includes(e.id));
+			}
 
-	$scope.visibleStatus = Object.keys($scope.inputsStatus).slice(-10);
-	$scope.hiddenStatus = Object.keys($scope.inputsStatus).slice(0, -10);
+			// Those list tell which rows should be displayed.
+			this.visibleStatus = Object.keys(this.inputsStatus).slice(-10);
+			this.hiddenStatus = Object.keys(this.inputsStatus).slice(0, -10);
 
-	$scope.showMore = function() {
-		$scope.visibleStatus = [...$scope.hiddenStatus.slice(-10), ...$scope.visibleStatus];
-		$scope.hiddenStatus.splice(-10, 10);
-	};
-
-	//////
-	// Free periodicity allow entering data as needed.
-	//////
-	if ($scope.form.periodicity === 'free') {
-		$scope.displayFooter = true;
-		$scope.newInputDate = {
-			date: new Date(Math.floor(Date.now() / 86400000) * 86400000).toISOString().substring(0, 10)
+			// Handle special case for free periodicity.
+			if (this.form.periodicity === 'free') {
+				this.displayFooter = true;
+				this.newInputDate = new Date().toISOString().substring(0, 10);
+			}
 		};
 
-		$scope.addInput = function(entityId) {
+		this.showMore = function() {
+			this.visibleStatus = [...this.hiddenStatus.slice(-10), ...this.visibleStatus];
+			this.hiddenStatus.splice(-10, 10);
+		};
+
+		this.addInput = function(entityId) {
 			$state.go('main.project.input.edit', {
-				period: $scope.newInputDate.date,
-				formId: $scope.form.id,
+				period: this.newInputDate,
+				formId: this.form.id,
 				entityId: entityId
 			});
 		};
 	}
 });
+
 
 export default module;
