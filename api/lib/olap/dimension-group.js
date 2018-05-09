@@ -27,7 +27,7 @@ export default class DimensionGroup {
 		// Create DimensionGroup mapping from Dimension items.
 		var mapping = {};
 
-		dimension.items.forEach(function(childValue) {
+		dimension.items.forEach(childValue => {
 			var parentValue = new TimeSlot(childValue).toUpperSlot(parent).value;
 
 			mapping[parentValue] = mapping[parentValue] || [];
@@ -40,10 +40,8 @@ export default class DimensionGroup {
 	static createLocation(project, form) {
 		var groups = {};
 
-		project.groups.forEach(function(group) {
-			groups[group.id] = group.members.filter(function(id) {
-				return form.entities.indexOf(id) !== -1;
-			});
+		project.groups.forEach(group => {
+			groups[group.id] = group.members.filter(id => form.entities.includes(id));
 
 			if (groups[group.id].length === 0)
 				delete groups[group.id];
@@ -54,7 +52,7 @@ export default class DimensionGroup {
 
 	static createPartition(partition) {
 		var pgroups = {};
-		partition.groups.forEach(function(g) { pgroups[g.id] = g.members; });
+		partition.groups.forEach(g => pgroups[g.id] = g.members);
 		return new DimensionGroup(partition.id + '_g', partition.id, pgroups);
 	}
 

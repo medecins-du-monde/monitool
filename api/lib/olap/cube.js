@@ -67,7 +67,7 @@ export default class Cube {
 
 		// Time
 		dimensions.push(Dimension.createTime(project, form, element, inputs));
-		['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].forEach(function(periodicity) {
+		['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].forEach(periodicity => {
 			// This will fail while indexOf(periodicity) < indexOf(form.periodicity)
 			try {
 				dimensionGroups.push(DimensionGroup.createTime(periodicity, dimensions[0]));
@@ -81,7 +81,7 @@ export default class Cube {
 			dimensionGroups.push(DimensionGroup.createLocation(project, form))
 
 		// Disaggregations
-		element.partitions.forEach(function(partition) {
+		element.partitions.forEach(partition => {
 			dimensions.push(Dimension.createPartition(partition));
 			if (partition.groups.length)
 				dimensionGroups.push(DimensionGroup.createPartition(partition));
@@ -91,13 +91,13 @@ export default class Cube {
 		// Build data
 		////////////
 		var dataSize = 1;
-		dimensions.forEach(function(dimension) { dataSize *= dimension.items.length; });
+		dimensions.forEach(dimension => dataSize *= dimension.items.length);
 
 		var data = {}; //new Array(dataSize)
 		// for (var i = 0; i < dataSize; ++i)
 		// 	data[i] = -2147483648;
 
-		inputs.forEach(function(input) {
+		inputs.forEach(input => {
 			// Compute location where this subtable should go, and length of data to copy.
 			var offset = dimensions[0].items.indexOf(input.period),
 				length = 1; // Slow!
@@ -113,7 +113,7 @@ export default class Cube {
 			}
 			offset = offset * dimensions[1].items.length + dimensions[1].items.indexOf(input.entity);
 
-			element.partitions.forEach(function(partition) {
+			element.partitions.forEach(partition => {
 				offset *= partition.elements.length;
 				length *= partition.elements.length;
 			});
@@ -143,7 +143,7 @@ export default class Cube {
 			var key = keys[i - 1], nextKey = keys[i];
 
 			if (key * 1 + data[key].length == nextKey) {
-				Array.prototype.push.apply(data[key], data[nextKey]);
+				data[key] = [...data[key], ...data[nextKey]];
 				delete data[nextKey];
 			}
 		}
@@ -181,8 +181,8 @@ export default class Cube {
 		// Index dimensions and dimensionGroups by id
 		this.dimensionsById = {};
 		this.dimensionGroupsById = {};
-		this.dimensions.forEach(function(d) { this.dimensionsById[d.id] = d; }, this);
-		this.dimensionGroups.forEach(function(d) { this.dimensionGroupsById[d.id] = d; }, this);
+		this.dimensions.forEach(d => this.dimensionsById[d.id] = d);
+		this.dimensionGroups.forEach(d => this.dimensionGroupsById[d.id] = d);
 	}
 
 	/**
@@ -227,7 +227,7 @@ export default class Cube {
 
 			// Intersect main filter with branch filter (branch filter is only one item, so it's easy to compute).
 			var oldFilter = filter[dimensionId];
-			if (!oldFilter || oldFilter.indexOf(dimensionItem) !== -1)
+			if (!oldFilter || oldFilter.includes(dimensionItem))
 				filter[dimensionId] = [dimensionItem];
 			else
 				// Either lines do the same. Continuing is a bit faster.
@@ -410,8 +410,8 @@ export default class Cube {
 				if (!newFilters[dimension.id])
 					newFilters[dimension.id] = oldFilter;
 				else
-					newFilters[dimension.id] = oldFilter.filter(function(e) {
-						return newFilters[dimension.id].indexOf(e) !== -1;
+					newFilters[dimension.id] = oldFilter.filter(e => {
+						return newFilters[dimension.id].includes(e);
 					});
 			}
 			// the dimension does not exists.
@@ -438,7 +438,7 @@ export default class Cube {
 						newFilters[dimensionGroup.childDimension] = newFilter;
 					else
 						newFilters[dimensionGroup.childDimension] = newFilter.filter(function(e) {
-							return newFilters[dimensionGroup.childDimension].indexOf(e) !== -1;
+							return newFilters[dimensionGroup.childDimension].includes(e);
 						});
 				}
 				// if it's not a dimension nor a dimensionGroup, raise.
