@@ -26,131 +26,136 @@ const module = angular.module(
 
 
 /**
+ * Convert the model value to the array that will be used in the view.
+ * It merges elements that can be merged together using the group ids,
+ * then add the elements that are not in any group.
+ *
+ * For instance:
+ * 	model = ['element1', 'element2']
+ * 	elements = [{id: 'element1', ...}, {id: 'element2', ...}]
+ * 	groups = [{id: 'whatever', members: ['element1', 'element2']}]
+ *
+ * Will give
+ * 	['whatever']
+ */
+const model2view = function(model, elements, groups) {
+	groups = groups || [];
+
+	if (model.length == elements.length)
+		return ['all'];
+
+	// retrieve all groups that are in the list.
+	const selectedGroups = groups.filter(group => {
+		return group.members.every(id => model.includes(id));
+	});
+
+	const additionalIds = model.filter(id => {
+		return selectedGroups.every(group => !group.members.includes(id));
+	});
+
+	return [
+		...selectedGroups.map(e => e.id),
+		...additionalIds
+	];
+};
+
+/**
+ * Convert the view array to the model value, by expanding all groups.
+ *
+ * For instance:
+ * 	view = ['whatever']
+ * 	elements = [{id: 'element1', ...}, {id: 'element2', ...}]
+ * 	groups = [{id: 'whatever', members: ['element1', 'element2']}]
+ *
+ * Will give
+ * 	['element1', 'element2']
+ */
+const view2model = function(view, elements, groups) {
+	groups = groups || [];
+
+	const model = {};
+
+	view.forEach(id => {
+		if (id == 'all')
+			elements.forEach(e => model[e.id] = true);
+
+		else {
+			const group = groups.find(g => g.id == id);
+			if (group)
+				group.members.forEach(m => model[m] = true);
+			else
+				model[id] = true;
+		}
+	});
+
+	return Object.keys(model);
+};
+
+
+
+
+/**
  * This directive is a form control that allows to select multiple elements in a list.
  * To make thing faster than selecting one by one, it allows to select groups at once.
  */
-module.directive('elementFilter', function($filter) {
 
-	/**
-	 * Convert the model value to the array that will be used in the view.
-	 * It merges elements that can be merged together using the group ids,
-	 * then add the elements that are not in any group.
-	 *
-	 * For instance:
-	 * 	model = ['element1', 'element2']
-	 * 	elements = [{id: 'element1', ...}, {id: 'element2', ...}]
-	 * 	groups = [{id: 'whatever', members: ['element1', 'element2']}]
-	 *
-	 * Will give
-	 * 	['whatever']
-	 */
-	var model2view = function(model, elements, groups) {
-		groups = groups || [];
 
-		if (model.length == elements.length)
-			return ['all'];
+module.component('elementFilter', {
+    require: {
+		ngModelCtrl: "ngModel"
+    },
 
-		// retrieve all groups that are in the list.
-		var selectedGroups = groups.filter(group => {
-			return group.members.every(id => model.includes(id));
-		});
+    template: require('./element-filter.html'),
 
-		var additionalIds = model.filter(id => {
-			return selectedGroups.every(group => !group.members.includes(id));
-		});
+    bindings: {
+		elements: '<',
+		groups: '<'
+    },
 
-		return [
-			...selectedGroups.map(e => e.id),
-			...additionalIds
-		];
-	};
+    controller: function() {
+    	this.$onInit = () => {
+			this.ngModelCtrl.$formatters.push(
+				modelValue => model2view(modelValue, this.elements, this.groups)
+			);
 
-	/**
-	 * Convert the view array to the model value, by expanding all groups.
-	 *
-	 * For instance:
-	 * 	view = ['whatever']
-	 * 	elements = [{id: 'element1', ...}, {id: 'element2', ...}]
-	 * 	groups = [{id: 'whatever', members: ['element1', 'element2']}]
-	 *
-	 * Will give
-	 * 	['element1', 'element2']
-	 */
-	var view2model = function(view, elements, groups) {
-		groups = groups || [];
+			this.ngModelCtrl.$parsers.push(
+				viewValue => view2model(viewValue, this.elements, this.groups)
+			);
 
-		var model = {};
+			this.ngModelCtrl.$render =
+				() => this.selectedElements = this.ngModelCtrl.$viewValue;
+    	};
 
-		view.forEach(id => {
-			if (id == 'all')
-				elements.forEach(e => model[e.id] = true);
+		// When elements or groups definition change.
+		this.$onChanges = changes => {
+			// Reset the list of selectable elements.
+			this.selectableElements = [
+				{id: 'all', name: 'project.all_elements'},
+				...(this.groups || []),
+				...this.elements
+			];
 
-			else {
-				var group = groups.find(g => g.id == id);
-				if (group)
-					group.members.forEach(m => model[m] = true);
-				else
-					model[id] = true;
-			}
-		});
-
-		return Object.keys(model);
-	};
-
-	return {
-		restrict: "E",
-		require: "ngModel",
-		scope: {
-			elements: '=',
-			groups: '='
-		},
-		template: require('./element-filter.html'),
-		link: function(scope, element, attributes, ngModelController) {
-			// This container is needed because we depend on ui-select, which can only see changed this way.
-			scope.container = {};
-
-			// When elements or groups definition change.
-			scope.$watchGroup(['elements', 'groups'], function(newValues, oldValues) {
-				// Reset the list of selectable elements.
-				scope.selectableElements = [
-					{id: 'all', name: $filter('translate')('project.all_elements')},
-					...(scope.groups || []),
-					...scope.elements
-				];
-
-				// Check that all selected elements are still valid.
-				scope.container.selectedElements = scope.container.selectedElements.filter(id => {
-					return !!scope.selectableElements.find(selectable => selectable.id == id);
-				});
+			// Check that all selected elements are still valid.
+			this.selectedElements = (this.selectedElements || []).filter(id => {
+				return !!this.selectableElements.find(selectable => selectable.id == id);
 			});
+		};
 
-			ngModelController.$formatters.push(function(modelValue) {
-				return model2view(modelValue, scope.elements, scope.groups);
-			});
+		this.onUiSelectChange = function() {
+			// Special case: we want to empty the list when a user select something over "all".
+			if (this.selectedElements.length === 2 && this.selectedElements[0] === 'all')
+				this.selectedElements = [this.selectedElements[1]];
 
-			ngModelController.$parsers.push(function(viewValue) {
-				return view2model(viewValue, scope.elements, scope.groups);
-			});
+			// Evaluate the whole list to remove inconsistencies.
+			else
+				this.selectedElements = model2view(
+					view2model(this.selectedElements, this.elements, this.groups),
+					this.elements,
+					this.groups
+				);
 
-			ngModelController.$render = function() {
-				scope.container.selectedElements = ngModelController.$viewValue;
-			};
-
-			scope.$watch('container.selectedElements', function(selectedElements) {
-				if (selectedElements.length === 2 && selectedElements[0] === 'all')
-					// Special case: we want to empty the list when a user select something over "all".
-					scope.container.selectedElements = [selectedElements[1]];
-				else
-					// Evaluate the whole list to remove inconsistencies.
-					scope.container.selectedElements = model2view(
-						view2model(selectedElements, scope.elements, scope.groups),
-						scope.elements,
-						scope.groups
-					);
-
-				ngModelController.$setViewValue(selectedElements);
-			}, true)
-		}
+			this.ngModelCtrl.$setViewValue(this.selectedElements);
+		};
 	}
 });
 
