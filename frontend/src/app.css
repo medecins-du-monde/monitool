@@ -149,44 +149,6 @@ textarea {
 
 
 
-.indicator-level-1, .indicator-level-2, .indicator-level-3 {
-	border: solid #ccc;
-	border-width: 1px;
-	padding: 5px 0 0 5px;
-	border-radius: 3px;
-	margin-bottom: 5px;
-	margin-right: 5px;
-}
-
-.indicator-header {
-	margin-bottom: 5px;
-  margin-right: 10px;
-}
-
-.indicator-level-1 {
-	margin-left: 0px;
-  margin-right: 10px;
-	background-color: white;
-}
-
-.indicator-level-2 {
-	margin-left: 20px;
-  margin-right: 10px;
-	background-color: #f8f8f8;
-
-}
-
-.indicator-level-3 {
-	margin-left: 20px;
-	background-color: #f0f0f0;
-}
-
-.indicator-level-3 .pull-right {
-  margin: 0 10px;
-  position: relative;
-  top: -3px;
-}
-
 .input-xs {
     height: 22px;
     padding: 5px 5px;

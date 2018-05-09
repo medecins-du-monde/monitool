@@ -22,7 +22,7 @@ import jsonpatch from 'fast-json-patch';
 export default class Revision {
 
 	static async fetch(projectId, offset, limit) {
-		const response = axios.get(
+		const response = await axios.get(
 			'/api/resources/project/' + projectId + '/revisions',
 			{params: {projectId: projectId, offset: offset, limit: limit}}
 		);
@@ -46,5 +46,9 @@ export default class Revision {
 
 			revisions[i].isEquivalent = angular.equals(project, revisions[i].before);
 		}
+	}
+
+	constructor(data) {
+		Object.assign(this, data);
 	}
 }
