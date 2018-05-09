@@ -40,6 +40,7 @@
     "password-hash": "x",
     "pdfmake": "^0.1.27",
     "roboto-fontface": "^0.7.0",
+    "timeslot-dag": "^0.1.0",
     "winston": "^2.3.1"
   },
   "scripts": {

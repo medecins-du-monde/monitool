@@ -15,7 +15,7 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TimeSlot from './time-slot';
+import TimeSlot from 'timeslot-dag';
 
 function minDate(dates) {
 	return dates.reduce(function(d, memo) { return !memo || memo > d ? d : memo; });

@@ -15,7 +15,7 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TimeSlot from './time-slot';
+import TimeSlot from 'timeslot-dag';
 
 /**
  * A DimensionGroup allows to query cubes on dimension aggregates.
