@@ -50,12 +50,8 @@ module.component('crossCuttingIndicatorList', {
 		themes: '<'
 	},
 	template: require('./list.html'),
-	controller: function($rootScope) {
-		// This getter will be used by the orderBy directive to sort indicators in the partial.
-		this.getName = function(indicator) {
-			return indicator.name[$rootScope.language];
-		};
 
+	controller: function($rootScope) {
 		this.$onChanges = changes => {
 			this.categories = [];
 
@@ -75,6 +71,11 @@ module.component('crossCuttingIndicatorList', {
 					this.categories.push({definition: theme, indicators: themeIndicators});
 			});
 		}
+
+		// This getter will be used by the orderBy directive to sort indicators in the partial.
+		this.getName = function(indicator) {
+			return indicator.name[$rootScope.language];
+		};
 	}
 });
 
