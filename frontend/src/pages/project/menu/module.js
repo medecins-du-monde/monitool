@@ -70,7 +70,7 @@ module.config(function($stateProvider) {
 });
 
 
-module.controller('ProjectMenuController', function($scope, $filter, $state, project, $http) {
+module.controller('ProjectMenuController', function($scope, $filter, $state, project) {
 	var translate = $filter('translate');
 
 	$scope.masterProject = project;
