@@ -1,0 +1,22 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.admin.users" translate="shared.settings"></a></li>
+	<li class="active" translate="theme.themes"></li>
+</ol>
+
+<div class="alert alert-info" translate="theme.list_info"></div>
+
+<div>
+	<div class="panel panel-primary indicator-panel">
+		<div class="panel-body">
+			<span translate="theme.new_theme"></span>
+			<a ng-click="$ctrl.create()" class="btn btn-xxs btn-primary" translate="theme.create_new"></a>
+		</div>
+	</div><div class="panel panel-default indicator-panel" ng-repeat="theme in $ctrl.themes|orderBy:('name.' + $root.language)">
+		<div class="panel-body">
+			{{theme.name[$root.language]}}
+
+			<a ng-click="$ctrl.edit(theme)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
+	  </div>
+	</div>
+</div>
+

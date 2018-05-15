@@ -19,7 +19,7 @@ import angular from 'angular';
 import uuid from 'uuid/v4';
 import TimeSlot from 'timeslot-dag';
 
-import CompoundCube from './compound-cube';
+import CompoundCube from '../../models/compound-cube';
 import {iterate} from '../../helpers/input-slots';
 
 

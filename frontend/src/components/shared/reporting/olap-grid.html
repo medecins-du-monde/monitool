@@ -1,0 +1,30 @@
+
+<table class="table table-bordered table-condensed data-grid" id="reporting">
+	<thead>
+		<tr ng-repeat="row in grid.header">
+			<th colspan="{{grid.body[0].headerCols.length}}"
+				rowspan="{{grid.header.length}}"
+				ng-if="$first"></th>
+
+			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}" title="{{col.title}}">
+				<i class="fa fa-arrow-circle-right" ng-if="col.members"></i>
+				{{col.name}}
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="row in grid.body">
+			<th ng-repeat="headerCol in row.headerCols"
+				ng-if="$parent.$index % rowspans[$index] == 0"
+				title="{{headerCol.title}}"
+				rowspan="{{rowspans[$index]}}"
+				style="min-width: 100px">
+
+				<i class="fa fa-arrow-circle-right" ng-if="headerCol.members"></i>
+				{{headerCol.name}}
+			</th>
+
+			<td ng-repeat="col in row.dataCols track by $index" reporting-field></td>
+		</tr>
+	</tbody>
+</table>

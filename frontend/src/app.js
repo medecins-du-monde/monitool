@@ -19,7 +19,7 @@ import '@bower_components/font-awesome/css/font-awesome.min.css';
 
 import angular from 'angular';
 
-import mtPages from './pages/module';
+import mtPages from './components/pages/all-pages';
 import mtTranslation from './translation/bootstrap';
 import mtFilterMisc from './filters/misc';
 

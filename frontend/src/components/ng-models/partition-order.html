@@ -1,0 +1,18 @@
+<table class="partition-order">
+	<thead>
+		<tr ng-repeat="headerRow in $ctrl.table.headerRows">
+			<td ng-repeat="leftCol in $ctrl.table.leftCols"></td>
+			<td>
+				<select ng-model="$ctrl.orderedPartitions[headerRow]"
+				        ng-options="p as (p.name + ' (' + p.elements.length + ')') for p in partitions"></select>
+			</td>
+		</tr>
+	</thead>
+	<tr>
+		<td ng-repeat="leftCol in $ctrl.table.leftCols">
+			<select ng-model="$ctrl.orderedPartitions[leftCol]"
+			        ng-options="p as (p.name + ' (' + p.elements.length + ')') for p in partitions"></select>
+		</td>
+		<td class="data-field">{{'project.data'|translate}} ({{size}})</td>
+	</tr>
+</table>

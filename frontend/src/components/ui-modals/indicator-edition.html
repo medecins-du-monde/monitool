@@ -1,0 +1,123 @@
+<div class="modal-header">
+	<h3 class="modal-title">
+		<a ng-click="$ctrl.dismiss()" class="pull-right" style="cursor: pointer">
+			<i class="fa fa-times"></i>
+		</a>
+
+		<span ng-if="!$ctrl.indicator" translate="project.edit_indicator"></span>
+		<span ng-if="$ctrl.indicator" title="{{$ctrl.indicator.name[$root.language]}}">
+			{{$ctrl.indicator.name[$root.language]|maxLength:90}}
+		</span>
+	</h3>
+</div>
+
+<div class="modal-body">
+	<form class="form-horizontal" role="form" name="planningForm" novalidate>
+
+		<p ng-if="$ctrl.indicator" style="text-align: center; margin-bottom: 10px">
+			{{$ctrl.indicator.description[$root.language]}}
+		</p>
+
+		<div class="form-group" ng-if="!$ctrl.indicator">
+			<label for="display-input" class="col-sm-2 control-label" translate="project.display"></label>
+			<div class="col-sm-10">
+
+				<input id="display-input"
+					   class="form-control"
+					   name="display"
+					   ng-model="$ctrl.planning.display"
+					   placeholder="{{'project.display_ph'|translate}}"
+					   required />
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_display"></span>
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="baseline-input" class="col-sm-2 control-label" translate="project.baseline"></label>
+			<div class="col-sm-10">
+				<optional-number
+					ng-model="$ctrl.planning.baseline"
+					default="0"
+					message="project.value_unknown"></optional-number>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_baseline"></span>
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="target-input" class="col-sm-2 control-label" translate="project.target"></label>
+			<div class="col-sm-10">
+				<optional-number
+					ng-model="$ctrl.planning.target"
+					default="100"
+					message="project.value_unknown"></optional-number>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_target"></span>
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group" ng-show="$ctrl.planning.baseline !== null && $ctrl.planning.target !== null">
+			<label for="colorize-input" class="col-sm-2 control-label" translate="shared.colorize"></label>
+			<div class="col-sm-10">
+				<input id="colorize-input" type="checkbox" ng-model="$ctrl.planning.colorize" />
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_colorize"></span>
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="computation-input" class="col-sm-2 control-label" translate="project.computation"></label>
+			<div class="col-sm-10">
+				<indicator-computation
+					forms="$ctrl.dataSources"
+					ng-model="$ctrl.planning.computation"></indicator-computation>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<div style="float: left">
+		<p class="text-danger" ng-if="planningForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_error_short"></span>
+		</p>
+
+		<p class="text-info" ng-if="$ctrl.isUnchanged() && !$ctrl.isNew">
+			<i class="fa fa-info-circle"></i>
+			<span translate="project.form_persisted_short"></span>
+		</p>
+
+		<p class="text-warning" ng-if="!$ctrl.isUnchanged() && !planningForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_changed_short"></span>
+		</p>
+	</div>
+
+	<button ng-click="$ctrl.save()" ng-disabled="planningForm.$invalid || $ctrl.isUnchanged()" class="btn btn-primary">
+		<i class="fa fa-object-group"></i>
+		<span translate="shared.apply"></span>
+	</button>
+
+	<button ng-click="$ctrl.reset()" ng-disabled="$ctrl.isUnchanged()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</button>
+
+	<button ng-click="$ctrl.delete()" class="btn btn-danger" ng-if="!$ctrl.isNew && !$ctrl.indicator">
+		<i class="fa fa-remove"></i>
+		<span translate="shared.delete"></span>
+	</button>
+</div>
