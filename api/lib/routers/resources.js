@@ -274,10 +274,10 @@ router.put('/resources/input/:id', async ctx => {
 	const project = await Project.storeInstance.get(input.project);
 
 	// Check ACLs
-	var projectUser = project.getProjectUser(ctx.state.user),
-		projectRole = project.getRole(ctx.state.user);
+	const projectUser = project.getProjectUser(ctx.state.user);
+	const projectRole = project.getRole(ctx.state.user);
 
-	var allowed =
+	const allowed =
 		(projectRole === 'owner') ||
 		(projectRole === 'input' && projectUser.entities.includes(input.entity) && projectUser.dataSources.includes(input.form));
 
@@ -298,14 +298,12 @@ router.delete('/resources/input/:id', async ctx => {
 	const project = await Project.storeInstance.get(input.project);
 
 	// Check ACLs
-	var projectUser = project.getProjectUser(ctx.state.user),
-		projectRole = project.getRole(ctx.state.user);
+	const projectUser = project.getProjectUser(ctx.state.user);
+	const projectRole = project.getRole(ctx.state.user);
 
-	var allowed = false;
-	if (projectRole === 'owner')
-		allowed = true;
-	else if (projectRole === 'input' && projectUser.entities.indexOf(input.entity) !== -1 && projectUser.dataSources.indexOf(input.form) !== -1)
-		allowed = true;
+	const allowed =
+		(projectRole === 'owner') ||
+		(projectRole === 'input' && projectUser.entities.includes(input.entity) && projectUser.dataSources.includes(input.form));
 
 	if (!allowed)
 		throw new Error('forbidden');
