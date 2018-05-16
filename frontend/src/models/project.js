@@ -245,9 +245,6 @@ export default class Project {
 		form.elements.forEach(element => {
 			if (element.distribution < 0 || element.distribution > element.partitions.length)
 				element.distribution = Math.floor(element.partitions.length / 2);
-
-			if (element.order < 0 || element.order >= factorial(element.partitions.length))
-				element.order = 0;
 		});
 	}
 

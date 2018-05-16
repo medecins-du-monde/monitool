@@ -26,6 +26,7 @@ import uiRouter from '@uirouter/angularjs';
 import mtDirectiveAclProjectCreation from '../../../directives/acl/project-creation';
 import mtDirectiveAclProjectRole from '../../../directives/acl/project-role';
 import mtDirectiveAclProjectInput from '../../../directives/acl/project-input';
+import mtDirectiveDisableIf from '../../../directives/helpers/disableif';
 
 
 const module = angular.module(
@@ -36,6 +37,7 @@ const module = angular.module(
 		mtDirectiveAclProjectCreation.name,
 		mtDirectiveAclProjectRole.name,
 		mtDirectiveAclProjectInput.name,
+		mtDirectiveDisableIf.name
 	]
 );
 

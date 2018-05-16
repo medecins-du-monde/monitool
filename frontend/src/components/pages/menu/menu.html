@@ -59,9 +59,9 @@
 					</a>
 
 					<ul class="dropdown-menu">
-						<li><a ng-click="changeLanguage('fr')" ng-if="language != 'fr'" translate="menu.french"></a></li>
-						<li><a ng-click="changeLanguage('en')" ng-if="language != 'en'" translate="menu.english"></a></li>
-						<li><a ng-click="changeLanguage('es')" ng-if="language != 'es'" translate="menu.spanish"></a></li>
+						<li><a ng-click="$root.changeLanguage('fr')" ng-if="$root.language != 'fr'" translate="menu.french"></a></li>
+						<li><a ng-click="$root.changeLanguage('en')" ng-if="$root.language != 'en'" translate="menu.english"></a></li>
+						<li><a ng-click="$root.changeLanguage('es')" ng-if="$root.language != 'es'" translate="menu.spanish"></a></li>
 					</ul>
 				</li>
 

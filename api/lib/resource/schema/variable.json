@@ -3,7 +3,7 @@
 	"title": "Monitool variable schema",
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["id", "name", "timeAgg", "geoAgg", "partitions", "order", "distribution"],
+	"required": ["id", "name", "timeAgg", "geoAgg", "partitions", "distribution"],
 	"properties": {
 		"id": { "$ref": "#/definitions/uuid" },
 		"name": { "type": "string", "minLength": 1 },
@@ -51,7 +51,6 @@
 				}
 			}
 		},
-		"order": { "type": "number" },
 		"distribution": { "type": "number" }
 	},
 

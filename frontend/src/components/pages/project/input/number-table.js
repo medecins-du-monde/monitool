@@ -20,7 +20,6 @@ import exprEval from 'expr-eval';
 import Handsontable from 'handsontable/dist/handsontable.js';
 import 'handsontable/dist/handsontable.css';
 
-import {transpose2D, computeNthPermutation} from '../../../../helpers/array';
 
 const module = angular.module(
 	'monitool.components.ng-models.number-table',
@@ -28,136 +27,132 @@ const module = angular.module(
 	]
 );
 
-
-
-const headerOptions = {
-	readOnly: true,
-	renderer: function(instance, td, row, col, prop, value, cellProperties) {
-		Handsontable.renderers.TextRenderer.apply(this, arguments);
-		td.style.color = 'black';
-		td.style.background = '#eee';
-	}
-};
-
-const dataOptions = {type: 'numeric', validator: /^\d+$/};
-
-/** This is a slightly changed version of pdf-export.js, we should refactor this */
-const makeRows = function(partitions) {
-	var totalCols = partitions.reduce((memo, tp) => memo * tp.elements.length, 1),
-		currentColSpan = totalCols;
-
-	var body = [];
-
-	// Create header rows for top partitions
-	partitions.forEach(tp => {
-		// Update currentColSpan
-		currentColSpan /= tp.elements.length;
-
-		// Create header row
-		var row = [];
-
-		// Add one field for each element in tp, with current colspan
-		for (var colIndex = 0; colIndex < totalCols; ++colIndex) {
-			// Add field
-			var tpe = tp.elements[(colIndex / currentColSpan) % tp.elements.length];
-			row.push(tpe.name);
-
-			// Add as many fillers as the colSpan value - 1
-			var colLimit = colIndex + currentColSpan - 1;
-			for (; colIndex < colLimit; ++colIndex)
-				row.push("");
-		}
-
-		// push to body
-		body.push(row);
-	});
-
-	return body;
-};
-
 /**
- * Given the index of a field in a data vector, returns the index of the same field
- * if the partitions were permutated
+ * Warning: do not rebind element after the component has initialized.
+ * It is not watching the value.
  */
-const permutateDataIndex = function(element, originalIndex) {
-	// Compute the order in which the partition are permutated. We need that later.
-	var permutation = computeNthPermutation(element.partitions.length, element.order);
-
-	// Use divmod operations to know which elements originalIndex comes from.
-	var originalIdxs = new Array(element.partitions.length);
-	for (var i = element.partitions.length - 1; i >= 0; --i) {
-		originalIdxs[i] = originalIndex % element.partitions[i].elements.length;
-		originalIndex = Math.floor(originalIndex / element.partitions[i].elements.length);
-	}
-
-	// Compute the new index in the permutatedData table.
-	var permutatedIndex = 0;
-	for (var i = 0; i < element.partitions.length; ++i) {
-		// i-th contribution is the contribution of partition[permutation[i]]
-		var j = permutation[i];
-		permutatedIndex = permutatedIndex * element.partitions[j].elements.length + originalIdxs[j];
-	}
-
-	return permutatedIndex;
-};
-
-/**
- * Permutate a complete data vector
- */
-const permutateData = function(element, originalData) {
-	var permutatedData = new Array(originalData.length);
-
-	for (var originalIndex = 0; originalIndex < originalData.length; ++originalIndex) {
-		var permutatedIndex = permutateDataIndex(element, originalIndex);
-		permutatedData[permutatedIndex] = originalData[originalIndex];
-	}
-
-	return permutatedData;
-};
-
-/**
- * Unpermutate a complete data vector
- */
-const unpermutateData = function(element, permutatedData) {
-	var originalData = new Array(permutatedData.length);
-
-	for (var originalIndex = 0; originalIndex < originalData.length; ++originalIndex) {
-		var permutatedIndex = permutateDataIndex(element, originalIndex);
-		originalData[originalIndex] = permutatedData[permutatedIndex];
-	}
-
-	return originalData;
-};
-
-
 module.component('inputGrid', {
 	bindings: {
 		element: '<'
 	},
-	require: 'ngModel',
+	require: {
+		'ngModelCtrl' :'^ngModel'
+	},
 	template: require('./number-table.html'),
 
-	controller: function() {
+	controller: class InputGridController {
 
-		// Convert a 1D array with all the data to a 2D table with headers.
-		ngModelController.$formatters.push(function(modelValue) {
+		constructor($element) {
+			this.$element = $element;
+		}
+
+		$onInit() {
+			// Convert a 1D array with all the data to a 2D table with headers and back.
+			this.ngModelCtrl.$formatters.push(this._modelToView.bind(this));
+			this.ngModelCtrl.$parsers.push(this._viewToModel.bind(this));
+
+			this.ngModelCtrl.$render = () => {
+				this.handsOnTable.loadData(this.ngModelCtrl.$viewValue);
+			};
+
+			this.ngModelCtrl.$validators.isNumber = (modelValue) => {
+				return modelValue.every(v => typeof v === 'number');
+			};
+		}
+
+		$postLink() {
+			const [colPartitions, rowPartitions] = [
+				this.element.partitions.slice(this.element.distribution),
+				this.element.partitions.slice(0, this.element.distribution)
+			];
+
+			const [width, height] = [
+				colPartitions.reduce((m, p) => m * p.elements.length, 1) + rowPartitions.length,
+				rowPartitions.reduce((m, p) => m * p.elements.length, 1) + colPartitions.length
+			];
+
+			this.handsOnTable = new Handsontable(this.$element[0].firstElementChild, {
+				// Use all width with columns all the same size
+				stretchH: "all",
+				colWidths: 'xxx',
+				className: "htLeft",
+
+				// Lock grid size so that user can't expand it.
+				maxCols: width,
+				maxRows: height,
+
+				// processing to do when the UI table is updated.
+				afterChange: this._onHandsOnTableChange.bind(this),
+				cells: this._handsOnTableCellRenderer.bind(this)
+			});
+		}
+
+		/**
+		 * Update the viewvalue when handsontable report changes.
+		 */
+		_onHandsOnTableChange(changes, action) {
+			// changes === undefined when action === "loadData"
+			// @see http://docs.handsontable.com/0.15.0-beta3/Hooks.html#event:afterChange
+			if (!changes)
+				return;
+
+			// if the data that was entered is a formula (eg: 1+2) replace by evaluated value.
+			changes.forEach(change => {
+				const [x, y, _, val] = change;
+
+				if (typeof val !== 'number') {
+					try {
+						const newValue = exprEval.Parser.evaluate(val, {});
+						this.handsOnTable.setDataAtCell(x, y, newValue);
+					}
+					catch (e) {
+					}
+				}
+			});
+
+			// tell this.ngModelCtrl that the data was changed from HandsOnTable.
+			this.ngModelCtrl.$setViewValue(this.handsOnTable.getData());
+		}
+
+		/**
+		 * Render header and content with different styles.
+		 */
+		_handsOnTableCellRenderer(row, col, prop) {
+			const isHeader = col < this.element.distribution
+				|| row < this.element.partitions.length - this.element.distribution;
+
+			if (isHeader)
+				return {
+					readOnly: true,
+					renderer: function(instance, td, row, col, prop, value, cellProperties) {
+						Handsontable.renderers.TextRenderer.apply(this, arguments);
+						td.style.color = 'black';
+						td.style.background = '#eee';
+					}
+				};
+			else
+				return {type: 'numeric', validator: /^\d+$/};
+		}
+
+		/**
+		 * Convert input 1D table to handsontable 2D table with headers.
+		 */
+		_modelToView(modelValue) {
 			// Special case! Having no partition does not cause having zero data fields
 			if (this.element.partitions.length === 0)
 				return [modelValue];
 
-			// We need the permutation later on.
-			var permutation = computeNthPermutation(this.element.partitions.length, this.element.order);
+			// Clone modelValue to avoid detroying the original model
+			modelValue = modelValue.slice();
 
 			var viewValue = [];
 
 			// Start by creating the headers.
-			var partitions = permutation.map(index => this.element.partitions[index]);
+			var colPartitions = this.element.partitions.slice(this.element.distribution),
+				rowPartitions = this.element.partitions.slice(0, this.element.distribution);
 
-			var colPartitions = partitions.slice(this.element.distribution),
-				rowPartitions = partitions.slice(0, this.element.distribution);
-
-			var topRows = makeRows(colPartitions),
-				bodyRows = transpose2D(makeRows(rowPartitions));
+			var topRows = this._makeHeaderRows(colPartitions),
+				bodyRows = this._makeHeaderCols(rowPartitions);
 
 			if (!bodyRows.length)
 				bodyRows.push([])
@@ -165,9 +160,8 @@ module.component('inputGrid', {
 			var dataColsPerRow = topRows.length ? topRows[0].length : 1;
 
 			// Add data fields to bodyRows
-			var permutatedData = permutateData(this.element, modelValue)
 			bodyRows.forEach(bodyRow => {
-				bodyRow.push(...permutatedData.splice(0, dataColsPerRow));
+				bodyRow.push(...modelValue.splice(0, dataColsPerRow));
 			});
 
 			// Add empty field in the top-left corner for topRows
@@ -177,72 +171,91 @@ module.component('inputGrid', {
 			});
 
 			return [...topRows, ...bodyRows];
-		});
+		}
 
-		ngModelController.$parsers.push(function(viewValue) {
+		/**
+		 * Convert 2D handsontable table with headers to 1D table that can be stored in input.
+		 */
+		_viewToModel(viewValue) {
 			// Special case! Having no partition does not cause having zero data fields
 			if (this.element.partitions.length === 0)
 				return viewValue[0];
 
 			var modelValue = [];
-			for (var y = this.element.partitions.length - this.element.distribution; y < viewValue.length; ++y) {
+			for (var y = this.element.partitions.length - this.element.distribution; y < viewValue.length; ++y)
 				modelValue.push(...viewValue[y].slice(this.element.distribution));
-			}
 
-			return unpermutateData(this.element, modelValue);
-		});
+			return modelValue;
+		}
 
-		// Renders the $viewValue to screen
+		/**
+		 * Helper to create the rows of the 2D array used by hands on table.
+		 * This is a slightly changed version of pdf-export.js from the server, we should refactor this
+		 * to make it smaller.
+		 */
+		_makeHeaderRows(partitions) {
+			var totalCols = partitions.reduce((memo, tp) => memo * tp.elements.length, 1),
+				currentColSpan = totalCols;
 
-		var hotTable = null;
+			var body = [];
 
-		ngModelController.$render = function() {
-			// hotTable was not created yet, let's do it now
-			if (!hotTable) {
-				hotTable = new Handsontable(element[0].firstElementChild, {
-					// Use all width with columns all the same size
-					stretchH: "all",
-					colWidths: 'xxx',
-				    className: "htLeft",
+			// Create header rows for top partitions
+			partitions.forEach(tp => {
+				// Update currentColSpan
+				currentColSpan /= tp.elements.length;
 
-					// Lock grid size so that user can't expand it.
-					maxRows: ngModelController.$viewValue.length,
-					maxCols: ngModelController.$viewValue[0].length,
+				// Create header row
+				var row = [];
 
-					// Pass data
-					data: ngModelController.$viewValue,
+				// Add one field for each element in tp, with current colspan
+				for (var colIndex = 0; colIndex < totalCols; ++colIndex) {
+					// Add field
+					var tpe = tp.elements[(colIndex / currentColSpan) % tp.elements.length];
+					row.push(tpe.name);
 
-					// processing to do when the UI table is updated.
-					afterChange: function(changes, action) {
-						// changes === undefined when action === "loadData"
-						// @see http://docs.handsontable.com/0.15.0-beta3/Hooks.html#event:afterChange
-						if (changes) {
-							// if the data that was entered is a formula (eg: 1+2) replace by evaluated value.
-							changes.forEach(change => {
-								var x = change[0], y = change[1], val = change[3];
+					// Add as many fillers as the colSpan value - 1
+					var colLimit = colIndex + currentColSpan - 1;
+					for (; colIndex < colLimit; ++colIndex)
+						row.push("");
+				}
 
-								if (typeof val != 'number') {
-									try { hotTable.setDataAtCell(x, y, exprEval.Parser.evaluate(val, {})); }
-									catch (e) { }
-								}
-							});
+				// push to body
+				body.push(row);
+			});
 
-							// tell ngModelController that the data was changed from HandsOnTable.
-							ngModelController.$setViewValue(hotTable.getData());
-						}
-					},
+			return body;
+		}
 
-					cells: function(row, col, prop) {
-						var isHeader = col < this.element.distribution || row < this.element.partitions.length - this.element.distribution;
-						return isHeader ? headerOptions : dataOptions;
+		/**
+		 * Make the header columns on the left of the table.
+		 * This function makes top rows, then rotate them.
+		 */
+		_makeHeaderCols(partitions) {
+			const rows = this._makeHeaderRows(partitions);
+			if (rows.length === 0)
+				return [];
+
+			var result = new Array(rows[0].length);
+
+			for (var x = 0; x < rows[0].length; ++x) {
+				result[x] = new Array(rows.length);
+
+				for (var y = 0; y < rows.length; ++y) {
+					result[x][y] = angular.copy(rows[y][x]);
+
+					if (result[x][y].colSpan) {
+						result[x][y].rowSpan = result[x][y].colSpan;
+						delete result[x][y].colSpan;
 					}
-				});
+					else if (result[x][y].rowSpan) {
+						result[x][y].colSpan = result[x][y].rowSpan;
+						delete result[x][y].rowSpan;
+					}
+				}
 			}
-			else {
-				// Update HandsOnTable data. We do not need to clone the table.
-				hotTable.loadData(ngModelController.$viewValue);
-			}
-		};
+
+			return result;
+		}
 	}
 });
 

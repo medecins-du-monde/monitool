@@ -1,16 +1,18 @@
 # Monitool
 
 Monitool is an indicator monitoring application for humanitarian organisations built around 2014-2015, and regulary updated from user feedback since.
+
 It is used to follow the international programs of Medecins du Monde France.
 
-A demo version can be seen at http://monitool-training.medecinsdumonde.net
+A demo version can be seen at http://monitool-training.medecinsdumonde.net (no account is required to login).
 
 # About the code
 
 ## API
 
-The API code uses CouchDB 1 as database.
-It originally was an express.js API, but was ported to Koa to make the code leaner.
+The API is a NodeJS daemon which uses CouchDB 1 as database.
+
+It originally written with express.js, but was ported to Koa to make the code easier to read.
 
 - Uses async/await syntax everywhere.
 - Model validation is performed with `is-my-json-valid` and some custom code.
@@ -22,9 +24,6 @@ It originally was an express.js API, but was ported to Koa to make the code lean
 ## Frontend
 
 Besides the login page, the whole frontend application is a SPA made with AngularJS.
-It was originally written in Angular 1.2 using `gulp` tasks for packing.
-
-It was mostly rewritten to use the new `component` API, building with `webpack` and reducing the AngularJS Dependency Injection usage by replacing it by ES6 imports where possible.
 
 The main dependencies are:
 
@@ -34,6 +33,31 @@ The main dependencies are:
 - `c3` for graphs.
 - `axios` for API queries (AngularJS `$http` is not used anymore, as to reduce the amount of DI).
 
+
+Monitool was originally written in Angular 1.2 using `gulp` tasks for packing, and then updated to further AngularJS versions.
+
+The project currently uses the last AngularJS version (1.7), and was refactored to be component based, to ease a possible future transition out of AngularJS.
+
+All component bindings are 'one-way' (`<`), so it should be possible to migrate the project easily to a framework that does not support two-way data bindings with a reasonable amount of work (React, Vue, ...).
+
+Changes include:
+
+- Use the new `angular.component()` API everywhere, instead of `angular.controller()`
+- Build with `webpack`
+- Reducing the AngularJS Dependency Injection (ES6 imports).
+- Declaring one component by angular module.
+
+
+## Docker
+
+Originally, the NodeJS daemon was in charge of serving the gzipped static files, and used an in-memory cache to speed up request.
+This allowed having to start only two services to start the complete application (NodeJS app and database).
+
+To reduce the amount of code that need to be maintained, the cache was moved to a redis instance, and the static files are now served from an nginx reverse proxy. Assets are compressed with brotli and gzip by webpack.
+
+Docker was introduced to make the transition easier and not having to start the 4 services manually.
+
+As the application is small, and not expecting much traffic, Docker Swarm was used in place of Kubernetes: the 4 containers that are needed to run the application can easily be deployed on a small cloud node (< 512MB RAM).
 
 # Install & Run
 
@@ -69,10 +93,6 @@ Monitool is configured by using environment variables.
 	MONITOOL_AUTH_PROVIDERS_TRAINING
 	MONITOOL_AUTH_PROVIDERS_TRAINING_LABEL
 	MONITOOL_AUTH_PROVIDERS_TRAINING_ACCOUNT
-
-## Docker
-
-Monitool uses docker both for development and deployment.
 
 ### Development
 

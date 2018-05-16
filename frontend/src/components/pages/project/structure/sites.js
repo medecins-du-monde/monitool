@@ -24,7 +24,7 @@ import 'angular-legacy-sortablejs-maintained';
 
 import 'ui-select/dist/select.min.css';
 
-import mtComponentsUtcDatepicker from '../../../ng-models/datepicker';
+import mtDatePickerOptional from '../../../shared/ng-models/datepicker-optional';
 
 
 const module = angular.module(
@@ -34,7 +34,7 @@ const module = angular.module(
 		uiSelect, // for site groups
 		'ng-sortable', // order sites
 
-		mtComponentsUtcDatepicker.name, // Datepicker start & end
+		mtDatePickerOptional.name, // Datepicker start & end
 	]
 );
 

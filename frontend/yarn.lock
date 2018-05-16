@@ -5802,9 +5802,9 @@ timers-browserify@^2.0.4:
   dependencies:
     setimmediate "^1.0.4"
 
-timeslot-dag@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/timeslot-dag/-/timeslot-dag-0.1.0.tgz#4c204ff514605e60a78cc6e00e4a58d5088fff2b"
+timeslot-dag@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/timeslot-dag/-/timeslot-dag-0.1.1.tgz#6124720a4ed377cf7b74def2a2566d98119d3b06"
 
 tmp@^0.0.33:
   version "0.0.33"

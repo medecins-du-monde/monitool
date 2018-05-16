@@ -17,9 +17,7 @@
 
 import angular from 'angular';
 import axios from 'axios';
-
-import {getList} from '../helpers/input-slots';
-
+import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 
 export default class Input {
 
@@ -47,8 +45,20 @@ export default class Input {
 			if (form.periodicity === 'free')
 				strPeriods = Object.keys(prj);
 			else {
-				var entity = project.entities.find(entity => entity.id == entityId);
-				strPeriods = getList(project, entity, form);
+				const entity = project.entities.find(entity => entity.id == entityId);
+				const [start, end] = [
+					[project.start, entity.start, form.start].filter(a => a).sort().pop(),
+					[project.end, entity.end, form.end, new Date().toISOString().substring(0, 10)].filter(a => a).sort().shift()
+				];
+
+				strPeriods = Array
+					.from(
+						timeSlotRange(
+							TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), form.periodicity),
+							TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), form.periodicity)
+						)
+					)
+					.map(ts => ts.value);
 			}
 
 			strPeriods.forEach(strPeriod => {
@@ -88,7 +98,6 @@ export default class Input {
 
 		const result = response.data.map(i => new Input(i));
 
-		var form = project.forms.find(f => f.id == formId);
 		var currentInputId = ['input', project._id, formId, entityId, period].join(':');
 
 		// both where found
@@ -105,16 +114,19 @@ export default class Input {
 			values: {}
 		});
 
+		const form = project.forms.find(f => f.id === formId);
 		form.elements.forEach(element => {
-			const numFields = element.partitions.reduce((p, memo) => memo * p.elements.length, 1);
-
+			const numFields = element.partitions.reduce((m, p) => m * p.elements.length, 1);
 			current.values[element.id] = new Array(numFields);
-			for (var i = 0; i < numFields; ++i)
-				current.values[element.id][i] = 0;
+			current.values[element.id].fill(0);
 		});
 
 		// the current one was not found (and we may or not have found the previous one).
-		return {current: current, previous: result.length ? result[0] : null, isNew: true};
+		return {
+			current: current,
+			previous: result.length ? result[0] : null,
+			isNew: true
+		};
 	}
 
 

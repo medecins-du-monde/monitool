@@ -39,7 +39,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-show="hiddenStatus.length">
+				<tr ng-show="$ctrl.hiddenStatus.length">
 					<td><div class="bodyField">&nbsp;</div></td>
 				</tr>
 				<tr ng-repeat="date in $ctrl.visibleStatus">
@@ -81,7 +81,7 @@
 						<div class="bodyField">
 							<a class="btn btn-xs"
 							   ng-class="::{'btn-default': $ctrl.inputsStatus[date][col.id] === 'done', 'btn-primary': $ctrl.inputsStatus[date][col.id] === 'expected', 'btn-danger': $ctrl.inputsStatus[date][col.id] === 'outofschedule'}"
-							   ui-sref="main.project.input.edit({period: date, entityId: col.id})"
+							   ui-sref="main.project.input_edit({formId: $ctrl.form.id, period: date, entityId: col.id})"
 							   ng-if="::$ctrl.inputsStatus[date][col.id]"
 							   translate="{{::('project.input_status.' + $ctrl.inputsStatus[date][col.id])}}"></a>
 						</div>

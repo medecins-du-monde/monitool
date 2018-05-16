@@ -1,59 +1,96 @@
 import database from '../database';
 
-const migrateDesignDoc = async () => {
-	// Update design document.
-	const ddoc = await database.get('_design/monitool');
 
-	delete ddoc.views.by_type;
-	delete ddoc.views.inputs_by_project_date;
-	delete ddoc.views.inputs_by_project_entity_date;
-	delete ddoc.views.inputs_by_project_form_date;
-	delete ddoc.views.themes_usage;
+const rotatePartitions = (partitions, order) => {
+	let n = partitions.length,
+		i = order;
 
-	ddoc.views.projects_short = {
-		map: function(doc) {
-			if (doc.type === 'project') {
-				emit(doc._id, {
-					_id: doc._id,
-					country: doc.country,
-					name: doc.name,
-					start: doc.start, end: doc.end,
-					users: doc.users.map(function(user) {
-						return {type: user.type, id: user.id, username: user.username, role: user.role};
-					}),
-					themes: doc.themes,
-					visibility: doc.visibility
-				});
-			}
-		}.toString()
-	};
+	//////////
+	// Compute of the n-th permutation of sequence range(i)
+	//////////
+	var j, k = 0,
+		fact = [],
+		perm = [];
 
-	ddoc.views.projects_public = {
-		map: function(doc) {
-			if (doc.type === 'project' && doc.visibility === 'public')
-				emit();
+	// compute factorial numbers
+	fact[k] = 1;
+	while (++k < n)
+		fact[k] = fact[k - 1] * k;
 
-		}.toString()
-	};
+	// compute factorial code
+	for (k = 0; k < n; ++k) {
+		perm[k] = i / fact[n - 1 - k] << 0;
+		i = i % fact[n - 1 - k];
+	}
 
-	ddoc.views.projects_private = {
-		map: function(doc) {
-			if (doc.type === 'project' && doc.visibility === 'private')
-				doc.users.forEach(function(user) {
-					if (user.id)
-						emit(user.id);
-				});
-		}.toString()
-	};
+	// readjust values to obtain the permutation
+	// start from the end and check if preceding values are lower
+	for (k = n - 1; k > 0; --k)
+		for (j = k - 1; j >= 0; --j)
+			if (perm[j] <= perm[k])
+				perm[k]++;
 
-	await database.insert(ddoc);
+	//////////
+	// Map our partitions to the found permutation
+	//////////
+	return perm.map(index => partitions[index]);
 };
 
+
+const migrateInputs = async () => {
+	// Load all projects (already updated).
+	const dbResultProjects = await database.callView('by_type', {key: 'project', include_docs: true});
+	const projectsById = {};
+	dbResultProjects.rows.forEach(row => projectsById[row.id] = row.doc);
+
+	// Update projects, and create revisions.
+	const dbResults = await database.callView('by_type', {key: 'input'});
+	const documents = [];
+
+	for (let i = 0; i < dbResults.rows.length; ++i) {
+		console.log('input', i, '/', dbResults.rows.length);
+
+		const input = await database.get(dbResults.rows[i].id);
+		const deleted = {_id: input._id, _rev: input._rev, _deleted: true};
+
+		const dataSource = projectsById[input.project].forms.find(f => f.id === input.form);
+
+		input._id = 'input:project:' + input.project + ":" + input.form + ":" + input.entity + ":" + input.period;
+		delete input._rev;
+		input.project = 'project:' + input.project;
+		input.structure = {};
+
+		dataSource.elements.forEach(e => {
+			input.structure[e.id] = e.partitions.map(partition => {
+				return {
+					id: partition.id,
+					items: partition.elements.map(pe => pe.id),
+					aggregation: partition.aggregation
+				};
+			});
+		});
+
+		documents.push(deleted, input)
+
+		if (documents.length > 40) {
+			await database.callBulk({docs: documents});
+			documents.length = 0
+		}
+	}
+
+	await database.callBulk({docs: documents});
+};
+
+
 const updateProject = project => {
+	// Add visibility
 	project.visibility = 'public';
 
 	project.logicalFrames.forEach(logframe => {
+		// Add start and end date
 		logframe.start = logframe.end = null;
+
+		// Add activities to logical frameworks
 		logframe.purposes.forEach(purpose => {
 			purpose.outputs.forEach(output => {
 				output.activities = [];
@@ -63,10 +100,15 @@ const updateProject = project => {
 
 	project.forms.forEach(form => {
 		form.elements.forEach(element => {
+			// Do not allow partition to have aggregation == 'none' anymore
 			element.partitions.forEach(partition => {
 				if (partition.aggregation === 'none')
 					partition.aggregation = 'sum';
 			});
+
+			// Remove variable.order
+			element.partitions = rotatePartitions(element.partitions, element.order);
+			delete element.order;
 		});
 	});
 
@@ -137,49 +179,6 @@ const migrateProjects = async () => {
 	}
 };
 
-const migrateInputs = async () => {
-	// Load all projects (already updated).
-	const dbResultProjects = await database.callView('by_type', {key: 'project', include_docs: true});
-	const projectsById = {};
-	dbResultProjects.rows.forEach(row => projectsById[row.id] = row.doc);
-
-	// Update projects, and create revisions.
-	const dbResults = await database.callView('by_type', {key: 'input'});
-	const documents = [];
-
-	for (let i = 0; i < dbResults.rows.length; ++i) {
-		console.log('input', i, '/', dbResults.rows.length);
-
-		const input = await database.get(dbResults.rows[i].id);
-		const deleted = {_id: input._id, _rev: input._rev, _deleted: true};
-
-		input._id = 'input:project:' + input.project + ":" + input.form + ":" + input.entity + ":" + input.period;
-		delete input._rev;
-		input.project = 'project:' + input.project;
-		input.structure = {};
-
-		const dataSource = projectsById[input.project].forms.find(f => f.id === input.form);
-		dataSource.elements.forEach(e => {
-			input.structure[e.id] = e.partitions.map(partition => {
-				return {
-					id: partition.id,
-					items: partition.elements.map(pe => pe.id),
-					aggregation: partition.aggregation
-				};
-			});
-		});
-
-		documents.push(deleted, input)
-
-		if (documents.length > 40) {
-			await database.callBulk({docs: documents});
-			documents.length = 0
-		}
-	}
-
-	await database.callBulk({docs: documents});
-};
-
 const migrateIndicators = async () => {
 	const dbResults = await database.callView('by_type', {key: 'indicator', include_docs: true});
 	const documents = [];
@@ -233,12 +232,62 @@ const migrateUsers = async () => {
 }
 
 
+const migrateDesignDoc = async () => {
+	// Update design document.
+	const ddoc = await database.get('_design/monitool');
+
+	delete ddoc.views.by_type;
+	delete ddoc.views.inputs_by_project_date;
+	delete ddoc.views.inputs_by_project_entity_date;
+	delete ddoc.views.inputs_by_project_form_date;
+	delete ddoc.views.themes_usage;
+
+	ddoc.views.projects_short = {
+		map: function(doc) {
+			if (doc.type === 'project') {
+				emit(doc._id, {
+					_id: doc._id,
+					country: doc.country,
+					name: doc.name,
+					start: doc.start, end: doc.end,
+					users: doc.users.map(function(user) {
+						return {type: user.type, id: user.id, username: user.username, role: user.role};
+					}),
+					themes: doc.themes,
+					visibility: doc.visibility
+				});
+			}
+		}.toString()
+	};
+
+	ddoc.views.projects_public = {
+		map: function(doc) {
+			if (doc.type === 'project' && doc.visibility === 'public')
+				emit();
+
+		}.toString()
+	};
+
+	ddoc.views.projects_private = {
+		map: function(doc) {
+			if (doc.type === 'project' && doc.visibility === 'private')
+				doc.users.forEach(function(user) {
+					if (user.id)
+						emit(user.id);
+				});
+		}.toString()
+	};
+
+	await database.insert(ddoc);
+};
+
 /**
- * Add activities to projects.
+ * Big migration for 2.7
  */
 export default async function() {
-	await migrateProjects();
+	// The order matters, do not change it.
 	await migrateInputs();
+	await migrateProjects();
 	await migrateIndicators();
 	await migrateThemes();
 	await migrateUsers();

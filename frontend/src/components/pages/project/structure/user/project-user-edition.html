@@ -1,0 +1,173 @@
+<div class="modal-header">
+	<h3 class="modal-title">
+		<a ng-click="$ctrl.dismiss()" class="pull-right" style="cursor: pointer">
+			<i class="fa fa-times"></i>
+		</a>
+		<span translate="project.edit_user"></span>
+	</h3>
+</div>
+
+<div class="modal-body">
+	<form class="form-horizontal" role="form" name="userForm" novalidate autocomplete="off">
+
+		<div class="form-group">
+			<label for="type-input" class="col-sm-3 control-label" translate="project.user_type"></label>
+			<div class="col-sm-9">
+				<select id="type-input" class="form-control" ng-model="$ctrl.user.type" required ng-disabled="!$ctrl.isNew">
+					<option value="internal" translate="project.user_types.internal"></option>
+					<option value="partner" translate="project.user_types.partner"></option>
+				</select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_type'|translate}}
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="$ctrl.user.type == 'internal'">
+			<label for="user-input" class="col-sm-3 control-label" translate="project.user"></label>
+			<div class="col-sm-9">
+				<select id="user-input"
+						class="form-control"
+						ng-disabled="!$ctrl.isNew"
+						ng-model="$ctrl.user.id"
+						ng-options="u._id as u.name for u in $ctrl.availableUsers|orderBy:'name'"
+						required></select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_user'|translate}}
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="$ctrl.user.type == 'partner'">
+			<label for="login-input" class="col-sm-3 control-label" translate="project.username"></label>
+			<div class="col-sm-9">
+				<input id="login-input"
+					   type="text"
+					   ng-model="$ctrl.user.username"
+					   ng-disabled="!$ctrl.isNew"
+					   class="form-control"
+					   ng-minlength="4"
+					   ng-pattern="/^[a-z\.\-]+$/"
+					   forbidden-values="$ctrl.partners"
+					   required>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_username'|translate}}
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="$ctrl.user.type == 'partner'">
+			<label for="fullname-input" class="col-sm-3 control-label" translate="project.user_fullname"></label>
+			<div class="col-sm-9">
+				<input id="fullname-input" type="text" ng-model="$ctrl.user.name" class="form-control" required>
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_fullname'|translate}}
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="$ctrl.user.type == 'partner'">
+			<label for="password-input" class="col-sm-3 control-label" translate="project.password"></label>
+			<div class="col-sm-9">
+				<input id="password-input"
+					   type="password"
+					   ng-model="$ctrl.user.password"
+					   class="form-control"
+					   ng-minlength="6"
+					   ng-required="$ctrl.isNew">
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_password'|translate}}
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="role-input" class="col-sm-3 control-label" translate="project.user_role"></label>
+			<div class="col-sm-9">
+				<select id="role-input" class="form-control" ng-model="$ctrl.user.role" required>
+					<option value="owner" translate="project.user_roles.owner"></option>
+					<option value="input" translate="project.user_roles.input"></option>
+					<option value="read" translate="project.user_roles.read"></option>
+				</select>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_role'|translate}}
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="$ctrl.user.role == 'input'">
+			<label for="entities-input" class="col-sm-3 control-label" translate="project.collection_site_list"></label>
+			<div class="col-sm-9">
+				<element-filter
+					ng-model="$ctrl.user.entities"
+					elements="$ctrl.entities"
+					groups="$ctrl.groups"></element-filter>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_sites'|translate}}
+				</p>
+			</div>
+		</div>
+
+		<div class="form-group" ng-if="$ctrl.user.role == 'input'">
+			<label for="dataSources-input" class="col-sm-3 control-label" translate="project.collection_form_list"></label>
+			<div class="col-sm-9">
+				<element-filter ng-model="$ctrl.user.dataSources" elements="$ctrl.dataSources"></element-filter>
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					{{'project.user_help_datasources'|translate}}
+				</p>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+<div class="modal-footer">
+
+	<div style="float: left">
+		<p class="text-danger" ng-if="userForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_error_short"></span>
+		</p>
+
+		<p class="text-info" ng-if="$ctrl.isUnchanged() && !$ctrl.isNew">
+			<i class="fa fa-info-circle"></i>
+			<span translate="project.form_persisted_short"></span>
+		</p>
+
+		<p class="text-warning" ng-if="!$ctrl.isUnchanged() && !userForm.$invalid">
+			<i class="fa fa-exclamation-triangle"></i>
+			<span translate="project.form_changed_short"></span>
+		</p>
+	</div>
+
+	<button ng-click="$ctrl.done()" ng-disabled="userForm.$invalid || $ctrl.isUnchanged()" class="btn btn-primary">
+		<i class="fa fa-object-group"></i>
+		<span translate="project.update_user"></span>
+	</button>
+
+	<button ng-click="$ctrl.reset()" ng-disabled="$ctrl.isUnchanged()" class="btn btn-default">
+		<i class="fa fa-undo"></i>
+		<span translate="shared.remove_changes"></span>
+	</button>
+
+	<button ng-click="$ctrl.delete()" class="btn btn-danger" ng-if="!$ctrl.isNew">
+		<i class="fa fa-remove"></i>
+		<span translate="shared.delete"></span>
+	</button>
+</div>
+

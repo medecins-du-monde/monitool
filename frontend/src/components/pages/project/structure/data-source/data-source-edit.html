@@ -179,9 +179,10 @@
 					<label class="col-sm-2 control-label" translate="project.partitions_label"></label>
 
 					<div class="col-sm-10 form-control-static">
+
 						<partition-list
 							partitions="element.partitions"
-							on-update="onPartitionListUpdated(element)"></partition-list>
+							on-update="onPartitionUpdate(element, partitions)"></partition-list>
 
 						<span class="help-block" style="margin-top: -10px">
 							<i class="fa fa-info-circle"></i>
@@ -194,7 +195,10 @@
 					<label class="col-sm-2 control-label" translate="project.distribution_label"></label>
 
 					<div class="col-sm-10 form-control-static">
-						<partition-distribution ng-model="element.distribution" num-partitions="element.partitions.length"></partition-distribution>
+
+						<partition-distribution
+							ng-model="element.distribution"
+							num-partitions="element.partitions.length"></partition-distribution>
 
 						<span class="help-block" style="margin-top: -10px">
 							<i class="fa fa-info-circle"></i>
@@ -207,7 +211,11 @@
 					<label class="col-sm-2 control-label" translate="project.order_label"></label>
 
 					<div class="col-sm-10 form-control-static">
-						<partition-order ng-model="element.order" partitions="element.partitions" distribution="element.distribution"></partition-order>
+
+						<partition-order
+							partitions="element.partitions"
+							distribution="element.distribution"
+							on-update="onPartitionUpdate(element, partitions)"></partition-order>
 
 						<span class="help-block">
 							<i class="fa fa-info-circle"></i>

@@ -17,10 +17,9 @@
 
 import angular from 'angular';
 import uuid from 'uuid/v4';
-import TimeSlot from 'timeslot-dag';
+import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 
 import CompoundCube from '../../models/compound-cube';
-import {iterate} from '../../helpers/input-slots';
 
 
 const module = angular.module(
@@ -63,10 +62,25 @@ module.service('mtReporting', function($filter, $rootScope) {
 		];
 
 		if (timeGroupBy.includes(groupBy)) {
+			const now = new Date().toISOString().substring(0, 10);
+			if (now < end)
+				end = now;
+
 			return [
-				...iterate(start, end, groupBy).map(slot => {
-					return {id: slot, name: $filter('formatSlot')(slot), title: $filter('formatSlotRange')(slot)};
-				}),
+				...Array
+					.from(
+						timeSlotRange(
+							TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), groupBy),
+							TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), groupBy)
+						)
+					)
+					.map(slot => {
+						return {
+							id: slot.value,
+							name: $filter('formatSlot')(slot.value),
+							title: $filter('formatSlotRange')(slot.value)
+						};
+					}),
 				{id:'_total', name: "Total"}
 			];
 		}

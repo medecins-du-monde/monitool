@@ -1,18 +1,18 @@
 <ol class="breadcrumb">
 	<li><a ui-sref="main.indicators" translate="indicator.cross_cutting"></a></li>
-	<li class="active">{{indicator.name[language]}}</li>
+	<li class="active">{{indicator.name[$root.language]}}</li>
 </ol>
 
 <div class="alert alert-info">
 	<dl>
 		<dt translate="shared.name"></dt>
-		<dd>{{indicator.name[language]}}</dd>
+		<dd>{{indicator.name[$root.language]}}</dd>
 
-		<dt translate="shared.description" ng-if="indicator.description[language]"></dt>
-		<dd ng-if="indicator.description[language]">{{indicator.description[language]}}</dd>
+		<dt translate="shared.description" ng-if="indicator.description[$root.language]"></dt>
+		<dd ng-if="indicator.description[$root.language]">{{indicator.description[$root.language]}}</dd>
 
 		<dt translate="theme.themes"></dt>
-		<dd>{{indicator.themes|getObjects:themes|pluck:'name'|pluck:language|join:', '}}</dd>
+		<dd>{{indicator.themes|getObjects:themes|pluck:'name'|pluck:$root.language|join:', '}}</dd>
 	</dl>
 </div>
 

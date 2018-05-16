@@ -2,13 +2,13 @@
 	<li ng-if="userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
 	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
-	<li><a ui-sref="main.project.input.list">{{$ctrl.form.name|maxLength:50}}</a></li>
+	<li><a ui-sref="main.project.input_list({formId: $ctrl.form.id})">{{$ctrl.form.name|maxLength:50}}</a></li>
 	<li class="active">{{$ctrl.entity.name|maxLength:50}}</li>
 	<li class="active">{{$ctrl.input.period|formatSlot}}</li>
 </ol>
 
 <div id="formblock">
-	<form class="form-horizontal">
+	<form class="form-horizontal" name="inputForm">
 		<legend translate="project.general_informations"></legend>
 
 		<div class="form-group">
@@ -57,33 +57,33 @@
 
 <div id="saveblock" class="noprint">
 	<div class="pull-right">
-		<p class="text-danger" ng-if="!$ctrl.isValid()">
+		<p ng-if="inputForm.$invalid" class="text-danger">
 			<i class="fa fa-exclamation-triangle"></i>
 			<span translate="project.form_error"></span>
 		</p>
 
-		<p class="text-info" ng-if="!$ctrl.isNew && $ctrl.isUnchanged()">
+		<p ng-if="!$ctrl.isNew && $ctrl.isUnchanged" class="text-info">
 			<i class="fa fa-info-circle"></i>
 			<span translate="project.form_persisted"></span>
 		</p>
 
-		<p class="text-warning" ng-if="!$ctrl.isUnchanged() && $ctrl.isValid()">
+		<p ng-if="!$ctrl.isUnchanged && inputForm.$valid" class="text-warning">
 			<i class="fa fa-exclamation-triangle"></i>
 			<span translate="project.form_changed"></span>
 		</p>
 	</div>
 
-	<a class="btn btn-primary" ng-click="$ctrl.save()" ng-disabled="(!$ctrl.isNew && $ctrl.isUnchanged()) || !$ctrl.isValid()">
+	<a ng-click="$ctrl.save()" ng-disabled="(!$ctrl.isNew && $ctrl.isUnchanged) || inputForm.$invalid" class="btn btn-primary">
 		<i class="fa fa-floppy-o"></i>
 		<span translate="shared.save"></span>
 	</a>
 
-	<a ng-click="reset()" ng-disabled="$ctrl.isUnchanged()" class="btn btn-default">
+	<a ng-click="$ctrl.reset()" ng-disabled="$ctrl.isUnchanged" class="btn btn-default">
 		<i class="fa fa-undo"></i>
 		<span translate="shared.remove_changes"></span>
 	</a>
 
-	<a class="btn btn-danger" ng-click="$ctrl.delete()" ng-if="!$ctrl.isNew">
+	<a ng-click="$ctrl.delete()" ng-if="!$ctrl.isNew" class="btn btn-danger">
 		<i class="fa fa-remove"></i>
 		<span translate="shared.delete"></span>
 	</a>

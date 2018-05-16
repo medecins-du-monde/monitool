@@ -115,12 +115,12 @@ module.controller('ProjectCollectionFormEditionController', function($scope, $st
 			element.order = 0;
 		}
 
-		angular.copy(newPartitions, element.partitions);
-	}
+		element.partitions = newPartitions;
+	};
 
 	$scope.newVariable = function() {
 		var newVariable = {
-			id: uuid(), name: "", partitions: [], order: 0, distribution: 0, geoAgg: 'sum', timeAgg: 'sum'
+			id: uuid(), name: "", partitions: [], distribution: 0, geoAgg: 'sum', timeAgg: 'sum'
 		};
 
 		$scope.editableProject.forms[$scope.currentFormIndex].elements.push(newVariable);

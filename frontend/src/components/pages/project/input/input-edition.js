@@ -64,6 +64,10 @@ module.component('projectInputEdition', {
 
 	controller: class ProjectInputEditionController {
 
+		get isUnchanged() {
+			return angular.equals(this.master, this.input);
+		}
+
 		constructor($state, $transitions, $filter) {
 			this.$state = $state;
 			this.$transitions = $transitions;
@@ -95,34 +99,20 @@ module.component('projectInputEdition', {
 		}
 
 		copy() {
-			angular.copy(this.lastInput.values, this.input.values);
+			angular.copy(this.previousInput.values, this.input.values);
 		}
 
 		async save() {
-			if ((!this.isNew && this.isUnchanged()) || !this.isValid())
+			if ((!this.isNew && this.isUnchanged) || !this.isValid())
 				return;
 
 			this._pageChangeWatch()
 			await this.input.save();
-			this.$state.go('main.project.input.list');
+			this.$state.go('main.project.input_list');
 		}
 
 		reset() {
 			angular.copy(this.master, this.input);
-		}
-
-		isUnchanged() {
-			return angular.equals(this.master, this.input);
-		}
-
-		isValid() {
-			for (var key in this.input.values) {
-				var arr = this.input.values[key], len = arr.length;
-				for (var i = 0; i < arr.length; ++i)
-					if (typeof arr[i] !== 'number')
-						return false;
-			}
-			return true;
 		}
 
 		delete() {
@@ -130,7 +120,7 @@ module.component('projectInputEdition', {
 
 			if (window.confirm(easy_question)) {
 				this._pageChangeWatch(); // remove the change page watch, because it will trigger otherwise.
-				this.input.delete(() => this.$state.go('main.project.input.list'));
+				this.input.delete(() => this.$state.go('main.project.input_list'));
 			}
 		}
 	}

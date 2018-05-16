@@ -22,7 +22,7 @@ import uiSelect from 'ui-select';
 
 import 'ui-select/dist/select.min.css';
 
-import mtComponentsUtcDatepicker from '../../../ng-models/datepicker';
+import mtComponentsUtcDatepicker from '../../../shared/ng-models/datepicker';
 
 
 const module = angular.module(

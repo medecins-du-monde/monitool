@@ -45,48 +45,11 @@ export default class Variable extends Model {
 		});
 	}
 
-	get rotatedPartitions() {
-		let n = this.partitions.length,
-			i = this.order;
-
-		//////////
-		// Compute of the n-th permutation of sequence range(i)
-		//////////
-		var j, k = 0,
-			fact = [],
-			perm = [];
-
-		// compute factorial numbers
-		fact[k] = 1;
-		while (++k < n)
-			fact[k] = fact[k - 1] * k;
-
-		// compute factorial code
-		for (k = 0; k < n; ++k) {
-			perm[k] = i / fact[n - 1 - k] << 0;
-			i = i % fact[n - 1 - k];
-		}
-
-		// readjust values to obtain the permutation
-		// start from the end and check if preceding values are lower
-		for (k = n - 1; k > 0; --k)
-			for (j = k - 1; j >= 0; --j)
-				if (perm[j] <= perm[k])
-					perm[k]++;
-
-		//////////
-		// Map our partitions to the found permutation
-		//////////
-		return perm.map(index => this.partitions[index]);
-	}
-
 	getPdfDocDefinition() {
-		var partitions = this.rotatedPartitions;
-
 		var body, widths;
 
-		var colPartitions = partitions.slice(this.distribution),
-			rowPartitions = partitions.slice(0, this.distribution);
+		var colPartitions = this.partitions.slice(this.distribution),
+			rowPartitions = this.partitions.slice(0, this.distribution);
 
 		var topRows = this._makeTopRows(colPartitions),
 			bodyRows = this._makeLeftCols(rowPartitions);
