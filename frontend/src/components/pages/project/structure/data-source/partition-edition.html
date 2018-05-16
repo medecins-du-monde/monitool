@@ -1,7 +1,7 @@
 <div class="modal-header">
 
 	<h3 class="modal-title">
-		<a ng-click="closeModal()" class="pull-right" style="cursor: pointer">
+		<a ng-click="$ctrl.dismiss()" class="pull-right" style="cursor: pointer">
 			<i class="fa fa-times"></i>
 		</a>
 		<span translate="project.partition_edit"></span>
@@ -10,7 +10,7 @@
 
 <div class="modal-body">
 
-	<form class="form-horizontal" name="partitionForm">
+	<form class="form-horizontal" name="$ctrl.partitionForm">
 		<div class="form-group">
 			<label for="input-partition-name" class="col-sm-2 control-label" translate="shared.name"></label>
 			<div class="col-sm-10">
@@ -18,7 +18,7 @@
 					   type="text"
 					   class="form-control"
 					   name="name"
-					   ng-model="partition.name"
+					   ng-model="$ctrl.partition.name"
 					   placeholder="{{'project.partition_general_placeholder'|translate}}"
 					   required />
 
@@ -41,13 +41,13 @@
 							<th style="width: 30px"></th>
 						</tr>
 					</thead>
-					<tbody ng-if="partition.elements.length == 0">
+					<tbody ng-if="$ctrl.partition.elements.length == 0">
 						<tr>
 							<td colspan="3" style="text-align: center" translate="project.no_partition_elements"></td>
 						</tr>
 					</tbody>
-					<tbody ng-if="partition.elements.length != 0" ng-sortable="{handle: '.handle'}">
-						<tr ng-repeat="partitionElement in partition.elements track by partitionElement.id">
+					<tbody ng-sortable="{handle: '.handle'}">
+						<tr ng-repeat="partitionElement in $ctrl.partition.elements track by partitionElement.id">
 							<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 
 							<td>
@@ -64,7 +64,7 @@
 							</td>
 
 							<td style="text-align: right">
-								<a class="btn btn-danger btn-sm" ng-click="deletePartitionElement(partitionElement.id)">
+								<a class="btn btn-danger btn-sm" ng-click="$ctrl.deletePartitionElement(partitionElement.id)">
 									<i class="fa fa-remove"></i>
 								</a>
 							</td>
@@ -73,7 +73,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="3" style="text-align: center">
-								<a class="btn btn-default btn-xs" ng-click="createPartitionElement()">
+								<a class="btn btn-default btn-xs" ng-click="$ctrl.createPartitionElement()">
 									<i class="fa fa-plus"></i>
 									<span translate="shared.add"></span>
 								</a>
@@ -90,9 +90,13 @@
 		</div>
 
 		<div class="form-group">
-			<label for="input-partition-aggregation" class="col-sm-2 control-label" translate="project.aggregation_lab"></label>
+			<label
+				for="input-partition-aggregation"
+				class="col-sm-2 control-label"
+				translate="project.aggregation_lab"></label>
+
 			<div class="col-sm-10">
-				<select id="input-partition-aggregation" ng-model="partition.aggregation" class="form-control">
+				<select id="input-partition-aggregation" ng-model="$ctrl.partition.aggregation" class="form-control">
 					<option value="sum" translate="project.aggregation.sum"></option>
 					<option value="average" translate="project.aggregation.average"></option>
 					<option value="highest" translate="project.aggregation.highest"></option>
@@ -109,10 +113,18 @@
 		<div class="form-group">
 			<label for="input-partition-use-groups" class="col-sm-2 control-label" translate="project.groups"></label>
 			<div class="col-sm-10">
-				<input id="input-partition-use-groups" type="checkbox" name="groups" ng-model="useGroups" />
-				<label for="input-partition-use-groups" translate="project.use_groups" style="font-weight: normal"></label>
+				<input
+					id="input-partition-use-groups"
+					type="checkbox"
+					name="groups"
+					ng-model="$ctrl.useGroups" />
 
-				<table class="table table-bordered table-stripped table-condensed" ng-if="useGroups">
+				<label
+					for="input-partition-use-groups"
+					translate="project.use_groups"
+					style="font-weight: normal"></label>
+
+				<table class="table table-bordered table-stripped table-condensed" ng-if="$ctrl.useGroups">
 					<thead>
 						<tr>
 							<th style="width: 30px"></th>
@@ -121,13 +133,13 @@
 							<th style="width: 30px;"></th>
 						</tr>
 					</thead>
-					<tbody ng-if="partition.groups.length == 0">
+					<tbody ng-if="$ctrl.partition.groups.length == 0">
 						<tr>
 							<td colspan="4" style="text-align: center" translate="project.no_partition_groups"></td>
 						</tr>
 					</tbody>
-					<tbody ng-if="partition.groups.length != 0" ng-sortable="{handle: '.handle'}">
-						<tr ng-repeat="partitionGroup in partition.groups track by partitionGroup.id">
+					<tbody ng-sortable="{handle: '.handle'}">
+						<tr ng-repeat="partitionGroup in $ctrl.partition.groups track by partitionGroup.id">
 							<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
 
 							<td>
@@ -146,14 +158,14 @@
 							<td>
 								<ui-select multiple ng-model="partitionGroup.members" theme="bootstrap">
 									<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
-									<ui-select-choices repeat="partitionElement.id as partitionElement in partition.elements">
+									<ui-select-choices repeat="partitionElement.id as partitionElement in $ctrl.partition.elements">
 										{{partitionElement.name}}
 									</ui-select-choices>
 								</ui-select>
 							</td>
 
 							<td style="text-align: right">
-								<a class="btn btn-danger btn-sm" ng-click="deleteGroup(partitionGroup.id)">
+								<a class="btn btn-danger btn-sm" ng-click="$ctrl.deleteGroup(partitionGroup.id)">
 									<i class="fa fa-remove"></i>
 								</a>
 							</td>
@@ -162,7 +174,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="4" style="text-align: center">
-								<a class="btn btn-default btn-xs" ng-click="createGroup()">
+								<a class="btn btn-default btn-xs" ng-click="$ctrl.createGroup()">
 									<i class="fa fa-plus"></i>
 									<span translate="shared.add"></span>
 								</a>
@@ -184,33 +196,33 @@
 <div class="modal-footer">
 
 	<div style="float: left">
-		<p class="text-danger" ng-if="partitionForm.$invalid">
+		<p class="text-danger" ng-if="$ctrl.partitionForm.$invalid">
 			<i class="fa fa-exclamation-triangle"></i>
 			<span translate="project.form_error_short"></span>
 		</p>
 
-		<p class="text-info" ng-if="isUnchanged() && !isNew">
+		<p class="text-info" ng-if="$ctrl.isUnchanged() && !$ctrl.isNew">
 			<i class="fa fa-info-circle"></i>
 			<span translate="project.form_persisted_short"></span>
 		</p>
 
-		<p class="text-warning" ng-if="!isUnchanged() && !partitionForm.$invalid">
+		<p class="text-warning" ng-if="!$ctrl.isUnchanged() && !$ctrl.partitionForm.$invalid">
 			<i class="fa fa-exclamation-triangle"></i>
 			<span translate="project.form_changed_short"></span>
 		</p>
 	</div>
 
-	<button ng-disabled="partitionForm.$invalid || isUnchanged()" class="btn btn-primary" ng-click="save()">
+	<button ng-disabled="$ctrl.partitionForm.$invalid || $ctrl.isUnchanged()" class="btn btn-primary" ng-click="$ctrl.save()">
 		<i class="fa fa-table"></i>
 		<span translate="shared.apply"></span>
 	</button>
 
-	<button ng-click="reset()" ng-disabled="isUnchanged()" class="btn btn-default">
+	<button ng-click="$ctrl.reset()" ng-disabled="$ctrl.isUnchanged()" class="btn btn-default">
 		<i class="fa fa-undo"></i>
 		<span translate="shared.remove_changes"></span>
 	</button>
 
-	<button ng-click="delete()" ng-if="!isNew" class="btn btn-danger">
+	<button ng-click="delete()" ng-if="!$ctrl.isNew" class="btn btn-danger">
 		<i class="fa fa-times"></i>
 		<span translate="shared.delete"></span>
 	</button>

@@ -16,8 +16,8 @@
  */
 
 import angular from 'angular';
-import Indicator from '../../../models/indicator';
-import Theme from '../../../models/theme';
+import Indicator from '../../../../models/indicator';
+import Theme from '../../../../models/theme';
 
 import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
@@ -25,8 +25,8 @@ import uiSelect from 'ui-select';
 
 import 'ui-select/dist/select.min.css';
 
-import mtCcIndicatorEdit from '../../ui-modals/cc-indicator-edition';
-import mtDirectiveAutoresize from '../../../directives/helpers/autoresize';
+import mtCcIndicatorEdit from './cc-indicator-edition';
+import mtDirectiveAutoresize from '../../../../directives/helpers/autoresize';
 
 const module = angular.module(
 	'monitool.components.pages.admin.cc-indicator-list',

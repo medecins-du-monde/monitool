@@ -17,67 +17,61 @@
 
 import angular from 'angular';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
-import translate from '../../helpers/translate';
-import Indicator from '../../models/indicator';
+import translate from '../../../../helpers/translate';
+import Theme from '../../../../models/theme';
+
 
 const module = angular.module(
-	'monitool.components.ui-modals.cc-indicator-edition',
+	'monitool.components.ui-modals.theme-edition',
 	[
 		uiModal
 	]
 );
 
-module.component('ccIndicatorEditionModal', {
+
+module.component('themeEditModal', {
 	bindings: {
 		resolve: '<',
 		close: '&',
 		dismiss: '&'
 	},
 
-	template: require('./cc-indicator-edition.html'),
+	template: require('./theme-edition.html'),
 
-	controller: class IndicatorEditModalController {
+	controller: class ThemeEditModalController {
 
-		get indicatorChanged() {
-			return !angular.equals(this.master, this.indicator);
-		}
-
-		get indicatorSavable() {
-			return this.indicatorChanged && !this.$scope.indicatorForm.$invalid;
+		get hasChanged() {
+			return !angular.equals(this.theme, this.master);
 		}
 
 		constructor($rootScope, $scope) {
-			this.$scope = $scope;
+			this.$scope = $scope; // Needed to $apply automatic translation
 			this.languages = $rootScope.languages;
 		}
 
 		$onChanges(changes) {
-			this.indicator = angular.copy(this.resolve.indicator) || new Indicator();
-			this.master = angular.copy(this.indicator);
-			this.themes = this.resolve.themes;
-			this.isNew = !this.resolve.indicator;
+			this.theme = angular.copy(this.resolve.theme) || new Theme();
+			this.isNew = !this.resolve.theme;
+			this.master = angular.copy(this.theme);
 		}
 
 		save() {
-			if (!this.indicatorSavable)
-				return;
-
-			this.close({$value: this.indicator});
+			this.close({'$value': this.theme});
 		}
 
 		delete() {
-			this.close({$value: null});
+			this.close({'$value': null});
 		}
 
-		translate(key, destLanguage) {
-			for (var sourceLanguage in this.languages) {
-				var source = indicator[key][sourceLanguage];
+		autofill(writeLanguageCode) {
+			for (var readLanguageCode in this.languages) {
+				var input = this.theme.name[readLanguageCode];
 
-				if (sourceLanguage != destLanguage && source && source.length) {
-					translate(source, destLanguage, sourceLanguage)
+				if (readLanguageCode !== writeLanguageCode && input.length) {
+					translate(input, writeLanguageCode, readLanguageCode)
 						.then(result => {
 							this.$scope.$apply(() => {
-								indicator[key][destLanguage] = result;
+								this.theme.name[writeLanguageCode] = result;
 							});
 						});
 
@@ -86,6 +80,7 @@ module.component('ccIndicatorEditionModal', {
 			}
 		}
 	}
+
 });
 
 

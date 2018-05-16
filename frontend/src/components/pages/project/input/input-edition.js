@@ -22,6 +22,7 @@ import Input from '../../../../models/input';
 import uiRouter from '@uirouter/angularjs';
 
 import mtFilterTimeSlot from '../../../../filters/time-slot';
+import mtNumberTable from './number-table';
 
 
 const module = angular.module(
@@ -29,6 +30,7 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 		mtFilterTimeSlot.name,
+		mtNumberTable.name
 	]
 );
 

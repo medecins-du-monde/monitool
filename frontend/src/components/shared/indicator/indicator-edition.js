@@ -18,7 +18,7 @@
 import angular from 'angular';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
 import mtNumberOptional from '../ng-models/number-optional';
-import mtIndicatorComputation from '../ng-models/indicator-computation';
+import mtIndicatorComputation from './indicator-computation';
 
 const module = angular.module(
 	'monitool.components.ui-modals.indicator-edition',

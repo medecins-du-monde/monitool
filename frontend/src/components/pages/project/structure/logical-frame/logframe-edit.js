@@ -21,9 +21,9 @@ import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
 import 'angular-legacy-sortablejs-maintained';
 
-import mtIndicatorDisplay from '../../../shared/indicator/display';
-import mtIndicatorModal from '../../../ui-modals/indicator-edition';
-import mtDirectiveAutoresize from '../../../../directives/helpers/autoresize';
+import mtIndicatorDisplay from '../../../../shared/indicator/display';
+import mtIndicatorModal from '../../../../shared/indicator/indicator-edition';
+import mtDirectiveAutoresize from '../../../../../directives/helpers/autoresize';
 
 
 const module = angular.module(

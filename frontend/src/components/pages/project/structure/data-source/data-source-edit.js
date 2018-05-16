@@ -24,9 +24,11 @@ import 'angular-legacy-sortablejs-maintained';
 
 import 'ui-select/dist/select.min.css';
 
-import mtComponentsOptionalDate from '../../../ng-models/datepicker-optional';
-import mtComponentsElementFilter from '../../../ng-models/mselect-with-groups';
-import {computePermutationIndex, computeNthPermutation, range} from '../../../../helpers/array';
+import mtOptionalDate from '../../../../shared/ng-models/datepicker-optional';
+import mtElementFilter from '../../../../shared/ng-models/mselect-with-groups';
+import mtPartitionList from './partition-list';
+import mtPartitionDistribution from './partition-distribution';
+import mtPartitionOrder from './partition-order';
 
 
 const module = angular.module(
@@ -37,8 +39,11 @@ const module = angular.module(
 
 		uiSelect, // for partition group members
 
-		mtComponentsOptionalDate.name, // Datepicker start & end
-		mtComponentsElementFilter.name, // Sites & groups associated with form
+		mtOptionalDate.name, // Datepicker start & end
+		mtElementFilter.name, // Sites & groups associated with form
+		mtPartitionList.name,
+		mtPartitionDistribution.name,
+		mtPartitionOrder.name,
 	]
 );
 
@@ -57,7 +62,7 @@ module.config(function($stateProvider) {
  * Controller used by the "main.project.structure.collection_form_edit" state.
  * Allows to edit a data sources.
  */
-module.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $filter, $uibModal, $timeout) {
+module.controller('ProjectCollectionFormEditionController', function($scope, $state, $stateParams, $timeout) {
 
 	$scope.container = {}
 	$scope.toggle = function(variableId) {
@@ -104,35 +109,14 @@ module.controller('ProjectCollectionFormEditionController', function($scope, $st
 		$scope.forms.current.$setValidity('elementsLength', length >= 1);
 	});
 
-	$scope.editPartition = function(element, currentPartition) {
-		$uibModal.open({
-			controller: 'PartitionEditionModalController',
-			template: require('./partition-modal.html'),
-			size: 'lg',
-			resolve: { currentPartition: function() { return currentPartition; } }
-		}).result.then(function(updatedPartition) {
-			var sizeChanged = false;
+	$scope.onPartitionUpdate = function(element, newPartitions) {
+		if (element.partitions.length !== newPartitions.length) {
+			element.distribution = Math.ceil(element.partitions.length / 2);
+			element.order = 0;
+		}
 
-			// Partition was deleted
-			if (currentPartition && !updatedPartition) {
-				element.partitions.splice(element.partitions.indexOf(currentPartition), 1);
-				sizeChanged = true;
-			}
-			// Partition was updated
-			else if (currentPartition && updatedPartition)
-				element.partitions[element.partitions.indexOf(currentPartition)] = updatedPartition;
-			// Partition was added
-			else if (!currentPartition && updatedPartition) {
-				sizeChanged = true;
-				element.partitions.push(updatedPartition);
-			}
-
-			if (sizeChanged) {
-				element.distribution = Math.ceil(element.partitions.length / 2);
-				element.order = 0;
-			}
-		});
-	};
+		angular.copy(newPartitions, element.partitions);
+	}
 
 	$scope.newVariable = function() {
 		var newVariable = {

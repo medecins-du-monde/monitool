@@ -1,0 +1,19 @@
+
+<div class="well" style="padding: 5px;">
+	<ul style="list-style-type: none; padding-left: 5px">
+		<li ng-if="$ctrl.partitions.length == 0" translate="project.no_partitions"></li>
+
+		<li ng-repeat="partition in $ctrl.partitions">
+			<a ng-click="$ctrl.editPartition(partition)">
+				<i class="fa fa-pencil"></i>
+				<strong>{{partition.name}}</strong>
+				({{partition.elements|pluck:"name"|join:", "}})
+			</a>
+		</li>
+	</ul>
+
+	<a ng-click="$ctrl.addPartition()" class="btn btn-xxs btn-default">
+		<i class="fa fa-plus"></i>
+		<span translate="project.add_partition"></span>
+	</a>
+</div>

@@ -19,10 +19,10 @@ import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 import uuid from 'uuid/v4';
 
-import Project from '../../../../models/project';
-import Theme from '../../../../models/theme';
+import Project from '../../../models/project';
+import Theme from '../../../models/theme';
 
-import mtDirectiveAclProjectCreation from '../../../../directives/acl/project-creation';
+import mtDirectiveAclProjectCreation from '../../../directives/acl/project-creation';
 
 const module = angular.module(
 	'monitool.components.pages.project.list',

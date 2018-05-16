@@ -19,9 +19,9 @@ import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
 
-import Theme from '../../../models/theme';
-import {translate} from '../../../helpers/translate';
-import mtThemeEditModal from '../../ui-modals/theme-edition';
+import Theme from '../../../../models/theme';
+import translate from '../../../../helpers/translate';
+import mtThemeEditModal from './theme-edition';
 
 const module = angular.module(
 	'monitool.components.pages.admin.themelist',

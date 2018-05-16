@@ -47,10 +47,6 @@ module.component('userEditModal', {
 		save() {
 			this.close({'$value': this.user});
 		}
-
-		cancel() {
-			this.dismiss();
-		}
 	}
 });
 

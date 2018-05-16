@@ -19,7 +19,7 @@ import angular from 'angular';
 
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
 
-import editionModal from '../../ui-modals/indicator-edition';
+import editionModal from './indicator-edition';
 
 const module = angular.module(
 	'monitool.components.shared.indicator.display',

@@ -20,7 +20,7 @@ import exprEval from 'expr-eval';
 import Handsontable from 'handsontable/dist/handsontable.js';
 import 'handsontable/dist/handsontable.css';
 
-import {transpose2D, computeNthPermutation} from '../../helpers/array';
+import {transpose2D, computeNthPermutation} from '../../../../helpers/array';
 
 const module = angular.module(
 	'monitool.components.ng-models.number-table',

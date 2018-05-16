@@ -21,7 +21,7 @@ import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
 import 'angular-legacy-sortablejs-maintained';
 
-import mtIndicatorEditionModal from '../../../ui-modals/indicator-edition';
+import mtIndicatorEditionModal from '../../../shared/indicator/indicator-edition';
 
 const module = angular.module(
 	'monitool.components.pages.project.structure.extraindicator',

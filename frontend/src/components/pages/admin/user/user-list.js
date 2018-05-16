@@ -19,9 +19,9 @@ import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
 
-import User from '../../../models/user';
+import User from '../../../../models/user';
 
-import mtUserModal from '../../ui-modals/user-edition';
+import mtUserModal from './user-edition';
 
 const module = angular.module(
 	'monitool.components.pages.admin.userlist',

@@ -17,7 +17,7 @@
 
 import angular from 'angular';
 
-import {computePermutationIndex, computeNthPermutation, range} from '../../helpers/array';
+import {computePermutationIndex, computeNthPermutation, range} from '../../../../../helpers/array';
 
 
 const module = angular.module(
@@ -55,14 +55,14 @@ module.component('partitionOrder', {
 			this.ngModelCtrl.$formatters.push(modelValue => {
 				return computeNthPermutation(this.partitions.length, modelValue).map(i => this.partitions[i]);
 			});
-		};
+		}
 
 		$onChanges(changes) {
 			if (changes.partitions) {
 				// we should only watch partitions.length, partitions[*].id and partitions[*].name
 				// but that will do it.
 				// however it's a bit overkill (will reset partitin order when we change an element name)
-				const [oldValue, newValue] = [changes.partitions.]
+				// const [oldValue, newValue] = [changes.partitions.]
 
 				if (!angular.equals(oldValue, newValue)) {
 					// Reset ordered partitions only when a partition was added or removed

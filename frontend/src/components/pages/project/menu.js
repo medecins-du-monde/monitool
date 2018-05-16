@@ -17,15 +17,15 @@
 
 import angular from 'angular';
 
-import Indicator from '../../../../models/indicator';
-import Theme from '../../../../models/theme';
-import Project from '../../../../models/project';
+import Indicator from '../../../models/indicator';
+import Theme from '../../../models/theme';
+import Project from '../../../models/project';
 
 import uiRouter from '@uirouter/angularjs';
 
-import mtDirectiveAclProjectCreation from '../../../../directives/acl/project-creation';
-import mtDirectiveAclProjectRole from '../../../../directives/acl/project-role';
-import mtDirectiveAclProjectInput from '../../../../directives/acl/project-input';
+import mtDirectiveAclProjectCreation from '../../../directives/acl/project-creation';
+import mtDirectiveAclProjectRole from '../../../directives/acl/project-role';
+import mtDirectiveAclProjectInput from '../../../directives/acl/project-input';
 
 
 const module = angular.module(

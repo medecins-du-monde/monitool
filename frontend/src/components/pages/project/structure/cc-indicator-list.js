@@ -18,7 +18,7 @@
 import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
-import mtIndicatorEditionModal from '../../../ui-modals/indicator-edition';
+import mtIndicatorEditionModal from '../../../shared/indicator/indicator-edition';
 
 const module = angular.module(
 	'monitool.components.pages.project.structure.crosscutting',

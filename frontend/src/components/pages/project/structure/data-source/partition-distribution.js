@@ -17,7 +17,7 @@
 
 import angular from 'angular';
 
-import {computePermutationIndex, computeNthPermutation, range} from '../../helpers/array';
+import {range} from '../../../../../helpers/array';
 
 
 const module = angular.module(
