@@ -15,34 +15,7 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TimeSlot from 'timeslot-dag';
-
-function minDate(dates) {
-	return dates.reduce(function(d, memo) { return !memo || memo > d ? d : memo; });
-};
-
-function maxDate(dates) {
-	return dates.reduce(function(d, memo) { return !memo || memo < d ? d : memo; });
-};
-
-function iterate(begin, end, periodicity) {
-	var slot = TimeSlot.fromDate(begin, periodicity),
-		endSlot = TimeSlot.fromDate(end, periodicity);
-
-	var now = TimeSlot.fromDate(new Date(), periodicity);
-	if (now.value < endSlot.value)
-		endSlot = now;
-
-	var slots = [];
-	while (slot.value < endSlot.value) {
-		slots.push(slot.value);
-		slot = slot.next();
-	}
-	slots.push(slot.value);
-
-	return slots;
-};
-
+import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 
 export default class Dimension {
 
@@ -51,17 +24,26 @@ export default class Dimension {
 
 		if (form.periodicity === 'free') {
 			periods = {};
-			inputs.forEach(function(input) { periods[input.period] = true; });
+			inputs.forEach(input => periods[input.period] = true);
 			periods = Object.keys(periods);
 			periods.sort();
 
 			return new Dimension(form.periodicity === 'free' ? 'day' : form.periodicity, periods, element.timeAgg);
 		}
 		else {
-			var start   = maxDate([project.start, form.start]),
-				end     = minDate([project.end, form.end]);
+			// max(project.start, form.start)
+			const start = [project.start, form.start].filter(a => a).sort().pop();
+			// min(project.end, form.end, new Date())
+			const end = [project.end, form.end, new Date().toISOString().substring(0, 10)].sort().shift();
 
-			periods = iterate(new Date(start + 'T00:00:00Z'), new Date(end + 'T00:00:00Z'), form.periodicity);
+			periods = Array
+				.from(
+					timeSlotRange(
+						TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), form.periodicity),
+						TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), form.periodicity)
+					)
+				)
+				.map(ts => ts.value)
 
 			return new Dimension(form.periodicity, periods, element.timeAgg);
 		}
