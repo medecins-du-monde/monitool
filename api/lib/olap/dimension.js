@@ -19,34 +19,24 @@ import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 
 export default class Dimension {
 
-	static createTime(project, form, element, inputs) {
-		var periods;
+	static createTime(project, form, element) {
+		const periodicity = form.periodicity === 'free' ? 'day' : form.periodicity;
 
-		if (form.periodicity === 'free') {
-			periods = {};
-			inputs.forEach(input => periods[input.period] = true);
-			periods = Object.keys(periods);
-			periods.sort();
+		// max(project.start, form.start)
+		const start = [project.start, form.start].filter(a => a).sort().pop();
+		// min(project.end, form.end, new Date())
+		const end = [project.end, form.end, new Date().toISOString().substring(0, 10)].sort().shift();
 
-			return new Dimension(form.periodicity === 'free' ? 'day' : form.periodicity, periods, element.timeAgg);
-		}
-		else {
-			// max(project.start, form.start)
-			const start = [project.start, form.start].filter(a => a).sort().pop();
-			// min(project.end, form.end, new Date())
-			const end = [project.end, form.end, new Date().toISOString().substring(0, 10)].sort().shift();
-
-			periods = Array
-				.from(
-					timeSlotRange(
-						TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), form.periodicity),
-						TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), form.periodicity)
-					)
+		const periods = Array
+			.from(
+				timeSlotRange(
+					TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), periodicity),
+					TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), periodicity)
 				)
-				.map(ts => ts.value)
+			)
+			.map(ts => ts.value)
 
-			return new Dimension(form.periodicity, periods, element.timeAgg);
-		}
+		return new Dimension(periodicity, periods, element.timeAgg);
 	}
 
 	static createLocation(project, form, element) {

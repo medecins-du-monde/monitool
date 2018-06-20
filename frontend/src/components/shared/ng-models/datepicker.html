@@ -1,9 +1,9 @@
 <input
 	type="text"
 	uib-datepicker-popup="longDate"
-	ng-model="localDate"
+	ng-model="$ctrl.localDate"
+	ng-change="$ctrl.onValueChange()"
 	is-open="dateOpen"
 	ng-click="dateOpen=true"
 	required
-	datepicker-options="options"
 	class="form-control" />

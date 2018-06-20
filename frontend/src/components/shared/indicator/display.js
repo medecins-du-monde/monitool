@@ -17,53 +17,56 @@
 
 import angular from 'angular';
 
-import uiModal from 'angular-ui-bootstrap/src/modal/index';
+import uibModal from 'angular-ui-bootstrap/src/modal/index';
 
 import editionModal from './indicator-edition';
 
 const module = angular.module(
 	'monitool.components.shared.indicator.display',
 	[
-		uiModal, // for $uibModal
+		uibModal, // for $uibModal
 		editionModal.name
 	]
 );
 
 
-module.directive('indicator', function($uibModal) {
-	return {
-		restrict: 'E',
-		template: require('./display.html'),
-		scope: {
-			indicator: '=',
-			indicatorList: '=',
-			editableProject: '=project'
-		},
-		link: function($scope) {
-			$scope.editIndicator = function() {
-				$uibModal
-					.open({
-						component: 'indicatorEditionModal',
-						size: 'lg',
-						resolve: {
-							planning: () => $scope.indicator,
-							indicator: () => null,
-							dataSources: () => $scope.editableProject.forms
-						}
-					})
-					.result
-					.then(function(newIndicator) {
-						var indicator = $scope.indicator;
+module.component('indicator', {
+	bindings: {
+		project: '<',
+		indicator: '<',
 
-						if (indicator && !newIndicator)
-							$scope.indicatorList.splice($scope.indicatorList.indexOf(indicator), 1);
-						else if (!indicator && newIndicator)
-							$scope.indicatorList.push(newIndicator);
-						else if (indicator && newIndicator)
-							$scope.indicatorList.splice($scope.indicatorList.indexOf(indicator), 1, newIndicator);
-					});
-			};
+		onUpdated: '&',
+		onDeleted: '&'
+	},
+
+	template: require('./display.html'),
+
+	controller: class IndicatorController {
+
+		constructor($uibModal) {
+			this.$uibModal = $uibModal;
 		}
+
+		onEditClicked() {
+			this.$uibModal
+				.open({
+					component: 'indicatorEditionModal',
+					size: 'lg',
+					resolve: {
+						planning: () => this.indicator,
+						indicator: () => null,
+						dataSources: () => this.project.forms
+					}
+				})
+				.result
+				.then(newIndicator => {
+					if (newIndicator)
+						this.onUpdated({newIndicator: newIndicator, previousValue: this.indicator});
+					else
+						this.onDeleted({indicator: this.indicator});
+				});
+		}
+
 	}
 });
 

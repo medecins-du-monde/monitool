@@ -13,7 +13,7 @@ module.exports = {
 	// Import polyfills, then our code
 	entry: ["babel-polyfill", "./src/init.js"],
 
-	// Output everything as a big bunder
+	// Output everything as a big bundle
 	output: {
 		path: path.resolve('dist'),
 		filename :'monitool2-[name]-[chunkhash].js'

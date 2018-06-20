@@ -1,0 +1,113 @@
+<ol class="breadcrumb noprint">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="project.basics"></li>
+</ol>
+
+<div class="alert alert-info" translate="project.basics_info"></div>
+
+<legend translate="project.basics"></legend>
+
+<form class="form-horizontal noprint" role="form" name="$ctrl.basicsForm" novalidate>
+	<fieldset>
+
+		<form-group
+			input-id="input-country"
+			label="shared.country"
+			help="project.basics_help_country">
+
+			<input
+				id="input-country"
+				class="form-control"
+				type="text"
+				name="country"
+				ng-model="$ctrl.editableProject.country"
+				ng-change="$ctrl.onFieldChange()"
+				placeholder="{{'project.country_ph'|translate}}"
+				required />
+
+		</form-group>
+
+		<form-group
+			input-id="input-name"
+			label="shared.name"
+			help="project.basics_help_name">
+
+			<input
+				id="input-name"
+				type="text"
+				class="form-control"
+				name="name"
+				ng-model="$ctrl.editableProject.name"
+				ng-change="$ctrl.onFieldChange()"
+				placeholder="{{'project.name_ph'|translate}}"
+				required />
+
+		</form-group>
+
+		<form-group
+			input-id="input-themes"
+			label="theme.themes"
+			help="project.basics_help_thematics">
+
+			<ui-select
+				id="input-themes"
+				multiple
+				ng-model="$ctrl.editableProject.themes"
+				ng-change="$ctrl.onFieldChange()"
+				name="themes"
+				theme="bootstrap">
+
+				<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">
+					{{$item.name[$root.language]}}
+				</ui-select-match>
+				<ui-select-choices repeat="theme._id as theme in $ctrl.themes">
+					{{theme.name[$root.language]}}
+				</ui-select-choices>
+			</ui-select>
+
+		</form-group>
+
+		<form-group
+			input-id="input-start"
+			label="project.start_date"
+			help="project.basics_help_begin">
+
+			<utc-datepicker
+				ng-model="$ctrl.editableProject.start"
+				ng-change="$ctrl.onFieldChange()"></utc-datepicker>
+
+		</form-group>
+
+		<form-group
+			input-id="input-end"
+			label="project.end_date"
+			help="project.basics_help_end">
+
+			<utc-datepicker
+				ng-model="$ctrl.editableProject.end"
+				ng-change="$ctrl.onFieldChange()"></utc-datepicker>
+		</form-group>
+
+		<form-group
+			input-id="input-visibility"
+			label="project.visibility.visibility"
+			help="project.visibility.help">
+
+			<select
+				id="input-visibility"
+				type="text"
+				class="form-control"
+				name="visibility"
+				ng-model="$ctrl.editableProject.visibility"
+				ng-change="$ctrl.onFieldChange()"
+				required>
+				<option value="public" translate="project.visibility.public"></option>
+				<option value="private" translate="project.visibility.private"></option>
+			</select>
+
+		</form-group>
+
+ 	</fieldset>
+</form>

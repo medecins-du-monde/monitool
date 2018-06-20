@@ -23,11 +23,11 @@ import winston from 'winston';
 database.prepare().then(
 	function() {
 		application.listen(config.port);
-	},
-	function(error) {
-		winston.log('error', 'Could not start database: ' + error.message);
-		process.exit(1);
-	}
+	}//,
+	// function(error) {
+	// 	winston.log('error', 'Could not start database: ' + error.message);
+	// 	process.exit(1);
+	// }
 );
 
 // Catch the uncaught errors that weren't wrapped in a domain or try catch statement

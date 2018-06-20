@@ -72,6 +72,7 @@ const migrateInputs = async () => {
 
 		documents.push(deleted, input)
 
+
 		if (documents.length > 40) {
 			await database.callBulk({docs: documents});
 			documents.length = 0
@@ -86,7 +87,9 @@ const updateProject = project => {
 	// Add visibility
 	project.visibility = 'public';
 
-	project.logicalFrames.forEach(logframe => {
+	project.logicalFrames.forEach((logframe, index) => {
+		logframe.id = '00000000-0000-0000-0000-' + index.toString().padStart(12, '0');
+
 		// Add start and end date
 		logframe.start = logframe.end = null;
 

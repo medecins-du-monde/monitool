@@ -29,7 +29,7 @@ const module = angular.module(
 );
 
 
-module.config(function($stateProvider) {
+module.config($stateProvider => {
 	$stateProvider.state('main', {
 		abstract: true,
 		template: require('./menu.html')

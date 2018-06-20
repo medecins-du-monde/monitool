@@ -110,11 +110,22 @@ export default class Project extends DbModel {
 		return this.forms.find(ds => ds.id === id);
 	}
 
+	getDataSourceByVariableId(id) {
+		return this.forms.find(ds => ds.getVariableById(id));
+	}
+
 	/**
 	 * Retrieve an entity by id.
 	 */
 	getEntityById(id) {
 		return this.entities.find(e => e.id === id);
+	}
+
+	/**
+	 * Retrieve a logical framework by id.
+	 */
+	getLogicalFrameById(id) {
+		return this.logicalFrames.find(lf => lf.id === id);
 	}
 
 	/**

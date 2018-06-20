@@ -1,24 +1,19 @@
 <div class="input-group">
-	<div class="input-group-addon">
+	<div class="input-group-addon" style="vertical-align: middle;">
 		<i class="fa fa-thumb-tack"
-		   ng-click="specifyDate=!specifyDate"
-		   ng-style="{color: specifyDate ? 'black' : 'revert'}"></i>
+		   ng-click="$ctrl.toggleSpecifyDate()"
+		   ng-style="{color: $ctrl.specifyDate ? 'black' : 'revert'}"></i>
 	</div>
 
-	<input type="text"
-		   ng-if="specifyDate"
-		   uib-datepicker-popup="longDate"
-		   name="start"
-		   ng-model="container.dateLocal"
-		   is-open="chosenDateOpen"
-		   ng-click="chosenDateOpen=true"
-		   required
-		   class="form-control" />
+	<utc-datepicker
+		ng-if="$ctrl.specifyDate"
+		ng-model="$ctrl.chosenDate"
+		ng-change="$ctrl.onDateChange()"></utc-datepicker>
 
-	<input type="text"
-		   ng-if="!specifyDate"
-		   value="{{message|translate}}"
-		   disabled
-		   class="form-control disabled" />
-
+	<input
+		type="text"
+		ng-if="!$ctrl.specifyDate"
+		value="{{$ctrl.message|translate}}"
+		disabled
+		class="form-control disabled" />
 </div>

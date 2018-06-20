@@ -1,0 +1,45 @@
+<td class="noprint" style="text-align: center">
+	<i class="fa fa-line-chart"
+	   ng-click="$ctrl.toggleGraph()"
+	   ng-style="{color: $ctrl.graphToggled ? 'black' : 'revert'}"></i>
+</td>
+
+<!-- <td class="row-title">
+	<span title="{{$ctrl.indicator.display}}">{{$ctrl.indicator.display|maxLength:50}}</span>
+</td> -->
+<td class="row-title">
+	<i class="fa fa-arrow-circle-right" ng-if="$ctrl.isGroup"></i>
+	<span title="{{$ctrl.name}}">{{$ctrl.name|maxLength:50}}</span>
+
+	<div class="pull-right">
+		<div class="btn-toolbar">
+			<div class="btn-group btn-group-xs">
+				<button ng-repeat="p in $ctrl.availablePartitions"
+						class="btn btn-default"
+						ng-class="{active:$ctrl.split === p.id}"
+						ng-click="$ctrl.toggleSplit(p.id)">
+					{{p.name}}
+				</button>
+			</div>
+		</div>
+	</div>
+</td>
+
+<td ng-class="{empty: $ctrl.indicator.baseline === null}">
+	<span>{{$ctrl.indicator.baseline}}{{$ctrl.indicator|indicatorUnit}}</span>
+</td>
+<td ng-class="{empty: $ctrl.indicator.target === null}">
+	<span>{{$ctrl.indicator.target}}{{$ctrl.indicator|indicatorUnit}}</span>
+</td>
+
+<td ng-if="!$ctrl.values"
+	colspan="{{$ctrl.columns.length}}"
+	style="background-color: rgb(238, 238, 238);">
+	{{$ctrl.errorMessage|translate}}
+</td>
+
+<td ng-repeat="value in $ctrl.values track by $index"
+	td-reporting-field
+	value="value"
+	indicator="$ctrl.indicator">
+</td>

@@ -129,14 +129,7 @@ export default class Input extends DbModel {
 				filter[newStructure[i].id] = [peIds[i]];
 
 			// Try to retrieve the value from the cube.
-			try {
-				newValues[fieldIndex] = cube.query([], filter);
-			}
-			// The cube raised an error, this means that we asked for an inexistent
-			// partitionElementId in the cube (which is made from former data).
-			catch (e) {
-				newValues[fieldIndex] = 0;
-			}
+			newValues[fieldIndex] = cube.query([], filter) || 0;
 		}
 
 		return newValues;

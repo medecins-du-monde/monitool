@@ -246,6 +246,9 @@ export default class Project {
 			if (element.distribution < 0 || element.distribution > element.partitions.length)
 				element.distribution = Math.floor(element.partitions.length / 2);
 		});
+
+		if (form.periodicity === 'free')
+			form.start = form.end = null;
 	}
 
 	async clone() {

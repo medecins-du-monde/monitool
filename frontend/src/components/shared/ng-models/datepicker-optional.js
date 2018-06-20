@@ -27,69 +27,40 @@ const module = angular.module(
 );
 
 
-module.directive('optionalDate', function() {
-	return {
-		restrict: 'E',
-		require: 'ngModel',
-		template: require('./datepicker-optional.html'),
-		scope: {
-			defaultUTC: '=default'
-		},
-		link: function(scope, element, attributes, ngModelController) {
+module.component('optionalDate', {
+	require: {
+		ngModelCtrl: 'ngModel'
+	},
 
-			ngModelController.$formatters.push(function(modelValue) {
-				return modelValue ? new Date(modelValue + 'T00:00:00Z') : null;
-			});
+	template: require('./datepicker-optional.html'),
 
-			ngModelController.$parsers.push(function(viewValue) {
-				return viewValue ? viewValue.toISOString().substring(0, 10) : null;
-			});
+	bindings: {
+		default: '<',
+		message: '@'
+	},
 
-			scope.message = attributes.message;
+	controller: class OptionalDateController {
 
-			scope.$watch('defaultUTC', function(defaultUTC) {
-				defaultUTC = new Date(defaultUTC + 'T00:00:00Z');
-				scope.defaultLocal = new Date(defaultUTC.getTime() + defaultUTC.getTimezoneOffset() * 60 * 1000);
-			});
-
-			scope.container = {};
-
-			ngModelController.$render = function() {
-				var dateUTC = ngModelController.$viewValue;
-				if (dateUTC) {
-					scope.container.dateLocal = new Date(dateUTC.getTime() + dateUTC.getTimezoneOffset() * 60 * 1000);
-					scope.specifyDate = true;
-				}
-				else {
-					scope.container.dateLocal = null;
-					scope.specifyDate = false;
-				}
+		$onInit() {
+			this.ngModelCtrl.$render = () => {
+				this.specifyDate = this.ngModelCtrl.$viewValue !== null;
+				this.chosenDate = this.ngModelCtrl.$viewValue;
 			};
+		}
 
-			scope.$watch('container.dateLocal', function(newDateLocal, oldDateLocal) {
-				if (newDateLocal === oldDateLocal)
-					return;
+		toggleSpecifyDate() {
+			this.specifyDate = !this.specifyDate;
+			if (this.specifyDate)
+				this.chosenDate = this.default;
 
-				if (newDateLocal)
-					ngModelController.$setViewValue(new Date(newDateLocal.getTime() - newDateLocal.getTimezoneOffset() * 60 * 1000));
-				else
-					ngModelController.$setViewValue(null);
-			});
+			this.onDateChange();
+		}
 
-			scope.$watch('specifyDate', function(newValue, oldValue) {
-				if (oldValue === newValue)
-					return;
-
-				if (newValue) {
-					var dateUTC = new Date(scope.defaultUTC + 'T00:00:00Z');
-					scope.container.dateLocal = new Date(dateUTC.getTime() + dateUTC.getTimezoneOffset() * 60 * 1000);
-				}
-				else {
-					scope.container.dateLocal = null;
-				}
-			});
+		onDateChange() {
+			this.ngModelCtrl.$setViewValue(this.specifyDate ? this.chosenDate : null);
 		}
 	}
 });
+
 
 export default module;

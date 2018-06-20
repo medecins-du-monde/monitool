@@ -22,28 +22,28 @@
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}" ng-if="userCtx.type == 'user'">
+				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}" ng-if="$root.userCtx.type == 'user'">
 					<a ui-sref="main.projects">
 						<i class="fa fa-fw fa-object-group"></i>
 						<span translate="shared.projects"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.project')}" ng-if="userCtx.type == 'partner'">
-					<a ui-sref="main.project.reporting.general">
+				<li ng-class="{active: $state.includes('main.project')}" ng-if="$root.userCtx.type == 'partner'">
+					<a ui-sref="main.project.reporting_general">
 						<i class="fa fa-fw fa-object-group"></i>
 						<span translate="shared.project"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator_reporting')}" ng-if="userCtx.type == 'user'">
+				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator_reporting')}" ng-if="$root.userCtx.type == 'user'">
 					<a ui-sref="main.indicators">
 						<i class="fa fa-fw fa-book"></i>
 						<span translate="indicator.cross_cutting"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.admin')}" ng-if="userCtx.type == 'user' && userCtx.role == 'admin'">
+				<li ng-class="{active: $state.includes('main.admin')}" ng-if="$root.userCtx.type == 'user' && userCtx.role == 'admin'">
 					<a ui-sref="main.admin.users">
 						<i class="fa fa-fw fa-cogs"></i>
 						<span translate="shared.settings"></span>

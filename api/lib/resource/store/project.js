@@ -103,7 +103,11 @@ var compare = function(before, after) {
 	let moves = [];
 	compareRec(before, after, moves, '/');
 
-	return moves.concat(jsonpatch.compare(before, after));
+	const operations = moves.concat(jsonpatch.compare(before, after));
+
+
+
+	return operations;
 };
 
 

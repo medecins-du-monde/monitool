@@ -1,0 +1,79 @@
+<ol class="breadcrumb">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="project.pivot_table"></li>
+</ol>
+
+
+<select-indicator
+	project="$ctrl.project"
+	cc-indicators="$ctrl.ccIndicators"
+	on-update="$ctrl.onIndicatorUpdated(indicator, logicalFramework)"></select-indicator>
+
+<olap-dimensions
+	project="$ctrl.project"
+	indicator="$ctrl.indicator"
+	on-update="$ctrl.onDimensionsUpdated(dimensions)"></olap-dimensions>
+
+<indicator-filter
+	project="$ctrl.project"
+	indicator="$ctrl.indicator"
+	on-update="$ctrl.onFilterUpdated(filter)"></indicator-filter>
+
+<div ng-if="$ctrl.indicator">
+	<span ng-if="$ctrl.indicator.baseline !== null">
+		Baseline: {{$ctrl.indicator.baseline}}{{$ctrl.indicator|indicatorUnit}}
+	</span>
+	<span ng-if="$ctrl.indicator.target !== null">
+		Target: {{$ctrl.indicator.target}}{{$ctrl.indicator|indicatorUnit}}
+	</span>
+</div>
+
+{{$ctrl.indicator}}<br/><br/>
+{{$ctrl.dimensions}}<br/><br/>
+{{$ctrl.filter}}<br/><br/>
+{{$ctrl.data}}<br/><br/>
+<!-- 
+
+
+<button class="btn btn-primary btn-xs pull-right noprint" csv-save style="margin-bottom: 10px;">
+	<i class="fa fa-download"></i>
+	<span translate="shared.download_table"></span>
+</button>
+
+<div>
+	<span ng-if="baseline !== null">Baseline: {{baseline}}{{unit}}</span>
+	<span ng-if="target !== null">Target: {{target}}{{unit}}</span>
+</div>
+
+<div style="clear: both"></div>
+
+<div ng-if="!cubes">
+	<table class="table table-bordered" id="reporting">
+		<tbody>
+			<tr>
+				<td>
+					<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>
+					<span translate="shared.loading"></span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div ng-if="cubes">
+	<div ng-if="display.cols.length == 0 && display.rows.length == 0">
+		<table class="table table-bordered" id="reporting">
+			<tbody>
+				<tr>
+					<td ng-if="display.data == 'formula_missing'" translate="project.indicator_computation_missing"></td>
+					<td ng-if="display.data != 'formula_missing'" reporting-field="display.data"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<olap-grid unit="unit" colorization="colorization" cols="display.cols" rows="display.rows" data="display.data"></olap-grid>
+
+</div> -->

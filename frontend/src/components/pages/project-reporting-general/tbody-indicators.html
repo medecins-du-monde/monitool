@@ -1,0 +1,30 @@
+<tr ng-click="$ctrl.onOpenToggle()" style="cursor: pointer">
+	<th class="indent0" colspan="{{4 + $ctrl.columns.length}}">
+		<fa-open value="$ctrl.open" class="noprint"></fa-open>
+		<span ng-if="$ctrl.prefix">
+			{{$ctrl.prefix|translate}}:
+		</span>
+		{{$ctrl.name|translate}}
+	</th>
+</tr>
+
+<tr ng-if="$ctrl.open && !$ctrl.indicators.length">
+	<td class="noprint"></td>
+	<td colspan="{{3 + $ctrl.columns.length}}" translate="project.reporting_empty"></td>
+</tr>
+
+<tr
+	ng-if="$ctrl.open"
+	ng-repeat="row in $ctrl.rows track by row.id"
+	class="indent{{row.indent}}"
+
+	tr-indicator
+	columns="$ctrl.columns"
+	project="$ctrl.project"
+	group-by="$ctrl.groupBy"
+	split="$ctrl.splits[row.id]"
+
+	filter="row.filter"
+	indicator="row.indicator"
+	on-split-toggle="$ctrl.onSplitToggle(row.id, partitionId)">
+</tr>

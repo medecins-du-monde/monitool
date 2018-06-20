@@ -178,28 +178,18 @@ textarea {
 	border-right-width: 0;
 }
 
-  table.project-reporting {
+  #reporting {
     font-size: 12px;
   }
 
-  #reporting label {
-    font-weight: normal;
-  }
-
-  table.project-reporting .section, table.project-reporting .section a {
-    color: black;
-    text-decoration: underline;
-    font-weight: bold;
-  }
-
-  table.project-reporting .indent1 {
+  #reporting .indent1 .row-title {
     padding-left: 25px !important;
   }
 
-  table.project-reporting .indent2 {
+  #reporting .indent2 .row-title {
     padding-left: 50px !important;
   }
-  table.project-reporting .indent3 {
+  #reporting .indent3 .row-title {
     padding-left: 75px !important;
   }
 
@@ -696,4 +686,10 @@ td.empty > span {
 
   .table>tbody.revtbody+tbody.revtbody {
     border-top-width: 1px;
+  }
+
+
+  indicator-group-by, project-group-by, select-indicator, indicator-filter .panel, olap-dimensions .panel {
+    display: block;
+    margin-bottom: 5px;
   }

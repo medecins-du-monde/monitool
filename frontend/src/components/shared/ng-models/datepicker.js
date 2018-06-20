@@ -39,35 +39,38 @@ module.config(function(uibDatepickerConfig, uibDatepickerPopupConfig) {
 
 // Work around bug in angular ui datepicker
 // https://github.com/angular-ui/bootstrap/issues/6140
-module.directive('utcDatepicker', function() {
-	return {
-		restrict: 'E',
-		require: 'ngModel',
-		template: require('./datepicker.html'),
-		scope: {},
-		link: function(scope, element, attributes, ngModelController) {
+module.component('utcDatepicker', {
+	require: {
+		ngModelCtrl: 'ngModel'
+	},
 
-			ngModelController.$formatters.push(function(modelValue) {
+	template: require('./datepicker.html'),
+
+	controller: class UtcDatepickerController {
+
+		$onInit() {
+			this.ngModelCtrl.$formatters.push(modelValue => {
 				modelValue = new Date(modelValue + 'T00:00:00Z');
 				modelValue = new Date(modelValue.getTime() + modelValue.getTimezoneOffset() * 60 * 1000);
 				return modelValue;
 			});
 
-			ngModelController.$parsers.push(function(viewValue) {
+			this.ngModelCtrl.$parsers.push(viewValue => {
 				viewValue = new Date(viewValue.getTime() - viewValue.getTimezoneOffset() * 60 * 1000);
 				viewValue = viewValue.toISOString().substring(0, 10);
 				return viewValue;
 			});
 
-			ngModelController.$render = function() {
-				scope.localDate = ngModelController.$viewValue;
+			this.ngModelCtrl.$render = () => {
+				this.localDate = this.ngModelCtrl.$viewValue;
 			};
+		}
 
-			scope.$watch('localDate', function(localDate) {
-				ngModelController.$setViewValue(localDate);
-			});
+		onValueChange() {
+			this.ngModelCtrl.$setViewValue(this.localDate);
 		}
 	}
 });
+
 
 export default module;

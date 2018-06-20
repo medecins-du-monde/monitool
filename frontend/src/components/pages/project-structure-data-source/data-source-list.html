@@ -1,0 +1,58 @@
+<ol class="breadcrumb">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="project.collection_form_list"></li>
+</ol>
+
+<div class="alert alert-info" translate="project.collection_form_list_info"></div>
+
+<legend translate="project.collection_form_list"></legend>
+
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th style="width: 30px"></th>
+			<th translate="shared.name"></th>
+			<th translate="project.periodicity"></th>
+			<th translate="project.collection_site_list"></th>
+			<th style="width: 250px"></th>
+		</tr>
+	</thead>
+	<tbody ng-if="$ctrl.editableProject.forms.length == 0">
+		<tr>
+			<td colspan="6" style="text-align: center" translate="project.no_forms"></td>
+		</tr>
+	</tbody>
+	<tbody ng-sortable="$ctrl.ngSortableOptions">
+		<tr ng-repeat="dataSource in $ctrl.editableProject.forms">
+			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
+			<td>
+				<a ui-sref="main.project.structure.collection_form_edition({dataSourceId: dataSource.id})">
+					{{dataSource.name}}
+				</a>
+			</td>
+			<td>{{'project.periodicities.' + dataSource.periodicity|translate}}</td>
+			<td>
+				{{dataSource.entities|getObjects:$ctrl.project.entities|pluck:'name'|join:', '}}
+			</td>
+			<td>
+				<i class="fa fa-file-pdf-o"></i>
+				<span translate="project.download_pdf"></span>
+				(<a href="/api/resources/project/{{$ctrl.project._id}}/data-source/{{dataSource.id}}.pdf?orientation=portrait" target="_blank" translate="shared.portrait"></a>,
+				<a href="/api/resources/project/{{$ctrl.project._id}}/data-source/{{dataSource.id}}.pdf?orientation=landscape" target="_blank" translate="shared.landscape"></a>)
+			</td>
+ 		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="6" style="text-align: center">
+				<a class="btn btn-default btn-xs" ng-click="$ctrl.onCreateFormClicked()">
+					<i class="fa fa-plus"></i>
+					<span translate="shared.add"></span>
+				</a>
+			</td>
+		</tr>
+	</tfoot>
+</table>

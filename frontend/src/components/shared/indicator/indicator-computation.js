@@ -28,113 +28,126 @@ const module = angular.module(
 );
 
 
-module.directive('indicatorComputation', function() {
+const PERCENTAGE_FORMULA = '100 * numerator / denominator';
+const PERMILLE_FORMULA   = '1000 * numerator / denominator';
+const COPY_FORMULA       = 'copied_value';
 
-	var PERCENTAGE_FORMULA = '100 * numerator / denominator',
-		PERMILLE_FORMULA   = '1000 * numerator / denominator',
-		COPY_FORMULA       = 'copied_value';
+module.component('indicatorComputation', {
+	require: {
+		ngModelCtrl: 'ngModel'
+	},
 
-	return {
-		restrict: 'E',
-		require: 'ngModel',
-		template: require('./indicator-computation.html'),
-		scope: {
-			forms: '='
-		},
-		link: function(scope, element, attributes, ngModelController) {
-			scope.selectElements = [];
-			scope.elementsById = {};
-			scope.forms.forEach(form => {
-				form.elements.forEach(element => {
-					scope.elementsById[element.id] = element; // Use to find partition on view
-					scope.selectElements.push({id: element.id, name: element.name, group: form.name}); // Used by selectbox
-				});
-			});
+	bindings: {
+		'dataSources': '<'
+	},
 
-			scope.symbols = [];
+	template: require('./indicator-computation.html'),
 
-			// The watch will be set by the render function to be sure the value is initialiazed
-			var formulaWatch;
+	controller: class IndicatorComputationController {
 
-			var onFormulaChange = function(formula) {
-				// Create and remove items in computation.parameters hash, when the formula changes.
-				var newSymbols, oldSymbols = Object.keys(scope.computation.parameters);
-				try { newSymbols = exprEval.Parser.parse(scope.computation.formula).variables(); }
-				catch (e) { newSymbols = []; }
+		$onInit() {
+			this.ngModelCtrl.$parsers.push(this._viewToModel.bind(this));
+			this.ngModelCtrl.$formatters.push(this._modelToView.bind(this));
 
-				if (!angular.equals(newSymbols, oldSymbols)) {
-					var addedSymbols = newSymbols.filter(s => !oldSymbols.includes(s));
+			this.ngModelCtrl.$render = () => {
+				this.computation = this.ngModelCtrl.$viewValue;
 
-					// Add new symbols to formula
-					addedSymbols.forEach(s => {
-						scope.computation.parameters[s] = {elementId: null, filter: {}};
-					});
+				try {
+					this.symbols = exprEval.Parser.parse(this.computation.formula).variables();
 				}
-
-				scope.symbols = newSymbols;
-			};
-
-			ngModelController.$render = function() {
-				scope.computation = ngModelController.$viewValue;
-
-				// we set the watch once the model is passed to the directive.
-				if (!formulaWatch)
-					formulaWatch = scope.$watch('computation.formula', onFormulaChange);
-			};
-
-			ngModelController.$parsers.push(function(viewValue) {
-				if (scope.computation.type === 'unavailable')
-					return null;
-
-				else if (scope.computation.type === 'fixed')
-					return {formula: scope.computation.formula, parameters: {}};
-
-				else
-					return {formula: scope.computation.formula, parameters: scope.computation.parameters};
-			});
-
-			ngModelController.$formatters.push(function(modelValue) {
-				// Guess formula type with the content.
-				if (modelValue === null)
-					return {type: 'unavailable', formula: '', parameters: {}};
-
-				else if (!isNaN(modelValue.formula))
-					return {type: 'fixed', formula: modelValue.formula, parameters: {}};
-
-				else if (modelValue.formula === COPY_FORMULA)
-					return {type: 'copy', formula: COPY_FORMULA, parameters: modelValue.parameters};
-
-				else if (modelValue.formula === PERCENTAGE_FORMULA)
-					return {type: 'percentage', formula: PERCENTAGE_FORMULA, parameters: modelValue.parameters};
-
-				else if (modelValue.formula === PERMILLE_FORMULA)
-					return {type: 'permille', formula: PERMILLE_FORMULA, parameters: modelValue.parameters};
-
-				else
-					return {type: 'formula', formula: modelValue.formula, parameters: modelValue.parameters};
-			});
-
-			scope.$watch('computation', function() {
-				ngModelController.$setViewValue(angular.copy(scope.computation));
-			}, true);
-
-			// when computation type is manually changed, update the formula.
-			scope.$watch('computation.type', function() {
-				// change fixed formula only if it is needed.
-				if (scope.computation.type === 'fixed' && isNaN(scope.computation.formula))
-					scope.computation.formula = '0';
-
-				else if (scope.computation.type === 'copy')
-					scope.computation.formula = COPY_FORMULA;
-
-				else if (scope.computation.type === 'percentage')
-					scope.computation.formula = PERCENTAGE_FORMULA;
-
-				else if (scope.computation.type === 'permille')
-					scope.computation.formula = PERMILLE_FORMULA;
-			});
+				catch (e) {
+					this.symbols = [];
+				}
+			}
 		}
-	};
+
+		$onChanges(changes) {
+			if (changes.dataSources) {
+				this.selectElements = [];
+				this.variablesById = {};
+				this.dataSources.forEach(dataSource => {
+					dataSource.elements.forEach(variable => {
+						this.variablesById[variable.id] = variable; // Use to find partition on view
+						this.selectElements.push({id: variable.id, name: variable.name, group: dataSource.name}); // Used by selectbox
+					});
+				});
+			}
+		}
+
+		onTypeChange() {
+			// change fixed formula only if it is needed.
+			if (this.computation.type === 'fixed' && isNaN(this.computation.formula))
+				this.computation.formula = '0';
+
+			else if (this.computation.type === 'copy')
+				this.computation.formula = COPY_FORMULA;
+
+			else if (this.computation.type === 'percentage')
+				this.computation.formula = PERCENTAGE_FORMULA;
+
+			else if (this.computation.type === 'permille')
+				this.computation.formula = PERMILLE_FORMULA;
+
+			this.onFormulaChange();
+		}
+
+		onFormulaChange() {
+			// Create and remove items in computation.parameters hash, when the formula changes.
+			var newSymbols, oldSymbols = Object.keys(this.computation.parameters);
+			try { newSymbols = exprEval.Parser.parse(this.computation.formula).variables(); }
+			catch (e) { newSymbols = []; }
+
+			if (!angular.equals(newSymbols, oldSymbols)) {
+				var addedSymbols = newSymbols.filter(s => !oldSymbols.includes(s));
+
+				// Add new symbols to formula
+				addedSymbols.forEach(s => {
+					this.computation.parameters[s] = {elementId: null, filter: {}};
+				});
+			}
+
+			this.symbols = newSymbols;
+			this.ngModelCtrl.$setViewValue(angular.copy(this.computation));
+		}
+
+		/**
+		 * Trigered when a filter, or the formula in fixed mode changes.
+		 */
+		onOtherChange() {
+			this.ngModelCtrl.$setViewValue(angular.copy(this.computation));
+		}
+
+		_viewToModel(viewValue) {
+			// why not filter out the parameters that are not needed in the modelValue here instead of before save in the model?
+			if (viewValue.type === 'unavailable')
+				return null;
+			else if (viewValue.type === 'fixed')
+				return {formula: viewValue.formula, parameters: {}};
+			else
+				return {formula: viewValue.formula, parameters: viewValue.parameters};
+		}
+
+		_modelToView(modelValue) {
+			// Guess formula type with the content.
+			if (modelValue === null)
+				return {type: 'unavailable', formula: '', parameters: {}};
+
+			else if (!isNaN(modelValue.formula))
+				return {type: 'fixed', formula: modelValue.formula, parameters: {}};
+
+			else if (modelValue.formula === COPY_FORMULA)
+				return {type: 'copy', formula: COPY_FORMULA, parameters: modelValue.parameters};
+
+			else if (modelValue.formula === PERCENTAGE_FORMULA)
+				return {type: 'percentage', formula: PERCENTAGE_FORMULA, parameters: modelValue.parameters};
+
+			else if (modelValue.formula === PERMILLE_FORMULA)
+				return {type: 'permille', formula: PERMILLE_FORMULA, parameters: modelValue.parameters};
+
+			else
+				return {type: 'formula', formula: modelValue.formula, parameters: modelValue.parameters};
+		}
+	}
 });
 
 

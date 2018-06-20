@@ -28,15 +28,8 @@ const module = angular.module(
 module.directive('aclHasProjectCreation', function($rootScope) {
 	return {
 		link: function(scope, element, attributes) {
-			var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
-				if (!userCtx)
-					return;
-
-				if (userCtx.type !== 'user' || userCtx.role === 'common')
-					element.remove();
-
-				unwatch();
-			});
+			if ($rootScope.userCtx.type !== 'user' || $rootScope.userCtx.role === 'common')
+				element.remove();
 		}
 	}
 });
@@ -45,15 +38,8 @@ module.directive('aclHasProjectCreation', function($rootScope) {
 module.directive('aclLacksProjectCreation', function($rootScope) {
 	return {
 		link: function(scope, element, attributes) {
-			var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
-				if (!userCtx)
-					return;
-
-				if (userCtx.type === 'user' && userCtx.role !== 'common')
-					element.remove();
-
-				unwatch();
-			});
+			if ($rootScope.userCtx.type === 'user' && $rootScope.userCtx.role !== 'common')
+				element.remove();
 		}
 	}
 });

@@ -77,26 +77,6 @@ const printer = new PdfPrinter({
 
 
 /**
- * Render a PDF file describing the given logical frame.
- */
-router.get('/resources/project/:id/logical-frame/:index.pdf', async ctx => {
-	if (!ctx.visibleProjectIds.has(ctx.params.id))
-		throw new Error('forbidden');
-
-	const project = await Project.storeInstance.get(ctx.params.id);
-
-	// Create document definition.
-	const logicalFrame = project.logicalFrames[ctx.params.index];
-	const docDef = logicalFrame.getPdfDocDefinition(request.query.orientation, project.forms);
-	docDef.styles = styles;
-
-	// Send to user.
-	ctx.response.type = 'application/pdf';
-	ctx.response.body = printer.createPdfKitDocument(docDef);
-});
-
-
-/**
  * Render a PDF file containing a sample paper form (for a datasource).
  */
 router.get('/resources/project/:id/data-source/:dataSourceId.pdf', async ctx => {
@@ -108,13 +88,38 @@ router.get('/resources/project/:id/data-source/:dataSourceId.pdf', async ctx => 
 	// Create document definition.
 	let docDef = project
 		.getDataSourceById(ctx.params.dataSourceId)
-		.getPdfDocDefinition(request.query.orientation);
+		.getPdfDocDefinition(ctx.request.query.orientation);
 
 	docDef.styles = styles;
 
 	// Send to user.
 	ctx.response.type = 'application/pdf';
 	ctx.response.body = printer.createPdfKitDocument(docDef);
+	ctx.response.body.end();
 });
+
+
+/**
+ * Render a PDF file describing the given logical frame.
+ */
+router.get('/resources/project/:id/logical-frame/:logicalFrameId.pdf', async ctx => {
+	if (!ctx.visibleProjectIds.has(ctx.params.id))
+		throw new Error('forbidden');
+
+	const project = await Project.storeInstance.get(ctx.params.id);
+
+	// Create document definition.
+	const docDef = project
+		.getLogicalFrameById(ctx.params.logicalFrameId)
+		.getPdfDocDefinition(ctx.request.query.orientation, project.forms);
+
+	docDef.styles = styles;
+
+	// Send to user.
+	ctx.response.type = 'application/pdf';
+	ctx.response.body = printer.createPdfKitDocument(docDef);
+	ctx.response.body.end();
+});
+
 
 export default router;

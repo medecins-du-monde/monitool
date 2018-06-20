@@ -25,7 +25,7 @@ const module = angular.module(
 	]
 );
 
-module.config(function($stateProvider) {
+module.config($stateProvider => {
 
 	$stateProvider.state('main.home', {
 		url: '/home',

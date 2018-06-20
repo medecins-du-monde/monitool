@@ -24,47 +24,37 @@ const module = angular.module(
 );
 
 
-module.directive('optionalNumber', function() {
-	return {
-		restrict: 'E',
-		require: 'ngModel',
-		template: require('./number-optional.html'),
-		scope: {
-			default: '=default'
-		},
-		link: function(scope, element, attributes, ngModelController) {
-			scope.message = attributes.message;
-			scope.container = {};
+module.component('optionalNumber', {
+	require: {
+		ngModelCtrl: 'ngModel'
+	},
 
-			ngModelController.$render = function() {
-				var numberValue = ngModelController.$viewValue;
-				if (numberValue !== null) {
-					scope.specifyValue = true;
-					scope.container.chosenValue = numberValue;
-				}
-				else {
-					scope.specifyValue = false;
-					scope.container.chosenValue = null;
-				}
+	template: require('./number-optional.html'),
+
+	bindings: {
+		default: '<',
+		message: '@'
+	},
+
+	controller: class OptionalNumberController {
+
+		$onInit() {
+			this.ngModelCtrl.$render = () => {
+				this.specifyValue = this.ngModelCtrl.$viewValue !== null;
+				this.chosenValue = this.ngModelCtrl.$viewValue;
 			};
+		}
 
-			scope.$watch('container.chosenValue', function(newValue, oldValue) {
-				if (newValue === oldValue)
-					return;
+		toggleSpecifyValue() {
+			this.specifyValue = !this.specifyValue;
+			if (this.specifyValue)
+				this.chosenValue = this.default;
 
-				ngModelController.$setViewValue(newValue);
-			});
+			this.onValueChange();
+		}
 
-			scope.$watch('specifyValue', function(newSpecifyValue, oldSpecifyValue) {
-				if (newSpecifyValue === oldSpecifyValue)
-					return;
-
-				if (newSpecifyValue)
-					scope.container.chosenValue = scope.default;
-				else
-					scope.container.chosenValue = null;
-			});
-
+		onValueChange() {
+			this.ngModelCtrl.$setViewValue(this.specifyValue ? this.chosenValue : null);
 		}
 	}
 });

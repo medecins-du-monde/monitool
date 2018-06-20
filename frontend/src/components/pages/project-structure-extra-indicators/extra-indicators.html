@@ -1,0 +1,25 @@
+<ol class="breadcrumb noprint">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="indicator.cross_cutting"></li>
+</ol>
+
+<div class="alert alert-info" translate="project.extra_indicators_list_info"></div>
+
+<p ng-if="$ctrl.editableProject.extraIndicators.length == 0" translate="project.no_extra_indicators"></p>
+
+<div ng-sortable="$ctrl.sortableOptions">
+
+	<indicator
+		ng-repeat="indicator in $ctrl.editableProject.extraIndicators"
+		indicator="indicator"
+		project="$ctrl.project"
+		on-updated="$ctrl.onIndicatorUpdated(newIndicator, previousValue)"
+		on-deleted="$ctrl.onIndicatorDeleted(indicator)"></indicator>
+</div>
+
+<a class="btn btn-default btn-sm" ng-click="$ctrl.onAddIndicatorClick()" style="margin-bottom: 20px">
+	<i class="fa fa-plus"></i>
+	{{"project.add_indicator"|translate}}
+</a>

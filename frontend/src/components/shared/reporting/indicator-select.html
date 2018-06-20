@@ -1,8 +1,0 @@
-<div class="input-group">
-	<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
-	<select id="element-input"
-			class="form-control input-sm"
-			ng-model="$ctrl.chosenElement"
-			ng-change="$ctrl.onUpdate({element: $ctrl.chosenElement})"
-			ng-options="i as i.name group by i.group for i in $ctrl.elementOptions"></select>
-</div>

@@ -1,5 +1,5 @@
 
-<select class="form-control" ng-model="computation.type">
+<select class="form-control" ng-model="$ctrl.computation.type" ng-change="$ctrl.onTypeChange()">
 	<option value="unavailable" translate="project.computations.unavailable"></option>
 	<option value="fixed" translate="project.computations.fixed"></option>
 	<option value="copy" translate="project.computations.copy"></option>
@@ -11,9 +11,10 @@
 
 <input type="text"
 	   class="form-control"
-	   ng-if="computation.type === 'fixed'"
+	   ng-if="$ctrl.computation.type === 'fixed'"
 	   style="margin-top: 3px"
-	   ng-model="computation.formula"
+	   ng-model="$ctrl.computation.formula"
+	   ng-change="$ctrl.onOtherChange()"
 	   ng-pattern="'\\d+'"
 	   required
 	   placeholder="{{'project.indicator_ph_fixed'|translate}}" />
@@ -25,7 +26,7 @@
 
 <table class="table table-bordered table-condensed table-stripped"
 	   style="margin-top: 10px"
-	   ng-if="computation.type !== 'unavailable' && computation.type !== 'fixed'">
+	   ng-if="$ctrl.computation.type !== 'unavailable' && $ctrl.computation.type !== 'fixed'">
 
 	<thead>
 		<tr>
@@ -35,33 +36,42 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-if="computation.type === 'formula'">
+		<tr>
 			<td colspan="3">
-				<input expression class="form-control" ng-model="computation.formula" />
+				<input
+					expression
+					class="form-control"
+					ng-model="$ctrl.computation.formula"
+					ng-change="$ctrl.onFormulaChange()"
+					ng-disabled="$ctrl.computation.type !== 'formula'" />
 			</td>
 		</tr>
-		<tr ng-repeat="key in symbols">
+		<tr ng-repeat="key in $ctrl.symbols">
 			<!-- parameter key (this one we edit in the formula) -->
 			<td>
-				<span ng-if="computation.type !== 'formula'">{{('project.formula.' + key)|translate}}</span>
-				<span ng-if="computation.type === 'formula'">{{key}}</span>
+				<span ng-if="$ctrl.computation.type !== 'formula'">{{('project.formula.' + key)|translate}}</span>
+				<span ng-if="$ctrl.computation.type === 'formula'">{{key}}</span>
 			</td>
 
 			<!-- elementId -->
 			<td>
-				<select required
-						class="form-control"
-						ng-model="computation.parameters[key].elementId"
-						ng-options="v.id as v.name group by v.group for v in selectElements"></select>
+				<select
+					required
+					class="form-control"
+					ng-model="$ctrl.computation.parameters[key].elementId"
+					ng-change="$ctrl.onOtherChange()"
+					ng-options="v.id as v.name group by v.group for v in $ctrl.selectElements"></select>
 
 			</td>
 
-			<td ng-show="elementsById[computation.parameters[key].elementId].partitions.length">
-				<partition-filter ng-model="computation.parameters[key].filter" element="elementsById[computation.parameters[key].elementId]"></partition-filter>
-
+			<td ng-show="$ctrl.variablesById[$ctrl.computation.parameters[key].elementId].partitions.length">
+				<partition-filter
+					ng-model="$ctrl.computation.parameters[key].filter"
+					ng-change="$ctrl.onOtherChange()"
+					variable="$ctrl.variablesById[$ctrl.computation.parameters[key].elementId]"></partition-filter>
 			</td>
 
-			<td ng-hide="elementsById[computation.parameters[key].elementId].partitions.length"
+			<td ng-hide="$ctrl.variablesById[$ctrl.computation.parameters[key].elementId].partitions.length"
 				style="background-color: #f3f3f3"></td>
 		</tr>
 		<tr>

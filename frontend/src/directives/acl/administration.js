@@ -28,15 +28,8 @@ const module = angular.module(
 module.directive('aclHasAdministration', function($rootScope) {
 	return {
 		link: function(scope, element, attributes) {
-			var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
-				if (!userCtx)
-					return;
-
-				if (userCtx.type !== 'user' || userCtx.role !== 'admin')
-					element.remove();
-
-				unwatch();
-			});
+			if ($rootScope.userCtx.type !== 'user' || $rootScope.userCtx.role !== 'admin')
+				element.remove();
 		}
 	}
 });
@@ -45,18 +38,10 @@ module.directive('aclHasAdministration', function($rootScope) {
 module.directive('aclLacksAdministration', function($rootScope) {
 	return {
 		link: function(scope, element, attributes) {
-			var unwatch = $rootScope.$watch('userCtx', function(userCtx) {
-				if (!userCtx)
-					return;
-
-				if (userCtx.type === 'user' && userCtx.role === 'admin')
-					element.remove();
-
-				unwatch();
-			});
+			if ($rootScope.userCtx.type === 'user' && $rootScope.userCtx.role === 'admin')
+				element.remove();
 		}
 	}
 });
-
 
 export default module;

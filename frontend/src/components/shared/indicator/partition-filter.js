@@ -24,62 +24,64 @@ const module = angular.module(
 );
 
 
-module.directive('partitionFilter', function() {
+module.component('partitionFilter', {
+	require: {
+		ngModelCtrl: 'ngModel'
+	},
 
-	return {
-		restrict: 'E',
-		require: "ngModel",
-		scope: { element: '=' },
-		template: require('./partition-filter.html'),
+	bindings: {
+		variable: '<'
+	},
 
-		link: function(scope, element, attributes, ngModelController) {
+	template: require('./partition-filter.html'),
 
-			scope.$watch('element', function(element, oldElement) {
-				if (element === undefined || element === null)
-					scope.filter = {};
+	controller: class PartitionFilterController {
 
-				else if (element !== oldElement) {
-					scope.filter = {};
+		$onInit() {
+			this.ngModelCtrl.$parsers.push(this._viewToModel.bind(this));
+			this.ngModelCtrl.$formatters.push(this._modelToView.bind(this));
+			this.ngModelCtrl.$render = () => this.filter = this.ngModelCtrl.$viewValue;
+		}
 
-					element.partitions.forEach(partition => {
-						scope.filter[partition.id] = partition.elements.map(e => e.id);
+		$onChanges(changes) {
+			if (changes.variable) {
+				this.filter = {};
+
+				if (this.variable)
+					this.variable.partitions.forEach(partition => {
+						this.filter[partition.id] = partition.elements.map(e => e.id);
 					});
-				}
-			});
+			}
+		}
 
-			ngModelController.$parsers.push(function(viewValue) {
-				var modelValue = {};
+		onFilterChange() {
+			this.ngModelCtrl.$setViewValue(angular.copy(this.filter));
+		}
 
-				if (scope.element)
-					scope.element.partitions.forEach(partition => {
-						if (viewValue[partition.id].length !== partition.elements.length)
-							modelValue[partition.id] = viewValue[partition.id];
-					});
+		_viewToModel(viewValue) {
+			var modelValue = {};
 
-				return modelValue;
-			});
+			if (this.variable)
+				this.variable.partitions.forEach(partition => {
+					if (viewValue[partition.id].length !== partition.elements.length)
+						modelValue[partition.id] = viewValue[partition.id];
+				});
 
-			ngModelController.$formatters.push(function(modelValue) {
-				var viewValue = {};
+			return modelValue;
+		}
 
-				if (scope.element)
-					scope.element.partitions.forEach(partition => {
-						if (modelValue[partition.id])
-							viewValue[partition.id] = modelValue[partition.id];
-						else
-							viewValue[partition.id] = partition.elements.map(e => e.id);
-					});
+		_modelToView(modelValue) {
+			var viewValue = {};
 
-				return viewValue;
-			});
+			if (this.variable)
+				this.variable.partitions.forEach(partition => {
+					if (modelValue[partition.id])
+						viewValue[partition.id] = modelValue[partition.id];
+					else
+						viewValue[partition.id] = partition.elements.map(e => e.id);
+				});
 
-			ngModelController.$render = function() {
-				scope.filter = ngModelController.$viewValue;
-			};
-
-			scope.$watch('filter', function() {
-				ngModelController.$setViewValue(angular.copy(scope.filter));
-			}, true)
+			return viewValue;
 		}
 	}
 });

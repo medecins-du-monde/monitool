@@ -129,7 +129,6 @@ export default class Input {
 		};
 	}
 
-
 	constructor(data=null) {
 		Object.assign(this, data);
 	}

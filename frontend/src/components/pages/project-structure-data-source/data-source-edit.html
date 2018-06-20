@@ -1,0 +1,240 @@
+<ol class="breadcrumb">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li><a ui-sref="main.project.structure.collection_form_list" translate="project.collection_form_list"></a></li>
+	<li class="active">{{$ctrl.editableDataSource.name|maxLength:50}}</li>
+</ol>
+
+<div class="alert alert-info" translate="project.collection_form_list_info"></div>
+
+<form class="form-horizontal" role="form" name="$ctrl.dsForm" novalidate>
+	<legend translate="project.collection_form_planning"></legend>
+
+	<!-- [name] -->
+	<form-group
+		input-id="input-name"
+		label="shared.name"
+		help="project.collection_edit_help_name">
+
+		<input
+			type="text"
+			class="form-control"
+			id="input-name"
+			name="name"
+			ng-model="$ctrl.editableDataSource.name"
+			ng-change="$ctrl.onFieldChange()"
+			placeholder="{{'project.form_name_ph'|translate}}"
+			required />
+		</div>
+
+	</form-group>
+	<!-- [/name] -->
+
+	<!-- [collection sites] -->
+	<form-group
+		input-id="collect-input"
+		label="project.collection_site_list"
+		help="project.collection_edit_help_sites">
+
+		<element-filter
+			ng-model="$ctrl.editableDataSource.entities"
+			ng-change="$ctrl.onFieldChange()"
+			elements="$ctrl.project.entities"
+			groups="$ctrl.project.groups"></element-filter>
+
+	</form-group>
+	<!-- [/collection sites] -->
+
+	<!-- [Periodicity] -->
+	<form-group
+		input-id="periodicity-input"
+		label="project.periodicity"
+		help="project.collection_edit_help_periodicity">
+
+		<select
+			id="periodicity-input"
+			class="form-control"
+			name="periodicity"
+			ng-model="$ctrl.editableDataSource.periodicity"
+			ng-change="$ctrl.onFieldChange()">
+			<option value="day" translate="project.periodicities.day"></option>
+			<option value="month_week_sat" translate="project.periodicities.month_week_sat"></option>
+			<option value="month_week_sun" translate="project.periodicities.month_week_sun"></option>
+			<option value="month_week_mon" translate="project.periodicities.month_week_mon"></option>
+			<option value="week_sat" translate="project.periodicities.week_sat"></option>
+			<option value="week_sun" translate="project.periodicities.week_sun"></option>
+			<option value="week_mon" translate="project.periodicities.week_mon"></option>
+			<option value="month" translate="project.periodicities.month"></option>
+			<option value="quarter" translate="project.periodicities.quarter"></option>
+			<option value="semester" translate="project.periodicities.semester"></option>
+			<option value="year" translate="project.periodicities.year"></option>
+			<option value="free" translate="project.periodicities.free"></option>
+		</select>
+	</form-group>
+
+	<!-- [/Periodicity] -->
+
+	<!-- [Specific dates] -->
+	<form-group
+		ng-if="$ctrl.editableDataSource.periodicity !== 'free'"
+		input-id="start-input"
+		label="project.specific_start"
+		help="project.collection_edit_help_start">
+
+		<optional-date
+			id="start-input"
+			ng-model="$ctrl.editableDataSource.start"
+			ng-change="$ctrl.onFieldChange()"
+			default="$ctrl.project.start"
+			message="project.same_as_start"></optional-date>
+	</form-group>
+
+	<form-group
+		ng-if="$ctrl.editableDataSource.periodicity !== 'free'"
+		input-id="end-input"
+		label="project.specific_end"
+		help="project.collection_edit_help_end">
+
+		<optional-date
+			id="end-input"
+			ng-model="$ctrl.editableDataSource.end"
+			ng-change="$ctrl.onFieldChange()"
+			default="$ctrl.project.end"
+			message="project.same_as_end"></optional-date>
+	</form-group>
+
+	<!-- [/Specific dates] -->
+
+	<legend translate="project.collection_form_structure"></legend>
+
+	<!-- [Variables] -->
+	<div ng-if="$ctrl.editableDataSource.elements.length === 0" translate="project.no_variable"></div>
+
+	<div ng-sortable="$ctrl.sortableOptions">
+		<div class="panel panel-info" ng-repeat="(index, variable) in $ctrl.editableDataSource.elements">
+			<div class="panel-heading" ng-click="$ctrl.onToggleVariableClicked(variable.id)" style="cursor: pointer">
+				<div class="pull-right">
+					<a class="btn btn-xxs btn-default variable-handle">
+						<i class="fa fa-sort fa-fw"></i>
+						{{'project.press_to_drag'|translate}}
+					</a>
+
+					<a class="btn btn-xxs btn-danger" ng-click="$ctrl.onRemoveVariableClicked(variable)">
+						<i class="fa fa-times"></i>
+						{{'project.remove_variable'|translate}}
+					</a>
+				</div>
+
+				<div class="panel-title">
+					<fa-open value="$ctrl.visibleVariableId == variable.id"></fa-open>
+					<strong>{{'project.variable'|translate}} {{index + 1}}:</strong> {{variable.name}}
+				</div>
+			</div>
+
+			<div class="panel-body" ng-if="$ctrl.visibleVariableId == variable.id" ng-form="variableForm">
+
+				<form-group
+					input-id="variable-name-input-{{variable.id}}"
+					label="project.variable_name_label"
+					help="project.collection_edit_help_varname"
+					help-values="{name: $ctrl.editableDataSource.name}">
+
+					<input
+						id="variable-name-input-{{variable.id}}"
+						type="text"
+						class="form-control"
+						ng-model="variable.name"
+						ng-change="$ctrl.onFieldChange()"
+						placeholder="{{'project.variable_name_ph'|translate}}"
+						required
+						name="variablename">
+				</form-group>
+
+				<form-group
+					input-id="variable-siteagg-input-{{variable.id}}"
+					label="project.site_agg_label"
+					help="project.collection_edit_help_geoagg"
+					help-values="{name: variable.name}">
+
+					<select
+						id="site-agg-select"
+						class="form-control"
+						ng-model="variable.geoAgg"
+						ng-change="$ctrl.onFieldChange()"
+						name="geoAgg">
+
+						<option value="sum" translate="project.aggregation.sum"></option>
+						<option value="average" translate="project.aggregation.average"></option>
+						<option value="highest" translate="project.aggregation.highest"></option>
+						<option value="lowest" translate="project.aggregation.lowest"></option>
+						<option value="none" translate="project.aggregation.none"></option>
+					</select>
+				</form-group>
+
+				<form-group
+					input-id="variable-timeagg-input-{{variable.id}}"
+					label="project.time_agg_label"
+					help="project.collection_edit_help_timeagg"
+					help-values="{name: variable.name}">
+
+					<select
+						id="variable-timeagg-input-{{variable.id}}"
+						class="form-control"
+						ng-model="variable.timeAgg"
+						ng-change="$ctrl.onFieldChange()"
+						name="timeAgg">
+
+						<option value="sum" translate="project.aggregation.sum"></option>
+						<option value="average" translate="project.aggregation.average"></option>
+						<option value="highest" translate="project.aggregation.highest"></option>
+						<option value="lowest" translate="project.aggregation.lowest"></option>
+						<option value="last" translate="project.aggregation.last"></option>
+						<option value="none" translate="project.aggregation.none"></option>
+					</select>
+				</form-group>
+
+				<form-group
+					label="project.partitions_label"
+					help="project.collection_edit_help_partition"
+					help-values="{name: variable.name}">
+
+					<partition-list
+						partitions="variable.partitions"
+						on-update="$ctrl.onPartitionUpdate(variable, partitions)"></partition-list>
+
+				</form-group>
+
+				<form-group
+					ng-if="variable.partitions.length > 0"
+					label="project.distribution_label"
+					help="project.collection_edit_help_distribution">
+
+					<partition-distribution
+						ng-model="variable.distribution"
+						ng-change="$ctrl.onFieldChange()"
+						num-partitions="variable.partitions.length"></partition-distribution>
+				</form-group>
+
+				<form-group
+					ng-if="variable.partitions.length > 1"
+					label="project.order_label"
+					help="project.collection_edit_help_order">
+
+					<partition-order
+						partitions="variable.partitions"
+						distribution="variable.distribution"
+						on-update="$ctrl.onPartitionUpdate(variable, partitions)"></partition-order>
+				</form-group>
+
+			</div>
+		</div>
+	</div>
+	<!-- [/Variables] -->
+
+	<a class="btn btn-default" ng-click="$ctrl.onAddVariableClicked()">
+		<i class="fa fa-plus"></i>
+		<span translate="project.add_variable"></span>
+	</a>
+
+</form>

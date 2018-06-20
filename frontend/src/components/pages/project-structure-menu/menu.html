@@ -1,0 +1,49 @@
+<div>
+	<div id="formblock">
+		<!--
+			<ui-view /> will be replaced by any of the project-structure-* components
+			which all take the same input/output bindings.
+		-->
+
+		<ui-view
+			project="$ctrl.project"
+			on-project-update="$ctrl.onProjectUpdate(newProject, isValid)"></ui-view>
+	</div>
+
+	<div id="saveblock" class="noprint">
+
+		<div class="pull-right">
+			<p class="text-danger" ng-if="!$ctrl.projectIsValid">
+				<i class="fa fa-exclamation-triangle"></i>
+				<span translate="project.form_error"></span>
+			</p>
+
+			<p class="text-info" ng-if="!$ctrl.projectChanged && $ctrl.project._rev">
+				<i class="fa fa-info-circle"></i>
+				<span translate="project.form_persisted"></span>
+			</p>
+
+			<p class="text-warning" ng-if="$ctrl.projectChanged && $ctrl.projectIsValid">
+				<i class="fa fa-exclamation-triangle"></i>
+				<span translate="project.form_changed"></span>
+			</p>
+		</div>
+
+		<a	ng-disabled="!$ctrl.projectChanged || !$ctrl.projectIsValid || $ctrl.projectSaveRunning"
+			ng-click="$ctrl.onSaveClicked()"
+			class="btn btn-primary">
+			<i class="fa fa-floppy-o" ng-if="!$ctrl.projectSaveRunning"></i>
+			<i class="fa fa-circle-o-notch fa-spin" ng-if="$ctrl.projectSaveRunning"></i>
+
+			<span translate="shared.save"></span>
+		</a>
+
+		<a	ng-disabled="!$ctrl.projectChanged || $ctrl.projectSaveRunning"
+			ng-click="$ctrl.onResetClicked()"
+			class="btn btn-default">
+			<i class="fa fa-undo"></i>
+			<span translate="shared.remove_changes"></span>
+		</a>
+
+	</div>
+</div>

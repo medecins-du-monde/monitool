@@ -1,25 +1,33 @@
 <div class="panel panel-default indicator-panel">
 
-	<div class="panel-heading" title="{{indicator.display}}">
+	<div class="panel-heading" title="{{$ctrl.indicator.display}}">
 		<i class="fa fa-arrows fa-fw indicator-handle"></i>
-		{{indicator.display|maxLength:90}}
+		{{$ctrl.indicator.display|maxLength:90}}
 	</div>
 
 	<div class="panel-body" style="padding-bottom: 10px">
-		<strong>{{'project.baseline'|translate}}:</strong> {{indicator.baseline != null ? indicator.baseline : '?'}}<br/>
-		<strong>{{'project.target'|translate}}:</strong> {{indicator.target != null ? indicator.target : '?'}}<br/>
+		<!-- Baseline -->
+		<strong>{{'project.baseline'|translate}}:</strong>
+		{{$ctrl.indicator.baseline != null ? $ctrl.indicator.baseline : '?'}}
+		<br/>
 
+		<!-- Target -->
+		<strong>{{'project.target'|translate}}:</strong>
+		{{$ctrl.indicator.target != null ? $ctrl.indicator.target : '?'}}
+		<br/>
+
+		<!-- Computation -->
 		<strong>{{'project.computation'|translate}}:</strong>
-		<span class="text-danger" ng-if="!indicator.computation">
+		<span class="text-danger" ng-if="!$ctrl.indicator.computation">
 			{{'project.indicator_is_not_computed'|translate}}
 			<i class="fa fa-unlink" ></i>
 		</span>
-		<span class="text-success" ng-if="indicator.computation">
+		<span class="text-success" ng-if="$ctrl.indicator.computation">
 			{{'project.indicator_is_computed'|translate}}
 			<i class="fa fa-link" ></i>
 		</span>
 
-		<button class="btn btn-xxs btn-default" style="width: 100%; display: block" ng-click="editIndicator()">
+		<button class="btn btn-xxs btn-default" style="width: 100%; display: block" ng-click="$ctrl.onEditClicked()">
 			<i class="fa fa-pencil"></i>
 			{{'shared.edit'|translate}}
 		</button>

@@ -1,0 +1,141 @@
+<ol class="breadcrumb">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="project.collection_site_list"></li>
+</ol>
+
+
+<div class="alert alert-info" translate="project.collection_site_info"></div>
+
+<form name="$ctrl.sitesForm" novalidate>
+
+	<legend translate="project.collection_site_list"></legend>
+
+	<table class="table table-bordered table-stripped table-condensed">
+		<thead>
+			<tr>
+				<th style="width: 30px"></th>
+				<th translate="project.entity_name"></th>
+				<th style="width: 200px" translate="project.specific_start"></th>
+				<th style="width: 200px" translate="project.specific_end"></th>
+				<th style="width: 30px"></th>
+			</tr>
+		</thead>
+		<tbody ng-if="$ctrl.editableProject.entities.length == 0">
+			<tr>
+				<td colspan="5" style="text-align: center" translate="project.no_input_entities"></td>
+			</tr>
+		</tbody>
+		<tbody ng-sortable="$ctrl.ngSortableOptions">
+			<tr ng-repeat="inputEntity in $ctrl.editableProject.entities track by inputEntity.id">
+				<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
+
+				<td>
+					<ng-form name="center">
+						<div class="form-group" show-errors style="margin: 0">
+							<input type="text"
+								   name="name"
+								   ng-model="inputEntity.name"
+								   ng-change="$ctrl.onFieldChange()"
+								   class="form-control input-sm"
+								   placeholder="{{'project.entity_name_placeholder'|translate}}"
+								   required />
+						</div>
+					</ng-form>
+				</td>
+				<td>
+					<optional-date
+						ng-model="inputEntity.start"
+						ng-change="$ctrl.onFieldChange()"
+						default="$ctrl.editableProject.start"
+						message="project.same_as_start"></optional-date>
+				</td>
+				<td>
+					<optional-date
+						ng-model="inputEntity.end"
+						ng-change="$ctrl.onFieldChange()"
+						default="$ctrl.editableProject.end"
+						message="project.same_as_end"></optional-date>
+				</td>
+				<td style="text-align: right">
+					<a class="btn btn-danger btn-sm" ng-click="$ctrl.onDeleteEntityClicked(inputEntity.id)">
+						<i class="fa fa-remove"></i>
+					</a>
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="5" style="text-align: center">
+					<a class="btn btn-default btn-xs" ng-click="$ctrl.onCreateEntityClicked()">
+						<i class="fa fa-plus"></i>
+						<span translate="shared.add"></span>
+					</a>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+
+	<legend translate="project.groups"></legend>
+
+	<table class="table table-bordered table-stripped table-condensed">
+		<thead>
+			<tr>
+				<th style="width: 30px"></th>
+				<th style="width: 300px" translate="project.group_name"></th>
+				<th translate="shared.members"></th>
+				<th style="width: 30px;"></th>
+			</tr>
+		</thead>
+		<tbody ng-if="$ctrl.editableProject.groups.length == 0">
+			<tr>
+				<td colspan="4" style="text-align: center" translate="project.no_input_groups"></td>
+			</tr>
+		</tbody>
+		<tbody ng-sortable="$ctrl.ngSortableOptions">
+			<tr ng-repeat="inputGroup in $ctrl.editableProject.groups track by inputGroup.id">
+				<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
+
+				<td>
+					<ng-form name="center">
+						<div class="form-group" show-errors style="margin: 0">
+							<input type="text"
+								   name="name"
+								   placeholder="{{'project.group_name_placeholder'|translate}}"
+								   ng-model="inputGroup.name"
+								   ng-change="$ctrl.onFieldChange()"
+								   class="form-control error input-sm"
+								   required />
+						</div>
+					</ng-form>
+				</td>
+
+				<td>
+					<ui-select multiple ng-model="inputGroup.members" ng-change="$ctrl.onFieldChange()" theme="bootstrap">
+						<ui-select-match placeholder="">{{$item.name}}</ui-select-match>
+						<ui-select-choices repeat="inputEntity.id as inputEntity in $ctrl.editableProject.entities">
+							{{inputEntity.name}}
+						</ui-select-choices>
+					</ui-select>
+				</td>
+
+				<td style="text-align: right">
+					<a class="btn btn-danger btn-sm" ng-click="$ctrl.onDeleteGroupClicked(inputGroup.id)">
+						<i class="fa fa-remove"></i>
+					</a>
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="4" style="text-align: center">
+					<a class="btn btn-default btn-xs" ng-click="$ctrl.onCreateGroupClicked()">
+						<i class="fa fa-plus"></i>
+						<span translate="shared.add"></span>
+					</a>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+</form>

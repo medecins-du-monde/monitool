@@ -1,0 +1,387 @@
+<ol class="breadcrumb noprint">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li><a ui-sref="main.project.structure.logical_frame_list" translate="shared.logical_frames"></a></li>
+	<li class="active">
+		<span ng-if="$ctrl.editableLogFrame.name">{{$ctrl.editableLogFrame.name|maxLength:50}}</span>
+		<span ng-if="!$ctrl.editableLogFrame.name" translate="project.unnamed_logframe"></span>
+	</li>
+</ol>
+
+<div class="alert alert-info" translate="project.logical_frame_list_info"></div>
+
+<form class="form-horizontal noprint" role="form" name="lfForm" novalidate>
+
+	<!-- [General information] -->
+	<fieldset>
+		<legend translate="project.general_informations"></legend>
+
+		<!-- [Name] -->
+		<form-group
+			input-id="logframe-name-input"
+			label="shared.name"
+			help="project.logframe_help_name">
+
+			<textarea
+				auto-resize
+				id="logframe-name-input"
+				class="form-control"
+				name="nameDesc"
+				placeholder="{{'project.logframe_ph_name'|translate}}"
+				ng-required="1"
+				ng-minlength="1"
+				ng-model="$ctrl.editableLogFrame.name"
+				ng-change="$ctrl.onFieldChange()"></textarea>
+		</form-group>
+		<!-- [/Name] -->
+
+		<!-- [Specific dates] -->
+		<form-group
+			input-id="logframe-startdate-input"
+			label="project.specific_start"
+			help="project.logframe_edit_help_start">
+
+			<optional-date
+				id="logframe-startdate-input"
+				ng-model="$ctrl.editableLogFrame.start"
+				ng-change="$ctrl.onFieldChange()"
+				default="$ctrl.project.start"
+				message="project.same_as_start"></optional-date>
+		</form-group>
+
+		<form-group
+			input-id="logframe-enddate-input"
+			label="project.specific_end"
+			help="project.logframe_edit_help_end">
+
+			<optional-date
+				ng-model="$ctrl.editableLogFrame.end"
+				ng-change="$ctrl.onFieldChange()"
+				default="$ctrl.project.end"
+				message="project.same_as_end"></optional-date>
+
+		</form-group>
+		<!-- [/Specific dates] -->
+	</fieldset>
+	<!-- [/General information] -->
+
+	<!-- [General objective] -->
+	<fieldset>
+		<legend translate="project.goal"></legend>
+
+		<!-- [General objective description] -->
+		<form-group
+			input-id="logframe-goal-input"
+			label="project.goal"
+			help="project.logframe_help_goal">
+
+			<textarea
+				auto-resize
+				id="logframe-goal-input"
+				class="form-control"
+				name="goalDesc"
+				placeholder="{{'project.intervention_logic_goal_ph'|translate}}"
+				ng-model="$ctrl.editableLogFrame.goal"
+				ng-change="$ctrl.onFieldChange()"></textarea>
+
+		</form-group>
+		<!-- [/General objective description] -->
+
+		<!-- [General objective indicators] -->
+		<form-group
+			label="shared.indicators"
+			help="project.logframe_help_goal_indicators">
+
+			<div
+				class="drag-destination"
+				ng-sortable="$ctrl.indicatorsSortOptions"
+				ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
+				ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
+					ng-repeat="indicator in $ctrl.editableLogFrame.indicators"
+					indicator="indicator"
+					project="$ctrl.project"
+					on-updated="$ctrl.onIndicatorUpdated(newIndicator, previousValue, $ctrl.editableLogFrame.indicators)"
+					on-deleted="$ctrl.onIndicatorDeleted(indicator, $ctrl.editableLogFrame.indicators)"></indicator></div>
+
+			<a	class="btn btn-default btn-sm"
+				ng-click="$ctrl.onAddIndicatorClicked($ctrl.editableLogFrame.indicators)">
+				<i class="fa fa-plus"></i>
+				{{"project.add_indicator"|translate}}
+			</a>
+		</form-group>
+		<!-- [/General objective indicators] -->
+	</fieldset>
+	<!-- [/General objective] -->
+
+	<!-- [Purposes] -->
+	<fieldset>
+		<legend translate="project.purposes"></legend>
+
+		<p ng-if="$ctrl.editableLogFrame.purposes.length == 0" translate="project.no_purposes"></p>
+
+		<div
+			ng-sortable="$ctrl.purposeSortOptions"
+			ng-mouseenter="$ctrl.onSortableMouseEvent('purposes', true)"
+			ng-mouseleave="$ctrl.onSortableMouseEvent('purposes', false)">
+
+			<!-- [Purpose repeat] -->
+			<div class="panel panel-primary" ng-repeat="(purposeId, purpose) in $ctrl.editableLogFrame.purposes">
+
+				<div class="panel-heading">
+					<div class="panel-title">
+						<a class="btn btn-danger btn-xs pull-right"
+						   ng-click="$ctrl.onRemoveClicked(purpose, $ctrl.editableLogFrame.purposes)">
+
+							<i class="fa fa-remove"></i>
+							<span translate="project.delete_purpose"></span>
+						</a>
+
+						<i class="fa fa-sort fa-fw purpose-handle"></i>
+
+						{{'project.purpose'|translate}} {{purposeId + 1}}: {{purpose.description}}
+					</div>
+				</div>
+
+				<div class="panel-body">
+					<ng-form name="purposeForm">
+						<!-- [Purpose description] -->
+						<form-group
+							input-id="purpose-desc-{{purposeId}}-input"
+							label="project.purpose"
+							help="project.logframe_help_purpose_desc">
+
+							<textarea
+								auto-resize class="form-control"
+								name="description"
+								id="purpose-desc-{{purposeId}}-input"
+								placeholder="{{'project.intervention_logic_purpose_ph'|translate}}"
+								ng-model="purpose.description"
+								ng-change="$ctrl.onFieldChange()"></textarea>
+						</form-group>
+						<!-- [/Purpose description] -->
+
+						<!-- [Purpose assumption] -->
+						<form-group
+							input-id="purpose-assum-{{purposeId}}-input"
+							label="project.assumptions"
+							help="project.logframe_help_purpose_assumptions">
+
+							<textarea
+								auto-resize class="form-control"
+								name="assumptions"
+								id="purpose-assum-{{purposeId}}-input"
+								placeholder="{{'project.assumptions_purpose_ph'|translate}}"
+								ng-model="purpose.assumptions"
+								ng-change="$ctrl.onFieldChange()"></textarea>
+						</form-group>
+						<!-- [/Purpose assumption] -->
+
+						<!-- [Purpose indicators] -->
+						<form-group
+							label="shared.indicators"
+							help="project.logframe_help_purpose_indicators">
+
+							<div
+								class="drag-destination"
+								ng-sortable="$ctrl.indicatorsSortOptions"
+								ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
+								ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
+									ng-repeat="indicator in purpose.indicators"
+									indicator="indicator"
+									project="$ctrl.project"
+									on-updated="$ctrl.onIndicatorUpdated(newIndicator, previousValue, purpose.indicators)"
+									on-deleted="$ctrl.onIndicatorDeleted(indicator, purpose.indicators)"></indicator></div>
+
+							<a class="btn btn-default btn-sm" ng-click="$ctrl.onAddIndicatorClicked(purpose.indicators)">
+								<i class="fa fa-plus"></i>
+								{{"project.add_indicator"|translate}}
+							</a>
+						</form-group>
+						<!-- [/Purpose indicators] -->
+
+						<!-- [Outputs] -->
+						<div
+							ng-sortable="$ctrl.outputSortOptions"
+							ng-mouseenter="$ctrl.onSortableMouseEvent('outputs', true)"
+							ng-mouseleave="$ctrl.onSortableMouseEvent('outputs', false)">
+
+							<!-- [Output repeat] -->
+							<div class="panel panel-info" ng-repeat="(outputId, output) in purpose.outputs">
+								<div class="panel-heading">
+									<div class="panel-title">
+										<span class="pull-right">
+											<a class="btn btn-danger btn-xs" ng-click="$ctrl.onRemoveClicked(output, purpose.outputs)">
+												<i class="fa fa-remove"></i>
+												<span translate="project.delete_result"></span>
+											</a>
+										</span>
+										<i class="fa fa-sort fa-fw output-handle"></i>
+										{{'project.output'|translate}} {{purposeId + 1}}.{{outputId + 1}}: {{output.description}}
+									</div>
+								</div>
+
+								<div class="panel-body">
+									<ng-form name="outputForm">
+										<!-- [Output description] -->
+										<form-group
+											input-id="output-desc-{{purposeId}}-{{outputId}}-input"
+											label="project.output"
+											help="project.logframe_help_output_desc">
+
+											<textarea
+												auto-resize
+												id="output-desc-{{purposeId}}-{{outputId}}-input"
+												class="form-control"
+												name="description"
+												placeholder="{{'project.output_desc_ph'|translate}}"
+												ng-model="output.description"
+												ng-change="$ctrl.onFieldChange()"></textarea>
+										</form-group>
+										<!-- [/Output description] -->
+
+										<!-- [Output assumptions] -->
+										<form-group
+											input-id="output-assump-{{purposeId}}-{{outputId}}-input"
+											label="project.assumptions"
+											help="project.logframe_help_output_assumptions">
+
+											<textarea
+												auto-resize
+												id="output-assump-{{purposeId}}-{{outputId}}-input"
+												class="form-control"
+												name="assumptions"
+												placeholder="{{'project.output_assumptions_ph'|translate}}"
+												ng-model="output.assumptions"
+												ng-change="$ctrl.onFieldChange()"></textarea>
+
+										</form-group>
+										<!-- [/Output assumptions] -->
+
+										<!-- [Output indicators] -->
+										<form-group
+											label="shared.indicators"
+											help="project.logframe_help_output_indicators">
+
+											<div
+												class="drag-destination"
+												ng-sortable="$ctrl.indicatorsSortOptions"
+												ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
+												ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
+													ng-repeat="indicator in output.indicators"
+													indicator="indicator"
+													project="$ctrl.project"
+													on-updated="$ctrl.onIndicatorUpdated(newIndicator, previousValue, output.indicators)"
+													on-deleted="$ctrl.onIndicatorDeleted(indicator, output.indicators)"></indicator></div>
+
+											<a class="btn btn-default btn-sm" ng-click="$ctrl.onAddIndicatorClicked(output.indicators)">
+												<i class="fa fa-plus"></i>
+												{{"project.add_indicator"|translate}}
+											</a>
+										</form-group>
+										<!-- [/Output indicators] -->
+
+									</ng-form>
+
+									<!-- [Activities] -->
+									<div
+										ng-sortable="$ctrl.activitySortOptions"
+										ng-mouseenter="$ctrl.onSortableMouseEvent('activities', true)"
+										ng-mouseleave="$ctrl.onSortableMouseEvent('activities', false)">
+
+										<!-- [Activity repeat] -->
+										<div class="panel panel-default" ng-repeat="(activityId, activity) in output.activities">
+											<div class="panel-heading">
+												<div class="panel-title">
+													<span class="pull-right">
+														<a class="btn btn-danger btn-xs" ng-click="$ctrl.onRemoveClicked(activity, output.activities)">
+															<i class="fa fa-remove"></i>
+															<span translate="project.delete_activity"></span>
+														</a>
+													</span>
+													<i class="fa fa-sort fa-fw activity-handle"></i>
+													{{'project.activity'|translate}} {{purposeId + 1}}.{{outputId + 1}}.{{activityId + 1}}: {{activity.description}}
+												</div>
+											</div>
+
+											<div class="panel-body">
+												<ng-form name="activityForm">
+
+													<!-- [Activity description] -->
+													<form-group
+														input-id="activity-desc-{{purposeId}}-{{outputId}}-{{activityId}}-input"
+														label="project.activity"
+														help="project.logframe_help_activity_desc">
+
+														<textarea
+															auto-resize
+															class="form-control"
+															id="activity-desc-{{purposeId}}-{{outputId}}-{{activityId}}-input"
+															name="description"
+															placeholder="{{'project.activity_desc_ph'|translate}}"
+															ng-model="activity.description"
+															ng-change="$ctrl.onFieldChange()"></textarea>
+													</form-group>
+
+													<!-- [/Activity description] -->
+
+													<!-- [Activity indicators] -->
+													<form-group
+														label="shared.indicators"
+														help="project.logframe_help_activity_indicators">
+
+														<div
+															class="drag-destination"
+															ng-sortable="$ctrl.indicatorsSortOptions"
+															ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
+															ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
+																ng-repeat="indicator in activity.indicators"
+																indicator="indicator"
+																project="$ctrl.project"
+																on-updated="$ctrl.onIndicatorUpdated(newIndicator, previousValue, activity.indicators)"
+																on-deleted="$ctrl.onIndicatorDeleted(indicator, activity.indicators)"></indicator></div>
+
+														<a class="btn btn-default btn-sm" ng-click="$ctrl.onAddIndicatorClicked(activity.indicators)">
+															<i class="fa fa-plus"></i>
+															{{"project.add_indicator"|translate}}
+														</a>
+													</form-group>
+													<!-- [/Activity indicators] -->
+												</ng-form>
+											</div>
+										</div>
+										<!-- [/Activity repeat] -->
+									</div>
+
+									<a class="btn btn-default" ng-click="$ctrl.onAddActivityClicked(output)">
+										<i class="fa fa-plus"></i>
+										<span translate="project.add_activity"></span>
+									</a>
+									<!-- [/Activities] -->
+
+								</div>
+							</div>
+							<!-- [/Output repeat] -->
+						</div>
+
+						<a class="btn btn-default" ng-click="$ctrl.onAddOutputClicked(purpose)">
+							<i class="fa fa-plus"></i>
+							<span translate="project.add_output"></span>
+						</a>
+						<!-- [/Outputs] -->
+					</ng-form>
+				</div>
+			</div>
+			<!-- [/Purpose repeat] -->
+
+		</div>
+
+		<a class="btn btn-default" ng-click="$ctrl.onAddPurposeClicked()">
+			<i class="fa fa-plus"></i>
+			<span translate="project.add_purpose"></span>
+		</a>
+	</fieldset>
+	<!-- [/Purposes] -->
+
+</form>
+

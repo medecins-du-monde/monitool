@@ -66,8 +66,8 @@ export default class Cube {
 		var dimensions = [], dimensionGroups = [];
 
 		// Time
-		dimensions.push(Dimension.createTime(project, form, element, inputs));
-		['week_sat', 'week_sun', 'week_mon', 'month', 'quarter', 'semester', 'year'].forEach(periodicity => {
+		dimensions.push(Dimension.createTime(project, form, element));
+		['week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'month', 'quarter', 'semester', 'year'].forEach(periodicity => {
 			// This will fail while indexOf(periodicity) < indexOf(form.periodicity)
 			try {
 				dimensionGroups.push(DimensionGroup.createTime(periodicity, dimensions[0]));
@@ -93,9 +93,10 @@ export default class Cube {
 		var dataSize = 1;
 		dimensions.forEach(dimension => dataSize *= dimension.items.length);
 
-		var data = {}; //new Array(dataSize)
-		// for (var i = 0; i < dataSize; ++i)
-		// 	data[i] = -2147483648;
+		// var data = {};
+		var data = new Array(dataSize)
+		for (var i = 0; i < dataSize; ++i)
+			data[i] = -2147483648;
 
 		inputs.forEach(input => {
 			// Compute location where this subtable should go, and length of data to copy.
@@ -131,9 +132,9 @@ export default class Cube {
 			}
 
 			// Copy into destination table.
-			data[offset] = source;
-			// for (var i = 0; i < length; ++i)
-			// 	data[offset + i] = source[i];
+			// data[offset] = source;
+			for (var i = 0; i < length; ++i)
+				data[offset + i] = source[i];
 		});
 
 		var keys = Object.keys(data);
@@ -208,7 +209,7 @@ export default class Cube {
 	 * c.query(['year', 'location'], {year: ['2013', '2014']}, true);
 	 * // {2013: {shopA: 10, shopB: 20, _total: 30}, 2014: {shopA: 30, shopB: 15, _total: 45}, _total: 75}
 	 */
-	query(dimensionIds, filter, withTotals) {
+	query(dimensionIds, filter, withTotals, withGroups) {
 		// End condition
 		if (dimensionIds.length == 0)
 			return this._query_total(filter);
@@ -235,7 +236,7 @@ export default class Cube {
 				continue;
 
 			// Compute branch of the result tree.
-			result[dimensionItem] = this.query(dimensionIds, filter);
+			result[dimensionItem] = this.query(dimensionIds, filter, withTotals, withGroups);
 
 			// Remove if empty
 			if (result[dimensionItem] === undefined)
@@ -250,14 +251,42 @@ export default class Cube {
 				filter[dimensionId] = oldFilter;
 		}
 
+		if (withGroups)
+			this.dimensionGroups
+				.filter(dg => dg.childDimension === dimension.id)
+				.forEach(dimensionGroup => {
+
+				var numDimensionItems = dimensionGroup.items.length;
+				contributions = 0;
+				for (var dimensionItemId = 0; dimensionItemId < numDimensionItems; ++dimensionItemId) {
+					var dimensionItem = dimensionGroup.items[dimensionItemId];
+
+					// Intersect main filter with branch filter (branch filter is only one item, so it's easy to compute).
+					var localFilter = Object.assign({}, filter);
+
+					// FIXME this is kinda wrong, because a filter on the group may already exists.
+					// this only works because we know that there are no such filter on the olap page.
+					localFilter[dimensionGroup.id] = [dimensionItem];
+
+					// Compute branch of the result tree.
+					result[dimensionItem] = this.query(dimensionIds, localFilter, withTotals, withGroups);
+
+					// Remove if empty
+					if (result[dimensionItem] === undefined)
+						delete result[dimensionItem];
+					else
+						++contributions;
+				}
+			});
+
+
 		if (withTotals)
-			result._total = this.query(dimensionIds, filter);
+			result._total = this.query(dimensionIds, filter, withTotals);
 
 		dimensionIds.unshift(dimensionId);
 
 		return contributions ? result : undefined;
 	}
-
 
 	/**
 	 * Retrieve the total value matching a given filter.
@@ -302,6 +331,9 @@ export default class Cube {
 	 * c._query_rec([[0], [0]], 5); // 5
 	 */
 	_query_rec(allIndexes, offset) {
+		if (Number.isNaN(offset))
+			return undefined;
+
 		if (allIndexes.length == 0)
 			return this.data[offset] == -2147483648 ? undefined : this.data[offset];
 
@@ -422,7 +454,9 @@ export default class Cube {
 				if (dimensionGroup) {
 					// Build new filter by concatenating elements.
 					var newFilter = [];
-					oldFilter.forEach(function(v) { Array.prototype.push.apply(newFilter, dimensionGroup.mapping[v]); });
+					oldFilter.forEach(function(v) {
+						Array.prototype.push.apply(newFilter, dimensionGroup.mapping[v]);
+					});
 					newFilter.sort();
 
 					// If there are duplicates, remove them.
@@ -460,7 +494,7 @@ export default class Cube {
 			// No filter => filter is range(0, dimension.items.length)
 			if (!filter[dimension.id]) {
 				size = dimension.items.length;
-				result = new Int32Array(size);
+				result = new Array(size);
 				for (i = 0; i < size; ++i)
 					result[i] = i;
 			}
@@ -468,11 +502,12 @@ export default class Cube {
 			else {
 				// Now we need to map our list of strings to indexes.
 				size = filter[dimension.id].length;
-				result = new Int32Array(size);
+				result = new Array(size);
 				for (i = 0; i < size; ++i) {
 					result[i] = dimension.items.indexOf(filter[dimension.id][i]);
 					if (result[i] === -1)
-						throw new Error('Dimension item "' + filter[dimension.id][i] + '" was not found.');
+						result[i] = NaN;
+						// throw new Error('Dimension item "' + filter[dimension.id][i] + '" was not found.');
 				}
 			}
 

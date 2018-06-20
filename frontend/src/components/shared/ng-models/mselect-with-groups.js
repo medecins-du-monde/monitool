@@ -31,7 +31,7 @@ const module = angular.module(
  */
 module.component('elementFilter', {
 	require: {
-		ngModelCtrl: "ngModel"
+		ngModelCtrl: 'ngModel'
 	},
 
 	template: require('./mselect-with-groups.html'),

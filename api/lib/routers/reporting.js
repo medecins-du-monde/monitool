@@ -17,86 +17,82 @@
 
 import Router from 'koa-router';
 import cache from 'memory-cache';
+import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 
-import CubeCollection from '../olap/cube-collection';
-import Input from '../resource/model/input';
 import Project from '../resource/model/project';
+import Input from '../resource/model/input';
+import Cube from '../olap/cube';
+
 
 const router = new Router();
 
 
-/**
- * Generate the cubes for a given project
- */
-router.get('/reporting/project/:id', async ctx => {
-	// Early quit if user is not allowed to access this project.
-	if (!ctx.visibleProjectIds.has(ctx.params.id))
-		throw new Error('forbidden');
-
-	// Try serving from cache
-	var cacheKey = 'reporting:project:' + ctx.params.id,
-		reporting = cache.get(cacheKey);
-
-	if (reporting) {
-		ctx.response.body = reporting;
-		ctx.response.type = 'application/json';
-		return;
+function mergeRec(fn, ...parameters) {
+	if (['number', 'string'].includes(typeof parameters[0])) {
+		const result = fn(...parameters);
+		return Number.isNaN(result) ? 'Division by zero' : result;
 	}
 
-	// Serve from main database
-	const [project, inputs] = await Promise.all([
-		Project.storeInstance.get(ctx.params.id),
-		Input.storeInstance.listByProject(ctx.params.id, true)
-	]);
-
-	var reporting = JSON.stringify({
-		error: false,
-		type: 'cubes',
-		projectId: project._id,
-		cubes: CubeCollection.fromProject(project, inputs).serialize()
-	});
-
-	cache.put(cacheKey, reporting, 24 * 3600 * 1000);
-	ctx.response.body = reporting;
-	ctx.response.type = 'application/json';
-});
+	const result = {};
+	for (let key in parameters[0])
+		result[key] = mergeRec(fn, ...parameters.map(p => p[key]));
+	return result;
+}
 
 
-/**
- * Generates the cubes for a given indicator
- */
-router.get('/reporting/indicator/:id', async ctx => {
-	if (ctx.state.user.type == 'partner')
-		throw new Error('forbidden');
+router.post('/reporting/project/:prjId', async ctx => {
+	const project = await Project.storeInstance.get(ctx.params.prjId);
+	const computation = ctx.request.body.computation;
 
-	// Retrieve all stripped down projects that compute this indicator
-	// (those contain only the cross-cutting indicator we want, and have all unnecessary
-	// forms and variables removed).
-	let projects = await Project.storeInstance.listByIndicator(ctx.params.id, true);
+	let subQueries = await Promise.all(
+		Object.values(computation.parameters).map(async param => {
+			// 
+			const variableId = param.elementId;
+			const extraFilter = param.filter;
 
-	// Remove projects that are not allowed for our user.
-	projects = projects.filter(p => ctx.visibleProjectIds.has(p._id));
+			// 
+			const dataSource = project.getDataSourceByVariableId(variableId);
+			const variable = dataSource.getVariableById(variableId);
+			const inputs = await Input.storeInstance.listByDataSource(project._id, dataSource.id, true);
+			const cube = Cube.fromElement(project, dataSource, variable, inputs);
 
-	// Retrieve all inputs from the data sources of the stripped down projects
-	// (all inputs that are no use for this particular indicator won't be fetched)
-	const inputsByProject = await Promise.all(
-		projects.map(async function(project) {
-			const inputsByDataSource = await Promise.all(
-				project.forms.map(form => Input.storeInstance.listByDataSource(project._id, form.id, true))
+			// Merge parameter filters
+			const filter = JSON.parse(JSON.stringify(ctx.request.body.filter));
+			for (let key in extraFilter)
+				filter[key] = filter[key] ? filter[key].filter(e => extraFilter[key].includes(e)) : extraFilter[key];
+
+			// Replace _start/_end by a proper filter depending on our time dimension.
+			if (filter._start && filter._end) {
+				const timeDimension = dataSource.periodicity === 'free' ? 'day' : dataSource.periodicity;
+				filter[timeDimension] = Array.from(
+					timeSlotRange(
+						TimeSlot.fromDate(new Date(filter._start + 'T00:00:00Z'), timeDimension),
+						TimeSlot.fromDate(new Date(filter._end + 'T00:00:00Z'), timeDimension)
+					)
+				).map(ts => ts.value);
+
+				delete filter._start;
+				delete filter._end;
+			}
+
+			// FIXME this line should be useless => check
+			filter.entity = filter.entity.filter(id => dataSource.entities.includes(id));
+
+			return cube.query(
+				ctx.request.body.dimensionIds,
+				filter,
+				ctx.request.body.withTotals,
+				ctx.request.body.withGroups
 			);
-
-			return inputsByDataSource.reduce((memo, arr) => memo.concat(arr), []);
 		})
 	);
 
-	// Merge the results
-	var result = {};
-	for (var i = 0; i < projects.length; ++i) {
-		var project = projects[i], inputs = inputsByProject[i];
-		result[project._id] = CubeCollection.fromProject(project, inputs).serialize();
-	}
+	const fn = new Function(
+		...Object.keys(computation.parameters),
+		'return ' + computation.formula
+	);
 
-	ctx.response.body = {type: 'cubes', cubes: result};
+	ctx.response.body = mergeRec(fn, ...subQueries);
 });
 
 export default router;

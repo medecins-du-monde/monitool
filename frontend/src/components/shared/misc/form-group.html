@@ -1,0 +1,15 @@
+<div class="form-group" show-errors>
+	<label
+		for="{{$ctrl.inputId}}"
+		class="col-sm-2 control-label"
+		translate="{{$ctrl.label}}"></label>
+
+	<div class="col-sm-10">
+		<ng-transclude></ng-transclude>
+
+		<span class="help-block" ng-if="$ctrl.help">
+			<i class="fa fa-info-circle"></i>
+			<span translate="{{$ctrl.help}}" translate-values="$ctrl.helpValues"></span>
+		</span>
+	</div>
+</div>

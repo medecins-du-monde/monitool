@@ -1,0 +1,68 @@
+<ol class="breadcrumb">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="shared.logical_frames"></li>
+</ol>
+
+<div class="alert alert-info" translate="project.logical_frame_list_info"></div>
+
+<legend translate="shared.logical_frames"></legend>
+
+<table class="table table-bordered table-stripped table-condensed">
+	<thead>
+		<tr>
+			<th style="width: 30px;"></th>
+			<th translate="shared.name"></th>
+			<th translate="project.goal"></th>
+			<th style="width: 250px"></th>
+		</tr>
+	</thead>
+	<tbody ng-if="$ctrl.editableProject.logicalFrames.length == 0">
+		<tr>
+			<td colspan="4" style="text-align: center" translate="project.no_logical_frames"></td>
+		</tr>
+	</tbody>
+	<tbody ng-sortable="$ctrl.ngSortableOptions">
+		<tr ng-repeat="logicalFrame in $ctrl.editableProject.logicalFrames">
+			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
+			<td>
+				<a ui-sref="main.project.structure.logical_frame_edition({logicalFrameId: logicalFrame.id})">
+					<span ng-show="logicalFrame.name">{{logicalFrame.name|maxLength:50}}</span>
+					<span ng-hide="logicalFrame.name" translate="project.unnamed_logframe"></span>
+				</a>
+			</td>
+			<td>{{logicalFrame.goal}}</td>
+			<td>
+				<i class="fa fa-file-pdf-o"></i>
+				<span translate="project.download_pdf"></span>
+				(<a href="/api/resources/project/{{$ctrl.editableProject._id}}/logical-frame/{{logicalFrame.id}}.pdf?orientation=portrait" target="_blank" translate="shared.portrait"></a>,
+				<a href="/api/resources/project/{{$ctrl.editableProject._id}}/logical-frame/{{logicalFrame.id}}.pdf?orientation=landscape" target="_blank" translate="shared.landscape"></a>)
+			</td>
+ 		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="4" style="text-align: center">
+				<div uib-dropdown style="display: inline-block;">
+					<a class="btn btn-default btn-xs" href="#" uib-dropdown-toggle>
+						<i class="fa fa-plus"></i>
+						<span translate="shared.add"></span>
+						<span class="caret"></span>
+					</a>
+
+					<ul class="dropdown-menu">
+						<li>
+							<a ng-click="$ctrl.onCreateLogicalFrameClicked()" translate="form.create_blank"></a>
+							<a
+								ng-repeat="logicalFrame in $ctrl.editableProject.logicalFrames"
+								ng-click="$ctrl.onCreateLogicalFrameClicked(logicalFrame)"
+								translate="form.create_copy"
+								translate-values="{name: logicalFrame.name}"></a>
+						</li>
+					</ul>
+				</div>
+			</td>
+		</tr>
+	</tfoot>
+</table>

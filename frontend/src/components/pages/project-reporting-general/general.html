@@ -1,0 +1,26 @@
+<ol class="breadcrumb">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="shared.reporting_general"></li>
+</ol>
+
+<reporting-graph plots="$ctrl.graphs"></reporting-graph>
+
+<project-group-by
+	project="$ctrl.project"
+	on-update="$ctrl.onGroupByUpdate(groupBy)"></project-group-by>
+
+<project-filter
+	project="$ctrl.project"
+	on-update="$ctrl.onFilterUpdate(filter)"></project-filter>
+
+<general-table
+	project="$ctrl.project"
+	cc-indicators="$ctrl.ccIndicators"
+	filter="$ctrl.filter"
+	group-by="$ctrl.groupBy"
+	on-group-by-update="$ctrl.onGroupByUpdate(groupBy)"
+	on-graph-toggle="$ctrl.onGraphToggle(id)">
+</general-table>
+

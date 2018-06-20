@@ -4,8 +4,11 @@
 
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["name", "goal", "start", "end", "indicators", "purposes"],
+	"required": ["id", "name", "goal", "start", "end", "indicators", "purposes"],
 	"properties": {
+		"id": {
+			"$ref": "#/definitions/uuid"
+		},
 		"name": { "type": "string" },
 		"goal": { "type": "string" },
 		"start": {

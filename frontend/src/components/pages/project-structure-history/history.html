@@ -1,0 +1,61 @@
+<ol class="breadcrumb noprint">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="project.revisions"></li>
+</ol>
+
+<div class="alert alert-info" translate="project.revision_info"></div>
+
+<legend translate="project.revisions"></legend>
+
+<table class="table table-bordered table-condensed">
+	<thead>
+		<tr>
+			<th style="width: 15%" translate="project.revision_datetime"></th>
+			<th translate="project.revision_changes"></th>
+		</tr>
+	</thead>
+	<tbody ng-if="!$ctrl.revisions.length && !$ctrl.loading">
+		<tr>
+			<td style="text-align: center" colspan="2" translate="project.revision_none"></td>
+		</tr>
+	</tbody>
+	<tbody ng-repeat="(revIndex, revision) in $ctrl.revisions" class="revtbody">
+		<tr>
+			<td>
+				{{::revision.time|date:'medium'}}<br/>
+				{{::revision.user.substring(5)}}
+			</td>
+			<td>
+				<revision-summary revision="revision"></revision-summary>
+			</td>
+		</tr>
+		<tr class="restore"
+			ng-class="{'selected': revIndex == $ctrl.selectedIndex}">
+
+			<td colspan="2" style="text-align: center">
+				<a ng-show="!revision.isEquivalent && revIndex != $ctrl.selectedIndex"
+					class="btn btn-xxs btn-default"
+					ng-click="$ctrl.onRestoreCliked(revIndex)"
+					translate="project.revision_restore"></a>
+
+				<span ng-show="!revision.isEquivalent && revIndex == $ctrl.selectedIndex" translate="project.revision_save_to_confirm"></span>
+				<span ng-show="revision.isEquivalent" translate="project.revision_is_equivalent"></span>
+			</td>
+		</tr>
+	</tbody>
+	<tbody ng-if="$ctrl.loading">
+		<tr>
+			<td style="text-align: center" colspan="2" translate="shared.loading"></td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr ng-if="$ctrl.revisions.length && !$ctrl.finished && !$ctrl.loading">
+			<td style="text-align: center" colspan="2">
+				<a ng-click="$ctrl.onShowMoreClicked()" translate="project.revision_show_more"></a>
+			</td>
+		</tr>
+	</tfoot>
+</table>
+

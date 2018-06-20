@@ -1,0 +1,28 @@
+
+<table id="reporting" class="table table-bordered table-condensed">
+	<thead class="parent">
+		<tr>
+			<th style="width: 30px" class="noprint"></th>
+			<th translate="shared.name" style="min-width: 300px"></th>
+			<th translate="project.baseline" style="width: 60px"></th>
+			<th translate="project.target" style="width: 60px"></th>
+			<th ng-repeat="col in $ctrl.columns" style="min-width: 50px" title="{{col.title}}">
+				{{col.name}}
+			</th>
+		</tr>
+	</thead>
+
+	<tbody
+		ng-repeat="tbody in $ctrl.tbodies"
+		tbody-indicators
+
+		project="$ctrl.project"
+
+		columns="$ctrl.columns"
+		filter="$ctrl.filter"
+		group-by="$ctrl.groupBy"
+
+		prefix="tbody.prefix"
+		name="tbody.name"
+		indicators="tbody.indicators"></tbody>
+</table>
