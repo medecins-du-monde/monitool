@@ -43,14 +43,12 @@ module.component('generalTable', {
 		}
 
 		_computeTBodies() {
-			const tbodies = [];
-
-			tbodies.push(...this.project.logicalFrames.map(lf => this._logicalFrameworkToTbody(lf)));
-			tbodies.push(this._ccIndicatorsToTbody());
-			tbodies.push(this._extraIndicatorsToTbody());
-			tbodies.push(...this.project.forms.map(ds => this._dataSourceToTbody(ds)));
-
-			return tbodies;
+			return [
+				...this.project.logicalFrames.map(lf => this._logicalFrameworkToTbody(lf)),
+				this._ccIndicatorsToTbody(),
+				this._extraIndicatorsToTbody(),
+				...this.project.forms.map(ds => this._dataSourceToTbody(ds))
+			].filter(tbody => tbody.sections.some(s => !!s.indicators.length));
 		}
 
 		_logicalFrameworkToTbody(logicalFramework) {
@@ -113,6 +111,7 @@ module.component('generalTable', {
 				tbody.sections.push({
 					id: uuid(),
 					name: 'project.multi_theme_indicator',
+					indent: 0,
 					indicators: manyThematicsIndicators
 				});
 
@@ -124,6 +123,7 @@ module.component('generalTable', {
 						tbody.sections.push({
 							id: theme._id,
 							name: theme.name[this.language],
+							indent: 0,
 							indicators: themeIndicators
 						});
 				}
@@ -151,6 +151,7 @@ module.component('generalTable', {
 				sections: [
 					{
 						id: uuid(),
+						indent: 0,
 						indicators: this.project.extraIndicators.map(ind => {
 							return Object.assign({}, ind, {id: uuid()})
 						})
@@ -166,6 +167,7 @@ module.component('generalTable', {
 				sections: [
 					{
 						id: dataSource.id,
+						indent: 0,
 						indicators: dataSource.elements.map(variable => {
 							// create fake indicators from the variables
 							return {
