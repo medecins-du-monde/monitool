@@ -183,14 +183,18 @@ textarea {
   }
 
   #reporting .indent1 .row-title {
-    padding-left: 25px !important;
+    padding-left: 20px !important;
   }
 
   #reporting .indent2 .row-title {
-    padding-left: 50px !important;
+    padding-left: 40px !important;
   }
   #reporting .indent3 .row-title {
-    padding-left: 75px !important;
+    padding-left: 60px !important;
+  }
+
+  #reporting .indent4 .row-title {
+    padding-left: 80px !important;
   }
 
 
@@ -286,13 +290,13 @@ ul:hover>.onrollover {
   }
 
 }
-
+/*
 
 .indent1 { padding-left: 20px !important; }
 .indent2 { padding-left: 40px !important; }
 .indent3 { padding-left: 60px !important; }
 .indent4 { padding-left: 80px !important; }
-.indent5 { padding-left: 100px !important; }
+.indent5 { padding-left: 100px !important; }*/
 
 
   .table-raw-data th {

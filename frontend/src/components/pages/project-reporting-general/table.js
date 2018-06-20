@@ -16,6 +16,8 @@ const module = angular.module(
 module.component('generalTable', {
 	bindings: {
 		project: '<',
+		themes: '<',
+
 		filter: '<',
 		groupBy: '<',
 		ccIndicators: '<',
@@ -43,10 +45,10 @@ module.component('generalTable', {
 		_computeTBodies() {
 			const tbodies = [];
 
-			// tbodies.push(...this.project.logicalFrames.map(lf => this._logicalFrameworkToTbody(lf));
+			tbodies.push(...this.project.logicalFrames.map(lf => this._logicalFrameworkToTbody(lf)));
 			tbodies.push(this._ccIndicatorsToTbody());
-			// tbodies.push(this._extraIndicatorsToTbody());
-			// tbodies.push(...this.project.forms.map(ds => this._dataSourceToTbody(ds));
+			tbodies.push(this._extraIndicatorsToTbody());
+			tbodies.push(...this.project.forms.map(ds => this._dataSourceToTbody(ds)));
 
 			return tbodies;
 		}
@@ -54,45 +56,91 @@ module.component('generalTable', {
 		_logicalFrameworkToTbody(logicalFramework) {
 			const tbody = {
 				prefix: 'project.logical_frame',
-				name: 'indicator.cross_cutting',
-				indicators: []
+				name: logicalFramework.name,
+				sections: []
 			};
+
+			tbody.sections.push({
+				id: logicalFramework.id,
+				name: logicalFramework.name,
+				indicators: logicalFramework.indicators.map(i => Object.assign({}, i, {id: uuid()})),
+				indent: 0
+			});
+
+			logicalFramework.purposes.forEach(purpose => {
+				tbody.sections.push({
+					id: uuid(),
+					name: purpose.description,
+					indicators: purpose.indicators.map(i => Object.assign({}, i, {id: uuid()})),
+					indent: 1
+				});
+
+				purpose.outputs.forEach(output => {
+					tbody.sections.push({
+						id: uuid(),
+						name: output.description,
+						indicators: output.indicators.map(i => Object.assign({}, i, {id: uuid()})),
+						indent: 2
+					});
+
+					output.activities.forEach(activity => {
+						tbody.sections.push({
+							id: uuid(),
+							name: activity.description,
+							indicators: activity.indicators.map(i => Object.assign({}, i, {id: uuid()})),
+							indent: 2
+						});
+					});
+				});
+			});
+
+			return tbody;
 		}
 
 		_ccIndicatorsToTbody() {
-
-			return {
+			const tbody = {
 				name: 'indicator.cross_cutting',
-				sections: [
-					{
-						indent: 0,
-						title: 'prout',
-						indicators: [
-							this.project.extraIndicators[0]
-						]
-					},
-					{
-						indent: 0,
-						title: 'prout',
-						indicators: [
-						]
-					}
-				]
+				sections: []
+			};
 
-			}
+			// Create a category with indicators that match project on 2 thematics or more
+			const manyThematicsIndicators = this.ccIndicators.filter(indicator => {
+				const commonThemes = indicator.themes.filter(themeId => this.project.themes.includes(themeId));
+				return indicator.themes.length > 1 && commonThemes.length > 0;
+			});
 
+			if (manyThematicsIndicators.length)
+				tbody.sections.push({
+					id: uuid(),
+					name: 'project.multi_theme_indicator',
+					indicators: manyThematicsIndicators
+				});
 
+			// Create a category with indicators that match project on exactly 1 thematic
+			this.themes.forEach(theme => {
+				if (this.project.themes.includes(theme._id)) {
+					var themeIndicators = this.ccIndicators.filter(i => i.themes.length === 1 && i.themes[0] === theme._id);
+					if (themeIndicators.length !== 0)
+						tbody.sections.push({
+							id: theme._id,
+							name: theme.name[this.language],
+							indicators: themeIndicators
+						});
+				}
+			});
 
-			// cc indicators.
-			const tbody = {name: 'indicator.cross_cutting', indicators: []};
+			// sort and replace indicators by their 'planning' (from the project)
+			tbody.sections.forEach(section => {
+				section.indicators = section.indicators.map(ccIndicator => {
+					return Object.assign(
+						{},
+						{id: ccIndicator._id, display: ccIndicator.name[this.language], baseline: null, target: null},
+						this.project.crossCutting[ccIndicator._id]
+					);
+				});
 
-			const newIndicators = [];
-			for (let ccIndicatorId in this.project.crossCutting) {
-				const newIndicator = angular.copy(this.project.crossCutting[ccIndicatorId]);
-				newIndicator.id = ccIndicatorId;
-				newIndicator.display = this.ccIndicators.find(i => i._id == ccIndicatorId).name[this.language];
-				tbody.indicators.push(newIndicator);
-			}
+				section.indicators.sort((a, b) => a.display.localeCompare(b.display));
+			});
 
 			return tbody;
 		}
@@ -100,9 +148,14 @@ module.component('generalTable', {
 		_extraIndicatorsToTbody() {
 			return {
 				name: 'indicator.extra',
-				indicators: this.project.extraIndicators.map(ind => {
-					return Object.assign({}, ind, {id: uuid()})
-				})
+				sections: [
+					{
+						id: uuid(),
+						indicators: this.project.extraIndicators.map(ind => {
+							return Object.assign({}, ind, {id: uuid()})
+						})
+					}
+				]
 			};
 		}
 
@@ -110,25 +163,30 @@ module.component('generalTable', {
 			return {
 				prefix: 'project.collection_form',
 				name: dataSource.name,
-				indicators: dataSource.elements.map(variable => {
-					// create fake indicators from the variables
-					return {
-						id: variable.id,
-						colorization: false,
-						baseline: null,
-						target: null,
-						display: variable.name,
-						computation: {
-							formula: 'a',
-							parameters: {
-								a: {
-									elementId: variable.id,
-									filter: {}
+				sections: [
+					{
+						id: dataSource.id,
+						indicators: dataSource.elements.map(variable => {
+							// create fake indicators from the variables
+							return {
+								id: variable.id,
+								colorization: false,
+								baseline: null,
+								target: null,
+								display: variable.name,
+								computation: {
+									formula: 'a',
+									parameters: {
+										a: {
+											elementId: variable.id,
+											filter: {}
+										}
+									}
 								}
-							}
-						}
-					};
-				})
+							};
+						})
+					}
+				]
 			};
 		}
 

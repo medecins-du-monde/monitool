@@ -75,8 +75,8 @@ module.component('selectIndicator', {
 			});
 
 			// FIXME, we can't modify this bindings (coding style)
-			// this.indicators.sort((a, b) => a.name[this.language].localeCompare(b.name[this.language]));
-			this.ccIndicators.forEach(ccIndicator => {
+			const ccIndicators = this.ccIndicators.slice().sort((a, b) => a.name[this.language].localeCompare(b.name[this.language]));
+			ccIndicators.forEach(ccIndicator => {
 				// If there no theme in common
 				if (ccIndicator.themes.filter(t => this.project.themes.includes(t)).length === 0)
 					return;

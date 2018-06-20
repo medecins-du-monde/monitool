@@ -90,7 +90,7 @@ module.directive('trIndicator', () => {
 					this.values = this.columns.map(col => data[col.id]);
 				}
 				catch (e) {
-					this.errorMessage = e.stack;
+					this.errorMessage = e.message;
 				}
 
 				this.$scope.$apply();

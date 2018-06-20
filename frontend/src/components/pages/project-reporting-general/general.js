@@ -48,6 +48,8 @@ module.config($stateProvider => {
 
 module.component('generalReporting', {
 	bindings: {
+		themes: '<',
+
 		project: '<',
 		ccIndicators: '<'
 	},

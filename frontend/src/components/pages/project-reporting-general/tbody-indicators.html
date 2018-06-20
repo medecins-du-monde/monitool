@@ -1,5 +1,5 @@
 <tr ng-click="$ctrl.onOpenToggle()" style="cursor: pointer">
-	<th class="indent0" colspan="{{4 + $ctrl.columns.length}}">
+	<th colspan="{{4 + $ctrl.columns.length}}">
 		<fa-open value="$ctrl.open" class="noprint"></fa-open>
 		<span ng-if="$ctrl.prefix">
 			{{$ctrl.prefix|translate}}:
@@ -8,14 +8,18 @@
 	</th>
 </tr>
 
-<tr ng-if="$ctrl.open && !$ctrl.indicators.length">
+<tr ng-repeat-start="row in $ctrl.rows track by row.id"
+	ng-if="$ctrl.open && row.type == 'header'"
+	class="indent{{row.indent}}">
 	<td class="noprint"></td>
-	<td colspan="{{3 + $ctrl.columns.length}}" translate="project.reporting_empty"></td>
+	<th class="row-title" colspan="{{3 + $ctrl.columns.length}}">{{row.name|translate}}</th>
 </tr>
-
-<tr
-	ng-if="$ctrl.open"
-	ng-repeat="row in $ctrl.rows track by row.id"
+<tr ng-if="$ctrl.open && row.type == 'no_indicators'" class="indent{{row.indent}}">
+	<td class="noprint"></td>
+	<td class="row-title" colspan="{{3 + $ctrl.columns.length}}" translate="project.reporting_empty"></td>
+</tr>
+<tr	ng-repeat-end
+	ng-if="$ctrl.open && row.type == 'indicator'"
 	class="indent{{row.indent}}"
 
 	tr-indicator

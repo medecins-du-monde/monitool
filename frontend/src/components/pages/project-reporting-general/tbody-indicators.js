@@ -1,6 +1,7 @@
 
 
 import angular from 'angular';
+import uuid from 'uuid/v4';
 
 import mtTrIndicator from '../../shared/reporting/tr-indicator';
 import mtFaOpen from '../../shared/misc/plus-minus-icon';
@@ -25,7 +26,7 @@ module.directive('tbodyIndicators', () => {
 			filter: '<',
 			groupBy: '<',
 			project: '<',
-			indicators: '<',
+			sections: '<',
 			name: '<',
 			prefix: '<',
 
@@ -41,7 +42,7 @@ module.directive('tbodyIndicators', () => {
 			}
 
 			$onChanges(changes) {
-				if (changes.indicators || changes.filter || changes.groupBy)
+				if (changes.sections || changes.filter || changes.groupBy)
 					this._makeRows();
 			}
 
@@ -57,10 +58,20 @@ module.directive('tbodyIndicators', () => {
 			_makeRows() {
 				// Make the rows.
 				this.rows = [];
-				this.indicators.forEach(indicator => this._makeRowsRec(indicator, this.filter));
+				this.sections.forEach(section => {
+					if (section.name)
+						this.rows.push({id: uuid(), type: 'header', name: section.name, indent: section.indent});
+
+					if (section.indicators.length)
+						section.indicators.forEach(indicator => {
+							this._makeRowsRec(indicator, this.filter, section.indent)
+						});
+					// else
+					// 	this.rows.push({id: uuid(), type: 'no_indicators', indent: section.indent});
+				});
 			}
 
-			_makeRowsRec(indicator, filter) {
+			_makeRowsRec(indicator, filter, indent) {
 				const partitions = this.project.forms
 					.reduce((m, e) => m.concat(e.elements), [])
 					.reduce((m, e) => m.concat(e.partitions), []);
@@ -76,9 +87,10 @@ module.directive('tbodyIndicators', () => {
 				// Add the row to the table
 				this.rows.push({
 					id: rowId,
+					type: 'indicator',
 					indicator: indicator,
 					filter: filter,
-					indent: Object.keys(filter).length - 3
+					indent: indent
 				});
 
 				// Recurse to append opened disagregations
@@ -89,13 +101,13 @@ module.directive('tbodyIndicators', () => {
 					partition.groups.forEach(pg => {
 						const childFilter = angular.copy(filter);
 						childFilter[partition.id] = pg.members;
-						this._makeRowsRec(indicator, childFilter);
+						this._makeRowsRec(indicator, childFilter, indent + 1);
 					});
 
 					partition.elements.forEach(pe => {
 						const childFilter = angular.copy(filter);
 						childFilter[partition.id] = [pe.id];
-						this._makeRowsRec(indicator, childFilter);
+						this._makeRowsRec(indicator, childFilter, indent + 1);
 					});
 				}
 			}
