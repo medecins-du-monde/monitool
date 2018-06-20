@@ -45,7 +45,7 @@ export function computeSplitPartitions(project, computation) {
 		return [];
 
 	// We need to keep only partitions that are common to all variables.
-	return Object
+	const result = Object
 		.values(computation.parameters)
 		.reduce((memo, param) => {
 			let partitions = project.forms
@@ -60,6 +60,9 @@ export function computeSplitPartitions(project, computation) {
 
 			return partitions;
 		}, null);
+
+	// do not return null when formula is a fixed value.
+	return result ? result : [];
 }
 
 // implement _fetch method here, and call it from the components
