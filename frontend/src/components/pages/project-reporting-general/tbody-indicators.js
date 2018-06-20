@@ -64,25 +64,17 @@ module.directive('tbodyIndicators', () => {
 
 					if (section.indicators.length)
 						section.indicators.forEach(indicator => {
-							this._makeRowsRec(indicator, this.filter, section.indent)
+							this._makeRowsRec(indicator, this.filter, section.indent, indicator.id)
 						});
 					// else
 					// 	this.rows.push({id: uuid(), type: 'no_indicators', indent: section.indent});
 				});
 			}
 
-			_makeRowsRec(indicator, filter, indent) {
+			_makeRowsRec(indicator, filter, indent, rowId) {
 				const partitions = this.project.forms
 					.reduce((m, e) => m.concat(e.elements), [])
 					.reduce((m, e) => m.concat(e.partitions), []);
-
-				// Compute id for this row "variableId[partitionId=partitionElementId][...]"
-				let rowId = indicator.id;
-				for (let filterKey in filter) {
-					const partition = partitions.find(p => p.id === filterKey);
-					if (partition)
-						rowId += '[' + filterKey + '=' + filter[filterKey] + ']';
-				}
 
 				// Add the row to the table
 				this.rows.push({
@@ -101,13 +93,13 @@ module.directive('tbodyIndicators', () => {
 					partition.groups.forEach(pg => {
 						const childFilter = angular.copy(filter);
 						childFilter[partition.id] = pg.members;
-						this._makeRowsRec(indicator, childFilter, indent + 1);
+						this._makeRowsRec(indicator, childFilter, indent + 1, rowId + '/' + partition.id + '=' + pg.id);
 					});
 
 					partition.elements.forEach(pe => {
 						const childFilter = angular.copy(filter);
 						childFilter[partition.id] = [pe.id];
-						this._makeRowsRec(indicator, childFilter, indent + 1);
+						this._makeRowsRec(indicator, childFilter, indent + 1, rowId + '/' + partition.id + '=' + pe.id);
 					});
 				}
 			}
