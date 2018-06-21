@@ -1,8 +1,26 @@
+<style id="reporting-style"></style>
+
+
 <table id="reporting" class="table table-bordered table-condensed">
+	<tbody
+		ng-repeat="tbody in $ctrl.tbodies"
+		tbody-indicators
+
+		project="$ctrl.project"
+		columns="$ctrl.columns"
+		filter="$ctrl.filter"
+		group-by="$ctrl.groupBy"
+
+		first-col-style="$ctrl.firstColStyle"
+
+		prefix="tbody.prefix"
+		name="tbody.name"
+		sections="tbody.sections">
+	</tbody>
 	<thead ng-style="$ctrl.headerStyle">
 		<tr>
-			<th style="width: 30px" class="noprint"></th>
-			<th translate="shared.name" style="min-width: 300px"></th>
+			<th style="width: 30px" class="noprint" ng-style="$ctrl.firstColStyle"></th>
+			<th translate="shared.name" style="min-width: 300px" ng-style="$ctrl.firstColStyle"></th>
 			<th translate="project.baseline" style="width: 60px"></th>
 			<th translate="project.target" style="width: 60px"></th>
 			<th ng-repeat="col in $ctrl.columns" style="min-width: 50px" title="{{col.title}}">
@@ -10,18 +28,4 @@
 			</th>
 		</tr>
 	</thead>
-
-	<tbody
-		ng-repeat="tbody in $ctrl.tbodies"
-		tbody-indicators
-
-		project="$ctrl.project"
-
-		columns="$ctrl.columns"
-		filter="$ctrl.filter"
-		group-by="$ctrl.groupBy"
-
-		prefix="tbody.prefix"
-		name="tbody.name"
-		sections="tbody.sections"></tbody>
 </table>

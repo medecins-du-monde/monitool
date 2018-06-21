@@ -55,9 +55,13 @@ module.component('generalTable', {
 
 		_onScroll() {
 			this.headerStyle = {
-				transform: 'translate(0, ' + this._element[0].scrollTop + 'px)',
-				'background-color': 'white'
+				transform: 'translate(0, ' + this._element[0].scrollTop + 'px)'
 			};
+
+			this.firstColStyle = {
+				transform: 'translate(' + this._element[0].scrollLeft + 'px)'
+			};
+
 			this.$scope.$apply();
 		}
 
@@ -149,7 +153,7 @@ module.component('generalTable', {
 							id: uuid(),
 							name: activity.description,
 							indicators: activity.indicators.map(i => Object.assign({}, i, {id: uuid()})),
-							indent: 2
+							indent: 3
 						});
 					});
 				});

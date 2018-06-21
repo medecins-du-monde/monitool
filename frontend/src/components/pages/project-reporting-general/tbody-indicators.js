@@ -29,6 +29,7 @@ module.directive('tbodyIndicators', () => {
 			sections: '<',
 			name: '<',
 			prefix: '<',
+			firstColStyle: '<',
 
 			onPlotToggle: '&',
 		},

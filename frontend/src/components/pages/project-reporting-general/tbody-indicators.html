@@ -1,5 +1,7 @@
 <tr ng-click="$ctrl.onOpenToggle()" style="cursor: pointer">
-	<th colspan="{{4 + $ctrl.columns.length}}">
+	<th colspan="{{4 + $ctrl.columns.length}}"
+		ng-style="$ctrl.firstColStyle">
+
 		<fa-open value="$ctrl.open" class="noprint"></fa-open>
 		<span ng-if="$ctrl.prefix">
 			{{$ctrl.prefix|translate}}:
@@ -11,12 +13,26 @@
 <tr ng-repeat-start="row in $ctrl.rows track by row.id"
 	ng-if="$ctrl.open && row.type == 'header'"
 	class="indent{{row.indent}}">
-	<td class="noprint"></td>
-	<th class="row-title" colspan="{{3 + $ctrl.columns.length}}">{{row.name|translate}}</th>
+
+	<td class="noprint"
+		ng-style="$ctrl.firstColStyle"></td>
+
+	<th class="row-title"
+		colspan="{{3 + $ctrl.columns.length}}"
+		ng-style="$ctrl.firstColStyle">
+		{{row.name|translate}}
+	</th>
 </tr>
-<tr ng-if="$ctrl.open && row.type == 'no_indicators'" class="indent{{row.indent}}">
-	<td class="noprint"></td>
-	<td class="row-title" colspan="{{3 + $ctrl.columns.length}}" translate="project.reporting_empty"></td>
+
+<tr ng-if="$ctrl.open && row.type == 'no_indicators'"
+	class="indent{{row.indent}}">
+
+	<td class="noprint"
+		ng-style="$ctrl.firstColStyle"></td>
+	<td class="row-title"
+		colspan="{{3 + $ctrl.columns.length}}"
+		translate="project.reporting_empty"
+		ng-style="$ctrl.firstColStyle"></td>
 </tr>
 <tr	ng-repeat-end
 	ng-if="$ctrl.open && row.type == 'indicator'"
@@ -27,6 +43,7 @@
 	project="$ctrl.project"
 	group-by="$ctrl.groupBy"
 	split="$ctrl.splits[row.id]"
+	first-col-style="$ctrl.firstColStyle"
 
 	filter="row.filter"
 	indicator="row.indicator"

@@ -709,31 +709,32 @@ general-reporting {
   flex-direction: column;
   margin-top: -50px;
   padding-top: 50px;
+  padding-bottom: 10px
 }
 
   /* your existing container */
   general-table {
     display: block;
     overflow: auto;
-    /*height: 400px;*/
     flex: 1;
     border: 0 solid #ccc;
     border-top-width: 1px;
   }
 
   general-table table {
+    overflow: hidden;
     border-collapse: separate !important;
     border-spacing: 0px !important;
     border-width: 0 !important;
   }
 
   general-table table thead {
-    background-color: 'white'
   }
 
   general-table table td, general-table table th {
     border-top-width: 0 !important;
     border-left-width: 0 !important;
+    background-color: white;
   }
 
   general-table table td:first-child, general-table table th:first-child {

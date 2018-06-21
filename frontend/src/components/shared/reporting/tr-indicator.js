@@ -28,6 +28,7 @@ module.directive('trIndicator', () => {
 			filter: '<',
 			indicator: '<',
 			split: '<',
+			firstColStyle: '<',
 
 			onSplitToggle: '&',
 			onPlotToggle: '&',

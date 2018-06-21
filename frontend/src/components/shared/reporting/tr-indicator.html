@@ -1,10 +1,10 @@
-<td class="noprint" style="text-align: center">
+<td class="noprint" style="text-align: center" ng-style="$ctrl.firstColStyle">
 	<i class="fa fa-line-chart"
 	   ng-click="$ctrl.toggleGraph()"
 	   ng-style="{color: $ctrl.graphToggled ? 'black' : 'revert'}"></i>
 </td>
 
-<td class="row-title">
+<td class="row-title" ng-style="$ctrl.firstColStyle">
 	<i class="fa fa-arrow-circle-right" ng-if="$ctrl.isGroup"></i>
 	<span title="{{$ctrl.name}}">{{$ctrl.name|maxLength:50}}</span>
 
