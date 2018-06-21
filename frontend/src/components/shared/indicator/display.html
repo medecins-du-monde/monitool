@@ -8,12 +8,14 @@
 	<div class="panel-body" style="padding-bottom: 10px">
 		<!-- Baseline -->
 		<strong>{{'project.baseline'|translate}}:</strong>
-		{{$ctrl.indicator.baseline != null ? $ctrl.indicator.baseline : '?'}}
+		<span ng-if="$ctrl.indicator.baseline != null">{{$ctrl.indicator.baseline}}{{$ctrl.indicator|indicatorUnit}}</span>
+		<span ng-if="$ctrl.indicator.baseline == null">?</span>
 		<br/>
 
 		<!-- Target -->
 		<strong>{{'project.target'|translate}}:</strong>
-		{{$ctrl.indicator.target != null ? $ctrl.indicator.target : '?'}}
+		<span ng-if="$ctrl.indicator.target != null">{{$ctrl.indicator.target}}{{$ctrl.indicator|indicatorUnit}}</span>
+		<span ng-if="$ctrl.indicator.target == null">?</span>
 		<br/>
 
 		<!-- Computation -->

@@ -22,8 +22,15 @@
 		<div class="panel-heading" title="{{indicator.name[$root.language]}}">{{indicator.name[$root.language]|maxLength:90}}</div>
 
 		<div class="panel-body" style="padding-bottom: 10px">
-			<strong>{{'project.baseline'|translate}}:</strong> {{$ctrl.editableProject.crossCutting[indicator._id].baseline != null ? $ctrl.editableProject.crossCutting[indicator._id].baseline : '?'}}<br/>
-			<strong>{{'project.target'|translate}}:</strong> {{$ctrl.editableProject.crossCutting[indicator._id].target != null ? $ctrl.editableProject.crossCutting[indicator._id].target : '?'}}<br/>
+			<strong>{{'project.baseline'|translate}}:</strong>
+			<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].baseline != null">{{$ctrl.editableProject.crossCutting[indicator._id].baseline}}{{$ctrl.editableProject.crossCutting[indicator._id]|indicatorUnit}}</span>
+			<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].baseline == null">?</span>
+			<br/>
+
+			<strong>{{'project.target'|translate}}:</strong>
+			<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].target != null">{{$ctrl.editableProject.crossCutting[indicator._id].target}}{{$ctrl.editableProject.crossCutting[indicator._id]|indicatorUnit}}</span>
+			<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].target == null">?</span>
+			<br/>
 
 			<strong>{{'project.computation'|translate}}:</strong>
 			<span class="text-danger" ng-if="!$ctrl.editableProject.crossCutting[indicator._id].computation">

@@ -19,13 +19,15 @@ import angular from 'angular';
 
 import uibModal from 'angular-ui-bootstrap/src/modal/index';
 
-import editionModal from './indicator-edition';
+import mtEditionModal from './indicator-edition';
+import mtIndicatorUnit from '../../../filters/indicator';
 
 const module = angular.module(
 	'monitool.components.shared.indicator.display',
 	[
 		uibModal, // for $uibModal
-		editionModal.name
+		mtEditionModal.name,
+		mtIndicatorUnit.name
 	]
 );
 
