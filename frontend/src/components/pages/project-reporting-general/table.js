@@ -27,10 +27,17 @@ module.component('generalTable', {
 	template: require('./table.html'),
 	controller: class GeneralTableController {
 
-		constructor($filter, $rootScope) {
+		constructor($filter, $rootScope, $element, $scope) {
+			this._element = angular.element($element);
 			this._formatSlot = $filter('formatSlot');
 			this._formatSlotRange = $filter('formatSlotRange');
 			this.language = $rootScope.language;
+			this.$scope = $scope;
+		}
+
+		$onInit() {
+			this._binded = this._onScroll.bind(this);
+			this._element.bind('scroll', this._binded);
 		}
 
 		$onChanges(changes) {
@@ -40,6 +47,62 @@ module.component('generalTable', {
 
 			if (changes.project)
 				this.tbodies = this._computeTBodies();
+		}
+
+		$onDestroy() {
+			this._element.unbind('scroll', this._binded);
+		}
+
+		_onScroll() {
+			this.headerStyle = {
+				transform: 'translate(0, ' + this._element[0].scrollTop + 'px)',
+				'background-color': 'white'
+			};
+			this.$scope.$apply();
+		}
+
+		_computeColumns() {
+			const timeGroupBy = [
+				'year', 'semester', 'quarter', 'month',
+				'week_sat', 'week_sun', 'week_mon',
+				'month_week_sat', 'month_week_sun', 'month_week_mon',
+				'day'
+			];
+
+			if (timeGroupBy.includes(this.groupBy)) {
+				const [start, end] = [this.filter._start, this.filter._end];
+
+				const slots = Array.from(
+					timeSlotRange(
+						TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), this.groupBy),
+						TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), this.groupBy)
+					)
+				);
+
+				return [
+					...slots.map(slot => {
+						return {
+							id: slot.value,
+							name: this._formatSlot(slot.value),
+							title: this._formatSlotRange(slot.value)
+						};
+					}),
+					{id:'_total', name: "Total"}
+				];
+			}
+
+			else if (this.groupBy === 'entity')
+				return [
+					...this.project.entities.filter(e => this.filter.entity.includes(e.id)),
+					{id: '_total', name: 'Total'}
+				];
+
+			else if (this.groupBy === 'group')
+				// keep groups that contain at least on of the entities we are filtering on.
+				return this.project.groups.filter(g => g.members.some(e => this.filter.entity.includes(e)));
+
+			else
+				throw new Error('Invalid groupBy: ' + this.groupBy)
 		}
 
 		_computeTBodies() {
@@ -192,49 +255,7 @@ module.component('generalTable', {
 			};
 		}
 
-		_computeColumns() {
-			const timeGroupBy = [
-				'year', 'semester', 'quarter', 'month',
-				'week_sat', 'week_sun', 'week_mon',
-				'month_week_sat', 'month_week_sun', 'month_week_mon',
-				'day'
-			];
 
-			if (timeGroupBy.includes(this.groupBy)) {
-				const [start, end] = [this.filter._start, this.filter._end];
-
-				const slots = Array.from(
-					timeSlotRange(
-						TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), this.groupBy),
-						TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), this.groupBy)
-					)
-				);
-
-				return [
-					...slots.map(slot => {
-						return {
-							id: slot.value,
-							name: this._formatSlot(slot.value),
-							title: this._formatSlotRange(slot.value)
-						};
-					}),
-					{id:'_total', name: "Total"}
-				];
-			}
-
-			else if (this.groupBy === 'entity')
-				return [
-					...this.project.entities.filter(e => this.filter.entity.includes(e.id)),
-					{id: '_total', name: 'Total'}
-				];
-
-			else if (this.groupBy === 'group')
-				// keep groups that contain at least on of the entities we are filtering on.
-				return this.project.groups.filter(g => g.members.some(e => this.filter.entity.includes(e)));
-
-			else
-				throw new Error('Invalid groupBy: ' + this.groupBy)
-		}
 
 	}
 });

@@ -692,8 +692,60 @@ td.empty > span {
     border-top-width: 1px;
   }
 
-
   indicator-group-by, project-group-by, select-indicator, indicator-filter .panel, olap-dimensions .panel {
     display: block;
     margin-bottom: 5px;
   }
+
+
+
+
+
+
+
+general-reporting {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  margin-top: -50px;
+  padding-top: 50px;
+}
+
+  /* your existing container */
+  general-table {
+    display: block;
+    overflow: auto;
+    /*height: 400px;*/
+    flex: 1;
+    border: 0 solid #ccc;
+    border-top-width: 1px;
+  }
+
+  general-table table {
+    border-collapse: separate !important;
+    border-spacing: 0px !important;
+    border-width: 0 !important;
+  }
+
+  general-table table thead {
+    background-color: 'white'
+  }
+
+  general-table table td, general-table table th {
+    border-top-width: 0 !important;
+    border-left-width: 0 !important;
+  }
+
+  general-table table td:first-child, general-table table th:first-child {
+    border-left-width: 1px !important;
+  }
+
+  general-table .btn-group, general-table .btn-group .btn {
+    /* buttons go UNDER the thead */
+    position: static;
+  }
+
+
+
+
+
