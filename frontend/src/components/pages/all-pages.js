@@ -43,8 +43,8 @@ import prjUserList from './project-structure-user/user-list.js';
 import extraIndicators from './project-structure-extra-indicators/extra-indicators.js';
 import history from './project-structure-history/history.js';
 
-import inputList from './project-input/input-list.js';
-import inputEdition from './project-input/input-edition.js';
+import inputList from './project-input-list/input-list.js';
+import inputEdition from './project-input-edition/input-edition.js';
 
 import general from './project-reporting-general/general.js';
 import detailed from './project-reporting-detailed/detailed.js';
