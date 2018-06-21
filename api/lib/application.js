@@ -33,17 +33,18 @@ import responseTimeMiddleware from 'koa-response-time';
 import errorHandlerMiddleware from './middlewares/error-handler';
 
 const app = new Koa();
+app.keys = [config.cookieSecret];
+
 app.use(responseTimeMiddleware());
 
 // We use sessions & body parser
-app.use(session({}, app))
-app.use(bodyParser({jsonLimit: '1mb'}))
+app.use(session({maxAge: 7 * 24 * 3600 * 1000}, app));
+app.use(bodyParser({jsonLimit: '1mb'}));
 
 // Serve the client-side config request, before authentication.
 app.use(configRouter.routes());
 
 // Enable authentication for the rest.
-app.keys = [config.cookieSecret]
 app.use(passport.initialize())
 app.use(passport.session())
 
