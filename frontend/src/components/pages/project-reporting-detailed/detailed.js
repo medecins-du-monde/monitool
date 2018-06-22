@@ -23,7 +23,7 @@ const module = angular.module(
 
 module.config($stateProvider => {
 
-	$stateProvider.state('main.project.reporting_detailed', {
+	$stateProvider.state('main.project.reporting.detailed', {
 		url: '/detailed',
 		component: 'detailedReporting'
 	});

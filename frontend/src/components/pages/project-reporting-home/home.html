@@ -1,0 +1,10 @@
+
+<ol class="breadcrumb noprint">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="shared.reporting"></li>
+</ol>
+
+<legend translate="shared.reporting"></legend>
+

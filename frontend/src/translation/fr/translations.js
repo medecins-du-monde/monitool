@@ -378,10 +378,9 @@ export default {
 		data_selection: "Selection des données",
 		filters: "Filtres",
 		input_status: {
-			'done': "Modifier",
+			'done': "Modifier ({{100*value|number:0}}%)",
 			'expected': "Saisir",
 			'expected-new': "Saisir (nouvelle date)",
-			'outofschedule': "Afficher (Hors calendrier)"
 		},
 		cols: "Colonnes",
 		rows: "Lignes",

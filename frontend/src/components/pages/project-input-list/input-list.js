@@ -35,12 +35,12 @@ const module = angular.module(
 
 module.config($stateProvider => {
 
-	$stateProvider.state('main.project.input_list', {
-		url: '/input/:formId/list',
+	$stateProvider.state('main.project.input.list', {
+		url: '/input/:dataSourceId/list',
 		component: 'projectInputList',
 		resolve: {
-			formId: ($stateParams) => $stateParams.formId,
-			inputsStatus: (project, formId) => Input.fetchFormStatus(project, formId)
+			dataSourceId: ($stateParams) => $stateParams.dataSourceId,
+			inputsStatus: (project, dataSourceId) => Input.fetchFormStatus(project, dataSourceId)
 		}
 	});
 });
@@ -49,7 +49,7 @@ module.config($stateProvider => {
 module.component('projectInputList', {
 	bindings: {
 		'project': '<',
-		'formId': '<',
+		'dataSourceId': '<',
 		'inputsStatus': '<'
 	},
 	template: require('./input-list.html'),
@@ -63,10 +63,10 @@ module.component('projectInputList', {
 
 		$onChanges(changes) {
 			// Define form
-			this.form = this.project.forms.find(f => f.id === this.formId);
+			this.dataSource = this.project.forms.find(ds => ds.id === this.dataSourceId);
 
-			// Define columns (depending on user permissions)
-			this.columns = this.project.entities.filter(e => this.form.entities.includes(e.id));
+			// Define sites (depending on user permissions)
+			this.sites = this.project.entities.filter(e => this.dataSource.entities.includes(e.id));
 			if (this.userCtx.role !== 'admin') {
 				const projectUser = this.project.users.find(u => {
 					return (this.userCtx.type == 'user' && u.id == this.userCtx._id) ||
@@ -75,29 +75,28 @@ module.component('projectInputList', {
 
 				if (projectUser.role === 'input')
 					// This will happen regardless of unexpected entries.
-					this.columns = this.columns.filter(e => projectUser.entities.includes(e.id));
+					this.sites = this.sites.filter(e => projectUser.entities.includes(e.id));
 			}
 
 			// Those list tell which rows should be displayed.
-			this.visibleStatus = Object.keys(this.inputsStatus).slice(-10);
-			this.hiddenStatus = Object.keys(this.inputsStatus).slice(0, -10);
+			this.visibleStatus = Object.keys(this.inputsStatus).slice(0, 10);
+			this.hiddenStatus = Object.keys(this.inputsStatus).slice(10);
 
 			// Handle special case for free periodicity.
-			if (this.form.periodicity === 'free') {
+			if (this.dataSource.periodicity === 'free') {
 				this.displayFooter = true;
 				this.newInputDate = new Date().toISOString().substring(0, 10);
 			}
 		}
 
 		showMore() {
-			this.visibleStatus = [...this.hiddenStatus.slice(-10), ...this.visibleStatus];
-			this.hiddenStatus.splice(-10, 10);
+			this.visibleStatus.push(...this.hiddenStatus.splice(0, 10));
 		}
 
 		addInput(entityId) {
 			this.$state.go('main.project.input.edit', {
 				period: this.newInputDate,
-				formId: this.form.id,
+				dataSourceId: this.dataSource.id,
 				entityId: entityId
 			});
 		}

@@ -35,12 +35,12 @@ const module = angular.module(
 
 module.config($stateProvider => {
 
-	$stateProvider.state('main.project.input_edit', {
-		url: '/input/:formId/edit/:period/:entityId',
+	$stateProvider.state('main.project.input.edit', {
+		url: '/input/:dataSourceId/edit/:period/:entityId',
 		component: 'projectInputEdition',
 		resolve: {
 			inputs: ($stateParams, project) =>
-				Input.fetchLasts(project, $stateParams.entityId, $stateParams.formId, $stateParams.period),
+				Input.fetchLasts(project, $stateParams.entityId, $stateParams.dataSourceId, $stateParams.period),
 
 			input: inputs => inputs.current,
 			previousInput: inputs => inputs.previous,
@@ -101,24 +101,25 @@ module.component('projectInputEdition', {
 		}
 
 		async save() {
-			if ((!this.isNew && this.isUnchanged) || !this.isValid())
+			if ((!this.isNew && this.isUnchanged) || this.inputForm.$invalid)
 				return;
 
 			this._pageChangeWatch()
 			await this.input.save();
-			this.$state.go('main.project.input_list');
+			this.$state.go('main.project.input.list', {dataSourceId: this.input.form});
 		}
 
 		reset() {
 			angular.copy(this.master, this.input);
 		}
 
-		delete() {
+		async delete() {
 			const question = this.translate('project.delete_input');
 
 			if (window.confirm(question)) {
 				this._pageChangeWatch(); // remove the change page watch, because it will trigger otherwise.
-				this.input.delete(() => this.$state.go('main.project.input_list'));
+				await this.input.delete();
+				this.$state.go('main.project.input.list', {dataSourceId: this.input.form});
 			}
 		}
 	}

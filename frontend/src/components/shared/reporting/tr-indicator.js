@@ -61,7 +61,8 @@ module.directive('trIndicator', () => {
 			}
 
 			$onDestroy() {
-				// Remove graphs
+				if (this.graphToggled)
+					this.onPlotToggle({data: null});
 			}
 
 			toggleSplit(partitionId) {
@@ -69,7 +70,12 @@ module.directive('trIndicator', () => {
 			}
 
 			toggleGraph() {
-				// show graph (send local data)
+				if (this.graphToggled)
+					this.onPlotToggle({data: null});
+				else
+					this.onPlotToggle({name: this.name, data: this._data});
+
+				this.graphToggled = !this.graphToggled;
 			}
 
 			async _fetchData() {
@@ -78,7 +84,7 @@ module.directive('trIndicator', () => {
 				this.values = null;
 
 				try {
-					const data = await fetchData(
+					this._data = await fetchData(
 						this.project,
 						this.indicator.computation,
 						[this.groupBy],
@@ -88,10 +94,13 @@ module.directive('trIndicator', () => {
 					);
 
 					this.errorMessage = null;
-					this.values = this.columns.map(col => data[col.id]);
+					this.values = this.columns.map(col => this._data[col.id]);
+					if (this.graphToggled)
+						this.onPlotToggle({name: this.name, data: this._data});
 				}
 				catch (e) {
 					this.errorMessage = e.message;
+					this.onPlotToggle({data: null});
 				}
 
 				this.$scope.$apply();

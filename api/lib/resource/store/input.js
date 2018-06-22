@@ -33,28 +33,32 @@ export default class InputStore extends Store {
 	 * Retrieve all input ids that are linked to a particular data source.
 	 * Used to populate datasource planning (/projects/xxx/input).
 	 */
-	async listIdsByDataSource(projectId, formId, update=false) {
-		if (typeof projectId !== 'string' || typeof formId !== 'string')
+	async listIdsByDataSource(projectId, dataSourceId, update=false) {
+		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string')
 			throw new Error('missing_parameter');
 
-		const result = await this._db.callList({
-			startkey: "input:" + projectId + ":" + formId + ":!",
-			endkey: "input:" + projectId + ":" + formId + ":~"
+		const dbResult = await this._db.callView('inputs_with_progress', {
+			startkey: "input:" + projectId + ":" + dataSourceId + ":0",
+			endkey: "input:" + projectId + ":" + dataSourceId + ":g"
 		});
 
-		let inputIds = result.rows.map(item => item.id);
 		if (update) {
 			const project = await Project.storeInstance.get(projectId);
-			const dataSource = project.getDataSourceById(formId);
+			const dataSource = project.getDataSourceById(dataSourceId);
 
 			// Remove inputs that are no longer relevant
 			if (dataSource)
-				inputIds = inputIds.filter(id => project.getEntityById(id.substr(88, 36)));
+				dbResult.rows = dbResult.rows.filter(row => project.getEntityById(row.id.substr(88, 36)));
 			else
-				inputIds = [];
+				dbResult.rows = [];
+
+			// FIXME a lot is missing here.
 		}
 
-		return inputIds;
+
+		const result = {};
+		dbResult.rows.forEach(item => result[item.id] = item.value);
+		return result;
 	}
 
 	async list(update=false) {
@@ -68,6 +72,8 @@ export default class InputStore extends Store {
 				const project = projects.find(p => p._id === input.project);
 				return project.getDataSourceById(input.form) && project.getEntityById(input.entity);
 			});
+
+			// FIXME a lot is missing here.
 
 			// Update structure
 			inputs.forEach(input => {
@@ -118,21 +124,21 @@ export default class InputStore extends Store {
 	 * Retrieve all inputs of a given data source
 	 * Used to generate cubes (for indicator reporting)
 	 */
-	async listByDataSource(projectId, formId, update=false) {
-		if (typeof projectId !== 'string' || typeof formId !== 'string')
+	async listByDataSource(projectId, dataSourceId, update=false) {
+		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string')
 			throw new Error('missing_parameter');
 
 		const result = await this._db.callList({
 			include_docs: true,
-			startkey: "input:" + projectId + ":" + formId + ":!",
-			endkey: "input:" + projectId + ":" + formId + ":~"
+			startkey: "input:" + projectId + ":" + dataSourceId + ":!",
+			endkey: "input:" + projectId + ":" + dataSourceId + ":~"
 		});
 
 		let inputs = result.rows.map(row => new Input(row.doc));
 
 		if (update) {
 			const project = await Project.storeInstance.get(projectId);
-			const dataSource = project.getDataSourceById(formId);
+			const dataSource = project.getDataSourceById(dataSourceId);
 
 			inputs = inputs.filter(input => dataSource && project.getEntityById(input.entity));
 			inputs.forEach(input => input.update(dataSource.structure));
@@ -142,17 +148,17 @@ export default class InputStore extends Store {
 	}
 
 	/**
-	 * Retrieve a given input, and the previous one for the same form and entity,
+	 * Retrieve a given input, and the previous one for the same data source and site,
 	 * This is used to populate the input page in client.
 	 */
-	async getLasts(projectId, formId, entityId, period, update=false) {
-		if (typeof projectId !== 'string' || typeof formId !== 'string' || typeof entityId !== 'string' || typeof period !== 'string')
+	async getLasts(projectId, dataSourceId, siteId, period, update=false) {
+		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string' || typeof siteId !== 'string' || typeof period !== 'string')
 			throw new Error('missing_parameter');
 
-		const id = 'input:' + projectId + ":" + formId + ":" + entityId + ":" + period;
+		const id = 'input:' + projectId + ":" + dataSourceId + ":" + siteId + ":" + period;
 		const result = await this._db.callList({
 			startkey: id,
-			endkey: 'input:' + projectId + ":" + formId + ":" + entityId,
+			endkey: 'input:' + projectId + ":" + dataSourceId + ":" + siteId,
 			descending: true,
 			limit: 2,
 			include_docs: true
@@ -177,7 +183,7 @@ export default class InputStore extends Store {
 
 		if (update) {
 			const project = await Project.storeInstance.get(projectId);
-			const dataSource = project.getDataSourceById(formId);
+			const dataSource = project.getDataSourceById(dataSourceId);
 
 			inputs.forEach(input => input.update(dataSource.structure));
 		}

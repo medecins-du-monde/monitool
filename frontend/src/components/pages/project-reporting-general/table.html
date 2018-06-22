@@ -15,7 +15,9 @@
 
 		prefix="tbody.prefix"
 		name="tbody.name"
-		sections="tbody.sections">
+		sections="tbody.sections"
+
+		on-plot-toggle="$ctrl.onPlotToggle({id: id, name: name, data: data})">
 	</tbody>
 	<thead ng-style="$ctrl.headerStyle">
 		<tr>
@@ -23,7 +25,7 @@
 			<th translate="shared.name" style="min-width: 300px" ng-style="$ctrl.firstColStyle"></th>
 			<th translate="project.baseline" style="width: 60px"></th>
 			<th translate="project.target" style="width: 60px"></th>
-			<th ng-repeat="col in $ctrl.columns" style="min-width: 50px" title="{{col.title}}">
+			<th ng-repeat="col in $ctrl.columns track by col.id" style="min-width: 50px" title="{{col.title}}">
 				{{col.name}}
 			</th>
 		</tr>

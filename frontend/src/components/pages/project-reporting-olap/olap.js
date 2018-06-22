@@ -39,7 +39,7 @@ const module = angular.module(
 
 
 module.config($stateProvider => {
-	$stateProvider.state('main.project.reporting_olap', {
+	$stateProvider.state('main.project.reporting.olap', {
 		url: '/olap',
 		component: 'olapReporting'
 	});

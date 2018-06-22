@@ -47,5 +47,6 @@
 
 	filter="row.filter"
 	indicator="row.indicator"
-	on-split-toggle="$ctrl.onSplitToggle(row.id, partitionId)">
+	on-split-toggle="$ctrl.onSplitToggle(row.id, partitionId)"
+	on-plot-toggle="$ctrl.onPlotToggle({id: row.id, name: name, data: data})">
 </tr>

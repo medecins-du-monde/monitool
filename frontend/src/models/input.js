@@ -21,76 +21,80 @@ import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 
 export default class Input {
 
-	static async fetchFormStatus(project, formId) {
+	static async fetchDataSourceShortStatus(project) {
+		const result = await Promise.all(project.forms.map(async dataSource => {
+			const dsResult = Object
+				.values(await this.fetchFormStatus(project, dataSource.id))
+				.reduce((m, e) => [...m, ...Object.values(e)], []);
+
+			return {
+				missing: dsResult.length ? dsResult.filter(v => v === null).length / dsResult.length : 0,
+				incomplete: dsResult.length ? dsResult.filter(v => v !== null && v < 1).length / dsResult.length : 0,
+				complete: dsResult.length ? dsResult.filter(v => v === 1).length / dsResult.length : 1,
+				total: dsResult.length
+			};
+		}));
+
+		return project.forms
+			.map((ds, i) => i)
+			.reduce((m, i) => { m[project.forms[i].id] = result[i]; return m; }, {})
+	}
+
+	static async fetchFormStatus(project, dataSourceId) {
 		const response = await axios.get(
 			'/api/resources/input',
-			{params: {mode: 'ids_by_form', projectId: project._id, formId: formId}}
+			{params: {mode: 'ids_by_form', projectId: project._id, formId: dataSourceId}}
 		);
 
-		const inputsDone = response.data;
-		const form = project.forms.find(f => f.id === formId);
-		var prj = {};
+		const result = {};
 
-		inputsDone.forEach(inputId => {
-			var splitted      = inputId.split(':'),
-				inputEntityId = splitted[4],
-				strPeriod     = splitted[5];
+		for (let inputId in response.data) {
+			const [siteId, period] = inputId.split(':').slice(-2);
+			result[period] = result[period] || {};
+			result[period][siteId] = response.data[inputId];
+		}
 
-			prj[strPeriod] = prj[strPeriod] || {};
-			prj[strPeriod][inputEntityId] = 'outofschedule';
-		});
-
-		form.entities.forEach(entityId => {
-			var strPeriods;
-			if (form.periodicity === 'free')
-				strPeriods = Object.keys(prj);
+		const dataSource = project.forms.find(ds => ds.id === dataSourceId);
+		dataSource.entities.forEach(siteId => {
+			let periods;
+			if (dataSource.periodicity === 'free')
+				periods = Object.keys(result);
 			else {
-				const entity = project.entities.find(entity => entity.id == entityId);
+				const site = project.entities.find(site => site.id == siteId);
 				const [start, end] = [
-					[project.start, entity.start, form.start].filter(a => a).sort().pop(),
-					[project.end, entity.end, form.end, new Date().toISOString().substring(0, 10)].filter(a => a).sort().shift()
+					[project.start, site.start, dataSource.start].filter(a => a).sort().pop(),
+					[project.end, site.end, dataSource.end, new Date().toISOString().substring(0, 10)].filter(a => a).sort().shift()
 				];
 
-				strPeriods = Array
-					.from(
-						timeSlotRange(
-							TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), form.periodicity),
-							TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), form.periodicity)
-						)
-					)
-					.map(ts => ts.value);
+				periods = Array.from(timeSlotRange(
+					TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), dataSource.periodicity),
+					TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), dataSource.periodicity)
+				)).map(ts => ts.value);
 			}
 
-			strPeriods.forEach(strPeriod => {
-				prj[strPeriod] = prj[strPeriod] || {};
+			periods.forEach(period => {
+				result[period] = result[period] || {};
 
-				if (prj[strPeriod][entityId] == 'outofschedule')
-					prj[strPeriod][entityId] = 'done';
-				else
-					prj[strPeriod][entityId] = 'expected';
+				if (result[period][siteId] === undefined)
+					result[period][siteId] = null;
 			});
 		});
 
 		// Sort periods alphabetically
-		var periods = Object.keys(prj);
-		periods.sort();
-
-		var newObj = {};
-		periods.forEach(period => newObj[period] = prj[period])
-		prj = newObj;
-
-		return prj;
+		const sortedResult = {};
+		Object.keys(result).sort().reverse().forEach(p => sortedResult[p] = result[p]);
+		return sortedResult;
 	}
 
-	static async fetchLasts(project, entityId, formId, period) {
+	static async fetchLasts(project, siteId, dataSourceId, period) {
 		const response = await axios.get(
 			'/api/resources/input',
 			{
 				params: {
 					mode: "current+last",
 					projectId: project._id,
-					entityId: entityId,
-					formId: formId,
+					entityId: siteId,
+					formId: dataSourceId,
 					period: period
 				}
 			}
@@ -98,7 +102,7 @@ export default class Input {
 
 		const result = response.data.map(i => new Input(i));
 
-		var currentInputId = ['input', project._id, formId, entityId, period].join(':');
+		var currentInputId = ['input', project._id, dataSourceId, siteId, period].join(':');
 
 		// both where found
 		if (result.length === 2)
@@ -110,15 +114,15 @@ export default class Input {
 
 		var current = new Input({
 			_id: currentInputId, type: "input",
-			project: project._id, form: formId, period: period, entity: entityId,
+			project: project._id, form: dataSourceId, period: period, entity: siteId,
 			values: {}
 		});
 
-		const form = project.forms.find(f => f.id === formId);
-		form.elements.forEach(element => {
-			const numFields = element.partitions.reduce((m, p) => m * p.elements.length, 1);
-			current.values[element.id] = new Array(numFields);
-			current.values[element.id].fill(0);
+		const dataSource = project.forms.find(ds => ds.id === dataSourceId);
+		dataSource.elements.forEach(variable => {
+			const numFields = variable.partitions.reduce((m, p) => m * p.elements.length, 1);
+			current.values[variable.id] = new Array(numFields);
+			current.values[variable.id].fill(0);
 		});
 
 		// the current one was not found (and we may or not have found the previous one).

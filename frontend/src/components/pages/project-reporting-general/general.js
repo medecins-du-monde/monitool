@@ -18,6 +18,7 @@
 import angular from 'angular';
 
 import uiRouter from '@uirouter/angularjs';
+import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 
 import mtGraph from '../../shared/reporting/graph';
 import mtProjectGroupBy from './project-group-by';
@@ -39,7 +40,7 @@ const module = angular.module(
 
 module.config($stateProvider => {
 
-	$stateProvider.state('main.project.reporting_general', {
+	$stateProvider.state('main.project.reporting.general', {
 		url: '/general',
 		component: 'generalReporting',
 	});
@@ -56,24 +57,90 @@ module.component('generalReporting', {
 	template: require('./general.html'),
 	controller: class GeneralReportingController {
 
-		$onInit() {
+		constructor($filter) {
+			this._formatSlot = $filter('formatSlot');
+			this._formatSlotRange = $filter('formatSlotRange');
+
 			this.filter = this.groupBy = null
-			this.graphs = [];
+			this.graphX = [];
+			this.graphYs = {};
 		}
 
 		onGroupByUpdate(groupBy) {
 			this.groupBy = groupBy;
+
+			if (this.filter)
+				this._updateColumns();
 		}
 
 		onFilterUpdate(newFilter) {
 			this.filter = newFilter;
+
+			if (this.groupBy)
+				this._updateColumns();
 		}
 
-		onGraphToggle(id) {
-			if (this.graphs.includes(id))
-				this.graphs = this.graphs.filter(i => i === id);
+		onPlotToggle(id, name, data) {
+			const newGraphs = Object.assign({}, this.graphYs);
+
+			if (data)
+				newGraphs[id] = {name: name, data: data};
 			else
-				this.graphs = [id, ...graphs];
+				delete newGraphs[id];
+
+			this.graphYs = newGraphs;
+		}
+
+		_updateColumns() {
+			const timeGroupBy = [
+				'year', 'semester', 'quarter', 'month',
+				'week_sat', 'week_sun', 'week_mon',
+				'month_week_sat', 'month_week_sun', 'month_week_mon',
+				'day'
+			];
+
+			if (timeGroupBy.includes(this.groupBy)) {
+				const [start, end] = [this.filter._start, this.filter._end];
+
+				const slots = Array.from(
+					timeSlotRange(
+						TimeSlot.fromDate(new Date(start + 'T00:00:00Z'), this.groupBy),
+						TimeSlot.fromDate(new Date(end + 'T00:00:00Z'), this.groupBy)
+					)
+				);
+
+				this.columns = [
+					...slots.map(slot => {
+						return {
+							id: slot.value,
+							name: this._formatSlot(slot.value),
+							title: this._formatSlotRange(slot.value)
+						};
+					}),
+					{id:'_total', name: "Total"}
+				];
+
+				this.graphType = 'line';
+			}
+
+			else if (this.groupBy === 'entity') {
+				this.columns = [
+					...this.project.entities.filter(e => this.filter.entity.includes(e.id)),
+					{id: '_total', name: 'Total'}
+				];
+
+				this.graphType = 'bar';
+			}
+
+			else if (this.groupBy === 'group') {
+				// keep groups that contain at least on of the entities we are filtering on.
+				this.columns = this.project.groups.filter(g => g.members.some(e => this.filter.entity.includes(e)));
+				this.graphType = 'bar';
+			}
+			else
+				throw new Error('Invalid groupBy: ' + this.groupBy)
+
+			this.graphX = this.columns.filter(x => x.id !== '_total');
 		}
 	}
 });

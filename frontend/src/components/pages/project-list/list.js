@@ -92,7 +92,7 @@ module.component('projectList', {
 		}
 
 		createProject() {
-			this.$state.go('main.project.structure.basics', {projectId: 'project:' + uuid()});
+			this.$state.go('main.project.structure.home', {projectId: 'project:' + uuid()});
 		}
 
 		open(project) {
@@ -102,9 +102,9 @@ module.component('projectList', {
 			});
 
 			if (projectUser && projectUser.role == 'owner')
-				this.$state.go("main.project.structure.basics", {projectId: project._id});
+				this.$state.go("main.project.structure.home", {projectId: project._id});
 			else
-				this.$state.go("main.project.reporting_general", {projectId: project._id});
+				this.$state.go("main.project.reporting.home", {projectId: project._id});
 		}
 	}
 });

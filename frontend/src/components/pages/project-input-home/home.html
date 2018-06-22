@@ -1,0 +1,45 @@
+
+<ol class="breadcrumb noprint">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="project.input"></li>
+</ol>
+
+<legend translate="project.input"></legend>
+
+<p>Le rôle de cette section est de fournir à Monitool les données qui lui permettront de calculer vos indicateurs.</p>
+
+<p>Chaque source de données renseignée lors de la formalisation du projet donne lieu à des formulaires réguliers.</p>
+
+<p>État actuel des saisies:</p>
+
+<table class="table table-bordered table-striped">
+	<thead>
+		<tr>
+			<th>Tâche</th>
+			<th>Saisies manquantes</th>
+			<th>Saisies incomplètes</th>
+			<th>Saisies complètes</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id">
+			<td>
+				Remplir les {{$ctrl.status[dataSource.id].total}} saisies attendues sur
+				<a ui-sref="main.project.input.list({dataSourceId: dataSource.id})">{{dataSource.name}}</a>
+			</td>
+			<td translate="shared.loading" colspan="3" ng-if="!$ctrl.status"></td>
+
+			<td ng-if="$ctrl.status">
+				{{100*$ctrl.status[dataSource.id].missing|number:0}}%
+			</td>
+			<td ng-if="$ctrl.status">
+				{{100*$ctrl.status[dataSource.id].incomplete|number:0}}%
+			</td>
+			<td ng-if="$ctrl.status">
+				{{100*$ctrl.status[dataSource.id].complete|number:0}}%
+			</td>
+		</tr>
+	</tbody>
+</table>

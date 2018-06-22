@@ -2,13 +2,13 @@
 	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
 	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
-	<li><a ui-sref="main.project.input_list({formId: $ctrl.form.id})">{{$ctrl.form.name|maxLength:50}}</a></li>
+	<li><a ui-sref="main.project.input.list({dataSourceId: $ctrl.form.id})">{{$ctrl.form.name|maxLength:50}}</a></li>
 	<li class="active">{{$ctrl.entity.name|maxLength:50}}</li>
 	<li class="active">{{$ctrl.input.period|formatSlot}}</li>
 </ol>
 
 <div id="formblock">
-	<form class="form-horizontal" name="inputForm">
+	<form class="form-horizontal" name="$ctrl.inputForm">
 		<legend translate="project.general_informations"></legend>
 
 		<div class="form-group">
@@ -57,7 +57,7 @@
 
 <div id="saveblock" class="noprint">
 	<div class="pull-right">
-		<p ng-if="inputForm.$invalid" class="text-danger">
+		<p ng-if="$ctrl.inputForm.$invalid" class="text-danger">
 			<i class="fa fa-exclamation-triangle"></i>
 			<span translate="project.form_error"></span>
 		</p>
@@ -67,13 +67,13 @@
 			<span translate="project.form_persisted"></span>
 		</p>
 
-		<p ng-if="!$ctrl.isUnchanged && inputForm.$valid" class="text-warning">
+		<p ng-if="!$ctrl.isUnchanged && $ctrl.inputForm.$valid" class="text-warning">
 			<i class="fa fa-exclamation-triangle"></i>
 			<span translate="project.form_changed"></span>
 		</p>
 	</div>
 
-	<a ng-click="$ctrl.save()" ng-disabled="(!$ctrl.isNew && $ctrl.isUnchanged) || inputForm.$invalid" class="btn btn-primary">
+	<a ng-click="$ctrl.save()" ng-disabled="(!$ctrl.isNew && $ctrl.isUnchanged) || $ctrl.inputForm.$invalid" class="btn btn-primary">
 		<i class="fa fa-floppy-o"></i>
 		<span translate="shared.save"></span>
 	</a>

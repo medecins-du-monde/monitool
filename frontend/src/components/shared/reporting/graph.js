@@ -26,121 +26,101 @@ const module = angular.module(
 	]
 );
 
+module.component('reportingGraph', {
 
-module.directive('reportingGraphAdapter', function() {
-	// This helper function allow us to get the data without totals.
-	var getStatsWithoutTotal = function(stats) {
-		var totalIndex = stats.cols.findIndex(e => e.id === '_total');
+	bindings: {
+		x: '<',
+		ys: '<',
+		presentation: '<'
+	},
 
-		if (totalIndex !== -1) {
-			var newStats = angular.copy(stats);
-			newStats.rows.forEach(row => row.cols.splice(totalIndex, 1));
-			newStats.cols.splice(totalIndex, 1);
+	template: '<div style="overflow: hidden; text-align: center"></div>',
+
+	controller: class GraphController {
+
+		constructor($element) {
+			this.element = $element[0];
+			this._formattedYs = [];
 		}
 
-		return newStats || stats;
-	};
-
-	return {
-		restrict: 'AE',
-		scope: {
-			cols: '=',
-			originalRows: '=rows',
-			plots: '=',
-			type: '='
-		},
-		template: '<reporting-graph type="type" data="data"></reporting-graph>',
-		link: function($scope, element, attributes, controller) {
-			// there is no need to subscribe to $destroy
-			// $scope will be destroyed with the directive.
-
-			$scope.$watch('[plots, originalRows]', function() {
-				if (!$scope.originalRows)
-					return;
-
-				let rows;
-				rows = angular.copy($scope.originalRows);
-				rows = rows.filter(row => $scope.plots[row.id] && row.type == 'data' && row.cols)
-
-				$scope.data = {cols: $scope.cols, rows: rows};
-				$scope.data = getStatsWithoutTotal($scope.data);
-			}, true);
-		}
-	};
-});
-
-
-module.directive('reportingGraph', function($rootScope) {
-
-
-	return {
-		restrict: 'AE',
-		template: '<div style="overflow: hidden; text-align: center"></div>',
-		scope: {
-			'data': '=',
-			'type': '='
-		},
-		link: function($scope, element, attributes, controller) {
-			var chartId = 'chart_' + Math.random().toString().substring(2);
-
-			element.children().attr('id', chartId);
-
-			// Generate chart one time, when element is created.
-			var chart = c3.generate({
-				size: { height: 200 },
-				bindto: '#' + chartId,
-				data: {x: 'x', columns: []},
+		$postLink() {
+			this.chart = c3.generate({
+				size: {
+					height: 200
+				},
+				bindto: this.element,
+				data: {
+					x: 'x',
+					columns: this._formattedYs,
+					type: this.presentation
+				},
 				axis: {
-					x: {type: "category"}
+					x: {
+						type: "category",
+						tick: {
+							// fit: true,
+							// count: 10
+							// culling: {
+							// 	max: 10
+							// }
+						}
+					}
 				}
 			});
+		}
 
-			// Watch all scope parameters that could make the graph to change
-			var unwatch = $scope.$watch('data', function(newStats, oldStats) {
-				// leave if we are loading and stats is not defined yet.
-				if (!newStats)
-					return;
+		$onChanges(changes) {
+			if (changes.x || changes.ys) {
+				const formerData = this._formattedYs;
+				this._formattedYs = this._format(this.x, this.ys);
 
-				// Retrieve stats + list rows that we want, and those that exit the current graph
-				var stats = newStats;
-
-				// Create X/Y series
-				var xSerie = [
-					'x',
-					...stats.cols.map(e => e.name)
-				];
-
-				var ySeries = stats.rows.map(row => [
-					row.fullname,
-					...row.cols.map(v => v === undefined ? null : v)
-				]);
-
-				// compute which rows are leaving.
-				var exitingRowNames = [];
-				if (oldStats) {
-					let exitingRows = oldStats.rows.filter(oldRow => {
-						return !stats.rows.find(newRow => newRow.fullname === oldRow.fullname);
+				// Chart may not be initialized yet.
+				if (this.chart)
+					this.chart.load({
+						columns: this._formattedYs,
+						unload:
+							formerData
+								.map(d => d[0])
+								.filter(d => this._formattedYs.every(e => e[0] !== d))
 					});
+			}
 
-					exitingRowNames = exitingRows.map(row => row.fullname);
+			if (changes.presentation && this.chart) {
+				this.chart.transform(this.presentation);
+			}
+		}
+
+		$onDestroy() {
+			this.chart.destroy();
+		}
+
+		_format(x, ys) {
+			// Format series according to what c3 is expecting.
+			const result = [
+				['x', ...x.map(x => x.name)],
+				...Object.keys(ys).map(rowId => [
+					ys[rowId].name,
+					...this.x.map(x => ys[rowId].data[x.id] || null)
+				])
+			];
+
+			// Remove duplicate names, c3 can't handle them.
+			const taken = new Set();
+			result.forEach(row => {
+				if (taken.has(row[0])) {
+					let i = 2;
+					while (taken.has(row[0] + ' (' + i + ')'))
+						i++;
+
+					row[0] = row[0] + ' (' + i + ')';
 				}
 
-				chart.load({
-					type: $scope.type,
-					unload: exitingRowNames,
-					columns: [xSerie, ...ySeries]
-				});
-			}, true);
-
-			// cleanup when done
-			// FIXME shouldn't this be an event on the scope?
-			element.on('$destroy', function() {
-				chart.destroy();
-				unwatch();
+				taken.add(row[0]);
 			});
+
+			return result;
 		}
 	}
 });
-
 
 export default module;

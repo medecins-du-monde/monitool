@@ -1,0 +1,89 @@
+
+<ol class="breadcrumb noprint">
+	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
+	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
+	<li class="active" title="{{$ctrl.project.name}}" ng-bind="$ctrl.project.name|maxLength:50"></li>
+	<li class="active" translate="project.structure"></li>
+</ol>
+
+<legend translate="project.structure"></legend>
+
+<p>Le rôle de cette section est de formaliser votre projet. Elle doit être utilisé pendant les phases de programmation du projet.</p>
+
+<p>Les tâches que vous devez realiser sont les suivantes</p>
+
+
+<table class="table table-bordered table-striped">
+	<thead>
+		<tr>
+			<th>Tâche</th>
+			<th style="width: 20%">État</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				Remplissez les
+				<a ui-sref="main.project.structure.basics">informations de base</a>
+				de votre projet (pays, nom, thématiques, ...).
+			</td>
+			<td><fa-ok value="$ctrl.project.name && $ctrl.project.country && $ctrl.project.themes.length"></fa-ok></td>
+		</tr>
+		<tr>
+			<td>
+				Renseignez les
+				<a ui-sref="main.project.structure.collection_site_list">differents sites</a>
+				sur lesquels votre projet va travailler.
+			</td>
+			<td><fa-ok value="$ctrl.project.entities.length"></fa-ok></td>
+		</tr>
+		<tr>
+			<td>
+				Renseignez le
+				<a ui-sref="main.project.structure.logical_frame_list">cadre logique</a>
+				de référence de votre projet.
+			</td>
+			<td><fa-ok value="$ctrl.project.logicalFrames.length > 0"></fa-ok></td>
+		</tr>
+		<tr>
+			<td>
+				Si vous disposez de fonds institutionnels et que d'autres <a ui-sref="main.project.structure.logical_frame_list">cadres logiques</a> vont être utilisés sur le même projet, renseignez les également.
+			</td>
+			<td><fa-ok value="$ctrl.project.logicalFrames.length > 1"></fa-ok></td>
+		</tr>
+		<tr>
+			<td>
+				Si vous disposez d'autres indicateurs que vous désirez suivre en dehors de votre (vos) cadre(s) logique(s),
+				ajoutez les dans <a ui-sref="main.project.structure.extra">Indicateurs annexés</a>.
+			</td>
+			<td><fa-ok value="$ctrl.project.extraIndicators.length > 0"></fa-ok></td>
+		</tr>
+		<tr>
+			<td>
+				Renseignez les <a ui-sref="main.project.structure.collection_form_list">sources de données</a> dont vous allez extraire les indicateurs de vos cadres logiques et
+				<a ui-sref="main.project.structure.logical_frame_list">remplissez leurs formules de calcul</a> à mesure de votre avancement.
+			</td>
+			<td>{{$ctrl.lfIndicatorsDone}}&nbsp;/&nbsp;{{$ctrl.lfIndicatorsTotal}}</td>
+		</tr>
+		<tr>
+			<td>
+				Réalisez la même tâche pour les <a ui-sref="main.project.structure.cross_cutting">indicateurs transversaux</a>.
+			</td>
+			<td>{{$ctrl.ccIndicatorsDone}}&nbsp;/&nbsp;{{$ctrl.ccIndicatorsTotal}}</td>
+		</tr>
+		<tr>
+			<td>
+				Réalisez la même tâche pour les <a ui-sref="main.project.structure.extra">Indicateurs annexés</a>.
+			</td>
+			<td>{{$ctrl.extraIndicatorsDone}}&nbsp;/&nbsp;{{$ctrl.extraIndicatorsTotal}}</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>
+	Astuce: En cas d'erreur, cliquez sur "Annuler les modifications" pour revenir à la dernière version sauvegardée.<br/>
+	Si vous sauvegardez une erreur: rendez-vous dans sur la page
+	<a ui-sref="main.project.structure.history">historique</a>
+	et restaurez une version antérieure du projet.
+</p>
+

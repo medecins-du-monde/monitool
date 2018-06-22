@@ -49,10 +49,11 @@ module.component('projectEditMenu', {
 
 	controller: class ProjectEditController {
 
-		constructor($transitions, $filter, $scope) {
+		constructor($transitions, $filter, $scope, $state) {
 			this.$transitions = $transitions;
 			this.$scope = $scope;
 			this.translate = $filter('translate');
+			this.$state = $state;
 		}
 
 		$onChanges(changes) {
@@ -153,6 +154,24 @@ module.component('projectEditMenu', {
 			}
 		}
 
+		async cloneProject() {
+			var question = this.translate('project.are_you_sure_to_clone');
+
+			if (window.confirm(question)) {
+				const newProjectId = await this.project.clone();
+				this.$state.go('main.project.structure.basics', {projectId: newProjectId});
+			}
+		}
+
+		async deleteProject() {
+			var question = this.translate('project.are_you_sure_to_delete'),
+				answer = this.translate('project.are_you_sure_to_delete_answer');
+
+			if (window.prompt(question) === answer) {
+				await this.project.delete();
+				this.$state.go('main.projects');
+			}
+		}
 	}
 });
 

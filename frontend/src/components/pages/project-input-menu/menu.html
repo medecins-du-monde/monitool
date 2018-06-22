@@ -1,0 +1,58 @@
+
+<div class="row">
+	<div class="col-md-2 noprint">
+		<div class="panel-group">
+
+			<div class="panel panel-default" acl-has-project-role="owner" acl-project="$ctrl.project">
+				<div class="panel-heading">
+					<i class="fa fa-caret-down pull-right"></i>
+					<a ui-sref="main.project.structure.home" class="panel-title" translate="project.structure"></a>
+				</div>
+			</div>
+
+			<div class="panel panel-default" acl-has-project-role="input" acl-project="$ctrl.project">
+				<div class="panel-heading">
+					<i class="fa fa-caret-up pull-right"></i>
+					<h4 class="panel-title" translate="project.input"></h4>
+				</div>
+
+				<div class="panel-collapse">
+					<div class="list-group">
+						<a ui-sref="main.project.input.home"
+						   ui-sref-active="active"
+						   class="list-group-item">
+							<i class="fa fa-home fa-fw"></i>
+							<span translate="shared.home"></span>
+						</a>
+
+						<a ng-repeat="dataSource in $ctrl.project.forms"
+						   ui-sref="main.project.input.list({dataSourceId: dataSource.id})"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   acl-has-input-form="dataSource.id" acl-project="$ctrl.project">
+							<i class="fa fa-pencil fa-fw"></i>
+							<span>{{dataSource.name}}</span>
+						</a>
+
+						<a class="list-group-item" ng-if="$ctrl.project.forms.length === 0" disable-if="1">
+							<i class="fa fa-pencil fa-fw"></i>
+							<span translate="project.no_data_source"></span>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<i class="fa fa-caret-down pull-right"></i>
+					<a ui-sref="main.project.reporting.home" class="panel-title" translate="shared.reporting"></a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="col-md-10 print-full-width">
+		<ui-view project="$ctrl.project"></ui-view>
+	</div>
+</div>

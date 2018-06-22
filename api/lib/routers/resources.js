@@ -224,7 +224,9 @@ router.get('/resources/input', async ctx => {
 		else
 			throw new Error('invalid_mode');
 
-		ctx.response.body = ids.filter(id => ctx.visibleProjectIds.has(id.substr(6, 44)));
+		ctx.response.body = Object.keys(ids)
+			.filter(inputId => ctx.visibleProjectIds.has(inputId.substr(6, 44)))
+			.reduce((m, e) => { m[e] = ids[e]; return m; }, {});
 	}
 	else {
 		let inputs;

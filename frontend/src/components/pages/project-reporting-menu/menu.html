@@ -1,0 +1,67 @@
+
+<div class="row">
+	<div class="col-md-2 noprint">
+		<div class="panel-group">
+
+			<div class="panel panel-default" acl-has-project-role="owner" acl-project="$ctrl.project">
+				<div class="panel-heading">
+					<i class="fa fa-caret-down pull-right"></i>
+					<a ui-sref="main.project.structure.home" class="panel-title" translate="project.structure"></a>
+				</div>
+			</div>
+
+			<div class="panel panel-default" acl-has-project-role="input" acl-project="$ctrl.project">
+				<div class="panel-heading">
+					<i class="fa fa-caret-down pull-right"></i>
+					<a ui-sref="main.project.input.home" class="panel-title" translate="project.input"></a>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<i class="fa fa-caret-up pull-right"></i>
+					<h4 class="panel-title" translate="shared.reporting"></h4>
+				</div>
+
+				<div class="panel-collapse">
+					<div class="list-group">
+						<a ui-sref="main.project.reporting.home"
+						   ui-sref-active="active"
+						   class="list-group-item">
+
+							<i class="fa fa-home fa-fw"></i>
+							<span translate="shared.home"></span>
+						</a>
+
+						<a ui-sref="main.project.reporting.general"
+						   ui-sref-active="active"
+						   class="list-group-item">
+
+							<i class="fa fa-line-chart fa-fw"></i>
+							<span translate="shared.reporting_general"></span>
+						</a>
+
+						<a ui-sref="main.project.reporting.detailed"
+						   ui-sref-active="active"
+						   class="list-group-item">
+							<i class="fa fa-bar-chart fa-fw"></i>
+							<span translate="project.reporting_compare_sites"></span>
+						</a>
+
+						<a ui-sref="main.project.reporting.olap"
+						   ui-sref-active="active"
+						   class="list-group-item">
+							<i class="fa fa-table fa-fw"></i>
+							<span translate="project.pivot_table"></span>
+						</a>
+ 					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="col-md-10 print-full-width">
+		<ui-view project="$ctrl.project"></ui-view>
+	</div>
+</div>

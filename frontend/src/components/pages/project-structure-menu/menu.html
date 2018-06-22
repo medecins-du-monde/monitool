@@ -1,49 +1,206 @@
-<div>
-	<div id="formblock">
-		<!--
-			<ui-view /> will be replaced by any of the project-structure-* components
-			which all take the same input/output bindings.
-		-->
 
-		<ui-view
-			project="$ctrl.project"
-			on-project-update="$ctrl.onProjectUpdate(newProject, isValid)"></ui-view>
+<div class="row">
+	<div class="col-md-2 noprint">
+		<div class="panel-group">
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<i class="fa fa-caret-up pull-right"></i>
+					<h4 class="panel-title" translate="project.structure"></h4>
+				</div>
+
+				<div class="panel-collapse">
+					<div class="list-group">
+
+						<a ui-sref="main.project.structure.home"
+						   ui-sref-active="active"
+						   class="list-group-item">
+
+							<i class="fa fa-home fa-fw"></i>
+							<span translate="shared.home"></span>
+						</a>
+
+						<a ui-sref="main.project.structure.basics"
+						   ui-sref-active="active"
+						   class="list-group-item">
+
+							<i class="fa fa-object-group fa-fw"></i>
+							<span translate="project.basics"></span>
+						</a>
+
+						<a ui-sref="main.project.structure.collection_site_list"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!$ctrl.project._rev">
+
+							<span class="label label-default pull-right">{{$ctrl.project.entities.length}}</span>
+							<i class="fa fa-map-marker fa-fw"></i>
+							<span translate="project.collection_site_list"></span>
+						</a>
+
+						<a ui-sref="main.project.structure.collection_form_list"
+						   class="list-group-item"
+						   ui-sref-active="active"
+						   disable-if="!$ctrl.project._rev">
+
+							<span class="label label-default pull-right">{{$ctrl.project.forms.length}}</span>
+							<i class="fa fa-sign-in fa-fw"></i>
+							<span translate="project.collection_form_list"></span>
+						</a>
+
+						<a ui-sref="main.project.structure.logical_frame_list"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!$ctrl.project._rev">
+
+							<span class="label label-default pull-right">{{$ctrl.project.logicalFrames.length}}</span>
+							<i class="fa fa-sign-out fa-fw"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+
+						<a ui-sref="main.project.structure.cross_cutting"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!$ctrl.project._rev">
+
+							<span class="label label-default pull-right">{{$ctrl.project.crossCutting|length}}</span>
+							<i class="fa fa-sign-out fa-fw"></i>
+							<span translate="indicator.cross_cutting"></span>
+						</a>
+
+						<a ui-sref="main.project.structure.extra"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!$ctrl.project._rev">
+
+							<span class="label label-default pull-right">{{$ctrl.project.extraIndicators.length}}</span>
+							<i class="fa fa-sign-out fa-fw"></i>
+							<span translate="indicator.extra"></span>
+						</a>
+
+						<a ui-sref="main.project.structure.user_list"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!$ctrl.project._rev">
+
+						   <span class="label label-default pull-right">{{$ctrl.project.users.length}}</span>
+							<i class="fa fa-user fa-fw"></i>
+							<span translate="project.users"></span>
+						</a>
+
+
+						<a ui-sref="main.project.structure.history"
+						   ui-sref-active="active"
+						   class="list-group-item"
+						   disable-if="!$ctrl.project._rev">
+
+							<i class="fa fa-history fa-fw"></i>
+							<span translate="project.revisions"></span>
+						</a>
+
+						<a class="list-group-item list-group-item-info"
+							ng-click="$ctrl.cloneProject()"
+							disable-if="!$ctrl.project._rev"
+							acl-has-project-creation acl-project="$ctrl.project">
+
+							<i class="fa fa-clone fa-fw"></i>
+							<span translate="shared.clone"></span>
+						</a>
+
+						<a	class="list-group-item list-group-item-info"
+							disable-if="1"
+							acl-lacks-project-creation acl-project="$ctrl.project"
+							style="cursor: not-allowed">
+							<i class="fa fa-clone fa-fw"></i>
+							<span translate="shared.clone"></span>
+						</a>
+
+						<a class="list-group-item list-group-item-danger"
+							ng-click="$ctrl.deleteProject()"
+							disable-if="!$ctrl.project._rev">
+
+							<i class="fa fa-trash fa-fw"></i>
+							<span translate="shared.delete"></span>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default" acl-has-project-role="input" acl-project="$ctrl.project">
+				<div class="panel-heading">
+					<i class="fa fa-caret-down pull-right"></i>
+					<a ui-sref="main.project.input.home" class="panel-title" translate="project.input"></a>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<i class="fa fa-caret-down pull-right"></i>
+					<a ui-sref="main.project.reporting.home" class="panel-title" translate="shared.reporting"></a>
+				</div>
+			</div>
+
+		</div>
 	</div>
 
-	<div id="saveblock" class="noprint">
+	<div class="col-md-10 print-full-width">
+		<div>
+			<div id="formblock">
+				<!--
+					<ui-view /> will be replaced by any of the project-structure-* components
+					which all take the same input/output bindings.
+				-->
 
-		<div class="pull-right">
-			<p class="text-danger" ng-if="!$ctrl.projectIsValid">
-				<i class="fa fa-exclamation-triangle"></i>
-				<span translate="project.form_error"></span>
-			</p>
+				<ui-view
+					project="$ctrl.project"
+					on-project-update="$ctrl.onProjectUpdate(newProject, isValid)"></ui-view>
+			</div>
 
-			<p class="text-info" ng-if="!$ctrl.projectChanged && $ctrl.project._rev">
-				<i class="fa fa-info-circle"></i>
-				<span translate="project.form_persisted"></span>
-			</p>
+			<div id="saveblock" class="noprint">
 
-			<p class="text-warning" ng-if="$ctrl.projectChanged && $ctrl.projectIsValid">
-				<i class="fa fa-exclamation-triangle"></i>
-				<span translate="project.form_changed"></span>
-			</p>
+				<div class="pull-right">
+					<p class="text-danger" ng-if="!$ctrl.projectIsValid">
+						<i class="fa fa-exclamation-triangle"></i>
+						<span translate="project.form_error"></span>
+					</p>
+
+					<p class="text-info" ng-if="!$ctrl.projectChanged && $ctrl.project._rev">
+						<i class="fa fa-info-circle"></i>
+						<span translate="project.form_persisted"></span>
+					</p>
+
+					<p class="text-warning" ng-if="$ctrl.projectChanged && $ctrl.projectIsValid">
+						<i class="fa fa-exclamation-triangle"></i>
+						<span translate="project.form_changed"></span>
+					</p>
+				</div>
+
+				<a	ng-disabled="!$ctrl.projectChanged || !$ctrl.projectIsValid || $ctrl.projectSaveRunning"
+					ng-click="$ctrl.onSaveClicked()"
+					class="btn btn-primary">
+					<i class="fa fa-floppy-o" ng-if="!$ctrl.projectSaveRunning"></i>
+					<i class="fa fa-circle-o-notch fa-spin" ng-if="$ctrl.projectSaveRunning"></i>
+
+					<span translate="shared.save"></span>
+				</a>
+
+				<a	ng-disabled="!$ctrl.projectChanged || $ctrl.projectSaveRunning"
+					ng-click="$ctrl.onResetClicked()"
+					class="btn btn-default">
+					<i class="fa fa-undo"></i>
+					<span translate="shared.remove_changes"></span>
+				</a>
+
+			</div>
 		</div>
-
-		<a	ng-disabled="!$ctrl.projectChanged || !$ctrl.projectIsValid || $ctrl.projectSaveRunning"
-			ng-click="$ctrl.onSaveClicked()"
-			class="btn btn-primary">
-			<i class="fa fa-floppy-o" ng-if="!$ctrl.projectSaveRunning"></i>
-			<i class="fa fa-circle-o-notch fa-spin" ng-if="$ctrl.projectSaveRunning"></i>
-
-			<span translate="shared.save"></span>
-		</a>
-
-		<a	ng-disabled="!$ctrl.projectChanged || $ctrl.projectSaveRunning"
-			ng-click="$ctrl.onResetClicked()"
-			class="btn btn-default">
-			<i class="fa fa-undo"></i>
-			<span translate="shared.remove_changes"></span>
-		</a>
 
 	</div>
 </div>
+
+
+
+
+
+
+
+

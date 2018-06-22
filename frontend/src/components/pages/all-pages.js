@@ -17,38 +17,45 @@
 
 import angular from 'angular';
 
-import menu from './menu/menu.js';
-import ccIndicatorList from './admin-cc-indicator/cc-indicator-list.js';
-import userList from './admin-user/user-list.js';
-import adminMenu from './admin-menu/menu.js';
-import themeList from './admin-theme/theme-list.js';
+import menu from './menu/menu';
+import ccIndicatorList from './admin-cc-indicator/cc-indicator-list';
+import userList from './admin-user/user-list';
+import adminMenu from './admin-menu/menu';
+import themeList from './admin-theme/theme-list';
 
-import home from './home/home.js';
+import home from './home/home';
 
-import repIndicatorList from './cc-indicators/cc-indicator-list.js';
-import ccIndicatorReporting from './cc-indicators/cc-indicator-reporting.js';
+import repIndicatorList from './cc-indicators/cc-indicator-list';
+import ccIndicatorReporting from './cc-indicators/cc-indicator-reporting';
 
-import projectMenu from './project-menu/menu.js';
-import projectList from './project-list/list.js';
+import projectMenu from './project-menu/menu';
+import projectList from './project-list/list';
 
-import structureMenu from './project-structure-menu/menu.js';
-import basics from './project-structure-basics/basics.js';
-import sites from './project-structure-sites/sites.js';
-import dsList from './project-structure-data-source/data-source-list.js';
-import dsEdit from './project-structure-data-source/data-source-edit.js';
-import prjCcIndicatorList from './project-structure-cc-indicators/cc-indicator-list.js';
-import logframeList from './project-structure-logical-frame/logframe-list.js';
-import logframeEdit from './project-structure-logical-frame/logframe-edit.js';
-import prjUserList from './project-structure-user/user-list.js';
-import extraIndicators from './project-structure-extra-indicators/extra-indicators.js';
-import history from './project-structure-history/history.js';
+import structureMenu from './project-structure-menu/menu';
+import basics from './project-structure-basics/basics';
+import sites from './project-structure-sites/sites';
+import dsList from './project-structure-data-source/data-source-list';
+import dsEdit from './project-structure-data-source/data-source-edit';
+import prjCcIndicatorList from './project-structure-cc-indicators/cc-indicator-list';
+import logframeList from './project-structure-logical-frame/logframe-list';
+import logframeEdit from './project-structure-logical-frame/logframe-edit';
+import prjUserList from './project-structure-user/user-list';
+import extraIndicators from './project-structure-extra-indicators/extra-indicators';
+import history from './project-structure-history/history';
 
-import inputList from './project-input-list/input-list.js';
-import inputEdition from './project-input-edition/input-edition.js';
+import inputList from './project-input-list/input-list';
+import inputEdition from './project-input-edition/input-edition';
 
-import general from './project-reporting-general/general.js';
-import detailed from './project-reporting-detailed/detailed.js';
-import olap from './project-reporting-olap/olap.js';
+import general from './project-reporting-general/general';
+import detailed from './project-reporting-detailed/detailed';
+import olap from './project-reporting-olap/olap';
+
+
+import projectInputmenu from './project-input-menu/menu';
+import projectReportingmenu from './project-reporting-menu/menu';
+import projectStructureHome from './project-structure-home/home';
+import projectInputHome from './project-input-home/home';
+import projectReportingHome from './project-reporting-home/home';
 
 export default angular.module(
 	'monitool.components.pages.all-pages',
@@ -79,6 +86,12 @@ export default angular.module(
 		logframeEdit.name,
 		repIndicatorList.name,
 		ccIndicatorReporting.name,
+
+		projectInputmenu.name,
+		projectReportingmenu.name,
+		projectStructureHome.name,
+		projectInputHome.name,
+		projectReportingHome.name
 	]
 );
 
