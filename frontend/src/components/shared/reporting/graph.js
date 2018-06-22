@@ -100,7 +100,7 @@ module.component('reportingGraph', {
 				['x', ...x.map(x => x.name)],
 				...Object.keys(ys).map(rowId => [
 					ys[rowId].name,
-					...this.x.map(x => ys[rowId].data[x.id] || null)
+					...this.x.map(x => Math.round(ys[rowId].data[x.id]) || null)
 				])
 			];
 
