@@ -20,13 +20,15 @@ module.component('tableIndicator', {
 		filter: '<',
 		groupBy: '<',
 		indicator: '<',
+		slots: '<',
 
-		onGraphToggle: '&'
+		onPlotToggle: '&'
 	},
 	template: require('./table-indicator.html'),
 	controller: class IndicatorTableController {
 
-		constructor($scope, $timeout) {
+		constructor($element, $scope, $timeout) {
+			this._element = angular.element($element);
 			this.$scope = $scope;
 			this.$timeout = $timeout;
 		}
@@ -34,8 +36,8 @@ module.component('tableIndicator', {
 		$onChanges(changes) {
 			// Update different parts of the interface depending on what has changed.
 			// premature optimisation warning: we could refresh everything for any changes
-			if (changes.groupBy || changes.filter)
-				this.columns = this._computeColumns();
+			// if (changes.groupBy || changes.filter)
+			// 	this.columns = this._computeColumns();
 
 			if (changes.project || changes.filter) {
 				this.sites = this.project.entities.filter(site => this.filter.entity.includes(site.id));
@@ -54,19 +56,44 @@ module.component('tableIndicator', {
 			}
 		}
 
-		_computeColumns() {
-			if (!this.groupBy) {
-				this.slots = [];
-				return;
-			}
+		/////////////////////////////////
+		// Handle scroll
+		/////////////////////////////////
 
-			this.slots = Array.from(
-				timeSlotRange(
-					TimeSlot.fromDate(new Date(this.filter._start + 'T00:00:00Z'), this.groupBy),
-					TimeSlot.fromDate(new Date(this.filter._end + 'T00:00:00Z'), this.groupBy)
-				)
-			).map(s => s.value);
+		$onInit() {
+			this._binded = this._onScroll.bind(this);
+			this._element.bind('scroll', this._binded);
 		}
+
+		$onDestroy() {
+			this._element.unbind('scroll', this._binded);
+		}
+
+		_onScroll() {
+			this.headerStyle = {
+				transform: 'translate(0, ' + this._element[0].scrollTop + 'px)'
+			};
+
+			this.firstColStyle = {
+				transform: 'translate(' + this._element[0].scrollLeft + 'px)'
+			};
+
+			this.$scope.$apply();
+		}
+
+		// _computeColumns() {
+		// 	if (!this.groupBy) {
+		// 		this.slots = [];
+		// 		return;
+		// 	}
+
+		// 	this.slots = Array.from(
+		// 		timeSlotRange(
+		// 			TimeSlot.fromDate(new Date(this.filter._start + 'T00:00:00Z'), this.groupBy),
+		// 			TimeSlot.fromDate(new Date(this.filter._end + 'T00:00:00Z'), this.groupBy)
+		// 		)
+		// 	).map(s => s.value);
+		// }
 
 		async _fetchData() {
 			this._fetchDataWaiting = false;
@@ -80,8 +107,6 @@ module.component('tableIndicator', {
 					true,
 					true
 				);
-
-				console.log(data)
 
 				this.errorMessage = null;
 				this.values = {};

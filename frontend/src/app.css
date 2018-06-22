@@ -703,7 +703,7 @@ td.empty > span {
 
 
 
-general-reporting {
+general-reporting, detailed-reporting {
   display: flex;
   height: 100vh;
   flex-direction: column;
@@ -712,38 +712,38 @@ general-reporting {
   padding-bottom: 10px
 }
 
-  /* your existing container */
-  general-table {
-    display: block;
-    overflow: auto;
-    flex: 1;
-    border: 0 solid #ccc;
-    border-top-width: 1px;
-  }
+/* your existing container */
+general-table, table-indicator {
+  display: block;
+  overflow: auto;
+  flex: 1;
+  border: 0 solid #ccc;
+  border-top-width: 1px;
+}
 
-  general-table table {
-    overflow: hidden;
-    border-collapse: separate !important;
-    border-spacing: 0px !important;
-    border-width: 0 !important;
-  }
+general-table table, table-indicator table {
+  overflow: hidden;
+  border-collapse: separate !important;
+  border-spacing: 0px !important;
+  border-width: 0 !important;
+}
 
-  general-table table thead {
-  }
+general-table table thead, table-indicator table thead {
+}
 
-  general-table table td, general-table table th {
-    border-top-width: 0 !important;
-    border-left-width: 0 !important;
-    background-color: white;
-  }
+general-table table td, general-table table th, table-indicator table td, table-indicator table th {
+  border-top-width: 0 !important;
+  border-left-width: 0 !important;
+  background-color: white;
+}
 
-  general-table table td:first-child, general-table table th:first-child {
-    border-left-width: 1px !important;
-  }
+general-table table td:first-child, general-table table th:first-child, table-indicator table td:first-child, table-indicator table th:first-child {
+  border-left-width: 1px !important;
+}
 
-  general-table .btn-group, general-table .btn-group .btn {
-    /* buttons go UNDER the thead */
-    position: static;
-  }
+general-table .btn-group, general-table .btn-group .btn, table-indicator .btn-group, table-indicator .btn-group .btn {
+  /* buttons go UNDER the thead */
+  position: static;
+}
 
 
