@@ -57,15 +57,20 @@ module.component('inputGrid', {
 		}
 
 		$postLink() {
+			const withSum =
+				this.variable.partitions.length > 0
+				&& this.variable.partitions.every(p => p.aggregation === 'sum');
+
+			this.withSumX = withSum && this.variable.distribution !== this.variable.partitions.length;
+			this.withSumY = withSum && this.variable.distribution !== 0;
+
 			const [colPartitions, rowPartitions] = [
 				this.variable.partitions.slice(this.variable.distribution),
 				this.variable.partitions.slice(0, this.variable.distribution)
 			];
 
-			const [width, height] = [
-				colPartitions.reduce((m, p) => m * p.elements.length, 1) + rowPartitions.length,
-				rowPartitions.reduce((m, p) => m * p.elements.length, 1) + colPartitions.length
-			];
+			this._width = colPartitions.reduce((m, p) => m * p.elements.length, 1) + rowPartitions.length + (this.withSumX ? 1 : 0);
+			this._height = rowPartitions.reduce((m, p) => m * p.elements.length, 1) + colPartitions.length + (this.withSumY ? 1 : 0);
 
 			this.handsOnTable = new Handsontable(this.$element[0].firstElementChild, {
 				// Use all width with columns all the same size
@@ -74,8 +79,8 @@ module.component('inputGrid', {
 				className: "htLeft",
 
 				// Lock grid size so that user can't expand it.
-				maxCols: width,
-				maxRows: height,
+				maxCols: this._width,
+				maxRows: this._height,
 
 				// processing to do when the UI table is updated.
 				afterChange: this._onHandsOnTableChange.bind(this),
@@ -94,15 +99,23 @@ module.component('inputGrid', {
 
 			// if the data that was entered is a formula (eg: 1+2) replace by evaluated value.
 			changes.forEach(change => {
-				const [x, y, _, val] = change;
+				const [y, x, _, val] = change;
 
+				console.log('change', x, y, val)
+
+				// If user entered something that is not a number, try to evaluate it with
+				// the parser to see if it works.
 				if (typeof val !== 'number') {
 					try {
 						const newValue = exprEval.Parser.evaluate(val, {});
-						this.handsOnTable.setDataAtCell(x, y, newValue);
+						this.handsOnTable.setDataAtCell(y, x, newValue);
 					}
 					catch (e) {
 					}
+				}
+				// If the user entered a number, update the totals on last columns and last row.
+				else {
+					this._updateSums(y, x)
 				}
 			});
 
@@ -114,10 +127,10 @@ module.component('inputGrid', {
 		 * Render header and content with different styles.
 		 */
 		_handsOnTableCellRenderer(row, col, prop) {
-			const isHeader = col < this.variable.distribution
-				|| row < this.variable.partitions.length - this.variable.distribution;
+			const numPartitions = this.variable.partitions.length;
 
-			if (isHeader)
+			// header
+			if (col < this.variable.distribution || row < numPartitions - this.variable.distribution)
 				return {
 					readOnly: true,
 					renderer: function(instance, td, row, col, prop, value, cellProperties) {
@@ -126,8 +139,38 @@ module.component('inputGrid', {
 						td.style.background = '#eee';
 					}
 				};
+
+			// total
+			else if ((this.withSumX && col == this._width - 1) || (this.withSumY && row === this._height - 1))
+				return {type: 'numeric', readOnly: true};
+
+			// editable field
 			else
 				return {type: 'numeric', validator: /^\d+$/};
+		}
+
+		_updateSums(editedY, editedX) {
+			const numPartitions = this.variable.partitions.length;
+			let sum;
+
+			console.log('edited', editedX, editedY)
+
+			// guard against infinite loop (the total update trigering another update etc...)
+			if (this.withSumX && editedX < this._width - 1) {
+				console.log('x', this.variable.distribution, this._width - 1)
+				sum = 0;
+				for (let x = this.variable.distribution; x < this._width - 1; ++x)
+					sum += this.handsOnTable.getDataAtCell(editedY, x);
+				this.handsOnTable.setDataAtCell(editedY, this._width - 1, sum);
+			}
+
+			if (this.withSumY && editedY < this._height - 1) {
+				console.log('y', numPartitions - this.variable.distribution, this._height - 1)
+				sum = 0;
+				for (let y = numPartitions - this.variable.distribution; y < this._height - 1; ++y)
+					sum += this.handsOnTable.getDataAtCell(y, editedX);
+				this.handsOnTable.setDataAtCell(this._height - 1, editedX, sum);
+			}
 		}
 
 		/**
@@ -147,17 +190,48 @@ module.component('inputGrid', {
 			var colPartitions = this.variable.partitions.slice(this.variable.distribution),
 				rowPartitions = this.variable.partitions.slice(0, this.variable.distribution);
 
-			var topRows = this._makeHeaderRows(colPartitions),
-				bodyRows = this._makeHeaderCols(rowPartitions);
+			var topRows = this._makeHeaderRows(colPartitions);
+			// super ugly hack so that _makeHeaderCols add the sum row only if relevant
+			[this.withSumX, this.withSumY] = [this.withSumY, this.withSumX];
 
+			var bodyRows = this._makeHeaderCols(rowPartitions);
+			[this.withSumX, this.withSumY] = [this.withSumY, this.withSumX]; // restore variable to their proper values.
+
+			// when distribution == 0, rowPartitions = [], and there is nowhere to enter the data.
 			if (!bodyRows.length)
 				bodyRows.push([])
 
 			var dataColsPerRow = topRows.length ? topRows[0].length : 1;
+			if (this.withSumX)
+				dataColsPerRow -= 1;
 
 			// Add data fields to bodyRows
+			let accumulator;
+			if (this.withSumY) {
+				accumulator = new Array(dataColsPerRow);
+				accumulator.fill(0);
+			}
+
 			bodyRows.forEach(bodyRow => {
-				bodyRow.push(...modelValue.splice(0, dataColsPerRow));
+				if (modelValue.length) {
+					const data = modelValue.splice(0, dataColsPerRow)
+					if (this.withSumX)
+						data.push(data.reduce((m, e) => m + e, 0));
+
+					bodyRow.push(...data);
+
+					if (this.withSumY)
+						for (var i = 0; i < dataColsPerRow; ++i)
+							accumulator[i] += data[i];
+				}
+				else {
+					if (!this.withSumY)
+						throw new Error('should not happen');
+
+					bodyRow.push(...accumulator)
+					if (this.withSumX)
+						bodyRow.push(accumulator.reduce((m, e) => m + e, 0))
+				}
 			});
 
 			// Add empty field in the top-left corner for topRows
@@ -177,9 +251,16 @@ module.component('inputGrid', {
 			if (this.variable.partitions.length === 0)
 				return viewValue[0];
 
+			const [minX, minY, maxX, maxY] = [
+				this.variable.distribution,
+				this.variable.partitions.length - this.variable.distribution,
+				viewValue[0].length - (this.withSumX ? 1 : 0),
+				viewValue.length - (this.withSumY ? 1 : 0),
+			];
+
 			var modelValue = [];
-			for (var y = this.variable.partitions.length - this.variable.distribution; y < viewValue.length; ++y)
-				modelValue.push(...viewValue[y].slice(this.variable.distribution));
+			for (var y = minY; y < maxY; ++y)
+				modelValue.push(...viewValue[y].slice(minX, maxX));
 
 			return modelValue;
 		}
@@ -214,6 +295,9 @@ module.component('inputGrid', {
 					for (; colIndex < colLimit; ++colIndex)
 						row.push("");
 				}
+
+				if (this.withSumX)
+					row.push('Total');
 
 				// push to body
 				body.push(row);
