@@ -101,8 +101,6 @@ module.component('inputGrid', {
 			changes.forEach(change => {
 				const [y, x, _, val] = change;
 
-				console.log('change', x, y, val)
-
 				// If user entered something that is not a number, try to evaluate it with
 				// the parser to see if it works.
 				if (typeof val !== 'number') {
@@ -153,19 +151,15 @@ module.component('inputGrid', {
 			const numPartitions = this.variable.partitions.length;
 			let sum;
 
-			console.log('edited', editedX, editedY)
-
 			// guard against infinite loop (the total update trigering another update etc...)
 			if (this.withSumX && editedX < this._width - 1) {
-				console.log('x', this.variable.distribution, this._width - 1)
 				sum = 0;
 				for (let x = this.variable.distribution; x < this._width - 1; ++x)
 					sum += this.handsOnTable.getDataAtCell(editedY, x);
 				this.handsOnTable.setDataAtCell(editedY, this._width - 1, sum);
 			}
 
-			if (this.withSumY && editedY < this._height - 1) {
-				console.log('y', numPartitions - this.variable.distribution, this._height - 1)
+			if (this.withSumY && editedX < this._width - 1 && editedY < this._height - 1) {
 				sum = 0;
 				for (let y = numPartitions - this.variable.distribution; y < this._height - 1; ++y)
 					sum += this.handsOnTable.getDataAtCell(y, editedX);
