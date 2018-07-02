@@ -51,9 +51,8 @@ module.run(function($rootScope, $window, $transitions) {
 
 	$transitions.onError({}, function(transition) {
 		const error = transition.error();
-		console.log(error)
 
-		if (error.detail && error.detail.status === 401) {
+		if (error.detail && error.detail.response.status === 401) {
 			alert("Session has expired, you need to log in again");
 			window.location.reload();
 		}
