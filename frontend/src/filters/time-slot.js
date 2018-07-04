@@ -29,7 +29,7 @@ module.filter('formatSlot', function($rootScope, $locale, $filter) {
 		if (slotValue === '_total' || slotValue == 'total')
 			return 'Total';
 
-		else {
+		try {
 			var slot = new TimeSlot(slotValue);
 
 			if (slot.periodicity === 'year')
@@ -85,6 +85,9 @@ module.filter('formatSlot', function($rootScope, $locale, $filter) {
 
 			else
 				throw new Error();
+		}
+		catch (e) {
+			return slotValue;
 		}
 	};
 })
