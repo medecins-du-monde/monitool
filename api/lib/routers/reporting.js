@@ -28,14 +28,25 @@ const router = new Router();
 
 
 function mergeRec(fn, ...parameters) {
-	if (['number', 'string'].includes(typeof parameters[0])) {
+	if (['number', 'string', 'undefined'].includes(typeof parameters[0])) {
 		const result = fn(...parameters);
-		return Number.isNaN(result) ? 'Division by zero' : result;
+
+		if (Number.isNaN(result))
+			console.log(fn.toString(), parameters)
+
+		return Number.isNaN(result) ? 'Invalid computation' : result;
 	}
 
+	const keys = new Set(
+		parameters
+			.map(p => Object.keys(p))
+			.reduce((memo, keys) => [...memo, ...keys], [])
+	);
+
 	const result = {};
-	for (let key in parameters[0])
+	for (let key of keys)
 		result[key] = mergeRec(fn, ...parameters.map(p => p[key]));
+
 	return result;
 }
 
