@@ -199,6 +199,9 @@ textarea {
 
 
 
+.clickable {
+  cursor: pointer;
+}
 
 
       .panel-collapse>.list-group .list-group-item:first-child {border-top-right-radius: 0;border-top-left-radius: 0;}
