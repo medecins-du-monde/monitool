@@ -170,7 +170,7 @@ export function generateIndicatorDimensions(project, computation) {
 		..._generatePeriods(project, computation),
 		..._generateSites(project, computation),
 		..._generatePartitions(project, computation)
-	];
+	].filter(dim => dim.rows.length !== 0);
 }
 
 
