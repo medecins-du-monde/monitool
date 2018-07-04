@@ -455,7 +455,7 @@ export default class Cube {
 					// Build new filter by concatenating elements.
 					var newFilter = [];
 					oldFilter.forEach(function(v) {
-						Array.prototype.push.apply(newFilter, dimensionGroup.mapping[v]);
+						newFilter.push(...dimensionGroup.mapping[v]);
 					});
 					newFilter.sort();
 

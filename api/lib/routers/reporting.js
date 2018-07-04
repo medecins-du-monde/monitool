@@ -64,7 +64,7 @@ router.post('/reporting/project/:prjId', async ctx => {
 			// Replace _start/_end by a proper filter depending on our time dimension.
 			if (filter._start && filter._end) {
 				const timeDimension = dataSource.periodicity === 'free' ? 'day' : dataSource.periodicity;
-				filter[timeDimension] = Array.from(
+				const timeValues = Array.from(
 					timeSlotRange(
 						TimeSlot.fromDate(new Date(filter._start + 'T00:00:00Z'), timeDimension),
 						TimeSlot.fromDate(new Date(filter._end + 'T00:00:00Z'), timeDimension)
@@ -73,6 +73,11 @@ router.post('/reporting/project/:prjId', async ctx => {
 
 				delete filter._start;
 				delete filter._end;
+
+				if (filter[timeDimension])
+					filter[timeDimension] = filter[timeDimension].filter(e => timeValues.includes(e));
+				else
+					filter[timeDimension] = timeValues;
 			}
 
 			// FIXME this line should be useless => check
