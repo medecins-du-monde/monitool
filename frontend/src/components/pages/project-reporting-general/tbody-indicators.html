@@ -1,5 +1,5 @@
 <tr ng-click="$ctrl.onOpenToggle()" style="cursor: pointer">
-	<th colspan="{{4 + $ctrl.columns.length}}"
+	<th colspan="{{5 + $ctrl.columns.length}}"
 		ng-style="$ctrl.firstColStyle">
 
 		<fa-open value="$ctrl.open" class="noprint"></fa-open>
@@ -18,9 +18,11 @@
 		ng-style="$ctrl.firstColStyle"></td>
 
 	<th class="row-title"
-		colspan="{{3 + $ctrl.columns.length}}"
+		colspan="{{4 + $ctrl.columns.length}}"
 		ng-style="$ctrl.firstColStyle">
-		{{row.name|translate}}
+		<div>
+			{{row.name|translate}}
+		</div>
 	</th>
 </tr>
 
@@ -30,7 +32,7 @@
 	<td class="noprint"
 		ng-style="$ctrl.firstColStyle"></td>
 	<td class="row-title"
-		colspan="{{3 + $ctrl.columns.length}}"
+		colspan="{{4 + $ctrl.columns.length}}"
 		translate="project.reporting_empty"
 		ng-style="$ctrl.firstColStyle"></td>
 </tr>

@@ -1,11 +1,18 @@
-<td class="noprint" style="text-align: center" ng-style="$ctrl.firstColStyle">
+<td class="row-graph" ng-style="$ctrl.firstColStyle">
 	<i class="fa fa-line-chart"
 	   ng-click="$ctrl.toggleGraph()"
 	   ng-style="{color: $ctrl.graphToggled ? 'black' : 'revert'}"></i>
 </td>
 
 <td class="row-title" ng-style="$ctrl.firstColStyle" title="{{$ctrl.name}}">
-	<div class="pull-right" ng-if="$ctrl.availableDimensions.length">
+	<div>
+		<i class="fa fa-arrow-circle-right" ng-if="$ctrl.isGroup"></i>
+		{{$ctrl.name|formatSlot}}
+	</div>
+</td>
+
+<td class="row-dimension" ng-style="$ctrl.firstColStyle">
+	<div ng-if="$ctrl.availableDimensions.length">
 		<button class="btn btn-default btn-xs" ng-if="$ctrl.split" ng-click="$ctrl.toggleSplit(null)">
 			<i class="fa fa-minus"></i>
 		</button>
@@ -21,11 +28,6 @@
 				</li>
 			</ul>
 		</div>
-	</div>
-
-	<div class="row-title-text">
-		<i class="fa fa-arrow-circle-right" ng-if="$ctrl.isGroup"></i>
-		{{$ctrl.name|formatSlot}}
 	</div>
 </td>
 

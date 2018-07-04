@@ -178,32 +178,56 @@ textarea {
 	border-right-width: 0;
 }
 
-  #reporting {
-    font-size: 12px;
-  }
-
-  #reporting .indent1 .row-title-text, #reporting .indent1 th.row-title {
-    padding-left: 20px !important;
-  }
-
-  #reporting .indent2 .row-title-text, #reporting .indent2 th.row-title {
-    padding-left: 40px !important;
-  }
-  #reporting .indent3 .row-title-text, #reporting .indent3 th.row-title {
-    padding-left: 60px !important;
-  }
-
-  #reporting .indent4 .row-title-text, #reporting .indent4 th.row-title {
-    padding-left: 80px !important;
-  }
 
 
-  #reporting .row-title .row-title-text {
-    width: 300px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+
+
+
+
+
+#reporting {
+  width: auto;
+  min-width: 100%;
+  table-layout: fixed;
+}
+
+#reporting .row-graph {
+  width: 30px;
+  text-align: center;
+}
+
+#reporting .row-title {
+  width: 300px;
+}
+
+#reporting .row-title div {
+  width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#reporting .indent1 .row-title div {
+  padding-left: 20px !important;
+}
+
+#reporting .indent2 .row-title div {
+  padding-left: 40px !important;
+}
+#reporting .indent3 .row-title div {
+  padding-left: 60px !important;
+}
+
+#reporting .indent4 .row-title div {
+  padding-left: 80px !important;
+}
+
+#reporting .row-dimension {
+  width: 30px;
+}
+
+
+
 
 .clickable {
   cursor: pointer;
