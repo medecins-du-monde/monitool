@@ -44,13 +44,28 @@ module.config($stateProvider => {
 			controller: 'IndicatorReportingController',
 			resolve: {
 				themes: () => Theme.fetchAll(),
-				indicator: ($stateParams) => Indicator.get($stateParams.indicatorId),
-				projects: ($stateParams) => Project.fetchCrossCutting($stateParams.indicatorId),
-				// cubes: ($stateParams) => Cube.fetchIndicator($stateParams.indicatorId)
+				ccIndicator: ($stateParams) => Indicator.get($stateParams.indicatorId),
+				projects: ($stateParams) => Project.fetchCrossCutting($stateParams.indicatorId)
 			}
 		});
 	}
 });
+
+
+module.component('ccIndicatorReporting', {
+	bindings: {
+		themes: '<',
+		ccIndicator: '<',
+		projects: '<'
+	},
+
+	template: require('./cc-indicator-reporting.html'),
+
+	controller: class IndicatorReportingController {
+		
+	}
+})
+
 
 
 module.controller('IndicatorReportingController', function($scope, mtReporting, indicator, projects, cubes, themes) {

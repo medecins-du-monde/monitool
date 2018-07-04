@@ -46,7 +46,6 @@ module.component('olapDimensions', {
 			exclusions['entity'] = ['group'];
 			exclusions['group'] = ['entity']
 
-
 			const timePeriodicities = computeCompatiblePeriodicities(this.project, this.indicator.computation);
 
 			timePeriodicities.forEach(periodicity => {

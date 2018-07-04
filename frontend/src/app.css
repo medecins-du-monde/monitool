@@ -4,7 +4,7 @@ body {
   font-size: 12px;
 }
 
-td.ng-invalid { 
+td.ng-invalid {
   background-color: #faa;
 }
 
@@ -182,22 +182,28 @@ textarea {
     font-size: 12px;
   }
 
-  #reporting .indent1 .row-title {
+  #reporting .indent1 .row-title-text, #reporting .indent1 th.row-title {
     padding-left: 20px !important;
   }
 
-  #reporting .indent2 .row-title {
+  #reporting .indent2 .row-title-text, #reporting .indent2 th.row-title {
     padding-left: 40px !important;
   }
-  #reporting .indent3 .row-title {
+  #reporting .indent3 .row-title-text, #reporting .indent3 th.row-title {
     padding-left: 60px !important;
   }
 
-  #reporting .indent4 .row-title {
+  #reporting .indent4 .row-title-text, #reporting .indent4 th.row-title {
     padding-left: 80px !important;
   }
 
 
+  #reporting .row-title .row-title-text {
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
 .clickable {
   cursor: pointer;
@@ -228,7 +234,7 @@ textarea {
 
 .ta-editor.ta-html, .ta-scroll-window.form-control {
   min-height: 0;
-  
+
 }
 .ta-scroll-window > .ta-bind {
   min-height: 0;
@@ -289,7 +295,7 @@ ul:hover>.onrollover {
   .htNumeric {
     color:white !important;
     font-size: 0;
-    
+
   }
 
 }
@@ -370,8 +376,8 @@ ul:hover>.onrollover {
 
       body {
         background-color: #EEE;
-      }   
-  
+      }
+
       #load-container{
         position: absolute;
         top: 50%;
@@ -395,7 +401,7 @@ ul:hover>.onrollover {
       #load-content h3 {
         margin-top: 10px;
       }
-      
+
       #load-content img {
         width: 250px;
         margin-bottom: 10px;
@@ -573,12 +579,12 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 
 .partition-order td {
   border: 1px solid #ccc;
-  padding: 4px 8px;  
+  padding: 4px 8px;
 }
 
 .partition-order td.data-field {
   border: 1px solid #ccc;
-  padding: 4px 8px;  
+  padding: 4px 8px;
   background-color: white;
 }
 
@@ -601,7 +607,7 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 #input-list table {
   table-layout: fixed;
 }
-  
+
 #input-list #table1-container {
   float: left;
   width: 15%;

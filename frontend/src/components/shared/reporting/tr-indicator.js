@@ -4,7 +4,7 @@ import angular from 'angular';
 
 import mtReportingField from './td-reporting-field';
 import mtIndicatorUnit from '../../../filters/indicator';
-import {fetchData, computeSplitPartitions} from '../../../helpers/indicator';
+import {fetchData, computeSplitPartitions, generateIndicatorDimensions} from '../../../helpers/indicator';
 
 const module = angular.module(
 	'monitool.components.pages.project.reporting.indicator-row',
@@ -32,6 +32,10 @@ module.directive('trIndicator', () => {
 
 			onSplitToggle: '&',
 			onPlotToggle: '&',
+
+			//tmp
+			name: '<',
+			isGroup: '<'
 		},
 
 		template: require('./tr-indicator.html'),
@@ -50,9 +54,10 @@ module.directive('trIndicator', () => {
 					(changes.columns && !angular.equals(changes.columns.previousValue, changes.columns.currentValue));
 
 				if (redraw && !this._refreshWaiting) {
-					this.name = this._computeName();
-					this.isGroup = this._computeIsGroup();
-					this.availablePartitions = this._computeAvailablePartitions();
+					this.availableDimensions =
+						generateIndicatorDimensions(this.project, this.indicator.computation)
+						.filter(dim => !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => this.filter[d.id]));
+
 					this.values = null;
 
 					this.$timeout(this._fetchData.bind(this), 100);
@@ -106,42 +111,7 @@ module.directive('trIndicator', () => {
 				this.$scope.$apply();
 			}
 
-			_computeName() {
-				const lastFilter = Object.keys(this.filter).pop();
-				const partition = this.project.forms
-					.reduce((m, e) => m.concat(e.elements), [])
-					.reduce((m, e) => m.concat(e.partitions), [])
-					.find(p => p.id === lastFilter)
 
-				if (partition) {
-					const filterValue = this.filter[lastFilter];
-					if (filterValue.length === 1) {
-						const pe = partition.elements.find(pe => pe.id === filterValue[0]);
-						return pe.name;
-					}
-					else {
-						const pg = partition.groups.find(pg => angular.equals(filterValue, pg.members));
-						return pg ? pg.name : '??';
-					}
-				}
-				else
-					return this.indicator.display;
-			}
-
-			_computeIsGroup() {
-				const lastFilter = Object.keys(this.filter).pop();
-				const partition = this.project.forms
-					.reduce((m, e) => m.concat(e.elements), [])
-					.reduce((m, e) => m.concat(e.partitions), [])
-					.find(p => p.id === lastFilter)
-
-				return partition ? this.filter[lastFilter].length !== 1 : false;
-			}
-
-			_computeAvailablePartitions() {
-				return computeSplitPartitions(this.project, this.indicator.computation)
-					.filter(p => !this.filter[p.id]);
-			}
 		}
 	};
 });

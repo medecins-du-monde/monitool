@@ -5,6 +5,7 @@ import uuid from 'uuid/v4';
 
 import mtTrIndicator from '../../shared/reporting/tr-indicator';
 import mtFaOpen from '../../shared/misc/plus-minus-icon';
+import {generateIndicatorDimensions} from '../../../helpers/indicator';
 
 const module = angular.module(
 	'monitool.components.pages.project.reporting-general.indicators-tbody',
@@ -51,8 +52,8 @@ module.directive('tbodyIndicators', () => {
 				this.open = !this.open;
 			}
 
-			onSplitToggle(rowId, partitionId) {
-				this.splits[rowId] = this.splits[rowId] !== partitionId ? partitionId : null;
+			onSplitToggle(rowId, dimensionId) {
+				this.splits[rowId] = this.splits[rowId] !== dimensionId ? dimensionId : null;
 				this._makeRows();
 			}
 
@@ -65,43 +66,56 @@ module.directive('tbodyIndicators', () => {
 
 					if (section.indicators.length)
 						section.indicators.forEach(indicator => {
-							this._makeRowsRec(indicator, this.filter, section.indent, indicator.id)
+							this._makeRowsRec(indicator, indicator.display, false, this.filter, section.indent, indicator.id)
 						});
 					// else
 					// 	this.rows.push({id: uuid(), type: 'no_indicators', indent: section.indent});
 				});
 			}
 
-			_makeRowsRec(indicator, filter, indent, rowId) {
-				const partitions = this.project.forms
-					.reduce((m, e) => m.concat(e.elements), [])
-					.reduce((m, e) => m.concat(e.partitions), []);
-
+			_makeRowsRec(indicator, name, isGroup, filter, indent, rowId) {
 				// Add the row to the table
 				this.rows.push({
 					id: rowId,
 					type: 'indicator',
+					name: name,
+					isGroup: isGroup,
 					indicator: indicator,
 					filter: filter,
 					indent: indent
 				});
 
 				// Recurse to append opened disagregations
-				const partitionId = this.splits[rowId];
-				if (partitionId) {
-					const partition = partitions.find(p => p.id === partitionId);
+				const dimensionId = this.splits[rowId];
+				if (dimensionId) {
+					const dimensions = generateIndicatorDimensions(this.project, indicator.computation)
+						.filter(dim => !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => this.filter[d.id]));
 
-					partition.groups.forEach(pg => {
-						const childFilter = angular.copy(filter);
-						childFilter[partition.id] = pg.members;
-						this._makeRowsRec(indicator, childFilter, indent + 1, rowId + '/' + partition.id + '=' + pg.id);
-					});
+					const dimension = dimensions.find(d => d.id === dimensionId);
 
-					partition.elements.forEach(pe => {
-						const childFilter = angular.copy(filter);
-						childFilter[partition.id] = [pe.id];
-						this._makeRowsRec(indicator, childFilter, indent + 1, rowId + '/' + partition.id + '=' + pe.id);
-					});
+					if (dimension) {
+						dimension.rows.forEach(row => {
+							const childFilter = Object.assign({}, filter);
+							for (let key in row.filter) {
+								if (childFilter[key])
+									childFilter[key] = row.filter[key].filter(e => childFilter[key].includes(e));
+								else
+									childFilter[key] = row.filter[key];
+							}
+
+							this._makeRowsRec(
+								indicator,
+								row.name,
+								row.isGroup,
+								childFilter,
+								indent + 1,
+								rowId + '/' + dimension.id + '=' + row.id
+							);
+						});
+					}
+					else {
+						this.splits[rowId] = null;
+					}
 				}
 			}
 		}
