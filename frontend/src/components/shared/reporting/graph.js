@@ -19,10 +19,13 @@ import angular from 'angular';
 import c3 from 'c3';
 import 'c3/c3.min.css';
 
+import exportSvg from './export-svg';
+
 
 const module = angular.module(
 	'monitool.components.shared.reporting.graph',
 	[
+		exportSvg.name
 	]
 );
 
@@ -34,12 +37,12 @@ module.component('reportingGraph', {
 		presentation: '<'
 	},
 
-	template: '<div style="overflow: hidden; text-align: center"></div>',
+	template: require('./graph.html'),
 
 	controller: class GraphController {
 
 		constructor($element) {
-			this.element = $element[0];
+			this.element = $element[0].querySelector('div');
 			this._formattedYs = [];
 		}
 
@@ -73,6 +76,12 @@ module.component('reportingGraph', {
 			if (changes.x || changes.ys) {
 				const formerData = this._formattedYs;
 				this._formattedYs = this._format(this.x, this.ys);
+
+				// Generate filename suggestion for the graph.
+				if (this._formattedYs.length > 1)
+					this.filename = 'graph - ' + Object.values(this.ys)[0].name
+				else
+					this.filename = null;
 
 				// Chart may not be initialized yet.
 				if (this.chart)

@@ -25,14 +25,16 @@ const module = angular.module(
 );
 
 module.component('exportSvg', {
-	bindings: {},
+	bindings: {
+		filename: '<'
+	},
 	template: require('./export-svg.html'),
 	controller: class ExportSvgController {
 
 		onClick() {
 			var sourceSVG = document.querySelector("svg");
 
-			this._saveSvgAsPng(sourceSVG, 'file.png', 1);
+			this._saveSvgAsPng(sourceSVG, this.filename + '.png' || 'file.png', 1);
 		}
 
 		_saveSvgAsPng(el, name, scaleFactor) {
