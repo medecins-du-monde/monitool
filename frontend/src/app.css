@@ -780,3 +780,15 @@ general-table .btn-group, general-table .btn-group .btn, table-indicator .btn-gr
 }
 
 
+.project-columns {
+}
+
+.project-menu {
+  position: fixed;
+  width: 200px;
+  top: 45px;
+}
+
+.project-content {
+  margin-left: 220px;
+}

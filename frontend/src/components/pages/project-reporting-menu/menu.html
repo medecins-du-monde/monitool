@@ -1,8 +1,7 @@
 
-<div class="row">
-	<div class="col-md-2 noprint">
+<div class="project-columns">
+	<div class="project-menu">
 		<div class="panel-group">
-
 			<div class="panel panel-default" acl-has-project-role="owner" acl-project="$ctrl.project">
 				<div class="panel-heading clickable" ui-sref="main.project.structure.home">
 					<i class="fa fa-caret-down pull-right"></i>
@@ -54,7 +53,7 @@
 		</div>
 	</div>
 
-	<div class="col-md-10 print-full-width">
+	<div class="project-content">
 		<ui-view project="$ctrl.project"></ui-view>
 	</div>
 </div>
