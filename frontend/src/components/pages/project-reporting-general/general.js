@@ -124,17 +124,21 @@ module.component('generalReporting', {
 			}
 
 			else if (this.groupBy === 'entity') {
-				this.columns = [
-					...this.project.entities.filter(e => this.filter.entity.includes(e.id)),
-					{id: '_total', name: 'Total'}
-				];
+				let entities = this.project.entities;
+				if (this.filter.entity)
+					entities = entities.filter(e => this.filter.entity.includes(e.id));
 
+				this.columns = [...entities, {id: '_total', name: 'Total'}];
 				this.graphType = 'bar';
 			}
 
 			else if (this.groupBy === 'group') {
-				// keep groups that contain at least on of the entities we are filtering on.
-				this.columns = this.project.groups.filter(g => g.members.some(e => this.filter.entity.includes(e)));
+				let groups = this.project.groups;
+				if (this.filter.entity)
+					groups = groups.filter(g => g.members.some(e => this.filter.entity.includes(e)));
+
+				// keep groups that contain at least one of the entities we are filtering on.
+				this.columns = groups;
 				this.graphType = 'bar';
 			}
 			else

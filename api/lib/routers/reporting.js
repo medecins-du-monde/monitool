@@ -91,9 +91,6 @@ router.post('/reporting/project/:prjId', async ctx => {
 					filter[timeDimension] = timeValues;
 			}
 
-			// FIXME this line should be useless => check
-			filter.entity = filter.entity.filter(id => dataSource.entities.includes(id));
-
 			return cube.query(
 				ctx.request.body.dimensionIds,
 				filter,

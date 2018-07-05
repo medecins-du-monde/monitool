@@ -89,7 +89,7 @@ module.directive('tbodyIndicators', () => {
 				const dimensionId = this.splits[rowId];
 				if (dimensionId) {
 					const dimensions = generateIndicatorDimensions(this.project, indicator.computation)
-						.filter(dim => !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => this.filter[d.id]));
+						.filter(dim => !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => this.filter[d]));
 
 					const dimension = dimensions.find(d => d.id === dimensionId);
 

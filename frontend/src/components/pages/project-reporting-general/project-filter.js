@@ -34,9 +34,12 @@ module.component('projectFilter', {
 		}
 
 		onFilterChange() {
-			this.onUpdate({filter: angular.copy(this.filter)});
-		}
+			const myFilter = angular.copy(this.filter);
+			if (myFilter.entity.length === this.project.entities.length)
+				delete myFilter.entity;
 
+			this.onUpdate({filter: myFilter});
+		}
 	}
 });
 
