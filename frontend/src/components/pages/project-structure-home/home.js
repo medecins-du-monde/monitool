@@ -18,13 +18,14 @@
 import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 
-import faOk from '../../shared/misc/check-times-icon';
+import progressBar from '../../shared/misc/progress-bar';
+
 
 const module = angular.module(
 	'monitool.components.pages.project.structure.home',
 	[
 		uiRouter, // for $stateProvider
-		faOk.name
+		progressBar.name
 	]
 );
 
@@ -51,6 +52,13 @@ module.component('projectStructureHome', {
 	controller: class ProjectStructureHomeController {
 
 		$onChanges(changes) {
+			this.basicsDone = this.project.name && this.project.country && this.project.themes.length ? 1 : 0;
+			this.sitesDone = this.project.entities.length ? 1 : 0;
+			this.referenceLfDone = this.project.logicalFrames.length > 0 ? 1 : 0;
+			this.otherLfDone = this.project.logicalFrames.length > 1 ? 1 : 0;
+			this.extraIndicatorsDone2 = this.project.extraIndicators.length ? 1 : 0;
+
+
 			const lfIndicators = this.project.logicalFrames.reduce((memo, lf) => [
 				...memo,
 				...lf.indicators,
@@ -68,16 +76,12 @@ module.component('projectStructureHome', {
 				], [])
 			], []);
 
-			this.lfIndicatorsDone = lfIndicators.filter(i => !!i.computation).length;
-			this.lfIndicatorsTotal = lfIndicators.length;
+			this.lfIndicatorsDone = lfIndicators.filter(i => !!i.computation).length / lfIndicators.length;
 
 			const ccIndicators = this.ccIndicators.filter(i => i.themes.some(t => this.project.themes.includes(t)));
+			this.ccIndicatorsDone = ccIndicators.filter(i => !!this.project.crossCutting[i._id]).length / ccIndicators.length;
 
-			this.ccIndicatorsDone = ccIndicators.filter(i => !!this.project.crossCutting[i._id]).length;
-			this.ccIndicatorsTotal = ccIndicators.length;
-
-			this.extraIndicatorsDone = this.project.extraIndicators.filter(i => !!i.computation).length;
-			this.extraIndicatorsTotal = this.project.extraIndicators.length;
+			this.extraIndicatorsDone = this.project.extraIndicators.filter(i => !!i.computation).length / this.project.extraIndicators.length;
 		}
 
 	}

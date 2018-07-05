@@ -8,82 +8,155 @@
 
 <legend translate="project.structure"></legend>
 
-<p>Le rôle de cette section est de formaliser votre projet. Elle doit être utilisé pendant les phases de programmation du projet.</p>
+<div class="row">
+	<div class="col-md-4">
+		<p>Le rôle de cette section est de formaliser votre projet. Elle doit être utilisé pendant les phases de programmation du projet.</p>
 
-<p>Les tâches que vous devez realiser sont les suivantes</p>
 
+<div class="alert alert-info">
+	<strong>Astuce:</strong>
+	<p>
+		En cas d'erreur, cliquez sur
+		<span class="btn btn-default btn-xs">
+			<i class="fa fa-undo"></i>
+			Annuler les modifications
+		</span>
+		pour revenir à la dernière version sauvegardée.<br/>
+	</p>
+	<p>
+		Si vous sauvegardez une erreur: rendez-vous dans sur la page
+		<a class="btn btn-default btn-xs" ui-sref="main.project.structure.history">
+			<i class="fa fa-history"></i>
+			<span translate="project.revisions"></span>
+		</a>
+		et restaurez une version antérieure du projet.
+	</p>
+</div>
+
+	</div>
+	<div class="col-md-8">
 
 <table class="table table-bordered table-striped">
 	<thead>
 		<tr>
-			<th>Tâche</th>
-			<th style="width: 20%">État</th>
+			<th style="width: 50%">Tâche</th>
+			<th>État</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
 			<td>
 				Remplissez les
-				<a ui-sref="main.project.structure.basics">informations de base</a>
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.basics">
+					<i class="fa fa-object-group"></i>
+					<span translate="project.basics"></span>
+				</a>
 				de votre projet (pays, nom, thématiques, ...).
 			</td>
-			<td><fa-ok value="$ctrl.project.name && $ctrl.project.country && $ctrl.project.themes.length"></fa-ok></td>
+			<td>
+				<progress-bar value="$ctrl.basicsDone"></progress-bar>
+			</td>
 		</tr>
 		<tr>
 			<td>
 				Renseignez les
-				<a ui-sref="main.project.structure.collection_site_list">differents sites</a>
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_site_list">
+					<i class="fa fa-map-marker"></i>
+					<span translate="project.collection_site_list"></span>
+				</a>
 				sur lesquels votre projet va travailler.
 			</td>
-			<td><fa-ok value="$ctrl.project.entities.length"></fa-ok></td>
+			<td>
+				<progress-bar value="$ctrl.sitesDone"></progress-bar>
+			</td>
 		</tr>
 		<tr>
 			<td>
-				Renseignez le
-				<a ui-sref="main.project.structure.logical_frame_list">cadre logique</a>
-				de référence de votre projet.
+				Renseignez le cadre logique de référence de votre projet dans
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list">
+					<i class="fa fa-sign-out"></i>
+					<span translate="shared.logical_frames"></span>
+				</a>
 			</td>
-			<td><fa-ok value="$ctrl.project.logicalFrames.length > 0"></fa-ok></td>
+			<td>
+				<progress-bar value="$ctrl.referenceLfDone"></progress-bar>
+			</td>
 		</tr>
 		<tr>
 			<td>
-				Si vous disposez de fonds institutionnels et que d'autres <a ui-sref="main.project.structure.logical_frame_list">cadres logiques</a> vont être utilisés sur le même projet, renseignez les également.
+				Si vous disposez de fonds institutionnels et que d'autres
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list">
+					<i class="fa fa-sign-out"></i>
+					<span translate="shared.logical_frames"></span>
+				</a>
+
+				vont être utilisés sur le même projet, renseignez les également.
 			</td>
-			<td><fa-ok value="$ctrl.project.logicalFrames.length > 1"></fa-ok></td>
+			<td>
+				<progress-bar value="$ctrl.otherLfDone"></progress-bar>
+			</td>
 		</tr>
 		<tr>
 			<td>
 				Si vous disposez d'autres indicateurs que vous désirez suivre en dehors de votre (vos) cadre(s) logique(s),
-				ajoutez les dans <a ui-sref="main.project.structure.extra">Indicateurs annexés</a>.
+				ajoutez les dans
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra">
+					<i class="fa fa-sign-out"></i>
+					<span translate="indicator.extra"></span>
+				</a>
 			</td>
-			<td><fa-ok value="$ctrl.project.extraIndicators.length > 0"></fa-ok></td>
+			<td>
+				<progress-bar value="$ctrl.extraIndicatorsDone2"></progress-bar>
+			</td>
 		</tr>
 		<tr>
 			<td>
-				Renseignez les <a ui-sref="main.project.structure.collection_form_list">sources de données</a> dont vous allez extraire les indicateurs de vos cadres logiques et
-				<a ui-sref="main.project.structure.logical_frame_list">remplissez leurs formules de calcul</a> à mesure de votre avancement.
+				Renseignez les
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_form_list">
+					<i class="fa fa-sign-in"></i>
+					<span translate="project.collection_form_list"></span>
+				</a>
+
+				dont vous allez extraire les données nécessaires au calculs des indicateurs vos cadres logiques.<br/>
+				À mesure de votre avancement, mettez à jour les formules de calcul de vos indicateurs dans
+
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list">
+					<i class="fa fa-sign-out"></i>
+					<span translate="shared.logical_frames"></span>
+				</a>
 			</td>
-			<td>{{$ctrl.lfIndicatorsDone}}&nbsp;/&nbsp;{{$ctrl.lfIndicatorsTotal}}</td>
+			<td>
+				<progress-bar value="$ctrl.lfIndicatorsDone"></progress-bar>
+			</td>
 		</tr>
 		<tr>
 			<td>
-				Réalisez la même tâche pour les <a ui-sref="main.project.structure.cross_cutting">indicateurs transversaux</a>.
+				Réalisez la même tâche pour les
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.cross_cutting">
+					<i class="fa fa-sign-out"></i>
+					<span translate="indicator.cross_cutting"></span>
+				</a>
 			</td>
-			<td>{{$ctrl.ccIndicatorsDone}}&nbsp;/&nbsp;{{$ctrl.ccIndicatorsTotal}}</td>
+			<td>
+				<progress-bar value="$ctrl.ccIndicatorsDone"></progress-bar>
+			</td>
 		</tr>
 		<tr>
 			<td>
-				Réalisez la même tâche pour les <a ui-sref="main.project.structure.extra">Indicateurs annexés</a>.
+				Réalisez la même tâche pour les
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra">
+					<i class="fa fa-sign-out"></i>
+					<span translate="indicator.extra"></span>
+				</a>
 			</td>
-			<td>{{$ctrl.extraIndicatorsDone}}&nbsp;/&nbsp;{{$ctrl.extraIndicatorsTotal}}</td>
+			<td>
+				<progress-bar value="$ctrl.extraIndicatorsDone"></progress-bar>
+			</td>
 		</tr>
 	</tbody>
 </table>
 
-<p>
-	Astuce: En cas d'erreur, cliquez sur "Annuler les modifications" pour revenir à la dernière version sauvegardée.<br/>
-	Si vous sauvegardez une erreur: rendez-vous dans sur la page
-	<a ui-sref="main.project.structure.history">historique</a>
-	et restaurez une version antérieure du projet.
-</p>
+	</div>
 
+
+</div>
