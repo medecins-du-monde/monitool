@@ -198,6 +198,7 @@ textarea {
 
 #reporting .row-title {
   width: 300px;
+  border-right-color: white;
 }
 
 #reporting .row-title div {
@@ -224,6 +225,7 @@ textarea {
 
 #reporting .row-dimension {
   width: 30px;
+  border-left-color: white;
 }
 
 
