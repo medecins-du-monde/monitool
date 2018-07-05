@@ -20,7 +20,7 @@ module.component('indicatorFilter', {
 
 	template: require('./indicator-filter.html'),
 
-	controller: class ProjectFilterController {
+	controller: class IndicatorFilterController {
 
 		$onInit() {
 			this.panelOpen = false;
