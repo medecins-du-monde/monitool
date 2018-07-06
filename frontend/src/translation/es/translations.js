@@ -173,6 +173,11 @@ export default {
 			logicalFrames_add: "Añade el marco lógico <code>{{item.name}}</code>",
 			logicalFrames_move: "Reordena los marcos lógicos",
 			logicalFrames_remove: "Elimina el marco lógico <code>{{item.name}}</code>",
+
+			logicalFrames_entities_add: "Añade el lugar <code>{{item.name}}</code> al marco lógico <code>{{logicalFrame.name}}</code>",
+			logicalFrames_entities_move: "Reordena los lugares del marco lógico <code>{{logicalFrame.name}}</code>",
+			logicalFrames_entities_remove: "Elimina el lugar <code>{{item.name}}</code> del marco lógico <code>{{logicalFrame.name}}</code>",
+
 			logicalFrames_name_replace: "Cambia el nombre del marco lógico <code>{{before}}</code> en <code>{{after}}</code>",
 			logicalFrames_goal_replace: "Cambia el objectivo general <code>{{before}}</code> en <code>{{after}}</code> en el marco lógico <code>{{logicalFrame.name}}</code>",
 			logicalFrames_start_replace: "Cambia el inicio <code>{{before}}</code> en <code>{{after}}</code> en el marco lógico <code>{{logicalFrame.name}}</code>",
@@ -500,6 +505,7 @@ export default {
 		output_assumptions_ph: '',
 		logframe_ph_name: "ej. ECHO",
 
+		logframe_help_sites: "Entre los lugares identificados en \"Lugares de colecta\", cuales son relevantes para este marco lógico?",
 		logframe_help_name: "Nombre este marco lógico para poder identificarlo facilment. Por ejemplo con el nombre del donante relevante",
 		logframe_help_goal: "Descripción de la contribución del proyecto a los objectivos (impacto) de una política o de un programa",
 		logframe_help_goal_indicators: "Entre los indicadores que permiten medir el objectivo general",

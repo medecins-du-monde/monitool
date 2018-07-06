@@ -173,6 +173,11 @@ export default {
 			logicalFrames_add: "Create logical framework <code>{{item.name}}</code>",
 			logicalFrames_move: "Reorder logical frameworks",
 			logicalFrames_remove: "Remove logical framework <code>{{item.name}}</code>",
+
+			logicalFrames_entities_add: "Add the site <code>{{item.name}}</code> to the logical framework <code>{{logicalFrame.name}}</code>",
+			logicalFrames_entities_move: "Reorder the sites of the logical framework <code>{{logicalFrame.name}}</code>",
+			logicalFrames_entities_remove: "Remove the site <code>{{item.name}}</code> from the logical framework <code>{{logicalFrame.name}}</code>",
+
 			logicalFrames_name_replace: "Rename logical framework <code>{{before}}</code> to <code>{{after}}</code>",
 			logicalFrames_goal_replace: "Change general objective <code>{{before}}</code> to <code>{{after}}</code> in logical framework <code>{{logicalFrame.name}}</code>",
 			logicalFrames_start_replace: "Change start date <code>{{before}}</code> to <code>{{after}}</code> in logical framework <code>{{logicalFrame.name}}</code>",
@@ -500,6 +505,7 @@ export default {
 		output_assumptions_ph: '',
 		logframe_ph_name: "e.g. ECHO",
 
+		logframe_help_sites: "Among sites identified in \"Collection sites\", which one are relevant for this logical framework?",
 		logframe_help_name: "Name this logical framework to be able to identify it easily. For instance, with the name of the relevant donor",
 		logframe_help_goal: "Describe the project\'s contribution on a program or policy",
 		logframe_help_goal_indicators: "Enter here the indicators that allow to measure the general objective",

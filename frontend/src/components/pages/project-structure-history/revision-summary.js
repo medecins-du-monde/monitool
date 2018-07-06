@@ -181,7 +181,7 @@ module.component('revisionSummary', {
 				if (editedField === 'users_dataSources')
 					translationData.item = before.forms.find(e => e.id === translationData.item);
 
-				if (editedField === 'groups_members' || editedField === 'forms_entities' || editedField === 'users_entities')
+				if (['groups_members', 'forms_entities', 'users_entities', 'logicalFrames_entities'].includes(editedField))
 					translationData.item = before.entities.find(e => e.id === translationData.item);
 
 				if (editedField === 'forms_elements_partitions_groups_members')

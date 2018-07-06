@@ -173,6 +173,11 @@ export default {
 			logicalFrames_add: "Ajoute le cadre logique <code>{{item.name}}</code>",
 			logicalFrames_move: "Reordonne les cadres logiques",
 			logicalFrames_remove: "Supprime le cadre logique <code>{{item.name}}</code>",
+
+			logicalFrames_entities_add: "Ajoute le lieu <code>{{item.name}}</code> au cadre logique <code>{{logicalFrame.name}}</code>",
+			logicalFrames_entities_move: "Reordonne les lieux du cadre logique <code>{{logicalFrame.name}}</code>",
+			logicalFrames_entities_remove: "Retire le lieu <code>{{item.name}}</code> du cadre logique <code>{{logicalFrame.name}}</code>",
+
 			logicalFrames_name_replace: "Renomme le cadre logique <code>{{before}}</code> en <code>{{after}}</code>",
 			logicalFrames_goal_replace: "Change l'objectif général <code>{{before}}</code> en <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
 			logicalFrames_start_replace: "Change la date de début <code>{{before}}</code> en <code>{{after}}</code> dans le cadre logique <code>{{logicalFrame.name}}</code>",
@@ -501,6 +506,7 @@ export default {
 		output_assumptions_ph: '',
 		logframe_ph_name: "ex: ECHO",
 
+		logframe_help_sites: "Parmi les structures identifiées dans \"Lieux de collecte\", lesquelles considérer pour ce cadre logique?",
 		logframe_help_name: "Nommez ce cadre logique de façon à l'identifier facilement. Par exemple avec le nom du bailleur auquel il est destiné",
 		logframe_help_goal: "Description de la contribution du projet aux objectifs (impact) d\'une politique ou d\'un programme",
 		logframe_help_goal_indicators: "Rentrez ici les indicateurs permettant de mesurer l'objectif géneral",
