@@ -61,21 +61,24 @@ module.directive('tbodyIndicators', () => {
 				// Make the rows.
 				this.rows = [];
 				this.sections.forEach(section => {
-					if (section.name)
-						this.rows.push({id: uuid(), type: 'header', name: section.name, indent: section.indent});
-
-					if (section.indicators.length)
-						section.indicators.forEach(indicator => {
-							this._makeRowsRec(indicator, indicator.display, false, this.filter, section.indent, indicator.id)
-						});
-					// else
-					// 	this.rows.push({id: uuid(), type: 'no_indicators', indent: section.indent});
+					this.rows.push(...this._makeSectionRows(section, this.filter))
 				});
 			}
 
-			_makeRowsRec(indicator, name, isGroup, filter, indent, rowId) {
+			*_makeSectionRows(section, filter) {
+				if (section.name)
+					yield {id: uuid(), type: 'header', name: section.name, indent: section.indent};
+
+				// if (section.indicators.length)
+				for (let indicator of section.indicators)
+					yield* this._makeSectionRowsRec(indicator, indicator.display, false, filter, section.indent, indicator.id)
+				// else
+				// 	yield {id: uuid(), type: 'no_indicators', indent: section.indent};
+			}
+
+			*_makeSectionRowsRec(indicator, name, isGroup, filter, indent, rowId) {
 				// Add the row to the table
-				this.rows.push({
+				yield {
 					id: rowId,
 					type: 'indicator',
 					name: name,
@@ -83,39 +86,46 @@ module.directive('tbodyIndicators', () => {
 					indicator: indicator,
 					filter: filter,
 					indent: indent
+				};
+
+				// Stop here is there is no disagregation open.
+				const dimensionId = this.splits[rowId];
+				if (!dimensionId)
+					return;
+
+				// Get the dimension we want to split on.
+				const dimensions = generateIndicatorDimensions(this.project, indicator).filter(dim => {
+					return !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => filter[d]);
 				});
 
-				// Recurse to append opened disagregations
-				const dimensionId = this.splits[rowId];
-				if (dimensionId) {
-					const dimensions = generateIndicatorDimensions(this.project, indicator.computation)
-						.filter(dim => !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => this.filter[d]));
+				const dimension = dimensions.find(d => d.id === dimensionId);
 
-					const dimension = dimensions.find(d => d.id === dimensionId);
+				// Stop here if we did not find it: we're folding this part of the tree.
+				if (!dimension) {
+					this.splits[rowId] = null;
+					return;
+				}
 
-					if (dimension) {
-						dimension.rows.forEach(row => {
-							const childFilter = Object.assign({}, filter);
-							for (let key in row.filter) {
-								if (childFilter[key])
-									childFilter[key] = row.filter[key].filter(e => childFilter[key].includes(e));
-								else
-									childFilter[key] = row.filter[key];
-							}
-
-							this._makeRowsRec(
-								indicator,
-								row.name,
-								row.isGroup,
-								childFilter,
-								indent + 1,
-								rowId + '/' + dimension.id + '=' + row.id
-							);
-						});
+				// Recurse on the dimension rows to create the new lines.
+				for (let row of dimension.rows) {
+					// Merge our filter with the global one.
+					const childFilter = Object.assign({}, filter);
+					for (let key in row.filter) {
+						if (childFilter[key])
+							childFilter[key] = row.filter[key].filter(e => childFilter[key].includes(e));
+						else
+							childFilter[key] = row.filter[key];
 					}
-					else {
-						this.splits[rowId] = null;
-					}
+
+					// Recurse
+					yield* this._makeSectionRowsRec(
+						row.indicator,
+						row.name,
+						row.isGroup,
+						childFilter,
+						indent + 1,
+						rowId + '/' + dimension.id + '=' + row.id
+					);
 				}
 			}
 		}

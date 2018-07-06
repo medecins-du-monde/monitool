@@ -9,8 +9,8 @@ const TIME_PERIODICITIES = [
 ];
 
 
-function* _generatePeriods(project, computation) {
-	const parameters = Object.values(computation.parameters);
+function* _generatePeriods(project, indicator) {
+	const parameters = Object.values(indicator.computation.parameters);
 	const dataSources = project.forms.filter(ds => {
 		return parameters.some(param => ds.elements.some(v => v.id === param.elementId));
 	});
@@ -54,6 +54,7 @@ function* _generatePeriods(project, computation) {
 					id: slot.value,
 					name: slot.value,
 					isGroup: periodicity !== periodicities[0],
+					indicator: indicator,
 					filter: {
 						[periodicity]: [slot.value] // FIXME would be better to use the native periodicity of the data source.
 					}
@@ -71,8 +72,8 @@ function* _generatePeriods(project, computation) {
 
 
 // intersection of sites that are in this computation
-function* _generateSites(project, computation) {
-	const parameters = Object.values(computation.parameters);
+function* _generateSites(project, indicator) {
+	const parameters = Object.values(indicator.computation.parameters);
 	const dataSources = project.forms.filter(ds => {
 		return parameters.some(param => ds.elements.some(variable => variable.id === param.elementId));
 	});
@@ -87,6 +88,7 @@ function* _generateSites(project, computation) {
 			id: site.id,
 			name: site.name,
 			isGroup: false,
+			indicator: indicator,
 			filter: {
 				entity: [site.id].filter(siteId => siteIds.includes(siteId))
 			}
@@ -98,6 +100,7 @@ function* _generateSites(project, computation) {
 			id: group.id,
 			name: group.name,
 			isGroup: true,
+			indicator: indicator,
 			filter: {
 				entity: group.members.filter(siteId => siteIds.includes(siteId))
 			}
@@ -113,10 +116,10 @@ function* _generateSites(project, computation) {
 }
 
 
-function* _generatePartitions(project, computation) {
+function* _generatePartitions(project, indicator) {
 	// Get all variables and computations parameters in arrays.
 	const variables = project.forms.reduce((m, e) => m.concat(e.elements), []);
-	const parameters = Object.values(computation.parameters);
+	const parameters = Object.values(indicator.computation.parameters);
 
 	// Get partitions which are available in all variables used for the computation (<=> intersect parameters)
 	let commonPartitions = parameters.reduce((memo, param) => {
@@ -139,6 +142,7 @@ function* _generatePartitions(project, computation) {
 				id: element.id,
 				name: element.name,
 				isGroup: false,
+				indicator: indicator,
 				filter: {[partition.id]: [element.id]}
 			};
 		});
@@ -148,6 +152,7 @@ function* _generatePartitions(project, computation) {
 				id: group.id,
 				name: group.name,
 				isGroup: true,
+				indicator: indicator,
 				filter: {[partition.id]: group.members}
 			};
 		});
@@ -161,15 +166,48 @@ function* _generatePartitions(project, computation) {
 	}
 }
 
+function* _generateParameters(project, indicator) {
+	const variables = project.forms.reduce((memo, ds) => [...memo, ...ds.elements], []);
 
-export function generateIndicatorDimensions(project, computation) {
-	if (!computation)
+	const rows = [];
+	for (let paramId in indicator.computation.parameters) {
+		const param = indicator.computation.parameters[paramId];
+		const variable = variables.find(v => v.id == param.elementId);
+
+		rows.push({
+			id: paramId,
+			name: paramId + ' (' + variable.name + ')',
+			isGroup: false,
+			indicator: {
+				id: paramId,
+				display: variable.name,
+				computation: {formula: paramId, parameters: {[paramId]: param}},
+				colorization: false,
+				baseline: null,
+				target: null,
+			},
+			filter: indicator.computation.filter
+		});
+	}
+
+	if (rows.length > 1)
+		yield {
+			id: 'computation',
+			name: 'project.computation',
+			exclude: [],
+			rows: rows
+		}
+}
+
+export function generateIndicatorDimensions(project, indicator) {
+	if (!indicator.computation)
 		return [];
 
 	return [
-		..._generatePeriods(project, computation),
-		..._generateSites(project, computation),
-		..._generatePartitions(project, computation)
+		..._generateParameters(project, indicator),
+		..._generatePeriods(project, indicator),
+		..._generateSites(project, indicator),
+		..._generatePartitions(project, indicator),
 	].filter(dim => dim.rows.length !== 0);
 }
 

@@ -55,7 +55,7 @@ module.directive('trIndicator', () => {
 
 				if (redraw && !this._refreshWaiting) {
 					this.availableDimensions =
-						generateIndicatorDimensions(this.project, this.indicator.computation)
+						generateIndicatorDimensions(this.project, this.indicator)
 						.filter(dim => !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => this.filter[d]));
 
 					this.values = null;
