@@ -78,34 +78,59 @@ function* _generateSites(project, indicator) {
 		return parameters.some(param => ds.elements.some(variable => variable.id === param.elementId));
 	});
 
-	// Intersect sites used by data sources that are used to compute this variable.
-	const siteIds = dataSources.reduce((siteIds, ds) => {
-		return siteIds ? siteIds.filter(siteId => ds.entities.includes(siteId)) : ds.entities;
-	}, null) || [];
+	// // Intersect sites used by data sources that are used to compute this variable.
+	// const siteIds = dataSources.reduce((siteIds, ds) => {
+	// 	return siteIds ? siteIds.filter(siteId => ds.entities.includes(siteId)) : ds.entities;
+	// }, null) || [];
 
-	const siteRows = project.entities.map(site => {
-		return {
-			id: site.id,
-			name: site.name,
-			isGroup: false,
-			indicator: indicator,
-			filter: {
-				entity: [site.id].filter(siteId => siteIds.includes(siteId))
+	const siteRows = project.entities
+		// We have an
+		// - Indicator defined by 100 * a / b
+		// - 3 sites: Paris, Madrid and London
+		// - a is collected only for paris and madrid
+		// - b is collected only for madrid and london
+		//
+		// => We can't compute the indicator for paris and london, but we can for madrid.
+		// => The condition for a site to have a subrow is that it must be present in ALL the parameters origin data source.
+		.filter(site => {
+			return dataSources.every(ds => ds.entities.includes(site.id));
+		})
+		.map(site => {
+			return {
+				id: site.id,
+				name: site.name,
+				isGroup: false,
+				indicator: indicator,
+				filter: {
+					entity: [site.id]
+				}
 			}
-		}
-	}).filter(row => row.filter.entity.length > 0);
+		});
 
-	const groupRows = project.groups.map(group => {
-		return {
-			id: group.id,
-			name: group.name,
-			isGroup: true,
-			indicator: indicator,
-			filter: {
-				entity: group.members.filter(siteId => siteIds.includes(siteId))
+	const groupRows = project.groups
+		// The case for groups is a bit more complicated.
+		// Same situation as before, our groups are "Continental" with Paris and Madrid, and Islanders with london.
+		//
+		// => For continental, the indicator value will be 100 * (Aparis + Amadrid) / Bmadrid
+		// => For islanders, the indicator would be 100 * (?) / Blondon => it must be excluded as there is no value for A
+		//
+		// The condition for a group to be included is that for all parameters, the group must provide a value.
+		// Which means, for all parameters, there must be an intersection between the group members and the data source providing the param.
+		.filter(group => {
+			// <=> for all dataSource, ds.entities intersection with group.members is non empty
+			return dataSources.every(ds => ds.entities.some(siteId => group.members.includes(siteId)));
+		})
+		.map(group => {
+			return {
+				id: group.id,
+				name: group.name,
+				isGroup: true,
+				indicator: indicator,
+				filter: {
+					entity: group.members // we could intersect this with the union of param's siteIds.
+				}
 			}
-		}
-	}).filter(row => row.filter.entity.length > 0);
+		});
 
 	yield {
 		id: 'entity',
