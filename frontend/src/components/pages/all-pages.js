@@ -47,7 +47,6 @@ import inputList from './project-input-list/input-list';
 import inputEdition from './project-input-edition/input-edition';
 
 import general from './project-reporting-general/general';
-import detailed from './project-reporting-detailed/detailed';
 import olap from './project-reporting-olap/olap';
 
 
@@ -72,7 +71,6 @@ export default angular.module(
 		inputList.name,
 		olap.name,
 		general.name,
-		detailed.name,
 		prjCcIndicatorList.name,
 		sites.name,
 		history.name,
