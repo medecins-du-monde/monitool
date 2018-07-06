@@ -366,7 +366,7 @@ export default {
 		reporting_compare_sites: "Comparar lugares",
 		unnamed_logframe: "Marco lógico sin nombre",
 
-		edit_indicator: "Editar usuario",
+		edit_indicator: "Editar indicador",
 		display: "Nombre",
 		display_ph: "ej: Tasa de consultaciones prenatales en las estructuras de salud",
 		computation: "Cálculo",
