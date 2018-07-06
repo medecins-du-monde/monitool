@@ -36,15 +36,7 @@ const defaultPlanning = {
 	colorize: true,
 	baseline: null,
 	target: null,
-	computation: {
-		formula: "copied_value",
-		parameters: {
-			copied_value: {
-				elementId: null,
-				filter: {}
-			}
-		}
-	}
+	computation: null
 };
 
 
