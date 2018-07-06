@@ -10,153 +10,162 @@
 
 <div class="row">
 	<div class="col-md-4">
-		<p>Le rôle de cette section est de formaliser votre projet. Elle doit être utilisé pendant les phases de programmation du projet.</p>
+		<p>
+			Cette section va vous aider à formaliser votre projet.
+			Elle doit être utilisé pendant la phase de programmation du projet.
+		</p>
+		<ul>
+			<li>Documentez les objectifs et résultats attendus par votre projet</li>
+			<li>Documentez les activités que vous mettrez en oeuvre pour les atteindre</li>
+			<li>Listez les indicateurs qui mesureront l'atteinte de vos résultats, ainsi que le suivi de vos activités</li>
+			<li>
+				Listez vos outils de collecte de donnée (Kobo, Excel, papier, ...)
+				ainsi que d'autres sources de données (SNIS, ...) que vous
+				utiliserez pour calculer vos indicateurs, en renseignant leur periodicité et sites de collecte et leur contenu
+			</li>
+		</ul>
 
-
-<div class="alert alert-info">
-	<strong>Astuce:</strong>
-	<p>
-		En cas d'erreur, cliquez sur
-		<span class="btn btn-default btn-xs">
-			<i class="fa fa-undo"></i>
-			Annuler les modifications
-		</span>
-		pour revenir à la dernière version sauvegardée.<br/>
-	</p>
-	<p>
-		Si vous sauvegardez une erreur: rendez-vous dans sur la page
-		<a class="btn btn-default btn-xs" ui-sref="main.project.structure.history">
-			<i class="fa fa-history"></i>
-			<span translate="project.revisions"></span>
-		</a>
-		et restaurez une version antérieure du projet.
-	</p>
-</div>
+		<div class="alert alert-info">
+			<strong>Astuce:</strong>
+			<p>
+				En cas d'erreur, cliquez sur
+				<span class="btn btn-default btn-xs">
+					<i class="fa fa-undo"></i>
+					Annuler les modifications
+				</span>
+				pour revenir à la dernière version sauvegardée.<br/>
+			</p>
+			<p>
+				Si vous sauvegardez une erreur: rendez-vous dans sur la page
+				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.history" disable-if="!$ctrl.project._rev">
+					<i class="fa fa-history"></i>
+					<span translate="project.revisions"></span>
+				</a>
+				et restaurez une version antérieure du projet.
+			</p>
+		</div>
 
 	</div>
 	<div class="col-md-8">
 
-<table class="table table-bordered table-striped">
-	<thead>
-		<tr>
-			<th style="width: 50%">Tâche</th>
-			<th>État</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>
-				Remplissez les
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.basics">
-					<i class="fa fa-object-group"></i>
-					<span translate="project.basics"></span>
-				</a>
-				de votre projet (pays, nom, thématiques, ...).
-			</td>
-			<td>
-				<progress-bar value="$ctrl.basicsDone"></progress-bar>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Renseignez les
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_site_list">
-					<i class="fa fa-map-marker"></i>
-					<span translate="project.collection_site_list"></span>
-				</a>
-				sur lesquels votre projet va travailler.
-			</td>
-			<td>
-				<progress-bar value="$ctrl.sitesDone"></progress-bar>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Renseignez le cadre logique de référence de votre projet dans
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list">
-					<i class="fa fa-sign-out"></i>
-					<span translate="shared.logical_frames"></span>
-				</a>
-			</td>
-			<td>
-				<progress-bar value="$ctrl.referenceLfDone"></progress-bar>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Si vous disposez de fonds institutionnels et que d'autres
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list">
-					<i class="fa fa-sign-out"></i>
-					<span translate="shared.logical_frames"></span>
-				</a>
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th style="width: 50%">Tâche</th>
+					<th>État</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						Remplissez les
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.basics">
+							<i class="fa fa-object-group"></i>
+							<span translate="project.basics"></span>
+						</a>
+						de votre projet (pays, nom, thématiques, ...).
+					</td>
+					<td>
+						<progress-bar value="$ctrl.basicsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Renseignez les
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_site_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-map-marker"></i>
+							<span translate="project.collection_site_list"></span>
+						</a>
+						sur lesquels votre projet va travailler.
+					</td>
+					<td>
+						<progress-bar value="$ctrl.sitesDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Renseignez le cadre logique de référence de votre projet dans
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar value="$ctrl.referenceLfDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Si vous disposez de fonds institutionnels et que d'autres
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
 
-				vont être utilisés sur le même projet, renseignez les également.
-			</td>
-			<td>
-				<progress-bar value="$ctrl.otherLfDone"></progress-bar>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Si vous disposez d'autres indicateurs que vous désirez suivre en dehors de votre (vos) cadre(s) logique(s),
-				ajoutez les dans
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra">
-					<i class="fa fa-sign-out"></i>
-					<span translate="indicator.extra"></span>
-				</a>
-			</td>
-			<td>
-				<progress-bar value="$ctrl.extraIndicatorsDone2"></progress-bar>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Renseignez les
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_form_list">
-					<i class="fa fa-sign-in"></i>
-					<span translate="project.collection_form_list"></span>
-				</a>
+						vont être utilisés sur le même projet, renseignez les également.
+					</td>
+					<td>
+						<progress-bar value="$ctrl.otherLfDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Si vous disposez d'autres indicateurs que vous désirez suivre en dehors de votre (vos) cadre(s) logique(s),
+						ajoutez les dans
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.extra"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar value="$ctrl.extraIndicatorsDone2"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Renseignez les
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_form_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-in"></i>
+							<span translate="project.collection_form_list"></span>
+						</a>
 
-				dont vous allez extraire les données nécessaires au calculs des indicateurs vos cadres logiques.<br/>
-				À mesure de votre avancement, mettez à jour les formules de calcul de vos indicateurs dans
+						dont vous allez extraire les données nécessaires au calculs des indicateurs vos cadres logiques.<br/>
+						À mesure de votre avancement, mettez à jour les formules de calcul de vos indicateurs dans
 
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list">
-					<i class="fa fa-sign-out"></i>
-					<span translate="shared.logical_frames"></span>
-				</a>
-			</td>
-			<td>
-				<progress-bar value="$ctrl.lfIndicatorsDone"></progress-bar>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Réalisez la même tâche pour les
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.cross_cutting">
-					<i class="fa fa-sign-out"></i>
-					<span translate="indicator.cross_cutting"></span>
-				</a>
-			</td>
-			<td>
-				<progress-bar value="$ctrl.ccIndicatorsDone"></progress-bar>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Réalisez la même tâche pour les
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra">
-					<i class="fa fa-sign-out"></i>
-					<span translate="indicator.extra"></span>
-				</a>
-			</td>
-			<td>
-				<progress-bar value="$ctrl.extraIndicatorsDone"></progress-bar>
-			</td>
-		</tr>
-	</tbody>
-</table>
-
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar value="$ctrl.lfIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Réalisez la même tâche pour les
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.cross_cutting" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.cross_cutting"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar value="$ctrl.ccIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Réalisez la même tâche pour les
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.extra"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar value="$ctrl.extraIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
-
-
 </div>
