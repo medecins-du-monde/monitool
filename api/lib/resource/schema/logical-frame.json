@@ -4,13 +4,18 @@
 
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["id", "name", "goal", "start", "end", "indicators", "purposes"],
+	"required": ["id", "name", "goal", "entities", "start", "end", "indicators", "purposes"],
 	"properties": {
 		"id": {
 			"$ref": "#/definitions/uuid"
 		},
 		"name": { "type": "string" },
 		"goal": { "type": "string" },
+
+		"entities": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/uuid" }
+		},
 		"start": {
 			"oneOf": [
 				{"type": "null"},

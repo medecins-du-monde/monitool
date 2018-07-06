@@ -36,6 +36,20 @@
 		</form-group>
 		<!-- [/Name] -->
 
+		<!-- [collection sites] -->
+		<form-group
+			input-id="collect-input"
+			label="project.collection_site_list"
+			help="project.logframe_help_sites">
+
+			<element-filter
+				ng-model="$ctrl.editableLogFrame.entities"
+				ng-change="$ctrl.onFieldChange()"
+				elements="$ctrl.project.entities"
+				groups="$ctrl.project.groups"></element-filter>
+
+		</form-group>
+
 		<!-- [Specific dates] -->
 		<form-group
 			input-id="logframe-startdate-input"

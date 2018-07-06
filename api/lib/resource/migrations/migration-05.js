@@ -90,10 +90,11 @@ const updateProject = project => {
 	project.logicalFrames.forEach((logframe, index) => {
 		logframe.id = '00000000-0000-0000-0000-' + index.toString().padStart(12, '0');
 
-		// Add start and end date
+		// Add start and end date + entities
 		logframe.start = logframe.end = null;
+		logframe.entities = project.entities.map(e => e.id);
 
-		// Add activities to logical frameworks
+		// Add activities
 		logframe.purposes.forEach(purpose => {
 			purpose.outputs.forEach(output => {
 				output.activities = [];
