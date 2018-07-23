@@ -245,7 +245,7 @@ export default {
 		show_more_inputs: "See older dates",
 		all_elements: "All",
 		no_extra_indicators: "No extra indicator has been created yet. Click on \"Add indicator\" to create one!",
-		no_data_source: "<span style=\"font-style: italic\">Create data sources to allow for data input</span>",
+		no_data_source: "<span style=\"font-style: italic\">Create data sources to allow data entry</span>",
 		general_info: "General information",
 		collected_by: "Information collected by",
 		reporting_empty: "No indicators were added to this section.",
