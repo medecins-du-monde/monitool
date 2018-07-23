@@ -30,10 +30,6 @@ const router = new Router();
 function mergeRec(fn, ...parameters) {
 	if (['number', 'string', 'undefined'].includes(typeof parameters[0])) {
 		const result = fn(...parameters);
-
-		if (Number.isNaN(result))
-			console.log(fn.toString(), parameters)
-
 		return Number.isNaN(result) ? 'Invalid computation' : result;
 	}
 
@@ -100,6 +96,7 @@ router.post('/reporting/project/:prjId', async ctx => {
 		})
 	);
 
+	// FIXME code injection...
 	const fn = new Function(
 		...Object.keys(computation.parameters),
 		'return ' + computation.formula
