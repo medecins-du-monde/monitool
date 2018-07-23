@@ -160,7 +160,9 @@ export default class Project {
 		// try to retrive the symbols from the formula.
 		var symbols = null;
 		try {
-			symbols = exprEval.Parser.parse(indicator.computation.formula).variables();
+			const parser = new exprEval.Parser();
+			parser.consts = {};
+   			symbols = parser.parse(indicator.computation.formula).variables();
 		}
 		catch (e) {
 			// if we fail to retrieve symbols => computation is invalid.

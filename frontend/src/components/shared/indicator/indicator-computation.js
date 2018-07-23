@@ -45,6 +45,11 @@ module.component('indicatorComputation', {
 
 	controller: class IndicatorComputationController {
 
+		constructor() {
+			this.parser = new exprEval.Parser();
+			this.parser.consts = {};
+		}
+
 		$onInit() {
 			this.ngModelCtrl.$parsers.push(this._viewToModel.bind(this));
 			this.ngModelCtrl.$formatters.push(this._modelToView.bind(this));
@@ -53,7 +58,7 @@ module.component('indicatorComputation', {
 				this.computation = this.ngModelCtrl.$viewValue;
 
 				try {
-					this.symbols = exprEval.Parser.parse(this.computation.formula).variables();
+					this.symbols = this.parser.parse(this.computation.formula).variables();
 				}
 				catch (e) {
 					this.symbols = [];
@@ -94,8 +99,12 @@ module.component('indicatorComputation', {
 		onFormulaChange() {
 			// Create and remove items in computation.parameters hash, when the formula changes.
 			var newSymbols, oldSymbols = Object.keys(this.computation.parameters);
-			try { newSymbols = exprEval.Parser.parse(this.computation.formula).variables(); }
-			catch (e) { newSymbols = []; }
+			try {
+				newSymbols = this.parser.parse(this.computation.formula).variables();
+			}
+			catch (e) {
+				newSymbols = [];
+			}
 
 			if (!angular.equals(newSymbols, oldSymbols)) {
 				var addedSymbols = newSymbols.filter(s => !oldSymbols.includes(s));
