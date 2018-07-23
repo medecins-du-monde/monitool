@@ -4,7 +4,7 @@ import database from '../database';
  * this migration add the missing "dataSources" field on all users.
  */
 export default async () => {
-	const result = database.callView('by_type', {include_docs: true, key: 'project'});
+	const result = await database.callView('by_type', {include_docs: true, key: 'project'});
 	const documents = [];
 
 	result.rows.forEach(row => {
