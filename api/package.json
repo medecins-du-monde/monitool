@@ -23,6 +23,7 @@
     "nodemon": "x"
   },
   "dependencies": {
+    "expr-eval": "^1.2.1",
     "fast-json-patch": "^2.0.6",
     "is-my-json-valid": "x",
     "koa": "^2.5.1",

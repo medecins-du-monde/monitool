@@ -18,6 +18,7 @@
 import Router from 'koa-router';
 import cache from 'memory-cache';
 import TimeSlot, {timeSlotRange} from 'timeslot-dag';
+import exprEval from 'expr-eval';
 
 import Project from '../resource/model/project';
 import Input from '../resource/model/input';
@@ -27,21 +28,31 @@ import Cube from '../olap/cube';
 const router = new Router();
 
 
-function mergeRec(fn, ...parameters) {
-	if (['number', 'string', 'undefined'].includes(typeof parameters[0])) {
-		const result = fn(...parameters);
-		return Number.isNaN(result) ? 'Invalid computation' : result;
+function mergeRec(depth, expr, parameters, trees) {
+	if (depth === 0) {
+		const paramMap = {};
+		parameters.forEach((key, index) => paramMap[key] = trees[index]);
+
+		try {
+			const result = expr.evaluate(paramMap);
+			if (typeof result !== 'number' || Number.isNaN(result))
+				throw new Error();
+			return result;
+		}
+		catch (e) {
+			return 'Invalid computation'
+		}
 	}
 
 	const keys = new Set(
-		parameters
-			.map(p => Object.keys(p))
+		trees
+			.map(p => p ? Object.keys(p) : [])
 			.reduce((memo, keys) => [...memo, ...keys], [])
 	);
 
 	const result = {};
 	for (let key of keys)
-		result[key] = mergeRec(fn, ...parameters.map(p => p[key]));
+		result[key] = mergeRec(depth - 1, expr, parameters, trees.map(p => p[key]));
 
 	return result;
 }
@@ -96,13 +107,16 @@ router.post('/reporting/project/:prjId', async ctx => {
 		})
 	);
 
-	// FIXME code injection...
-	const fn = new Function(
-		...Object.keys(computation.parameters),
-		'return ' + computation.formula
-	);
+	const parser = new exprEval.Parser();
+	parser.consts = {};
 
-	ctx.response.body = mergeRec(fn, ...subQueries);
+	const expr = parser.parse(computation.formula);
+	ctx.response.body = mergeRec(
+		ctx.request.body.dimensionIds.length,
+		expr,
+		Object.keys(computation.parameters),
+		subQueries
+	);
 });
 
 export default router;
