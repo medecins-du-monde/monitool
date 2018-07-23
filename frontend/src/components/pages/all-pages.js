@@ -25,8 +25,8 @@ import themeList from './admin-theme/theme-list';
 
 import home from './home/home';
 
-import repIndicatorList from './cc-indicators/cc-indicator-list';
-import ccIndicatorReporting from './cc-indicators/cc-indicator-reporting';
+import repIndicatorList from './cc-indicator-list/cc-indicator-list';
+import ccIndicatorReporting from './cc-indicator-reporting/cc-indicator-reporting';
 
 import projectMenu from './project-menu/menu';
 import projectList from './project-list/list';

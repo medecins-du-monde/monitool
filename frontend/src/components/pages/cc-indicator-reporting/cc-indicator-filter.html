@@ -1,0 +1,31 @@
+
+<div class="panel panel-default">
+	<div class="panel-heading" ng-click="$ctrl.panelOpen=!$ctrl.panelOpen" style="cursor: pointer" ng-init="$ctrl.panelOpen=false">
+		<fa-open value="$ctrl.panelOpen"></fa-open>
+		<span translate="project.filters"></span>
+	</div>
+	<div class="panel-body" ng-if="$ctrl.panelOpen">
+		<form class="form-horizontal noprint" role="form" novalidate>
+
+			<form-group input-id="start-date" label="shared.start">
+				<div class="input-group">
+					<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+					<utc-datepicker
+						input-id="start-date"
+						ng-model="$ctrl.filter._start"
+						ng-change="$ctrl.onFilterChange()"></utc-datepicker>
+				</div>
+			</form-group>
+
+			<form-group input-id="end-date" label="shared.end">
+				<div class="input-group">
+					<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+					<utc-datepicker
+						input-id="end-date"
+						ng-model="$ctrl.filter._end"
+						ng-change="$ctrl.onFilterChange()"></utc-datepicker>
+				</div>
+			</form-group>
+		</form>
+	</div>
+</div>

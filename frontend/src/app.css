@@ -727,7 +727,14 @@ td.empty > span {
     border-top-width: 1px;
   }
 
-  indicator-group-by, project-group-by, select-indicator, indicator-filter .panel, olap-dimensions .panel {
+  cc-indicator-group-by,
+  indicator-group-by,
+  project-group-by,
+  select-indicator,
+  indicator-filter .panel,
+  olap-dimensions .panel
+
+  {
     display: block;
     margin-bottom: 5px;
   }

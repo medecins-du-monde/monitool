@@ -1,0 +1,11 @@
+<ol class="breadcrumb">
+	<li><a ui-sref="main.indicators" translate="indicator.cross_cutting"></a></li>
+	<li class="active">{{$ctrl.ccIndicator.name[$root.language]}}</li>
+</ol>
+
+<cc-indicator-group-by
+	projects="$ctrl.projects"
+	on-update="$ctrl.onGroupByUpdate(groupBy)"></cc-indicator-group-by>
+
+<cc-indicator-filter
+	on-update="$ctrl.onFilterUpdate(filter)"></cc-indicator-filter>
