@@ -84,8 +84,7 @@ module.component('projectSites', {
 		}
 
 		onCreateEntityClicked() {
-			this.editableProject.entities.push(this.editableProject.entities.shift())
-			// this.editableProject.entities.push({id: uuid(), name: '', start: null, end: null});
+			this.editableProject.entities.push({id: uuid(), name: '', start: null, end: null});
 			this.onFieldChange();
 		}
 
