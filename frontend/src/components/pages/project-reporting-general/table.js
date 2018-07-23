@@ -16,10 +16,10 @@ module.component('generalTable', {
 	bindings: {
 		project: '<',
 		themes: '<',
+		ccIndicators: '<',
 
 		filter: '<',
 		groupBy: '<',
-		ccIndicators: '<',
 		columns: '<',
 
 		onPlotToggle: '&'
