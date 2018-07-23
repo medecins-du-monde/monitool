@@ -127,14 +127,14 @@
 			</div>
 
 			<div class="panel panel-default" acl-has-project-role="input" acl-project="$ctrl.project">
-				<div class="panel-heading clickable" ui-sref="main.project.input.home">
+				<div class="panel-heading clickable" ui-sref="main.project.input.home" disable-if="!$ctrl.project._rev">
 					<i class="fa fa-caret-down pull-right"></i>
 					<h4 class="panel-title" translate="project.input"></h4>
 				</div>
 			</div>
 
 			<div class="panel panel-default">
-				<div class="panel-heading clickable" ui-sref="main.project.reporting.home">
+				<div class="panel-heading clickable" ui-sref="main.project.reporting.home" disable-if="!$ctrl.project._rev">
 					<i class="fa fa-caret-down pull-right"></i>
 					<h4 class="panel-title" translate="shared.reporting"></h4>
 				</div>

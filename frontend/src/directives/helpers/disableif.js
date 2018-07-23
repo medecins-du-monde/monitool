@@ -43,10 +43,20 @@ module.directive('disableIf', function() {
 				if (disable) {
 					element.addClass('disabled')
 					element.on('click', inhibitHandler);
+
+					if (element.hasClass('clickable')) {
+						element.removeClass('clickable');
+						element.addClass('nonclickable');
+					}
 				}
 				else {
 					element.removeClass('disabled')
 					element.off('click', inhibitHandler);
+
+					if (element.hasClass('nonclickable')) {
+						element.addClass('clickable');
+						element.removeClass('nonclickable');
+					}
 				}
 			});
 		}
