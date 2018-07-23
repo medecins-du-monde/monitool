@@ -50,7 +50,7 @@ module.config($stateProvider => {
 		component: 'projectMenu',
 
 		resolve: {
-			project: function($rootScope, $stateParams, $q) {
+			loadedProject: function($rootScope, $stateParams, $q) {
 				// If partner account, we retrieve the projectId from profile, else from URL.
 				var projectId = $rootScope.userCtx.type === 'user' ? $stateParams.projectId : $rootScope.userCtx.projectId;
 
@@ -74,7 +74,7 @@ module.config($stateProvider => {
 
 module.component('projectMenu', {
 	bindings: {
-		project: '<',
+		loadedProject: '<',
 		ccIndicators: '<',
 		themes: '<'
 	},
@@ -82,6 +82,10 @@ module.component('projectMenu', {
 	template: require('./menu.html'),
 
 	controller: class ProjectMenuController {
+
+		$onChanges(changes) {
+			this.project = this.loadedProject;
+		}
 
 		onProjectSaveSuccess(newProject) {
 			this.project = newProject;

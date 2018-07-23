@@ -40,7 +40,6 @@ module.config($stateProvider => {
 		component: 'projectInputList',
 		resolve: {
 			dataSourceId: ($stateParams) => $stateParams.dataSourceId,
-			inputsStatus: (project, dataSourceId) => Input.fetchFormStatus(project, dataSourceId)
 		}
 	});
 });
@@ -50,15 +49,15 @@ module.component('projectInputList', {
 	bindings: {
 		'project': '<',
 		'dataSourceId': '<',
-		'inputsStatus': '<'
 	},
 	template: require('./input-list.html'),
 
 	controller: class ProjectInputListController {
 
-		constructor($rootScope, $state) {
+		constructor($rootScope, $state, $scope) {
 			this.userCtx = $rootScope.userCtx;
 			this.$state = $state;
+			this.$scope = $scope;
 		}
 
 		$onChanges(changes) {
@@ -78,15 +77,25 @@ module.component('projectInputList', {
 					this.sites = this.sites.filter(e => projectUser.entities.includes(e.id));
 			}
 
-			// Those list tell which rows should be displayed.
-			this.visibleStatus = Object.keys(this.inputsStatus).slice(0, 10);
-			this.hiddenStatus = Object.keys(this.inputsStatus).slice(10);
-
 			// Handle special case for free periodicity.
 			if (this.dataSource.periodicity === 'free') {
 				this.displayFooter = true;
 				this.newInputDate = new Date().toISOString().substring(0, 10);
 			}
+
+			this.loading = true;
+			this.load();
+		}
+
+		async load() {
+			this.inputsStatus = await Input.fetchFormStatus(this.project, this.dataSourceId);
+
+			// Those list tell which rows should be displayed.
+			this.visibleStatus = Object.keys(this.inputsStatus).slice(0, 10);
+			this.hiddenStatus = Object.keys(this.inputsStatus).slice(10);
+
+			this.loading = false;
+			this.$scope.$apply();
 		}
 
 		showMore() {

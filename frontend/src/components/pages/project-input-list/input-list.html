@@ -71,23 +71,28 @@
 			<tbody>
 				<tr ng-repeat="date in $ctrl.visibleStatus">
 					<td ng-repeat="site in ::$ctrl.sites">
-						<div class="bodyField" ng-if="::$ctrl.inputsStatus[date][site.id] !== undefined">
+						<div class="bodyField" ng-if="$ctrl.inputsStatus[date][site.id] !== undefined">
 							<a class="btn btn-xs btn-default"
-							   ng-if="::$ctrl.inputsStatus[date][site.id] !== null"
+							   ng-if="$ctrl.inputsStatus[date][site.id] !== null"
 							   ui-sref="main.project.input.edit({dataSourceId: $ctrl.dataSource.id, period: date, entityId: site.id})"
 							   translate="project.input_status.done"
 							   translate-values="::{value: $ctrl.inputsStatus[date][site.id]}">
 
 							<a class="btn btn-xs btn-primary"
 							   ui-sref="main.project.input.edit({dataSourceId: $ctrl.dataSource.id, period: date, entityId: site.id})"
-							   ng-if="::$ctrl.inputsStatus[date][site.id] === null"
+							   ng-if="$ctrl.inputsStatus[date][site.id] === null"
 							   translate="project.input_status.expected"></a>
 						</div>
 					</td>
 				</tr>
-				<tr ng-hide="$ctrl.visibleStatus.length">
+				<tr ng-hide="$ctrl.visibleStatus.length || $ctrl.loading">
 					<td colspan="{{::$ctrl.sites.length}}">
 						<div class="bodyField" translate="project.no_inputs"></div>
+					</td>
+				</tr>
+				<tr ng-show="$ctrl.loading">
+					<td colspan="{{::$ctrl.sites.length}}">
+						<div class="bodyField" translate="shared.loading"></div>
 					</td>
 				</tr>
 				<tr ng-show="$ctrl.hiddenStatus.length">

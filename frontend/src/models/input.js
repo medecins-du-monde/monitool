@@ -86,13 +86,13 @@ export default class Input {
 		return sortedResult;
 	}
 
-	static async fetchLasts(project, siteId, dataSourceId, period) {
+	static async fetchLasts(projectId, siteId, dataSourceId, period) {
 		const response = await axios.get(
 			'/api/resources/input',
 			{
 				params: {
 					mode: "current+last",
-					projectId: project._id,
+					projectId: projectId,
 					entityId: siteId,
 					formId: dataSourceId,
 					period: period
@@ -102,35 +102,18 @@ export default class Input {
 
 		const result = response.data.map(i => new Input(i));
 
-		var currentInputId = ['input', project._id, dataSourceId, siteId, period].join(':');
+		var currentInputId = ['input', projectId, dataSourceId, siteId, period].join(':');
 
 		// both where found
 		if (result.length === 2)
-			return { current: result[0], previous: result[1], isNew: false };
+			return {current: result[0], previous: result[1]};
 
 		// only the current one was found
 		else if (result.length === 1 && result[0]._id === currentInputId)
-			return { current: result[0], previous: null, isNew: false };
+			return {current: result[0], previous: null};
 
-		var current = new Input({
-			_id: currentInputId, type: "input",
-			project: project._id, form: dataSourceId, period: period, entity: siteId,
-			values: {}
-		});
-
-		const dataSource = project.forms.find(ds => ds.id === dataSourceId);
-		dataSource.elements.forEach(variable => {
-			const numFields = variable.partitions.reduce((m, p) => m * p.elements.length, 1);
-			current.values[variable.id] = new Array(numFields);
-			current.values[variable.id].fill(0);
-		});
-
-		// the current one was not found (and we may or not have found the previous one).
-		return {
-			current: current,
-			previous: result.length ? result[0] : null,
-			isNew: true
-		};
+		else
+			return {current: null, previous: result.length ? result[0] : null};
 	}
 
 	constructor(data=null) {

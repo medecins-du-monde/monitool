@@ -39,12 +39,13 @@ module.config($stateProvider => {
 		url: '/input/:dataSourceId/edit/:period/:entityId',
 		component: 'projectInputEdition',
 		resolve: {
-			inputs: ($stateParams, project) =>
-				Input.fetchLasts(project, $stateParams.entityId, $stateParams.dataSourceId, $stateParams.period),
-
+			inputs: $stateParams => Input.fetchLasts($stateParams.projectId, $stateParams.entityId, $stateParams.dataSourceId, $stateParams.period),
 			input: inputs => inputs.current,
 			previousInput: inputs => inputs.previous,
-			isNew: inputs => inputs.isNew,
+			dsId: $stateParams => $stateParams.dataSourceId,
+			period: $stateParams => $stateParams.period,
+			siteId: $stateParams => $stateParams.entityId
+
 		}
 	});
 });
@@ -52,8 +53,11 @@ module.config($stateProvider => {
 
 module.component('projectInputEdition', {
 	bindings: {
-		project: '<', // for breadcrumb
-		isNew: '<',
+		project: '<',
+		dsId: '<',
+		period: '<',
+		siteId: '<',
+
 		input: '<',
 		previousInput: '<',
 	},
@@ -90,8 +94,31 @@ module.component('projectInputEdition', {
 		}
 
 		$onChanges(changes) {
-			this.form = this.project.forms.find(f => f.id === this.input.form);
-			this.entity = this.project.entities.find(f => f.id === this.input.entity);
+			this.isNew = false;
+			this.form = this.project.forms.find(f => f.id === this.dsId);
+			this.entity = this.project.entities.find(f => f.id === this.siteId);
+
+			if (!this.input) {
+				const currentInputId = ['input', this.project._id, this.dsId, this.siteId, this.period].join(':');
+
+				this.input = new Input({
+					_id: currentInputId,
+					type: "input",
+					project: this.project._id,
+					form: this.dsId,
+					period: this.period,
+					entity: this.siteId,
+					values: {}
+				});
+
+				this.form.elements.forEach(variable => {
+					const numFields = variable.partitions.reduce((m, p) => m * p.elements.length, 1);
+					this.input.values[variable.id] = new Array(numFields);
+					this.input.values[variable.id].fill(0);
+				});
+
+				this.isNew = true;
+			}
 
 			this.master = angular.copy(this.input);
 		}
