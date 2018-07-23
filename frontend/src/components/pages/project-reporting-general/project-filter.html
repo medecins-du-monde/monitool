@@ -11,7 +11,7 @@
 				<div class="input-group">
 					<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 					<utc-datepicker
-						id="start-date"
+						input-id="start-date"
 						ng-model="$ctrl.filter._start"
 						ng-change="$ctrl.onFilterChange()"></utc-datepicker>
 				</div>
@@ -21,7 +21,7 @@
 				<div class="input-group">
 					<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 					<utc-datepicker
-						id="end-date"
+						input-id="end-date"
 						ng-model="$ctrl.filter._end"
 						ng-change="$ctrl.onFilterChange()"></utc-datepicker>
 				</div>
@@ -29,7 +29,7 @@
 
 			<form-group input-id="site-list" label="project.collection_site_list">
 				<element-filter
-					id="site-list"
+					input-id="site-list"
 					ng-model="$ctrl.filter.entity"
 					ng-change="$ctrl.onFilterChange()"
 					elements="$ctrl.project.entities"
