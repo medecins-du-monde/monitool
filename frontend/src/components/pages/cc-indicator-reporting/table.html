@@ -1,0 +1,34 @@
+
+<table id="reporting" class="table table-bordered table-condensed">
+	<tbody>
+		<tr	ng-repeat="row in $ctrl.rows track by row.id"
+			class="indent{{row.indent}}"
+
+			tr-indicator
+			columns="$ctrl.columns"
+			group-by="$ctrl.groupBy"
+			split="$ctrl.splits[row.id]"
+			first-col-style="$ctrl.firstColStyle"
+
+			project="row.project"
+			name="row.name"
+			is-group="row.isGroup"
+			filter="row.filter"
+			indicator="row.indicator"
+			on-split-toggle="$ctrl.onSplitToggle(row.id, partitionId)"
+			on-plot-toggle="$ctrl.onPlotToggle({id: row.id, name: name, data: data})">
+		</tr>
+	</tbody>
+	<thead ng-style="$ctrl.headerStyle">
+		<tr>
+			<th class="row-graph" ng-style="$ctrl.firstColStyle"></th>
+			<th class="row-title" translate="shared.name" ng-style="$ctrl.firstColStyle"></th>
+			<th class="row-dimension" ng-style="$ctrl.firstColStyle"></th>
+			<th translate="project.baseline"></th>
+			<th translate="project.target"></th>
+			<th ng-repeat="col in $ctrl.columns track by col.id" title="{{col.title}}">
+				{{col.name}}
+			</th>
+		</tr>
+	</thead>
+</table>

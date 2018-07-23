@@ -17,6 +17,7 @@
 
 import Store from './store';
 import Project from '../model/project';
+import Indicator from '../model/indicator';
 import jsonpatch from 'fast-json-patch';
 
 
@@ -240,18 +241,21 @@ export default class ProjectStore extends Store {
 		if (typeof indicatorId !== 'string')
 			throw new Error("missing_parameter");
 
-		const result = await this._db.callView('cross_cutting', {key: indicatorId, include_docs: true});
-		var projects = result.rows.map(row => row.doc);
+		const indicator = await Indicator.storeInstance.get(indicatorId);
+
+		let projects = await this.list();
+		projects = projects.filter(p => p.themes.some(themeId => indicator.themes.includes(themeId)));
 
 		// strip down project
 		if (strippedDown) {
 			projects.forEach(function(project) {
 				var cc = {}
-				cc[indicatorId] = project.crossCutting[indicatorId];
+				if (project.crossCutting[indicatorId])
+					cc[indicatorId] = project.crossCutting[indicatorId];
 				project.crossCutting = cc;
 
 				var used = {};
-				if (project.crossCutting[indicatorId].computation)
+				if (project.crossCutting[indicatorId] && project.crossCutting[indicatorId].computation)
 					for (var key in project.crossCutting[indicatorId].computation.parameters)
 						used[project.crossCutting[indicatorId].computation.parameters[key].elementId] = true;
 
@@ -262,7 +266,7 @@ export default class ProjectStore extends Store {
 			});
 		}
 
-		return projects.map(p => new Project(p));
+		return projects;
 	}
 
 	/**

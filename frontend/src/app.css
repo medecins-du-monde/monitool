@@ -745,7 +745,7 @@ td.empty > span {
 
 
 
-general-reporting, detailed-reporting {
+general-reporting, cc-indicator-reporting {
   display: flex;
   height: 100vh;
   flex-direction: column;
@@ -755,7 +755,7 @@ general-reporting, detailed-reporting {
 }
 
 /* your existing container */
-general-table, table-indicator {
+general-table, cc-indicator-table {
   display: block;
   overflow: auto;
   flex: 1;
@@ -763,31 +763,25 @@ general-table, table-indicator {
   border-top-width: 1px;
 }
 
-general-table table, table-indicator table {
+general-table table, cc-indicator-table table {
   overflow: hidden;
   border-collapse: separate !important;
   border-spacing: 0px !important;
   border-width: 0 !important;
 }
 
-general-table table thead, table-indicator table thead {
+general-table table thead, cc-indicator-table table thead {
 }
 
-general-table table td, general-table table th, table-indicator table td, table-indicator table th {
+general-table table td, general-table table th, cc-indicator-table table td, cc-indicator-table table th {
   border-top-width: 0 !important;
   border-left-width: 0 !important;
   background-color: white;
 }
 
-general-table table td:first-child, general-table table th:first-child, table-indicator table td:first-child, table-indicator table th:first-child {
+general-table table td:first-child, general-table table th:first-child, cc-indicator-table table td:first-child, cc-indicator-table table th:first-child {
   border-left-width: 1px !important;
 }
-
-general-table .btn-group, general-table .btn-group .btn, table-indicator .btn-group, table-indicator .btn-group .btn {
-  /* buttons go UNDER the thead */
-  position: static;
-}
-
 
 .project-columns {
 }

@@ -3,9 +3,26 @@
 	<li class="active">{{$ctrl.ccIndicator.name[$root.language]}}</li>
 </ol>
 
+<reporting-graph
+	x="$ctrl.graphX"
+	ys="$ctrl.graphYs"
+	presentation="'line'"
+	ng-if="$ctrl.graphYs|length"></reporting-graph>
+
 <cc-indicator-group-by
 	projects="$ctrl.projects"
 	on-update="$ctrl.onGroupByUpdate(groupBy)"></cc-indicator-group-by>
 
 <cc-indicator-filter
 	on-update="$ctrl.onFilterUpdate(filter)"></cc-indicator-filter>
+
+<cc-indicator-table
+	projects="$ctrl.projects"
+	cc-indicator="$ctrl.ccIndicator",
+
+	filter="$ctrl.filter"
+	group-by="$ctrl.groupBy"
+	columns="$ctrl.columns"
+
+	on-plot-toggle="$ctrl.onPlotToggle(id, name, data)">
+</cc-indicator-table>
