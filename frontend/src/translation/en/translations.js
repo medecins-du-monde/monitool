@@ -705,6 +705,7 @@ export default {
 	},
 
 	indicator: {
+		missing_description: "<i>The description of this indicator was not filled</i>",
 		not_collected: "This indicator is not collected by any project",
 		extra: "Extra indicators",
 		new_indicator: "New indicator",
