@@ -486,71 +486,71 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 
 
 
-.indicator-panel {
+.columns-panel {
   display: inline-block;
   vertical-align: top
 }
 
 
 @media (max-width: 800px) {
-  .indicator-panel {
+  .columns-panel {
     display: block;
   }
 }
 
 @media (min-width: 800px) and (max-width: 1000px) {
-  .indicator-panel {
+  .columns-panel {
     width: 32%;
     margin-left: 1.5%;
   }
 
-  .indicator-panel:nth-child(3n+1) {
+  .columns-panel:nth-child(3n+1) {
     margin-left: 0;
   }
 }
 
 @media (min-width: 1000px) and (max-width: 1200px) {
-  .indicator-panel {
+  .columns-panel {
     width: 24%;
     margin-left: 1.33%;
   }
 
-  .indicator-panel:nth-child(4n+1) {
+  .columns-panel:nth-child(4n+1) {
     margin-left: 0;
   }
 }
 
 
 @media (min-width: 1200px) and (max-width: 1400px) {
-  .indicator-panel {
+  .columns-panel {
     width: 19%;
     margin-left: 1.25%;
   }
 
-  .indicator-panel:nth-child(5n+1) {
+  .columns-panel:nth-child(5n+1) {
     margin-left: 0;
   }
 }
 
 @media (min-width: 1400px) {
-  .indicator-panel {
+  .columns-panel {
     width: 16%;
     margin-left: 0.66%;
   }
 
-  .indicator-panel:nth-child(6n+1) {
+  .columns-panel:nth-child(6n+1) {
     margin-left: 0;
   }
 }
 
 
 
-.indicator-panel .panel-body {
+.columns-panel .panel-body {
   padding: 10px 10px 30px 10px;
   position: relative;
 }
 
-.indicator-panel .panel-body a {
+.columns-panel .panel-body a {
   margin-top: 5px;
   position: absolute;
   bottom: 10px;

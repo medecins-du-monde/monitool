@@ -16,7 +16,7 @@
 	<!-- identation is broken on purpose: do not fix -->
 	<!-- If we put spaces between tags, margins break -->
 
-	<div><div class="panel panel-default indicator-panel"
+	<div><div class="panel panel-default columns-panel"
 		 ng-repeat="indicator in theme.indicators|orderBy:('name.' + $root.language)">
 
 		<div class="panel-heading" title="{{indicator.name[$root.language]}}">{{indicator.name[$root.language]|maxLength:90}}</div>

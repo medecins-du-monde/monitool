@@ -7,14 +7,14 @@
 <div class="alert alert-info" translate="indicator.list_info"></div>
 
 <div>
-	<div class="panel panel-primary indicator-panel">
+	<div class="panel panel-primary columns-panel">
 		<div class="panel-heading">
 			<div class="panel-title" translate="indicator.new_indicator"></div>
 		</div>
 		<div class="panel-body">
 			<a ng-click="$ctrl.onCreateClicked()" class="btn btn-xxs btn-primary" translate="indicator.create_new"></a>
 	  </div>
-	</div><div class="panel panel-default indicator-panel" ng-repeat="indicator in $ctrl.indicators|orderBy:('name.' + $root.language)">
+	</div><div class="panel panel-default columns-panel" ng-repeat="indicator in $ctrl.indicators|orderBy:('name.' + $root.language)">
 		<div class="panel-heading">
 			<div class="panel-title" title="{{indicator.name[$root.language]}}">{{indicator.name[$root.language]|maxLength:90}}</div>
 		</div>
