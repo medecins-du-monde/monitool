@@ -2,9 +2,12 @@
 
 export default {
 	shared: {
+		open: "Ouvrir",
 		loading: "Chargement en cours...",
 		portrait: "Portrait",
 		landscape: "Paysage",
+
+		restore: "Restaurer",
 
 		name_label_fr: "Nom (français)",
 		name_label_es: "Nom (espagnol)",
@@ -81,6 +84,14 @@ export default {
 	},
 
 	project: {
+		is_user: "Vous êtes membre de ce projet",
+		no_matches: "Aucun projet ne correspond à vos critères de recherche",
+		is_finished: "Ce projet est terminé",
+		was_deleted: "Ce projet a été supprimé",
+		show_finished_projects: "Afficher les projets terminés",
+		show_deleted_projects: "Afficher les projets supprimés",
+		filter_placeholder: "Rentrez du texte pour filtrer les projets",
+
 		revisions: "Historique",
 		revision_info: "L'historique des modifications vous permet de consulter la liste des modifications faites sur la structure de votre projet.",
 		revision_datetime: "Date & Utilisateur",
@@ -377,9 +388,8 @@ export default {
 		field_distribution: "Distribution",
 		cant_create: "Vous n'êtes pas autorisé à créer de nouveaux projets",
 		my_projects: "Mes projets",
-		are_you_sure_to_clone: "Cette action va cloner ce projet et toutes ses saisies. Confimez pour continuer.",
-		are_you_sure_to_delete: "Tapez: 'Je suis sûr de vouloir supprimer ce projet' pour confirmer",
-		are_you_sure_to_delete_answer: "Je suis sûr de vouloir supprimer ce projet",
+		are_you_sure_to_clone: "Cette action va cloner ce projet et toutes ses saisies. Confimez pour cloner.",
+		are_you_sure_to_delete: "Êtes-vous sûr de vouloir supprimer ce projet? Confirmez pour supprimer.",
 		data_selection: "Selection des données",
 		filters: "Filtres",
 		input_status: {
@@ -565,7 +575,7 @@ export default {
 		collection_edit_help_varname: "Nommez la variable que vous voulez extraire de/du <code>{{name}}</code>. Par exemple \"Nombre de diagnostics effectués\".",
 		collection_edit_help_geoagg: "Dans un projet avec deux sites, si <code>{{name}}</code> vaut 10 pour un site, et 20 pour l'autre, que vaut-il pour le projet dans son ensemble?",
 		collection_edit_help_timeagg: "Dans un projet qui collecte mensuellement, si <code>{{name}}</code> vaut 10 en janvier, et 20 en février et 30 en mars que vaut-il pour le premier trimestre?",
-		collection_edit_help_partition: "Veut-t'on être capable de différencier <code>{{name}}</code> par age, sexe, prise en charge, motif de consultation, pathologie, tranche horaire, reférencement effectif, ...?",
+		collection_edit_help_partition: "Veut-t'on être capable de différencier <code>{{name}}</code> par age, sexe, prise en charge, motif de consultation, pathologie, tranche horaire, reférencement effectif, ...?<br/>Ne désagrégez pas ici par zone géographique ou site d'intervention: vos lieux de collecte ont déjà été renseignés dans la page prévu à cet effet.",
 		collection_edit_help_distribution: "Si vous desirez imprimer des formulaires en A4, préférez placer les intitulés sur la gauche des tableaux, afin de limiter leur largeur.",
 		collection_edit_help_order: "Dans quel ordre voulez vous placer vos désagrégations dans les différentes lignes et colonnes?",
 
@@ -588,7 +598,7 @@ export default {
 
 		download_portrait: "Télécharger PDF (portrait)",
 		download_landscape: "Télécharger PDF (paysage)",
-		download_pdf: "Télécharger PDF",
+		download_pdf: "PDF",
 
 		press_to_drag: "Restez appuyé pour glisser déposer",
 		titles: "Intitulés",
@@ -641,7 +651,7 @@ export default {
 		},
 
 		create_blank: "Créer un cadre logique vierge",
-		create_copy: "Créer une copie du cadre logique {{name}}"
+		create_copy: "Ajouter une copie"
 	},
 	theme: {
 		new_theme: "Nouvelle thématique",
@@ -707,7 +717,7 @@ export default {
 
 	indicator: {
 
-		missing_description: "<i>La description de cet indicator n'a pas été renseignée</i>",
+		missing_description: "<i>La description de cet indicateur n'a pas été renseignée</i>",
 		not_collected: "Cet indicateur n'est collecté par aucun projet",
 		extra: "Indicateurs annexés",
 		new_indicator: "Nouvel indicateur",

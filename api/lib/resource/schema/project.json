@@ -11,6 +11,7 @@
 		"start",
 		"end",
 		"visibility",
+		"active",
 		"entities",
 		"groups",
 		"forms",
@@ -35,6 +36,7 @@
 		"start": { "type": "string", "format": "date" },
 		"end": { "type": "string", "format": "date" },
 		"visibility": { "type": "string", "enum": ["public", "private"]},
+		"active": { "type": "boolean" },
 
 		"entities": {
 			"type": "array",

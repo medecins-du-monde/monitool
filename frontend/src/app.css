@@ -501,22 +501,22 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 @media (min-width: 800px) and (max-width: 1000px) {
   .columns-panel {
     width: 32%;
-    margin-left: 1.5%;
+    margin-right: 1.5%;
   }
 
-  .columns-panel:nth-child(3n+1) {
-    margin-left: 0;
+  .columns-panel:nth-child(3n) {
+    margin-right: 0;
   }
 }
 
 @media (min-width: 1000px) and (max-width: 1200px) {
   .columns-panel {
     width: 24%;
-    margin-left: 1.33%;
+    margin-right: 1.33%;
   }
 
-  .columns-panel:nth-child(4n+1) {
-    margin-left: 0;
+  .columns-panel:nth-child(4n) {
+    margin-right: 0;
   }
 }
 
@@ -524,22 +524,22 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 @media (min-width: 1200px) and (max-width: 1400px) {
   .columns-panel {
     width: 19%;
-    margin-left: 1.25%;
+    margin-right: 1.25%;
   }
 
-  .columns-panel:nth-child(5n+1) {
-    margin-left: 0;
+  .columns-panel:nth-child(5n) {
+    margin-right: 0;
   }
 }
 
 @media (min-width: 1400px) {
   .columns-panel {
     width: 16%;
-    margin-left: 0.66%;
+    margin-right: 0.66%;
   }
 
-  .columns-panel:nth-child(6n+1) {
-    margin-left: 0;
+  .columns-panel:nth-child(6n) {
+    margin-right: 0;
   }
 }
 
@@ -550,13 +550,20 @@ ul[ng-sortable] li *, i.fa.fa-bars {
   position: relative;
 }
 
-.columns-panel .panel-body a {
+.columns-panel .panel-body .panel-buttons {
   margin-top: 5px;
   position: absolute;
   bottom: 10px;
   right: 10px;
 }
 
+.columns-panel .panel-body .bl-info {
+  display: block;
+  margin-top: 5px;
+  position: absolute;
+  bottom: 12px;
+  left: 10px;
+}
 
 
 
@@ -794,4 +801,53 @@ general-table table td:first-child, general-table table th:first-child, cc-indic
 
 .project-content {
   margin-left: 220px;
+}
+
+
+.panel-dashed {
+  color: #666;
+  border-color: #999;
+  border-style: dashed;
+}
+
+.panel-dashed > .panel-heading {
+  background-color: #f5f5f5;
+  border-color: #999;
+  border-bottom-style: dashed;
+}
+
+
+
+.panel-deleted {
+  border-color: #b33;
+  border-style: dashed;
+}
+
+.panel-deleted > .panel-heading {
+  color: #b33;
+  background-color: #f5dddd;
+  border-color: #b33;
+  border-bottom-style: dashed;
+}
+
+
+
+
+
+
+body {
+  background-color: #fbfbfb !important;
+}
+
+.table {
+  background-color: white;
+}
+
+
+.project-content-inner {
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
 }

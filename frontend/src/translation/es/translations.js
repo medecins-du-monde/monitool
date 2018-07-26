@@ -2,9 +2,12 @@
 
 export default {
 	shared: {
+		open: "Abrir",
 		loading: "Cargando...",
 		portrait: "Vertical",
 		landscape: "Horizontal",
+
+		restore: "Restaurar",
 
 		name_label_fr: "Nombre (francès)",
 		name_label_es: "Nombre (español)",
@@ -81,6 +84,14 @@ export default {
 	},
 
 	project: {
+		is_user: "Usted es miembro de ese proyecto",
+		no_matches: "Ningún proyecto corresponde a sus criterios de búsqueda",
+		is_finished: "Este proyecto esta terminado",
+		was_deleted: "Este proyecto fue suprimido",
+		show_finished_projects: "Mostrar proyectos terminados",
+		show_deleted_projects: "Mostrar proyectos suprimidos",
+		filter_placeholder: "Entre texto para buscar proyectos",
+
 		revisions: "Historial",
 		revision_info: "El historial de modificaciones le permite consultar todos los cambios hechos en la estructura de su proyecto.",
 		revision_datetime: "Fecha & Usuario",
@@ -376,9 +387,8 @@ export default {
 		field_distribution: "Distribución",
 		cant_create: "No esta autorizado a crear nuevos proyectos",
 		my_projects: "Mis proyectos",
-		are_you_sure_to_clone: "Va a clonar este proyecto, y todas sus entradas de datos. Confirme para continuar.",
-		are_you_sure_to_delete: "Por favor entre: 'Estoy seguro de querer suprimir este proyecto' para confirmar.",
-		are_you_sure_to_delete_answer: "Estoy seguro de querer suprimir este proyecto",
+		are_you_sure_to_clone: "Va a clonar este proyecto, y todas sus entradas de datos. Confirme para clonar.",
+		are_you_sure_to_delete: "¿Esta seguro de querer suprimir este proyecto? Confirme para suprimir.",
 		data_selection: "Seleccione los datos",
 		filters: "Filtros",
 		input_status: {
@@ -564,7 +574,7 @@ export default {
 		collection_edit_help_varname: "Nombre la variable que quiere extraer de <code>{{name}}</code>. ej: \"Número de diagnosticos\".",
 		collection_edit_help_geoagg: "En un proyecto que trabaja en dos lugares, si <code>{{name}}</code> vale 10 en el primero, y 20 en el segundo, cual es el valor para el proyecto entero?",
 		collection_edit_help_timeagg: "En un proyecto que colecta datos mensuales, si <code>{{name}}</code> vale 10 en enero, 20 en febrero y 30 en marzo, que vale para el trimer trimestre?",
-		collection_edit_help_partition: "Quiere poder diferenciar <code>{{name}}</code> por edad, sexo, tipo de consulta, motivo de consulta, patología, hora del dia, ...?",
+		collection_edit_help_partition: "¿Quiere poder diferenciar <code>{{name}}</code> por edad, sexo, tipo de consulta, motivo de consulta, patología, hora del dia, ...? <br/>No desagrege por zona geográfica: los lugares de colecta ya se rellenaron en la otra página.",
 		collection_edit_help_distribution: "Si va a imprimir formulario en A4, prefiera tener columnas a la izquierda para que las tablas sean menor anchas.",
 		collection_edit_help_order: "En que ordén quiere que aparescan la desagregaciones en las tablas de entrada de datos?",
 
@@ -587,7 +597,7 @@ export default {
 
 		download_portrait: "Descargar PDF (vertical)",
 		download_landscape: "Descargar PDF (horizontal)",
-		download_pdf: "Descargar PDF",
+		download_pdf: "PDF",
 
 		press_to_drag: "Pulse para arrastrar y soltar",
 		titles: "Título",
@@ -640,7 +650,7 @@ export default {
 		},
 
 		create_blank: "Añadir un marco lógico en blanco",
-		create_copy: "Añadir una copia del marco lógico {{name}}"
+		create_copy: "Añadir una copia"
 	},
 	theme: {
 		new_theme: "Nueva temática",

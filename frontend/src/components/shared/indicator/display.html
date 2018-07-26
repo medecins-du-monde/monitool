@@ -1,37 +1,66 @@
-<div class="panel panel-default columns-panel">
+<div class="panel panel-default">
 
 	<div class="panel-heading" title="{{$ctrl.indicator.display}}">
 		<i class="fa fa-arrows fa-fw indicator-handle"></i>
 		{{$ctrl.indicator.display|maxLength:90}}
 	</div>
 
-	<div class="panel-body" style="padding-bottom: 10px">
+	<div class="panel-body">
 		<!-- Baseline -->
-		<strong>{{'project.baseline'|translate}}:</strong>
-		<span ng-if="$ctrl.indicator.baseline != null">{{$ctrl.indicator.baseline}}{{$ctrl.indicator|indicatorUnit}}</span>
-		<span ng-if="$ctrl.indicator.baseline == null">?</span>
-		<br/>
+		<div>
+			<strong>{{'project.baseline'|translate}}:</strong>
+			<span ng-if="$ctrl.indicator.baseline != null">{{$ctrl.indicator.baseline}}{{$ctrl.indicator|indicatorUnit}}</span>
+			<span ng-if="$ctrl.indicator.baseline == null">?</span>
+		</div>
 
 		<!-- Target -->
-		<strong>{{'project.target'|translate}}:</strong>
-		<span ng-if="$ctrl.indicator.target != null">{{$ctrl.indicator.target}}{{$ctrl.indicator|indicatorUnit}}</span>
-		<span ng-if="$ctrl.indicator.target == null">?</span>
-		<br/>
+		<div>
+			<strong>{{'project.target'|translate}}:</strong>
+			<span ng-if="$ctrl.indicator.target != null">{{$ctrl.indicator.target}}{{$ctrl.indicator|indicatorUnit}}</span>
+			<span ng-if="$ctrl.indicator.target == null">?</span>
+		</div>
 
 		<!-- Computation -->
-		<strong>{{'project.computation'|translate}}:</strong>
-		<span class="text-danger" ng-if="!$ctrl.indicator.computation">
-			{{'project.indicator_is_not_computed'|translate}}
-			<i class="fa fa-unlink" ></i>
-		</span>
-		<span class="text-success" ng-if="$ctrl.indicator.computation">
-			{{'project.indicator_is_computed'|translate}}
-			<i class="fa fa-link" ></i>
-		</span>
+		<div>
+			<strong>{{'project.computation'|translate}}:</strong>
+			<span class="text-danger" ng-if="!$ctrl.indicator.computation">
+				{{'project.indicator_is_not_computed'|translate}}
+				<i class="fa fa-unlink" ></i>
+			</span>
+			<span class="text-success" ng-if="$ctrl.indicator.computation">
+				{{'project.indicator_is_computed'|translate}}
+				<i class="fa fa-link" ></i>
+		</div>
 
-		<button class="btn btn-xxs btn-default" style="width: 100%; display: block" ng-click="$ctrl.onEditClicked()">
-			<i class="fa fa-pencil"></i>
-			{{'shared.edit'|translate}}
-		</button>
+		<div class="panel-buttons">
+
+
+		</div>
+
+
+		<div class="panel-buttons btn-group">
+			<button class="btn btn-xxs btn-default" ng-click="$ctrl.onEditClicked()">
+				<i class="fa fa-pencil"></i>
+				<span translate="shared.edit"></span>
+			</button>
+
+			<div class="btn-group" uib-dropdown>
+				<a class="btn btn-default btn-xxs" uib-dropdown-toggle>
+					<span class="caret"></span>
+				</a>
+
+				  <ul class="dropdown-menu">
+					<li>
+						<a ng-click="$ctrl.onDeleteClicked()">
+							<i class="fa fa-times text-danger"></i>
+							<span class="text-danger" translate="shared.delete"></span>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+
+
 	</div>
 </div>

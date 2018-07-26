@@ -20,10 +20,11 @@
 			<div ng-if="indicator.description[$root.language]">{{indicator.description[$root.language]|maxLength:200}}</div>
 			<div ng-if="!indicator.description[$root.language]" translate="indicator.missing_description"></div>
 
-
-			<a ui-sref="main.indicator_reporting({indicatorId: indicator._id})"
-			   class="btn btn-xxs btn-default"
-			   translate="indicator.see_report"></a>
+			<div class="panel-buttons">
+				<a ui-sref="main.indicator_reporting({indicatorId: indicator._id})"
+				   class="btn btn-xxs btn-default"
+				   translate="indicator.see_report"></a>
+			</div>
 		</div>
 
 	</div></div>

@@ -15,35 +15,35 @@
 		<div class="collapse navbar-collapse" uib-collapse="!isNavCollapsed">
 
 			<ul class="nav navbar-nav">
-				<li ng-class="{active: $state.includes('main.home')}">
+				<li ng-class="{active: $ctrl.$state.includes('main.home')}">
 					<a ui-sref="main.home">
 						<i class="fa fa-fw fa-home"></i>
 						<span translate="shared.home"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.projects') || $state.includes('main.project')}" ng-if="$root.userCtx.type == 'user'">
+				<li ng-class="{active: $ctrl.$state.includes('main.projects') || $ctrl.$state.includes('main.project')}" ng-if="$root.userCtx.type == 'user'">
 					<a ui-sref="main.projects">
 						<i class="fa fa-fw fa-object-group"></i>
 						<span translate="shared.projects"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.project')}" ng-if="$root.userCtx.type == 'partner'">
+				<li ng-class="{active: $ctrl.$state.includes('main.project')}" ng-if="$root.userCtx.type == 'partner'">
 					<a ui-sref="main.project.reporting_general">
 						<i class="fa fa-fw fa-object-group"></i>
 						<span translate="shared.project"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.indicators') || $state.includes('main.indicator_reporting')}" ng-if="$root.userCtx.type == 'user'">
+				<li ng-class="{active: $ctrl.$state.includes('main.indicators') || $ctrl.$state.includes('main.indicator_reporting')}" ng-if="$root.userCtx.type == 'user'">
 					<a ui-sref="main.indicators">
 						<i class="fa fa-fw fa-book"></i>
 						<span translate="indicator.cross_cutting"></span>
 					</a>
 				</li>
 
-				<li ng-class="{active: $state.includes('main.admin')}" ng-if="$root.userCtx.type == 'user' && userCtx.role == 'admin'">
+				<li ng-class="{active: $ctrl.$state.includes('main.admin')}" ng-if="$root.userCtx.type == 'user' && $root.userCtx.role == 'admin'">
 					<a ui-sref="main.admin.users">
 						<i class="fa fa-fw fa-cogs"></i>
 						<span translate="shared.settings"></span>
@@ -68,7 +68,7 @@
 				<li uib-dropdown>
 					<a href="#" uib-dropdown-toggle>
 						<i class="fa fa-fw fa-user"></i>
-						{{userCtx.name}}
+						{{$root.userCtx.name}}
 						<span class="caret"></span>
 					</a>
 					<ul class="dropdown-menu">

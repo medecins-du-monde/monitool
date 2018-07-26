@@ -86,6 +86,7 @@ const migrateInputs = async () => {
 const updateProject = project => {
 	// Add visibility
 	project.visibility = 'public';
+	project.active = true;
 
 	project.logicalFrames.forEach((logframe, index) => {
 		logframe.id = '00000000-0000-0000-0000-' + index.toString().padStart(12, '0');
@@ -265,8 +266,7 @@ const migrateDesignDoc = async () => {
 				emit(doc._id, progress / count);
 			}
 		}.toString()
-	}
-
+	};
 
 	ddoc.views.projects_short = {
 		map: function(doc) {
@@ -279,8 +279,8 @@ const migrateDesignDoc = async () => {
 					users: doc.users.map(function(user) {
 						return {type: user.type, id: user.id, username: user.username, role: user.role};
 					}),
-					themes: doc.themes,
-					visibility: doc.visibility
+					visibility: doc.visibility,
+					active: doc.active
 				});
 			}
 		}.toString()
@@ -303,6 +303,9 @@ const migrateDesignDoc = async () => {
 				});
 		}.toString()
 	};
+
+	for (let key in ddoc.views)
+		ddoc.views[key].map = ddoc.views[key].map.replace(/[\n\t\s]+/g, ' ');
 
 	await database.insert(ddoc);
 };

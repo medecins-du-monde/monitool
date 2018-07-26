@@ -14,9 +14,18 @@
 <div class="modal-body">
 	<form class="form-horizontal" role="form" name="planningForm" novalidate>
 
-		<p ng-if="$ctrl.indicator" style="text-align: center; margin-bottom: 10px">
-			{{$ctrl.indicator.description[$root.language]}}
-		</p>
+		<div class="form-group" ng-if="$ctrl.indicator">
+			<label class="col-sm-2 control-label" translate="shared.description"></label>
+
+			<div class="col-sm-10">
+				{{$ctrl.indicator.description[$root.language]}}
+
+				<p class="help-block">
+					<i class="fa fa-info-circle"></i>
+					<span translate="project.indicator_help_description"></span>
+				</p>
+			</div>
+		</div>
 
 		<div class="form-group" ng-if="!$ctrl.indicator">
 			<label for="display-input" class="col-sm-2 control-label" translate="project.display"></label>
@@ -114,10 +123,5 @@
 	<button ng-click="$ctrl.reset()" ng-disabled="$ctrl.isUnchanged()" class="btn btn-default">
 		<i class="fa fa-undo"></i>
 		<span translate="shared.remove_changes"></span>
-	</button>
-
-	<button ng-click="$ctrl.delete()" class="btn btn-danger" ng-if="!$ctrl.isNew && !$ctrl.indicator">
-		<i class="fa fa-remove"></i>
-		<span translate="shared.delete"></span>
 	</button>
 </div>

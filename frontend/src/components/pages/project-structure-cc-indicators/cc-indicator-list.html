@@ -16,41 +16,47 @@
 	<!-- identation is broken on purpose: do not fix -->
 	<!-- If we put spaces between tags, margins break -->
 
-	<div><div class="panel panel-default columns-panel"
-		 ng-repeat="indicator in theme.indicators|orderBy:('name.' + $root.language)">
+	<div>
+		<div class="panel panel-default columns-panel" ng-repeat="indicator in theme.indicators|orderBy:('name.' + $root.language)">
 
-		<div class="panel-heading" title="{{indicator.name[$root.language]}}">{{indicator.name[$root.language]|maxLength:90}}</div>
+			<div class="panel-heading" title="{{indicator.name[$root.language]}}">{{indicator.name[$root.language]|maxLength:90}}</div>
 
-		<div class="panel-body" style="padding-bottom: 10px">
-			<strong>{{'project.baseline'|translate}}:</strong>
-			<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].baseline != null">{{$ctrl.editableProject.crossCutting[indicator._id].baseline}}{{$ctrl.editableProject.crossCutting[indicator._id]|indicatorUnit}}</span>
-			<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].baseline == null">?</span>
-			<br/>
+			<div class="panel-body">
+				<div ng-if="indicator.description[$root.language]">{{indicator.description[$root.language]|maxLength:200}}</div>
+				<div ng-if="!indicator.description[$root.language]" translate="indicator.missing_description"></div>
 
-			<strong>{{'project.target'|translate}}:</strong>
-			<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].target != null">{{$ctrl.editableProject.crossCutting[indicator._id].target}}{{$ctrl.editableProject.crossCutting[indicator._id]|indicatorUnit}}</span>
-			<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].target == null">?</span>
-			<br/>
+				<strong>{{'project.baseline'|translate}}:</strong>
+				<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].baseline != null">{{$ctrl.editableProject.crossCutting[indicator._id].baseline}}{{$ctrl.editableProject.crossCutting[indicator._id]|indicatorUnit}}</span>
+				<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].baseline == null">?</span>
+				<br/>
 
-			<strong>{{'project.computation'|translate}}:</strong>
-			<span class="text-danger" ng-if="!$ctrl.editableProject.crossCutting[indicator._id].computation">
-				{{'project.indicator_is_not_computed'|translate}}
-				<i class="fa fa-unlink" ></i>
-			</span>
-			<span class="text-success" ng-if="$ctrl.editableProject.crossCutting[indicator._id].computation">
-				{{'project.indicator_is_computed'|translate}}
-				<i class="fa fa-link" ></i>
-			</span>
+				<strong>{{'project.target'|translate}}:</strong>
+				<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].target != null">{{$ctrl.editableProject.crossCutting[indicator._id].target}}{{$ctrl.editableProject.crossCutting[indicator._id]|indicatorUnit}}</span>
+				<span ng-if="$ctrl.editableProject.crossCutting[indicator._id].target == null">?</span>
+				<br/>
 
-			<button
-				class="btn btn-xxs btn-default"
-				style="width: 100%; display: block"
-				ng-click="$ctrl.onEditIndicatorClick(indicator._id)">
-				<i class="fa fa-pencil"></i>
-				{{'shared.edit'|translate}}
-			</button>
+				<strong>{{'project.computation'|translate}}:</strong>
+				<span class="text-danger" ng-if="!$ctrl.editableProject.crossCutting[indicator._id].computation">
+					{{'project.indicator_is_not_computed'|translate}}
+					<i class="fa fa-unlink" ></i>
+				</span>
+				<span class="text-success" ng-if="$ctrl.editableProject.crossCutting[indicator._id].computation">
+					{{'project.indicator_is_computed'|translate}}
+					<i class="fa fa-link" ></i>
+				</span>
+
+				<div class="panel-buttons">
+					<button
+						class="btn btn-xxs btn-default"
+						style="width: 100%; display: block"
+						ng-click="$ctrl.onEditIndicatorClick(indicator._id)">
+						<i class="fa fa-pencil"></i>
+						{{'shared.edit'|translate}}
+					</button>
+				</div>
+			</div>
 		</div>
-	</div></div>
+	</div>
 
 	<br/>
 </div>

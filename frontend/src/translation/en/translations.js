@@ -2,9 +2,12 @@
 
 export default {
 	shared: {
+		open: "Open",
 		loading: "Loading...",
 		portrait: "Portrait",
 		landscape: "Landscape",
+
+		restore: "Restore",
 
 		name_label_fr: "Name (french)",
 		name_label_es: "Name (spanish)",
@@ -81,6 +84,14 @@ export default {
 	},
 
 	project: {
+		is_user: "You are a member of this project",
+		no_matches: "No projects match the selected criterias",
+		is_finished: "This project is finished",
+		was_deleted: "This project was deleted",
+		show_finished_projects: "Show finshed projects",
+		show_deleted_projects: "Show deleted projects",
+		filter_placeholder: "Enter text here to filter the projects",
+
 		revisions: "History",
 		revision_info: "The changelog allows to consult all modifications that were made to the structure of your project, and revert to previous revisions if needed.",
 		revision_datetime: "Date & User",
@@ -376,9 +387,8 @@ export default {
 		field_distribution: "Distribution",
 		cant_create: "You are not allowed to create new projects",
 		my_projects: "My projects",
-		are_you_sure_to_clone: "This action will clone this project, and all related input. Confirm to continue.",
-		are_you_sure_to_delete: "Please type: 'Yes, I do want to delete this project' to confirm",
-		are_you_sure_to_delete_answer: "Yes, I do want to delete this project",
+		are_you_sure_to_clone: "This action will clone this project, and all related input. Confirm to clone.",
+		are_you_sure_to_delete: "Are you sure that you want to delete this project? Confirm to delete.",
 		data_selection: "Data selection",
 		filters: "Filters",
 		input_status: {
@@ -564,7 +574,7 @@ export default {
 		collection_edit_help_varname: "Name the variable that you want to extract from <code>{{name}}</code>. i.e. \"Number of diagnostics\".",
 		collection_edit_help_geoagg: "In a project with two sites, if <code>{{name}}</code> is 10 for the first and 20 for the second, what is the value for the complete project?",
 		collection_edit_help_timeagg: "In a project collecting monthly data, if <code>{{name}}</code> is 10 in january, 20 in february and 30 in march, what is the value for the first quarter?",
-		collection_edit_help_partition: "Do we want to be able to differenciate <code>{{name}}</code> by age, gender, type of care, consultation motive, pathology, hour of the day, referral type, ...?",
+		collection_edit_help_partition: "Do we want to be able to differenciate <code>{{name}}</code> by age, gender, type of care, consultation motive, pathology, hour of the day, referral type, ...?<br/>Do not disaggregate by location: your collection sites were already filled in the relevant page.",
 		collection_edit_help_distribution: "If you wish to print the forms in A4 format, prefer having the titles at the left of the tables, to shorten their width.",
 		collection_edit_help_order: "How do you wish to show the disaggregations on the input form?",
 
@@ -587,7 +597,7 @@ export default {
 
 		download_portrait: "Download PDF (portrait)",
 		download_landscape: "Download PDF (landscape)",
-		download_pdf: "Download PDF",
+		download_pdf: "PDF",
 
 		press_to_drag: "Hold to drag & drop",
 		titles: "Titles",
@@ -640,7 +650,7 @@ export default {
 		},
 
 		create_blank: "Create a blank logical framework",
-		create_copy: "Create a copy of {{name}}"
+		create_copy: "Create a copy"
 	},
 	theme: {
 		new_theme: "New thematic",

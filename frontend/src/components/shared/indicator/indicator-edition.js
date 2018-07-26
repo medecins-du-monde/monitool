@@ -75,10 +75,6 @@ module.component('indicatorEditionModal', {
 		save() {
 			this.close({'$value': this.planning});
 		}
-
-		delete() {
-			this.close({'$value': null});
-		}
 	}
 });
 

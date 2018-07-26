@@ -100,10 +100,6 @@ module.component('projectUserModal', {
 			this.close({$value: this.user});
 		}
 
-		delete() {
-			this.close();
-		}
-
 	}
 });
 

@@ -7,52 +7,71 @@
 
 <div class="alert alert-info" translate="project.collection_form_list_info"></div>
 
-<legend translate="project.collection_form_list"></legend>
 
+<div ng-sortable="$ctrl.ngSortableOptions">
+	<div class="panel panel-default columns-panel"
+		 ng-repeat="dataSource in $ctrl.editableProject.forms">
 
-<table class="table table-bordered table-stripped table-condensed">
-	<thead>
-		<tr>
-			<th style="width: 30px"></th>
-			<th translate="shared.name"></th>
-			<th translate="project.periodicity"></th>
-			<th translate="project.collection_site_list"></th>
-			<th style="width: 250px"></th>
-		</tr>
-	</thead>
-	<tbody ng-if="$ctrl.editableProject.forms.length == 0">
-		<tr>
-			<td colspan="6" style="text-align: center" translate="project.no_forms"></td>
-		</tr>
-	</tbody>
-	<tbody ng-sortable="$ctrl.ngSortableOptions">
-		<tr ng-repeat="dataSource in $ctrl.editableProject.forms">
-			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
-			<td>
-				<a ui-sref="main.project.structure.collection_form_edition({dataSourceId: dataSource.id})">
-					{{dataSource.name}}
-				</a>
-			</td>
-			<td>{{'project.periodicities.' + dataSource.periodicity|translate}}</td>
-			<td>
+		<div class="panel-heading">
+			<div class="panel-title">
+				<i class="fa fa-arrows fa-fw handle"></i>
+				{{dataSource.name}}
+			</div>
+		</div>
+		<div class="panel-body">
+			<div>
+				<strong translate="shared.date"></strong>
+				{{dataSource.start|date}} - {{dataSource.end|date}}
+			</div>
+			<div>
+				<strong translate="project.periodicity"></strong>
+				{{'project.periodicities.' + dataSource.periodicity|translate}}
+			</div>
+			<div>
+				<strong translate="project.collection_site_list"></strong>
 				{{dataSource.entities|getObjects:$ctrl.project.entities|pluck:'name'|join:', '}}
-			</td>
-			<td>
-				<i class="fa fa-file-pdf-o"></i>
-				<span translate="project.download_pdf"></span>
-				(<a href="/api/resources/project/{{$ctrl.project._id}}/data-source/{{dataSource.id}}.pdf?orientation=portrait" target="_blank" translate="shared.portrait"></a>,
-				<a href="/api/resources/project/{{$ctrl.project._id}}/data-source/{{dataSource.id}}.pdf?orientation=landscape" target="_blank" translate="shared.landscape"></a>)
-			</td>
- 		</tr>
-	</tbody>
-	<tfoot>
-		<tr>
-			<td colspan="6" style="text-align: center">
-				<a class="btn btn-default btn-xs" ng-click="$ctrl.onCreateFormClicked()">
-					<i class="fa fa-plus"></i>
-					<span translate="shared.add"></span>
+			</div>
+
+			<div class="panel-buttons btn-group">
+				<a class="btn btn-default btn-xxs"
+				   ui-sref="main.project.structure.collection_form_edition({dataSourceId: dataSource.id})">
+				   	<i class="fa fa-pencil"></i>
+				   	<span translate="shared.edit"></span>
 				</a>
-			</td>
-		</tr>
-	</tfoot>
-</table>
+
+				<div class="btn-group" uib-dropdown>
+					<a class="btn btn-default btn-xxs" uib-dropdown-toggle>
+						<span class="caret"></span>
+					</a>
+
+					<ul class="dropdown-menu">
+						<li>
+							<a href="/api/resources/project/{{$ctrl.editableProject._id}}/data-source/{{dataSource.id}}.pdf?orientation=portrait" target="_blank">
+								<i class="fa fa-file-pdf-o"></i>
+								<span translate="project.download_portrait"></span>
+							</a>
+						</li>
+						<li>
+							<a href="/api/resources/project/{{$ctrl.editableProject._id}}/data-source/{{dataSource.id}}.pdf?orientation=landscape" target="_blank">
+								<i class="fa fa-file-pdf-o fa-rotate-270"></i>
+								<span translate="project.download_landscape"></span>
+							</a>
+						</li>
+						<li>
+							<a ng-click="$ctrl.delete(dataSource)">
+								<i class="fa fa-times text-danger"></i>
+								<span class="text-danger" translate="shared.delete"></span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<a class="btn btn-default" ng-click="$ctrl.onCreateFormClicked()">
+	<i class="fa fa-plus"></i>
+	<span translate="project.add_datasource"></span>
+</a>

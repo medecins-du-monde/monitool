@@ -187,26 +187,6 @@ router.put('/resources/project/:id', async ctx => {
 })
 
 /**
- * Delete a project
- */
-router.delete('/resources/project/:id', async ctx => {
-	// Partners cannot delete projects (that would be deleting themselves).
-	if (ctx.state.user.type !== 'user')
-		throw new Error('forbidden');
-
-	const project = await Project.storeInstance.get(ctx.params.id);
-
-	// Ask the project if it is deletable.
-	if (project.getRole(ctx.state.user) !== 'owner')
-		throw new Error("forbidden");
-
-	cache.del('reporting:project:' + ctx.params.id);
-
-	ctx.response.body = await project.destroy();
-});
-
-
-/**
  * Retrieve a list of inputs, or inputs ids.
  *
  * Multiple modes are supported

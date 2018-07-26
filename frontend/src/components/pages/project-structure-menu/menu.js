@@ -164,12 +164,20 @@ module.component('projectEditMenu', {
 		}
 
 		async deleteProject() {
-			var question = this.translate('project.are_you_sure_to_delete'),
-				answer = this.translate('project.are_you_sure_to_delete_answer');
+			var question = this.translate('project.are_you_sure_to_delete');
 
-			if (window.prompt(question) === answer) {
-				await this.project.delete();
-				this.$state.go('main.projects');
+			if (window.confirm(question)) {
+				this.project.active = false;
+				this.onProjectUpdate(this.project, true); // make sure that _onTransition won't be triggered
+
+				try {
+					await this.project.save();
+					this.$state.go('main.projects');
+				}
+				catch (error) {
+					// Display message to tell user that it's not possible to save.
+					alert(this.translate('project.saving_failed'));
+				}
 			}
 		}
 	}

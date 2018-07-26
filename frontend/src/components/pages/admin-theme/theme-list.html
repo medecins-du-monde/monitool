@@ -6,17 +6,24 @@
 <div class="alert alert-info" translate="theme.list_info"></div>
 
 <div>
-	<div class="panel panel-primary columns-panel">
-		<div class="panel-body">
-			<span translate="theme.new_theme"></span>
-			<a ng-click="$ctrl.create()" class="btn btn-xxs btn-primary" translate="theme.create_new"></a>
+	<div class="panel panel-default columns-panel" ng-repeat="theme in $ctrl.themes|orderBy:('name.' + $root.language)">
+		<div class="panel-heading">
+			<div class="panel-title" title="{{theme.name[$root.language]}}">{{theme.name[$root.language]|maxLength:90}}</div>
 		</div>
-	</div><div class="panel panel-default columns-panel" ng-repeat="theme in $ctrl.themes|orderBy:('name.' + $root.language)">
-		<div class="panel-body">
-			{{theme.name[$root.language]}}
 
+		<div class="panel-body">
 			<a ng-click="$ctrl.edit(theme)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
 	  </div>
+	</div><div class="panel panel-dashed columns-panel">
+		<div class="panel-heading">
+			<div class="panel-title" translate="theme.new_theme"></div>
+		</div>
+		<div class="panel-body">
+			<a ng-click="$ctrl.create()" class="btn btn-xxs btn-default">
+				<i class="fa fa-plus"></i>
+				<span translate="theme.create_new"></span>
+			</a>
+		</div>
 	</div>
 </div>
 

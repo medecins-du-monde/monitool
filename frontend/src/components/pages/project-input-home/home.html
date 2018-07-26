@@ -6,49 +6,50 @@
 	<li class="active" translate="project.input"></li>
 </ol>
 
-<legend translate="project.input"></legend>
 
+<div class="project-content-inner">
+	<div class="row">
+		<div class="col-md-4">
+			<p>Le rôle de cette section est de fournir à Monitool les données qui lui permettront de calculer vos indicateurs.</p>
 
-<div class="row">
-	<div class="col-md-4">
-		<p>Le rôle de cette section est de fournir à Monitool les données qui lui permettront de calculer vos indicateurs.</p>
+			<p>Chaque source de données renseignée lors de la formalisation du projet donne lieu à des formulaires réguliers.</p>
+		</div>
+		<div class="col-md-8">
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th style="width: 50%">Tâche</th>
+						<th>État</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id">
+						<td>
+							Remplir les {{$ctrl.status[dataSource.id].total}} saisies de
+							<a class="btn btn-default btn-xs" ui-sref="main.project.input.list({dataSourceId: dataSource.id})">
+								<i class="fa fa-pencil"></i>
+								{{dataSource.name}}
+							</a>
+						</td>
+						<td translate="shared.loading" ng-if="!$ctrl.status"></td>
 
-		<p>Chaque source de données renseignée lors de la formalisation du projet donne lieu à des formulaires réguliers.</p>
-	</div>
-	<div class="col-md-8">
-		<table class="table table-bordered table-striped">
-			<thead>
-				<tr>
-					<th style="width: 50%">Tâche</th>
-					<th>État</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id">
-					<td>
-						Remplir les {{$ctrl.status[dataSource.id].total}} saisies de
-						<a class="btn btn-default btn-xs" ui-sref="main.project.input.list({dataSourceId: dataSource.id})">
-							<i class="fa fa-pencil"></i>
-							{{dataSource.name}}
-						</a>
-					</td>
-					<td translate="shared.loading" ng-if="!$ctrl.status"></td>
-
-					<td ng-if="$ctrl.status">
-						<div class="progress" style="margin-bottom: 0">
-							<div class="progress-bar progress-bar-success" ng-style="{width: 100 * $ctrl.status[dataSource.id].complete + '%'}">
-								<span>{{100*$ctrl.status[dataSource.id].complete|number:0}}% complets</span>
+						<td ng-if="$ctrl.status">
+							<div class="progress" style="margin-bottom: 0">
+								<div class="progress-bar progress-bar-success" ng-style="{width: 100 * $ctrl.status[dataSource.id].complete + '%'}">
+									<span>{{100*$ctrl.status[dataSource.id].complete|number:0}}% complets</span>
+								</div>
+								<div class="progress-bar progress-bar-warning" ng-style="{width: 100 * $ctrl.status[dataSource.id].incomplete + '%'}">
+									<span>{{100*$ctrl.status[dataSource.id].incomplete|number:0}}% partiels</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" ng-style="{width: 100 * $ctrl.status[dataSource.id].missing + '%'}">
+									<span>{{100*$ctrl.status[dataSource.id].missing|number:0}}% manquants</span>
+								</div>
 							</div>
-							<div class="progress-bar progress-bar-warning" ng-style="{width: 100 * $ctrl.status[dataSource.id].incomplete + '%'}">
-								<span>{{100*$ctrl.status[dataSource.id].incomplete|number:0}}% partiels</span>
-							</div>
-							<div class="progress-bar progress-bar-danger" ng-style="{width: 100 * $ctrl.status[dataSource.id].missing + '%'}">
-								<span>{{100*$ctrl.status[dataSource.id].missing|number:0}}% manquants</span>
-							</div>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </div>
+

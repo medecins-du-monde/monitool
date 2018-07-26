@@ -83,24 +83,7 @@ export default class Project extends DbModel {
 	 * @return {Promise}
 	 */
 	async destroy() {
-		const inputIds = await this._db.callList({
-			startkey: 'input:' + this._id + ':!',
-			endkey: 'input:' + this._id + ':~'
-		});
-
-		await this._db.callBulk({
-			docs: [
-				// Delete project
-				{_id: this._id, _rev: this._rev, _deleted: true},
-
-				// Delete associated inputs.
-				...inputIds.rows.map(i => {
-					return {_id: i.id, _rev: i.value.rev, _deleted: true};
-				})
-			]
-		});
-
-		return {};
+		throw new Error('Projects can\'t be deleted');
 	}
 
 	/**

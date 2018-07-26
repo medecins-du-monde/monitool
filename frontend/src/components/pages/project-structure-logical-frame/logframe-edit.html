@@ -17,66 +17,70 @@
 	<fieldset>
 		<legend translate="project.general_informations"></legend>
 
-		<!-- [Name] -->
-		<form-group
-			input-id="logframe-name-input"
-			label="shared.name"
-			help="project.logframe_help_name">
+		<div class="project-content-inner">
 
-			<textarea
-				auto-resize
-				id="logframe-name-input"
-				class="form-control"
-				name="nameDesc"
-				placeholder="{{'project.logframe_ph_name'|translate}}"
-				ng-required="1"
-				ng-minlength="1"
-				ng-model="$ctrl.editableLogFrame.name"
-				ng-change="$ctrl.onFieldChange()"></textarea>
-		</form-group>
-		<!-- [/Name] -->
+			<!-- [Name] -->
+			<form-group
+				input-id="logframe-name-input"
+				label="shared.name"
+				help="project.logframe_help_name">
 
-		<!-- [collection sites] -->
-		<form-group
-			input-id="collect-input"
-			label="project.collection_site_list"
-			help="project.logframe_help_sites">
+				<textarea
+					auto-resize
+					id="logframe-name-input"
+					class="form-control"
+					name="nameDesc"
+					placeholder="{{'project.logframe_ph_name'|translate}}"
+					ng-required="1"
+					ng-minlength="1"
+					ng-model="$ctrl.editableLogFrame.name"
+					ng-change="$ctrl.onFieldChange()"></textarea>
+			</form-group>
+			<!-- [/Name] -->
 
-			<element-filter
-				ng-model="$ctrl.editableLogFrame.entities"
-				ng-change="$ctrl.onFieldChange()"
-				elements="$ctrl.project.entities"
-				groups="$ctrl.project.groups"></element-filter>
+			<!-- [collection sites] -->
+			<form-group
+				input-id="collect-input"
+				label="project.collection_site_list"
+				help="project.logframe_help_sites">
 
-		</form-group>
+				<element-filter
+					ng-model="$ctrl.editableLogFrame.entities"
+					ng-change="$ctrl.onFieldChange()"
+					elements="$ctrl.project.entities"
+					groups="$ctrl.project.groups"></element-filter>
 
-		<!-- [Specific dates] -->
-		<form-group
-			input-id="logframe-startdate-input"
-			label="project.specific_start"
-			help="project.logframe_edit_help_start">
+			</form-group>
 
-			<optional-date
-				id="logframe-startdate-input"
-				ng-model="$ctrl.editableLogFrame.start"
-				ng-change="$ctrl.onFieldChange()"
-				default="$ctrl.project.start"
-				message="project.same_as_start"></optional-date>
-		</form-group>
+			<!-- [Specific dates] -->
+			<form-group
+				input-id="logframe-startdate-input"
+				label="project.specific_start"
+				help="project.logframe_edit_help_start">
 
-		<form-group
-			input-id="logframe-enddate-input"
-			label="project.specific_end"
-			help="project.logframe_edit_help_end">
+				<optional-date
+					id="logframe-startdate-input"
+					ng-model="$ctrl.editableLogFrame.start"
+					ng-change="$ctrl.onFieldChange()"
+					default="$ctrl.project.start"
+					message="project.same_as_start"></optional-date>
+			</form-group>
 
-			<optional-date
-				ng-model="$ctrl.editableLogFrame.end"
-				ng-change="$ctrl.onFieldChange()"
-				default="$ctrl.project.end"
-				message="project.same_as_end"></optional-date>
+			<form-group
+				input-id="logframe-enddate-input"
+				label="project.specific_end"
+				help="project.logframe_edit_help_end">
 
-		</form-group>
-		<!-- [/Specific dates] -->
+				<optional-date
+					ng-model="$ctrl.editableLogFrame.end"
+					ng-change="$ctrl.onFieldChange()"
+					default="$ctrl.project.end"
+					message="project.same_as_end"></optional-date>
+
+			</form-group>
+			<!-- [/Specific dates] -->
+
+		</div>
 	</fieldset>
 	<!-- [/General information] -->
 
@@ -84,47 +88,52 @@
 	<fieldset>
 		<legend translate="project.goal"></legend>
 
-		<!-- [General objective description] -->
-		<form-group
-			input-id="logframe-goal-input"
-			label="project.goal"
-			help="project.logframe_help_goal">
+		<div class="project-content-inner">
 
-			<textarea
-				auto-resize
-				id="logframe-goal-input"
-				class="form-control"
-				name="goalDesc"
-				placeholder="{{'project.intervention_logic_goal_ph'|translate}}"
-				ng-model="$ctrl.editableLogFrame.goal"
-				ng-change="$ctrl.onFieldChange()"></textarea>
+			<!-- [General objective description] -->
+			<form-group
+				input-id="logframe-goal-input"
+				label="project.goal"
+				help="project.logframe_help_goal">
 
-		</form-group>
-		<!-- [/General objective description] -->
+				<textarea
+					auto-resize
+					id="logframe-goal-input"
+					class="form-control"
+					name="goalDesc"
+					placeholder="{{'project.intervention_logic_goal_ph'|translate}}"
+					ng-model="$ctrl.editableLogFrame.goal"
+					ng-change="$ctrl.onFieldChange()"></textarea>
 
-		<!-- [General objective indicators] -->
-		<form-group
-			label="shared.indicators"
-			help="project.logframe_help_goal_indicators">
+			</form-group>
+			<!-- [/General objective description] -->
 
-			<div
-				class="drag-destination"
-				ng-sortable="$ctrl.indicatorsSortOptions"
-				ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
-				ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
-					ng-repeat="indicator in $ctrl.editableLogFrame.indicators"
-					indicator="indicator"
-					project="$ctrl.project"
-					on-updated="$ctrl.onIndicatorUpdated(newIndicator, previousValue, $ctrl.editableLogFrame.indicators)"
-					on-deleted="$ctrl.onIndicatorDeleted(indicator, $ctrl.editableLogFrame.indicators)"></indicator></div>
+			<!-- [General objective indicators] -->
+			<form-group
+				label="shared.indicators"
+				help="project.logframe_help_goal_indicators">
 
-			<a	class="btn btn-default btn-sm"
-				ng-click="$ctrl.onAddIndicatorClicked($ctrl.editableLogFrame.indicators)">
-				<i class="fa fa-plus"></i>
-				{{"project.add_indicator"|translate}}
-			</a>
-		</form-group>
-		<!-- [/General objective indicators] -->
+				<div
+					class="drag-destination"
+					ng-sortable="$ctrl.indicatorsSortOptions"
+					ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
+					ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
+						class="columns-panel"
+						ng-repeat="indicator in $ctrl.editableLogFrame.indicators"
+						indicator="indicator"
+						project="$ctrl.project"
+						on-updated="$ctrl.onIndicatorUpdated(newIndicator, previousValue, $ctrl.editableLogFrame.indicators)"
+						on-deleted="$ctrl.onIndicatorDeleted(indicator, $ctrl.editableLogFrame.indicators)"></indicator></div>
+
+				<a	class="btn btn-default btn-sm"
+					ng-click="$ctrl.onAddIndicatorClicked($ctrl.editableLogFrame.indicators)">
+					<i class="fa fa-plus"></i>
+					{{"project.add_indicator"|translate}}
+				</a>
+			</form-group>
+			<!-- [/General objective indicators] -->
+
+		</div>
 	</fieldset>
 	<!-- [/General objective] -->
 
@@ -201,6 +210,7 @@
 								ng-sortable="$ctrl.indicatorsSortOptions"
 								ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
 								ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
+									class="columns-panel"
 									ng-repeat="indicator in purpose.indicators"
 									indicator="indicator"
 									project="$ctrl.project"
@@ -282,6 +292,7 @@
 												ng-sortable="$ctrl.indicatorsSortOptions"
 												ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
 												ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
+													class="columns-panel"
 													ng-repeat="indicator in output.indicators"
 													indicator="indicator"
 													project="$ctrl.project"
@@ -349,6 +360,7 @@
 															ng-sortable="$ctrl.indicatorsSortOptions"
 															ng-mouseenter="$ctrl.onSortableMouseEvent('indicators', true)"
 															ng-mouseleave="$ctrl.onSortableMouseEvent('indicators', false)"><indicator
+																class="columns-panel"
 																ng-repeat="indicator in activity.indicators"
 																indicator="indicator"
 																project="$ctrl.project"

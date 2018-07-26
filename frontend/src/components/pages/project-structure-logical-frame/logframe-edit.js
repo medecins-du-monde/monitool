@@ -82,8 +82,16 @@ module.component('logicalFrameEdit', {
 					angular.copy(lfs.find(lf => lf.id === this.logicalFrameId));
 
 				// Or copy an existing one
-				if (!this.editableLogFrame)
+				if (!this.editableLogFrame) {
 					this.editableLogFrame = angular.copy(lfs.find(lf => lf.id === this.from))
+					if (this.editableLogFrame) {
+						const m = this.editableLogFrame.name.match(/^(.*) \((\d+)\)$/);
+						if (!m)
+							this.editableLogFrame.name += ' (2)'
+						else
+							this.editableLogFrame.name = m[1] + ' (' + (parseInt(m[2]) + 1) + ')';
+					}
+				}
 
 				// Or create a blank one.
 				if (!this.editableLogFrame)

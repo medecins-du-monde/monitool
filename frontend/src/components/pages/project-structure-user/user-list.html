@@ -7,57 +7,61 @@
 
 <div class="alert alert-info" translate="project.users_list_info"></div>
 
-<legend translate="project.users"></legend>
+<div ng-sortable="$ctrl.sortableOptions">
+	<div class="panel panel-default columns-panel"
+		 ng-repeat="user in $ctrl.editableProject.users">
 
-<table class="table table-bordered table-stripped table-condensed">
-	<thead>
-		<tr>
-			<th style="width: 30px"></th>
-			<th translate="shared.name"></th>
-			<th translate="project.username"></th>
-			<th style="width: 150px" translate="project.user_role"></th>
-			<th style="width: 60%" translate="project.authorization"></th>
-		</tr>
-	</thead>
-	<tbody ng-if="$ctrl.editableProject.users.length == 0">
-		<tr>
-			<td colspan="5" style="text-align: center" translate="project.no_users"></td>
-		</tr>
-	</tbody>
-
-	<tbody ng-sortable="$ctrl.sortableOptions">
-		<tr ng-repeat="user in $ctrl.editableProject.users">
-			<td class="handle"><i class="fa fa-sort fa-fw"></i></td>
-			<td>
-				<a ng-click="$ctrl.onEditUserClicked(user)">
-					{{user.name || $ctrl.usersById[user.id].name}}
-				</a>
-			</td>
-			<td>
+		<div class="panel-heading">
+			<div class="panel-title">
+				<i class="fa fa-arrows fa-fw handle"></i>
+				{{user.name || $ctrl.usersById[user.id].name}}
+			</div>
+		</div>
+		<div class="panel-body">
+			<div>
+				<strong translate="project.username"></strong>
 				<img src="user-list-logo.svg" style="height: 17px" ng-if="user.type=='internal'" />
 				{{user.username}}
-			</td>
-			<td>{{('project.user_roles.' + user.role)|translate}}</td>
-			<td>
-				<span ng-if="user.role == 'input'">
-					<span translate="project.collection_site_list" style="font-weight: bold"></span>:
-					{{user.entities|getObjects:$ctrl.project.entities|pluck:'name'|join:', '}}
-					<br/>
+			</div>
+			<div>
+				<strong translate="project.user_role"></strong>
+				{{('project.user_roles.' + user.role)|translate}}
+			</div>
+			<div ng-if="user.role == 'input'">
+				<strong translate="project.collection_site_list"></strong>
+				{{user.entities|getObjects:$ctrl.project.entities|pluck:'name'|join:', '}}
+			</div>
+			<div ng-if="user.role == 'input'">
+				<strong translate="project.collection_form_list"></strong>
+				{{user.dataSources|getObjects:$ctrl.project.forms|pluck:'name'|join:', '}}
+			</div>
 
-					<span translate="project.collection_form_list" style="font-weight: bold"></span>:
-					{{user.dataSources|getObjects:$ctrl.project.forms|pluck:'name'|join:', '}}
-				</span>
-			</td>
-		</tr>
-	</tbody>
-	<tfoot>
-		<tr>
-			<td colspan="5" style="text-align: center">
-				<a class="btn btn-default btn-xs" ng-click="$ctrl.onEditUserClicked()">
-					<i class="fa fa-plus"></i>
-					<span translate="shared.add"></span>
+			<div class="panel-buttons btn-group">
+				<a ng-click="$ctrl.onEditUserClicked(user)" class="btn btn-default btn-xxs">
+					<i class="fa fa-pencil"></i>
+					<span translate="shared.edit"></span>
 				</a>
-			</td>
-		</tr>
-	</tfoot>
-</table>
+
+				<div class="btn-group" uib-dropdown>
+					<a class="btn btn-default btn-xxs" uib-dropdown-toggle>
+						<span class="caret"></span>
+					</a>
+
+					  <ul class="dropdown-menu">
+						<li>
+							<a ng-click="$ctrl.delete(user)">
+								<i class="fa fa-times text-danger"></i>
+								<span class="text-danger" translate="shared.delete"></span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<a class="btn btn-default" ng-click="$ctrl.onEditUserClicked()">
+	<i class="fa fa-plus"></i>
+	<span translate="project.add_user"></span>
+</a>

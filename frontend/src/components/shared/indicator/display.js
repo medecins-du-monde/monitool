@@ -69,6 +69,9 @@ module.component('indicator', {
 				});
 		}
 
+		onDeleteClicked() {
+			this.onDeleted({indicator: this.indicator});
+		}
 	}
 });
 

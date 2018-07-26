@@ -23,7 +23,7 @@
 	<span translate="project.input_list_info" translate-values="::{name: $ctrl.dataSource.name}"></span>
 </div>
 
-<legend>{{::form.name}}</legend>
+<legend>{{::$ctrl.dataSource.name}}</legend>
 
 <div ng-if="!$ctrl.dataSource.entities.length">
 	<span translate="project.form_is_not_associated_with_site"></span>

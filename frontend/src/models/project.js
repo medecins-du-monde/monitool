@@ -54,6 +54,7 @@ export default class Project {
 		this._id = uuid()
 		this.type = "project";
 		this.name = "";
+		this.active = true;
 		this.start = now;
 		this.end = now;
 		this.themes = [];

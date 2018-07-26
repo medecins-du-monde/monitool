@@ -32,9 +32,19 @@ const module = angular.module(
 module.config($stateProvider => {
 	$stateProvider.state('main', {
 		abstract: true,
-		template: require('./menu.html')
+		component: 'topMenu'
 	});
 
 });
+
+
+module.component('topMenu', {
+	template: require('./menu.html'),
+	controller: class MenuController {
+		constructor($state) {
+			this.$state = $state;
+		}
+	}
+})
 
 export default module;
