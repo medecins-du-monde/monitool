@@ -12,18 +12,29 @@
 		</div>
 
 		<div class="panel-body">
-			<a ng-click="$ctrl.edit(theme)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
-	  </div>
-	</div><div class="panel panel-dashed columns-panel">
-		<div class="panel-heading">
-			<div class="panel-title" translate="theme.new_theme"></div>
-		</div>
-		<div class="panel-body">
-			<a ng-click="$ctrl.create()" class="btn btn-xxs btn-default">
-				<i class="fa fa-plus"></i>
-				<span translate="theme.create_new"></span>
-			</a>
+			<div class="panel-buttons btn-group">
+				<a ng-click="$ctrl.edit(theme)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
+
+				<div class="btn-group" uib-dropdown>
+					<a class="btn btn-default btn-xxs" uib-dropdown-toggle>
+						<span class="caret"></span>
+					</a>
+
+					<ul class="dropdown-menu">
+						<li>
+							<a ng-click="$ctrl.onDeleteClicked(theme)">
+								<i class="fa fa-trash text-danger"></i>
+								<span class="text-danger" translate="shared.delete"></span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
 
+<a ng-click="$ctrl.create()" class="btn btn-default">
+	<i class="fa fa-plus"></i>
+	<span translate="theme.create_new"></span>
+</a>

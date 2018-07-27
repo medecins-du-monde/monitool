@@ -65,10 +65,6 @@ module.component('ccIndicatorEditionModal', {
 			this.close({$value: this.indicator});
 		}
 
-		delete() {
-			this.close({$value: null});
-		}
-
 		translate(key, destLanguage) {
 			for (let sourceLanguage in this.languages) {
 				const source = indicator[key][sourceLanguage];

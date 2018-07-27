@@ -59,10 +59,6 @@ module.component('themeEditModal', {
 			this.close({'$value': this.theme});
 		}
 
-		delete() {
-			this.close({'$value': null});
-		}
-
 		autofill(writeLanguageCode) {
 			for (let readLanguageCode in this.languages) {
 				const input = this.theme.name[readLanguageCode];

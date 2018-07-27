@@ -7,14 +7,24 @@
 
 <div>
 	<div class="panel panel-default columns-panel" ng-repeat="user in $ctrl.displayedUsers track by user._id">
+		<div class="panel-heading">
+			<div class="panel-title">{{user.name}}</div>
+		</div>
 		<div class="panel-body">
-			{{user.name}}<br/>
+			<div>
+				<strong translate="project.username"></strong>
+				{{user._id.substring(5)}}
+			</div>
+			<div>
+				<strong translate="user.role"></strong>
+				<i class="fa fa-circle text-primary" ng-if="user.role == 'admin'"> <span translate="user.roles_short.admin"></span></i>
+				<i class="fa fa-circle text-success" ng-if="user.role == 'project'"> <span translate="user.roles_short.project"></span></i>
+				<i class="fa fa-circle text-warning" ng-if="user.role == 'common'"> <span translate="user.roles_short.common"></span></i>
+			</div>
 
-			<i class="fa fa-circle text-primary" ng-if="user.role == 'admin'"> <span translate="user.roles_short.admin"></span></i>
-			<i class="fa fa-circle text-success" ng-if="user.role == 'project'"> <span translate="user.roles_short.project"></span></i>
-			<i class="fa fa-circle text-warning" ng-if="user.role == 'common'"> <span translate="user.roles_short.common"></span></i>
-
-			<a ng-click="$ctrl.edit(user)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
+			<div class="panel-buttons">
+				<a ng-click="$ctrl.edit(user)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
+			</div>
 		</div>
 	</div>
 </div>

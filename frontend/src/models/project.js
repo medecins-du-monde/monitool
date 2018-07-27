@@ -254,23 +254,6 @@ export default class Project {
 			form.start = form.end = null;
 	}
 
-	async clone() {
-		const newProjectId = 'project:' + uuid();
-
-		await axios.put(
-			'/api/resources/project/' + newProjectId,
-			null,
-			{
-				params: {
-					from: this._id,
-					with_data: 'true'
-				}
-			}
-		);
-
-		return newProjectId;
-	}
-
 	async save() {
 		const response = await axios.put(
 			'/api/resources/project/' + this._id,

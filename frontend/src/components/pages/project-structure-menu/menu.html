@@ -97,31 +97,6 @@
 							<i class="fa fa-history fa-fw"></i>
 							<span translate="project.revisions"></span>
 						</a>
-
-						<a class="list-group-item list-group-item-info"
-							ng-click="$ctrl.cloneProject()"
-							disable-if="!$ctrl.project._rev"
-							acl-has-project-creation acl-project="$ctrl.project">
-
-							<i class="fa fa-clone fa-fw"></i>
-							<span translate="shared.clone"></span>
-						</a>
-
-						<a	class="list-group-item list-group-item-info"
-							disable-if="1"
-							acl-lacks-project-creation acl-project="$ctrl.project"
-							style="cursor: not-allowed">
-							<i class="fa fa-clone fa-fw"></i>
-							<span translate="shared.clone"></span>
-						</a>
-
-						<a class="list-group-item list-group-item-danger"
-							ng-click="$ctrl.deleteProject()"
-							disable-if="!$ctrl.project._rev">
-
-							<i class="fa fa-trash fa-fw"></i>
-							<span translate="shared.delete"></span>
-						</a>
 					</div>
 				</div>
 			</div>

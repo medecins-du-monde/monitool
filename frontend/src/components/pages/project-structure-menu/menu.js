@@ -153,33 +153,6 @@ module.component('projectEditMenu', {
 				this.projectIsValid = true;
 			}
 		}
-
-		async cloneProject() {
-			var question = this.translate('project.are_you_sure_to_clone');
-
-			if (window.confirm(question)) {
-				const newProjectId = await this.project.clone();
-				this.$state.go('main.project.structure.basics', {projectId: newProjectId});
-			}
-		}
-
-		async deleteProject() {
-			var question = this.translate('project.are_you_sure_to_delete');
-
-			if (window.confirm(question)) {
-				this.project.active = false;
-				this.onProjectUpdate(this.project, true); // make sure that _onTransition won't be triggered
-
-				try {
-					await this.project.save();
-					this.$state.go('main.projects');
-				}
-				catch (error) {
-					// Display message to tell user that it's not possible to save.
-					alert(this.translate('project.saving_failed'));
-				}
-			}
-		}
 	}
 });
 

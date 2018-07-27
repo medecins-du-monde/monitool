@@ -72,16 +72,15 @@ module.component('themeList', {
 		edit(theme) {
 			this._createModal(theme)
 				.then(newTheme => {
-					if (newTheme) {
-						angular.copy(newTheme, theme)
-						theme.save();
-					}
-					else {
-						this.themes.splice(this.themes.indexOf(theme), 1);
-						theme.delete();
-					}
+					angular.copy(newTheme, theme)
+					theme.save();
 				})
 				.catch(() => {})
+		}
+
+		onDeleteClicked(theme) {
+			this.themes.splice(this.themes.indexOf(theme), 1);
+			theme.delete();
 		}
 
 		_createModal(theme=null) {

@@ -16,6 +16,7 @@
  */
 
 import angular from 'angular';
+import axios from 'axios';
 import uiRouter from '@uirouter/angularjs';
 import uuid from 'uuid/v4';
 import diacritics from 'diacritics';
@@ -23,14 +24,16 @@ import diacritics from 'diacritics';
 import Project from '../../../models/project';
 import Theme from '../../../models/theme';
 
-import mtDirectiveAclProjectCreation from '../../../directives/acl/project-creation';
+import mtAclProjectCreation from '../../../directives/acl/project-creation';
+import mtAclProjectRole from '../../../directives/acl/project-role';
 
 const module = angular.module(
 	'monitool.components.pages.project.list',
 	[
 		uiRouter, // for $stateProvider
 
-		mtDirectiveAclProjectCreation.name,
+		mtAclProjectCreation.name,
+		mtAclProjectRole.name
 	]
 );
 
@@ -59,10 +62,12 @@ module.component('projectList', {
 
 	controller: class ProjectListController {
 
-		constructor($rootScope, $state, $window) {
+		constructor($rootScope, $filter, $scope, $state, $window) {
 			this.userCtx = $rootScope.userCtx;
+			this.$scope = $scope;
 			this.$state = $state;
 			this.$window = $window;
+			this.translate = $filter('translate');
 
 			this.displayFinished = false;
 			this.displayDeleted = false;
@@ -138,12 +143,75 @@ module.component('projectList', {
 			this.$state.go('main.project.structure.home', {projectId: 'project:' + uuid()});
 		}
 
-		open(project) {
+		onOpenClicked(project) {
 			if (project.isOwner)
 				this.$state.go("main.project.structure.home", {projectId: project._id});
 			else
 				this.$state.go("main.project.reporting.home", {projectId: project._id});
 		}
+
+		async onCloneClicked(project) {
+			var question = this.translate('project.are_you_sure_to_clone');
+
+			if (window.confirm(question)) {
+				const newProjectId = 'project:' + uuid();
+
+				await axios.put(
+					'/api/resources/project/' + newProjectId,
+					null,
+					{
+						params: {
+							from: project._id,
+							with_data: 'true'
+						}
+					}
+				)
+
+				this.projects = await Project.fetchShort();
+				this.$onChanges();
+				this.$scope.$apply();
+				this.$window.scrollTo(0, 0);
+			}
+		}
+
+		async onDeleteClicked(shortProject) {
+			var question = this.translate('project.are_you_sure_to_delete');
+
+			if (window.confirm(question)) {
+				const project = await Project.get(shortProject._id);
+				project.active = false;
+
+				try {
+					await project.save();
+
+					this.projects = await Project.fetchShort();
+					this.$onChanges();
+					this.$scope.$apply();
+				}
+				catch (error) {
+					// Display message to tell user that it's not possible to save.
+					alert(this.translate('project.saving_failed'));
+				}
+			}
+		}
+
+		async onRestoreClicked(shortProject) {
+			const project = await Project.get(shortProject._id);
+			project.active = true;
+
+			try {
+				await project.save();
+
+				this.projects = await Project.fetchShort();
+				this.$onChanges();
+				this.$scope.$apply();
+			}
+			catch (error) {
+				// Display message to tell user that it's not possible to save.
+				alert(this.translate('project.saving_failed'));
+			}
+		}
+
 	}
 });
 

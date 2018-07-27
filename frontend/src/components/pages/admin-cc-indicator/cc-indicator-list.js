@@ -87,21 +87,20 @@ module.component('adminIndicatorList', {
 				this.indicators.push(indicator);
 				indicator.save();
 			});
-		};
+		}
 
 		onEditClicked(indicator) {
 			this._createModal(indicator)
 				.then(newIndicator => {
-					if (newIndicator) {
-						angular.copy(newIndicator, indicator);
-						indicator.save();
-					}
-					else {
-						this.indicators.splice(this.indicators.indexOf(indicator), 1);
-						indicator.delete();
-					}
+					angular.copy(newIndicator, indicator);
+					indicator.save();
 				})
 				.catch(error => {})
+		}
+
+		onDeleteClicked(indicator) {
+			this.indicators.splice(this.indicators.indexOf(indicator), 1);
+			indicator.delete();
 		}
 
 		_createModal(indicator=null) {

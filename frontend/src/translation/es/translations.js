@@ -84,6 +84,9 @@ export default {
 	},
 
 	project: {
+		add_user: "Añadir un usuario",
+		add_datasource: "Crear una nueva fuente de datos",
+
 		is_user: "Usted es miembro de ese proyecto",
 		no_matches: "Ningún proyecto corresponde a sus criterios de búsqueda",
 		is_finished: "Este proyecto esta terminado",
