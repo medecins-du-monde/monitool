@@ -81,7 +81,8 @@ module.component('generalTable', {
 
 			tbody.sections.push({
 				id: logicalFramework.id,
-				name: logicalFramework.name,
+				prefix: 'project.goal',
+				name: logicalFramework.goal,
 				indicators: logicalFramework.indicators.map(i => Object.assign({}, i, {id: uuid()})),
 				indent: 0
 			});
@@ -89,6 +90,7 @@ module.component('generalTable', {
 			logicalFramework.purposes.forEach(purpose => {
 				tbody.sections.push({
 					id: uuid(),
+					prefix: 'project.purpose',
 					name: purpose.description,
 					indicators: purpose.indicators.map(i => Object.assign({}, i, {id: uuid()})),
 					indent: 1
@@ -97,6 +99,7 @@ module.component('generalTable', {
 				purpose.outputs.forEach(output => {
 					tbody.sections.push({
 						id: uuid(),
+						prefix: 'project.output',
 						name: output.description,
 						indicators: output.indicators.map(i => Object.assign({}, i, {id: uuid()})),
 						indent: 2
@@ -105,6 +108,7 @@ module.component('generalTable', {
 					output.activities.forEach(activity => {
 						tbody.sections.push({
 							id: uuid(),
+							prefix: 'project.activity',
 							name: activity.description,
 							indicators: activity.indicators.map(i => Object.assign({}, i, {id: uuid()})),
 							indent: 3

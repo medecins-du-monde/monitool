@@ -208,18 +208,18 @@ textarea {
   text-overflow: ellipsis;
 }
 
-#reporting .indent1 .row-title div {
+#reporting .indent1 .row-title div, #reporting .indent1 .row-header-title div {
   padding-left: 20px !important;
 }
 
-#reporting .indent2 .row-title div {
+#reporting .indent2 .row-title div, #reporting .indent2 .row-header-title div {
   padding-left: 40px !important;
 }
-#reporting .indent3 .row-title div {
+#reporting .indent3 .row-title div, #reporting .indent3 .row-header-title div {
   padding-left: 60px !important;
 }
 
-#reporting .indent4 .row-title div {
+#reporting .indent4 .row-title div, #reporting .indent4 .row-header-title div {
   padding-left: 80px !important;
 }
 

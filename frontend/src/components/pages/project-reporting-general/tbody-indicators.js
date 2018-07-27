@@ -67,7 +67,7 @@ module.directive('tbodyIndicators', () => {
 
 			*_makeSectionRows(section, filter) {
 				if (section.name)
-					yield {id: uuid(), type: 'header', name: section.name, indent: section.indent};
+					yield {id: uuid(), type: 'header', name: section.name, prefix: section.prefix, indent: section.indent};
 
 				// if (section.indicators.length)
 				for (let indicator of section.indicators)

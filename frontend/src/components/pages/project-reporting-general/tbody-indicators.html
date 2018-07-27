@@ -18,8 +18,12 @@
 		ng-style="$ctrl.firstColStyle"></td>
 
 	<th colspan="{{4 + $ctrl.columns.length}}"
+		class="row-header-title"
 		ng-style="$ctrl.firstColStyle">
 		<div>
+			<span ng-if="row.prefix">
+				{{row.prefix|translate}}:
+			</span>
 			{{row.name|translate}}
 		</div>
 	</th>
@@ -31,6 +35,7 @@
 	<td class="noprint"
 		ng-style="$ctrl.firstColStyle"></td>
 	<td colspan="{{4 + $ctrl.columns.length}}"
+		class="row-header-title"
 		translate="project.reporting_empty"
 		ng-style="$ctrl.firstColStyle"></td>
 </tr>
