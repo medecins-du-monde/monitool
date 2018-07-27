@@ -26,6 +26,15 @@
 						ng-change="$ctrl.onFilterChange()"></utc-datepicker>
 				</div>
 			</form-group>
+
+			<form-group input-id="input-finished" label="project.show_finished_projects">
+				<input
+					id="input-finished"
+					type="checkbox"
+					ng-model="$ctrl.filter._showFinished"
+					ng-change="$ctrl.onFilterChange()" />
+
+			</form-group>
 		</form>
 	</div>
 </div>

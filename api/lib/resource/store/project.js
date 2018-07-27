@@ -244,7 +244,7 @@ export default class ProjectStore extends Store {
 		const indicator = await Indicator.storeInstance.get(indicatorId);
 
 		let projects = await this.list();
-		projects = projects.filter(p => p.themes.some(themeId => indicator.themes.includes(themeId)));
+		projects = projects.filter(p => p.active && p.themes.some(themeId => indicator.themes.includes(themeId)));
 
 		// strip down project
 		if (strippedDown) {

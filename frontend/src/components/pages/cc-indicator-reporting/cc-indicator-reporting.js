@@ -76,6 +76,10 @@ module.component('ccIndicatorReporting', {
 			this.graphYs = {};
 		}
 
+		$onChanges(changes) {
+			this.selectedProjects = this.projects.filter(p => p.active);
+		}
+
 		onGroupByUpdate(groupBy) {
 			this.groupBy = groupBy;
 
@@ -84,7 +88,11 @@ module.component('ccIndicatorReporting', {
 		}
 
 		onFilterUpdate(newFilter) {
-			this.filter = newFilter;
+			this.filter = Object.assign({}, newFilter);
+			delete this.filter._showFinished;
+
+			const now = new Date().toISOString().slice(0, 10);
+			this.selectedProjects = this.projects.filter(p => newFilter._showFinished || p.end > now);
 
 			if (this.groupBy)
 				this._updateColumns();

@@ -26,7 +26,8 @@ module.component('ccIndicatorFilter', {
 			const currentYear = new Date().getFullYear();
 			this.filter = {
 				_start: (currentYear - 1) + '-01-01',
-				_end: currentYear + '-12-31'
+				_end: currentYear + '-12-31',
+				_showFinished: false
 			};
 
 			this.onFilterChange();
