@@ -105,6 +105,7 @@ export default {
 		revision_show_more: "Load more revisions",
 
 		history: {
+			active_replace: "Change deletion status from <code>{{!before}}</code> to <code>{{!after}}</code>",
 			name_replace: "Rename the project from <code>{{before}}</code> to <code>{{after}}</code>",
 			start_replace: "Change the project start date of the project from <code>{{before|date}}</code> to <code>{{after|date}}</code>",
 			end_replace: "Change the project end date from <code>{{before|date}}</code> to <code>{{after|date}}</code>",

@@ -106,6 +106,7 @@ export default {
 		revision_show_more: "Ver cambios mas antiguos",
 
 		history: {
+			active_replace: "Cambia el estatus de supresión de <code>{{!before}}</code> a <code>{{!after}}</code>",
 			name_replace: "Cambia el nombre del proyecto de <code>{{before}}</code> a <code>{{after}}</code>",
 			start_replace: "Cambia el inicio del proyecto de <code>{{before|date}}</code> a <code>{{after|date}}</code>",
 			end_replace: "Cambia el final del proyecto de <code>{{before|date}}</code> a <code>{{after|date}}</code>",
