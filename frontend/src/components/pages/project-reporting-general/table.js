@@ -45,6 +45,9 @@ module.component('generalTable', {
 
 			if (changes.project)
 				this.tbodies = this._computeTBodies();
+
+			if (changes.filter)
+				this._updateFilters();
 		}
 
 		$onDestroy() {
@@ -63,6 +66,28 @@ module.component('generalTable', {
 			this.$scope.$apply();
 		}
 
+		_updateFilters() {
+			this.tbodies.forEach(tbody => {
+				const logFrame = this.project.logicalFrames.find(lf => lf.id == tbody.id);
+				if (!logFrame) {
+					tbody.filter = this.filter;
+					return;
+				}
+
+				tbody.filter = Object.assign({}, this.filter);
+				if (logFrame.start && (!tbody.filter._start || tbody.filter._start < logFrame.start))
+					tbody.filter._start = logFrame.start;
+				if (logFrame.end && (!tbody.filter._end || tbody.filter._end > logFrame.end))
+					tbody.filter._end = logFrame.end;
+
+				if (tbody.filter.entity)
+					tbody.filter.entity = logFrame.entities.filter(e => tbody.filter.entity.includes(e));
+				else
+					tbody.filter.entity = logFrame.entities;
+
+			});
+		}
+
 		_computeTBodies() {
 			return [
 				...this.project.logicalFrames.map(lf => this._logicalFrameworkToTbody(lf)),
@@ -74,6 +99,7 @@ module.component('generalTable', {
 
 		_logicalFrameworkToTbody(logicalFramework) {
 			const tbody = {
+				id: logicalFramework.id,
 				prefix: 'project.logical_frame',
 				name: logicalFramework.name,
 				sections: []
@@ -122,6 +148,7 @@ module.component('generalTable', {
 
 		_ccIndicatorsToTbody() {
 			const tbody = {
+				id: 'cross_cutting',
 				name: 'indicator.cross_cutting',
 				sections: []
 			};
@@ -172,6 +199,7 @@ module.component('generalTable', {
 
 		_extraIndicatorsToTbody() {
 			return {
+				id: "extra",
 				name: 'indicator.extra',
 				sections: [
 					{
@@ -187,6 +215,7 @@ module.component('generalTable', {
 
 		_dataSourceToTbody(dataSource) {
 			return {
+				id: dataSource.id,
 				prefix: 'project.collection_form',
 				name: dataSource.name,
 				sections: [

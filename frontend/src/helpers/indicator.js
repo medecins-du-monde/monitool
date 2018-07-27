@@ -9,7 +9,7 @@ const TIME_PERIODICITIES = [
 ];
 
 
-function* _generatePeriods(project, indicator) {
+function* _generatePeriods(project, indicator, filter) {
 	const parameters = Object.values(indicator.computation.parameters);
 	const dataSources = project.forms.filter(ds => {
 		return parameters.some(param => ds.elements.some(v => v.id === param.elementId));
@@ -17,7 +17,7 @@ function* _generatePeriods(project, indicator) {
 
 	// Get list of periodicities which are compatible with the computation
 	const periodicities = TIME_PERIODICITIES.filter(periodicity => {
-		return dataSources.every(dataSource => {
+		const validForIndicator = dataSources.every(dataSource => {
 			if (dataSource.periodicity === 'free' || periodicity === dataSource.periodicity)
 				return true;
 
@@ -30,19 +30,44 @@ function* _generatePeriods(project, indicator) {
 				return false;
 			}
 		});
+
+		if (!validForIndicator)
+			return false;
+
+		// can't disagregate twice by the same periodicity
+		if (filter[periodicity])
+			return false;
+
+		// can't disaggregate by a parent periodicity
+		for (let key in filter) {
+			if (TIME_PERIODICITIES.includes(key) && filter[key].length < 2) { // don't invert the test: it will crash
+				try {
+					let t = TimeSlot.fromDate(new Date(), key);
+					t.toUpperSlot(periodicity);
+					return false;
+				}
+				catch (e) {
+				}
+			}
+		}
+
+		return true;
 	});
 
-	// Get start & end date
-	const start = dataSources.reduce((start, ds) => {
-		return ds.start && ds.start > start ? ds.start : start;
-	}, project.start);
+	// Get the most restrictive possible start & end date by scanning all filters, project limits, ds limits, ...
+	// (logframe limits are within the filter because they get injected elsewhere).
+	const starts = [filter._start, ...dataSources.map(ds => ds.start)];
+	const ends = [filter._end, ...dataSources.map(ds => ds.end)]
+	for (let key in filter)
+		if (TIME_PERIODICITIES.includes(key)) {
+			starts.push(new TimeSlot(filter[key][0]).firstDate.toISOString().slice(0, 10));
+			ends.push(new TimeSlot(filter[key][filter[key].length - 1]).lastDate.toISOString().slice(0, 10));
+		}
 
-	const end = dataSources.reduce((end, ds) => {
-		return ds.end && ds.end < end ? ds.end : end;
-	}, project.end);
+	const start = starts.reduce((memo, date) => date && date > memo ? date : memo, project.start);
+	const end = ends.reduce((memo, date) => date && date < memo ? date : memo, project.end);
 
 	// Create dimensions
-	// const variants = {};
 	for (let periodicity of periodicities) {
 		const rows = Array
 			.from(timeSlotRange(
@@ -72,16 +97,15 @@ function* _generatePeriods(project, indicator) {
 
 
 // intersection of sites that are in this computation
-function* _generateSites(project, indicator) {
+function* _generateSites(project, indicator, filter) {
+	// no entity dimension if already filtered as much as possible.
+	if (filter.entity && (filter.entity.length < 2 || filter.entity.final))
+		return;
+
 	const parameters = Object.values(indicator.computation.parameters);
 	const dataSources = project.forms.filter(ds => {
 		return parameters.some(param => ds.elements.some(variable => variable.id === param.elementId));
 	});
-
-	// // Intersect sites used by data sources that are used to compute this variable.
-	// const siteIds = dataSources.reduce((siteIds, ds) => {
-	// 	return siteIds ? siteIds.filter(siteId => ds.entities.includes(siteId)) : ds.entities;
-	// }, null) || [];
 
 	const siteRows = project.entities
 		// We have an
@@ -93,7 +117,13 @@ function* _generateSites(project, indicator) {
 		// => We can't compute the indicator for paris and london, but we can for madrid.
 		// => The condition for a site to have a subrow is that it must be present in ALL the parameters origin data source.
 		.filter(site => {
-			return dataSources.every(ds => ds.entities.includes(site.id));
+			if (!dataSources.every(ds => ds.entities.includes(site.id)))
+				return false;
+
+			if (filter.entity && !filter.entity.includes(site.id))
+				return false;
+
+			return true;
 		})
 		.map(site => {
 			return {
@@ -118,7 +148,13 @@ function* _generateSites(project, indicator) {
 		// Which means, for all parameters, there must be an intersection between the group members and the data source providing the param.
 		.filter(group => {
 			// <=> for all dataSource, ds.entities intersection with group.members is non empty
-			return dataSources.every(ds => ds.entities.some(siteId => group.members.includes(siteId)));
+			if (!dataSources.every(ds => ds.entities.some(siteId => group.members.includes(siteId))))
+				return false;
+
+			if (filter.entity && !filter.entity.some(siteId => group.members.includes(siteId)))
+				return false;
+
+			return true;
 		})
 		.map(group => {
 			return {
@@ -141,7 +177,7 @@ function* _generateSites(project, indicator) {
 }
 
 
-function* _generatePartitions(project, indicator) {
+function* _generatePartitions(project, indicator, filter) {
 	// Get all variables and computations parameters in arrays.
 	const variables = project.forms.reduce((m, e) => m.concat(e.elements), []);
 	const parameters = Object.values(indicator.computation.parameters);
@@ -162,6 +198,10 @@ function* _generatePartitions(project, indicator) {
 
 	// Build dimensions
 	for (let partition of commonPartitions) {
+		// skip partitions that are already filtered to single element or that are marked as final
+		if (filter[partition.id] && (filter[partition.id].length < 2 || filter[partition.id].final))
+			continue;
+
 		const elementRows = partition.elements.map(element => {
 			return {
 				id: element.id,
@@ -191,7 +231,7 @@ function* _generatePartitions(project, indicator) {
 	}
 }
 
-function* _generateParameters(project, indicator) {
+function* _generateParameters(project, indicator, filter) {
 	const variables = project.forms.reduce((memo, ds) => [...memo, ...ds.elements], []);
 
 	const rows = [];
@@ -211,7 +251,7 @@ function* _generateParameters(project, indicator) {
 				baseline: null,
 				target: null,
 			},
-			filter: indicator.computation.filter
+			filter: {}
 		});
 	}
 
@@ -224,15 +264,15 @@ function* _generateParameters(project, indicator) {
 		}
 }
 
-export function generateIndicatorDimensions(project, indicator) {
+export function generateIndicatorDimensions(project, indicator, filter) {
 	if (!indicator.computation)
 		return [];
 
 	return [
-		..._generateParameters(project, indicator),
-		..._generatePeriods(project, indicator),
-		..._generateSites(project, indicator),
-		..._generatePartitions(project, indicator),
+		..._generateParameters(project, indicator, filter),
+		..._generatePeriods(project, indicator, filter),
+		..._generateSites(project, indicator, filter),
+		..._generatePartitions(project, indicator, filter),
 	].filter(dim => dim.rows.length !== 0);
 }
 

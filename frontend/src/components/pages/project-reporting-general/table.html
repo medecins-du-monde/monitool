@@ -1,12 +1,11 @@
 
 <table id="reporting" class="table table-bordered table-condensed">
 	<tbody
-		ng-repeat="tbody in $ctrl.tbodies"
+		ng-repeat="tbody in $ctrl.tbodies track by tbody.id"
 		tbody-indicators
 
 		project="$ctrl.project"
 		columns="$ctrl.columns"
-		filter="$ctrl.filter"
 		group-by="$ctrl.groupBy"
 
 		first-col-style="$ctrl.firstColStyle"
@@ -14,6 +13,7 @@
 		prefix="tbody.prefix"
 		name="tbody.name"
 		sections="tbody.sections"
+		filter="tbody.filter"
 
 		on-plot-toggle="$ctrl.onPlotToggle({id: id, name: name, data: data})">
 	</tbody>

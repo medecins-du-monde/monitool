@@ -94,9 +94,10 @@ module.directive('tbodyIndicators', () => {
 					return;
 
 				// Get the dimension we want to split on.
-				const dimensions = generateIndicatorDimensions(this.project, indicator).filter(dim => {
-					return !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => filter[d]);
-				});
+				const dimensions =
+					// not really sure if we should use global/local filter (with or without 'this.'')
+					generateIndicatorDimensions(this.project, indicator, /*this.*/filter)
+					.filter(dim => !dim.exclude.includes(this.groupBy));
 
 				const dimension = dimensions.find(d => d.id === dimensionId);
 
@@ -114,7 +115,13 @@ module.directive('tbodyIndicators', () => {
 						if (childFilter[key])
 							childFilter[key] = row.filter[key].filter(e => childFilter[key].includes(e));
 						else
-							childFilter[key] = row.filter[key];
+							childFilter[key] = row.filter[key].slice();
+
+						// Dirty: This is a huge hack.
+						// We want to make sure that the user won't be able to disagregate twice on the same thing using the "+"
+						// buttons that are in the reporting table.
+						// For instance, disagregate by site, and then open a site group again, because it never ends and duplicates data on the table.
+						childFilter[key].final = true;
 					}
 
 					// Recurse

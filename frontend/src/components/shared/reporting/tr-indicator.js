@@ -54,9 +54,7 @@ module.directive('trIndicator', () => {
 					(changes.columns && !angular.equals(changes.columns.previousValue, changes.columns.currentValue));
 
 				if (redraw && !this._refreshWaiting) {
-					this.availableDimensions =
-						generateIndicatorDimensions(this.project, this.indicator)
-						.filter(dim => !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => this.filter[d]));
+					this.availableDimensions = generateIndicatorDimensions(this.project, this.indicator, this.filter).filter(dim => !dim.exclude.includes(this.groupBy))
 
 					this.values = null;
 

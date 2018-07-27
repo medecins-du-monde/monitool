@@ -120,8 +120,8 @@ module.component('ccIndicatorTable', {
 				return;
 
 			// Get the dimension we want to split on.
-			const dimensions = generateIndicatorDimensions(project, indicator).filter(dim => {
-				return !dim.exclude.includes(this.groupBy) && !dim.exclude.some(d => filter[d]);
+			const dimensions = generateIndicatorDimensions(project, indicator, filter).filter(dim => {
+				return !dim.exclude.includes(this.groupBy);
 			});
 
 			const dimension = dimensions.find(d => d.id === dimensionId);
