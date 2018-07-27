@@ -151,19 +151,29 @@ module.component('inputGrid', {
 			const numPartitions = this.variable.partitions.length;
 			let sum;
 
+			const isSumX = this.withSumX && editedX === this._width - 1;
+			const isSumY = this.withSumY && editedY === this._height - 1;
+
 			// guard against infinite loop (the total update trigering another update etc...)
-			if (this.withSumX && editedX < this._width - 1) {
+			if (this.withSumX && !isSumX) {
 				sum = 0;
 				for (let x = this.variable.distribution; x < this._width - 1; ++x)
 					sum += this.handsOnTable.getDataAtCell(editedY, x);
 				this.handsOnTable.setDataAtCell(editedY, this._width - 1, sum);
 			}
 
-			if (this.withSumY && editedX < this._width - 1 && editedY < this._height - 1) {
+			if (this.withSumY && !isSumY) {
 				sum = 0;
 				for (let y = numPartitions - this.variable.distribution; y < this._height - 1; ++y)
 					sum += this.handsOnTable.getDataAtCell(y, editedX);
 				this.handsOnTable.setDataAtCell(this._height - 1, editedX, sum);
+			}
+
+			if (this.withSumX && this.withSumY && !isSumX && isSumY) {
+				sum = 0;
+				for (let x = this.variable.distribution; x < this._width - 1; ++x)
+					sum += this.handsOnTable.getDataAtCell(this._height - 1, x);
+				this.handsOnTable.setDataAtCell(this._height - 1, this._width - 1, sum);
 			}
 		}
 
