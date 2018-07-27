@@ -45,9 +45,12 @@ module.component('projectInputMenu', {
 
 	template: require('./menu.html'),
 
-	controller: class ProjectInputController {
+	controller: class ProjectInputMenuController {
 
-
+		constructor($state, $stateParams) {
+			this.$state = $state;
+			this.$stateParams = $stateParams;
+		}
 	}
 });
 

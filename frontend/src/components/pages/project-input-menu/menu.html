@@ -27,7 +27,7 @@
 
 						<a ng-repeat="dataSource in $ctrl.project.forms"
 						   ui-sref="main.project.input.list({dataSourceId: dataSource.id})"
-						   ui-sref-active="active"
+						   ng-class="{active: ($ctrl.$state.is('main.project.input.list') || $ctrl.$state.is('main.project.input.edit')) && $ctrl.$stateParams.dataSourceId == dataSource.id}"
 						   class="list-group-item"
 						   acl-has-input-form="dataSource.id" acl-project="$ctrl.project">
 							<i class="fa fa-pencil fa-fw"></i>
