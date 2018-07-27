@@ -85,7 +85,16 @@ module.component('logicalFrameworkList', {
 					from: logicalFrame ? logicalFrame.id : null
 				}
 			);
-		};
+		}
+
+		onDeleteClicked(logicalFrame) {
+			this.editableProject.logicalFrames.splice(
+				this.editableProject.logicalFrames.indexOf(logicalFrame),
+				1
+			);
+
+			this.onFieldChange();
+		}
 	}
 });
 

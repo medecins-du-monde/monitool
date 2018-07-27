@@ -79,6 +79,15 @@ module.component('dataSourceList', {
 			this.$state.go('main.project.structure.collection_form_edition', {dataSourceId: uuid()});
 		}
 
+		onDeleteClicked(dataSource) {
+			this.editableProject.forms.splice(
+				this.editableProject.forms.indexOf(dataSource),
+				1
+			);
+
+			this.onFieldChange();
+		}
+
 	}
 });
 
