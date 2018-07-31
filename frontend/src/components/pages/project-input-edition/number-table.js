@@ -27,6 +27,10 @@ const module = angular.module(
 	]
 );
 
+
+const onScreenGrids = [];
+
+
 /**
  * Warning: do not rebind variable after the component has initialized.
  * It is not watching the value.
@@ -44,6 +48,9 @@ module.component('inputGrid', {
 
 		constructor($element) {
 			this.$element = $element;
+
+			// bind the event handler so that we can remove it when the component is destroyed
+			this._keyDownHandler = e => this._onKeyDown(e);
 		}
 
 		$onInit() {
@@ -54,6 +61,11 @@ module.component('inputGrid', {
 			this.ngModelCtrl.$render = () => this.handsOnTable.loadData(this.ngModelCtrl.$viewValue);
 
 			this.ngModelCtrl.$validators.isNumber = modelValue => modelValue.every(v => typeof v === 'number');
+		}
+
+		$onDestroy() {
+			onScreenGrids.splice(onScreenGrids.indexOf(this), 1);
+			document.body.removeEventListener('keydown', this._keyDownHandler);
 		}
 
 		$postLink() {
@@ -86,7 +98,105 @@ module.component('inputGrid', {
 				afterChange: this._onHandsOnTableChange.bind(this),
 				cells: this._handsOnTableCellRenderer.bind(this)
 			});
+
+			// Simulate tab index between all fields.
+			onScreenGrids.push(this);
+			if (onScreenGrids.length === 1)
+				this.selectFirstCell();
+
+			document.body.addEventListener('keydown', this._keyDownHandler);
 		}
+
+
+		/**
+		 * Focus the first cell of the table.
+		 * This will be called by other number-tables when tabbing between various fields.
+		 */
+		selectFirstCell() {
+			this.handsOnTable.selectCells([
+				[
+					this.variable.partitions.length - this.variable.distribution,
+					this.variable.distribution,
+					this.variable.partitions.length - this.variable.distribution,
+					this.variable.distribution,
+				]
+			]);
+
+			console.log(this.handsOnTable.getCoords(this.handsOnTable.getCell(this.variable.partitions.length - this.variable.distribution, this.variable.distribution)));
+		}
+
+
+		/**
+		 * Focus the first cell of the table.
+		 * This will be called by other number-tables when tabbing between various fields.
+		 */
+		selectLastCell() {
+			this.handsOnTable.selectCells([
+				[
+					this.withSumY ? this._height - 2 : this._height - 1,
+					this.withSumX ? this._width - 2 : this._width - 1,
+					this.withSumY ? this._height - 2 : this._height - 1,
+					this.withSumX ? this._width - 2 : this._width - 1,
+				]
+			]);
+		}
+
+		_onKeyDown(e) {
+			if (!this.handsOnTable || e.keyCode !== 9)
+				return;
+
+			var selection = this.handsOnTable.getSelected();
+			if (selection) {
+				e.stopPropagation(); // do not let handsontable get the event.
+				e.stopImmediatePropagation() // do no let other instances of number-table to get the event.
+				e.preventDefault(); // do not let the browser use this event (ie: to select the address bar or something else).
+
+				const [minX, maxX] = [this.variable.distribution, this.withSumX ? this._width - 1 : this._width];
+				const [minY, maxY] = [this.variable.partitions.length - this.variable.distribution, this.withSumY ? this._height - 1 : this._height];
+
+				// Select only one zone in the table
+				selection.length = 1;
+
+				if (!e.shiftKey) {
+					// Select next cell
+					selection[0][1]++;
+					if (selection[0][1] >= maxX) {
+						selection[0][0]++;
+						selection[0][1] = minX;
+					}
+				}
+				else {
+					// Select previous cell
+					selection[0][1]--;
+					if (selection[0][1] < minX) {
+						selection[0][0]--;
+						selection[0][1] = maxX - 1;
+					}
+				}
+
+				if (minY <= selection[0][0] && selection[0][0] < maxY) {
+					// select only one cell
+					selection[0][2] = selection[0][0];
+					selection[0][3] = selection[0][1];
+
+					this.handsOnTable.selectCells(selection);
+				}
+				else if (selection[0][0] < minY) {
+					this.handsOnTable.deselectCell();
+
+					const next = onScreenGrids[(onScreenGrids.indexOf(this) + onScreenGrids.length - 1) % onScreenGrids.length];
+					next.selectLastCell()
+				}
+				else {
+					this.handsOnTable.deselectCell();
+
+					const next = onScreenGrids[(onScreenGrids.indexOf(this) + 1) % onScreenGrids.length];
+					next.selectFirstCell()
+				}
+
+			}
+		}
+
 
 		/**
 		 * Update the viewvalue when handsontable report changes.
