@@ -137,8 +137,13 @@ export default class Project {
 		if (indicators) {
 			for (var indicatorId in this.crossCutting) {
 				var indicator = indicators.find(i => i._id == indicatorId);
+				if (!indicator) {
+					delete this.crossCutting[indicatorId];
+					continue;
+				}
+
 				var commonThemes = indicator.themes.filter(t => this.themes.includes(t));
-				if (!indicator || commonThemes.length === 0)
+				if (commonThemes.length === 0)
 					delete this.crossCutting[indicatorId];
 			}
 		}
