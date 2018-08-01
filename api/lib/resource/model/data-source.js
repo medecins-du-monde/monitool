@@ -15,8 +15,10 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Variable from './variable';
+import TimeSlot from 'timeslot-dag';
 import validator from 'is-my-json-valid';
+
+import Variable from './variable';
 import Model from './model';
 import schema from '../schema/data-source.json';
 
@@ -42,6 +44,18 @@ export default class DataSource extends Model {
 		let s = {};
 		this.elements.forEach(element => s[element.id] = element.structure);
 		return s;
+	}
+
+	isValidSlot(slot) {
+		const timeSlot = new TimeSlot(slot);
+
+		if (this.periodicity === 'free' && timeSlot.periodicity !== 'day')
+			return false;
+
+		if (this.periodicity !== 'free' && timeSlot.periodicity !== this.periodicity)
+			return false;
+
+		return true;
 	}
 
 	/**

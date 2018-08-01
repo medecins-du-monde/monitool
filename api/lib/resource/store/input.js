@@ -15,6 +15,7 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import TimeSlot from 'timeslot-dag';
 import Store from './store';
 import Input from '../model/input';
 import Project from '../model/project';
@@ -47,14 +48,20 @@ export default class InputStore extends Store {
 			const dataSource = project.getDataSourceById(dataSourceId);
 
 			// Remove inputs that are no longer relevant
-			if (dataSource)
-				dbResult.rows = dbResult.rows.filter(row => project.getEntityById(row.id.substr(88, 36)));
-			else
-				dbResult.rows = [];
+			dbResult.rows = dbResult.rows.filter(row => {
+				const [siteId, period] = row.id.split(':').slice(4);
+				const timeSlot = new TimeSlot(period);
+				const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
 
-			// FIXME a lot is missing here.
+				return dataSource
+					&& project.start <= endDate
+					&& project.end >= startDate
+					&& (!dataSource.start || dataSource.start <= endDate)
+					&& (!dataSource.end || dataSource.end >= startDate)
+					&& dataSource.entities.includes(siteId)
+					&& dataSource.isValidSlot(period);
+			});
 		}
-
 
 		const result = {};
 		dbResult.rows.forEach(item => result[item.id] = item.value);
@@ -70,10 +77,18 @@ export default class InputStore extends Store {
 			// Remove inputs that are no longer relevant
 			inputs = inputs.filter(input => {
 				const project = projects.find(p => p._id === input.project);
-				return project.getDataSourceById(input.form) && project.getEntityById(input.entity);
-			});
+				const dataSource = project.getDataSourceById(input.form);
+				const timeSlot = new TimeSlot(input.period);
+				const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
 
-			// FIXME a lot is missing here.
+				return dataSource
+					&& project.start <= endDate
+					&& project.end >= startDate
+					&& (!dataSource.start || dataSource.start <= endDate)
+					&& (!dataSource.end || dataSource.end >= startDate)
+					&& dataSource.entities.includes(input.entity)
+					&& dataSource.isValidSlot(input.period);
+			});
 
 			// Update structure
 			inputs.forEach(input => {
@@ -107,7 +122,17 @@ export default class InputStore extends Store {
 
 			// Remove inputs that are no longer relevant
 			inputs = inputs.filter(input => {
-				return project.getDataSourceById(input.form) && project.getEntityById(input.entity);
+				const dataSource = project.getDataSourceById(input.form);
+				const timeSlot = new TimeSlot(input.period);
+				const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
+
+				return dataSource
+					&& project.start <= endDate
+					&& project.end >= startDate
+					&& (!dataSource.start || dataSource.start <= endDate)
+					&& (!dataSource.end || dataSource.end >= startDate)
+					&& dataSource.entities.includes(input.entity)
+					&& dataSource.isValidSlot(input.period);
 			});
 
 			// Update structure
@@ -140,7 +165,19 @@ export default class InputStore extends Store {
 			const project = await Project.storeInstance.get(projectId);
 			const dataSource = project.getDataSourceById(dataSourceId);
 
-			inputs = inputs.filter(input => dataSource && project.getEntityById(input.entity));
+			inputs = inputs.filter(input => {
+				const timeSlot = new TimeSlot(input.period);
+				const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
+
+				return dataSource
+					&& project.start <= endDate
+					&& project.end >= startDate
+					&& (!dataSource.start || dataSource.start <= endDate)
+					&& (!dataSource.end || dataSource.end >= startDate)
+					&& dataSource.entities.includes(input.entity)
+					&& dataSource.isValidSlot(input.period)
+			});
+
 			inputs.forEach(input => input.update(dataSource.structure));
 		}
 
