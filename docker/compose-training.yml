@@ -13,6 +13,9 @@ services:
 
   api:
     image: medecinsdumonde/monitool-api:latest
+    deploy:
+      mode: replicated
+      replicas: 4
     networks:
       - backend
       - frontend
