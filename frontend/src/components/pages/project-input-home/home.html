@@ -26,9 +26,12 @@
 					<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id">
 						<td>
 							Remplir les {{$ctrl.status[dataSource.id].total}} saisies de
-							<a class="btn btn-default btn-xs" ui-sref="main.project.input.list({dataSourceId: dataSource.id})">
+							<a
+								class="btn btn-default btn-xs"
+								title="{{dataSource.name}}"
+								ui-sref="main.project.input.list({dataSourceId: dataSource.id})">
 								<i class="fa fa-pencil"></i>
-								{{dataSource.name}}
+								{{dataSource.name|maxLength:30}}
 							</a>
 						</td>
 						<td translate="shared.loading" ng-if="!$ctrl.status"></td>

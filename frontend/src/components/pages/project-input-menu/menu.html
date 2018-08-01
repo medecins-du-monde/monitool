@@ -29,7 +29,9 @@
 						   ui-sref="main.project.input.list({dataSourceId: dataSource.id})"
 						   ng-class="{active: ($ctrl.$state.is('main.project.input.list') || $ctrl.$state.is('main.project.input.edit')) && $ctrl.$stateParams.dataSourceId == dataSource.id}"
 						   class="list-group-item"
-						   acl-has-input-form="dataSource.id" acl-project="$ctrl.project">
+						   title="{{dataSource.name}}"
+						   acl-has-input-form="dataSource.id" acl-project="$ctrl.project"
+						   style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
 							<i class="fa fa-pencil fa-fw"></i>
 							<span>{{dataSource.name}}</span>
 						</a>
