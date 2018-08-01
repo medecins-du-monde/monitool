@@ -81,7 +81,7 @@ router.post('/reporting/project/:prjId', async ctx => {
 			// 
 			const dataSource = project.getDataSourceByVariableId(variableId);
 			const variable = dataSource.getVariableById(variableId);
-			const inputs = await Input.storeInstance.listByDataSource(project._id, dataSource.id, true);
+			const inputs = await Input.storeInstance.listByVariable(project._id, dataSource.id, variableId, true);
 			const cube = Cube.fromElement(project, dataSource, variable, inputs);
 
 			// Merge parameter filters

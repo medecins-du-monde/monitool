@@ -247,6 +247,29 @@ const migrateDesignDoc = async () => {
 	delete ddoc.views.inputs_by_project_form_date;
 	delete ddoc.views.themes_usage;
 
+	ddoc.views.inputs_variable = {
+		map: function(doc) {
+			if (doc.type === 'input') {
+				for (var variableId in doc.values) {
+					var content = {
+						_id: doc._id,
+						type: 'input',
+						project: doc.project,
+						entity: doc.entity,
+						form: doc.form,
+						period: doc.period,
+						values: {},
+						structure: {}
+					};
+
+					content.values[variableId] = doc.values[variableId];
+					content.structure[variableId] = doc.structure[variableId];
+					emit(doc.project + ':' + doc.form + ':' + variableId, content);
+				}
+			}
+		}.toString()
+	};
+
 	ddoc.views.inputs_with_progress = {
 		map: function(doc) {
 			if (doc.type === 'input') {

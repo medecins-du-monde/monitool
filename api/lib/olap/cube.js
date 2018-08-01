@@ -50,14 +50,12 @@ export default class Cube {
 	 * @return {Cube}
 	 *
 	 * @example
-	 * let projectId = '6acefb96-a047-4b77-a698-6a9da3994306';
+	 * const projectId = '6acefb96-a047-4b77-a698-6a9da3994306';
+	 * const project = await Project.store.get(projectId);
+	 * const inputs = await Input.listByVariable(projectId, project.forms[0].id, project.forms[0].elements[0].id, true);
 	 *
-	 * Project.store.get(projectId).then(function(project) {
-	 *     Input.listByDataSource(projectId, project.forms[0].id).then(function(inputs) {
-	 *         let c =  = Cube.fromElement(project, project.forms[0], project.forms[0].element[0], inputs);
-	 *         // do stuff here
-	 *     });
-	 * });
+	 * let c = Cube.fromElement(project, project.forms[0], project.forms[0].element[0], inputs);
+	 * // do stuff here
 	 */
 	static fromElement(project, form, element, inputs) {
 		////////////

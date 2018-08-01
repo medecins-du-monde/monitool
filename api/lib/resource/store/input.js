@@ -149,17 +149,15 @@ export default class InputStore extends Store {
 	 * Retrieve all inputs of a given data source
 	 * Used to generate cubes (for indicator reporting)
 	 */
-	async listByDataSource(projectId, dataSourceId, update=false) {
-		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string')
+	async listByVariable(projectId, dataSourceId, variableId, update=false) {
+		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string' || typeof variableId !== 'string')
 			throw new Error('missing_parameter');
 
-		const result = await this._db.callList({
-			include_docs: true,
-			startkey: "input:" + projectId + ":" + dataSourceId + ":!",
-			endkey: "input:" + projectId + ":" + dataSourceId + ":~"
-		});
-
-		let inputs = result.rows.map(row => new Input(row.doc));
+		const result = await this._db.callView(
+			'inputs_variable',
+			{key: projectId + ':' + dataSourceId + ':' + variableId}
+		);
+		let inputs = result.rows.map(row => new Input(row.value));
 
 		if (update) {
 			const project = await Project.storeInstance.get(projectId);
@@ -178,8 +176,14 @@ export default class InputStore extends Store {
 					&& dataSource.isValidSlot(input.period)
 			});
 
-			inputs.forEach(input => input.update(dataSource.structure));
+			const structure = {[variableId]: dataSource.structure[variableId]};
+			inputs.forEach(input => input.update(structure));
 		}
+		else
+			inputs.forEach(input => {
+				inputs.values = {[variableId]: inputs.values[variableId]};
+				inputs.structure = {[variableId]: inputs.structure[variableId]};
+			});
 
 		return inputs;
 	}
