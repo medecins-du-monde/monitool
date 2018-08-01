@@ -121,10 +121,7 @@ module.component('inputGrid', {
 					this.variable.distribution,
 				]
 			]);
-
-			console.log(this.handsOnTable.getCoords(this.handsOnTable.getCell(this.variable.partitions.length - this.variable.distribution, this.variable.distribution)));
 		}
-
 
 		/**
 		 * Focus the first cell of the table.
