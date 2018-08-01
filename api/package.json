@@ -33,7 +33,6 @@
     "koa-response-time": "^2.0.0",
     "koa-router": "^7.4.0",
     "koa-session": "^5.8.1",
-    "memory-cache": "^0.1.6",
     "nano": "x",
     "node-uuid": "x",
     "passport-local": "^1.0.0",

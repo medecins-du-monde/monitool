@@ -16,7 +16,6 @@
  */
 
 import Router from 'koa-router';
-import cache from 'memory-cache';
 import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 import exprEval from 'expr-eval';
 

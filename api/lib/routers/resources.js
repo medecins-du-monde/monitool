@@ -17,7 +17,6 @@
 
 
 import Router from 'koa-router';
-import cache from 'memory-cache';
 
 import Indicator from '../resource/model/indicator';
 import Input from '../resource/model/input';
@@ -176,9 +175,6 @@ router.put('/resources/project/:id', async ctx => {
 				throw new Error('forbidden');
 		}
 
-		// Create the project.
-		cache.del('reporting:project:' + ctx.params.id); // This empties the reporting cache
-
 		const newProject = new Project(ctx.request.body);
 		await newProject.save(false, ctx.state.user);
 
@@ -191,7 +187,6 @@ router.put('/resources/project/:id', async ctx => {
  *
  * Multiple modes are supported
  * 		- ids_by_form: retrieve all input ids that match a given projectId and formId
- *		- ids_by_entity: retrieve all inputs ids that match a given projectId and entityId
  * 		- current+last: retrieve a given input and the previous one (with projectId, formId, entityId & period)
  */
 router.get('/resources/input', async ctx => {
@@ -266,8 +261,6 @@ router.put('/resources/input/:id', async ctx => {
 	if (!allowed)
 		throw new Error('forbidden');
 
-	cache.del('reporting:project:' + input.project);
-
 	await input.save();
 	ctx.response.body = input.toAPI();
 })
@@ -289,8 +282,6 @@ router.delete('/resources/input/:id', async ctx => {
 
 	if (!allowed)
 		throw new Error('forbidden');
-
-	cache.del('reporting:project:' + input.project);
 
 	ctx.response.body = input.destroy();
 })
