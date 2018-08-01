@@ -35,7 +35,8 @@ function mergeRec(depth, expr, parameters, trees) {
 
 		try {
 			const result = expr.evaluate(paramMap);
-			if (typeof result !== 'number' || Number.isNaN(result))
+
+			if (typeof result !== 'number' || !Number.isFinite(result))
 				throw new Error();
 			return result;
 		}
@@ -52,7 +53,17 @@ function mergeRec(depth, expr, parameters, trees) {
 
 	const result = {};
 	for (let key of keys)
-		result[key] = mergeRec(depth - 1, expr, parameters, trees.map(p => p[key]));
+		result[key] = mergeRec(
+			depth - 1,
+			expr,
+			parameters,
+			trees.map(p => {
+				if (p !== undefined)
+					return p[key];
+				else
+					return depth <= 1 ? undefined : {};
+			})
+		);
 
 	return result;
 }
