@@ -140,7 +140,13 @@ module.component('ccIndicatorTable', {
 					if (childFilter[key])
 						childFilter[key] = row.filter[key].filter(e => childFilter[key].includes(e));
 					else
-						childFilter[key] = row.filter[key];
+						childFilter[key] = row.filter[key].slice();
+
+					// Dirty: This is a huge hack.
+					// We want to make sure that the user won't be able to disagregate twice on the same thing using the "+"
+					// buttons that are in the reporting table.
+					// For instance, disagregate by site, and then open a site group again, because it never ends and duplicates data on the table.
+					childFilter[key].final = true;
 				}
 
 				// Recurse
