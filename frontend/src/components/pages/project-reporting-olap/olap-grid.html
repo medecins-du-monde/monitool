@@ -1,27 +1,27 @@
 
 <table class="table table-bordered table-condensed data-grid" id="reporting">
 	<thead>
-		<tr ng-repeat="row in grid.header">
-			<th colspan="{{grid.body[0].headerCols.length}}"
-				rowspan="{{grid.header.length}}"
+		<tr ng-repeat="row in $ctrl.grid.header">
+			<th colspan="{{$ctrl.grid.body[0].headerCols.length}}"
+				rowspan="{{$ctrl.grid.header.length}}"
 				ng-if="$first"></th>
 
 			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}" title="{{col.title}}">
-				<i class="fa fa-arrow-circle-right" ng-if="col.members"></i>
-				{{col.name}}
+				<i class="fa fa-arrow-circle-right" ng-if="col.isGroup"></i>
+				{{col.name|formatSlot}}
 			</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in grid.body">
+		<tr ng-repeat="row in $ctrl.grid.body">
 			<th ng-repeat="headerCol in row.headerCols"
-				ng-if="$parent.$index % rowspans[$index] == 0"
+				ng-if="$parent.$index % $ctrl.rowspans[$index] == 0"
 				title="{{headerCol.title}}"
-				rowspan="{{rowspans[$index]}}"
+				rowspan="{{$ctrl.rowspans[$index]}}"
 				style="min-width: 100px">
 
-				<i class="fa fa-arrow-circle-right" ng-if="headerCol.members"></i>
-				{{headerCol.name}}
+				<i class="fa fa-arrow-circle-right" ng-if="headerCol.isGroup"></i>
+				{{headerCol.name|formatSlot}}
 			</th>
 
 			<td ng-repeat="col in row.dataCols track by $index"

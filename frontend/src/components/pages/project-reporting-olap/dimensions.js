@@ -24,7 +24,7 @@ module.component('olapDimensions', {
 
 		$onChanges(changes) {
 			if (changes.project || changes.indicator) {
-				this._dimensions = generateIndicatorDimensions(this.project, this.indicator);
+				this._dimensions = generateIndicatorDimensions(this.project, this.indicator, {}).filter(dim => dim.id !== 'computation');
 				this.selected = {rows: [this._dimensions[0].id], cols: []};
 
 				this.onSelectUpdate();

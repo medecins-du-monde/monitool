@@ -1,5 +1,5 @@
 
-import mtMselectWithGroups from '../ng-models/mselect-with-groups';
+import mtMselectWithGroups from '../../shared/ng-models/mselect-with-groups';
 import {computeSplitPartitions} from '../../../helpers/indicator';
 
 const module = angular.module(
@@ -75,6 +75,8 @@ module.component('indicatorFilter', {
 					this.minDate = this.logicalFramework.start;
 				if (this.logicalFramework.end && this.maxDate > this.logicalFramework.end)
 					this.maxDate = dataSource.end;
+
+				this.availableSites = this.availableSites.filter(site => this.logicalFramework.entities.includes(site.id));
 			}
 
 			this.availableGroups = this.project.groups
