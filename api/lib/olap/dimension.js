@@ -39,6 +39,14 @@ export default class Dimension {
 		return new Dimension(periodicity, periods, element.timeAgg);
 	}
 
+	static createTimeFast(project, form, element, inputs) {
+		const periodicity = form.periodicity === 'free' ? 'day' : form.periodicity;
+		const periods = [...(new Set(inputs.map(i => i.period)))];
+		periods.sort();
+
+		return new Dimension(periodicity, periods, element.timeAgg);
+	}
+
 	static createLocation(project, form, element) {
 		return new Dimension('entity', form.entities, element.geoAgg);
 	}

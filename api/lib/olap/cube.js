@@ -64,7 +64,8 @@ export default class Cube {
 		var dimensions = [], dimensionGroups = [];
 
 		// Time
-		dimensions.push(Dimension.createTime(project, form, element));
+		// dimensions.push(Dimension.createTime(project, form, element));
+		dimensions.push(Dimension.createTimeFast(project, form, element, inputs));
 		['week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'month', 'quarter', 'semester', 'year'].forEach(periodicity => {
 			// This will fail while indexOf(periodicity) < indexOf(form.periodicity)
 			try {
@@ -91,10 +92,8 @@ export default class Cube {
 		var dataSize = 1;
 		dimensions.forEach(dimension => dataSize *= dimension.items.length);
 
-		// var data = {};
-		var data = new Array(dataSize)
-		for (var i = 0; i < dataSize; ++i)
-			data[i] = -2147483648;
+		var data = new Array(dataSize);
+		data.fill(-2147483648);
 
 		inputs.forEach(input => {
 			// Compute location where this subtable should go, and length of data to copy.
@@ -130,22 +129,9 @@ export default class Cube {
 			}
 
 			// Copy into destination table.
-			// data[offset] = source;
 			for (var i = 0; i < length; ++i)
 				data[offset + i] = source[i];
 		});
-
-		var keys = Object.keys(data);
-		keys.sort((a, b) => a * 1 - b * 1)
-
-		for (var i = keys.length - 1; i > 0; --i) {
-			var key = keys[i - 1], nextKey = keys[i];
-
-			if (key * 1 + data[key].length == nextKey) {
-				data[key] = [...data[key], ...data[nextKey]];
-				delete data[nextKey];
-			}
-		}
 
 		// Build and fill cube
 		return new Cube(element.id, dimensions, dimensionGroups, data);
