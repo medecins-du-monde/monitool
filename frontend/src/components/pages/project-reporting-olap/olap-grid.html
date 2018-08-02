@@ -1,23 +1,12 @@
 
 <table class="table table-bordered table-condensed data-grid" id="reporting">
-	<thead>
-		<tr ng-repeat="row in $ctrl.grid.header">
-			<th colspan="{{$ctrl.grid.body[0].headerCols.length}}"
-				rowspan="{{$ctrl.grid.header.length}}"
-				ng-if="$first"></th>
-
-			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}" title="{{col.title}}">
-				<i class="fa fa-arrow-circle-right" ng-if="col.isGroup"></i>
-				{{col.name|formatSlot}}
-			</th>
-		</tr>
-	</thead>
 	<tbody>
 		<tr ng-repeat="row in $ctrl.grid.body">
 			<th ng-repeat="headerCol in row.headerCols"
 				ng-if="$parent.$index % $ctrl.rowspans[$index] == 0"
 				title="{{headerCol.title}}"
 				rowspan="{{$ctrl.rowspans[$index]}}"
+				ng-style="$ctrl.firstColStyle"
 				style="min-width: 100px">
 
 				<i class="fa fa-arrow-circle-right" ng-if="headerCol.isGroup"></i>
@@ -30,4 +19,16 @@
 				td-reporting-field></td>
 		</tr>
 	</tbody>
+	<thead ng-style="$ctrl.headerStyle">
+		<tr ng-repeat="row in $ctrl.grid.header">
+			<th colspan="{{$ctrl.grid.body[0].headerCols.length}}"
+				rowspan="{{$ctrl.grid.header.length}}"
+				ng-if="$first"></th>
+
+			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}" title="{{col.title}}">
+				<i class="fa fa-arrow-circle-right" ng-if="col.isGroup"></i>
+				{{col.name|formatSlot}}
+			</th>
+		</tr>
+	</thead>
 </table>

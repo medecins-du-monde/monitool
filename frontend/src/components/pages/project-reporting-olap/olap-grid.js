@@ -39,6 +39,32 @@ module.component('olapGrid', {
 
 	controller: class OlapGridController {
 
+		constructor($element, $scope) {
+			this._element = angular.element($element);
+			this.$scope = $scope;
+		}
+
+		$onInit() {
+			this._binded = this._onScroll.bind(this);
+			this._element.bind('scroll', this._binded);
+		}
+
+		$onDestroy() {
+			this._element.unbind('scroll', this._binded);
+		}
+
+		_onScroll() {
+			this.headerStyle = {
+				transform: 'translate(0, ' + this._element[0].scrollTop + 'px)'
+			};
+
+			this.firstColStyle = {
+				transform: 'translate(' + this._element[0].scrollLeft + 'px)'
+			};
+
+			this.$scope.$apply();
+		}
+
 		$onChanges(changes) {
 			const dimensions = generateIndicatorDimensions(this.project, this.indicator, this.filter);
 

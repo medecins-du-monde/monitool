@@ -709,7 +709,7 @@ td.empty > span {
 
 
 
-general-reporting, cc-indicator-reporting, project-input-list {
+general-reporting, cc-indicator-reporting, project-input-list, olap-reporting {
   display: flex;
   height: 100vh;
   flex-direction: column;
@@ -890,5 +890,37 @@ project-input-list .bodyField2 {
 }
 
 
+/**
+ * Styling of olap table
+ */
 
 
+olap-grid {
+  flex: 1;
+  display: block;
+  overflow: auto;
+  border: 0 solid #ccc;
+  border-top-width: 1px;
+}
+
+
+olap-grid table {
+  overflow: hidden;
+  border-collapse: separate !important;
+  border-spacing: 0px !important;
+  border-width: 0 !important;
+}
+
+olap-grid table td, olap-grid table th {
+  border-top-width: 0 !important;
+  border-left-width: 0 !important;
+  background-color: white;
+}
+
+olap-grid table td:first-child, olap-grid table th:first-child {
+  border-left-width: 1px !important;
+}
+
+olap-grid th:first-child, .input-table-container td:first-child {
+  width: 15%;
+}
