@@ -753,7 +753,15 @@ general-table table td:first-child, general-table table th:first-child, cc-indic
 .project-menu {
   position: fixed;
   width: 200px;
-  top: 45px;
+  top: 0;
+  padding-top: 45px;
+  padding-bottom: 10px;
+  height: 100%;
+}
+
+.project-menu .panel-group {
+  height: 100%;
+  overflow-y: auto;
 }
 
 .project-content {
