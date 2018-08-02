@@ -71,8 +71,20 @@ module.component('olapGrid', {
 			const rows = this.dimensions.rows.map(id => dimensions.find(d => d.id == id).rows);
 			const cols = this.dimensions.cols.map(id => dimensions.find(d => d.id == id).rows);
 
-			rows.forEach(row => row.push({id: '_total', name: 'total', isGroup: true}))
-			cols.forEach(col => col.push({id: '_total', name: 'total', isGroup: true}))
+			if (!rows.length) {
+				rows.push([]);
+				this.data = {_total: this.data};
+			}
+			if (!cols.length) {
+				cols.push([])
+				for (let key in this.data)
+					this.data[key] = {_total: this.data[key]}
+			}
+
+			console.log(this.data)
+
+			rows.forEach(row => row.push({id: '_total', name: 'total', isGroup: true}));
+			cols.forEach(col => col.push({id: '_total', name: 'total', isGroup: true}));
 
 			// Create empty grid.
 			this.grid = {header: [], body: []};
@@ -104,6 +116,8 @@ module.component('olapGrid', {
 			}
 
 			product(rows).forEach(headers => {
+				console.log(headers)
+
 				this.grid.body.push({
 					headerCols: headers,
 					dataCols: product([...headers.map(a => [a]), ...cols]).map(els => {

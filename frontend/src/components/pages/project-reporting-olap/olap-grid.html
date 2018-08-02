@@ -23,6 +23,7 @@
 		<tr ng-repeat="row in $ctrl.grid.header">
 			<th colspan="{{$ctrl.grid.body[0].headerCols.length}}"
 				rowspan="{{$ctrl.grid.header.length}}"
+				ng-style="$ctrl.firstColStyle"
 				ng-if="$first"></th>
 
 			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}" title="{{col.title}}">
