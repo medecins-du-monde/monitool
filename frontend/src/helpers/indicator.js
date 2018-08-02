@@ -99,7 +99,7 @@ function* _generatePeriods(project, indicator, filter) {
 // intersection of sites that are in this computation
 function* _generateSites(project, indicator, filter) {
 	// no entity dimension if already filtered as much as possible.
-	if (filter.entity && (filter.entity.length < 2 || filter.entity.final))
+	if (filter.entity && (/*filter.entity.length < 2 || */filter.entity.final))
 		return;
 
 	const parameters = Object.values(indicator.computation.parameters);
@@ -199,28 +199,32 @@ function* _generatePartitions(project, indicator, filter) {
 	// Build dimensions
 	for (let partition of commonPartitions) {
 		// skip partitions that are already filtered to single element or that are marked as final
-		if (filter[partition.id] && (filter[partition.id].length < 2 || filter[partition.id].final))
+		if (filter[partition.id] && (/*filter[partition.id].length < 2 || */filter[partition.id].final))
 			continue;
 
-		const elementRows = partition.elements.map(element => {
-			return {
-				id: element.id,
-				name: element.name,
-				isGroup: false,
-				indicator: indicator,
-				filter: {[partition.id]: [element.id]}
-			};
-		});
+		const elementRows = partition.elements
+			.filter(element => !filter[partition.id] || filter[partition.id].includes(element.id))
+			.map(element => {
+				return {
+					id: element.id,
+					name: element.name,
+					isGroup: false,
+					indicator: indicator,
+					filter: {[partition.id]: [element.id]}
+				};
+			})
 
-		const groupRows = partition.groups.map(group => {
-			return {
-				id: group.id,
-				name: group.name,
-				isGroup: true,
-				indicator: indicator,
-				filter: {[partition.id]: group.members}
-			};
-		});
+		const groupRows = partition.groups
+			.filter(group => !filter[partition.id] || filter[partition.id].some(peid => group.members.includes(peid)))
+			.map(group => {
+				return {
+					id: group.id,
+					name: group.name,
+					isGroup: true,
+					indicator: indicator,
+					filter: {[partition.id]: group.members}
+				};
+			});
 
 		yield {
 			id: partition.id,
