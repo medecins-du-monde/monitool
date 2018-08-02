@@ -265,7 +265,7 @@ export default class Cube {
 
 
 		if (withTotals)
-			result._total = this.query(dimensionIds, filter, withTotals);
+			result._total = this.query(dimensionIds, filter, withTotals, withGroups);
 
 		dimensionIds.unshift(dimensionId);
 
