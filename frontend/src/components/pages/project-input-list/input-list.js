@@ -54,10 +54,32 @@ module.component('projectInputList', {
 
 	controller: class ProjectInputListController {
 
-		constructor($rootScope, $state, $scope) {
+		constructor($element, $rootScope, $state, $scope) {
 			this.userCtx = $rootScope.userCtx;
 			this.$state = $state;
 			this.$scope = $scope;
+			this._element = $element;
+		}
+
+		$onInit() {
+			this._binded = this._onScroll.bind(this);
+		}
+
+		$onDestroy() {
+			if (this._container)
+				this._container.unbind('scroll', this._binded);
+		}
+
+		_onScroll() {
+			this.headerStyle = {
+				transform: 'translate(0, ' + this._container[0].scrollTop + 'px)'
+			};
+
+			this.firstColStyle = {
+				transform: 'translate(' + this._container[0].scrollLeft + 'px)'
+			};
+
+			this.$scope.$apply();
 		}
 
 		$onChanges(changes) {
@@ -96,6 +118,13 @@ module.component('projectInputList', {
 
 			this.loading = false;
 			this.$scope.$apply();
+
+			// if there are results, bind a scroll event to the div around the table.
+			// this is extremely hacky and will break when the template is changed. There must be a better way
+			if (this.visibleStatus.length) {
+				this._container = angular.element(this._element.children()[2]);
+				this._container.bind('scroll', this._binded);
+			}
 		}
 
 		showMore() {

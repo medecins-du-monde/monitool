@@ -23,95 +23,70 @@
 	<span translate="project.input_list_info" translate-values="::{name: $ctrl.dataSource.name}"></span>
 </div>
 
-<legend>{{::$ctrl.dataSource.name}}</legend>
-
 <div ng-if="!$ctrl.dataSource.entities.length">
 	<span translate="project.form_is_not_associated_with_site"></span>
 </div>
 
-<div id="input-list" ng-if="$ctrl.dataSource.entities.length">
+<div class="input-table-container" ng-if="$ctrl.dataSource.entities.length">
+	<table class="table table-bordered table-condensed">
+		<tbody>
+			<tr ng-repeat="date in $ctrl.visibleStatus">
+				<td title="{{::date|formatSlotRange}}" ng-style="$ctrl.firstColStyle"><div class="bodyField">{{::date|formatSlot}}</div></td>
+				<td ng-repeat="site in ::$ctrl.sites">
+					<div class="bodyField" ng-if="$ctrl.inputsStatus[date][site.id] !== undefined">
+						<a class="btn btn-xs btn-default"
+						   ng-if="$ctrl.inputsStatus[date][site.id] !== null"
+						   ui-sref="main.project.input.edit({dataSourceId: $ctrl.dataSource.id, period: date, entityId: site.id})"
+						   translate="project.input_status.done"
+						   translate-values="::{value: $ctrl.inputsStatus[date][site.id]}">
 
-	<div id="table1-container">
-		<table id="table1" class="table table-bordered table-stripped table-condensed">
-			<thead>
-				<tr>
-					<th><div class="headerField" translate="shared.date"></div></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="date in $ctrl.visibleStatus">
-					<td title="{{::date|formatSlotRange}}"><div class="bodyField">{{::date|formatSlot}}</div></td>
-				</tr>
-				<tr ng-hide="$ctrl.visibleStatus.length">
-					<td><div class="bodyField">&nbsp;</div></td>
-				</tr>
-				<tr ng-show="$ctrl.hiddenStatus.length">
-					<td><div class="bodyField">&nbsp;</div></td>
-				</tr>
-			</tbody>
-			<tfoot ng-if="$ctrl.displayFooter">
-				<tr>
-					<th>
-						<div class="bodyField2">
-							<utc-datepicker ng-model="$ctrl.newInputDate"></utc-datepicker>
-						</div>
-					</th>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-
-	<div id="table2-container">
-		<table id="table2" class="table table-bordered table-stripped table-condensed">
-			<thead>
-				<tr>
-					<th ng-repeat="site in ::$ctrl.sites"><div class="headerField"><div>{{::site.name}}</div></div></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="date in $ctrl.visibleStatus">
-					<td ng-repeat="site in ::$ctrl.sites">
-						<div class="bodyField" ng-if="$ctrl.inputsStatus[date][site.id] !== undefined">
-							<a class="btn btn-xs btn-default"
-							   ng-if="$ctrl.inputsStatus[date][site.id] !== null"
-							   ui-sref="main.project.input.edit({dataSourceId: $ctrl.dataSource.id, period: date, entityId: site.id})"
-							   translate="project.input_status.done"
-							   translate-values="::{value: $ctrl.inputsStatus[date][site.id]}">
-
-							<a class="btn btn-xs btn-primary"
-							   ui-sref="main.project.input.edit({dataSourceId: $ctrl.dataSource.id, period: date, entityId: site.id})"
-							   ng-if="$ctrl.inputsStatus[date][site.id] === null"
-							   translate="project.input_status.expected"></a>
-						</div>
-					</td>
-				</tr>
-				<tr ng-hide="$ctrl.visibleStatus.length || $ctrl.loading">
-					<td colspan="{{::$ctrl.sites.length}}">
-						<div class="bodyField" translate="project.no_inputs"></div>
-					</td>
-				</tr>
-				<tr ng-show="$ctrl.loading">
-					<td colspan="{{::$ctrl.sites.length}}">
-						<div class="bodyField" translate="shared.loading"></div>
-					</td>
-				</tr>
-				<tr ng-show="$ctrl.hiddenStatus.length">
-					<td colspan="{{::$ctrl.sites.length}}">
-						<div class="bodyField">
-							<a ng-click="$ctrl.showMore()" translate="project.show_more_inputs"></a>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-			<tfoot ng-if="$ctrl.displayFooter">
-				<tr>
-					<td ng-repeat="site in ::$ctrl.sites">
-						<div class="bodyField2">
-							<a class="btn btn-xs btn-success" ng-click="$ctrl.addInput(site.id)" translate="project.input_status.expected-new"></a>
-						</div>
-					</td>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
+						<a class="btn btn-xs btn-primary"
+						   ui-sref="main.project.input.edit({dataSourceId: $ctrl.dataSource.id, period: date, entityId: site.id})"
+						   ng-if="$ctrl.inputsStatus[date][site.id] === null"
+						   translate="project.input_status.expected"></a>
+					</div>
+				</td>
+			</tr>
+			<tr ng-hide="$ctrl.visibleStatus.length || $ctrl.loading">
+				<td ng-style="$ctrl.firstColStyle"><div class="bodyField">&nbsp;</div></td>
+				<td colspan="{{::$ctrl.sites.length}}">
+					<div class="bodyField" translate="project.no_inputs"></div>
+				</td>
+			</tr>
+			<tr ng-show="$ctrl.loading">
+				<td ng-style="$ctrl.firstColStyle"><div class="bodyField">&nbsp;</div></td>
+				<td colspan="{{::$ctrl.sites.length}}">
+					<div class="bodyField" translate="shared.loading"></div>
+				</td>
+			</tr>
+			<tr ng-show="$ctrl.hiddenStatus.length">
+				<td ng-style="$ctrl.firstColStyle"><div class="bodyField">&nbsp;</div></td>
+				<td colspan="{{::$ctrl.sites.length}}" style="text-align: center">
+					<!-- <div class="bodyField"> -->
+						<a class="btn btn-default btn-xs" ng-click="$ctrl.showMore()" translate="project.show_more_inputs"></a>
+					<!-- </div> -->
+				</td>
+			</tr>
+		</tbody>
+		<thead ng-style="$ctrl.headerStyle">
+			<tr>
+				<th ng-style="$ctrl.firstColStyle"><div class="headerField" translate="shared.date"></div></th>
+				<th ng-repeat="site in ::$ctrl.sites"><div class="headerField"><div>{{::site.name}}</div></div></th>
+			</tr>
+		</thead>
+		<tfoot ng-if="$ctrl.displayFooter">
+			<tr>
+				<th ng-style="$ctrl.firstColStyle">
+					<div class="bodyField2">
+						<utc-datepicker ng-model="$ctrl.newInputDate"></utc-datepicker>
+					</div>
+				</th>
+				<td ng-repeat="site in ::$ctrl.sites">
+					<div class="bodyField2">
+						<a class="btn btn-xs btn-success" ng-click="$ctrl.addInput(site.id)" translate="project.input_status.expected-new"></a>
+					</div>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
 </div>
