@@ -81,8 +81,6 @@ module.component('olapGrid', {
 					this.data[key] = {_total: this.data[key]}
 			}
 
-			console.log(this.data)
-
 			rows.forEach(row => row.push({id: '_total', name: 'total', isGroup: true}));
 			cols.forEach(col => col.push({id: '_total', name: 'total', isGroup: true}));
 
@@ -116,8 +114,6 @@ module.component('olapGrid', {
 			}
 
 			product(rows).forEach(headers => {
-				console.log(headers)
-
 				this.grid.body.push({
 					headerCols: headers,
 					dataCols: product([...headers.map(a => [a]), ...cols]).map(els => {
