@@ -38,5 +38,17 @@ module.component('home', {
 	template: require('./home.html')
 });
 
+module.component('homeEn', {
+	template: require('./home-en.html')
+});
+
+module.component('homeEs', {
+	template: require('./home-es.html')
+});
+
+module.component('homeFr', {
+	template: require('./home-fr.html')
+});
+
 
 export default module;
