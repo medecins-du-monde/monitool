@@ -88,7 +88,7 @@ router.get('/resources/project/:id/data-source/:dataSourceId.pdf', async ctx => 
 	// Create document definition.
 	let docDef = project
 		.getDataSourceById(ctx.params.dataSourceId)
-		.getPdfDocDefinition(ctx.request.query.orientation);
+		.getPdfDocDefinition(ctx.request.query.orientation, ctx.request.query.language);
 
 	docDef.styles = styles;
 
@@ -111,7 +111,7 @@ router.get('/resources/project/:id/logical-frame/:logicalFrameId.pdf', async ctx
 	// Create document definition.
 	const docDef = project
 		.getLogicalFrameById(ctx.params.logicalFrameId)
-		.getPdfDocDefinition(ctx.request.query.orientation, project.forms);
+		.getPdfDocDefinition(ctx.request.query.orientation, project.forms, ctx.request.query.language);
 
 	docDef.styles = styles;
 

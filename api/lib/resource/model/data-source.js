@@ -25,6 +25,24 @@ import schema from '../schema/data-source.json';
 
 const validate = validator(schema);
 
+const strings = Object.freeze({
+	fr: Object.freeze({
+		collection_site: "Lieu de collecte",
+		covered_period: "Période couverte",
+		collected_by: "Saisie par"
+	}),
+	en: Object.freeze({
+		collection_site: "Collection site",
+		covered_period: "Covered period",
+		collected_by: "Collected by"
+	}),
+	es: Object.freeze({
+		collection_site: "Lugar de colecta",
+		covered_period: "Periodo",
+		collected_by: "Rellenado por"
+	})
+});
+
 export default class DataSource extends Model {
 
 	constructor(data, project) {
@@ -65,7 +83,7 @@ export default class DataSource extends Model {
 		return this.elements.find(el => el.id === id);
 	}
 
-	getPdfDocDefinition(pageOrientation) {
+	getPdfDocDefinition(pageOrientation, language='en') {
 		var doc = {};
 		doc.pageSize = "A4";
 		doc.pageOrientation = pageOrientation;
@@ -75,21 +93,21 @@ export default class DataSource extends Model {
 			{
 				columns: [
 					[
-						{style: "variableName", text: "Collection site"},
+						{style: "variableName", text: strings[language].collection_site},
 						{
 							table: {headerRows: 0, widths: ['*'], body: [[{style: "normal", text: ' '}]]},
 							margin: [0, 0, 10, 0]
 						}
 					],
 					[
-						{style: "variableName", text: "Covered period"},
+						{style: "variableName", text: strings[language].covered_period},
 						{
 							table: {headerRows: 0, widths: ['*'], body: [[{style: "normal", text: ' '}]]},
 							margin: [0, 0, 10, 0]
 						},
 					],
 					[
-						{style: "variableName", text: "Collected by"},
+						{style: "variableName", text: strings[language].collected_by},
 						{
 							table: {headerRows: 0, widths: ['*'], body: [[{style: "normal", text: ' '}]]},
 							margin: [0, 0, 0, 0]

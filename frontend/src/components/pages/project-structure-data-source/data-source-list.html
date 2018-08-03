@@ -46,13 +46,13 @@
 
 					<ul class="dropdown-menu">
 						<li>
-							<a href="/api/resources/project/{{$ctrl.editableProject._id}}/data-source/{{dataSource.id}}.pdf?orientation=portrait" target="_blank">
+							<a href="/api/resources/project/{{$ctrl.editableProject._id}}/data-source/{{dataSource.id}}.pdf?orientation=portrait&language={{$root.language}}" target="_blank">
 								<i class="fa fa-file-pdf-o"></i>
 								<span translate="project.download_portrait"></span>
 							</a>
 						</li>
 						<li>
-							<a href="/api/resources/project/{{$ctrl.editableProject._id}}/data-source/{{dataSource.id}}.pdf?orientation=landscape" target="_blank">
+							<a href="/api/resources/project/{{$ctrl.editableProject._id}}/data-source/{{dataSource.id}}.pdf?orientation=landscape&language={{$root.language}}" target="_blank">
 								<i class="fa fa-file-pdf-o fa-rotate-270"></i>
 								<span translate="project.download_landscape"></span>
 							</a>

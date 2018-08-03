@@ -22,13 +22,47 @@ import schema from '../schema/logical-frame.json';
 
 var validate = validator(schema);
 
+const strings = Object.freeze({
+	fr: Object.freeze({
+		intervention_logic: "Logique d'intervention",
+		indicators: "Indicateurs",
+		verification_sources: "Sources de verification",
+		assumptions: "Hypothèses",
+		goal: "Objectif général",
+		purpose: "Objectif spécifique",
+		output: "Résultat",
+		activity: "Activité"
+	}),
+	en: Object.freeze({
+		intervention_logic: "Intervention logic",
+		indicators: "Indicators",
+		verification_sources: "Sources of verification",
+		assumptions: "Assumptions",
+		goal: "Goal",
+		purpose: "Purpose",
+		output: "Output",
+		activity: "Activity"
+	}),
+	es: Object.freeze({
+		intervention_logic: "Lógica de intervención",
+		indicators: "Indicadores",
+		verification_sources: "Fuentes de verificación",
+		assumptions: "Hipótesis",
+		goal: "Objetivo general",
+		purpose: "Objetivo específico",
+		output: "Resultado",
+		activity: "Actividad"
+	})
+});
+
+
 export default class LogicalFrame extends Model {
 
 	constructor(data, project) {
 		super(data, validate);
 	}
 
-	getPdfDocDefinition(pageOrientation, dataSources) {
+	getPdfDocDefinition(pageOrientation, dataSources, language='en') {
 		var doc = {};
 		doc.pageSize = "A4";
 		doc.pageOrientation = pageOrientation;
@@ -42,17 +76,17 @@ export default class LogicalFrame extends Model {
 			width: ['auto', 'auto', 'auto', 'auto'],
 			body: [
 				[
-					{text: "Intervention logic", style: "bold"},
-					{text: "Indicators", style: "bold"},
-					{text: "Sources of verification", style: "bold"},
-					{text: "Assumptions", style: "bold"}
+					{text: strings[language].intervention_logic, style: "bold"},
+					{text: strings[language].indicators, style: "bold"},
+					{text: strings[language].verification_sources, style: "bold"},
+					{text: strings[language].assumptions, style: "bold"}
 				]
 			]
 		};
 
 		table.body.push([
 			[
-				{text: "Goal", style: "bold"},
+				{text: strings[language].goal, style: "bold"},
 				{text: this.goal, style: 'normal'}
 			],
 			{ul: this.indicators.map(i => i.display), style: 'normal'},
@@ -63,7 +97,7 @@ export default class LogicalFrame extends Model {
 		this.purposes.forEach(function(purpose, purposeIndex) {
 			table.body.push([
 				[
-					{text: "Purpose " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) : ""), style: "bold"},
+					{text: strings[language].purpose + " " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) : ""), style: "bold"},
 					{text: purpose.description, style: 'normal'}
 				],
 				{ul: purpose.indicators.map(i => i.display), style: 'normal'},
@@ -76,7 +110,7 @@ export default class LogicalFrame extends Model {
 			purpose.outputs.forEach(function(output, outputIndex) {
 				table.body.push([
 					[
-						{text: "Output " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) + '.' : "") + (outputIndex + 1), style: "bold"},
+						{text: strings[language].output + " " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) + '.' : "") + (outputIndex + 1), style: "bold"},
 						{text: output.description, style: 'normal'}
 					],
 					{ul: output.indicators.map(i => i.display), style: 'normal'},
@@ -92,7 +126,7 @@ export default class LogicalFrame extends Model {
 
 					table.body.push([
 						[
-							{text: "Activity " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) + '.' : "") + (outputIndex + 1) + '.' + (activityIndex + 1), style: "bold"},
+							{text: strings[language].activity + " " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) + '.' : "") + (outputIndex + 1) + '.' + (activityIndex + 1), style: "bold"},
 							{text: activity.description, style: 'normal'}
 						],
 						{ul: activity.indicators.map(i => i.display), style: 'normal'},
