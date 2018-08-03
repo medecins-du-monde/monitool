@@ -89,8 +89,7 @@ export default class LogicalFrame extends Model {
 				{text: strings[language].goal, style: "bold"},
 				{text: this.goal, style: 'normal'}
 			],
-			{ul: this.indicators.map(i => i.display), style: 'normal'},
-			{ul: this._computeSources(this.indicators, dataSources), style: 'normal'},
+			...this._computeIndicatorsSources(this.indicators, dataSources),
 			""
 		]);
 
@@ -100,8 +99,7 @@ export default class LogicalFrame extends Model {
 					{text: strings[language].purpose + " " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) : ""), style: "bold"},
 					{text: purpose.description, style: 'normal'}
 				],
-				{ul: purpose.indicators.map(i => i.display), style: 'normal'},
-				{ul: this._computeSources(purpose.indicators, dataSources), style: 'normal'},
+				...this._computeIndicatorsSources(purpose.indicators, dataSources),
 				{text: purpose.assumptions, style: 'normal'}
 			]);
 		}, this);
@@ -113,8 +111,7 @@ export default class LogicalFrame extends Model {
 						{text: strings[language].output + " " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) + '.' : "") + (outputIndex + 1), style: "bold"},
 						{text: output.description, style: 'normal'}
 					],
-					{ul: output.indicators.map(i => i.display), style: 'normal'},
-					{ul: this._computeSources(output.indicators, dataSources), style: 'normal'},
+					...this._computeIndicatorsSources(output.indicators, dataSources),
 					{text: output.assumptions, style: 'normal'}
 				]);
 			}, this);
@@ -129,8 +126,7 @@ export default class LogicalFrame extends Model {
 							{text: strings[language].activity + " " + (this.purposes.length > 1 ? " " + (purposeIndex + 1) + '.' : "") + (outputIndex + 1) + '.' + (activityIndex + 1), style: "bold"},
 							{text: activity.description, style: 'normal'}
 						],
-						{ul: activity.indicators.map(i => i.display), style: 'normal'},
-						{ul: this._computeSources(activity.indicators, dataSources), style: 'normal'},
+						...this._computeIndicatorsSources(activity.indicators, dataSources),
 						" "
 					]);
 				}, this);
@@ -142,31 +138,63 @@ export default class LogicalFrame extends Model {
 		return doc;
 	}
 
-	_computeSources(indicators, dataSources) {
-		var sources = {};
+	_computeIndicatorsSources(indicators, dataSources) {
+		let myDataSources = dataSources.map(ds => Object.assign({}, ds));
 
-		indicators.forEach(indicator => {
-			if (indicator.computation) {
-				for (var key in indicator.computation.parameters) {
-					var elementId = indicator.computation.parameters[key].elementId,
-						dataSource = dataSources.find(ds => {
-							return !!ds.elements.find(el => el.id === elementId);
-						}),
-						element = dataSource.elements.find(el => el.id === elementId);
+		let index = 1;
+		myDataSources.forEach(ds => {
+			ds.elements = ds.elements.filter(variable => {
+				return indicators.some(i => {
+					return i.computation
+						&& Object.values(i.computation.parameters).some(param => param.elementId === variable.id);
+				});
+			});
 
-					if (!sources[dataSource.name])
-						sources[dataSource.name] = {};
+			ds.elements.forEach(variable => {
+				variable.index = index++;
+			});
+		});
 
-					sources[dataSource.name][element.name] = true;
-				}
+		myDataSources = myDataSources.filter(ds => ds.elements.length > 0);
+
+		return [
+			{
+				ul: indicators.map(i => {
+					let indexes;
+					try {
+						indexes = Object.values(i.computation.parameters).map(param => {
+							return myDataSources
+								.find(ds => ds.elements.some(variable => variable.id == param.elementId))
+								.elements.find(variable => variable.id == param.elementId)
+								.index;
+						});
+
+						indexes = [...new Set(indexes)].sort();
+
+						if (indexes.length == 0)
+							indexes = ['F']
+					}
+					catch (e) {
+						indexes	= ['?'];
+					}
+
+					return i.display + (indexes.length ? ' [' + indexes.join(', ') + ']' : '');
+				}),
+				style: 'normal'
+			},
+			{
+				ul: myDataSources.map(ds => {
+					return [
+						ds.name,
+						...ds.elements.map(variable => {
+							return {text: variable.index + '. ' + variable.name, style: 'italic'}
+						})
+					]
+				}),
+				style: 'normal'
 			}
-		});
-
-		return Object.keys(sources).map(function(source) {
-			return [source, {ol: Object.keys(sources[source]), style: 'italic'}];
-		});
+		];
 	}
-
 }
 
 
