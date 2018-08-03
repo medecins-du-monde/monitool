@@ -625,6 +625,7 @@ export default {
 		no_element_selected: "Ningún elemento esta seleccionado",
 
 		indicator_ph_fixed: "Entre el valor constante del indicador (ej: \"12\")",
+		indicator_help_description: "Contexto de colecta, detalles sobre el método de cálculo...",
 		indicator_help_display: "Nombre su indicador. Es preferible obtener el nombre a partir de un catalogo para ser consistente con otros proyectos.",
 		indicator_help_baseline: "Cual era el valor del indicador antes de empezar la actividades? Marque la casilla para especificar un valor.",
 		indicator_help_target: "Cual es el objectivo para este indicador? Marque la casilla para especificar un valor.",

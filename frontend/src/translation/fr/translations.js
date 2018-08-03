@@ -626,6 +626,7 @@ export default {
 		no_element_selected: "Aucun élément selectionné",
 
 		indicator_ph_fixed: "Entrez ici la valeur fixe de l'indicateur",
+		indicator_help_description: "Contexte de collecte, détails sur la méthode de calcul choisie...",
 		indicator_help_display: "Nommez votre indicateur. Le nom doit provenir d'un catalogue d'indicateur, afin d'être cohérent avec les autres projets.",
 		indicator_help_baseline: "Combien valait cet indicateur avant le début du projet? Cochez la case pour spécifier cette valeur.",
 		indicator_help_target: "Quel est l'objectif à atteindre sur cet indicateur?  Cochez la case pour spécifier cette valeur.",

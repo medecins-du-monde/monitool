@@ -624,6 +624,7 @@ export default {
 		no_element_selected: "No element is selected",
 
 		indicator_ph_fixed: "Enter the constant value for the indicator (e.g. 12)",
+		indicator_help_description: "Context of the data collection, details on how to compute the indicator...",
 		indicator_help_display: "Name your indicator. The name should come from a catalog to be consistent with other projects.",
 		indicator_help_baseline: "What was the value of the indicator before the first activities? Tick the checkbox to specify.",
 		indicator_help_target: "What is the target for this indicator? Tick the checkbox to specify.",
