@@ -9,23 +9,33 @@
 
 <div class="project-content-inner">
 	<div class="row">
-		<div class="col-md-4">
-			<p>Le rôle de cette section est de fournir à Monitool les données qui lui permettront de calculer vos indicateurs.</p>
+		<div class="col-md-4" ng-if="$root.language == 'en'">
+			<p>This section's goal is providing the data that will allow to compute your indicators to Monitool.</p>
+			<p>Each one of the data sources that were created during the structuration of the project results in a periodic form that need to be filled.</p>
+		</div>
 
+		<div class="col-md-4" ng-if="$root.language == 'es'">
+			<p>El objectivo de esta sección es permitirle entrar los datos que Monitool usara para calcular sus indicadores</p>
+			<p>Cada una de las fuentes de datos que fueron creadas durante la estructuración del proyecto da lugar a un formulario que se rellena periódicamente</p>
+		</div>
+
+		<div class="col-md-4" ng-if="$root.language == 'fr'">
+			<p>Le rôle de cette section est de fournir à Monitool les données qui lui permettront de calculer vos indicateurs.</p>
 			<p>Chaque source de données renseignée lors de la formalisation du projet donne lieu à des formulaires réguliers.</p>
 		</div>
+
 		<div class="col-md-8">
 			<table class="table table-bordered table-striped">
 				<thead>
 					<tr>
-						<th style="width: 50%">Tâche</th>
-						<th>État</th>
+						<th style="width: 50%" translate="shared.task"></th>
+						<th translate="shared.state"></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id">
 						<td>
-							Remplir les {{$ctrl.status[dataSource.id].total}} saisies de
+							<span translate="project.input_fill_forms" translate-values="{numInputs: $ctrl.status[dataSource.id].total}"></span>
 							<a
 								class="btn btn-default btn-xs"
 								title="{{dataSource.name}}"

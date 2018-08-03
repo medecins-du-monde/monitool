@@ -2,6 +2,8 @@
 
 export default {
 	shared: {
+		task: "Tâche",
+		state: "État",
 		open: "Ouvrir",
 		loading: "Chargement en cours...",
 		portrait: "Portrait",
@@ -84,9 +86,9 @@ export default {
 	},
 
 	project: {
+		input_fill_forms: "Remplir les {{numInputs}} saisies de",
 		add_user: "Ajouter un utilisateur",
 		add_datasource: "Créer une nouvelle source de données",
-
 		is_user: "Vous êtes membre de ce projet",
 		no_matches: "Aucun projet ne correspond à vos critères de recherche",
 		is_finished: "Ce projet est terminé",

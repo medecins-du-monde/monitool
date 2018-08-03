@@ -2,6 +2,8 @@
 
 export default {
 	shared: {
+		task: "Task",
+		state: "State",
 		open: "Open",
 		loading: "Loading...",
 		portrait: "Portrait",
@@ -84,6 +86,7 @@ export default {
 	},
 
 	project: {
+		input_fill_forms: "Fill the {{numInputs}} forms of",
 		add_user: "Add new user",
 		add_datasource: "Create a new data source",
 		is_user: "You are a member of this project",

@@ -2,6 +2,8 @@
 
 export default {
 	shared: {
+		task: "Tarea",
+		state: "Estado",
 		open: "Abrir",
 		loading: "Cargando...",
 		portrait: "Vertical",
@@ -84,6 +86,7 @@ export default {
 	},
 
 	project: {
+		input_fill_forms: "Rellenar los {{numInputs}} formularios de",
 		add_user: "Añadir un usuario",
 		add_datasource: "Crear una nueva fuente de datos",
 
