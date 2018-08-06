@@ -924,3 +924,7 @@ olap-grid table td:first-child, olap-grid table th:first-child {
 olap-grid th:first-child, .input-table-container td:first-child {
   width: 15%;
 }
+
+dd {
+  margin-bottom: 5px;
+}
