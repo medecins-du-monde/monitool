@@ -25,7 +25,7 @@ const module = angular.module(
 	'monitool.components.pages.project.structure.home',
 	[
 		uiRouter, // for $stateProvider
-		progressBar.name
+		progressBar
 	]
 );
 
@@ -88,5 +88,5 @@ module.component('projectStructureHome', {
 });
 
 
-export default module;
+export default module.name;
 

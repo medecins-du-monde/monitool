@@ -44,4 +44,4 @@ module.directive('aclLacksAdministration', function($rootScope) {
 	}
 });
 
-export default module;
+export default module.name;

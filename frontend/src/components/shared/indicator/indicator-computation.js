@@ -23,7 +23,7 @@ import mtPartitionFilter from './partition-filter';
 const module = angular.module(
 	'monitool.components.ng-models.indicator-computation',
 	[
-		mtPartitionFilter.name
+		mtPartitionFilter
 	]
 );
 
@@ -160,4 +160,4 @@ module.component('indicatorComputation', {
 });
 
 
-export default module;
+export default module.name;

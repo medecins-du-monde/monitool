@@ -129,5 +129,5 @@ module.component('selectIndicator', {
 	}
 });
 
-export default module;
+export default module.name;
 

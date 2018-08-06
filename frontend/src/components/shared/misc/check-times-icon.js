@@ -31,5 +31,5 @@ module.component('faOk', {
 });
 
 
-export default module;
+export default module.name;
 

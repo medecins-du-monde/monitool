@@ -34,10 +34,10 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtDirectiveAclProjectCreation.name,
-		mtDirectiveAclProjectRole.name,
-		mtDirectiveAclProjectInput.name,
-		mtDirectiveDisableIf.name
+		mtDirectiveAclProjectCreation,
+		mtDirectiveAclProjectRole,
+		mtDirectiveAclProjectInput,
+		mtDirectiveDisableIf
 	]
 );
 
@@ -96,4 +96,4 @@ module.component('projectMenu', {
 });
 
 
-export default module;
+export default module.name;

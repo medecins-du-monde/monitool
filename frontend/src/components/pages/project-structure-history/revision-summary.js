@@ -196,4 +196,4 @@ module.component('revisionSummary', {
 
 
 
-export default module;
+export default module.name;

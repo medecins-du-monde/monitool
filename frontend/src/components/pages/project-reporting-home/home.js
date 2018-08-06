@@ -50,5 +50,5 @@ module.component('projectReportingHome', {
 });
 
 
-export default module;
+export default module.name;
 

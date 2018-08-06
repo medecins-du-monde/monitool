@@ -9,7 +9,7 @@ import mtTrIndicator from '../../shared/reporting/tr-indicator';
 const module = angular.module(
 	'monitool.components.pages.cc-indicator-reporting.table',
 	[
-		mtTrIndicator.name
+		mtTrIndicator
 	]
 );
 
@@ -164,4 +164,4 @@ module.component('ccIndicatorTable', {
 	}
 });
 
-export default module;
+export default module.name;

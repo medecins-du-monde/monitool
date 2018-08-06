@@ -76,4 +76,4 @@ module.component('crossCuttingIndicatorList', {
 });
 
 
-export default module;
+export default module.name;

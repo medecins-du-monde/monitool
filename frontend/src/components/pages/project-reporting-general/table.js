@@ -7,7 +7,7 @@ import mtIndicatorsTbody from './tbody-indicators';
 const module = angular.module(
 	'monitool.components.pages.project.reporting_general.table',
 	[
-		mtIndicatorsTbody.name,
+		mtIndicatorsTbody,
 	]
 );
 
@@ -249,4 +249,4 @@ module.component('generalTable', {
 });
 
 
-export default module;
+export default module.name;

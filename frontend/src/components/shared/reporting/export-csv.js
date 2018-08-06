@@ -120,4 +120,4 @@ module.component('exportCsv', {
 	}
 });
 
-export default module;
+export default module.name;

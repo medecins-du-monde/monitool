@@ -30,10 +30,10 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtGraph.name,
-		mtProjectGroupBy.name,
-		mtProjectFilter.name,
-		mtTable.name
+		mtGraph,
+		mtProjectGroupBy,
+		mtProjectFilter,
+		mtTable
 	]
 );
 
@@ -150,5 +150,5 @@ module.component('generalReporting', {
 });
 
 
-export default module;
+export default module.name;
 

@@ -47,4 +47,4 @@ module.component('topMenu', {
 	}
 })
 
-export default module;
+export default module.name;

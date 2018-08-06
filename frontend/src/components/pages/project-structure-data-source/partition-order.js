@@ -66,4 +66,4 @@ module.component('partitionOrder', {
 });
 
 
-export default module;
+export default module.name;

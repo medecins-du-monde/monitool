@@ -104,4 +104,4 @@ module.component('projectUserModal', {
 });
 
 
-export default module;
+export default module.name;

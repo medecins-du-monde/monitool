@@ -82,4 +82,4 @@ module.run(function($translate, $rootScope, $locale) {
 });
 
 
-export default module;
+export default module.name;

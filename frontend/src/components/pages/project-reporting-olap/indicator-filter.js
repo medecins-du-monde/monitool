@@ -5,7 +5,7 @@ import {computeSplitPartitions} from '../../../helpers/indicator';
 const module = angular.module(
 	'monitool.component.shared.reporting.project-filter',
 	[
-		mtMselectWithGroups.name
+		mtMselectWithGroups
 	]
 );
 
@@ -102,4 +102,4 @@ module.component('indicatorFilter', {
 });
 
 
-export default module;
+export default module.name;

@@ -30,7 +30,7 @@ const module = angular.module(
 		uiModal,
 		'ng-sortable',
 
-		mtIndicatorEditionModal.name,
+		mtIndicatorEditionModal,
 	]
 );
 
@@ -111,5 +111,5 @@ module.component('extraIndicatorList', {
 })
 
 
-export default module;
+export default module.name;
 

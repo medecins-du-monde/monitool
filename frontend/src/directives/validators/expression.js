@@ -48,4 +48,4 @@ module.directive('expression', function() {
 	}
 });
 
-export default module;
+export default module.name;

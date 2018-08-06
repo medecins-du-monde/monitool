@@ -27,8 +27,8 @@ const module = angular.module(
 	'monitool.components.pages.project.input.edit',
 	[
 		uiRouter, // for $stateProvider
-		mtFilterTimeSlot.name,
-		mtNumberTable.name
+		mtFilterTimeSlot,
+		mtNumberTable
 	]
 );
 
@@ -153,5 +153,4 @@ module.component('projectInputEdition', {
 });
 
 
-export default module;
-
+export default module.name;

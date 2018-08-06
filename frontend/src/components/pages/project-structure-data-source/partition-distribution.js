@@ -77,4 +77,4 @@ module.component('partitionDistribution', {
 });
 
 
-export default module;
+export default module.name;

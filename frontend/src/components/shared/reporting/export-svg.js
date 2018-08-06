@@ -93,4 +93,4 @@ module.component('exportSvg', {
 	}
 });
 
-export default module;
+export default module.name;

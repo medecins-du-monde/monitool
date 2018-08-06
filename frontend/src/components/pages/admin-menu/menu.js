@@ -35,5 +35,5 @@ module.config($stateProvider => {
 
 });
 
-export default module;
+export default module.name;
 

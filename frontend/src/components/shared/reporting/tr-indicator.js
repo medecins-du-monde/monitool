@@ -9,8 +9,8 @@ import {fetchData, computeSplitPartitions, generateIndicatorDimensions} from '..
 const module = angular.module(
 	'monitool.components.pages.project.reporting.indicator-row',
 	[
-		mtReportingField.name,
-		mtIndicatorUnit.name
+		mtReportingField,
+		mtIndicatorUnit
 	]
 );
 
@@ -114,4 +114,4 @@ module.directive('trIndicator', () => {
 	};
 });
 
-export default module;
+export default module.name;

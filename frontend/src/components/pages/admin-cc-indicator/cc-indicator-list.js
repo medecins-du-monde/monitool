@@ -35,8 +35,8 @@ const module = angular.module(
 		uiModal, // for $uibModal
 		uiSelect, // for <ui-select>
 
-		mtDirectiveAutoresize.name,
-		mtCcIndicatorEdit.name
+		mtDirectiveAutoresize,
+		mtCcIndicatorEdit
 	]
 );
 
@@ -118,4 +118,4 @@ module.component('adminIndicatorList', {
 	}
 });
 
-export default module;
+export default module.name;

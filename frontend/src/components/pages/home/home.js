@@ -51,4 +51,4 @@ module.component('homeFr', {
 });
 
 
-export default module;
+export default module.name;

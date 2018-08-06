@@ -26,9 +26,9 @@ import mtFilterMisc from './filters/misc';
 const module = angular.module(
 	'monitool.app',
 	[
-		mtPages.name,
-		mtTranslation.name,
-		mtFilterMisc.name
+		mtPages,
+		mtTranslation,
+		mtFilterMisc
 	]
 );
 

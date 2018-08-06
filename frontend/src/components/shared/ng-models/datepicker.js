@@ -73,4 +73,4 @@ module.component('utcDatepicker', {
 });
 
 
-export default module;
+export default module.name;

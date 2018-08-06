@@ -55,4 +55,4 @@ module.directive('ngMax', function() {
 });
 
 
-export default module;
+export default module.name;

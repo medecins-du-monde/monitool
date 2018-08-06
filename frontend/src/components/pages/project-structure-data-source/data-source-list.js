@@ -92,4 +92,4 @@ module.component('dataSourceList', {
 });
 
 
-export default module;
+export default module.name;

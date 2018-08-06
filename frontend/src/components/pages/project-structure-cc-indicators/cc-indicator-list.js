@@ -28,8 +28,8 @@ const module = angular.module(
 		uiRouter, // for $stateProvider
 		uiModal,
 
-		mtIndicatorEditionModal.name,
-		mtIndicatorUnit.name
+		mtIndicatorEditionModal,
+		mtIndicatorUnit
 	]
 );
 
@@ -124,4 +124,4 @@ module.component('crossCuttingList', {
 });
 
 
-export default module;
+export default module.name;

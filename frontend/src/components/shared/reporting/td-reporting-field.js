@@ -22,7 +22,7 @@ import mtIndicatorUnit from '../../../filters/indicator';
 const module = angular.module(
 	'monitool.components.shared.reporting.field',
 	[
-		mtIndicatorUnit.name
+		mtIndicatorUnit
 	]
 );
 
@@ -110,5 +110,5 @@ module.directive('tdReportingField', function() {
 	}
 });
 
-export default module;
+export default module.name;
 

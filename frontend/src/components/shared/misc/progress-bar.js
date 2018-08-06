@@ -38,5 +38,5 @@ module.component('progressBar', {
 });
 
 
-export default module;
+export default module.name;
 

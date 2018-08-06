@@ -80,4 +80,4 @@ module.component('themeEditModal', {
 });
 
 
-export default module;
+export default module.name;

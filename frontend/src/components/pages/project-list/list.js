@@ -32,8 +32,8 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtAclProjectCreation.name,
-		mtAclProjectRole.name
+		mtAclProjectCreation,
+		mtAclProjectRole
 	]
 );
 
@@ -215,4 +215,4 @@ module.component('projectList', {
 	}
 });
 
-export default module;
+export default module.name;

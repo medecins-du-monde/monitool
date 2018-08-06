@@ -109,4 +109,4 @@ module.filter('formatSlotLong', function($filter) {
 });
 
 
-export default module;
+export default module.name;

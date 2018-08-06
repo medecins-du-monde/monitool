@@ -38,4 +38,4 @@ module.directive('forbiddenValues', function() {
 });
 
 
-export default module;
+export default module.name;

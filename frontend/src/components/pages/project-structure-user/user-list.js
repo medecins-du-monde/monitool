@@ -29,7 +29,7 @@ const module = angular.module(
 		uiRouter, // for $stateProvider
 		'ng-sortable',
 
-		mtProjectUserEditModal.name
+		mtProjectUserEditModal
 	]
 );
 
@@ -116,5 +116,5 @@ module.component('projectUserList', {
 });
 
 
-export default module;
+export default module.name;
 

@@ -31,4 +31,4 @@ module.component('ccIndicatorGroupBy', {
 	}
 });
 
-export default module;
+export default module.name;

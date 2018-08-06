@@ -34,7 +34,7 @@ const module = angular.module(
 		uiSelect, // for site groups
 		'ng-sortable', // order sites
 
-		mtDatePickerOptional.name, // Datepicker start & end
+		mtDatePickerOptional, // Datepicker start & end
 	]
 );
 
@@ -107,4 +107,4 @@ module.component('projectSites', {
 });
 
 
-export default module;
+export default module.name;

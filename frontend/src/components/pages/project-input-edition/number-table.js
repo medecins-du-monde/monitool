@@ -451,5 +451,5 @@ module.component('inputGrid', {
 });
 
 
-export default module;
+export default module.name;
 

@@ -50,4 +50,4 @@ module.component('userEditModal', {
 	}
 });
 
-export default module;
+export default module.name;

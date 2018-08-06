@@ -4,7 +4,7 @@ import mtMselectWithGroups from '../../shared/ng-models/mselect-with-groups';
 const module = angular.module(
 	'monitool.components.pages.cc-indicator-reporting.cc-indicator-filter',
 	[
-		mtMselectWithGroups.name
+		mtMselectWithGroups
 	]
 );
 
@@ -40,4 +40,4 @@ module.component('ccIndicatorFilter', {
 });
 
 
-export default module;
+export default module.name;

@@ -61,5 +61,5 @@ module.component('projectInputHome', {
 });
 
 
-export default module;
+export default module.name;
 

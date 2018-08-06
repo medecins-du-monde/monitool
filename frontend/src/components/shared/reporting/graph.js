@@ -25,7 +25,7 @@ import exportSvg from './export-svg';
 const module = angular.module(
 	'monitool.components.shared.reporting.graph',
 	[
-		exportSvg.name
+		exportSvg
 	]
 );
 
@@ -134,4 +134,4 @@ module.component('reportingGraph', {
 	}
 });
 
-export default module;
+export default module.name;

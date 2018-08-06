@@ -85,4 +85,4 @@ module.component('ccIndicatorEditionModal', {
 });
 
 
-export default module;
+export default module.name;

@@ -87,4 +87,4 @@ module.component('partitionFilter', {
 });
 
 
-export default module;
+export default module.name;

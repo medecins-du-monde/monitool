@@ -85,4 +85,4 @@ module.directive('aclLacksProjectRole', function($rootScope) {
 });
 
 
-export default module;
+export default module.name;

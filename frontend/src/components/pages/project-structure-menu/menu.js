@@ -157,5 +157,5 @@ module.component('projectEditMenu', {
 });
 
 
-export default module;
+export default module.name;
 

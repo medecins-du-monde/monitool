@@ -62,4 +62,4 @@ module.directive('aclLacksInputForm', function($rootScope) {
 });
 
 
-export default module;
+export default module.name;

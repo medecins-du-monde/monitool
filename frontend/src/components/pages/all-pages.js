@@ -56,40 +56,41 @@ import projectStructureHome from './project-structure-home/home';
 import projectInputHome from './project-input-home/home';
 import projectReportingHome from './project-reporting-home/home';
 
-export default angular.module(
+const module = angular.module(
 	'monitool.components.pages.all-pages',
 	[
-		menu.name,
-		ccIndicatorList.name,
-		userList.name,
-		adminMenu.name,
-		themeList.name,
-		home.name,
-		projectMenu.name,
-		projectList.name,
-		inputEdition.name,
-		inputList.name,
-		olap.name,
-		general.name,
-		prjCcIndicatorList.name,
-		sites.name,
-		history.name,
-		logframeList.name,
-		dsList.name,
-		prjUserList.name,
-		basics.name,
-		structureMenu.name,
-		dsEdit.name,
-		extraIndicators.name,
-		logframeEdit.name,
-		repIndicatorList.name,
-		ccIndicatorReporting.name,
+		menu,
+		ccIndicatorList,
+		userList,
+		adminMenu,
+		themeList,
+		home,
+		projectMenu,
+		projectList,
+		inputEdition,
+		inputList,
+		olap,
+		general,
+		prjCcIndicatorList,
+		sites,
+		history,
+		logframeList,
+		dsList,
+		prjUserList,
+		basics,
+		structureMenu,
+		dsEdit,
+		extraIndicators,
+		logframeEdit,
+		repIndicatorList,
+		ccIndicatorReporting,
 
-		projectInputmenu.name,
-		projectReportingmenu.name,
-		projectStructureHome.name,
-		projectInputHome.name,
-		projectReportingHome.name
+		projectInputmenu,
+		projectReportingmenu,
+		projectStructureHome,
+		projectInputHome,
+		projectReportingHome
 	]
 );
 
+export default module.name;

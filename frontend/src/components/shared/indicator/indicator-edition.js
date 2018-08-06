@@ -25,8 +25,8 @@ const module = angular.module(
 	[
 		uiModal, // for $uibModal
 
-		mtNumberOptional.name,
-		mtIndicatorComputation.name
+		mtNumberOptional,
+		mtIndicatorComputation
 	]
 );
 
@@ -79,4 +79,4 @@ module.component('indicatorEditionModal', {
 });
 
 
-export default module;
+export default module.name;

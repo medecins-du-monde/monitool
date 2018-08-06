@@ -99,5 +99,5 @@ module.component('logicalFrameworkList', {
 });
 
 
-export default module;
+export default module.name;
 

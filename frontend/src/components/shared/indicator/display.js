@@ -26,8 +26,8 @@ const module = angular.module(
 	'monitool.components.shared.indicator.display',
 	[
 		uibModal, // for $uibModal
-		mtEditionModal.name,
-		mtIndicatorUnit.name
+		mtEditionModal,
+		mtIndicatorUnit
 	]
 );
 
@@ -76,4 +76,4 @@ module.component('indicator', {
 });
 
 
-export default module;
+export default module.name;

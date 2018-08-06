@@ -4,7 +4,7 @@ import mtMselectWithGroups from '../../shared/ng-models/mselect-with-groups';
 const module = angular.module(
 	'monitool.component.page.project-reporting-general.project-filter',
 	[
-		mtMselectWithGroups.name
+		mtMselectWithGroups
 	]
 );
 
@@ -44,4 +44,4 @@ module.component('projectFilter', {
 });
 
 
-export default module;
+export default module.name;

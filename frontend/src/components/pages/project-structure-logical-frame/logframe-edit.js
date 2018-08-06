@@ -33,9 +33,9 @@ const module = angular.module(
 		uiModal, // for $uibModal
 		'ng-sortable',
 
-		mtIndicatorDisplay.name,
-		mtIndicatorModal.name,
-		mtDirectiveAutoresize.name,
+		mtIndicatorDisplay,
+		mtIndicatorModal,
+		mtDirectiveAutoresize,
 	]
 );
 
@@ -233,4 +233,4 @@ module.component('logicalFrameEdit', {
 });
 
 
-export default module;
+export default module.name;

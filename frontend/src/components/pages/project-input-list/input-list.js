@@ -28,7 +28,7 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtFilterTimeSlot.name
+		mtFilterTimeSlot
 	]
 );
 
@@ -142,4 +142,4 @@ module.component('projectInputList', {
 });
 
 
-export default module;
+export default module.name;

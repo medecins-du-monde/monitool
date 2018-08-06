@@ -92,5 +92,5 @@ module.filter('maxLength', function() {
 	};
 });
 
-export default module;
+export default module.name;
 

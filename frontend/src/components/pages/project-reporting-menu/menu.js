@@ -52,5 +52,5 @@ module.component('projectReportingMenu', {
 });
 
 
-export default module;
+export default module.name;
 

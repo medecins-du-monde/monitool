@@ -62,4 +62,4 @@ module.component('olapDimensions', {
 	}
 });
 
-export default module;
+export default module.name;

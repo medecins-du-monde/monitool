@@ -47,5 +47,5 @@ module.directive('autoResize', function() {
 	};
 });
 
-export default module;
+export default module.name;
 

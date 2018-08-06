@@ -156,5 +156,5 @@ module.component('elementFilter', {
 });
 
 
-export default module;
+export default module.name;
 

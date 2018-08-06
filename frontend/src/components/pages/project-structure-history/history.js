@@ -29,7 +29,7 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtRevisionSummary.name
+		mtRevisionSummary
 	]
 );
 
@@ -107,4 +107,4 @@ module.component('history', {
 });
 
 
-export default module;
+export default module.name;

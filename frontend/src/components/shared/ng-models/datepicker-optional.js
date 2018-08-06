@@ -63,4 +63,4 @@ module.component('optionalDate', {
 });
 
 
-export default module;
+export default module.name;

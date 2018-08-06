@@ -29,7 +29,7 @@ const module = angular.module(
 		uiRouter, // for $stateProvider
 		uiModal, // for $uibModal
 
-		mtThemeEditModal.name
+		mtThemeEditModal
 	]
 );
 
@@ -98,4 +98,4 @@ module.component('themeList', {
 });
 
 
-export default module;
+export default module.name;

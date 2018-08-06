@@ -44,4 +44,4 @@ module.directive('aclLacksProjectCreation', function($rootScope) {
 	}
 });
 
-export default module;
+export default module.name;

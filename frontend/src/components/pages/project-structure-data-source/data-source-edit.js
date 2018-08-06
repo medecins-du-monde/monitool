@@ -39,11 +39,11 @@ const module = angular.module(
 
 		uiSelect, // for partition group members
 
-		mtOptionalDate.name, // Datepicker start & end
-		mtElementFilter.name, // Sites & groups associated with form
-		mtPartitionList.name,
-		mtPartitionDistribution.name,
-		mtPartitionOrder.name,
+		mtOptionalDate, // Datepicker start & end
+		mtElementFilter, // Sites & groups associated with form
+		mtPartitionList,
+		mtPartitionDistribution,
+		mtPartitionOrder,
 	]
 );
 
@@ -164,4 +164,4 @@ module.component('dataSourceEdition', {
 });
 
 
-export default module;
+export default module.name;

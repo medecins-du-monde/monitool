@@ -34,10 +34,10 @@ const module = angular.module(
 		uiRouter, // for $stateProvider
 		uiSelect,
 
-		mtSelectIndicator.name,
-		mtIndicatorFilter.name,
-		mtDimensions.name,
-		mtOlapGrid.name
+		mtSelectIndicator,
+		mtIndicatorFilter,
+		mtDimensions,
+		mtOlapGrid
 	]
 );
 
@@ -117,5 +117,5 @@ module.component('olapReporting', {
 });
 
 
-export default module;
+export default module.name;
 

@@ -56,4 +56,4 @@ module.directive('ngMin', function() {
 });
 
 
-export default module;
+export default module.name;

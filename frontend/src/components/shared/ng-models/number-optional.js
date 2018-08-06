@@ -60,4 +60,4 @@ module.component('optionalNumber', {
 });
 
 
-export default module;
+export default module.name;

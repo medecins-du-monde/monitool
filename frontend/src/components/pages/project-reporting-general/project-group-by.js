@@ -80,4 +80,4 @@ module.component('projectGroupBy', {
 	}
 });
 
-export default module;
+export default module.name;

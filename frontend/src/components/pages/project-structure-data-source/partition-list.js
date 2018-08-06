@@ -24,7 +24,7 @@ const module = angular.module(
 	'monitool.components.data-source.partition-list',
 	[
 		uiModal,
-		mtPartitionEdition.name
+		mtPartitionEdition
 	]
 );
 
@@ -83,4 +83,4 @@ module.component('partitionList', {
 	}
 });
 
-export default module;
+export default module.name;

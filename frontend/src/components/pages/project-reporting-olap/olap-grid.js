@@ -135,4 +135,4 @@ module.component('olapGrid', {
 	}
 })
 
-export default module;
+export default module.name;

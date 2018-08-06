@@ -24,4 +24,4 @@ module.component('formGroup', {
 });
 
 
-export default module;
+export default module.name;

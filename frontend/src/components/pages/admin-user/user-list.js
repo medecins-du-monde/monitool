@@ -28,7 +28,7 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 		uiModal, // for $uibModal
-		mtUserModal.name,
+		mtUserModal,
 	]
 );
 
@@ -82,4 +82,4 @@ module.component('userList', {
 });
 
 
-export default module;
+export default module.name;

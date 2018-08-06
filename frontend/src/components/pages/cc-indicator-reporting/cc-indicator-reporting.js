@@ -33,9 +33,9 @@ const module = angular.module(
 	[
 		uiRouter, // for $stateProvider
 
-		mtFilter.name,
-		mtGroupBy.name,
-		mtTable.name
+		mtFilter,
+		mtGroupBy,
+		mtTable
 	]
 );
 
@@ -135,4 +135,4 @@ module.component('ccIndicatorReporting', {
 	}
 });
 
-export default module;
+export default module.name;

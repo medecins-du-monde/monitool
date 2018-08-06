@@ -32,8 +32,8 @@ const module = angular.module(
 		uiRouter, // for $stateProvider
 		uiSelect, // Select themes
 
-		mtUtcDatepicker.name, // Datepicker start & end
-		mtFormGroup.name
+		mtUtcDatepicker, // Datepicker start & end
+		mtFormGroup
 	]
 );
 
@@ -80,4 +80,4 @@ module.component('projectBasics', {
 });
 
 
-export default module;
+export default module.name;

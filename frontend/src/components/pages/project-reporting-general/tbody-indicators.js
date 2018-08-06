@@ -10,8 +10,8 @@ import {generateIndicatorDimensions} from '../../../helpers/indicator';
 const module = angular.module(
 	'monitool.components.pages.project.reporting-general.indicators-tbody',
 	[
-		mtTrIndicator.name,
-		mtFaOpen.name
+		mtTrIndicator,
+		mtFaOpen
 	]
 );
 
@@ -139,5 +139,5 @@ module.directive('tbodyIndicators', () => {
 	};
 });
 
-export default module;
+export default module.name;
 

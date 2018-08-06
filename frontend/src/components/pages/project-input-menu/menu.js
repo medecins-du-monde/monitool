@@ -55,5 +55,5 @@ module.component('projectInputMenu', {
 });
 
 
-export default module;
+export default module.name;
 
