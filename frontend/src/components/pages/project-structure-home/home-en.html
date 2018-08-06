@@ -1,0 +1,169 @@
+<div class="row">
+	<div class="col-md-5">
+		<div class="project-content-inner">
+			<p>
+				This section will help you formalize your project. It must be used during the project planning phase and then revised during the project implementation phase.
+			</p>
+			<p>
+				Use your data flow chart to structure your project in Monitool. If you have followed all the steps, you have all the necessary elements.
+			</p>
+
+			<ul>
+				<li>Document the objectives and expected results of your project</li>
+				<li>Document the activities you will do to reach them</li>
+				<li>
+					List the indicators that will measure the achievement of your results, as well as the monitoring of your activities (process indicators)
+				</li>
+				<li>
+					List your data collection tools (Excel, paper, ...) as well as other sources of data (NHIS, surveys ...) that you will use to calculate your indicators, by informing their periodicity and collection sites and their contents
+				</li>
+			</ul>
+		</div>
+
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			Use short names to name collection sites, data sources, variables, and indicators. <br/>
+			By avoiding acronyms you improve the readability of your charts and tables and allow a better understanding of your project by all actors of Doctors of the World.
+		</div>
+
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			In case of mistake, click
+			<span class="btn btn-default btn-xs">
+				<i class="fa fa-undo"></i>
+				<span translate="shared.remove_changes"></span>
+			</span>
+			to return to the last saved version.
+		</div>
+
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			If you saved a mistake: go to the
+			<a class="btn btn-default btn-xs" ui-sref="main.project.structure.history" disable-if="!$ctrl.project._rev">
+				<i class="fa fa-history"></i>
+				<span translate="project.revisions"></span>
+			</a>
+			page and restore an earlier version of the project.
+		</div>
+	</div>
+
+	<div class="col-md-7">
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th style="width: 60%" translate="shared.task"></th>
+					<th translate="shared.state"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						Fill up the
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.basics">
+							<i class="fa fa-object-group"></i>
+							<span translate="project.basics"></span>
+						</a>
+						of your project (country, name, thematics,&nbsp;...).
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.basicsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Fill up the list of
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_site_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-map-marker"></i>
+							<span translate="project.collection_site_list"></span>
+						</a>
+						on which your project will collect data.
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.sitesDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Fill up the logical framework of your reference project in
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.referenceLfDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						If your project is founded by institutional donors and you need to track other
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+
+						fill them up as well.
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.otherLfDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						If you wish to track other indicators than those that are provided by your logical framework(s), add them in
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.extra"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.extraIndicatorsDone2"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Fill up the
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_form_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-in"></i>
+							<span translate="project.collection_form_list"></span>
+						</a>
+
+						from which you plan to extract the data that will be necesary to compute your indicators.<br/>
+						As you progress, update the formulas for calculating your indicators in
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.lfIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Perform the same task for
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.cross_cutting" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.cross_cutting"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.ccIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Perform the same task for
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.extra"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.extraIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

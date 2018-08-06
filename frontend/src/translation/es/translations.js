@@ -2,6 +2,10 @@
 
 export default {
 	shared: {
+		percentage_done: "{{value}}% realizado",
+		percentage_incomplete: "{{value}}% en curso",
+		percentage_missing: "{{value}}% por hacer",
+
 		task: "Tarea",
 		state: "Estado",
 		open: "Abrir",
@@ -74,7 +78,7 @@ export default {
 
 		logout: 'Desconectar',
 
-		sure_to_leave: 'Ha realizado cambios. ¿Esta seguro de querer cambiar de página sin salvar?',
+		sure_to_leave: 'Ha realizado cambios. ¿Esta seguro de querer cambiar de página sin guardar?',
 		filter: "Filtro"
 	},
 	menu: {
@@ -318,7 +322,7 @@ export default {
 		not_available_min_semester: "Estos datos estan disponibles por semestre",
 		not_available_min_year: "Estos datos estan disponibles por año",
 
-		saving_failed: "Monitool no consiguio salvar los cambios.",
+		saving_failed: "Monitool no consiguio guardar los cambios.",
 		no_logical_frames: "Ningún marco lógico has sido creado en este proyecto.",
 		partition_general: "General",
 		partition_general_placeholder: "ej: Grupos de edad, sexo, motivo de consulta, patología, ...",

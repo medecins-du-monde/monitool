@@ -1,4 +1,3 @@
-
 <ol class="breadcrumb noprint">
 	<li ng-if="$root.userCtx.type == 'user'"><a ui-sref="main.projects" translate="shared.projects"></a></li>
 	<li class="active" title="{{$ctrl.project.country}}" ng-bind="$ctrl.project.country|maxLength:20"></li>
@@ -6,181 +5,23 @@
 	<li class="active" translate="project.structure"></li>
 </ol>
 
-<div class="project-content-inner">
 
-	<div class="row">
-		<div class="col-md-4">
-			<p>
-				Cette section va vous aider à formaliser votre projet.
-				Elle doit être utilisé pendant la phase de programmation du projet, puis révisée pendant la phase d'implantation du projet.
-			</p>
-			<p>
-				Aidez-vous de votre data-flow pour structurer votre projet dans Monitool. Si vous avez suivi toutes les étapes, vous disposez de tous les éléments nécessaires.
-			</p>
-			<ul>
-				<li>
-					Documentez les objectifs et résultats attendus par votre projet
-				</li>
-				<li>
-					Documentez les activités que vous mettrez en oeuvre pour les atteindre
-				</li>
-				<li>
-					Listez les indicateurs qui mesureront l'atteinte de vos résultats, ainsi que le suivi de vos activités
-					(indicateurs de processus)
-				</li>
-				<li>
-					Listez vos outils de collecte de donnée (Excel, papier, ...)
-					ainsi que d'autres sources de données (SNIS, enquêtes...) que vous
-					utiliserez pour calculer vos indicateurs, en renseignant leur periodicité et sites de collecte et leur contenu
-				</li>
-			</ul>
+<div ng-switch="$root.language">
+	<project-structure-home-en
+		ng-switch-when="en"
+		project="$ctrl.project"
+		percentages="$ctrl.percentages">
+	</project-structure-home-en>
 
-			<div class="alert alert-info">
-				<i class="fa fa-info-circle"></i>
-				Utilisez des noms courts pour nommer lieux de collecte, sources de données, variables et indicateurs.<br/>
-				En évitant les acronymes vous améliorez la lisibilité de vos graphiques et tableaux et permettez une meilleur compréhension de votre projet par tous les acteurs de Médecins du Monde.
-			</div>
-			<div class="alert alert-info">
-				<i class="fa fa-info-circle"></i>
-				En cas d'erreur, cliquez sur
-				<span class="btn btn-default btn-xs">
-					<i class="fa fa-undo"></i>
-					<span translate="shared.remove_changes"></span>
-				</span>
-				pour revenir à la dernière version sauvegardée.<br/>
-			</div>
-			<div class="alert alert-info">
-				<i class="fa fa-info-circle"></i>
-				Si vous sauvegardez une erreur: rendez-vous dans sur la page
-				<a class="btn btn-default btn-xs" ui-sref="main.project.structure.history" disable-if="!$ctrl.project._rev">
-					<i class="fa fa-history"></i>
-					<span translate="project.revisions"></span>
-				</a>
-				et restaurez une version antérieure du projet.
-			</div>
+	<project-structure-home-fr
+		ng-switch-when="fr"
+		project="$ctrl.project"
+		percentages="$ctrl.percentages">
+	</project-structure-home-fr>
 
-		</div>
-
-		<div class="col-md-8">
-			<table class="table table-bordered table-striped">
-				<thead>
-					<tr>
-						<th style="width: 50%">Tâche</th>
-						<th>État</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>
-							Remplissez les
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.basics">
-								<i class="fa fa-object-group"></i>
-								<span translate="project.basics"></span>
-							</a>
-							de votre projet (pays, nom, thématiques, ...).
-						</td>
-						<td>
-							<progress-bar value="$ctrl.basicsDone"></progress-bar>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Renseignez les
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_site_list" disable-if="!$ctrl.project._rev">
-								<i class="fa fa-map-marker"></i>
-								<span translate="project.collection_site_list"></span>
-							</a>
-							sur lesquels votre projet va travailler.
-						</td>
-						<td>
-							<progress-bar value="$ctrl.sitesDone"></progress-bar>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Renseignez le cadre logique de référence de votre projet dans
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
-								<i class="fa fa-sign-out"></i>
-								<span translate="shared.logical_frames"></span>
-							</a>
-						</td>
-						<td>
-							<progress-bar value="$ctrl.referenceLfDone"></progress-bar>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Si vous disposez de fonds institutionnels et que d'autres
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
-								<i class="fa fa-sign-out"></i>
-								<span translate="shared.logical_frames"></span>
-							</a>
-
-							vont être utilisés sur le même projet, renseignez les également.
-						</td>
-						<td>
-							<progress-bar value="$ctrl.otherLfDone"></progress-bar>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Si vous disposez d'autres indicateurs que vous désirez suivre en dehors de votre (vos) cadre(s) logique(s),
-							ajoutez les dans
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra" disable-if="!$ctrl.project._rev">
-								<i class="fa fa-sign-out"></i>
-								<span translate="indicator.extra"></span>
-							</a>
-						</td>
-						<td>
-							<progress-bar value="$ctrl.extraIndicatorsDone2"></progress-bar>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Renseignez les
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_form_list" disable-if="!$ctrl.project._rev">
-								<i class="fa fa-sign-in"></i>
-								<span translate="project.collection_form_list"></span>
-							</a>
-
-							dont vous allez extraire les données nécessaires au calculs des indicateurs de tous vos cadres logiques.<br/>
-							À mesure de votre avancement, mettez à jour les formules de calcul de vos indicateurs dans
-
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
-								<i class="fa fa-sign-out"></i>
-								<span translate="shared.logical_frames"></span>
-							</a>
-						</td>
-						<td>
-							<progress-bar value="$ctrl.lfIndicatorsDone"></progress-bar>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Réalisez la même tâche pour les
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.cross_cutting" disable-if="!$ctrl.project._rev">
-								<i class="fa fa-sign-out"></i>
-								<span translate="indicator.cross_cutting"></span>
-							</a>
-						</td>
-						<td>
-							<progress-bar value="$ctrl.ccIndicatorsDone"></progress-bar>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Réalisez la même tâche pour les
-							<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra" disable-if="!$ctrl.project._rev">
-								<i class="fa fa-sign-out"></i>
-								<span translate="indicator.extra"></span>
-							</a>
-						</td>
-						<td>
-							<progress-bar value="$ctrl.extraIndicatorsDone"></progress-bar>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+	<project-structure-home-es
+		ng-switch-when="es"
+		project="$ctrl.project"
+		percentages="$ctrl.percentages">
+	</project-structure-home-es>
 </div>

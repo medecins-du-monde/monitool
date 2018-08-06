@@ -2,6 +2,10 @@
 
 export default {
 	shared: {
+		percentage_done: "{{value}}% réalisé",
+		percentage_incomplete: "{{value}}% en cours",
+		percentage_missing: "{{value}}% manquant",
+
 		task: "Tâche",
 		state: "État",
 		open: "Ouvrir",

@@ -1,0 +1,173 @@
+<div class="row">
+	<div class="col-md-5">
+		<div class="project-content-inner">
+			<p>
+				Esta sección le ayudará a formalizar su proyecto. Debe ser utilizado durante la fase de planificación
+				del proyecto y revisada durante la fase de implementación del proyecto.
+			</p>
+			<p>
+				Use su diagrama de flujo de datos para estructurar su proyecto en Monitool. Si ha seguido todos los
+				pasos, tiene todos los elementos necesarios.
+			</p>
+			<ul>
+				<li>Documente los objetivos y los resultados esperados de su proyecto</li>
+				<li>Documente las actividades que hará para alcanzarlas</li>
+				<li>
+					Enumere los indicadores que medirán el logro de sus resultados, así como el monitoreo
+					de sus actividades (indicadores de proceso)
+				</li>
+				<li>
+					Enumere sus herramientas de recolección de datos (Excel, papel, ...) así como otras fuentes
+					de datos (SNIS, encuestas ...) que usará para calcular sus indicadores, informando sus sitios de
+					periodicidad y recolección y sus contenido
+				</li>
+			</ul>
+		</div>
+
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			Use nombres cortos para nombrar ubicaciones de colecciones, fuentes de datos, variables e indicadores. <br/>
+			Al evitar los acrónimos, mejora la legibilidad de sus cuadros y tablas y permite una mejor comprensión de su proyecto por parte de todos los actores de Médicos del Mundo.
+		</div>
+
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+
+			En caso de error, haga clic en
+			<span class="btn btn-default btn-xs">
+				<i class="fa fa-undo"></i>
+				<span translate="shared.remove_changes"></span>
+			</span>
+			para volver a la última versión guardada.
+		</div>
+
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			Si ha guardado un error: vaya a la página
+			<a class="btn btn-default btn-xs" ui-sref="main.project.structure.history" disable-if="!$ctrl.project._rev">
+				<i class="fa fa-history"></i>
+				<span translate="project.revisions"></span>
+			</a>
+			y restaure una versión anterior del proyecto.
+		</div>
+	</div>
+
+	<div class="col-md-7">
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th style="width: 60%" translate="shared.task"></th>
+					<th translate="shared.state"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						Rellene los
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.basics">
+							<i class="fa fa-object-group"></i>
+							<span translate="project.basics"></span>
+						</a>
+						de su proyecto (país, nombre, temáticas,&nbsp;...).
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.basicsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Rellene la lista de
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_site_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-map-marker"></i>
+							<span translate="project.collection_site_list"></span>
+						</a>
+						en los que su proyecto trabaja.
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.sitesDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Rellene el marco lógico de su proyecto de referencia en
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.referenceLfDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Si su proyecto esta financiado por fondos institucionales y que otros
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+						seran usados en el mismo proyecto, agréguelos los tambien.
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.otherLfDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Si tiene otros indicadores que desea rastrear fuera de su(s) marco(s) lógico(s), agréguelos en
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.extra"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.extraIndicatorsDone2"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Complete los
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.collection_form_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-in"></i>
+							<span translate="project.collection_form_list"></span>
+						</a>
+
+						de donde extraerá los datos necesarios para calcular los indicadores de todos sus marcos lógicos.<br/>
+						A medida que avance, actualice las fórmulas para calcular sus indicadores en
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.logical_frame_list" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="shared.logical_frames"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.lfIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Realice la misma tarea para
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.cross_cutting" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.cross_cutting"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.ccIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Realice la misma tarea para
+						<a class="btn btn-default btn-xs" ui-sref="main.project.structure.extra" disable-if="!$ctrl.project._rev">
+							<i class="fa fa-sign-out"></i>
+							<span translate="indicator.extra"></span>
+						</a>
+					</td>
+					<td>
+						<progress-bar done="$ctrl.percentages.extraIndicatorsDone"></progress-bar>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

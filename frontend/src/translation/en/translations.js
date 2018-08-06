@@ -2,6 +2,10 @@
 
 export default {
 	shared: {
+		percentage_done: "{{value}}% done",
+		percentage_incomplete: "{{value}}% incomplete",
+		percentage_missing: "{{value}}% missing",
+
 		task: "Task",
 		state: "State",
 		open: "Open",
@@ -93,7 +97,7 @@ export default {
 		no_matches: "No projects match the selected criterias",
 		is_finished: "This project is finished",
 		was_deleted: "This project was deleted",
-		show_finished_projects: "Show finshed projects",
+		show_finished_projects: "Show finished projects",
 		show_deleted_projects: "Show deleted projects",
 		filter_placeholder: "Enter text here to filter the projects",
 

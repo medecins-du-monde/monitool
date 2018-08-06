@@ -25,14 +25,16 @@ const module = angular.module(
 
 module.component('progressBar', {
 	bindings: {
-		value: '<'
+		done: '<',
+		incomplete: '<'
 	},
 	template: require('./progress-bar.html'),
 	controller: class ProgressBarController {
 
 		$onChanges(changes) {
-			this.done = this.value || 0;
-			this.failed = 1 - this.done;
+			this.done = Math.round(100 * (this.done || 0));
+			this.incomplete = Math.round(100 * (this.incomplete || 0));
+			this.failed = 100 - this.done - this.incomplete;
 		}
 	}
 });

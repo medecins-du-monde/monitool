@@ -6,63 +6,113 @@
 	<li class="active" translate="project.input"></li>
 </ol>
 
+<div class="row">
+	<div class="col-md-4" ng-if="$root.language == 'en'">
 
-<div class="project-content-inner">
-	<div class="row">
-		<div class="col-md-4" ng-if="$root.language == 'en'">
+		<div class="project-content-inner">
 			<p>This section's goal is providing the data that will allow to compute your indicators to Monitool.</p>
 			<p>Each one of the data sources that were created during the structuration of the project results in a periodic form that need to be filled.</p>
 		</div>
 
-		<div class="col-md-4" ng-if="$root.language == 'es'">
+		<div class="alert alert-info">
+			<p>
+				<i class="fa fa-info-circle"></i>
+				When entering data, the Tab key on your keyboard allows you to navigate between the boxes.
+			</p>
+			<p>To return to the previous box, use Shift + Tab</p>
+		</div>
+
+		<div class="alert alert-info" ng-if="$root.language == 'en'">
+			<p>
+				<i class="fa fa-info-circle"></i>
+				A printable version of each forms is available.
+			</p>
+			<p>
+				If you have several paper forms to enter (for example, one per social worker), and want to add them, you can enter sums in the entry boxes: "1 + 2 + 3"
+			</p>
+		</div>
+	</div>
+
+	<div class="col-md-4" ng-if="$root.language == 'es'">
+		<div class="project-content-inner">
 			<p>El objectivo de esta sección es permitirle entrar los datos que Monitool usara para calcular sus indicadores</p>
 			<p>Cada una de las fuentes de datos que fueron creadas durante la estructuración del proyecto da lugar a un formulario que se rellena periódicamente</p>
 		</div>
 
-		<div class="col-md-4" ng-if="$root.language == 'fr'">
+		<div class="alert alert-info">
+			<p>
+				<i class="fa fa-info-circle"></i>
+				Al ingresar datos, la tecla Tabulador en su teclado le permite navegar entre los cuadros.
+			</p>
+			<p>Para volver al cuadro anterior, use Mayús + Tabulador</p>
+		</div>
+
+		<div class="alert alert-info">
+			<p>
+				<i class="fa fa-info-circle"></i>
+				Una versión imprimible de cada formulario está disponible.
+			</p>
+			<p>
+				Si tiene varios formularios en papel para ingresar (por ejemplo, uno por trabajador social) y desea agregarlos, puede ingresar sumas en los cuadros de entrada: "1 + 2 + 3"
+			</p>
+		</div>
+	</div>
+
+	<div class="col-md-4" ng-if="$root.language == 'fr'">
+
+		<div class="project-content-inner">
 			<p>Le rôle de cette section est de fournir à Monitool les données qui lui permettront de calculer vos indicateurs.</p>
 			<p>Chaque source de données renseignée lors de la formalisation du projet donne lieu à des formulaires réguliers.</p>
 		</div>
 
-		<div class="col-md-8">
-			<table class="table table-bordered table-striped">
-				<thead>
-					<tr>
-						<th style="width: 50%" translate="shared.task"></th>
-						<th translate="shared.state"></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id">
-						<td>
-							<span translate="project.input_fill_forms" translate-values="{numInputs: $ctrl.status[dataSource.id].total}"></span>
-							<a
-								class="btn btn-default btn-xs"
-								title="{{dataSource.name}}"
-								ui-sref="main.project.input.list({dataSourceId: dataSource.id})">
-								<i class="fa fa-pencil"></i>
-								{{dataSource.name|maxLength:30}}
-							</a>
-						</td>
-						<td translate="shared.loading" ng-if="!$ctrl.status"></td>
+		<div class="alert alert-info">
+			<p>
+				<i class="fa fa-info-circle"></i>
+				Lors de la saisie de données, la touch Tab de votre clavier vous permet de naviguer entre les cases.
+			</p>
+			<p>Pour revenir à la case précédente, utilisez Shift + Tab</p>
+		</div>
 
-						<td ng-if="$ctrl.status">
-							<div class="progress" style="margin-bottom: 0">
-								<div class="progress-bar progress-bar-success" ng-style="{width: 100 * $ctrl.status[dataSource.id].complete + '%'}">
-									<span>{{100*$ctrl.status[dataSource.id].complete|number:0}}% complets</span>
-								</div>
-								<div class="progress-bar progress-bar-warning" ng-style="{width: 100 * $ctrl.status[dataSource.id].incomplete + '%'}">
-									<span>{{100*$ctrl.status[dataSource.id].incomplete|number:0}}% partiels</span>
-								</div>
-								<div class="progress-bar progress-bar-danger" ng-style="{width: 100 * $ctrl.status[dataSource.id].missing + '%'}">
-									<span>{{100*$ctrl.status[dataSource.id].missing|number:0}}% manquants</span>
-								</div>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+		<div class="alert alert-info">
+			<p>
+				<i class="fa fa-info-circle"></i>
+				Une version imprimable de chaque formulaires est disponible.
+			</p>
+			<p>
+				Si vous disposez de plusieurs formulaires papier à saisir (par exemple, un par travailleur social), et que désirez les additioner, vous pouvez rentrer des sommes dans les cases de saisies: "1 + 2 + 3"
+			</p>
 		</div>
 	</div>
-</div>
 
+	<div class="col-md-8">
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th style="width: 50%" translate="shared.task"></th>
+					<th translate="shared.state"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id">
+					<td>
+						<span translate="project.input_fill_forms" translate-values="{numInputs: $ctrl.status[dataSource.id].total}"></span>
+						<a
+							class="btn btn-default btn-xs"
+							title="{{dataSource.name}}"
+							ui-sref="main.project.input.list({dataSourceId: dataSource.id})">
+							<i class="fa fa-pencil"></i>
+							{{dataSource.name|maxLength:30}}
+						</a>
+					</td>
+					<td translate="shared.loading" ng-if="!$ctrl.status"></td>
+
+					<td ng-if="$ctrl.status">
+						<progress-bar
+							done="$ctrl.status[dataSource.id].complete"
+							incomplete="$ctrl.status[dataSource.id].incomplete"></progress-bar>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

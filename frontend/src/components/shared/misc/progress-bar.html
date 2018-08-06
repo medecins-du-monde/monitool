@@ -1,8 +1,11 @@
 <div class="progress" style="margin-bottom: 0">
-	<div class="progress-bar progress-bar-success" ng-style="{width: 100 * $ctrl.done + '%'}">
-		<span>{{100*$ctrl.done|number:0}}% réalisé</span>
+	<div class="progress-bar progress-bar-success" ng-style="{width: $ctrl.done + '%'}">
+		<span translate="shared.percentage_done" translate-values="{'value': $ctrl.done}"></span>
 	</div>
-	<div class="progress-bar progress-bar-danger" ng-style="{width: 100 * $ctrl.failed + '%'}">
-		<span>{{100*$ctrl.failed|number:0}}% manquant</span>
+	<div class="progress-bar progress-bar-warning" ng-style="{width: $ctrl.incomplete + '%'}">
+		<span translate="shared.percentage_incomplete" translate-values="{'value': $ctrl.incomplete}"></span>
+	</div>
+	<div class="progress-bar progress-bar-danger" ng-style="{width: $ctrl.failed + '%'}">
+		<span translate="shared.percentage_missing" translate-values="{'value': $ctrl.failed}"></span>
 	</div>
 </div>

@@ -52,13 +52,6 @@ module.component('projectStructureHome', {
 	controller: class ProjectStructureHomeController {
 
 		$onChanges(changes) {
-			this.basicsDone = this.project.name && this.project.country && this.project.themes.length ? 1 : 0;
-			this.sitesDone = this.project.entities.length ? 1 : 0;
-			this.referenceLfDone = this.project.logicalFrames.length > 0 ? 1 : 0;
-			this.otherLfDone = this.project.logicalFrames.length > 1 ? 1 : 0;
-			this.extraIndicatorsDone2 = this.project.extraIndicators.length ? 1 : 0;
-
-
 			const lfIndicators = this.project.logicalFrames.reduce((memo, lf) => [
 				...memo,
 				...lf.indicators,
@@ -76,16 +69,49 @@ module.component('projectStructureHome', {
 				], [])
 			], []);
 
-			this.lfIndicatorsDone = lfIndicators.filter(i => !!i.computation).length / lfIndicators.length;
-
 			const ccIndicators = this.ccIndicators.filter(i => i.themes.some(t => this.project.themes.includes(t)));
-			this.ccIndicatorsDone = ccIndicators.filter(i => !!this.project.crossCutting[i._id]).length / ccIndicators.length;
 
-			this.extraIndicatorsDone = this.project.extraIndicators.filter(i => !!i.computation).length / this.project.extraIndicators.length;
+
+			this.percentages = {
+				basicsDone: this.project.name && this.project.country && this.project.themes.length ? 1 : 0,
+				sitesDone: this.project.entities.length ? 1 : 0,
+				referenceLfDone: this.project.logicalFrames.length > 0 ? 1 : 0,
+				otherLfDone: this.project.logicalFrames.length > 1 ? 1 : 0,
+				extraIndicatorsDone2: this.project.extraIndicators.length ? 1 : 0,
+				lfIndicatorsDone: lfIndicators.filter(i => !!i.computation).length / lfIndicators.length,
+				ccIndicatorsDone: ccIndicators.filter(i => !!this.project.crossCutting[i._id]).length / ccIndicators.length,
+				extraIndicatorsDone: this.project.extraIndicators.filter(i => !!i.computation).length / this.project.extraIndicators.length
+			};
 		}
 
 	}
 });
+
+
+module.component('projectStructureHomeEs', {
+	bindings: {
+		project: '<',
+		percentages: '<'
+	},
+	template: require('./home-es.html')
+})
+
+module.component('projectStructureHomeEn', {
+	bindings: {
+		project: '<',
+		percentages: '<'
+	},
+	template: require('./home-en.html')
+})
+
+module.component('projectStructureHomeFr', {
+	bindings: {
+		project: '<',
+		percentages: '<'
+	},
+	template: require('./home-fr.html')
+});
+
 
 
 export default module.name;
