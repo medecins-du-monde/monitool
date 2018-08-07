@@ -29,7 +29,7 @@
 			</div>
 			<div>
 				<strong translate="project.collection_site_list"></strong>
-				{{dataSource.entities|getObjects:$ctrl.project.entities|pluck:'name'|join:', '}}
+				<element-groups ids="dataSource.entities" items="$ctrl.project.entities" groups="$ctrl.project.groups"></element-groups>
 			</div>
 
 			<div class="panel-buttons btn-group">

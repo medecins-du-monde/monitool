@@ -29,11 +29,11 @@
 			</div>
 			<div ng-if="user.role == 'input'">
 				<strong translate="project.collection_site_list"></strong>
-				{{user.entities|getObjects:$ctrl.project.entities|pluck:'name'|join:', '}}
+				<element-groups ids="user.entities" items="$ctrl.project.entities" groups="$ctrl.project.groups"></element-groups>
 			</div>
 			<div ng-if="user.role == 'input'">
 				<strong translate="project.collection_form_list"></strong>
-				{{user.dataSources|getObjects:$ctrl.project.forms|pluck:'name'|join:', '}}
+				<element-groups ids="user.dataSources" items="$ctrl.project.forms" groups="[]"></element-groups>
 			</div>
 
 			<div class="panel-buttons btn-group">

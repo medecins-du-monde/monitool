@@ -21,12 +21,16 @@ import uuid from 'uuid/v4';
 import uiRouter from '@uirouter/angularjs';
 import 'angular-legacy-sortablejs-maintained';
 
+import mtElementGroups from '../../shared/misc/element-groups';
+
 
 const module = angular.module(
 	'monitool.components.pages.project.structure.datasource.list',
 	[
 		uiRouter, // for $stateProvider
-		'ng-sortable'
+		'ng-sortable',
+
+		mtElementGroups
 	]
 );
 
