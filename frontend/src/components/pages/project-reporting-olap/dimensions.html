@@ -25,6 +25,14 @@
 					</ui-select>
 				</div>
 			</form-group>
+
+			<form-group label="project.show_totals" input-id="show-totals-input">
+				<input
+					id="show-totals-input"
+					type="checkbox"
+					ng-model="$ctrl.selected.showTotals"
+					ng-change="$ctrl.onSelectUpdate()" />
+			</form-group>
 		</form>
 	</div>
 </div>

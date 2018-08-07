@@ -90,6 +90,7 @@ export default {
 	},
 
 	project: {
+		show_totals: "Show totals",
 		input_fill_forms: "Fill the {{numInputs}} forms of",
 		add_user: "Add new user",
 		add_datasource: "Create a new data source",
