@@ -33,12 +33,25 @@ module.component('revisionSummary', {
 	template: require('./revision-summary.html'),
 	controller: class RevisionSummaryController {
 
-		constructor($filter, $sce) {
+		constructor($filter, $sce, $rootScope) {
 			this.translate = $filter('translate');
 			this.$sce = $sce;
+			this.$rootScope = $rootScope;
+		}
+
+		$onInit() {
+			this._watch = this.$rootScope.$watch('language', () => this.$onChanges());
+		}
+
+		$onDestroy() {
+			this._watch();
 		}
 
 		$onChanges(changes) {
+			// ignore first one.
+			if (!this._watch)
+				return;
+
 			var before = jsonpatch.deepClone(this.revision.before),
 				after  = jsonpatch.deepClone(this.revision.before);
 
