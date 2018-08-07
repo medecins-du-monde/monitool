@@ -6,16 +6,8 @@
 	<li class="active" translate="shared.reporting"></li>
 </ol>
 
-<div class="row">
-	<div class="col-md-4">
-		<div class="project-content-inner">
-			<p>Cette section vous permet de suivre votre projet.</p>
-		</div>
-
-	</div>
-	<div class="col-md-8">
-
-	</div>
+<div ng-switch="$root.language">
+	<project-reporting-home-en ng-switch-when="en" project="$ctrl.project"></project-reporting-home-en>
+	<project-reporting-home-fr ng-switch-when="fr" project="$ctrl.project"></project-reporting-home-fr>
+	<project-reporting-home-es ng-switch-when="es" project="$ctrl.project"></project-reporting-home-es>
 </div>
-
-

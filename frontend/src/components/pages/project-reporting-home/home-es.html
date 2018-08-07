@@ -1,0 +1,88 @@
+<div class="row">
+	<div class="col-md-4">
+		<div class="project-content-inner">
+			<p>Esta sección le permite seguir su proyecto.</p>
+
+			<p>
+				Las páginas
+				<a ui-sref="main.project.reporting.general" class="btn btn-default btn-xxs">
+					<i class="fa fa-line-chart"></i>
+					<span translate="shared.reporting_general"></span>
+				</a>
+				y
+				<a ui-sref="main.project.reporting.olap" class="btn btn-default btn-xxs">
+					<i class="fa fa-table"></i>
+					<span translate="project.pivot_table"></span>
+				</a>
+				ambas permiten acceder a todos sus datos, en diferentes formas.
+			</p>
+			<dl>
+				<dt translate="shared.reporting_general"></dt>
+				<dd>
+					<p>Le permite explorar sus datos jerárquicamente: desde una vista general de su proyecto.</p>
+					<p>
+						Vous pouvez y consulter chaque cadre logique ou source de données, qui contiennent des indicateurs, que vous pourrez ensuite désagréger par lieu de collecte, paramètres que vous avez utilisé pour les calculer, et d'autres désagrégations selon la structure des données que vous avez collecté (tranche d'age, sexe, pathologies, contenu de formations, ...).
+					</p>
+				</dd>
+
+				<dt translate="project.pivot_table"></dt>
+				<dd>
+					Puede consultar cada marco lógico o fuente de datos, que contiene indicadores, que luego puede desglosar por ubicación de recopilación, parámetros que utilizó para calcularlos y otras desagregaciones de acuerdo con la estructura de datos que recopiló (rango de edad, sexo, patologías, contenido de entrenamiento, ...).
+				</dd>
+			</dl>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			Use
+			<span class="btn btn-default btn-xxs">
+				<i class="fa fa-line-chart"></i>
+			</span>
+			para mostrar un gráfico que contiene los datos de la línea actual.
+		</div>
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			Use
+			<span class="btn btn-default btn-xxs">
+				<i class="fa fa-plus"></i>
+			</span>
+			para desagregar los datos de la línea actual.
+		</div>
+		<div class="alert alert-info">
+			<p>
+				<i class="fa fa-info-circle"></i>
+				El símbolo
+				<span class="btn btn-default btn-xxs">
+					<i class="fa fa-ban"></i>
+				</span>
+				significa que uno de los pasos para calcular su indicador ha fallado.
+			</p>
+			<p>
+				Lo más probable es que haya dividido por cero, que no se hayan ingresado todos los datos o que haya indicado explícitamente que no es posible agregar estos datos al configurar el proyecto.
+			</p>
+			<p>
+				Desagrega tu línea haciendo clic en
+				<span class="btn btn-default btn-xxs">
+					<i class="fa fa-plus"></i>
+				</span>
+				y en
+				<span class="btn btn-default btn-xxs">Calcul</span>
+				para identificar el problema.
+			</p>
+		</div>
+	</div>
+
+	<div class="col-md-4">
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			Los
+			<span class="btn btn-default btn-xxs">
+				<i class="fa fa-plus-circle"></i>
+				Filtros
+			</span>
+			le permiten restringir los datos que consulta en determinadas fechas, lugares de recogida o de acuerdo con las desagregaciones especificadas durante la creación de su proyecto (grupos de edad, sexo, ...).
+		</div>
+	</div>
+
+</div>

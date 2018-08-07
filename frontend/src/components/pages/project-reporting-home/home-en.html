@@ -1,0 +1,87 @@
+<div class="row">
+	<div class="col-md-4">
+		<div class="project-content-inner">
+			<p>This section allows you to track your project progress.</p>
+
+			<p>
+				The interfaces
+				<a ui-sref="main.project.reporting.general" class="btn btn-default btn-xxs">
+					<i class="fa fa-line-chart"></i>
+					<span translate="shared.reporting_general"></span>
+				</a>
+				and
+				<a ui-sref="main.project.reporting.olap" class="btn btn-default btn-xxs">
+					<i class="fa fa-table"></i>
+					<span translate="project.pivot_table"></span>
+				</a>
+				both allow you to access all of your data, in different ways.
+			</p>
+			<dl>
+				<dt translate="shared.reporting_general"></dt>
+				<dd>
+					<p>The first allows you to explore your data hierarchically: starting from a general vision of your project..</p>
+					<p>
+						You can consult each logical framework or data source, which contains indicators, which you can then disaggregate by collection site, parameter that you used to calculate them, and other disaggregations according to the data structure that you collected (age range, sex, pathologies, training content, ...).
+					</p>
+				</dd>
+
+				<dt translate="project.pivot_table"></dt>
+				<dd>
+					The second one allows you to build tables that will take the form you want, and download them in Excel format, to include them in reports or to create visualizations outside of Monitool.
+				</dd>
+			</dl>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			Use
+			<span class="btn btn-default btn-xxs">
+				<i class="fa fa-line-chart"></i>
+			</span>
+			in order to display a graph that contains the data of the current row.
+		</div>
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			Use
+			<span class="btn btn-default btn-xxs">
+				<i class="fa fa-plus"></i>
+			</span>
+			in order to disaggregate the data of the current row.
+		</div>
+		<div class="alert alert-info">
+			<p>
+				<i class="fa fa-info-circle"></i>
+				The
+				<span class="btn btn-default btn-xxs">
+					<i class="fa fa-ban"></i>
+				</span>
+				symbol means that one of the steps taken to compute your indicador failed.
+			</p>
+			<p>
+				The most likely is that you have divided by zero, that all the data was not entered, or that you have explicitly indicated that it was not possible to aggregate this data when setting up your data source.
+			</p>
+			<p>
+				Disaggregate your line by clicking
+				<span class="btn btn-default btn-xxs">
+					<i class="fa fa-plus"></i>
+				</span>
+				and then on
+				<span class="btn btn-default btn-xxs">Computation</span>
+				to identify the issue.
+			</p>
+		</div>
+	</div>
+
+	<div class="col-md-4">
+		<div class="alert alert-info">
+			<i class="fa fa-info-circle"></i>
+			The
+			<span class="btn btn-default btn-xxs">
+				<i class="fa fa-plus-circle"></i>
+				Filters
+			</span>
+			allow you to restrict the data that you consult on certain dates, collection sites, or according to the disaggregations specified during the creation of your project (age groups, sex, ...).
+		</div>
+	</div>
+</div>

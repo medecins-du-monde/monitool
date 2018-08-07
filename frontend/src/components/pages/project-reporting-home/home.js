@@ -37,16 +37,22 @@ module.config($stateProvider => {
 
 
 module.component('projectReportingHome', {
-
 	bindings: {
 		project: '<'
 	},
-
 	template: require('./home.html'),
+});
 
-	controller: class ProjectReportingHomeController {
+module.component('projectReportingHomeEn', {
+	template: require('./home-en.html'),
+});
 
-	}
+module.component('projectReportingHomeEs', {
+	template: require('./home-es.html'),
+});
+
+module.component('projectReportingHomeFr', {
+	template: require('./home-fr.html'),
 });
 
 
