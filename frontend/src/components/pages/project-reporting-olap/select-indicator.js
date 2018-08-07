@@ -124,7 +124,7 @@ module.component('selectIndicator', {
 				});
 			});
 
-			return choices;
+			return choices.filter(choice => choice.indicator.computation && Object.keys(choice.indicator.computation.parameters).length);
 		}
 	}
 });
