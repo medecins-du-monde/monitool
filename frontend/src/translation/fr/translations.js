@@ -2,6 +2,7 @@
 
 export default {
 	shared: {
+		none: "Aucune",
 		percentage_done: "{{value}}% réalisé",
 		percentage_incomplete: "{{value}}% en cours",
 		percentage_missing: "{{value}}% manquant",
@@ -90,6 +91,7 @@ export default {
 	},
 
 	project: {
+		last_entry: "Dernière saisie",
 		show_totals: "Afficher les totaux",
 		input_fill_forms: "Remplir les {{numInputs}} saisies de",
 		add_user: "Ajouter un utilisateur",

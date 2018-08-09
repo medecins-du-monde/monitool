@@ -51,6 +51,12 @@
 				{{p.start|date}} - {{p.end|date}}
 			</div>
 
+			<div>
+				<strong translate="project.last_entry"></strong>
+				<span ng-if="p.inputDate">{{p.inputDate|date}}</span>
+				<span ng-if="!p.inputDate" translate="shared.none"></span>
+			</div>
+
 			<div class="panel-buttons btn-group">
 				<a ng-if="p.active" class="btn btn-default btn-xxs" ng-click="$ctrl.onOpenClicked(p)" translate="shared.open"></a>
 				<a ng-if="!p.active && p.isOwner" class="btn btn-default btn-xxs" ng-click="$ctrl.onRestoreClicked(p)" translate="shared.restore"></a>

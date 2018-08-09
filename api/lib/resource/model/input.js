@@ -216,6 +216,7 @@ export default class Input extends DbModel {
 		const project = await Project.storeInstance.get(this.project);
 		await this.validateForeignKeys(project);
 		this.structure = project.getDataSourceById(this.form).structure;
+		this.updatedAt = new Date().toISOString();
 
 		return super.save(true);
 	}

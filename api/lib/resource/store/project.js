@@ -218,13 +218,18 @@ export default class ProjectStore extends Store {
 		if (typeof userId !== 'string')
 			throw new Error('missing_parameter');
 
-		var view = 'projects_short';
+		const [mainResult, updatedAtResult] = await Promise.all([
+			this._db.callView('projects_short', {}),
+			this._db.callView('inputs_updated_at', {group: true})
+		]);
 
-		const result = await this._db.callView(view, {});
-		var projects = result.rows.map(row => row.value);
+		const projects = mainResult.rows.map(row => row.value);
 
-		projects.forEach(function(p) {
-			p.users = p.users.filter(u => u.id === userId)
+		projects.forEach(p => {
+			const updatedAt = updatedAtResult.rows.find(row => row.key === p._id);
+
+			p.inputDate = updatedAt ? updatedAt.value : null;
+			p.users = p.users.filter(u => u.id === userId);
 		});
 
 		return projects;

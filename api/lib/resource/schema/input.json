@@ -54,6 +54,9 @@
 		},
 		"structure": {
 			"type": "object"
+		},
+		"updatedAt": {
+			"type": "string"
 		}
 	}
 }
