@@ -51,12 +51,16 @@ export default class Project {
 
 	constructor(data) {
 		var now = new Date().toISOString().substring(0, 10);
+		var oneYear = new Date();
+		oneYear.setFullYear(oneYear.getFullYear() + 1);
+		oneYear = oneYear.toISOString().substring(0, 10);
+
 		this._id = uuid()
 		this.type = "project";
 		this.name = "";
 		this.active = true;
 		this.start = now;
-		this.end = now;
+		this.end = oneYear;
 		this.themes = [];
 		this.crossCutting = {};
 		this.extraIndicators = [];
