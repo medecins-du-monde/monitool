@@ -141,7 +141,6 @@ async function init() {
 
 		clearInterval(inter);
 
-		document.body.style.backgroundColor = 'white';
 		document.body.removeChild(document.getElementById('load-container'));
 		document.body.removeChild(document.getElementById('version'));
 
