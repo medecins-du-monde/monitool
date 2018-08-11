@@ -41,6 +41,9 @@ app.use(responseTimeMiddleware());
 app.use(session({maxAge: 7 * 24 * 3600 * 1000}, app));
 app.use(bodyParser({jsonLimit: '1mb'}));
 
+// Handle errors
+app.use(errorHandlerMiddleware)
+
 // Serve the client-side config request, before authentication.
 app.use(configRouter.routes());
 
@@ -53,7 +56,6 @@ app.use(authenticationRouter.routes()) // eg: login page, ...
 
 // Serve API
 app.use(forceAuthenticationMiddleware)	// From now on, all pages require auth
-app.use(errorHandlerMiddleware)			// Add helpers to the response object
 app.use(pdfRouter.routes())				// PDF generation module
 app.use(resourcesRouter.routes())		// REST JSON API
 app.use(reportingRouter.routes())		// Reporting API
