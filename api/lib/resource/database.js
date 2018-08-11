@@ -52,8 +52,16 @@ class Database {
 		this.database = this.nano.use(this.bucketName)
 	}
 
+	async checkConnectivity() {
+		try {
+			return this.nano.db.list();
+		}
+		catch (e) {
+			throw new Error('Cannot connect to couchdb');
+		}
+	}
+
 	async prepare() {
-		await this._checkConnectivity();
 		await this._createBucket();
 		await this._applyMigrations();
 	}
@@ -63,15 +71,6 @@ class Database {
 			throw new Error('This method shall never be called on a production server.');
 
 		await this.nano.db.destroy(this.bucketName);
-	}
-
-	async _checkConnectivity() {
-		try {
-			return this.nano.db.list();
-		}
-		catch (e) {
-			throw new Error('Cannot connect to couchdb');
-		}
 	}
 
 	async _createBucket() {
