@@ -15,7 +15,6 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import nano from 'nano';
 import winston from 'winston';
 import config from '../config/config';
@@ -63,33 +62,26 @@ class Database {
 		if (this.bucketName.indexOf('test') === -1)
 			throw new Error('This method shall never be called on a production server.');
 
-		return new Promise((resolve, reject) => {
-			this.nano.db.destroy(this.bucketName, function(error, result) {
-				resolve();
-			});
-		});
+		await this.nano.db.destroy(this.bucketName);
 	}
 
 	async _checkConnectivity() {
-		return new Promise((resolve, reject) => {
-			this.nano.db.list(function(error, body) {
-				if (error)
-					reject(new Error('Cannot connect to couchdb'));
-				else
-					resolve(body);
-			});
-		});
+		try {
+			return this.nano.db.list();
+		}
+		catch (e) {
+			throw new Error('Cannot connect to couchdb');
+		}
 	}
 
 	async _createBucket() {
-		return new Promise((resolve, reject) => {
-			this.nano.db.create(this.bucketName, function(error) {
-				if (error && error.error !== 'file_exists')
-					reject(error);
-				else
-					resolve();
-			});
-		});
+		try {
+			await this.nano.db.create(this.bucketName);
+		}
+		catch (e) {
+			if (e && e.error !== 'file_exists')
+				throw e;
+		}
 	}
 
 	async _applyMigrations() {
@@ -124,14 +116,7 @@ class Database {
 	 * @return {Array}
 	 */
 	async callView(viewName, options) {
-		return new Promise((resolve, reject) => {
-			this.database.view('monitool', viewName, options, function(error, result) {
-				if (error)
-					reject(error);
-				else
-					resolve(result);
-			});
-		});
+		return this.database.view('monitool', viewName, options);
 	}
 
 	/**
@@ -142,14 +127,7 @@ class Database {
 	 * @return {Array}
 	 */
 	async callList(options) {
-		return new Promise((resolve, reject) => {
-			this.database.list(options, function(error, result) {
-				if (error)
-					reject(error);
-				else
-					resolve(result);
-			});
-		});
+		return this.database.list(options);
 	}
 
 	/**
@@ -160,14 +138,7 @@ class Database {
 	 * @return {Array}
 	 */
 	async callBulk(options) {
-		return new Promise((resolve, reject) => {
-			this.database.bulk(options, function(error, result) {
-				if (error)
-					reject(error);
-				else
-					resolve(result);
-			});
-		});
+		return this.database.bulk(options);
 	}
 
 	/**
@@ -176,41 +147,19 @@ class Database {
 	 * @return {Model}
 	 */
 	async get(id, params=undefined) {
-		return new Promise((resolve, reject) => {
-			this.database.get(id, params, function(error, data) {
-				if (error)
-					reject(error);
-				else
-					resolve(data);
-			});
-		});
+		return this.database.get(id, params);
 	}
 
 	async insert(doc) {
-		return new Promise((resolve, reject) => {
-			this.database.insert(doc, function(error, result) {
-				if (error)
-					reject(error)
-				else {
-					doc._rev = result.rev;
-					resolve();
-				}
-			});
-		});
+		const result = await this.database.insert(doc);
+		doc._rev = result.rev;
 	}
 
 	async destroy(id, rev) {
 		if (typeof id !== 'string' || typeof rev !== 'string')
 			throw new Error('invalid call to destroy.');
 
-		return new Promise((resolve, reject) => {
-			this.database.destroy(id, rev, function(error) {
-				if (error)
-					reject(error);
-				else
-					resolve();
-			});
-		});
+		return this.database.destroy(id, rev);
 	}
 }
 

@@ -45,7 +45,7 @@ services:
       - googletranslate_apikey
 
   couchdb:
-    image: couchdb:1
+    image: couchdb:latest
     ports:
       - "5984:5984"
     environment:

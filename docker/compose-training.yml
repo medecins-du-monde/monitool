@@ -33,7 +33,7 @@ services:
       - googletranslate_apikey
 
   couchdb:
-    image: couchdb:1
+    image: couchdb:latest
     networks:
       - backend
     volumes:

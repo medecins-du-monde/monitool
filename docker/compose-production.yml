@@ -27,8 +27,6 @@ services:
       MONITOOL_BASE_URL: "https://monitool.medecinsdumonde.net"
       MONITOOL_COOKIE_SECRET_FILE: "/var/run/secrets/monitool_cookiesecret"
       MONITOOL_COUCHDB_HOST: "couchdb"
-      MONITOOL_COUCHDB_USER: "monitool_couchdb"
-      MONITOOL_COUCHDB_PASS_FILE: "/var/run/secrets/monitool_dbpassword"
       MONITOOL_API_GOOGLE_FILE: "/var/run/secrets/googletranslate_apikey"
       MONITOOL_AUTH_ADMINISTRATOR: "romain.gilliotte"
       MONITOOL_AUTH_PROVIDERS_AZUREAD: "TRUE"
@@ -45,12 +43,9 @@ services:
       - monitool_dbpassword
 
   couchdb:
-    image: romaingilliotte/couchdb:1.7.1
+    image: couchdb:latest
     networks:
       - backend
-    environment:
-      COUCHDB_USER: "monitool_couchdb"
-      COUCHDB_PASSWORD_FILE: "/var/run/secrets/monitool_dbpassword"
     volumes:
       - couchdb-data:/usr/local/var/lib/couchdb
     secrets:
@@ -66,8 +61,6 @@ secrets:
   googletranslate_apikey:
     external: true
   monitool_cookiesecret:
-    external: true
-  monitool_dbpassword:
     external: true
 
 volumes:
