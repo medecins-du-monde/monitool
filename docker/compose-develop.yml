@@ -52,7 +52,7 @@ services:
       COUCHDB_USER: "admin"
       COUCHDB_PASSWORD: ""
     volumes:
-      - couchdb_data:/usr/local/var/lib/couchdb
+      - couchdb_data:/opt/couchdb/data
 
 secrets:
   googletranslate_apikey:

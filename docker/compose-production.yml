@@ -47,7 +47,7 @@ services:
     networks:
       - backend
     volumes:
-      - couchdb-data:/usr/local/var/lib/couchdb
+      - couchdb-data:/opt/couchdb/data
     secrets:
       - monitool_dbpassword
 
