@@ -33,7 +33,7 @@ async function tryStartApplication() {
 		await database.checkConnectivity();
 	}
 	catch (error) {
-		winston.log('error', 'Could not connect database: ' + error.message + '. Retry in 15 seconds.');
+		winston.log('warning', 'Could not connect database: ' + error.message + '. Retry in 15 seconds.');
 		setTimeout(startApplication, 15 * 1000);
 		return;
 	}
@@ -46,8 +46,10 @@ async function tryStartApplication() {
 }
 
 function startApplication() {
-	tryStartApplication()
-		.catch(error => process.exit(1));
+	tryStartApplication().catch(error => {
+		winston.log('error', error.message);
+		process.exit(1)
+	});
 }
 
 startApplication();

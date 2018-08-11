@@ -20,6 +20,16 @@ import winston from 'winston';
 import config from '../config/config';
 import migrations from './migrations/index';
 
+
+// Helper function: delay something by 5 seconds
+const delay = async () => {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => resolve(), 5000);
+	});
+};
+
+
+
 class Database {
 
 	get url() {
@@ -84,6 +94,9 @@ class Database {
 	}
 
 	async _applyMigrations() {
+		// Get the migration lock, to ensure that two API instances are not migrating at the same time.
+		const lock = await this._acquireMigrationLock();
+
 		winston.log('info', '[Database] Checking for migrations');
 
 		// Retrieve current database version
@@ -104,6 +117,31 @@ class Database {
 		}
 
 		winston.log('info', '[Database] No more migrations. Current version is ' + versionDoc.version);
+
+		// Free migration lock
+		winston.log('info', '[Database] Release migration lock');
+		this.destroy(lock._id, lock._rev);
+	}
+
+	async _acquireMigrationLock() {
+		const getLockRec = async () => {
+			try {
+				winston.log('info', '[Database] Acquire migration lock');
+
+				const lock = {_id: 'version_lock'};
+				await this.insert(lock);
+				winston.log('info', '[Database] Migration lock acquired');
+				return lock;
+			}
+			catch (e) {
+				winston.log('info', '[Database] Failed to acquire migration lock');
+
+				await delay();
+				return getLockRec();
+			}
+		}
+
+		return getLockRec();
 	}
 
 	/**
