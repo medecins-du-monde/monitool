@@ -1,6 +1,60 @@
+
+
+
+
+/*
+ * Login page.
+ */
+
+#load-container{
+  position: absolute;
+  top: 50%;
+  margin-top: -205px;/* half of #content height*/
+  left: 0;
+  width: 100%;
+}
+
+#load-content {
+  width: 624px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 410px;
+  text-align: center;
+  background-color: #FFF;
+  border: 1px solid #CCC;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+#load-content h3 {
+  margin-top: 10px;
+}
+
+#load-content img {
+  width: 250px;
+  margin-bottom: 10px;
+  transition: width .2s;
+}
+
+#load-content .progress {
+  width: 80%;
+  margin: auto;
+}
+
+#version {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+
+
+
+
 /* make bootstrap smaller */
 
 body {
+  background-color: #fbfbfb;
   font-size: 12px;
 }
 
@@ -12,13 +66,6 @@ td.ng-invalid {
   font-size: 12px;
   padding: 3px 6px;
   height: 24px;
-}
-.input-lg {
-    height: 46px;
-    padding: 10px 16px;
-    font-size: 18px;
-    line-height: 1.3333333;
-    border-radius: 6px;
 }
 
 .form-group {
@@ -223,6 +270,14 @@ textarea {
   padding-left: 80px !important;
 }
 
+#reporting .indent5 .row-title div, #reporting .indent5 .row-header-title div {
+  padding-left: 100px !important;
+}
+
+#reporting .indent6 .row-title div, #reporting .indent6 .row-header-title div {
+  padding-left: 120px !important;
+}
+
 #reporting .row-dimension {
   width: 30px;
   border-left-color: white;
@@ -271,46 +326,8 @@ textarea {
 }
 
 
-.show-on-hover {
-  height: 10px;
-  /*text-align: center;*/
-  overflow: hidden;
-  transition: height .5s;
-}
-
-.show-on-hover button {
-  margin: 10px 5px;
-  opacity: 0;
-  display: inline;
-  transition: opacity .25s;
-}
-
-.show-on-hover:hover {
-  height: 50px;
-  transition: height .5s;
-}
-
-.show-on-hover:hover button {
-  opacity: 1;
-  transition: opacity .25s;
-  transition-delay: .25s
-}
-
-report-preview .table {
-  margin-bottom: 0;
-}
-
-
 .print { display: none;}
 .main-content { padding-top: 45px; }
-
-
-ul>.onrollover {
-  display: none;
-}
-ul:hover>.onrollover {
-  display: list-item;
-}
 
 @media print {
   .print { display: block; }
@@ -329,50 +346,6 @@ ul:hover>.onrollover {
   }
 
 }
-/*
-
-.indent1 { padding-left: 20px !important; }
-.indent2 { padding-left: 40px !important; }
-.indent3 { padding-left: 60px !important; }
-.indent4 { padding-left: 80px !important; }
-.indent5 { padding-left: 100px !important; }*/
-
-
-  .table-raw-data th {
-    width: 20%;
-  }
-
-  .remove-action {
-    display: none;
-  }
-
-  li:hover > .remove-action, td:hover > .remove-action {
-    display: inline;
-    cursor: hand;
-  }
-  .table-raw-data span[contenteditable] {
-    display: inline-block;
-    min-width: 100px;
-    min-height: 12px;
-  }
-
-/*  .table-raw-data td:hover span[contenteditable] {
-    border: 1px dashed #ccc;
-    margin: 3px;
-  }*/
-
-
-.formula {
-  border-style: solid;
-  border-width: 0 0 0 5px;
-  border-color: #CCC;
-
-}
-
-.formula.error {
-  border-color: darkred;
-}
-
 
 .form-control.ng-invalid.ng-touched {
   border-color: #a94442;
@@ -402,52 +375,6 @@ ul:hover>.onrollover {
     border-radius: 3px;
 }
 
-
-
-      body {
-        background-color: #EEE;
-      }
-
-      #load-container{
-        position: absolute;
-        top: 50%;
-        margin-top: -205px;/* half of #content height*/
-        left: 0;
-        width: 100%;
-      }
-
-      #load-content {
-        width: 624px;
-        margin-left: auto;
-        margin-right: auto;
-        height: 410px;
-        text-align: center;
-        background-color: #FFF;
-        border: 1px solid #CCC;
-        border-radius: 5px;
-        padding: 20px;
-      }
-
-      #load-content h3 {
-        margin-top: 10px;
-      }
-
-      #load-content img {
-        width: 250px;
-        margin-bottom: 10px;
-        transition: width .2s;
-      }
-
-      #load-content .progress {
-        width: 80%;
-        margin: auto;
-      }
-
-#version {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-}
 
 .handle {
   text-align: center !important;
@@ -670,7 +597,6 @@ ul[ng-sortable] li *, i.fa.fa-bars {
 }
 .fa-thumb-tack:hover, #reporting .fa-line-chart:hover {
   color: #555;
-
 }
 
 
@@ -751,26 +677,30 @@ general-table table td:first-child, general-table table th:first-child, cc-indic
   border-left-width: 1px !important;
 }
 
-.project-columns {
+
+@media (min-width: 768px) {
+  .project-columns {
+  }
+
+  .project-menu {
+    position: fixed;
+    width: 200px;
+    top: 0;
+    padding-top: 45px;
+    padding-bottom: 10px;
+    height: 100%;
+  }
+
+  .project-menu .panel-group {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .project-content {
+    margin-left: 220px;
+  }
 }
 
-.project-menu {
-  position: fixed;
-  width: 200px;
-  top: 0;
-  padding-top: 45px;
-  padding-bottom: 10px;
-  height: 100%;
-}
-
-.project-menu .panel-group {
-  height: 100%;
-  overflow-y: auto;
-}
-
-.project-content {
-  margin-left: 220px;
-}
 
 
 .panel-dashed {
@@ -803,10 +733,6 @@ general-table table td:first-child, general-table table th:first-child, cc-indic
 
 
 
-
-body {
-  background-color: #fbfbfb !important;
-}
 
 .table {
   background-color: white;

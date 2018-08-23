@@ -19,12 +19,14 @@ import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
 
 import uiDropdown from 'angular-ui-bootstrap/src/dropdown/index';
+import uiCollapse from 'angular-ui-bootstrap/src/collapse/index';
 
 const module = angular.module(
 	'monitool.components.pages.menu',
 	[
 		uiRouter, // for $stateProvider
-		uiDropdown
+		uiDropdown,
+		uiCollapse
 	]
 );
 
