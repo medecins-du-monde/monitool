@@ -2,7 +2,7 @@
 import database from '../database';
 
 // Add new view to access inputs by variable
-export default async function() {
+export default async () => {
 	// Update design document.
 	const ddoc = await database.get('_design/monitool');
 
