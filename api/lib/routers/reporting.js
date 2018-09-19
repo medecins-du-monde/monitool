@@ -18,6 +18,9 @@
 import Router from 'koa-router';
 import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 import exprEval from 'expr-eval';
+import Redis from 'ioredis';
+import hash from 'object-hash';
+
 
 import Project from '../resource/model/project';
 import Input from '../resource/model/input';
@@ -25,8 +28,12 @@ import Cube from '../olap/cube';
 
 
 const router = new Router();
+const redis = new Redis({host: 'redis'});
 
-
+/**
+ * When querying for a computed indicator (ex: 100 * a / b)
+ * we query separately for a and b, and merge the results with this function.
+ */
 function mergeRec(depth, expr, parameters, trees) {
 	if (depth === 0) {
 		const paramMap = {};
@@ -72,13 +79,32 @@ router.post('/reporting/project/:prjId', async ctx => {
 	const project = await Project.storeInstance.get(ctx.params.prjId);
 	const computation = ctx.request.body.computation;
 
-	let subQueries = await Promise.all(
-		Object.values(computation.parameters).map(async param => {
-			// 
+	// Force response type to be JSON, as we will provide a string to Koa.
+	let finalResult = null;
+
+	// Compute cache key dependent on the query
+	const cacheKey = ctx.params.prjId + ':' + hash(ctx.request.body, {unorderedObjects: true, algorithm: 'md5'});
+	try {
+		/////////
+		// Try to respond from cache.
+		/////////
+
+		finalResult = await redis.get(cacheKey);
+		if (!finalResult)
+			throw new Error();
+	}
+	catch (e) {
+		/////////
+		// Generate fresh response.
+		/////////
+
+		// Make promises to query each independent parameter.
+		const subQueries = Object.values(computation.parameters).map(async param => {
+			// Convenience alias
 			const variableId = param.elementId;
 			const extraFilter = param.filter;
 
-			// 
+			// Get everything needed to compute the report.
 			const dataSource = project.getDataSourceByVariableId(variableId);
 			const variable = dataSource.getVariableById(variableId);
 			const inputs = await Input.storeInstance.listByVariable(project, dataSource, variable, true);
@@ -114,19 +140,30 @@ router.post('/reporting/project/:prjId', async ctx => {
 				ctx.request.body.withTotals,
 				ctx.request.body.withGroups
 			);
-		})
-	);
+		});
 
-	const parser = new exprEval.Parser();
-	parser.consts = {};
+		// Wait for all of them to finish
+		const variableResults = await Promise.all(subQueries);
 
-	const expr = parser.parse(computation.formula);
-	ctx.response.body = mergeRec(
-		ctx.request.body.dimensionIds.length,
-		expr,
-		Object.keys(computation.parameters),
-		subQueries
-	);
+		// Merge parameters into final result.
+		const parser = new exprEval.Parser();
+		parser.consts = {};
+
+		finalResult = JSON.stringify(
+			mergeRec(
+				ctx.request.body.dimensionIds.length,
+				parser.parse(computation.formula),
+				Object.keys(computation.parameters),
+				variableResults
+			)
+		);
+
+		// no await: No need to wait for redis to respond to user.
+		redis.set(cacheKey, finalResult, 'EX', 3600);
+	}
+
+	ctx.response.body = finalResult;
+	ctx.response.type = 'application/json';
 });
 
 export default router;

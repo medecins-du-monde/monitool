@@ -22,6 +22,7 @@ services:
       - backend
       - frontend
     environment:
+      NODE_ENV: "production"
       MONITOOL_DEBUG: "FALSE"
       MONITOOL_PORT: "80"
       MONITOOL_BASE_URL: "https://monitool.medecinsdumonde.net"
@@ -40,7 +41,14 @@ services:
       - azuread_clientsecret
       - googletranslate_apikey
       - monitool_cookiesecret
-      - monitool_dbpassword
+
+  redis:
+    image: redis:latest
+    command: "redis-server /usr/local/etc/redis/redis.conf"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - backend
 
   couchdb:
     image: couchdb:latest
@@ -48,8 +56,6 @@ services:
       - backend
     volumes:
       - couchdb-data:/opt/couchdb/data
-    secrets:
-      - monitool_dbpassword
 
 networks:
   frontend:
