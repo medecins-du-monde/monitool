@@ -112,6 +112,15 @@ module.component('projectUserList', {
 				})
 				.catch(error => {});
 		}
+
+		onDeleteClicked(user) {
+			this.editableProject.users.splice(
+				this.editableProject.users.indexOf(user),
+				1
+			);
+
+			this.onProjectUpdate({newProject: this.editableProject, isValid: true});
+		}
 	}
 });
 
