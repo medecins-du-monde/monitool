@@ -76,13 +76,31 @@ export default class InputStore extends Store {
 		if (!project || !dataSource || !variable)
 			throw new Error('missing_parameter');
 
-		const result = await this._db.callView(
+		let result = await this._db.callView(
 			'inputs_variable',
 			{key: project._id + ':' + dataSource.id + ':' + variable.id}
 		);
-		let inputs = result.rows.map(row => new Input(row.value));
+
+		let inputs = result.rows.map(row => {
+			const [projectId, dataSourceId, siteId, period] = row.id.split(':').slice(2);
+
+			return new Input({
+				_id: row.id,
+				type: 'input',
+				project: 'project:' + projectId,
+				form: dataSourceId,
+				entity: siteId,
+				period: period,
+				structure: {[variable.id]: row.value.s},
+				values: {[variable.id]: row.value.v}
+			});
+		});
+
+		// Free memory
+		result = null;
 
 		if (update) {
+			// Remove all invalid inputs (wrong dates, wrong entity, wrong periodicity...).
 			inputs = inputs.filter(input => {
 				const timeSlot = new TimeSlot(input.period);
 				const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
@@ -96,6 +114,7 @@ export default class InputStore extends Store {
 					&& dataSource.isValidSlot(input.period)
 			});
 
+			// Update to new structure.
 			const structure = {[variable.id]: dataSource.structure[variable.id]};
 			inputs.forEach(input => input.update(structure));
 		}
