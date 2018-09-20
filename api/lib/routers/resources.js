@@ -207,10 +207,6 @@ router.get('/resources/input', async ctx => {
 		let inputs;
 		if (q.mode === 'current+last')
 			inputs = await Input.storeInstance.getLasts(q.projectId, q.formId, q.entityId, q.period, true);
-		else if (q.mode === undefined && typeof q.projectId === 'string')
-			inputs = await Input.storeInstance.listByProject(q.projectId, true);
-		else if (q.mode === undefined)
-			inputs = await Input.storeInstance.list(true);
 		else
 			throw new Error('invalid_mode');
 
