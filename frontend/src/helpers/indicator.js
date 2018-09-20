@@ -459,8 +459,17 @@ export async function fetchData(project, computation, dimensionIds, filter, with
 		withGroups: withGroups
 	};
 
-	const response = await axios.post(url, data);
-	return response.data;
+	try {
+		const response = await axios.post(url, data);
+		return response.data;
+	}
+	catch (e) {
+		// Try to fail with the server error message
+		if (e.response && e.response.data && e.response.data.message)
+			throw new Error(e.response.data.message);
+		else
+			throw e;
+	}
 }
 
 
