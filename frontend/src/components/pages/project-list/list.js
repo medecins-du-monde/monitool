@@ -81,7 +81,7 @@ module.component('projectList', {
 
 				p.running = p.end > new Date().toISOString().slice(0, 10);
 				p.isUser = !!user;
-				p.isOwner = this.userCtx.role === 'admin' || user.role === 'owner';
+				p.isOwner = this.userCtx.role === 'admin' || (user && user.role === 'owner');
 				p.favorite = !!localStorage['favorites::projects::' + p._id];
 			});
 
