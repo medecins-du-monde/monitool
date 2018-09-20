@@ -93,7 +93,8 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id">
+				<tr ng-repeat="dataSource in $ctrl.project.forms track by dataSource.id"
+					acl-has-input-form="dataSource.id" acl-project="$ctrl.project">
 					<td>
 						<span translate="project.input_fill_forms" translate-values="{numInputs: $ctrl.status[dataSource.id].total}"></span>
 						<a
