@@ -22,14 +22,16 @@ process.on('message', m => {
 function mergeRec(depth, expr, parameters, trees) {
 	if (depth === 0) {
 		const paramMap = {};
-		parameters.forEach((key, index) => paramMap[key] = trees[index]);
+		parameters.forEach((key, index) => {
+			paramMap[key] = typeof trees[index] !== 'undefined' ? trees[index] : 'unknown';
+		});
 
 		try {
 			const result = expr.evaluate(paramMap);
-
-			if (typeof result !== 'number' || !Number.isFinite(result))
-				throw new Error();
-			return result;
+			if (typeof result === 'number' && Number.isFinite(result))
+				return result;
+			else
+				return 'Not a finite number';
 		}
 		catch (e) {
 			return 'Invalid computation'
@@ -108,6 +110,12 @@ async function computeReport(query) {
 	// Merge parameters into final result.
 	const parser = new exprEval.Parser();
 	parser.consts = {};
+	parser.binaryOps['||'] = parser.binaryOps['or'] = (a, b) => {
+		if (typeof a !== 'number')
+			return b;
+		else
+			return a;
+	};
 
 	return JSON.stringify(
 		mergeRec(
