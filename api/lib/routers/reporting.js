@@ -16,150 +16,168 @@
  */
 
 import Router from 'koa-router';
-import TimeSlot, {timeSlotRange} from 'timeslot-dag';
-import exprEval from 'expr-eval';
-import Redis from 'ioredis';
+import child_process from 'child_process';
+
 import hash from 'object-hash';
-
-
-import Project from '../resource/model/project';
-import Input from '../resource/model/input';
-import Cube from '../olap/cube';
+import redis from '../resource/redis';
 
 
 const router = new Router();
-const redis = new Redis({host: 'redis'});
 
 /**
- * When querying for a computed indicator (ex: 100 * a / b)
- * we query separately for a and b, and merge the results with this function.
+ * not really a queue: allows tracking waiting computations from subprocess.
  */
-function mergeRec(depth, expr, parameters, trees) {
-	if (depth === 0) {
-		const paramMap = {};
-		parameters.forEach((key, index) => paramMap[key] = trees[index]);
+const queue = {};
 
-		try {
-			const result = expr.evaluate(paramMap);
+/**
+ * There is only one subprocess => global.
+ */
+let subprocess;
 
-			if (typeof result !== 'number' || !Number.isFinite(result))
-				throw new Error();
-			return result;
-		}
-		catch (e) {
-			return 'Invalid computation'
-		}
+/**
+ * start subprocess and listen to events.
+ */
+function startChild() {
+	if (subprocess) {
+		subprocess.removeListener('message', onSubprocessMessage);
+		subprocess.removeListener('exit', onSubprocessExit);
 	}
 
-	const keys = new Set(
-		trees
-			.map(p => p ? Object.keys(p) : [])
-			.reduce((memo, keys) => [...memo, ...keys], [])
-	);
-
-	const result = {};
-	for (let key of keys)
-		result[key] = mergeRec(
-			depth - 1,
-			expr,
-			parameters,
-			trees.map(p => {
-				if (p !== undefined)
-					return p[key];
-				else
-					return depth <= 1 ? undefined : {};
-			})
-		);
-
-	return result;
+	subprocess = child_process.fork(`${__dirname}/../main-reporting.js`);
+	subprocess.on('message', onSubprocessMessage);
+	subprocess.on('exit', onSubprocessExit);
 }
+
+/**
+ * Respond to however is waiting when we get news from subprocess.
+ */
+function onSubprocessMessage(message) {
+	const queueItem = queue[message.messageId];
+
+	if (queueItem) {
+		if (message.result)
+			queueItem.resolve(message.result);
+		else
+			queueItem.reject(message.error);
+
+		clearTimeout(queueItem.timeout);
+		delete queue[message.messageId];
+	}
+}
+
+/**
+ * restart subprocess when it crashes, and tell queued queries
+ * that we won't answer.
+ */
+function onSubprocessExit(code) {
+	// restart subprocess.
+	startChild();
+
+	// Fail all queued messages
+	for (let msgId in queue) {
+		const queueItem = queue[msgId];
+		queueItem.reject(new Error('Reporting server crashed'));
+		clearTimeout(queueItem.timeout);
+		delete queue[msgId];
+	}
+}
+
+/**
+ * Handle timeouts when we asked something to subprocess and got
+ * no answer.
+ */
+function onTimeout(msgId) {
+	const queueItem = queue[msgId];
+	queueItem.reject(new Error('Reporting server was too slow'));
+	delete queue[msgId];
+}
+
+/**
+ * Ask the subprocess to compute some reporting.
+ */
+async function queryReportingSubprocess(query) {
+	// Create random message Id.
+	const msgId = Math.random().toString().substring(2);
+
+	// Send it to the reporting process.
+	const msgSent = subprocess.send({messageId: msgId, query: query});
+	if (!msgSent)
+		throw new Error('Reporting server not available');
+
+	// This promise will resolve when we get the answer from the subprocess
+	// or fail if we timeout.
+	return new Promise((resolve, reject) => {
+		queue[msgId] = {};
+
+		// Store promise handlers so that they can be handled when
+		// getting message from subprocess.
+		queue[msgId].resolve = resolve;
+		queue[msgId].reject = reject;
+
+		// Fail if the subprocess did not answer in 2.5 minutes.
+		// (nginx timeout is set to 3 minutes).
+		queue[msgId].timeout = setTimeout(
+			onTimeout.bind(null, msgId),
+			2.5 * 60 * 1000
+		);
+	});
+}
+
+/**
+ * Pool redis for a key each 500ms.
+ *  - fail if the key is missing
+ *  - Wait while the key value is "computing"
+ *  - return if the key is something else.
+ */
+async function poolRedis(queryHash) {
+	let resolvePromise, rejectPromise;
+
+	const interval = setInterval(async () => {
+		const result = await redis.get(queryHash);
+		if (result === 'computing')
+			return;
+
+		clearInterval(interval);
+		if (!result)
+			rejectPromise(new Error('no_found'));
+		else
+			resolvePromise(result);
+	}, 500);
+
+	return new Promise((resolve, reject) => {
+		resolvePromise = resolve;
+		rejectPromise = reject;
+	});
+}
+
+startChild();
 
 
 router.post('/reporting/project/:prjId', async ctx => {
-	const project = await Project.storeInstance.get(ctx.params.prjId);
-	const computation = ctx.request.body.computation;
+	const query = {
+		projectId: ctx.params.prjId,
+		computation: ctx.request.body.computation,
+		filter: ctx.request.body.filter,
+		dimensionIds: ctx.request.body.dimensionIds,
+		withTotals: ctx.request.body.withTotals,
+		withGroups: ctx.request.body.withGroups
+	};
 
-	// Force response type to be JSON, as we will provide a string to Koa.
+	const queryHash = hash(query, {unorderedObjects: true, algorithm: 'md5'});
+
 	let finalResult = null;
 
-	// Compute cache key dependent on the query
-	const cacheKey = ctx.params.prjId + ':' + hash(ctx.request.body, {unorderedObjects: true, algorithm: 'md5'});
 	try {
-		/////////
 		// Try to respond from cache.
-		/////////
-
-		finalResult = await redis.get(cacheKey);
-		if (!finalResult)
-			throw new Error();
+		finalResult = await poolRedis(queryHash);
 	}
 	catch (e) {
-		/////////
-		// Generate fresh response.
-		/////////
+		// Tell other nodes that we are computing this.
+		await redis.set(queryHash, 'computing', 'EX', 5 * 60);
 
-		// Make promises to query each independent parameter.
-		const subQueries = Object.values(computation.parameters).map(async param => {
-			// Convenience alias
-			const variableId = param.elementId;
-			const extraFilter = param.filter;
-
-			// Get everything needed to compute the report.
-			const dataSource = project.getDataSourceByVariableId(variableId);
-			const variable = dataSource.getVariableById(variableId);
-			const inputs = await Input.storeInstance.listByVariable(project, dataSource, variable, true);
-			const cube = Cube.fromElement(project, dataSource, variable, inputs);
-
-			// Merge parameter filters
-			const filter = JSON.parse(JSON.stringify(ctx.request.body.filter));
-			for (let key in extraFilter)
-				filter[key] = filter[key] ? filter[key].filter(e => extraFilter[key].includes(e)) : extraFilter[key];
-
-			// Replace _start/_end by a proper filter depending on our time dimension.
-			if (filter._start && filter._end) {
-				const timeDimension = dataSource.periodicity === 'free' ? 'day' : dataSource.periodicity;
-				const timeValues = Array.from(
-					timeSlotRange(
-						TimeSlot.fromDate(new Date(filter._start + 'T00:00:00Z'), timeDimension),
-						TimeSlot.fromDate(new Date(filter._end + 'T00:00:00Z'), timeDimension)
-					)
-				).map(ts => ts.value);
-
-				delete filter._start;
-				delete filter._end;
-
-				if (filter[timeDimension])
-					filter[timeDimension] = filter[timeDimension].filter(e => timeValues.includes(e));
-				else
-					filter[timeDimension] = timeValues;
-			}
-
-			return cube.query(
-				ctx.request.body.dimensionIds,
-				filter,
-				ctx.request.body.withTotals,
-				ctx.request.body.withGroups
-			);
-		});
-
-		// Wait for all of them to finish
-		const variableResults = await Promise.all(subQueries);
-
-		// Merge parameters into final result.
-		const parser = new exprEval.Parser();
-		parser.consts = {};
-
-		finalResult = JSON.stringify(
-			mergeRec(
-				ctx.request.body.dimensionIds.length,
-				parser.parse(computation.formula),
-				Object.keys(computation.parameters),
-				variableResults
-			)
-		);
-
-		// no await: No need to wait for redis to respond to user.
-		redis.set(cacheKey, finalResult, 'EX', 3600);
+		// Get answer from reporting subprocess, and store in cache.
+		finalResult = await queryReportingSubprocess(query);
+		redis.set(queryHash, finalResult, 'EX', 3600);
 	}
 
 	ctx.response.body = finalResult;
@@ -167,3 +185,4 @@ router.post('/reporting/project/:prjId', async ctx => {
 });
 
 export default router;
+

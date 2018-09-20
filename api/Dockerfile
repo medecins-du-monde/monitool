@@ -31,4 +31,4 @@ COPY --from=builder /app/dist ./dist
 
 # Run monitool API
 EXPOSE 80
-CMD node ./dist/main.js
+CMD node ./dist/main-webapp.js

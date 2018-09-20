@@ -15,11 +15,11 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import winston from 'winston';
+
 import application from './application';
 import config from './config/config';
 import database from './resource/database';
-import winston from 'winston';
-
 
 // Catch the uncaught errors that weren't wrapped in a domain or try catch statement
 process.on('uncaughtException', function(err) {
