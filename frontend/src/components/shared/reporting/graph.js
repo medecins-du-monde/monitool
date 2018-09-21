@@ -42,7 +42,7 @@ module.component('reportingGraph', {
 	controller: class GraphController {
 
 		constructor($element) {
-			this.element = $element[0].querySelector('div');
+			this.element = $element[0].querySelector('div>div');
 			this._formattedYs = [];
 		}
 

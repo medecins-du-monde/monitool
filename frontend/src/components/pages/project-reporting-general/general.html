@@ -5,12 +5,6 @@
 	<li class="active" translate="shared.reporting_general"></li>
 </ol>
 
-<reporting-graph
-	x="$ctrl.graphX"
-	ys="$ctrl.graphYs"
-	presentation="$ctrl.graphType"
-	ng-if="$ctrl.graphYs|length"></reporting-graph>
-
 <project-group-by
 	project="$ctrl.project"
 	on-update="$ctrl.onGroupByUpdate(groupBy)"></project-group-by>
@@ -19,11 +13,16 @@
 	project="$ctrl.project"
 	on-update="$ctrl.onFilterUpdate(filter)"></project-filter>
 
+<reporting-graph
+	x="$ctrl.graphX"
+	ys="$ctrl.graphYs"
+	presentation="$ctrl.graphType"
+	ng-if="$ctrl.graphYs|length"></reporting-graph>
+
 <general-table
 	project="$ctrl.project"
 	themes="$ctrl.themes"
 	cc-indicators="$ctrl.ccIndicators"
-
 
 	filter="$ctrl.filter"
 	group-by="$ctrl.groupBy"
