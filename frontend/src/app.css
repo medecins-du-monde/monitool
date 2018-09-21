@@ -858,3 +858,8 @@ olap-grid th:first-child, .input-table-container td:first-child {
 dd {
   margin-bottom: 5px;
 }
+
+.row-baseline, .row-target {
+  background: repeating-linear-gradient(-45deg, #fff, #fff 3px, #f0f0f0 3px, #f0f0f0 6px);
+}
+
