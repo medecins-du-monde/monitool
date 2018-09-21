@@ -169,7 +169,7 @@ router.post('/reporting/project/:prjId', async ctx => {
 
 	try {
 		// Try to respond from cache.
-		finalResult = await poolRedis('x' + queryHash);
+		finalResult = await poolRedis(queryHash);
 	}
 	catch (e) {
 		// Tell other nodes that we are computing this.
