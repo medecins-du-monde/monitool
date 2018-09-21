@@ -45,7 +45,6 @@ const config = {
 		"host": process.env.MONITOOL_COUCHDB_HOST || "localhost",
 		"port": parseInt(process.env.MONITOOL_COUCHDB_PORT) || 5984,
 		"bucket": process.env.MONITOOL_COUCHDB_DATABUCKET || "monitool",
-		"sessionBucket": process.env.MONITOOL_COUCHDB_SESSIONBUCKET || "monitool-sessions",
 		"username":
 			process.env.MONITOOL_COUCHDB_USER ||
 			readFile(process.env.MONITOOL_COUCHDB_USER_FILE) ||

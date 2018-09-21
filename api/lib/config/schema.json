@@ -24,7 +24,7 @@
 		},
 		"couchdb": {
 			"type": "object",
-			"required": ["host", "port", "bucket", "sessionBucket"],
+			"required": ["host", "port", "bucket"],
 			"properties": {
 				"host": {"type": "string"},
 				"port": {
@@ -33,10 +33,6 @@
 					"maximum": 65536
 				},
 				"bucket": {
-					"type": "string",
-					"minLength": 1
-				},
-				"sessionBucket": {
 					"type": "string",
 					"minLength": 1
 				},
