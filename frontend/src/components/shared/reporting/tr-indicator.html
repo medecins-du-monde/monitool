@@ -38,8 +38,8 @@
 	<span>{{$ctrl.indicator.target}}{{$ctrl.indicator|indicatorUnit}}</span>
 </td>
 
-<td ng-if="!$ctrl.values"
-	colspan="{{$ctrl.columns.length}}"
+<td colspan="{{$ctrl.columns.length}}"
+	ng-if="!$ctrl.values"
 	style="background-color: rgb(238, 238, 238);">
 	{{$ctrl.errorMessage|translate}}
 </td>

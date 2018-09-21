@@ -1,8 +1,12 @@
 <div class="input-group">
 	<span class="input-group-addon"><i class="fa fa-tachometer fa-fw"></i></span>
-	<select id="element-input"
-			class="form-control input-sm"
-			ng-model="$ctrl.chosenElement"
-			ng-change="$ctrl.onUpdate({indicator: $ctrl.chosenElement.indicator, logicalFramework: $ctrl.chosenElement.logicalFramework})"
-			ng-options="i as i.name group by i.group for i in $ctrl.elementOptions"></select>
+
+	<select
+		id="element-input"
+		class="form-control input-sm"
+		ng-model="$ctrl.chosenElement"
+		ng-change="$ctrl.onUpdate({indicator: $ctrl.chosenElement.indicator, logicalFramework: $ctrl.chosenElement.logicalFramework})"
+		ng-options="i as i.name group by i.group for i in $ctrl.elementOptions"></select>
+
+	<export-csv class="input-group-btn"></export-csv>
 </div>

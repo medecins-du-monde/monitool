@@ -2,14 +2,16 @@
 
 import angular from 'angular';
 import uuid from 'uuid/v4';
+import {generateIndicatorDimensions} from '../../../helpers/indicator';
 
+import mtExportCsv from '../../shared/reporting/export-csv';
 import mtTrIndicator from '../../shared/reporting/tr-indicator';
 import mtFaOpen from '../../shared/misc/plus-minus-icon';
-import {generateIndicatorDimensions} from '../../../helpers/indicator';
 
 const module = angular.module(
 	'monitool.components.pages.project.reporting-general.indicators-tbody',
 	[
+		mtExportCsv,
 		mtTrIndicator,
 		mtFaOpen
 	]

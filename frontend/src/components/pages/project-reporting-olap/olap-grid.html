@@ -26,7 +26,7 @@
 				ng-style="$ctrl.firstColStyle"
 				ng-if="$first"></th>
 
-			<th ng-repeat="col in row.cols track by $index" colspan="{{row.colspan}}" title="{{col.title}}">
+			<th colspan="{{row.colspan}}" title="{{col.title}}" ng-repeat="col in row.cols track by $index">
 				<i class="fa fa-arrow-circle-right" ng-if="col.isGroup"></i>
 				{{col.name|formatSlot}}
 			</th>

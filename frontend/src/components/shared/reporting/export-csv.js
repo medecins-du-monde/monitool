@@ -39,7 +39,12 @@ module.component('exportCsv', {
 			const tableHtml = '<table>' + this._cleanHtml(table.innerHTML) + '</table>';
 			const excelXml = this._htmlToExcel(tableHtml);
 
-			var blob = new Blob([excelXml], {type: "application/vnd.ms-excel"});
+			const final = '<table>'
+				+ excelXml.match('<thead>.*</thead>')[0]
+				+ excelXml.match('<tbody>.*</tbody>')[0]
+				+ '</table>';
+
+			var blob = new Blob([final], {type: "application/vnd.ms-excel"});
 			fileSaver.saveAs(blob, 'export.xls');
 		}
 
@@ -72,36 +77,26 @@ module.component('exportCsv', {
 					</body>
 				</html>`;
 
-			const ctx = {worksheet: name || 'Worksheet', table: innerHTML};
+			const ctx = {worksheet: name || 'Worksheet', table: table};
 
-			return template.replace(
-				/{(\w+)}/g,
-				function(m, p) {
-					return ctx[p];
-				}
-			);
+			return template.replace(/{(\w+)}/g, (m, p) => ctx[p]);
 		}
 
 		/**
 		 * Remove all monitool related tags, styles, etc from the table
 		 * we dumped from the DOM by hacking with regular expressions.
+		 *
+		 * Hopefully no one will ever git blame this.
 		 */
 		_cleanHtml(innerHTML) {
 			innerHTML = innerHTML.replace(/<!--[\s\S]*?-->/g, ''); // remove comments
 			innerHTML = innerHTML.replace(/<i class.*?<\/i>/g, ''); // remove pictograms
 
-			// remove checkboxes
-			innerHTML = innerHTML.replace(/<input.*?>/g, '');
-			innerHTML = innerHTML.replace(/<div class="btn-group btn-group-xs">[\s\S]*?<\/div>/g, '');
-			innerHTML = innerHTML.replace(/<div class="btn-toolbar">[\s\S]*?<\/div>/g, '');
-			innerHTML = innerHTML.replace(/<div class="btn-toolbar">[\s\S]*?<\/div>/g, '');
-			innerHTML = innerHTML.replace(/<div class="pull-right">[\s\S]*?<\/div>/g, '');
+			innerHTML = innerHTML.replace(/<fa\-open.*?<\/fa\-open>/g, '');
+			innerHTML = innerHTML.replace(/<export\-csv.*?<\/export\-csv>/g, '');
+			innerHTML = innerHTML.replace(/<button.*?<\/button>/g, '');
 
-			// Replace label by complete content
-			innerHTML = innerHTML.replace(
-				/<label for=".*?" title="(.*?)" class="ng-binding">.*?<\/label>/g,
-				(match, title) => title
-			);
+			innerHTML = innerHTML.replace(/<td class="row-dimension".*?<\/td>/g, '<td></td>');
 
 			// Remove separators from numbers
 			innerHTML = innerHTML.replace(
@@ -109,8 +104,18 @@ module.component('exportCsv', {
 				match => '>' + match.match(/\d+/g).join('') + '<'
 			);
 
-			// remove angular, classes, styles attrs
-			innerHTML = innerHTML.replace(/ (ng-[a-z]+?|class|style|reporting-field|title|translate)=".*?"/g, '');
+			// Remove all HTML attributes, spans and divs, besides "colspan"
+			innerHTML = innerHTML.replace(/<th colspan="(\d+)".*?>/g, (match, colspan) => '<thcolspan="' + colspan + '">');
+			innerHTML = innerHTML.replace(/<([a-z]+) .*?>/g, (match, tag) => '<' + tag + '>');
+			innerHTML = innerHTML.replace(/<thcolspan/g, '<th colspan');
+
+			innerHTML = innerHTML.replace(/<div>(.*?)<\/div>/g, (match, content) => content);
+			innerHTML = innerHTML.replace(/<span>(.*?)<\/span>/g, (match, content) => content);
+
+			// Remove extra spaces.
+			innerHTML = innerHTML.replace(/\s+/g, ' ');
+			innerHTML = innerHTML.replace(/> /g, '>');
+			innerHTML = innerHTML.replace(/ </g, '<');
 
 			// DIRTY: Remove accents, because there is no way to have encoding working.
 			innerHTML = diacritics.remove(innerHTML);
