@@ -84,17 +84,17 @@ router.get('/resources/project/:id/data-source/:dataSourceId.pdf', async ctx => 
 		throw new Error('forbidden');
 
 	const project = await Project.storeInstance.get(ctx.params.id);
+	const dataSource = project.getDataSourceById(ctx.params.dataSourceId);
 
 	// Create document definition.
-	let docDef = project
-		.getDataSourceById(ctx.params.dataSourceId)
-		.getPdfDocDefinition(ctx.request.query.orientation, ctx.request.query.language);
-
+	const title = dataSource.name || 'data-source';
+	const docDef = dataSource.getPdfDocDefinition(ctx.request.query.orientation, ctx.request.query.language);
 	docDef.styles = styles;
 
 	// Send to user.
 	ctx.response.type = 'application/pdf';
 	ctx.response.body = printer.createPdfKitDocument(docDef);
+	ctx.response.attachment(title + '.pdf');
 	ctx.response.body.end();
 });
 
@@ -107,17 +107,17 @@ router.get('/resources/project/:id/logical-frame/:logicalFrameId.pdf', async ctx
 		throw new Error('forbidden');
 
 	const project = await Project.storeInstance.get(ctx.params.id);
+	const logicalFramework = project.getLogicalFrameById(ctx.params.logicalFrameId)
 
 	// Create document definition.
-	const docDef = project
-		.getLogicalFrameById(ctx.params.logicalFrameId)
-		.getPdfDocDefinition(ctx.request.query.orientation, project.forms, ctx.request.query.language);
-
+	const title = logicalFramework.name || 'logical-framework';
+	const docDef = logicalFramework.getPdfDocDefinition(ctx.request.query.orientation, project.forms, ctx.request.query.language);
 	docDef.styles = styles;
 
 	// Send to user.
 	ctx.response.type = 'application/pdf';
 	ctx.response.body = printer.createPdfKitDocument(docDef);
+	ctx.response.attachment(title + '.pdf');
 	ctx.response.body.end();
 });
 
