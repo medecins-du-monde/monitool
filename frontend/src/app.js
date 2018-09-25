@@ -52,7 +52,7 @@ module.run(function($rootScope, $window, $transitions) {
 	$transitions.onError({}, function(transition) {
 		const error = transition.error();
 
-		if (error.detail && error.detail.response.status === 401) {
+		if (error.detail && error.detail.response && error.detail.response.status === 401) {
 			alert("Session has expired, you need to log in again");
 			window.location.reload();
 		}
