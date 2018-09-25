@@ -39,13 +39,12 @@ module.config($stateProvider => {
 		url: '/input/:dataSourceId/edit/:period/:entityId',
 		component: 'projectInputEdition',
 		resolve: {
-			inputs: $stateParams => Input.fetchLasts($stateParams.projectId, $stateParams.entityId, $stateParams.dataSourceId, $stateParams.period),
+			inputs: (loadedProject, $stateParams) => Input.fetchLasts(loadedProject._id, $stateParams.entityId, $stateParams.dataSourceId, $stateParams.period),
 			input: inputs => inputs.current,
 			previousInput: inputs => inputs.previous,
 			dsId: $stateParams => $stateParams.dataSourceId,
 			period: $stateParams => $stateParams.period,
 			siteId: $stateParams => $stateParams.entityId
-
 		}
 	});
 });
