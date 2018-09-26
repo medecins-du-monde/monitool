@@ -118,11 +118,6 @@ export default class InputStore extends Store {
 			const structure = {[variable.id]: dataSource.structure[variable.id]};
 			inputs.forEach(input => input.update(structure));
 		}
-		else
-			inputs.forEach(input => {
-				inputs.values = {[variable.id]: inputs.values[variable.id]};
-				inputs.structure = {[variable.id]: inputs.structure[variable.id]};
-			});
 
 		return inputs;
 	}
