@@ -168,6 +168,8 @@ router.post('/reporting/project/:prjId', async ctx => {
 	let finalResult = null;
 
 	try {
+		// FIXME ugly race condition here, we should set with proper flags to check if the key exists.
+
 		// Try to respond from cache.
 		finalResult = await poolRedis(queryHash);
 	}
