@@ -1,5 +1,5 @@
 import database from '../database';
-import uuid from 'node-uuid';
+import uuidv4 from 'uuid/v4';
 
 /**
  * This migration removes the fake "none" entity used to attach data
@@ -16,7 +16,7 @@ export default async () => {
 		var update = false, hasProjectLevelForms = false;
 		var project = row.doc;
 
-		projectUUIDs[project._id] = uuid.v4();
+		projectUUIDs[project._id] = uuidv4();
 
 		project.forms.forEach(form => {
 			if (form.collect === 'project') {
