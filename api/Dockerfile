@@ -3,7 +3,7 @@
 ###################################
 
 # Switch to a clean image
-FROM node:8 as builder
+FROM node:10 as builder
 WORKDIR /app
 
 # Install prod + dev dependencies
@@ -19,7 +19,7 @@ RUN yarn run build
 ###################################
 
 # Switch to a clean image
-FROM node:8-slim as production
+FROM node:10-slim as production
 WORKDIR /app
 
 # Install prod dependencies only

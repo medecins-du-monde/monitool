@@ -23,6 +23,7 @@
     "nodemon": "x"
   },
   "dependencies": {
+    "JSONStream": "^1.3.4",
     "expr-eval": "^1.2.1",
     "fast-json-patch": "^2.0.6",
     "ioredis": "^4.0.0",

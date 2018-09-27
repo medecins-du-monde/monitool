@@ -23,7 +23,7 @@ services:
       - frontend_node_modules:/app/node_modules
 
   api:
-    image: node:8
+    image: node:10
     working_dir: /app
     command: sh -c "yarn install && yarn run start"
     ports:
