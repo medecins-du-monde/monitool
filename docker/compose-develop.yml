@@ -26,6 +26,8 @@ services:
     image: node:8
     working_dir: /app
     command: sh -c "yarn install && yarn run start"
+    ports:
+      - "9229:9229" # debugger
     volumes:
       - ../api/lib:/app/lib:ro
       - ../api/package.json:/app/package.json:ro
