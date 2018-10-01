@@ -11,9 +11,19 @@ import Input from './resource/model/input';
 import Cube from './olap/cube';
 
 
-
-
 const pipelineP = promisify(pipeline);
+
+const _cubeCache = {};
+
+// Keep cubes in memory for 5 minutes at most.
+setInterval(() => {
+	const now = +new Date();
+
+	for (const key in _cubeCache) {
+		if (now - _cubeCache[key].time > 5 * 60 * 1000)
+			delete _cubeCache[key];
+	}
+}, 5000);
 
 
 process.on('message', m => {
@@ -58,7 +68,26 @@ async function _subQuery(project, query, param) {
 	const dataSource = project.getDataSourceByVariableId(param.elementId);
 	const variable = dataSource.getVariableById(param.elementId);
 
-	// Create empty cube
+	// Retrieve cube
+	const cacheKey = [project._id, dataSource.id, variable.id].join(":");
+
+	if (!_cubeCache[cacheKey])
+		_cubeCache[cacheKey] = {
+			time: +new Date(),
+			cube: _createCube(project, dataSource, variable)
+		}
+
+	const cube = await _cubeCache[cacheKey].cube;
+
+	return cube.query(
+		query.dimensionIds,
+		_createFilter(dataSource, query.filter, param.filter),
+		query.withTotals,
+		query.withGroups
+	);
+}
+
+async function _createCube(project, dataSource, variable) {
 	const cube = Cube.fromElement(project, dataSource, variable);
 
 	// Query database, and stream the response in it.
@@ -73,12 +102,7 @@ async function _subQuery(project, query, param) {
 		new CubeFiller(cube, variable)
 	);
 
-	return cube.query(
-		query.dimensionIds,
-		_createFilter(dataSource, query.filter, param.filter),
-		query.withTotals,
-		query.withGroups
-	);
+	return cube;
 }
 
 function _createFilter(dataSource, queryFilter, paramFilter) {
