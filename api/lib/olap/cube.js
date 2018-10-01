@@ -180,8 +180,8 @@ export default class Cube {
 		var dataSize = 1;
 		dimensions.forEach(dimension => dataSize *= dimension.items.length);
 
-		var data = new Array(dataSize);
-		data.fill(-2147483648);
+		var data = new Int32Array(dataSize);
+		data.fill(-123456);
 
 		const cube = new Cube(element.id, dimensions, dimensionGroups, data);
 
@@ -407,7 +407,7 @@ export default class Cube {
 		// 	return undefined;
 
 		if (indexesOffset == indexes.length)
-			return this.data[dataOffset] == -2147483648 ? undefined : this.data[dataOffset];
+			return this.data[dataOffset] == -123456 ? undefined : this.data[dataOffset];
 
 		const dimension  = this.dimensions[indexesOffset];
 
