@@ -56,10 +56,13 @@ export default class DimensionGroup {
 		return new DimensionGroup(partition.id + '_g', partition.id, pgroups);
 	}
 
+	get items() {
+		return Object.keys(mapping);
+	}
+
 	constructor(id, childDimension, mapping) {
 		this.id = id;
 		this.childDimension = childDimension;
-		this.items = Object.keys(mapping);
 		this.mapping = mapping;
 	}
 }

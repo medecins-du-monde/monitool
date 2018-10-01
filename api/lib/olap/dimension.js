@@ -59,6 +59,18 @@ export default class Dimension {
 		);
 	};
 
+	get indexes() {
+		if (!this._indexes) {
+			const numItems = this.items.length;
+
+			this._indexes = {};
+			for (let i = 0; i < numItems; ++i)
+				this._indexes[this.items[i]] = i;
+		}
+
+		return this._indexes;
+	}
+
 	/**
 	 * id = "month"
 	 * items = ["2010-01", "2010-02", ...]

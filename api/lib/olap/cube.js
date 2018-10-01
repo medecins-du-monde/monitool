@@ -19,6 +19,89 @@ import winston from 'winston';
 import Dimension from './dimension';
 import DimensionGroup from './dimension-group';
 
+
+
+const _globalRange = _range(4096);
+function _range(n) {
+	const list = new Array(n);
+
+	for (let i = 0; i < n; ++i)
+		list[i] = i;
+
+	return list;
+}
+
+
+const _countHelper = new Array(256);
+
+function _sort(list, maxValue) {
+	const len = list.length;
+
+	// insertion sort
+	for (let i = 1; i < len; i++) {
+		let tmp = list[i],
+		j = i;
+		while (list[j - 1] > tmp) {
+			list[j] = list[j - 1];
+			--j;
+		}
+		list[j] = tmp;
+	}
+
+	return list;
+}
+
+function _removeDuplicates(list) {
+	const length = list.length;
+
+	let readIndex = 1, writeIndex = 0;
+
+	while (readIndex < length) {
+		if (list[readIndex - 1] !== list[readIndex])
+			list[writeIndex++] = list[readIndex - 1];
+		++readIndex;
+	}
+
+	list[writeIndex++] = list[readIndex - 1];
+
+	if (writeIndex !== length)
+		list.length = writeIndex;
+
+	return list;
+}
+
+function _intersect(list, other) {
+	const listLength = list.length, otherLength = other.length;
+
+	let listWriteIndex = 0, listReadIndex = 0, otherReadIndex = 0;
+	while (listReadIndex < listLength && otherReadIndex < otherLength) {
+		const listItem = list[listReadIndex];
+		const otherItem = other[otherReadIndex];
+
+		if (listItem === otherItem) {
+			listReadIndex++;
+			otherReadIndex++;
+
+			list[listWriteIndex++] = listItem;
+		}
+		else if (listItem < otherItem)
+			// Item in list is not in other, let's check next item in list.
+			listReadIndex++;
+
+		else // listItem > otherItem
+			// Item in other not in list, let's check next item in other.
+			otherReadIndex++;
+	}
+
+	if (listLength !== listWriteIndex)
+		list.length = listWriteIndex;
+
+	return list;
+}
+
+
+
+
 /**
  * This class represents an [OLAP Cube](https://en.wikipedia.org/wiki/OLAP_cube)
  */
@@ -57,15 +140,18 @@ export default class Cube {
 	 * let c = Cube.fromElement(project, project.forms[0], project.forms[0].element[0], inputs);
 	 * // do stuff here
 	 */
-	static fromElement(project, form, element, inputs) {
+	static fromElement(project, form, element, inputs=null) {
 		////////////
 		// Build dimensions & groups
 		////////////
 		var dimensions = [], dimensionGroups = [];
 
 		// Time
-		// dimensions.push(Dimension.createTime(project, form, element));
-		dimensions.push(Dimension.createTimeFast(project, form, element, inputs));
+		if (inputs)
+			dimensions.push(Dimension.createTimeFast(project, form, element, inputs));
+		else
+			dimensions.push(Dimension.createTime(project, form, element));
+
 		['week_sat', 'week_sun', 'week_mon', 'month_week_sat', 'month_week_sun', 'month_week_mon', 'month', 'quarter', 'semester', 'year'].forEach(periodicity => {
 			// This will fail while indexOf(periodicity) < indexOf(form.periodicity)
 			try {
@@ -95,46 +181,40 @@ export default class Cube {
 		var data = new Array(dataSize);
 		data.fill(-2147483648);
 
-		inputs.forEach(input => {
-			// Compute location where this subtable should go, and length of data to copy.
-			var offset = dimensions[0].items.indexOf(input.period),
-				length = 1; // Slow!
+		const cube = new Cube(element.id, dimensions, dimensionGroups, data);
 
-			if (offset < 0) {
-				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(did not find period in timeDim)");
-				return;
-			}
-
-			if (dimensions[1].items.indexOf(input.entity) < 0) {
-				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(did not find entity in spacialDim)");
-				return;
-			}
-			offset = offset * dimensions[1].items.length + dimensions[1].items.indexOf(input.entity);
-
-			element.partitions.forEach(partition => {
-				offset *= partition.elements.length;
-				length *= partition.elements.length;
-			});
-
-			// Retrieve data from input, and copy (if valid).
-			var source = input.values[element.id];
-			if (!source) {
-				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(value missing)");
-				return;
-			}
-
-			if (source.length !== length) {
-				winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(value size mismatch expected", length, ", found", source.length, ")");
-				return;
-			}
-
-			// Copy into destination table.
-			for (var i = 0; i < length; ++i)
-				data[offset + i] = source[i];
-		});
+		if (inputs)
+			inputs.forEach(input => cube.fillFrom(element, input));
 
 		// Build and fill cube
-		return new Cube(element.id, dimensions, dimensionGroups, data);
+		return cube;
+	}
+
+	get dimensionsById() {
+		if (!this._dimensionsById) {
+			this._dimensionsById = {};
+			this.dimensions.forEach(d => this._dimensionsById[d.id] = d);
+		}
+
+		return this._dimensionsById;
+	}
+
+	get dimIndexById() {
+		if (!this._dimIndexById) {
+			this._dimIndexById = {};
+			this.dimensions.forEach((d, i) => this._dimIndexById[d.id] = i);
+		}
+
+		return this._dimIndexById;
+	}
+
+	get dimensionGroupsById() {
+		if (!this._dimensionGroupsById) {
+			this._dimensionGroupsById = {};
+			this.dimensionGroups.forEach(d => this._dimensionGroupsById[d.id] = d);
+		}
+
+		return this._dimensionGroupsById;
 	}
 
 	/**
@@ -162,12 +242,49 @@ export default class Cube {
 		this.dimensions = dimensions;
 		this.dimensionGroups = dimensionGroups;
 		this.data = data;
+	}
 
-		// Index dimensions and dimensionGroups by id
-		this.dimensionsById = {};
-		this.dimensionGroupsById = {};
-		this.dimensions.forEach(d => this.dimensionsById[d.id] = d);
-		this.dimensionGroups.forEach(d => this.dimensionGroupsById[d.id] = d);
+	fillFrom(element, input) {
+		// Compute location where this subtable should go, and length of data to copy.
+		const numPartitions = element.partitions.length;
+
+		let offset = this.dimensions[0].indexes[input.period],
+			length = 1; // Slow!
+
+		if (offset === undefined) {
+			winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(did not find period in timeDim)");
+			return;
+		}
+
+		offset = offset * this.dimensions[1].items.length + this.dimensions[1].indexes[input.entity];
+
+		if (Number.isNaN(offset)) {
+			winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(did not find entity in spacialDim)");
+			return;
+		}
+
+		for (let i = 0; i < numPartitions; ++i) {
+			const numPartitionElements = element.partitions[i].elements.length;
+
+			offset *= numPartitionElements;
+			length *= numPartitionElements;
+		}
+
+		// Retrieve data from input, and copy (if valid).
+		var source = input.values[element.id];
+		if (!source) {
+			winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(value missing)");
+			return;
+		}
+
+		if (source.length !== length) {
+			winston.log('debug', "[Cube] Skip variable", element.id, 'from', input._id, "(value size mismatch expected", length, ", found", source.length, ")");
+			return;
+		}
+
+		// Copy into destination table.
+		for (let i = 0; i < length; ++i)
+			this.data[offset + i] = source[i];
 	}
 
 	/**
@@ -194,106 +311,75 @@ export default class Cube {
 	 * // {2013: {shopA: 10, shopB: 20, _total: 30}, 2014: {shopA: 30, shopB: 15, _total: 45}, _total: 75}
 	 */
 	query(dimensionIds, filter, withTotals, withGroups) {
-		// End condition
-		if (dimensionIds.length == 0)
-			return this._query_total(filter);
+		// Remove dimension groups from filters.
+		filter = this._cleanFilter(filter);
 
-		var dimensionId = dimensionIds.shift();
+		// Build keys of all levels with related filters one time.
+		const levels = dimensionIds.map(dimId => {
+			const rows = {};
 
-		// search dimension
-		var dimension = this.dimensionsById[dimensionId] || this.dimensionGroupsById[dimensionId];
+			let dimIndex;
 
-		// Build tree
-		var result = {};
-		var numDimensionItems = dimension.items.length;
-		var contributions = 0;
-		for (var dimensionItemId = 0; dimensionItemId < numDimensionItems; ++dimensionItemId) {
-			var dimensionItem = dimension.items[dimensionItemId];
+			// If dimension is a strait dimension.
+			dimIndex = this.dimIndexById[dimId];
+			if (dimIndex !== undefined) {
+				const dimension = this.dimensions[dimIndex];
 
-			// Intersect main filter with branch filter (branch filter is only one item, so it's easy to compute).
-			var oldFilter = filter[dimensionId];
-			if (!oldFilter || oldFilter.includes(dimensionItem))
-				filter[dimensionId] = [dimensionItem];
-			else
-				// Either lines do the same. Continuing is a bit faster.
-				// filter[dimensionId] = [];
-				continue;
+				filter[dimIndex].forEach(index => {
+					rows[dimension.items[index]] = [index];
+				});
+			}
+			else {
+				// if dimension is a group.
+				const dimensionGroup = this.dimensionGroupsById[dimId];
+				if (dimensionGroup) {
+					dimIndex = this.dimIndexById[dimensionGroup.childDimension];
 
-			// Compute branch of the result tree.
-			result[dimensionItem] = this.query(dimensionIds, filter, withTotals, withGroups);
+					const dimension = this.dimensions[dimIndex];
 
-			// Remove if empty
-			if (result[dimensionItem] === undefined)
-				delete result[dimensionItem];
-			else
-				++contributions;
+					Object.keys(dimensionGroup.mapping).forEach(key => {
+						const indexes = dimensionGroup.mapping[key]
+							.map(item => dimension.indexes[item])
+							.filter(index => filter[dimIndex].includes(index));
 
-			// Restore filter to its former value
-			if (oldFilter === undefined)
-				delete filter[dimensionId];
-			else
-				filter[dimensionId] = oldFilter;
-		}
-
-		if (withGroups)
-			this.dimensionGroups
-				.filter(dg => dg.childDimension === dimension.id)
-				.forEach(dimensionGroup => {
-
-				var numDimensionItems = dimensionGroup.items.length;
-				contributions = 0;
-				for (var dimensionItemId = 0; dimensionItemId < numDimensionItems; ++dimensionItemId) {
-					var dimensionItem = dimensionGroup.items[dimensionItemId];
-
-					// Intersect main filter with branch filter (branch filter is only one item, so it's easy to compute).
-					var localFilter = Object.assign({}, filter);
-
-					// FIXME this is kinda wrong, because a filter on the group may already exists.
-					// this only works because we know that there are no such filter on the olap page.
-					localFilter[dimensionGroup.id] = [dimensionItem];
-
-					// Compute branch of the result tree.
-					result[dimensionItem] = this.query(dimensionIds, localFilter, withTotals, withGroups);
-
-					// Remove if empty
-					if (result[dimensionItem] === undefined)
-						delete result[dimensionItem];
-					else
-						++contributions;
+						if (indexes.length)
+							rows[key] = indexes;
+					})
 				}
-			});
+				else
+					throw new Error('invalid dimensionId');
+			}
 
+			// with totals means that we need to provide another key.
+			if (withTotals) {
+				rows._total = filter[dimIndex];
+			}
 
-		if (withTotals)
-			result._total = this.query(dimensionIds, filter, withTotals, withGroups);
+			// Remove filter from main array, it was merged into levels.
+			filter[dimIndex] = null;
 
-		dimensionIds.unshift(dimensionId);
+			return {dimIndex: dimIndex, rows: rows};
+		});
 
-		return contributions ? result : undefined;
+		return this.query2(levels, 0, filter)
 	}
 
-	/**
-	 * Retrieve the total value matching a given filter.
-	 *
-	 * @private
-	 * @param {Object.<string, Array.<string>>} filter Elements that should be included by dimension. Missing dimensions are not filtered.
-	 * @return {number} total value matching the provided filter.
-	 *
-	 * @example
-	 * let cube = Cube.fromSerialization(...);
-	 * let result = cube._query_total({year: ['2014'], "bc4b0c3f-ee9d-4507-87ad-6eaea9102cd9": ["2d31a636-1739-4b77-98a5-bf9b7a080626"]})
-	 * result // 2321
-	 */
-	_query_total(filter) {
-		// rewrite the filter so that it contains only dimensions.
-		filter = this._remove_dimension_groups(filter);
-		filter = this._rewrite_as_indexes(filter);
-		try {
-			return this._query_rec(filter, 0);
-		}
-		catch (e) {
-			return e.message;
-		}
+	query2(levels, levelIndex, filters) {
+		if (levelIndex == levels.length)
+			return this._query_rec(filters, 0, 0);
+
+		const level = levels[levelIndex];
+
+		const hash = {};
+		Object.keys(level.rows).forEach(key => {
+			filters[level.dimIndex] = level.rows[key];
+			const result = this.query2(levels, levelIndex + 1, filters);
+			if (result !== undefined)
+				hash[key] = result;
+		});
+		filters[level.dimIndex] = null;
+
+		return hash;
 	}
 
 	/**
@@ -314,189 +400,163 @@ export default class Cube {
 	 * c._query_rec([[1, 2]], 0); // 3
 	 * c._query_rec([[0], [0]], 5); // 5
 	 */
-	_query_rec(allIndexes, offset) {
-		if (Number.isNaN(offset))
-			return undefined;
+	_query_rec(indexes, indexesOffset, dataOffset) {
+		// if (Number.isNaN(dataOffset))
+		// 	return undefined;
 
-		if (allIndexes.length == 0)
-			return this.data[offset] == -2147483648 ? undefined : this.data[offset];
+		if (indexesOffset == indexes.length)
+			return this.data[dataOffset] == -2147483648 ? undefined : this.data[dataOffset];
 
-		var dimension  = this.dimensions[this.dimensions.length - allIndexes.length],
-			indexes    = allIndexes.shift(),
-			numIndexes = indexes.length;
+		const dimension  = this.dimensions[indexesOffset];
+
+		// if indexes[indexesOffset] == null => take all
+		const localIndexes = indexes[indexesOffset] || _globalRange;
+		const numIndexes = indexes[indexesOffset] ? localIndexes.length : dimension.items.length;
 
 		var result, tmp, contributions = 0;
 
-		// Compute offset at this level.
-		offset *= dimension.items.length;
+		// Compute dataOffset at this level.
+		dataOffset *= dimension.items.length;
 
 		// Aggregate
-		if (dimension.aggregation == 'sum') {
-			result = 0;
-			for (var i = 0; i < numIndexes; ++i) {
-				tmp = this._query_rec(allIndexes, offset + indexes[i])
-				if (tmp !== undefined) {
-					++contributions;
-					result += tmp
+		switch (dimension.aggregation) {
+			case 'sum':
+				result = 0;
+				for (let i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
+					if (tmp !== undefined) {
+						++contributions;
+						result += tmp
+					}
 				}
-			}
-		}
-		else if (dimension.aggregation == 'average') {
-			result = 0;
-			for (var i = 0; i < numIndexes; ++i) {
-				tmp = this._query_rec(allIndexes, offset + indexes[i])
-				if (tmp !== undefined) {
-					++contributions;
-					result += tmp
-				}
-			}
-			result /= contributions;
-		}
-		else if (dimension.aggregation == 'highest') {
-			result = -Number.MAX_VALUE;
-			for (var i = 0; i < numIndexes; ++i) {
-				tmp = this._query_rec(allIndexes, offset + indexes[i]);
-				if (tmp !== undefined && tmp > result) {
-					++contributions;
-					result = tmp;
-				}
-			}
-		}
-		else if (dimension.aggregation == 'lowest') {
-			result = Number.MAX_VALUE;
-			for (var i = 0; i < numIndexes; ++i) {
-				tmp = this._query_rec(allIndexes, offset + indexes[i])
-				if (tmp !== undefined && tmp < result) {
-					++contributions;
-					result = tmp;
-				}
-			}
-		}
-		else if (dimension.aggregation == 'last') {
-			for (var i = numIndexes - 1; i >= 0; --i) {
-				tmp = this._query_rec(allIndexes, offset + indexes[i])
-				if (tmp !== undefined) {
-					result = tmp;
-					++contributions;
-					break; // first defined value is OK for us.
-				}
-			}
-		}
+				break;
 
-		else if (dimension.aggregation == 'none') {
-			for (var i = 0; i < numIndexes; ++i) {
-				tmp = this._query_rec(allIndexes, offset + indexes[i])
-				if (tmp !== undefined) {
-					result = tmp;
-					++contributions;
+			case 'average':
+				result = 0;
+				for (let i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
+					if (tmp !== undefined) {
+						++contributions;
+						result += tmp
+					}
 				}
-			}
+				result /= contributions;
+				break;
 
-			if (contributions > 1)
-				throw new Error('AGGREGATION_FORBIDDEN');
+			case 'highest':
+				result = -Number.MAX_VALUE;
+				for (let i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i]);
+					if (tmp !== undefined && tmp > result) {
+						++contributions;
+						result = tmp;
+					}
+				}
+				break;
+
+			case 'lowest':
+				result = Number.MAX_VALUE;
+				for (let i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
+					if (tmp !== undefined && tmp < result) {
+						++contributions;
+						result = tmp;
+					}
+				}
+				break;
+
+			case 'last':
+				for (let i = numIndexes - 1; i >= 0; --i) {
+					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
+					if (tmp !== undefined) {
+						result = tmp;
+						++contributions;
+						break; // first defined value is OK for us.
+					}
+				}
+				break;
+
+			case 'none':
+				for (let i = 0; i < numIndexes; ++i) {
+					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
+					if (tmp !== undefined) {
+						result = tmp;
+						++contributions;
+					}
+				}
+				if (contributions > 1)
+					throw new Error('AGGREGATION_FORBIDDEN');
+				break;
+
+			default:
+				throw new Error('INVALID_AGGREGATION_MODE');
 		}
-
-		else
-			throw new Error('INVALID_AGGREGATION_MODE');
 
 		if (contributions == 0)
 			result = undefined;
 
-		allIndexes.unshift(indexes)
-
 		return result;
 	}
 
-	/**
-	 * When querying the cube with _query_total(), we only support
-	 * using dimensions (and not dimensionGroups).
-	 *
-	 * This rewrites any filter so that they use dimensions.
-	 */
-	_remove_dimension_groups(oldFilters) {
-		var newFilters = {};
+	_cleanFilter(textFilters) {
+		const numDimensions = this.dimensions.length;
+		const intFilters = new Array(numDimensions);
 
-		for (var dimensionId in oldFilters) {
-			var dimension = this.dimensionsById[dimensionId],
-				oldFilter = oldFilters[dimensionId];
+		// Convert all filters to sorted integer lists.
+		for (const key in textFilters) {
+			const textFilter = textFilters[key];
+			const textFilterLength = textFilter.length;
 
-			// if the dimension exists, we have nothing to do.
-			if (dimension) {
-				// Insersect our new filter with the existing one.
-				if (!newFilters[dimension.id])
-					newFilters[dimension.id] = oldFilter;
-				else
-					newFilters[dimension.id] = oldFilter.filter(e => {
-						return newFilters[dimension.id].includes(e);
-					});
+			const intFilter = new Array();
+
+			// Try converting to ints if filtering on dimension
+			let dimIndex = this.dimIndexById[key];
+			if (dimIndex !== undefined) {
+				const dimensionIndexes = this.dimensions[dimIndex].indexes;
+				for (let i = 0; i < textFilterLength; ++i) {
+					const intValue = dimensionIndexes[textFilter[i]];
+					if (intValue !== undefined) // skip unknown dimension items from user provided filter
+						intFilter.push(intValue);
+				}
 			}
-			// the dimension does not exists.
 			else {
-				var dimensionGroup = this.dimensionGroupsById[dimensionId];
-
-				// if it's a group, replace it.
+				// Try converting to ints if filtering on dimensionGroup
+				const dimensionGroup = this.dimensionGroupsById[key];
 				if (dimensionGroup) {
-					// Build new filter by concatenating elements.
-					var newFilter = [];
-					oldFilter.forEach(function(v) {
-						newFilter.push(...dimensionGroup.mapping[v]);
-					});
-					newFilter.sort();
-
-					// If there are duplicates, remove them.
-					var i = newFilter.length - 2;
-					while (i > 0) {
-						if (newFilter[i] == newFilter[i + 1])
-							newFilter.splice(i, 1);
-						--i
+					for (let i = 0; i < textFilterLength; ++i) {
+						const mapping = dimensionGroup.mapping[textFilter[i]];
+						if (mapping) { // skip unknown group items from user provided filter
+							const mappingLength = mapping.length;
+							for (let j = 0; j < mappingLength; ++j)
+								intFilter.push(dimension.indexes[mapping[j]]);
+						}
 					}
 
-					// Insersect our new filter with the existing one.
-					if (!newFilters[dimensionGroup.childDimension])
-						newFilters[dimensionGroup.childDimension] = newFilter;
-					else
-						newFilters[dimensionGroup.childDimension] = newFilter.filter(function(e) {
-							return newFilters[dimensionGroup.childDimension].includes(e);
-						});
+					dimIndex = this.dimIndexById[dimensionGroup.childDimension];
 				}
-				// if it's not a dimension nor a dimensionGroup, raise.
 				else
-					throw new Error('Invalid dimension in filter: ' + dimensionId);
+					throw new Error('Invalid filter on: ' + key);
 			}
+
+			// User filter may contain duplicates and be unsorted.
+			_sort(intFilter);
+			_removeDuplicates(intFilter);
+
+			// Merge into filter.
+			if (intFilters[dimIndex])
+				_intersect(intFilters[dimIndex], intFilter);
+			else
+				intFilters[dimIndex] = intFilter;
 		}
 
-		return newFilters;
-	}
+		// Fixme: this could be easily removed.
+		// Add missing filters.
+		for (let i = 0; i < numDimensions; ++i) {
+			if (intFilters[i] === undefined)
+				intFilters[i] = _range(this.dimensions[i].items.length);
+		}
 
-	_rewrite_as_indexes(filter) {
-		// Rewrite the filter again in the form of integers.
-		// We don't want to rewrite it into the _query_rec function, because it is
-		// more efficient to do it only once here, instead of many times on the rec function.
-		return this.dimensions.map(function(dimension) {
-			var i, result, size;
-
-			// No filter => filter is range(0, dimension.items.length)
-			if (!filter[dimension.id]) {
-				size = dimension.items.length;
-				result = new Array(size);
-				for (i = 0; i < size; ++i)
-					result[i] = i;
-			}
-			// Yes filter => map strings to ids in the real query.
-			else {
-				// Now we need to map our list of strings to indexes.
-				size = filter[dimension.id].length;
-				result = new Array(size);
-				for (i = 0; i < size; ++i) {
-					result[i] = dimension.items.indexOf(filter[dimension.id][i]);
-					if (result[i] === -1)
-						result[i] = NaN;
-						// throw new Error('Dimension item "' + filter[dimension.id][i] + '" was not found.');
-				}
-			}
-
-			return result;
-		});
+		return intFilters;
 	}
 
 	serialize() {
@@ -507,6 +567,5 @@ export default class Cube {
 			data: this.data
 		};
 	}
-
 }
 
