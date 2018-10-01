@@ -308,12 +308,12 @@ export default class Cube {
 		const levels = dimensionIds.map(dimId => {
 			const rows = {};
 
-			let dimIndex;
+			let dimIndex, dimension;
 
 			// If dimension is a strait dimension.
 			dimIndex = this.dimIndexById[dimId];
 			if (dimIndex !== undefined) {
-				const dimension = this.dimensions[dimIndex];
+				dimension = this.dimensions[dimIndex];
 
 				filter[dimIndex].forEach(index => {
 					rows[dimension.items[index]] = [index];
@@ -324,8 +324,7 @@ export default class Cube {
 				const dimensionGroup = this.dimensionGroupsById[dimId];
 				if (dimensionGroup) {
 					dimIndex = this.dimIndexById[dimensionGroup.childDimension];
-
-					const dimension = this.dimensions[dimIndex];
+					dimension = this.dimensions[dimIndex];
 
 					Object.keys(dimensionGroup.mapping).forEach(key => {
 						const indexes = dimensionGroup.mapping[key]
@@ -338,6 +337,22 @@ export default class Cube {
 				}
 				else
 					throw new Error('invalid dimensionId');
+			}
+
+			if (withGroups) {
+				this.dimensionGroups.forEach(dimensionGroup => {
+					if (dimensionGroup.childDimension === dimension.id && dimensionGroup.id !== dimId) {
+						// Copy pasted ... need refactoring.
+						Object.keys(dimensionGroup.mapping).forEach(key => {
+							const indexes = dimensionGroup.mapping[key]
+								.map(item => dimension.indexes[item])
+								.filter(index => filter[dimIndex].includes(index));
+
+							if (indexes.length)
+								rows[key] = indexes;
+						});
+					}
+				});
 			}
 
 			// with totals means that we need to provide another key.
