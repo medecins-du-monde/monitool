@@ -62,7 +62,7 @@ function mergeRec(depth, expr, parameters, trees) {
 }
 
 
-async function computeReport(query) {
+export async function computeReport(query) {
 
 	const project = await Project.storeInstance.get(query.projectId);
 

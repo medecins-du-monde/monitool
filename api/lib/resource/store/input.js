@@ -84,16 +84,17 @@ export default class InputStore extends Store {
 		let inputs = result.rows.map(row => {
 			const [projectId, dataSourceId, siteId, period] = row.id.split(':').slice(2);
 
-			return new Input({
-				_id: row.id,
-				type: 'input',
-				project: 'project:' + projectId,
-				form: dataSourceId,
-				entity: siteId,
-				period: period,
-				structure: {[variable.id]: row.value.s},
-				values: {[variable.id]: row.value.v}
-			});
+			const input = Object.create(Input.prototype);
+			input._id = row.id,
+			input.type = 'input',
+			input.project = 'project:' + projectId,
+			input.form = dataSourceId,
+			input.entity = siteId,
+			input.period = period,
+			input.structure = {[variable.id]: row.value.s},
+			input.values = {[variable.id]: row.value.v}
+
+			return input;
 		});
 
 		// Free memory
