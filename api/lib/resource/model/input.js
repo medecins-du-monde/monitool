@@ -90,24 +90,28 @@ export default class Input extends DbModel {
 	 * in the partitions of a variable.
 	 */
 	_migrateRecord(oldStructure, newStructure, oldValues) {
-		const newLength = newStructure.reduce((m, p) => m * p.items.length, 1);
-		const newValues = new Array(newLength);
+		const newValuesLength = newStructure.reduce((m, p) => m * p.items.length, 1);
+		const newValues = new Array(newValuesLength);
+
+		const newStructureLength = newStructure.length;
 
 		//////////////
 		// Step 1: Start by adding zero until we have all elements of newStructure in the old one.
 		//////////////
 
 		// Search for new partitions.
-		for (let i = 0; i < newStructure.length; ++i) {
+		for (let i = 0; i < newStructureLength; ++i) {
 			let newPartition = newStructure[i];
 
 			// This partition already existed in the past, we can skip it.
 			if (!oldStructure.find(p => p.id === newPartition.id)) {
-				// Unshift the partition, and put zeros in oldValues to have to good length.
+				// Unshift the partition
 				oldStructure.unshift(newPartition);
-				let newLength = oldValues.length * newPartition.items.length;
-				while (oldValues.length < newLength)
-					oldValues.push(0);
+
+				// Put zeros in oldValues to have to good length.
+				const oldLength = oldValues.length;
+				oldValues.length = oldLength * newPartition.items.length;
+				oldValues.fill(0, oldLength);
 			}
 		}
 
@@ -117,44 +121,38 @@ export default class Input extends DbModel {
 
 		// Create an olap cube from the old values.
 		let dimensions = oldStructure.map(p => new Dimension(p.id, p.items, p.aggregation)),
-			cube = new Cube('someid', dimensions, [], oldValues);
+			cube = new Cube(null, dimensions, [], oldValues);
 
-		// Fill the new values from the cube.
-		for (let fieldIndex = 0; fieldIndex < newValues.length; ++fieldIndex) {
-			// Build a filter targeting this specific value.
-			let peIds = this._computePartitionElementIds(newStructure, fieldIndex),
-				filter = {};
+		const textFilter = {};
+		const intFilter = new Array(newStructureLength);
+		for (let i = 0; i < newStructureLength; ++i) {
+			intFilter[i] = 0;
+			textFilter[newStructure[i].id] = [newStructure[i].items[0]];
+		}
 
-			for (let i = 0; i < newStructure.length; ++i)
-				filter[newStructure[i].id] = [peIds[i]];
-
+		let fieldIndex = 0;
+		while (fieldIndex < newValues.length) {
 			// Try to retrieve the value from the cube.
-			newValues[fieldIndex] = cube.query([], filter) || 0;
+			newValues[fieldIndex] = cube.query([], textFilter) || 0;
+
+			// Increment intFilter, textFilter and fieldIndex.
+			for (let i = newStructureLength - 1; i >= 0; --i) {
+				++intFilter[i];
+
+				if (intFilter[i] == newStructure[i].items.length) {
+					intFilter[i] = 0;
+					textFilter[newStructure[i].id][0] = newStructure[i].items[0];
+				}
+				else {
+					textFilter[newStructure[i].id][0] = newStructure[i].items[intFilter[i]];
+					break;
+				}
+			}
+
+			++fieldIndex;
 		}
 
 		return newValues;
-	}
-
-	/**
-	 * Convert an index in the storage array to a list of partition elements ids.
-	 * 232 => ['8655ac1c-2c43-43f6-b4d0-177ad2d3eb8e', '1847b479-bc08-4ced-9fc3-a569b168a764']
-	 */
-	_computePartitionElementIds(structure, fieldIndex) {
-		var numPartitions = structure.length,
-			partitionElementIds = new Array(numPartitions);
-
-		if (fieldIndex < 0)
-			throw new Error('Invalid field index (negative)')
-
-		for (var i = numPartitions - 1; i >= 0; --i) {
-			partitionElementIds[i] = structure[i].items[fieldIndex % structure[i].items.length];
-			fieldIndex = Math.floor(fieldIndex / structure[i].items.length);
-		}
-
-		if (fieldIndex !== 0)
-			throw new Error('Invalid field index (too large)')
-
-		return partitionElementIds;
 	}
 
 	/**
