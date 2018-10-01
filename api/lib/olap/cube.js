@@ -34,10 +34,12 @@ function _range(n) {
 
 const _countHelper = new Array(256);
 
-function _sort(list, maxValue) {
+// Insertion sort. This has a terrible complexity for randomized arrays,
+// but is very fast for already sorted arrays, which is what we'll be using it for
+// most of the time.
+function _sort(list) {
 	const len = list.length;
 
-	// insertion sort
 	for (let i = 1; i < len; i++) {
 		let tmp = list[i],
 		j = i;
