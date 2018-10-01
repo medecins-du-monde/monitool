@@ -19,9 +19,6 @@ import winston from 'winston';
 import Dimension from './dimension';
 import DimensionGroup from './dimension-group';
 
-
-
-const _globalRange = _range(4096);
 function _range(n) {
 	const list = new Array(n);
 
@@ -30,9 +27,6 @@ function _range(n) {
 
 	return list;
 }
-
-
-const _countHelper = new Array(256);
 
 // Insertion sort. This has a terrible complexity for randomized arrays,
 // but is very fast for already sorted arrays, which is what we'll be using it for
@@ -68,8 +62,6 @@ function _removeDuplicates(list) {
 
 	if (writeIndex !== length)
 		list.length = writeIndex;
-
-	return list;
 }
 
 function _intersect(list, other) {
@@ -97,11 +89,7 @@ function _intersect(list, other) {
 
 	if (listLength !== listWriteIndex)
 		list.length = listWriteIndex;
-
-	return list;
 }
-
-
 
 
 /**
@@ -367,8 +355,14 @@ export default class Cube {
 	}
 
 	query2(levels, levelIndex, filters) {
-		if (levelIndex == levels.length)
-			return this._query_rec(filters, 0, 0);
+		if (levelIndex == levels.length) {
+			try {
+				return this._query_rec(filters, 0, 0);
+			}
+			catch (e) {
+				return e.message;
+			}
+		}
 
 		const level = levels[levelIndex];
 
@@ -412,8 +406,8 @@ export default class Cube {
 		const dimension  = this.dimensions[indexesOffset];
 
 		// if indexes[indexesOffset] == null => take all
-		const localIndexes = indexes[indexesOffset] || _globalRange;
-		const numIndexes = indexes[indexesOffset] ? localIndexes.length : dimension.items.length;
+		const localIndexes = indexes[indexesOffset];
+		const numIndexes = localIndexes.length;
 
 		var result, tmp, contributions = 0;
 
