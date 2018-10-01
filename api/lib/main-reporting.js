@@ -1,10 +1,19 @@
+import {Transform, Writable, pipeline} from 'stream';
+import {promisify} from 'util';
+
 import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 import exprEval from 'expr-eval';
+import JSONStream from 'JSONStream';
 
+import database from './resource/database';
 import Project from './resource/model/project';
 import Input from './resource/model/input';
 import Cube from './olap/cube';
 
+
+
+
+const pipelineP = promisify(pipeline);
 
 
 process.on('message', m => {
@@ -15,11 +24,99 @@ process.on('message', m => {
 });
 
 
+export async function computeReport(query) {
+	const project = await Project.storeInstance.get(query.projectId);
+
+	// Get result trees for each parameter
+	const variableResults = await Promise.all(
+		Object
+			.values(query.computation.parameters)
+			.map(param => _subQuery(project, query, param))
+	);
+
+	// Create expression to compute final result.
+	const parser = new exprEval.Parser();
+	parser.consts = {};
+	parser.binaryOps['||'] = parser.binaryOps['or'] = (a, b) => typeof a !== 'number' ? b : a;
+
+	const expression = parser.parse(query.computation.formula);
+
+	// Merge into final result
+	const result = _mergeRec(
+		query.dimensionIds.length,
+		expression,
+		Object.keys(query.computation.parameters),
+		variableResults
+	);
+
+	// Return a JSON string, which will be easier to cache and to send
+	// to the parent process than a deep object tree.
+	return JSON.stringify(result);
+}
+
+async function _subQuery(project, query, param) {
+	const dataSource = project.getDataSourceByVariableId(param.elementId);
+	const variable = dataSource.getVariableById(param.elementId);
+
+	// Create empty cube
+	const cube = Cube.fromElement(project, dataSource, variable);
+
+	// Query database, and stream the response in it.
+	await pipelineP(
+		database.database.viewAsStream(
+			'monitool',
+			'inputs_variable',
+			{key: project._id + ':' + dataSource.id + ':' + variable.id}
+		),
+		JSONStream.parse(['rows', true]),
+		new InputBuilder(project, dataSource, variable),
+		new CubeFiller(cube, variable)
+	);
+
+	return cube.query(
+		query.dimensionIds,
+		_createFilter(dataSource, query.filter, param.filter),
+		query.withTotals,
+		query.withGroups
+	);
+}
+
+function _createFilter(dataSource, queryFilter, paramFilter) {
+	// Merge queryFilter and paramFilter
+	const filter = JSON.parse(JSON.stringify(queryFilter));
+	for (let key in paramFilter)
+		filter[key] =
+			filter[key] ?
+			filter[key].filter(e => paramFilter[key].includes(e)) :
+			paramFilter[key];
+
+	// Replace _start/_end by a proper filter depending on our time dimension.
+	if (filter._start && filter._end) {
+		const timeDimension = dataSource.periodicity === 'free' ? 'day' : dataSource.periodicity;
+		const timeValues = Array.from(
+			timeSlotRange(
+				TimeSlot.fromDate(new Date(filter._start + 'T00:00:00Z'), timeDimension),
+				TimeSlot.fromDate(new Date(filter._end + 'T00:00:00Z'), timeDimension)
+			)
+		).map(ts => ts.value);
+
+		delete filter._start;
+		delete filter._end;
+
+		if (filter[timeDimension])
+			filter[timeDimension] = filter[timeDimension].filter(e => timeValues.includes(e));
+		else
+			filter[timeDimension] = timeValues;
+	}
+
+	return filter;
+}
+
 /**
  * When querying for a computed indicator (ex: 100 * a / b)
  * we query separately for a and b, and merge the results with this function.
  */
-function mergeRec(depth, expr, parameters, trees) {
+function _mergeRec(depth, expr, parameters, trees) {
 	if (depth === 0) {
 		const paramMap = {};
 		parameters.forEach((key, index) => {
@@ -46,7 +143,7 @@ function mergeRec(depth, expr, parameters, trees) {
 
 	const result = {};
 	for (let key of keys)
-		result[key] = mergeRec(
+		result[key] = _mergeRec(
 			depth - 1,
 			expr,
 			parameters,
@@ -61,68 +158,62 @@ function mergeRec(depth, expr, parameters, trees) {
 	return result;
 }
 
+class InputBuilder extends Transform {
 
-export async function computeReport(query) {
+	constructor(project, dataSource, variable) {
+		super({objectMode: true});
 
-	const project = await Project.storeInstance.get(query.projectId);
+		this.project = project;
+		this.dataSource = dataSource;
+		this.structure = {[variable.id]: variable.structure};
+	}
 
-	// Make promises to query each independent parameter.
-	const subQueries = Object.values(query.computation.parameters).map(async param => {
-		// Get everything needed to compute the report.
-		const dataSource = project.getDataSourceByVariableId(param.elementId);
-		const variable = dataSource.getVariableById(param.elementId);
-		const inputs = await Input.storeInstance.listByVariable(project, dataSource, variable, true);
-		const cube = Cube.fromElement(project, dataSource, variable, inputs);
+	_transform(row, encoding, callback) {
+		const [projectId, dataSourceId, siteId, period] = row.id.split(':').slice(2);
+		const variableId = row.key.split(':')[3];
 
-		// Merge query.filter and param.filter
-		const filter = JSON.parse(JSON.stringify(query.filter));
-		for (let key in param.filter)
-			filter[key] =
-				filter[key] ?
-				filter[key].filter(e => param.filter[key].includes(e)) :
-				param.filter[key];
+		const input = Object.create(Input.prototype);
+		input._id = row.id;
+		input.type = 'input';
+		input.project = 'project:' + projectId;
+		input.form = dataSourceId;
+		input.entity = siteId;
+		input.period = period;
+		input.structure = {[variableId]: row.value.s};
+		input.values = {[variableId]: row.value.v};
 
-		// Replace _start/_end by a proper filter depending on our time dimension.
-		if (filter._start && filter._end) {
-			const timeDimension = dataSource.periodicity === 'free' ? 'day' : dataSource.periodicity;
-			const timeValues = Array.from(
-				timeSlotRange(
-					TimeSlot.fromDate(new Date(filter._start + 'T00:00:00Z'), timeDimension),
-					TimeSlot.fromDate(new Date(filter._end + 'T00:00:00Z'), timeDimension)
-				)
-			).map(ts => ts.value);
-
-			delete filter._start;
-			delete filter._end;
-
-			if (filter[timeDimension])
-				filter[timeDimension] = filter[timeDimension].filter(e => timeValues.includes(e));
-			else
-				filter[timeDimension] = timeValues;
+		if (this._inputIsValid(input)) {
+			input.update(this.structure);
+			this.push(input);
 		}
 
-		return cube.query(query.dimensionIds, filter, query.withTotals, query.withGroups);
-	});
+		callback();
+	}
 
-	// Wait for all of them to finish
-	const variableResults = await Promise.all(subQueries);
+	_inputIsValid(input) {
+		const timeSlot = new TimeSlot(input.period);
+		const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
 
-	// Merge parameters into final result.
-	const parser = new exprEval.Parser();
-	parser.consts = {};
-	parser.binaryOps['||'] = parser.binaryOps['or'] = (a, b) => {
-		if (typeof a !== 'number')
-			return b;
-		else
-			return a;
-	};
+		return this.project.start <= endDate
+			&& this.project.end >= startDate
+			&& (!this.dataSource.start || this.dataSource.start <= endDate)
+			&& (!this.dataSource.end || this.dataSource.end >= startDate)
+			&& this.dataSource.entities.includes(input.entity)
+			&& this.dataSource.isValidSlot(input.period)
+	}
+}
 
-	return JSON.stringify(
-		mergeRec(
-			query.dimensionIds.length,
-			parser.parse(query.computation.formula),
-			Object.keys(query.computation.parameters),
-			variableResults
-		)
-	);
+class CubeFiller extends Writable {
+
+	constructor(cube, variable) {
+		super({objectMode: true});
+
+		this.variable = variable;
+		this.cube = cube;
+	}
+
+	_write(chunk, encoding, callback) {
+		this.cube.fillFrom(this.variable, chunk);
+		callback();
+	}
 }
