@@ -18,10 +18,6 @@
 import Router from 'koa-router';
 import child_process from 'child_process';
 
-import hash from 'object-hash';
-import redis from '../resource/redis';
-
-
 const router = new Router();
 
 /**
@@ -123,32 +119,6 @@ async function queryReportingSubprocess(query) {
 	});
 }
 
-/**
- * Pool redis for a key each 500ms.
- *  - fail if the key is missing
- *  - Wait while the key value is "computing"
- *  - return if the key is something else.
- */
-async function poolRedis(queryHash) {
-	let resolvePromise, rejectPromise;
-
-	const interval = setInterval(async () => {
-		const result = await redis.get(queryHash);
-		if (result === 'computing')
-			return;
-
-		clearInterval(interval);
-		if (!result)
-			rejectPromise(new Error('no_found'));
-		else
-			resolvePromise(result);
-	}, 500);
-
-	return new Promise((resolve, reject) => {
-		resolvePromise = resolve;
-		rejectPromise = reject;
-	});
-}
 
 startChild();
 
@@ -163,26 +133,7 @@ router.post('/reporting/project/:prjId', async ctx => {
 		withGroups: ctx.request.body.withGroups
 	};
 
-	const queryHash = hash(query, {unorderedObjects: true, algorithm: 'md5'});
-
-	let finalResult = null;
-
-	try {
-		// FIXME ugly race condition here, we should set with proper flags to check if the key exists.
-
-		// Try to respond from cache.
-		finalResult = await poolRedis(queryHash);
-	}
-	catch (e) {
-		// Tell other nodes that we are computing this.
-		await redis.set(queryHash, 'computing', 'EX', 5 * 60);
-
-		// Get answer from reporting subprocess, and store in cache.
-		finalResult = await queryReportingSubprocess(query);
-		redis.set(queryHash, finalResult, 'EX', 3600);
-	}
-
-	ctx.response.body = finalResult;
+	ctx.response.body = await queryReportingSubprocess(query);
 	ctx.response.type = 'application/json';
 });
 

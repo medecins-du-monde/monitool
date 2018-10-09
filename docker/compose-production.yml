@@ -42,14 +42,6 @@ services:
       - googletranslate_apikey
       - monitool_cookiesecret
 
-  redis:
-    image: redis:latest
-    command: "redis-server /usr/local/etc/redis/redis.conf"
-    volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
-    networks:
-      - backend
-
   couchdb:
     image: couchdb:latest
     networks:
