@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Install build dependencies
 COPY package.json yarn.lock ./
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 # Build the app
 COPY webpack.config.js ./
