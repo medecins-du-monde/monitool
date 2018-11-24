@@ -17,7 +17,7 @@
 
 import config from '../config/config';
 
-const statusCodes = {
+const statusCodes = Object.freeze({
 	wrong_type: 400,	// id collision
 	forbidden: 403,		// trying to get forbidden item
 
@@ -33,7 +33,7 @@ const statusCodes = {
 	invalid_data: 400,	// saving entity that did not pass validation
 	missing_data: 400,  // ???
 	invalid_reference: 400, // foreign key fail.
-};
+});
 
 
 export default async (ctx, next) => {
