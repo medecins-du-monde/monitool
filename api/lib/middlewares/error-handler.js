@@ -33,6 +33,7 @@ const statusCodes = Object.freeze({
 	invalid_data: 400,	// saving entity that did not pass validation
 	missing_data: 400,  // ???
 	invalid_reference: 400, // foreign key fail.
+	'Document update conflict.': 400, // trying to update an out of date document.
 });
 
 

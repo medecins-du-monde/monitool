@@ -73,8 +73,12 @@
 		</p>
 	</div>
 
-	<a ng-click="$ctrl.save()" ng-disabled="(!$ctrl.isNew && $ctrl.isUnchanged) || $ctrl.inputForm.$invalid" class="btn btn-primary">
-		<i class="fa fa-floppy-o"></i>
+	<a ng-click="$ctrl.save()"
+	   ng-disabled="(!$ctrl.isNew && $ctrl.isUnchanged) || $ctrl.inputForm.$invalid || $ctrl.inputSaving" class="btn btn-primary">
+
+		<i class="fa fa-floppy-o" ng-if="!$ctrl.inputSaving"></i>
+		<i class="fa fa-circle-o-notch fa-spin" ng-if="$ctrl.inputSaving"></i>
+
 		<span translate="shared.save"></span>
 	</a>
 

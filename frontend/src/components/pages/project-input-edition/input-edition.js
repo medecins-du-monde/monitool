@@ -69,7 +69,8 @@ module.component('projectInputEdition', {
 			return angular.equals(this.master, this.input);
 		}
 
-		constructor($state, $transitions, $filter) {
+		constructor($scope, $state, $transitions, $filter) {
+			this.$scope = $scope;
 			this.$state = $state;
 			this.$transitions = $transitions;
 			this.translate = $filter('translate');
@@ -82,13 +83,16 @@ module.component('projectInputEdition', {
 				if (hasChanged) {
 					// then ask the user if he meant to abandon changes
 					const hasConfirmed = window.confirm(this.translate('shared.sure_to_leave'))
-					if (!hasConfirmed) {
+					if (hasConfirmed)
+						// We're leaving because the user does not mind losing changes => stop listening.
+						this._pageChangeWatch();
+					else
+						// Stay on the page.
 						transition.abort();
-						return;
-					}
 				}
-
-				this._pageChangeWatch();
+				else
+					// We're leaving because the data entry did not change => stop listening.
+					this._pageChangeWatch();
 			});
 		}
 
@@ -127,12 +131,34 @@ module.component('projectInputEdition', {
 		}
 
 		async save() {
-			if ((!this.isNew && this.isUnchanged) || this.inputForm.$invalid)
+			if ((!this.isNew && this.isUnchanged) || this.inputForm.$invalid || this.inputSaving)
 				return;
 
-			this._pageChangeWatch()
-			await this.input.save();
-			this.$state.go('main.project.input.list', {dataSourceId: this.input.form});
+			try {
+				this.inputSaving = true;
+				await this.input.save();
+
+				// Stop listening transitions before leaving the page to avoid the safety message.
+				this._pageChangeWatch();
+				this.$state.go('main.project.input.list', {dataSourceId: this.input.form});
+			}
+			catch (error) {
+				let errorMessage = 'project.saving_failed_other';
+
+				// Customize error message if server is telling us there was an editing conflict.
+				try {
+					if (error.response.data.message == 'Document update conflict.')
+						errorMessage = 'project.saving_failed_conflict_input';
+				}
+				catch (e) {}
+
+				// Display message to tell user that it's not possible to save.
+				alert(this.translate(errorMessage));
+			}
+			finally {
+				this.inputSaving = false;
+				this.$scope.$apply();
+			}
 		}
 
 		reset() {

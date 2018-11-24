@@ -325,7 +325,10 @@ export default {
 		not_available_min_semester: "Estos datos estan disponibles por semestre",
 		not_available_min_year: "Estos datos estan disponibles por año",
 
-		saving_failed: "Monitool no consiguio guardar los cambios.",
+		saving_failed_conflict_input: "No se pudieron guardar los cambios, porque un otro usuario ha realizado cambios en esta entrada de datos desde que cargó la página. Actualize el navegador para obtener la última versión, y aplique sus cambios de nuevo.",
+		saving_failed_conflict: "No se pudieron guardar los cambios, porque un otro usuario ha realizado cambios en este proyecto desde que cargó la página. Actualize el navegador para obtener la última versión, y aplique sus cambios de nuevo.",
+		saving_failed_other: "No se pudieron guardar los cambios, probablemente porque no esta conectado a internet. Intente guardar de nuevo cuando se conecte a internet.",
+
 		no_logical_frames: "Ningún marco lógico has sido creado en este proyecto.",
 		partition_general: "General",
 		partition_general_placeholder: "ej: Grupos de edad, sexo, motivo de consulta, patología, ...",

@@ -325,7 +325,10 @@ export default {
 		not_available_min_semester: "Ces données sont disponibles par semestre",
 		not_available_min_year: "Ces données sont disponibles par an",
 
-		saving_failed: "Monitool n'a pas réussi à sauvegarder vos changements.",
+		saving_failed_conflict_input: "Impossible de sauvegarder vos modification car un autre utilisateur à modifié cette saisie depuis que vous avez chargé cette page. Rechargez la page pour obtenir la dernière version, et re-appliquez vos changements.",
+		saving_failed_conflict: "Impossible de sauvegarder vos modification car un autre utilisateur à modifié le projet depuis que vous avez chargé cette page. Rechargez la page pour obtenir la dernière version, et re-appliquez vos changements.",
+		saving_failed_other: "Impossible de sauvegarder vos modifications, probablement car vous n'êtes plus connecté à internet. Gardez cette fenêtre ouverte, et retentez de sauvegarder quand vous serez connecté à internet.",
+
 		no_logical_frames: "Aucun cadre logique n'a encore été créé sur ce projet.",
 		partition_general: "Général",
 		partition_general_placeholder: "ex: Tranches d'âge, sexe, motif de consultation, pathologie, référencement effectué, ...",

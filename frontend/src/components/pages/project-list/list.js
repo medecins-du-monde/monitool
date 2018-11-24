@@ -178,6 +178,8 @@ module.component('projectList', {
 			var question = this.translate('project.are_you_sure_to_delete');
 
 			if (window.confirm(question)) {
+
+				// FIXME this should be HTTP patch
 				const project = await Project.get(shortProject._id);
 				project.active = false;
 
@@ -190,12 +192,13 @@ module.component('projectList', {
 				}
 				catch (error) {
 					// Display message to tell user that it's not possible to save.
-					alert(this.translate('project.saving_failed'));
+					alert(this.translate('project.saving_failed_other'));
 				}
 			}
 		}
 
 		async onRestoreClicked(shortProject) {
+			// FIXME this should be HTTP patch
 			const project = await Project.get(shortProject._id);
 			project.active = true;
 
@@ -208,7 +211,7 @@ module.component('projectList', {
 			}
 			catch (error) {
 				// Display message to tell user that it's not possible to save.
-				alert(this.translate('project.saving_failed'));
+				alert(this.translate('project.saving_failed_other'));
 			}
 		}
 

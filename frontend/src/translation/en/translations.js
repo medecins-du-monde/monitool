@@ -324,7 +324,10 @@ export default {
 		not_available_min_semester: "This data is available by semester",
 		not_available_min_year: "This data is available by year",
 
-		saving_failed: "Monitool was unable to save the changes.",
+		saving_failed_conflict_input: "Unable to save the changes because another user made changes to the same data entry since you loaded the page. Reload the page to get the last version, and apply your changes again.",
+		saving_failed_conflict: "Unable to save the changes because another user made changes to the same project since you loaded the page. Reload the page to get the last version, and apply your changes again.",
+		saving_failed_other: "Unable to save the changes, probably because of connectivity issues. Keep this window open, and try saving again once you are connected to the internet.",
+
 		no_logical_frames: "No logical framework was created yet for this project.",
 		partition_general: "General",
 		partition_general_placeholder: "ex: Age group, gender, motive for consultation, pathology, referral status, ...",

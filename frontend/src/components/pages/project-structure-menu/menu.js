@@ -133,8 +133,17 @@ module.component('projectEditMenu', {
 					this.onProjectSaveSuccess({newProject: this.childProject});
 				}
 				catch (error) {
+					let errorMessage = 'project.saving_failed_other';
+
+					// Customize error message if server is telling us there was an editing conflict.
+					try {
+						if (error.response.data.message == 'Document update conflict.')
+							errorMessage = 'project.saving_failed_conflict';
+					}
+					catch (e) {}
+
 					// Display message to tell user that it's not possible to save.
-					alert(this.translate('project.saving_failed'));
+					alert(this.translate(errorMessage));
 				}
 				finally {
 					this.$scope.$apply(() => {
