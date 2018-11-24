@@ -32,8 +32,11 @@
 </div>
 
 <olap-grid
+	ng-if="!$ctrl.errorMessage"
 	project="$ctrl.project"
 	indicator="$ctrl.indicator"
 	dimensions="$ctrl.dimensions"
 	filter="$ctrl.filter"
 	data="$ctrl.data"></olap-grid>
+
+<span ng-if="$ctrl.errorMessage">{{$ctrl.errorMessage|translate}}</span>

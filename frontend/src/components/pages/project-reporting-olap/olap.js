@@ -62,6 +62,11 @@ module.component('olapReporting', {
 
 		constructor($scope) {
 			this.$scope = $scope;
+
+			// Autoincrementing id, to work around
+			// slow fetches breaking interface for long ones.
+			this._fetchId = 0;
+			this._timeout = null;
 		}
 
 		onIndicatorUpdated(indicator, logicalFramework) {
@@ -81,41 +86,41 @@ module.component('olapReporting', {
 		}
 
 		_fetchDataSoon() {
-			if (this._timer)
-				return
+			if (this._timeout !== null)
+				clearTimeout(this._timeout);
 
-			this._timer = setTimeout(async () => {
+			this._timeout = setTimeout(async () => {
 				await this._fetchData();
-				this._timer = null; // FIXME this son't work
+				this._timeout = null; // FIXME this son't work
 			}, 200);
 		}
 
 		async _fetchData() {
+			const myFetchId = ++this._fetchId;
+
+			// Tell display that we are loading results.
 			this.errorMessage = 'shared.loading';
-			this.values = null;
+			this.data = null;
+			this.$scope.$apply();
 
 			// Query server
-			const url = '/api/reporting/project/' + this.project._id;
-
-			const query = {
+			const response = await axios.post('/api/reporting/project/' + this.project._id, {
 				dimensionIds: [...this.dimensions.rows, ...this.dimensions.cols],
 				filter: this.filter,
 				withTotals: true,
 				withGroups: true,
 				computation: this.indicator.computation
-			};
-
-			const response = await axios.post(url, query);
-			this.$scope.$apply(() => {
-				this.errorMessage = null;
-
-				// Format values.
-				this.data = response.data;
 			});
+
+			// Ignore query result if a new query was launched in between.
+			if (this._fetchId === myFetchId) {
+				this.errorMessage = null;
+				this.data = response.data;
+				this.$scope.$apply();
+			}
 		}
 	}
 });
 
 
 export default module.name;
-
