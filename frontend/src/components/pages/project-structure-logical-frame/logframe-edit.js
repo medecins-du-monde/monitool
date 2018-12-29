@@ -151,9 +151,7 @@ module.component('logicalFrameEdit', {
 
 			this.onProjectUpdate({
 				newProject: newProject,
-				isValid:
-					!!this.editableLogFrame.name &&
-					(!this.lfForm || this.lfForm.$valid)
+				isValid: !!this.editableLogFrame.name && this.lfForm.$valid
 			});
 		}
 
