@@ -1,5 +1,5 @@
 {
-  "name": "Monitool",
+  "name": "monitool",
   "description": "Indicator monitoring application for Medecins du Monde",
   "version": "2.7.0",
   "repository": "git@github.com:medecins-du-monde/monitool.git",
@@ -26,7 +26,6 @@
     "JSONStream": "^1.3.4",
     "expr-eval": "^1.2.1",
     "fast-json-patch": "^2.0.6",
-    "ioredis": "^4.0.0",
     "is-my-json-valid": "x",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.0",
@@ -36,7 +35,6 @@
     "koa-router": "^7.4.0",
     "koa-session": "^5.8.1",
     "nano": "^7.0.0",
-    "object-hash": "^1.3.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.4.0",
     "password-hash": "x",
