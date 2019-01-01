@@ -101,6 +101,7 @@ export default {
 		no_matches: "Ningún proyecto corresponde a sus criterios de búsqueda",
 		is_finished: "Este proyecto esta terminado",
 		was_deleted: "Este proyecto fue suprimido",
+		show_ongoing_projects: "Mostrar proyectos en curso",
 		show_finished_projects: "Mostrar proyectos terminados",
 		show_deleted_projects: "Mostrar proyectos suprimidos",
 		filter_placeholder: "Entre texto para buscar proyectos",

@@ -69,6 +69,7 @@ module.component('projectList', {
 			this.$window = $window;
 			this.translate = $filter('translate');
 
+			this.displayOngoing = true;
 			this.displayFinished = false;
 			this.displayDeleted = false;
 		}
@@ -90,11 +91,11 @@ module.component('projectList', {
 				const needle = diacritics.remove(this.filterValue || '').toLowerCase();
 
 				const matchSearch = search.includes(needle);
-				const alwaysOn = p.running && p.active;
+				const matchOngoing = this.displayOngoing && p.running && p.active;
 				const matchFinished = this.displayFinished && !p.running && p.active;
 				const matchDeleted = this.displayDeleted && !p.active;
 
-				return matchSearch && (alwaysOn || matchFinished || matchDeleted)
+				return matchSearch && (matchOngoing || matchFinished || matchDeleted)
 			});
 
 			this.displayedProjects.sort((p1, p2) => {
@@ -114,6 +115,11 @@ module.component('projectList', {
 		}
 
 		filter() {
+			this.$onChanges();
+		}
+
+		toggleOngoing() {
+			this.displayOngoing = !this.displayOngoing;
 			this.$onChanges();
 		}
 

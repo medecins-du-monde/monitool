@@ -100,6 +100,7 @@ export default {
 		no_matches: "No projects match the selected criterias",
 		is_finished: "This project is finished",
 		was_deleted: "This project was deleted",
+		show_ongoing_projects: "Show ongoing projects",
 		show_finished_projects: "Show finished projects",
 		show_deleted_projects: "Show deleted projects",
 		filter_placeholder: "Enter text here to filter the projects",

@@ -21,6 +21,7 @@
 	</div>
 
 	<div class="btn-group">
+		<a ng-click="$ctrl.toggleOngoing()" class="btn btn-default" ng-class="{active: $ctrl.displayOngoing}" translate="project.show_ongoing_projects"></a>
 		<a ng-click="$ctrl.toggleFinished()" class="btn btn-default" ng-class="{active: $ctrl.displayFinished}" translate="project.show_finished_projects"></a>
 		<a ng-click="$ctrl.toggleDeleted()" class="btn btn-default" ng-class="{active: $ctrl.displayDeleted}" translate="project.show_deleted_projects"></a>
 	</div>
