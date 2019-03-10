@@ -21,7 +21,7 @@ RUN yarn run build
 ###################################
 
 # Switch to the nginx image
-FROM fholzer/nginx-brotli
+FROM fholzer/nginx-brotli:v1.15.8
 
 # Retrieve the files that need to be hosted
 COPY --from=builder /app/dist /usr/share/nginx/html

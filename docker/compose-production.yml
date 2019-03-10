@@ -41,7 +41,7 @@ services:
       - monitool_cookiesecret
 
   couchdb:
-    image: couchdb:latest
+    image: couchdb:2
     networks:
       - backend
     volumes:

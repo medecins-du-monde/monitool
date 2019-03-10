@@ -3,7 +3,7 @@ version: "3.6"
 services:
 
   reverse_proxy:
-    image: fholzer/nginx-brotli
+    image: fholzer/nginx-brotli:v1.15.8
     ports:
       - "80:80"
     volumes:
@@ -44,7 +44,7 @@ services:
       MONITOOL_AUTH_PROVIDERS_TRAINING_ACCOUNT: "training"
 
   couchdb:
-    image: couchdb:latest
+    image: couchdb:2
     ports:
       - "5984:5984"
     environment:
