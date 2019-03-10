@@ -17,7 +17,6 @@
 
 import angular from 'angular';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
-import translate from '../../../helpers/translate';
 import Indicator from '../../../models/indicator';
 
 const module = angular.module(
@@ -46,9 +45,8 @@ module.component('ccIndicatorEditionModal', {
 			return this.indicatorChanged && !this.$scope.indicatorForm.$invalid;
 		}
 
-		constructor($rootScope, $scope) {
+		constructor($scope) {
 			this.$scope = $scope;
-			this.languages = $rootScope.languages;
 		}
 
 		$onChanges(changes) {
@@ -62,24 +60,7 @@ module.component('ccIndicatorEditionModal', {
 			if (!this.indicatorSavable)
 				return;
 
-			this.close({$value: this.indicator});
-		}
-
-		translate(key, destLanguage) {
-			for (let sourceLanguage in this.languages) {
-				const source = indicator[key][sourceLanguage];
-
-				if (sourceLanguage != destLanguage && source && source.length) {
-					translate(source, destLanguage, sourceLanguage)
-						.then(result => {
-							this.$scope.$apply(() => {
-								indicator[key][destLanguage] = result;
-							});
-						});
-
-					break;
-				}
-			}
+			this.close({ $value: this.indicator });
 		}
 	}
 });

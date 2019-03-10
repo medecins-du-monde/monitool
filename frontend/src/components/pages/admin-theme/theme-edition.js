@@ -17,7 +17,6 @@
 
 import angular from 'angular';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
-import translate from '../../../helpers/translate';
 import Theme from '../../../models/theme';
 
 
@@ -44,11 +43,6 @@ module.component('themeEditModal', {
 			return !angular.equals(this.theme, this.master);
 		}
 
-		constructor($rootScope, $scope) {
-			this.$scope = $scope; // Needed to $apply automatic translation
-			this.languages = $rootScope.languages;
-		}
-
 		$onChanges(changes) {
 			this.theme = angular.copy(this.resolve.theme) || new Theme();
 			this.isNew = !this.resolve.theme;
@@ -56,24 +50,7 @@ module.component('themeEditModal', {
 		}
 
 		save() {
-			this.close({'$value': this.theme});
-		}
-
-		autofill(writeLanguageCode) {
-			for (let readLanguageCode in this.languages) {
-				const input = this.theme.name[readLanguageCode];
-
-				if (readLanguageCode !== writeLanguageCode && input.length) {
-					translate(input, writeLanguageCode, readLanguageCode)
-						.then(result => {
-							this.$scope.$apply(() => {
-								this.theme.name[writeLanguageCode] = result;
-							});
-						});
-
-					break;
-				}
-			}
+			this.close({ '$value': this.theme });
 		}
 	}
 

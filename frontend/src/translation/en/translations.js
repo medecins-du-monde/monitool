@@ -560,8 +560,8 @@ export default {
 			"<p>When a project have the same activities on different sites, those activities need to be followed-up by site, groups of sites, and at project level.</p>" +
 			"<p>Enter here:</p>" +
 			"<ul>" +
-				"<li>The list of sites where your project works (i.e. the list of health centers)</li>" +
-				"<li>Groups that will be used during monitoring (i.e. by region, or type of structure)</li>" +
+			"<li>The list of sites where your project works (i.e. the list of health centers)</li>" +
+			"<li>Groups that will be used during monitoring (i.e. by region, or type of structure)</li>" +
 			"</ul>",
 
 		users_list_info:
@@ -724,12 +724,7 @@ export default {
 		name_placeholder_en: "i.e. Sexual and Reproductive Health",
 
 		info:
-			"<p>Enter here the name of the thematic in all languages used by your organisation.</p>" +
-			"<p>If you cannot translate to all languages:</p>" +
-			"<ol>" +
-				"<li>Manually translate all the languages that you can</li>" +
-				"<li>Use the button on the left to use automatic translation for the others</li>" +
-			"</ol>"
+			"Enter here the name of the thematic in all languages used by your organisation."
 	},
 
 	indicator: {
@@ -760,12 +755,7 @@ export default {
 			"<p>To allow projects to plan for their data collection, avoid changing this list often.</p>",
 
 		edit_info:
-			"<p>This page allows changing the definition of a cross-cutting indicator. If you make changes, take care to update all languages.</p>" +
-			"<p>If you cannot translate to all language:</p>" +
-			"<ol>" +
-				"<li>Translate all languages that you can</li>" +
-				"<li>Use the button on the left on missing fields to use automatic translation</li>" +
-			"</ol>",
+			"This page allows changing the definition of a cross-cutting indicator. If you make changes, take care to update all languages.",
 
 		save: "Save indicator"
 	}

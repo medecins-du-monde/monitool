@@ -17,9 +17,12 @@
 			<label for="input-themes" class="col-sm-2 control-label" translate="indicator.themes_label"></label>
 
 			<div class="col-sm-10">
-				<ui-select id="input-themes" multiple ng-model="$ctrl.indicator.themes" name="themes" theme="bootstrap" required>
-					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">{{$item.name[$root.language]}}</ui-select-match>
-					<ui-select-choices repeat="theme._id as theme in $ctrl.themes">{{theme.name[$root.language]}}</ui-select-choices>
+				<ui-select id="input-themes" multiple ng-model="$ctrl.indicator.themes" name="themes" theme="bootstrap"
+					required>
+					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">
+						{{$item.name[$root.language]}}</ui-select-match>
+					<ui-select-choices repeat="theme._id as theme in $ctrl.themes">{{theme.name[$root.language]}}
+					</ui-select-choices>
 				</ui-select>
 			</div>
 		</div>
@@ -30,22 +33,9 @@
 			</label>
 
 			<div class="col-sm-10">
-				<div class="input-group">
-					<span class="input-group-btn">
-						<button class="btn btn-default" ng-click="translate('name', language_code)">
-							<i class="fa fa-language"></i>
-						</button>
-					</span>
-
-					<textarea auto-resize
-						id="input-name-{{language_code}}"
-						type="text"
-						class="form-control"
-						name="name_{{language_code}}"
-						ng-model="$ctrl.indicator.name[language_code]"
-						placeholder="{{'indicator.name_placeholder_' + language_code|translate}}"
-						required></textarea>
-				</div>
+				<textarea auto-resize id="input-name-{{language_code}}" type="text" class="form-control"
+					name="name_{{language_code}}" ng-model="$ctrl.indicator.name[language_code]"
+					placeholder="{{'indicator.name_placeholder_' + language_code|translate}}" required></textarea>
 			</div>
 		</div>
 
@@ -55,21 +45,9 @@
 			</label>
 
 			<div class="col-sm-10">
-				<div class="input-group">
-					<span class="input-group-btn">
-						<button class="btn btn-default" ng-click="translate('description', language_code)">
-							<i class="fa fa-language"></i>
-						</button>
-					</span>
-
-					<textarea auto-resize
-						id="input-description-{{language_code}}"
-						type="text"
-						class="form-control"
-						name="description_{{language_code}}"
-						ng-model="$ctrl.indicator.description[language_code]"
-						placeholder="{{'indicator.description_placeholder_' + language_code|translate}}"></textarea>
-				</div>
+				<textarea auto-resize id="input-description-{{language_code}}" type="text" class="form-control"
+					name="description_{{language_code}}" ng-model="$ctrl.indicator.description[language_code]"
+					placeholder="{{'indicator.description_placeholder_' + language_code|translate}}"></textarea>
 			</div>
 		</div>
 	</form>

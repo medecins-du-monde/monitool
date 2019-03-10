@@ -561,8 +561,8 @@ export default {
 			"<p>Lorsqu'un projet réalise les même activités dans plusieurs lieux, celles-ci doivent pouvoir être suivi individuellements, par groupes, et tous ensembles.</p>" +
 			"<p>Rentrez ici:</p>" +
 			"<ul>" +
-				"<li>La liste des lieux sur lesquels le projet travaille (par exemple: une liste des centres de santé)</li>" +
-				"<li>Des groupements qui seront utilisé lors du suivi (par exemple: des régions, des types de structure)</li>" +
+			"<li>La liste des lieux sur lesquels le projet travaille (par exemple: une liste des centres de santé)</li>" +
+			"<li>Des groupements qui seront utilisé lors du suivi (par exemple: des régions, des types de structure)</li>" +
 			"</ul>",
 
 		users_list_info:
@@ -725,12 +725,7 @@ export default {
 		name_placeholder_en: "ex: Sexual and Reproductive Health",
 
 		info:
-			"<p>Rentrez ici le nom de la thématique dans toutes les langues utilisées par votre organisation.</p>" +
-			"<p>Si vous ne pouvez pas traduire vers toutes les langues:</p>" +
-			"<ol>" +
-				"<li>Remplissez les langues que vous pouvez</li>" +
-				"<li>Utilisez le bouton à gauche des champs pour une traduction automatique</li>" +
-			"</ol>"
+			"Rentrez ici le nom de la thématique dans toutes les langues utilisées par votre organisation."
 	},
 
 	indicator: {
@@ -762,12 +757,7 @@ export default {
 			"<p>Afin de permettre aux projets de planifier leur collecte, merci de ne pas changer régulièrement cette liste.</p>",
 
 		edit_info:
-			"<p>Cette page vous permet de modifier la définition d'un indicateur transversal. Si vous réalisez des changements, attention de bien mettre à jour les champs dans toutes les langues.</p>" +
-			"<p>Si vous ne pouvez pas traduire vers toutes les langues:</p>" +
-			"<ol>" +
-				"<li>Remplissez les langues que vous pouvez</li>" +
-				"<li>Utilisez le bouton à gauche des champs pour une traduction automatique</li>" +
-			"</ol>",
+			"Cette page vous permet de modifier la définition d'un indicateur transversal. Si vous réalisez des changements, attention de bien mettre à jour les champs dans toutes les langues.",
 
 		save: "Sauvegarder l'indicateur"
 	}

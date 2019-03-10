@@ -79,8 +79,6 @@ Monitool's API takes the following configuration keys:
 	couchdb.user		Self-explanatory [default=]
 	couchdb.pass		Self-explanatory [default=]
 
-	api.google			API key that allows using Google Translate API. Used to create cross-cutting indicators [no_default]
-
 	auth.administrator	Login of account that will always be an admin, disregarding entry in database.
 
 	auth.providers.azuread.label
@@ -105,7 +103,6 @@ To start a local instance:
 
 	# Configure docker
 	docker swarm init
-	printf "your-google-translate-api-key" | docker secret create googletranslate_apikey -
 
 	# Start up all the containers.
 	docker stack deploy -c docker/compose-develop.yml monitool-dev
@@ -125,7 +122,6 @@ The compose files available on the repository are for small deployment, keeping 
 
 	printf "your-azuread-client-id" | docker secret create azuread_clientid -
 	printf "your-azuread-client-secret" | docker secret create azuread_clientsecret -
-	printf "your-google-translate-api-key" | docker secret create googletranslate_apikey -
 	printf "a-long-random-string" | docker secret create monitool_cookiesecret -
 
 	docker stack deploy -c compose-production.yml monitool-prod

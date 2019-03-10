@@ -28,7 +28,6 @@ services:
       MONITOOL_BASE_URL: "https://monitool.medecinsdumonde.net"
       MONITOOL_COOKIE_SECRET_FILE: "/var/run/secrets/monitool_cookiesecret"
       MONITOOL_COUCHDB_HOST: "couchdb"
-      MONITOOL_API_GOOGLE_FILE: "/var/run/secrets/googletranslate_apikey"
       MONITOOL_AUTH_ADMINISTRATOR: "romain.gilliotte"
       MONITOOL_AUTH_PROVIDERS_AZUREAD: "TRUE"
       MONITOOL_AUTH_PROVIDERS_AZUREAD_LABEL: "Use MDM account"
@@ -39,7 +38,6 @@ services:
       MONITOOL_AUTH_PROVIDERS_TRAINING: "FALSE"
     secrets:
       - azuread_clientsecret
-      - googletranslate_apikey
       - monitool_cookiesecret
 
   couchdb:
@@ -55,8 +53,6 @@ networks:
 
 secrets:
   azuread_clientsecret:
-    external: true
-  googletranslate_apikey:
     external: true
   monitool_cookiesecret:
     external: true

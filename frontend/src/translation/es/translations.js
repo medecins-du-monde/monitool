@@ -561,8 +561,8 @@ export default {
 			"<p>Cuando un proyecto tiene las mismas actividades en varios lugares, se deben seguir por lugar, grupos de lugares y a nivel de proyecto.</p>" +
 			"<p>Entre aqui:</p>" +
 			"<ul>" +
-				"<li>La lista de lugares donde su proyecto trabaja (ej: la lista de centros de salud)</li>" +
-				"<li>los grupos que se usuran durante la vida del proyecto (ej: por región, o tipo de estructura)</li>" +
+			"<li>La lista de lugares donde su proyecto trabaja (ej: la lista de centros de salud)</li>" +
+			"<li>los grupos que se usuran durante la vida del proyecto (ej: por región, o tipo de estructura)</li>" +
 			"</ul>",
 
 		users_list_info:
@@ -725,12 +725,7 @@ export default {
 		name_placeholder_en: "i.e. Sexual and Reproductive Health",
 
 		info:
-			"<p>Entre aqui el nombre de la temática en todos los idiomas usados por su organización.</p>" +
-			"<p>Si no puede traducir a todos los idiomas:</p>" +
-			"<ol>" +
-				"<li>Entre manualmente todos los idiomas que pueda</li>" +
-				"<li>Pulse el botón a la izquierda para traducir automáticamente los demás</li>" +
-			"</ol>"
+			"Entre aqui el nombre de la temática en todos los idiomas usados por su organización."
 	},
 
 	indicator: {
@@ -761,12 +756,7 @@ export default {
 			"<p>Para ayudar los proyectos a planificar su colecta de datos, evite cambiar esta lista a menudo.</p>",
 
 		edit_info:
-			"<p>Esta página permite cambiar la definicion de un indicador transversal. Si have cambios, tenga cuidado en poner todos los idiomas a día.</p>" +
-			"<p>Si no puede traducir a todos los idiomas:</p>" +
-			"<ol>" +
-				"<li>Entre manualmente todos los idiomas que pueda</li>" +
-				"<li>Pulse el botón a la izquierda para traducir automáticamente los demás</li>" +
-			"</ol>",
+			"Esta página permite cambiar la definicion de un indicador transversal. Si have cambios, tenga cuidado en poner todos los idiomas a día.",
 
 		save: "Guardar indicador"
 	}

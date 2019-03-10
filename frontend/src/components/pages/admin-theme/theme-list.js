@@ -15,12 +15,10 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
 import uiRouter from '@uirouter/angularjs';
+import angular from 'angular';
 import uiModal from 'angular-ui-bootstrap/src/modal/index';
-
 import Theme from '../../../models/theme';
-import translate from '../../../helpers/translate';
 import mtThemeEditModal from './theme-edition';
 
 const module = angular.module(
@@ -75,7 +73,7 @@ module.component('themeList', {
 					angular.copy(newTheme, theme)
 					theme.save();
 				})
-				.catch(() => {})
+				.catch(() => { })
 		}
 
 		onDeleteClicked(theme) {
@@ -83,7 +81,7 @@ module.component('themeList', {
 			theme.delete();
 		}
 
-		_createModal(theme=null) {
+		_createModal(theme = null) {
 			return this.$uibModal
 				.open({
 					component: 'themeEditModal',

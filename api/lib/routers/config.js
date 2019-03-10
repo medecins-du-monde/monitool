@@ -29,8 +29,7 @@ router.get('/config', ctx => {
 	ctx.response.body = {
 		version: pkg.version,
 		trainingLabel: config.auth.providers.training ? config.auth.providers.training.label : null,
-		azureLabel: config.auth.providers.azureAD ? config.auth.providers.azureAD.label : null,
-		googleKey: config.api.google
+		azureLabel: config.auth.providers.azureAD ? config.auth.providers.azureAD.label : null
 	};
 });
 
