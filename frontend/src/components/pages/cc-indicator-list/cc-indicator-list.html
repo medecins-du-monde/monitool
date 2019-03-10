@@ -1,31 +1,46 @@
-
-
 <ol class="breadcrumb">
 	<li class="active" translate="indicator.cross_cutting"></li>
 </ol>
 
 <div ng-repeat="category in $ctrl.categories">
 	<legend ng-if="!category.definition">{{('project.' + category.translate)|translate}}</legend>
-	<legend ng-if="category.definition">{{category.definition.name[$root.language]}}</legend>
+	<legend ng-if="category.definition">
+		{{category.definition.shortName[$root.language]}}:
+		{{category.definition.name[$root.language]}}
+	</legend>
 
-	<!-- markup is broken on purpose: do not fix -->
-	<!-- If we put spaces between tags, margins break -->
+	<div>
+		<div class="panel panel-default columns-panel"
+			ng-repeat="indicator in category.indicators|orderBy:('name.' + $root.language)">
 
-	<div><div class="panel panel-default columns-panel"
-		 ng-repeat="indicator in category.indicators|orderBy:('name.' + $root.language)">
+			<div class="panel-heading" title="{{indicator.name[$root.language]}}">
+				{{indicator.name[$root.language]|maxLength:90}}</div>
 
-		<div class="panel-heading" title="{{indicator.name[$root.language]}}">{{indicator.name[$root.language]|maxLength:90}}</div>
+			<div class="panel-body">
+				<div ng-if="!category.definition">
+					<strong translate="theme.themes"></strong>
+					<span
+						ng-repeat="theme in indicator.themes|getObjects:$ctrl.themes|orderBy:('shortName.' + $root.language)"
+						title="{{theme.name[$root.language]}}">
+						{{theme.shortName[$root.language]}}
+					</span>
+				</div>
 
-		<div class="panel-body">
-			<div ng-if="indicator.description[$root.language]">{{indicator.description[$root.language]|maxLength:200}}</div>
-			<div ng-if="!indicator.description[$root.language]" translate="indicator.missing_description"></div>
+				<div>
+					<strong translate="shared.description"></strong>
+					<span
+						ng-if="indicator.description[$root.language]">{{indicator.description[$root.language]|maxLength:200}}
+					</span>
+					<span ng-if="!indicator.description[$root.language]"
+						translate="indicator.missing_description"></span>
+				</div>
 
-			<div class="panel-buttons">
-				<a ui-sref="main.indicator_reporting({indicatorId: indicator._id})"
-				   class="btn btn-xxs btn-default"
-				   translate="indicator.see_report"></a>
+				<div class="panel-buttons">
+					<a ui-sref="main.indicator_reporting({indicatorId: indicator._id})" class="btn btn-xxs btn-default"
+						translate="indicator.see_report"></a>
+				</div>
 			</div>
-		</div>
 
-	</div></div>
+		</div>
+	</div>
 </div>

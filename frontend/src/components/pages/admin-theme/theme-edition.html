@@ -13,17 +13,31 @@
 
 		<div class="alert alert-info" translate="theme.info"></div>
 
-		<div class="form-group" ng-repeat="(language_code, language) in $root.languages">
-			<label for="input-name-{{language_code}}" class="col-sm-2 control-label">
-				{{'shared.name_label_' + language_code | translate}}
-			</label>
-
-			<div class="col-sm-10">
-				<input id="input-name-{{language_code}}" type="text" class="form-control" name="name_{{language_code}}"
-					ng-model="$ctrl.theme.name[language_code]"
-					placeholder="{{'theme.name_placeholder_' + language_code|translate}}" required />
-			</div>
-		</div>
+		<table class="table table-bordered table-condensed">
+			<thead>
+				<tr>
+					<th></th>
+					<th translate="shared.short_name"></th>
+					<th translate="shared.name"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="(language_code, language) in $root.languages">
+					<th style="width: 15%">{{('menu.' + language)|translate}}</th>
+					<td style="width: 20%">
+						<input id="input-short-name-{{language_code}}" type="text" class="form-control"
+							name="short_name_{{language_code}}" ng-model="$ctrl.theme.shortName[language_code]"
+							placeholder="{{'theme.short_name_placeholder_' + language_code|translate}}" required
+							maxlength="5" />
+					</td>
+					<td>
+						<input id="input-name-{{language_code}}" type="text" class="form-control"
+							name="name_{{language_code}}" ng-model="$ctrl.theme.name[language_code]"
+							placeholder="{{'theme.name_placeholder_' + language_code|translate}}" required />
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</form>
 </div>
 

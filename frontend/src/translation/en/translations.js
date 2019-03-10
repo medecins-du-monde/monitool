@@ -2,6 +2,7 @@
 
 export default {
 	shared: {
+		short_name: "Acronym",
 		none: "None",
 		percentage_done: "{{value}}% done",
 		percentage_incomplete: "{{value}}% incomplete",

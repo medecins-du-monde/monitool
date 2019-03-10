@@ -3,7 +3,8 @@
 </ol>
 
 <div style="margin-bottom: 10px">
-	<input type="text" ng-change="$ctrl.filter()" ng-model="$ctrl.filterValue" class="form-control" placeholder="{{'project.filter_placeholder'|translate}}">
+	<input type="text" ng-change="$ctrl.filter()" ng-model="$ctrl.filterValue" class="form-control"
+		placeholder="{{'project.filter_placeholder'|translate}}">
 </div>
 <div style="margin-bottom: 10px">
 	<div class="pull-right">
@@ -21,24 +22,28 @@
 	</div>
 
 	<div class="btn-group">
-		<a ng-click="$ctrl.toggleOngoing()" class="btn btn-default" ng-class="{active: $ctrl.displayOngoing}" translate="project.show_ongoing_projects"></a>
-		<a ng-click="$ctrl.toggleFinished()" class="btn btn-default" ng-class="{active: $ctrl.displayFinished}" translate="project.show_finished_projects"></a>
-		<a ng-click="$ctrl.toggleDeleted()" class="btn btn-default" ng-class="{active: $ctrl.displayDeleted}" translate="project.show_deleted_projects"></a>
+		<a ng-click="$ctrl.toggleOngoing()" class="btn btn-default" ng-class="{active: $ctrl.displayOngoing}"
+			translate="project.show_ongoing_projects"></a>
+		<a ng-click="$ctrl.toggleFinished()" class="btn btn-default" ng-class="{active: $ctrl.displayFinished}"
+			translate="project.show_finished_projects"></a>
+		<a ng-click="$ctrl.toggleDeleted()" class="btn btn-default" ng-class="{active: $ctrl.displayDeleted}"
+			translate="project.show_deleted_projects"></a>
 	</div>
 </div>
 
-
-
 <div>
 	<div class="panel columns-panel"
-		 ng-class="{'panel-default': p.active && p.running, 'panel-dashed': p.active && !p.running, 'panel-deleted': !p.active}"
-		 ng-repeat="p in $ctrl.displayedProjects track by p._id">
+		ng-class="{'panel-default': p.active && p.running, 'panel-dashed': p.active && !p.running, 'panel-deleted': !p.active}"
+		ng-repeat="p in $ctrl.displayedProjects track by p._id">
 
 		<div class="panel-heading">
 			<div class="panel-title">
-				<i class="fa pull-right fa-user" ng-if="p.isUser" style="margin-top: 3px" title="{{'project.is_user'|translate}}"></i>
-				<i class="fa pull-right fa-star" ng-if="!p.isUser && p.favorite" style="margin-top: 3px; cursor: pointer" ng-click="$ctrl.toggleFavorite(p)"></i>
-				<i class="fa pull-right fa-star-o" ng-if="!p.isUser && !p.favorite" style="margin-top: 3px; cursor: pointer" ng-click="$ctrl.toggleFavorite(p)"></i>
+				<i class="fa pull-right fa-user" ng-if="p.isUser" style="margin-top: 3px"
+					title="{{'project.is_user'|translate}}"></i>
+				<i class="fa pull-right fa-star" ng-if="!p.isUser && p.favorite"
+					style="margin-top: 3px; cursor: pointer" ng-click="$ctrl.toggleFavorite(p)"></i>
+				<i class="fa pull-right fa-star-o" ng-if="!p.isUser && !p.favorite"
+					style="margin-top: 3px; cursor: pointer" ng-click="$ctrl.toggleFavorite(p)"></i>
 				{{p.country}}
 			</div>
 		</div>
@@ -47,9 +52,19 @@
 				<strong translate="shared.name"></strong>
 				{{p.name}}
 			</div>
+
 			<div>
 				<strong translate="shared.date"></strong>
 				{{p.start|date}} - {{p.end|date}}
+			</div>
+
+			<div>
+				<strong translate="theme.themes"></strong>
+				<span ng-repeat="theme in p.themes|getObjects:$ctrl.themes|orderBy:('shortName.' + $root.language)"
+					title="{{theme.name[$root.language]}}">
+					{{theme.shortName[$root.language]}}
+				</span>
+				<span ng-if="p.themes.length == 0" translate="shared.none"></span>
 			</div>
 
 			<div>
@@ -59,8 +74,10 @@
 			</div>
 
 			<div class="panel-buttons btn-group">
-				<a ng-if="p.active" class="btn btn-default btn-xxs" ng-click="$ctrl.onOpenClicked(p)" translate="shared.open"></a>
-				<a ng-if="!p.active && p.isOwner" class="btn btn-default btn-xxs" ng-click="$ctrl.onRestoreClicked(p)" translate="shared.restore"></a>
+				<a ng-if="p.active" class="btn btn-default btn-xxs" ng-click="$ctrl.onOpenClicked(p)"
+					translate="shared.open"></a>
+				<a ng-if="!p.active && p.isOwner" class="btn btn-default btn-xxs" ng-click="$ctrl.onRestoreClicked(p)"
+					translate="shared.restore"></a>
 
 				<div class="btn-group" uib-dropdown ng-if="p.active">
 					<a class="btn btn-default btn-xxs" uib-dropdown-toggle>

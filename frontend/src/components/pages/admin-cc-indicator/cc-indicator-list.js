@@ -72,16 +72,6 @@ module.component('adminIndicatorList', {
 			this.$uibModal = $uibModal;
 		}
 
-		$onChanges(changes) {
-			// Give a color to each theme
-			if (changes.themes) {
-				const classes = ["text-primary", "text-success", "text-info", "text-warning", "text-danger"];
-
-				this.themes = angular.copy(this.themes); // we must not change a one-way binding => clone.
-				this.themes.forEach((theme, index) => theme.class = classes[index % classes.length]);
-			}
-		}
-
 		onCreateClicked() {
 			this._createModal().then(indicator => {
 				this.indicators.push(indicator);
@@ -95,7 +85,7 @@ module.component('adminIndicatorList', {
 					angular.copy(newIndicator, indicator);
 					indicator.save();
 				})
-				.catch(error => {})
+				.catch(error => { })
 		}
 
 		onDeleteClicked(indicator) {
@@ -103,7 +93,7 @@ module.component('adminIndicatorList', {
 			indicator.delete();
 		}
 
-		_createModal(indicator=null) {
+		_createModal(indicator = null) {
 			return this.$uibModal
 				.open({
 					component: 'ccIndicatorEditionModal',

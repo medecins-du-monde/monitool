@@ -64,6 +64,7 @@ module.component('projectList', {
 
 		constructor($rootScope, $filter, $scope, $state, $window) {
 			this.userCtx = $rootScope.userCtx;
+			this.$rootScope = $rootScope;
 			this.$scope = $scope;
 			this.$state = $state;
 			this.$window = $window;
@@ -87,7 +88,15 @@ module.component('projectList', {
 			});
 
 			this.displayedProjects = this.displayedProjects.filter(p => {
-				const search = diacritics.remove(p.country + '//' + p.name || '').toLowerCase();
+				const search = diacritics.remove(
+					[
+						p.country || '',
+						p.name || '',
+						...this.themes.filter(t => p.themes.includes(t._id)).map(t => t.shortName[this.$rootScope.language])
+					].join('//')
+				).toLowerCase();
+				console.log(search)
+				// const search = diacritics.remove(p.country + '//' + p.name + thematics || '').toLowerCase();
 				const needle = diacritics.remove(this.filterValue || '').toLowerCase();
 
 				const matchSearch = search.includes(needle);
@@ -146,14 +155,14 @@ module.component('projectList', {
 		}
 
 		createProject() {
-			this.$state.go('main.project.structure.home', {projectId: 'project:' + uuid()});
+			this.$state.go('main.project.structure.home', { projectId: 'project:' + uuid() });
 		}
 
 		onOpenClicked(project) {
 			if (project.isOwner)
-				this.$state.go("main.project.structure.home", {projectId: project._id});
+				this.$state.go("main.project.structure.home", { projectId: project._id });
 			else
-				this.$state.go("main.project.reporting.home", {projectId: project._id});
+				this.$state.go("main.project.reporting.home", { projectId: project._id });
 		}
 
 		async onCloneClicked(project) {

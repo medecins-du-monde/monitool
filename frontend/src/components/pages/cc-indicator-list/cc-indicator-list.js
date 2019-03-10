@@ -53,24 +53,32 @@ module.component('crossCuttingIndicatorList', {
 
 	controller: class CrossCuttingIndicatorList {
 
+		constructor($rootScope) {
+			this.$rootScope = $rootScope;
+		}
+
 		$onChanges(changes) {
 			this.categories = [];
 
 			const noThematicsIndicators = this.indicators.filter(i => i.themes.length == 0);
 			if (noThematicsIndicators.length)
-				this.categories.push({definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators});
+				this.categories.push({ definition: null, translate: 'zero_theme_indicator', indicators: noThematicsIndicators });
+
+			// Create a category with indicators that match project on exactly 1 thematic
+			// FIXME: The theme sorting won't be updated if the user change the language while using this page.
+			this.themes
+				.slice()
+				.sort((t1, t2) => t1.shortName[this.$rootScope.language].localeCompare(t2.shortName[this.$rootScope.language]))
+				.forEach(theme => {
+					const themeIndicators = this.indicators.filter(i => i.themes.length === 1 && i.themes[0] === theme._id);
+					if (themeIndicators.length !== 0)
+						this.categories.push({ definition: theme, indicators: themeIndicators });
+				});
 
 			// Create a category with indicators that match project on 2 thematics or more
 			const manyThematicsIndicators = this.indicators.filter(i => i.themes.length > 1);
 			if (manyThematicsIndicators.length)
-				this.categories.push({definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators});
-
-			// Create a category with indicators that match project on exactly 1 thematic
-			this.themes.forEach(theme => {
-				const themeIndicators = this.indicators.filter(i => i.themes.length === 1 && i.themes[0] === theme._id);
-				if (themeIndicators.length !== 0)
-					this.categories.push({definition: theme, indicators: themeIndicators});
-			});
+				this.categories.push({ definition: null, translate: 'multi_theme_indicator', indicators: manyThematicsIndicators });
 		}
 	}
 });

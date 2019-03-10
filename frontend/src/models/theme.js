@@ -30,10 +30,11 @@ export default class Theme {
 		return new Theme(response.data);
 	}
 
-	constructor(data=null) {
+	constructor(data = null) {
 		this._id = 'theme:' + uuid();
 		this.type = "theme";
-		this.name = {en: '', fr: '', es: ''};
+		this.name = { en: '', fr: '', es: '' };
+		this.shortName = { en: '', fr: '', es: '' };
 
 		if (data)
 			Object.assign(this, data);

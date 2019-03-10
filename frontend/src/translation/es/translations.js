@@ -2,6 +2,7 @@
 
 export default {
 	shared: {
+		short_name: "Sigla",
 		none: "Ninguna",
 		percentage_done: "{{value}}% realizado",
 		percentage_incomplete: "{{value}}% en curso",

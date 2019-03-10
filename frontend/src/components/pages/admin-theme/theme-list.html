@@ -6,12 +6,18 @@
 <div class="alert alert-info" translate="theme.list_info"></div>
 
 <div>
-	<div class="panel panel-default columns-panel" ng-repeat="theme in $ctrl.themes|orderBy:('name.' + $root.language)">
+	<div class="panel panel-default columns-panel"
+		ng-repeat="theme in $ctrl.themes|orderBy:('shortName.' + $root.language)">
 		<div class="panel-heading">
-			<div class="panel-title" title="{{theme.name[$root.language]}}">{{theme.name[$root.language]|maxLength:90}}</div>
+			<div class="panel-title" title="{{theme.name[$root.language]}}">{{theme.shortName[$root.language]}}</div>
 		</div>
 
 		<div class="panel-body">
+			<div>
+				<strong translate="shared.name"></strong>
+				{{theme.name[$root.language]}}
+			</div>
+
 			<div class="panel-buttons btn-group">
 				<a ng-click="$ctrl.edit(theme)" class="btn btn-xxs btn-default" translate="shared.edit"></a>
 

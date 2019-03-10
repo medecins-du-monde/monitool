@@ -20,8 +20,11 @@
 				<ui-select id="input-themes" multiple ng-model="$ctrl.indicator.themes" name="themes" theme="bootstrap"
 					required>
 					<ui-select-match placeholder="{{'indicator.select_themes'|translate}}">
-						{{$item.name[$root.language]}}</ui-select-match>
-					<ui-select-choices repeat="theme._id as theme in $ctrl.themes">{{theme.name[$root.language]}}
+						{{$item.shortName[$root.language]}}: {{$item.name[$root.language]}}
+					</ui-select-match>
+					<ui-select-choices
+						repeat="theme._id as theme in $ctrl.themes|orderBy:('shortName.' + $root.language)">
+						{{theme.shortName[$root.language]}}: {{theme.name[$root.language]}}
 					</ui-select-choices>
 				</ui-select>
 			</div>
