@@ -334,6 +334,14 @@ my-component-name {
 }
 ```
 
+#### Keeping track of translations
+
+A small script was written to keep track of translations which are no longer used + those which are missing.
+
+#### Authentication
+
+All authentication code was removed from the code. Auth0 is used instead
+
 ### Others topics
 
 #### Login page
