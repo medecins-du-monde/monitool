@@ -36,7 +36,7 @@ function _sort(list) {
 
 	for (let i = 1; i < len; i++) {
 		let tmp = list[i],
-		j = i;
+			j = i;
 		while (list[j - 1] > tmp) {
 			list[j] = list[j - 1];
 			--j;
@@ -123,14 +123,10 @@ export default class Cube {
 	 * @return {Cube}
 	 *
 	 * @example
-	 * const projectId = '6acefb96-a047-4b77-a698-6a9da3994306';
-	 * const project = await Project.store.get(projectId);
-	 * const inputs = await Input.listByVariable(projectId, project.forms[0].id, project.forms[0].elements[0].id, true);
-	 *
 	 * let c = Cube.fromElement(project, project.forms[0], project.forms[0].element[0], inputs);
 	 * // do stuff here
 	 */
-	static fromElement(project, form, element, inputs=null) {
+	static fromElement(project, form, element, inputs = null) {
 		////////////
 		// Build dimensions & groups
 		////////////
@@ -147,7 +143,7 @@ export default class Cube {
 			try {
 				dimensionGroups.push(DimensionGroup.createTime(periodicity, dimensions[0]));
 			}
-			catch (e) {}
+			catch (e) { }
 		});
 
 		// Location
@@ -363,7 +359,7 @@ export default class Cube {
 			// Remove filter from main array, it was merged into levels.
 			filter[dimIndex] = null;
 
-			return {dimIndex: dimIndex, rows: rows};
+			return { dimIndex: dimIndex, rows: rows };
 		});
 
 		return this.query2(levels, 0, filter)
@@ -418,7 +414,7 @@ export default class Cube {
 		if (indexesOffset == indexes.length)
 			return this.data[dataOffset] == -123456 ? undefined : this.data[dataOffset];
 
-		const dimension  = this.dimensions[indexesOffset];
+		const dimension = this.dimensions[indexesOffset];
 
 		// if indexes[indexesOffset] == null => take all
 		const localIndexes = indexes[indexesOffset];

@@ -34,7 +34,7 @@ export default class InputStore extends Store {
 	 * Retrieve all input ids that are linked to a particular data source.
 	 * Used to populate datasource planning (/projects/xxx/input).
 	 */
-	async listIdsByDataSource(projectId, dataSourceId, update=false) {
+	async listIdsByDataSource(projectId, dataSourceId, update = false) {
 		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string')
 			throw new Error('missing_parameter');
 
@@ -72,7 +72,7 @@ export default class InputStore extends Store {
 	 * Retrieve all inputs of a given project
 	 * Used to generate cubes (for project reporting), or fetch partner inputs.
 	 */
-	async listByProject(projectId, update=false) {
+	async listByProject(projectId, update = false) {
 		if (typeof projectId !== 'string')
 			throw new Error('missing_parameter');
 
@@ -112,65 +112,10 @@ export default class InputStore extends Store {
 	}
 
 	/**
-	 * Retrieve all inputs of a given data source
-	 * Used to generate cubes (for indicator reporting)
-	 */
-	async listByVariable(project, dataSource, variable, update=false) {
-		if (!project || !dataSource || !variable)
-			throw new Error('missing_parameter');
-
-		let result = await this._db.callView(
-			'inputs_variable',
-			{key: project._id + ':' + dataSource.id + ':' + variable.id}
-		);
-
-		let inputs = result.rows.map(row => {
-			const [projectId, dataSourceId, siteId, period] = row.id.split(':').slice(2);
-
-			const input = Object.create(Input.prototype);
-			input._id = row.id,
-			input.type = 'input',
-			input.project = 'project:' + projectId,
-			input.form = dataSourceId,
-			input.entity = siteId,
-			input.period = period,
-			input.structure = {[variable.id]: row.value.s},
-			input.values = {[variable.id]: row.value.v}
-
-			return input;
-		});
-
-		// Free memory
-		result = null;
-
-		if (update) {
-			// Remove all invalid inputs (wrong dates, wrong entity, wrong periodicity...).
-			inputs = inputs.filter(input => {
-				const timeSlot = new TimeSlot(input.period);
-				const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
-
-				return dataSource
-					&& project.start <= endDate
-					&& project.end >= startDate
-					&& (!dataSource.start || dataSource.start <= endDate)
-					&& (!dataSource.end || dataSource.end >= startDate)
-					&& dataSource.entities.includes(input.entity)
-					&& dataSource.isValidSlot(input.period)
-			});
-
-			// Update to new structure.
-			const structure = {[variable.id]: dataSource.structure[variable.id]};
-			inputs.forEach(input => input.update(structure));
-		}
-
-		return inputs;
-	}
-
-	/**
 	 * Retrieve a given input, and the previous one for the same data source and site,
 	 * This is used to populate the input page in client.
 	 */
-	async getLasts(projectId, dataSourceId, siteId, period, update=false) {
+	async getLasts(projectId, dataSourceId, siteId, period, update = false) {
 		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string' || typeof siteId !== 'string' || typeof period !== 'string')
 			throw new Error('missing_parameter');
 
@@ -214,7 +159,7 @@ export default class InputStore extends Store {
 		inputs = inputs.slice();
 
 		while (inputs.length)
-			await this._db.callBulk({docs: inputs.splice(0, 40)});
+			await this._db.callBulk({ docs: inputs.splice(0, 40) });
 	}
 }
 
