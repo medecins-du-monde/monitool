@@ -15,7 +15,17 @@ server {
 	brotli off;
 	gzip off;
 
-	
+	location / {
+		gzip_static on;
+		gzip_vary on;
+
+		brotli_static on; # brotli_static adds the equivalent of gzip_vary alone.
+
+		expires $static_expires;
+
+		root /usr/share/nginx/html;
+		index index.html;
+	}
 
 	# The trailing slashes in /api/ is important
 	location ~ ^/api/(.*)$ {
@@ -38,7 +48,8 @@ server {
 
 		# proxy_pass to api server on another container.
 		proxy_read_timeout 180s;
-		proxy_pass http://$api/$1$is_args$args;
+		# proxy_pass http://$api/$1$is_args$args;
+		proxy_pass http://localhost:9229/$api/$1$is_args$args;
 		proxy_http_version 1.1;
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection 'upgrade';
