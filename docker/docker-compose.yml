@@ -5,7 +5,7 @@ services:
   reverse_proxy:
     image: fholzer/nginx-brotli:v1.15.8
     ports:
-      - "80:80"
+      - "8045:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
