@@ -16,6 +16,7 @@
  */
 
 import Koa from 'koa';
+import cors from '@koa/cors';
 import bodyParser from 'koa-bodyparser';
 import session from 'koa-session'
 
@@ -33,6 +34,9 @@ import responseTimeMiddleware from 'koa-response-time';
 import errorHandlerMiddleware from './middlewares/error-handler';
 
 const app = new Koa();
+var whitelist = ['localhost:4200']
+
+app.use(cors(whitelist, '*', '*', '*', '*','*', '*'));
 app.keys = [config.cookieSecret];
 
 app.use(responseTimeMiddleware());
