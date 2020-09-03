@@ -63,10 +63,18 @@ To start a local instance, you can use either Docker Swarm or docker-compose:
 # Clone the repo and go to the working directory
 git clone git@github.com:medecins-du-monde/monitool.git
 cd monitool
+cd docker
+```
 
-# Start with Docker Swarm
+# With Docker Swarm
+```
 docker swarm init
 docker stack deploy -c docker/compose-develop.yml monitool-dev
+```
+# With Docker compose
+
+```
+The command docker-compose up --build
 ```
 
 Both frontend and server source folders are binded from your filesystem: the frontend and backend code will autoreload when changes are made to the sources.
