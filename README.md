@@ -66,12 +66,12 @@ cd monitool
 cd docker
 ```
 
-# With Docker Swarm
+##### With Docker Swarm
 ```
 docker swarm init
 docker stack deploy -c docker/compose-develop.yml monitool-dev
 ```
-# With Docker compose
+##### With Docker compose
 
 ```
 The command docker-compose up --build
