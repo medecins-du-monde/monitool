@@ -43,7 +43,7 @@ services:
       COUCHDB_USER: "admin"
       COUCHDB_PASSWORD: ""
     volumes:
-      - ../couchdb_data:/opt/couchdb/data
+      - couchdb_data:/opt/couchdb/data
 
 volumes:
   api_node_modules:
