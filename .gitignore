@@ -40,3 +40,4 @@ wwwroot
 docs
 dist
 *.log
+docker/docker-compose.yml
