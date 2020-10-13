@@ -48,5 +48,3 @@ services:
 volumes:
   api_node_modules:
   couchdb_data:
-  frontend_dist:
-  frontend_node_modules:
