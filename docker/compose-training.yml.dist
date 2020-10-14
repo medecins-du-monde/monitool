@@ -1,0 +1,45 @@
+version: "3.6"
+
+services:
+
+  reverse_proxy:
+    image: medecinsdumonde/monitool-frontend:latest
+    networks:
+      - frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  api:
+    image: medecinsdumonde/monitool-api:latest
+    deploy:
+      mode: replicated
+      replicas: 2
+    networks:
+      - backend
+      - frontend
+    environment:
+      NODE_ENV: "production"
+      MONITOOL_DEBUG: "FALSE"
+      MONITOOL_PORT: "80"
+      MONITOOL_COOKIE_SECRET: ""
+      MONITOOL_COUCHDB_HOST: "couchdb"
+      MONITOOL_AUTH_ADMINISTRATOR: ""
+      MONITOOL_AUTH_PROVIDERS_AZUREAD: "FALSE"
+      MONITOOL_AUTH_PROVIDERS_TRAINING: "TRUE"
+      MONITOOL_AUTH_PROVIDERS_TRAINING_ACCOUNT: ""
+
+  couchdb:
+    image: couchdb:2
+    networks:
+      - backend
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  couchdb-data:

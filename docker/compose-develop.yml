@@ -5,8 +5,6 @@ services:
   reverse_proxy:
     image: fholzer/nginx-brotli:v1.15.8
     restart: always
-    networks:
-      - frontend
     ports:
       - "8045:80"
     volumes:
@@ -16,9 +14,6 @@ services:
     image: node:10
     working_dir: /app
     restart: always
-    networks:
-      - backend
-      - frontend
     command: sh -c "yarn install --frozen-lockfile && yarn run start"
     ports:
       - "9229:9229" # debugger
@@ -30,31 +25,25 @@ services:
     environment:
       MONITOOL_DEBUG: "TRUE"
       MONITOOL_PORT: "80"
-      MONITOOL_COOKIE_SECRET_FILE: "/var/run/secrets/monitool_cookiesecret"
+      MONITOOL_COOKIE_SECRET: "123456789"
       MONITOOL_COUCHDB_HOST: "couchdb"
+      MONITOOL_COUCHDB_USER: "admin"
+      MONITOOL_COUCHDB_PASS: "admin"
       MONITOOL_AUTH_ADMINISTRATOR: "training"
       MONITOOL_AUTH_PROVIDERS_AZUREAD: "FALSE"
       MONITOOL_AUTH_PROVIDERS_TRAINING: "TRUE"
       MONITOOL_AUTH_PROVIDERS_TRAINING_ACCOUNT: "training"
-    secrets:
-      - monitool_cookiesecret
 
   couchdb:
     image: couchdb:2
-    networks:
-      - backend
     restart: always
     ports:
       - "5984:5984"
+    environment:
+      COUCHDB_USER: "admin"
+      COUCHDB_PASSWORD: ""
     volumes:
       - couchdb_data:/opt/couchdb/data
-
-networks:
-  frontend:
-  backend:
-secrets:
-  monitool_cookiesecret:
-    external: true
 
 volumes:
   api_node_modules:
