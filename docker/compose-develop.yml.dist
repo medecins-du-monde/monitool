@@ -4,27 +4,16 @@ services:
 
   reverse_proxy:
     image: fholzer/nginx-brotli:v1.15.8
+    restart: always
     ports:
-      - "80:80"
+      - "8045:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - frontend_dist:/usr/share/nginx/html:ro
-
-  frontend_watch:
-    image: node:8
-    working_dir: /app
-    command: sh -c "yarn install --frozen-lockfile && yarn run watch"
-    volumes:
-      - ../frontend/src:/app/src:ro
-      - ../frontend/package.json:/app/package.json
-      - ../frontend/webpack.config.js:/app/webpack.config.js:ro
-      - ../frontend/yarn.lock:/app/yarn.lock
-      - frontend_dist:/app/dist
-      - frontend_node_modules:/app/node_modules
 
   api:
     image: node:10
     working_dir: /app
+    restart: always
     command: sh -c "yarn install --frozen-lockfile && yarn run start"
     ports:
       - "9229:9229" # debugger
@@ -47,6 +36,7 @@ services:
 
   couchdb:
     image: couchdb:2
+    restart: always
     ports:
       - "5984:5984"
     environment:
@@ -58,5 +48,3 @@ services:
 volumes:
   api_node_modules:
   couchdb_data:
-  frontend_dist:
-  frontend_node_modules:
