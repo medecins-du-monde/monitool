@@ -41,9 +41,9 @@ router.post(
  * Log current user out.
  * FIXME This query should be POST: loggin an user out is not idempotent.
  */
-router.get('/authentication/logout', async ctx => {
-	ctx.logout();
-	ctx.response.redirect('/');
+router.post('/authentication/logout', async ctx => {
+    ctx.logout();
+    ctx.response.status = 200;
 });
 
 
