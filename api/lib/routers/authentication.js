@@ -31,10 +31,9 @@ const router = new Router();
  */
 router.post(
 	'/authentication/login-partner',
-	passport.authenticate('partner_local', {
-		successRedirect: '/',
-		failureRedirect: '/?failed'
-	})
+	passport.authenticate('partner_local'), async ctx => {
+		ctx.response.status = 200;
+	}
 )
 
 /**
