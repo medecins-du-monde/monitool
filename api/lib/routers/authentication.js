@@ -54,10 +54,10 @@ if (config.auth.providers.azureAD) {
 	 */
 	router.get(
 		'/authentication/login-azure',
-		passport.authenticate('user_azure', {
-			successRedirect: '/',
-			failureRedirect: '/'
-		})
+		passport.authenticate('user_azure', async ctx => {
+			ctx.response.status = 200;
+		}
+		)
 	);
 
 	/**
@@ -65,10 +65,10 @@ if (config.auth.providers.azureAD) {
 	 */
 	router.get(
 		'/authentication/login-callback',
-		passport.authenticate('user_azure', {
-			successRedirect: '/',
-			failureRedirect: '/'
-		})
+		passport.authenticate('user_azure', async ctx => {
+			ctx.response.status = 200;
+		}
+		)
 	);
 }
 
