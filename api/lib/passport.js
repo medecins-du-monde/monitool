@@ -142,6 +142,9 @@ if (config.auth.providers.azureAD) {
 		}
 	);
 
+	console.log('here is the strategy :');
+	console.log(strategy);
+
 	// Azure AD requires an additional 'resource' parameter for the token request
 	//  this corresponds to the Azure resource you're requesting access to
 	//  in our case we're just trying to authenticate, so we just request generic access to the Azure AD graph API
