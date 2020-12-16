@@ -34,7 +34,7 @@ import responseTimeMiddleware from 'koa-response-time';
 import errorHandlerMiddleware from './middlewares/error-handler';
 
 const app = new Koa();
-var whitelist = ['localhost:4200', 'https://monitool-api.test.humanitarian.tech/', 'https://login.windows.net/']
+var whitelist = ['localhost:4200', 'https://monitool-api.test.humanitarian.tech/', 'https://login.windows.net/', 'https://monitool-uat.medecinsdumonde.net/']
 
 app.use(cors(whitelist, '*', '*', '*', '*','*', '*'));
 app.keys = [config.cookieSecret];
