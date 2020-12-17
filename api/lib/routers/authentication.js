@@ -55,8 +55,8 @@ if (config.auth.providers.azureAD) {
 	router.get(
 		'/authentication/login-azure',
 		passport.authenticate('user_azure', {
-			successRedirect: '/',
-			failureRedirect: '/'
+			successRedirect: process.env.MONITOOL_BASE_URL || "http://localhost:4200",
+			failureRedirect: `${process.env.MONITOOL_BASE_URL}/login` || "http://localhost:4200/login",
 		})
 	);
 
@@ -66,8 +66,8 @@ if (config.auth.providers.azureAD) {
 	router.get(
 		'/authentication/login-callback',
 		passport.authenticate('user_azure', {
-			successRedirect: '/',
-			failureRedirect: '/'
+			successRedirect: process.env.MONITOOL_BASE_URL || "http://localhost:4200",
+			failureRedirect: `${process.env.MONITOOL_BASE_URL}/login` || "http://localhost:4200/login",
 		})
 	);
 }

@@ -75,7 +75,6 @@ module.component('partitionList', {
 				.then(newPartition => {
 					this.partitions.push(newPartition);
 
-					console.log('added')
 					this.onUpdate({partitions: this.partitions});
 				})
 				.catch(e => {});
