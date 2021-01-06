@@ -17,5 +17,5 @@ jobs:
         - eval "$(ssh-agent -s)"
         # Add the key to the authentication agent
         - DISPLAY=":0.0" SSH_ASKPASS="/tmp/askpass" setsid ssh-add /tmp/monitoolbackdev </dev/null
-      script: ./CI/deploy-dev.sh /tmp/monitoolbackdev SSH_ASKPASS
+      script: ./CI/deploy-dev.sh /tmp/monitoolbackdev /tmp/askpass
 
