@@ -17,9 +17,10 @@ CMD="cd ${REMOTE_PATH}; \
     git checkout dev; \
     git pull origin dev; \
     echo -e 'running docker compose'; \
-    cp docker/compose-develop.yml.dist docker/docker-compose.yml;\
-    sudo docker/docker-compose up --build\
+    cd docker; \
+    cp compose-develop.yml.dist docker-compose.yml;\
+    sudo docker-compose up --build -T;\
     "
-ssh -i $1 -A $2 $CONNECTION $CMD
+ssh -i $1 $CONNECTION $CMD
 
 echo -e "Deployed !!!"
