@@ -20,6 +20,6 @@ CMD="cd ${REMOTE_PATH}; \
     cp docker/compose-develop.yml.dist docker/docker-compose.yml;\
     sudo docker/docker-compose up --build\
     "
-ssh -t -i $1 $CONNECTION $CMD
+ssh -T -i $1 $CONNECTION $CMD
 
 echo -e "Deployed !!!"
