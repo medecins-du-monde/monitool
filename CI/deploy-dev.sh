@@ -12,7 +12,7 @@ if [ -z `ssh-keygen -F $IP` ]; then
 fi
 
 echo -e "Synchronizing files and restarting the docker ..."
-CMD="cd ${REMOTE_PATH}; \
+CMD="cd $REMOTE_PATH; \
     echo -e 'checking out dev'; \
     git checkout dev; \
     git pull origin dev; \
@@ -20,7 +20,7 @@ CMD="cd ${REMOTE_PATH}; \
     cd docker; \
     cp compose-develop.yml.dist docker-compose.yml;\
     echo -e 'running docker compose'; \
-    sudo docker-compose up --build;\
+    echo $SSH_PASS | sudo -S docker-compose up --build -d;\
     "
 ssh -i $1 $CONNECTION $CMD
 
