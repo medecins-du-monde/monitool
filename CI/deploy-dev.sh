@@ -4,6 +4,9 @@ REMOTE_PATH=/var/www/html/monitool
 
 CONNECTION=reliefapps@92.243.25.191
 
+#immediately exits if a command exits with an non-zero status
+set -e
+
 echo -e "Synchronizing files and restarting the docker ..."
 CMD="cd ${REMOTE_PATH}; \
     echo -e 'checking out dev'; \
@@ -13,6 +16,6 @@ CMD="cd ${REMOTE_PATH}; \
     sudo cp compose-develop.yml docker-compose.yml;\
     sudo docker-compose up --build\
     "
-ssh -oStrictHostKeyChecking=no -o PubkeyAuthentication=yes $CONNECTION "$CMD"
+ssh -i $1 $CONNECTION "$CMD"
 
 echo -e "Deployed !!!"
