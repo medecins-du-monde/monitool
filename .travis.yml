@@ -10,7 +10,7 @@ jobs:
         - apt-get update -qq
         - 'which ssh-agent || ( apt-get install -qq openssh-client )'
         - eval $(ssh-agent -s)
-        - ssh-add <(echo "$SSH_PRIVATE_KEY_DEV")
+        - ssh-add <(echo $SSH_PRIVATE_KEY_DEV)
         - mkdir -p ~/.ssh
         - chmod 700 ~/.ssh
         - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
