@@ -279,7 +279,7 @@ router.delete('/resources/input/:id', async ctx => {
 	if (!allowed)
 		throw new Error('forbidden');
 
-	ctx.response.body = input.destroy();
+	ctx.response.body = await input.destroy();
 })
 
 /**
@@ -335,7 +335,7 @@ router.delete('/resources/:modelName(indicator|theme)/:id', async ctx => {
 	const Model = {indicator: Indicator, theme: Theme, user: User}[ctx.params.modelName];
 	const model = await Model.storeInstance.get(ctx.params.id);
 
-	ctx.response.body = model.destroy()
+	ctx.response.body = await model.destroy()
 });
 
 

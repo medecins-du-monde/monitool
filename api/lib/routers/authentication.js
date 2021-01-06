@@ -31,19 +31,18 @@ const router = new Router();
  */
 router.post(
 	'/authentication/login-partner',
-	passport.authenticate('partner_local', {
-		successRedirect: '/',
-		failureRedirect: '/?failed'
-	})
+	passport.authenticate('partner_local'), async ctx => {
+		ctx.response.status = 200;
+	}
 )
 
 /**
  * Log current user out.
  * FIXME This query should be POST: loggin an user out is not idempotent.
  */
-router.get('/authentication/logout', async ctx => {
-	ctx.logout();
-	ctx.response.redirect('/');
+router.post('/authentication/logout', async ctx => {
+    ctx.logout();
+    ctx.response.status = 200;
 });
 
 
@@ -56,8 +55,8 @@ if (config.auth.providers.azureAD) {
 	router.get(
 		'/authentication/login-azure',
 		passport.authenticate('user_azure', {
-			successRedirect: '/',
-			failureRedirect: '/'
+			successRedirect: process.env.MONITOOL_BASE_URL || "http://localhost:4200",
+			failureRedirect: `${process.env.MONITOOL_BASE_URL}/login` || "http://localhost:4200/login",
 		})
 	);
 
@@ -67,8 +66,8 @@ if (config.auth.providers.azureAD) {
 	router.get(
 		'/authentication/login-callback',
 		passport.authenticate('user_azure', {
-			successRedirect: '/',
-			failureRedirect: '/'
+			successRedirect: process.env.MONITOOL_BASE_URL || "http://localhost:4200",
+			failureRedirect: `${process.env.MONITOOL_BASE_URL}/login` || "http://localhost:4200/login",
 		})
 	);
 }
