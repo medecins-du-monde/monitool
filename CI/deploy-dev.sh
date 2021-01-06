@@ -13,4 +13,4 @@ CMD="cd ${REMOTE_PATH}; \
     "
 ssh -oStrictHostKeyChecking=no -o PubkeyAuthentication=yes $CONNECTION "$CMD"
 
-echo -e "Deployed !!"
+echo -e "Deployed !!!"
