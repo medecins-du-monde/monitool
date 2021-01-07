@@ -15,14 +15,14 @@ CMD="cd $REMOTE_PATH; \
     echo -e 'getting dev version '; \
     git checkout dev; \
     git pull origin dev; \
-    echo -e 'copying files'; \
     cd docker; \
     echo -e 'Stopping docker containers...'; \
     echo $SSH_PASS | sudo -S docker-compose up --build -d;\
+    echo -e 'copying files'; \
     cp compose-develop.yml.dist docker-compose.yml;\
     echo -e 'Starting docker containers...'; \
     echo $SSH_PASS | sudo -S docker-compose up --build -d;\
     "
 ssh -i $1 $CONNECTION $CMD
 
-echo -e "Deployed !!!"
+echo -e "Deployed in DEV!!!"

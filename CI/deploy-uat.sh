@@ -15,7 +15,10 @@ CMD="cd $REMOTE_PATH; \
     echo -e 'getting master version'; \
     git checkout master; \
     git pull origin master; \
+    cd docker; \
+    echo -e 'Updating the docker swarm'; \
+    sudo docker stack deploy --resolve-image never -c compose-production.yml monitool-prod;\
     "
 ssh -i $1 $CONNECTION $CMD
 
-echo -e "Deployed !!!"
+echo -e "Deployed in UAT!!!"
