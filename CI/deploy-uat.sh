@@ -12,9 +12,9 @@ if [ -z `ssh-keygen -F $IP` ]; then
 fi
 
 CMD="cd $REMOTE_PATH; \
-    echo -e 'getting prod version'; \
-    git checkout prod; \
-    git pull origin prod; \
+    echo -e 'getting master version'; \
+    git checkout master; \
+    git pull origin master; \
     "
 ssh -i $1 $CONNECTION $CMD
 
