@@ -18,7 +18,7 @@ jobs:
         # Add the key to the authentication agent
         - DISPLAY=":0.0" SSH_ASKPASS="/tmp/askpass" setsid ssh-add /tmp/monitoolbackdev </dev/null
       script: ./CI/deploy-dev.sh /tmp/monitoolbackdev
-
+    - stage: deploy
       if: branch = master
       install:
         # Decrypt the git_deploy_key.enc key into /tmp/monitoolbackuat
