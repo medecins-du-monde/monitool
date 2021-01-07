@@ -12,7 +12,7 @@ if [ -z `ssh-keygen -F $IP` ]; then
 fi
 
 CMD="cd $REMOTE_PATH; \
-    echo -e 'getting dev version'; \
+    echo -e 'getting dev version '; \
     git checkout dev; \
     git pull origin dev; \
     echo -e 'copying files'; \
