@@ -1,105 +1,217 @@
 const Router = require('koa-router');
 const Excel = require('exceljs')
 
+import Project from '../resource/model/project';
+import { queryReportingSubprocess } from './reporting';
+import TimeSlot, {timeSlotRange} from 'timeslot-dag';
+import Indicator from '../resource/model/indicator';
+
 const router = new Router();
+
+let sectionHeader = {
+  // gray background
+  fill: {
+    type: 'pattern',
+    pattern:'solid',
+    fgColor:{argb:'999999'}
+  },
+  // white, bold and bigger font
+  font: {
+    name: 'Calibri',
+    size: 12,
+    bold: true,
+    color: {argb:'ffffff'},
+  }
+}
+
+// add the name of the indicator to the result of the computation
+async function indicatorToRow(ctx, computation, name, filter={}){
+  let result = JSON.parse(await getCalculationResult(ctx, computation, filter));
+  result.name = name;
+  return result;
+}
+
+// calls the database and get the computated values
+async function getCalculationResult(ctx, computation, filter){
+  const query = {
+		projectId: ctx.params.projectId,
+		computation: computation,
+		filter: filter,
+		dimensionIds: [ctx.params.periodicity],
+		withTotals: false,
+		withGroups: false
+	};
+	let result = await queryReportingSubprocess(query);
+  return result;
+}
 
 /** Render file containing all data entry up to a given date */
 router.get('/export/:projectId/:periodicity', async ctx => {
+  
+  const project = await Project.storeInstance.get(ctx.params.projectId);
 
-    const stuff = [{
-        firstName: 'John',
-        lastName: 'Bailey',
-        purchasePrice: 1000,
-        paymentsMade: 100
-      }, {
-        firstName: 'Leonard',
-        lastName: 'Clark',
-        purchasePrice: 1000,
-        paymentsMade: 150
-      }, {
-        firstName: 'Phil',
-        lastName: 'Knox',
-        purchasePrice: 1000,
-        paymentsMade: 200
-      }, {
-        firstName: 'Sonia',
-        lastName: 'Glover',
-        purchasePrice: 1000,
-        paymentsMade: 250
-      }, {
-        firstName: 'Adam',
-        lastName: 'Mackay',
-        purchasePrice: 1000,
-        paymentsMade: 350
-      }, {
-        firstName: 'Lisa',
-        lastName: 'Ogden',
-        purchasePrice: 1000,
-        paymentsMade: 400
-      }, {
-        firstName: 'Elizabeth',
-        lastName: 'Murray',
-        purchasePrice: 1000,
-        paymentsMade: 500
-      }, {
-        firstName: 'Caroline',
-        lastName: 'Jackson',
-        purchasePrice: 1000,
-        paymentsMade: 350
-      }, {
-        firstName: 'Kylie',
-        lastName: 'James',
-        purchasePrice: 1000,
-        paymentsMade: 900
-      }, {
-        firstName: 'Harry',
-        lastName: 'Peake',
-        purchasePrice: 1000,
-        paymentsMade: 1000
-      }];
+  // iterate over all the logical frame layers and puts all indicators in the same list
+  // an indicator is being represented by it's name and computation
+  let logiFrameCompleteIndicators = [];
+  for (let lf of project.logicalFrames){
+    // this creates a row to act as a header for the section
+    // this row has a different style and font size
+    logiFrameCompleteIndicators.push({name: 'Logical Framework: ' + lf.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    for (let ind of lf.indicators){
+      logiFrameCompleteIndicators.push({computation: ind.computation, display: ind.display});
+    }
+    for (let purpose of lf.purposes){
+      for (let ind of purpose.indicators){
+        logiFrameCompleteIndicators.push({computation: ind.computation, display: ind.display});
+      }
+      for (let output of purpose.outputs){
+        for (let ind of output.indicators){
+          logiFrameCompleteIndicators.push({computation: ind.computation, display: ind.display});
+        }
+        for (let activity of output.activities){
+          for (let ind of activity.indicators){
+            logiFrameCompleteIndicators.push({computation: ind.computation, display: ind.display});
+          }
+        }
+      }
+    }
+  }
 
-    let workbook = new Excel.Workbook();
-    let worksheet = workbook.addWorksheet('Global');
+  // match the cross cutting id saved inside the project with the id of the global indicators in the database
+  // and add them to the list too
+  let crossCuttingCompleteIndicators = [];
+  crossCuttingCompleteIndicators.push({name: 'Crosscutting indicators', fill: sectionHeader.fill, font: sectionHeader.font});
+  for (const [indicatorID, value] of Object.entries(project.crossCutting)){
+    let ind = await Indicator.storeInstance.get(indicatorID);
+    crossCuttingCompleteIndicators.push({computation: value.computation, display: ind.name['en']});
+  }
 
-    worksheet.columns = [
-        {header: 'First Name', key: 'firstName'},
-        {header: 'Last Name', key: 'lastName'},
-        {header: 'Purchase Price', key: 'purchasePrice'},
-        {header: 'Payments Made', key: 'paymentsMade'},
-        {header: 'Amount Remaining', key: 'amountRemaining'},
-        {header: '% Remaining', key: 'percentRemaining'}
-      ]
+  // iterate over the extra indicators and adds them to the list in the same format
+  let extraCompleteIndicators = [];
+  extraCompleteIndicators.push({name: 'Extra indicators', fill: sectionHeader.fill, font: sectionHeader.font});
+  for (let ind of project.extraIndicators){
+    extraCompleteIndicators.push({computation: ind.computation, display: ind.display});
+  }
 
-    // force the columns to be at least as long as their header row.
-    // Have to take this approach because ExcelJS doesn't have an autofit property.
-    worksheet.columns.forEach(column => {
-        column.width = column.header.length < 12 ? 12 : column.header.length
-    })
+  // data sources don't have a computation field, but their computation use always the same formula,
+  // so we can create a computation and represent them as an indicator
+  let dataSourcesCompleteIndicators = [];
+  for(let form of project.forms){
+    dataSourcesCompleteIndicators.push({ name: 'Data source: ' + form.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    for (let element of form.elements){
+      let computation = {
+        formula: 'a',
+        parameters: {
+          a: {
+            elementId: element.id,
+            filter: {}
+          }
+        }
+      }
+      dataSourcesCompleteIndicators.push({computation: computation, display: element.name});
+    }
+  }
+  
+  // creates a list for the names of the columns based on the periodicity received as a parameter
+  let timeColumns = Array.from(
+    timeSlotRange(
+      TimeSlot.fromDate(new Date(project.start + 'T00:00:00Z'), ctx.params.periodicity),
+      TimeSlot.fromDate(new Date(project.end + 'T00:00:00Z'), ctx.params.periodicity)
+    )
+  ).map(ts => ts.value);
 
-    // Make the header bold.
+  // create the excel file
+  let workbook = new  Excel.Workbook();
+  // the Global tab will have the information of all sites combined
+  let worksheet = workbook.addWorksheet('Global');
+
+  // set the columns of the sheet with the right header and key
+  worksheet.columns = [{header: '', key: 'name'}].concat(timeColumns.map(name => {
+    return {
+      header: name,
+      key: name
+    }
+  }));
+
+  // force the columns to be at least as long as their header row.
+  // Have to take this approach because ExcelJS doesn't have an autofit property.
+  worksheet.columns.forEach(column => {
+      column.width = column.header.length < 12 ? 12 : column.header.length
+  })
+
+  
+  // combine all the lists into one
+  let allCompleteIndicators = [].concat(logiFrameCompleteIndicators, crossCuttingCompleteIndicators, extraCompleteIndicators, dataSourcesCompleteIndicators);
+
+  // Adding the data
+  for (let e of allCompleteIndicators){
     // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
-    worksheet.getRow(1).font = {bold: true}
-
-    // Adding the data
-    // Dump all the data into Excel
-    stuff.forEach((e, index) => {
     // row 1 is the header.
-    const rowIndex = index + 2
+    // const rowIndex = index + 2;
 
     // By using destructuring we can easily dump all of the data into the row without doing much
     // We can add formulas pretty easily by providing the formula property.
-    worksheet.addRow({ e })
+    let row;
+
+    // if it has a computation (is an indicator) we get the values and put dump in the sheet
+    if (e.computation){
+      // get values
+      // when no filter is provided it means we want data from all sites
+      let res = await indicatorToRow(ctx, e.computation, e.display);
+      // Dump all the data into Excel
+      row = worksheet.addRow(res);
+    }
+    // if the row is a section header 
+    else {
+      // Dump all the data into Excel
+      row = worksheet.addRow(e);
+      // apply the styles
+      row.fill = e.fill;
+      row.font = e.font;
+    }
+  };
+
+  // iterates over the sites
+  for (let site of project.entities){
+    // creating a tab for each site
+    let newWorksheet = workbook.addWorksheet(site.name);
+    newWorksheet.columns = [{header: '', key: 'name'}].concat(timeColumns.map(name => {
+      return {
+        header: name,
+        key: name
+      }
+    }));
+
+    // force the columns to be at least as long as their header row.
+    newWorksheet.columns.forEach(column => {
+      column.width = column.header.length < 12 ? 12 : column.header.length
     })
-    
-    ctx.set('Content-disposition', `attachment; filename=Project.xlsx`);
-    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    
-    await workbook.xlsx.writeFile('Project.xlsx');
+  
+    // create a custom filter to get only the data relate to that specific site
+    let customFilter = { entity: [site.id] };
 
-    // Write to memory, buffer
-    const buffer = await workbook.xlsx.writeBuffer()
+    for (let e of allCompleteIndicators){
+      let row;
+      if (e.computation){
+        let res = await indicatorToRow(ctx, e.computation, e.display, customFilter);
+        row = newWorksheet.addRow(res);
+      } else {
+        row = newWorksheet.addRow(e);
+        row.fill = e.fill;
+        row.font = e.font;
+      }
+    };
+  }
+  
+  ctx.set('Content-disposition', `attachment; filename=Project.xlsx`);
+  ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  
+  await workbook.xlsx.writeFile('Project.xlsx');
 
-    ctx.body = buffer;
+  // Write to memory, buffer
+  const buffer = await workbook.xlsx.writeBuffer()
+
+  ctx.body = buffer;
 });
 
 export default router;
