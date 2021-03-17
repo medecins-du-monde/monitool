@@ -119,20 +119,21 @@ if (config.auth.providers.azureAD) {
 					},
 					function(error) {
 						// This user never logged in!
-						if (error.message === 'missing') {
+						if (error.message === 'missing' || error.message === 'deleted') {
 							var user = new User({_id: userId, type: 'user', name: profile.name, role: 'common'});
 							user.save().then(
 								function() {
 									done(null, user); // Auth is OK
 								},
 								function(error) {
-									done(error); // Something failed while creating user.
+									done('Error while creating' + error); // Something failed while creating user.
 								}
 							);
 						}
-						else
+						else {
 							// Something else failed (db is down?).
-							done(error);
+							done('Internal error in the database ' + error);
+						}
 					}
 				);
 			}

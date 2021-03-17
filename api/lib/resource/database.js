@@ -73,6 +73,7 @@ class Database {
 
 	async prepare() {
 		await this._createBucket();
+		// To comment when we really have migrations
 		await this._applyMigrations();
 	}
 
@@ -134,7 +135,7 @@ class Database {
 				return lock;
 			}
 			catch (e) {
-				winston.log('info', '[Database] Failed to acquire migration lock');
+				winston.log('info', '[Database] Failed to acquire migration lock :');
 
 				await delay();
 				return getLockRec();
