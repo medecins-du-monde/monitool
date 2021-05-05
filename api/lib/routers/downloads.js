@@ -24,6 +24,8 @@ let sectionHeader = {
   }
 }
 
+let timeColumns = [];
+
 // add the name of the indicator to the result of the computation
 async function indicatorToRow(ctx, computation, name, filter={}){
   let result = JSON.parse(await getCalculationResult(ctx, computation, filter));
@@ -41,7 +43,23 @@ async function getCalculationResult(ctx, computation, filter){
 		withTotals: false,
 		withGroups: false
 	};
-	let result = await queryReportingSubprocess(query);
+
+  let result = {};
+
+  // this function can throw an error in case the periodicity asked is not compatible with the data
+  try{
+    result = await queryReportingSubprocess(query);
+  }
+  catch (err){
+    // if this is the case, instead of the results we add an error message
+    if (err.message == "invalid dimensionId"){
+      result[timeColumns[0]] = "This data is not available by " + ctx.params.periodicity
+      result = JSON.stringify(result)
+    }else{
+    // if it's some other error, we throw it again
+      throw err;
+    }
+  }
   return result;
 }
 
@@ -113,7 +131,7 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   }
   
   // creates a list for the names of the columns based on the periodicity received as a parameter
-  let timeColumns = Array.from(
+  timeColumns = Array.from(
     timeSlotRange(
       TimeSlot.fromDate(new Date(project.start + 'T00:00:00Z'), ctx.params.periodicity),
       TimeSlot.fromDate(new Date(project.end + 'T00:00:00Z'), ctx.params.periodicity)

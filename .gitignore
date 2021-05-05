@@ -42,3 +42,4 @@ dist
 *.log
 docker/docker-compose.yml
 docker/compose-production.yml
+couchdb_data
