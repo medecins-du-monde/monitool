@@ -40,6 +40,7 @@ jobs:
         # Make sure only the current user can read the private key
         - chmod 600 /tmp/monitoolbackprod
         # Create a script to return the passphrase environment variable to ssh-add
+        - echo ${SSH_PASSPHRASE_PROD}
         - echo 'echo ${SSH_PASSPHRASE_PROD}' > /tmp/askpass && chmod +x /tmp/askpass
         # Start the authentication agent
         - eval "$(ssh-agent -s)"
