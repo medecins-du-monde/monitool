@@ -36,7 +36,7 @@ jobs:
       if: branch = master
       install:
         # Decrypt the git_deploy_key.enc key into /tmp/monitoolbackuat
-        - openssl aes-256-cbc -K $encrypted_bea0181439c1_key -iv $encrypted_bea0181439c1_iv -in monitoolbackprod.enc -out /tmp/monitoolbackprod -d
+        - openssl aes-256-cbc -K $encrypted_bea0181439c1_key -iv $encrypted_bea0181439c1_iv -in keys/monitoolbackprod.enc -out /tmp/monitoolbackprod -d
         # Make sure only the current user can read the private key
         - chmod 600 /tmp/monitoolbackprod
         # Create a script to return the passphrase environment variable to ssh-add
