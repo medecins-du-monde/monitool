@@ -28,7 +28,7 @@ let timeColumns = [];
 
 // add the name of the indicator to the result of the computation
 async function indicatorToRow(ctx, computation, name, filter={}){
-  let result = JSON.parse(await getCalculationResult(ctx, computation, filter));
+  let result = await getCalculationResult(ctx, computation, filter);
   result.name = name;
   return result;
 }
@@ -46,21 +46,35 @@ async function getCalculationResult(ctx, computation, filter){
 
   let result = {};
 
-  // this function can throw an error in case the periodicity asked is not compatible with the data
-  try{
-    result = await queryReportingSubprocess(query);
+  if(computation === null){
+    result[timeColumns[0]] = "Calculation is missing";
+    return result;
   }
-  catch (err){
-    // if this is the case, instead of the results we add an error message
-    if (err.message == "invalid dimensionId"){
-      result[timeColumns[0]] = "This data is not available by " + ctx.params.periodicity
-      result = JSON.stringify(result)
-    }else{
-    // if it's some other error, we throw it again
-      throw err;
+
+  else if (JSON.stringify(computation.parameters) === JSON.stringify({})) {
+    for (let timeColumn of timeColumns){
+      result[timeColumn] = computation.formula;
     }
+
+    return result;
   }
-  return result;
+
+  else{
+    // this function can throw an error in case the periodicity asked is not compatible with the data
+    try{
+      result = JSON.parse(await queryReportingSubprocess(query));
+    }
+    catch (err){
+      // if this is the case, instead of the results we add an error message
+      if (err.message == "invalid dimensionId"){
+        result[timeColumns[0]] = "This data is not available by " + ctx.params.periodicity
+      }else{
+      // if it's some other error, we throw it again
+        throw err;
+      }
+    }
+    return result;
+  }
 }
 
 /** Render file containing all data entry up to a given date */
@@ -172,7 +186,7 @@ router.get('/export/:projectId/:periodicity', async ctx => {
     let row;
 
     // if it has a computation (is an indicator) we get the values and put dump in the sheet
-    if (e.computation){
+    if (e.computation !== undefined){
       // get values
       // when no filter is provided it means we want data from all sites
       let res = await indicatorToRow(ctx, e.computation, e.display);
