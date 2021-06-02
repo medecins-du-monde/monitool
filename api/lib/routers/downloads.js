@@ -24,6 +24,15 @@ let sectionHeader = {
   }
 }
 
+let partitionsCollapsed = {
+  font: {
+    name: 'Calibri',
+    size: 10,
+    bold: false,
+    color: {argb:'666666'},
+  }
+}
+
 let timeColumns = [];
 
 // add the name of the indicator to the result of the computation
@@ -53,7 +62,7 @@ async function getCalculationResult(ctx, computation, filter){
 
   else if (JSON.stringify(computation.parameters) === JSON.stringify({})) {
     for (let timeColumn of timeColumns){
-      result[timeColumn] = computation.formula;
+      result[timeColumn] = +computation.formula;
     }
 
     return result;
@@ -80,12 +89,12 @@ async function getCalculationResult(ctx, computation, filter){
 
 function generateAllCombinations(partitionIndex, computation, name, formElement, list){
   if (partitionIndex === formElement.partitions.length){
-    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true})
+    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
   }
   else{
     for(let partitionOption of formElement.partitions[partitionIndex].elements){
       computation.parameters.a.filter[formElement.partitions[partitionIndex].id] = [partitionOption.id]
-      generateAllCombinations(partitionIndex + 1, computation, name + ' / ' + partitionOption.name, formElement, list);
+      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== "") ? " / ":"") + partitionOption.name, formElement, list);
       delete computation.parameters.a.filter[formElement.partitions[partitionIndex].id];
     }
   }
@@ -233,7 +242,10 @@ router.get('/export/:projectId/:periodicity', async ctx => {
         row.outlineLevel = e.outlineLevel;
       }
       if (e.hidden !== undefined){
-        row.hidden = e.hidden
+        row.hidden = e.hidden;
+      }
+      if (e.font !== undefined){
+        row.font = e.font;
       }
     }
     // if the row is a section header 
