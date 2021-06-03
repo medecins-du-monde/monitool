@@ -33,6 +33,14 @@ let partitionsCollapsed = {
   }
 }
 
+let errorRow = {
+  fill: {
+    type: 'pattern',
+    pattern:'solid',
+    fgColor:{argb:'bbbbbb'}
+  }
+}
+
 let timeColumns = [];
 
 // add the name of the indicator to the result of the computation
@@ -57,6 +65,7 @@ async function getCalculationResult(ctx, computation, filter){
 
   if(computation === null){
     result[timeColumns[0]] = "Calculation is missing";
+    result.fill = errorRow.fill;
     return result;
   }
 
@@ -76,7 +85,8 @@ async function getCalculationResult(ctx, computation, filter){
     catch (err){
       // if this is the case, instead of the results we add an error message
       if (err.message == "invalid dimensionId"){
-        result[timeColumns[0]] = "This data is not available by " + ctx.params.periodicity
+        result[timeColumns[0]] = "This data is not available by " + ctx.params.periodicity;
+        result.fill = errorRow.fill;
       }else{
       // if it's some other error, we throw it again
         throw err;
@@ -246,6 +256,12 @@ router.get('/export/:projectId/:periodicity', async ctx => {
       }
       if (e.font !== undefined){
         row.font = e.font;
+      }
+      if (e.fill !== undefined){
+        row.fill = e.fill;
+      }
+      if (res.fill !== undefined){
+        row.fill = res.fill;
       }
     }
     // if the row is a section header 
