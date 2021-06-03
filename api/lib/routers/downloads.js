@@ -28,7 +28,7 @@ let timeColumns = [];
 
 // add the name of the indicator to the result of the computation
 async function indicatorToRow(ctx, computation, name, filter={}){
-  let result = JSON.parse(await getCalculationResult(ctx, computation, filter));
+  let result = await getCalculationResult(ctx, computation, filter);
   result.name = name;
   return result;
 }
@@ -46,21 +46,67 @@ async function getCalculationResult(ctx, computation, filter){
 
   let result = {};
 
-  // this function can throw an error in case the periodicity asked is not compatible with the data
-  try{
-    result = await queryReportingSubprocess(query);
+  if(computation === null){
+    result[timeColumns[0]] = "Calculation is missing";
+    return result;
   }
-  catch (err){
-    // if this is the case, instead of the results we add an error message
-    if (err.message == "invalid dimensionId"){
-      result[timeColumns[0]] = "This data is not available by " + ctx.params.periodicity
-      result = JSON.stringify(result)
-    }else{
-    // if it's some other error, we throw it again
-      throw err;
+
+  else if (JSON.stringify(computation.parameters) === JSON.stringify({})) {
+    for (let timeColumn of timeColumns){
+      result[timeColumn] = computation.formula;
+    }
+
+    return result;
+  }
+
+  else{
+    // this function can throw an error in case the periodicity asked is not compatible with the data
+    try{
+      result = JSON.parse(await queryReportingSubprocess(query));
+    }
+    catch (err){
+      // if this is the case, instead of the results we add an error message
+      if (err.message == "invalid dimensionId"){
+        result[timeColumns[0]] = "This data is not available by " + ctx.params.periodicity
+      }else{
+      // if it's some other error, we throw it again
+        throw err;
+      }
+    }
+    return result;
+  }
+}
+
+
+function generateAllCombinations(partitionIndex, computation, name, formElement, list){
+  if (partitionIndex === formElement.partitions.length){
+    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true})
+  }
+  else{
+    for(let partitionOption of formElement.partitions[partitionIndex].elements){
+      computation.parameters.a.filter[formElement.partitions[partitionIndex].id] = [partitionOption.id]
+      generateAllCombinations(partitionIndex + 1, computation, name + ' / ' + partitionOption.name, formElement, list);
+      delete computation.parameters.a.filter[formElement.partitions[partitionIndex].id];
     }
   }
-  return result;
+}
+
+function buildAllPartitionsPossibilities(formElement){
+  let computation = {
+    formula: 'a',
+    parameters: {
+      a: {
+        elementId: formElement.id,
+        filter: {}
+      }
+    }
+  }
+
+  let list = [];
+
+  generateAllCombinations(0, computation, '', formElement, list);
+
+  return list
 }
 
 /** Render file containing all data entry up to a given date */
@@ -127,6 +173,10 @@ router.get('/export/:projectId/:periodicity', async ctx => {
         }
       }
       dataSourcesCompleteIndicators.push({computation: computation, display: element.name});
+
+      if (element.partitions.length > 0){
+        dataSourcesCompleteIndicators = dataSourcesCompleteIndicators.concat(buildAllPartitionsPossibilities(element))
+      } 
     }
   }
   
@@ -139,7 +189,7 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   ).map(ts => ts.value);
 
   // create the excel file
-  let workbook = new  Excel.Workbook();
+  let workbook = new Excel.Workbook();
   // the Global tab will have the information of all sites combined
   let worksheet = workbook.addWorksheet('Global');
 
@@ -172,12 +222,19 @@ router.get('/export/:projectId/:periodicity', async ctx => {
     let row;
 
     // if it has a computation (is an indicator) we get the values and put dump in the sheet
-    if (e.computation){
+    if (e.computation !== undefined){
       // get values
       // when no filter is provided it means we want data from all sites
       let res = await indicatorToRow(ctx, e.computation, e.display);
       // Dump all the data into Excel
       row = worksheet.addRow(res);
+
+      if (e.outlineLevel !== undefined){
+        row.outlineLevel = e.outlineLevel;
+      }
+      if (e.hidden !== undefined){
+        row.hidden = e.hidden
+      }
     }
     // if the row is a section header 
     else {
@@ -210,7 +267,7 @@ router.get('/export/:projectId/:periodicity', async ctx => {
 
     for (let e of allCompleteIndicators){
       let row;
-      if (e.computation){
+      if (e.computation !== undefined){
         let res = await indicatorToRow(ctx, e.computation, e.display, customFilter);
         row = newWorksheet.addRow(res);
       } else {
@@ -218,7 +275,7 @@ router.get('/export/:projectId/:periodicity', async ctx => {
         row.fill = e.fill;
         row.font = e.font;
       }
-    };
+    }
   }
   
   ctx.set('Content-disposition', `attachment; filename=Project.xlsx`);
