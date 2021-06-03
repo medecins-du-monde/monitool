@@ -298,6 +298,22 @@ router.get('/export/:projectId/:periodicity', async ctx => {
       if (e.computation !== undefined){
         let res = await indicatorToRow(ctx, e.computation, e.display, customFilter);
         row = newWorksheet.addRow(res);
+
+        if (e.outlineLevel !== undefined){
+          row.outlineLevel = e.outlineLevel;
+        }
+        if (e.hidden !== undefined){
+          row.hidden = e.hidden;
+        }
+        if (e.font !== undefined){
+          row.font = e.font;
+        }
+        if (e.fill !== undefined){
+          row.fill = e.fill;
+        }
+        if (res.fill !== undefined){
+          row.fill = res.fill;
+        }
       } else {
         row = newWorksheet.addRow(e);
         row.fill = e.fill;
