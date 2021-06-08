@@ -41,17 +41,11 @@ let errorRow = {
   }
 }
 
-let timeColumns = [];
+let dateColumn = [];
 
-// add the name of the indicator to the result of the computation
+// Call the database and get the computed values
+// Add the name of the indicator to the result of the computation
 async function indicatorToRow(ctx, computation, name, filter={}){
-  let result = await getCalculationResult(ctx, computation, filter);
-  result.name = name;
-  return result;
-}
-
-// calls the database and get the computated values
-async function getCalculationResult(ctx, computation, filter){
   const query = {
 		projectId: ctx.params.projectId,
 		computation: computation,
@@ -64,17 +58,14 @@ async function getCalculationResult(ctx, computation, filter){
   let result = {};
 
   if(computation === null){
-    result[timeColumns[0]] = "Calculation is missing";
+    result[dateColumn[0]] = "Calculation is missing";
     result.fill = errorRow.fill;
-    return result;
   }
 
   else if (JSON.stringify(computation.parameters) === JSON.stringify({})) {
-    for (let timeColumn of timeColumns){
+    for (let timeColumn of dateColumn){
       result[timeColumn] = +computation.formula;
     }
-
-    return result;
   }
 
   else{
@@ -82,21 +73,24 @@ async function getCalculationResult(ctx, computation, filter){
     try{
       result = JSON.parse(await queryReportingSubprocess(query));
     }
+    // Here are the various reported on the excel export
     catch (err){
-      // if this is the case, instead of the results we add an error message
+      // if this is the case, instead of the results we add an a custom error message
       if (err.message == "invalid dimensionId"){
-        result[timeColumns[0]] = "This data is not available by " + ctx.params.periodicity;
+        result[dateColumn[0]] = "This data is not available by " + ctx.params.periodicity;
         result.fill = errorRow.fill;
       }else{
-      // if it's some other error, we throw it again
-        throw err;
+      // if it's some other error, we send this error in the excel
+        result[dateColumn[0]] = err.message;
+        result.fill = errorRow.fill;
       }
     }
-    return result;
   }
+  result.name = name;
+  return result;
 }
 
-
+// TODO: Optimize this method.
 function generateAllCombinations(partitionIndex, computation, name, formElement, list){
   if (partitionIndex === formElement.partitions.length){
     list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
@@ -109,7 +103,7 @@ function generateAllCombinations(partitionIndex, computation, name, formElement,
     }
   }
 }
-
+// TODO: Optimize this method.
 function buildAllPartitionsPossibilities(formElement){
   let computation = {
     formula: 'a',
@@ -120,40 +114,58 @@ function buildAllPartitionsPossibilities(formElement){
       }
     }
   }
-
   let list = [];
-
   generateAllCombinations(0, computation, '', formElement, list);
-
   return list
+}
+
+function buildWorksheet(workbook, name) {
+  // Cleaning the name replacing all special characters by a space
+  name = name.replace(/[^a-zA-Z0-9]/g,' ');
+
+  let newWorksheet = workbook.addWorksheet(name);
+
+  newWorksheet.columns = [{header: '', key: 'name'}].concat(dateColumn.map(name => {
+    return {
+      header: name,
+      key: name
+    }
+  }));
+
+  // force the columns to be at least as long as their header row.
+  newWorksheet.columns.forEach(column => {
+    column.width = column.header.length < 12 ? 12 : column.header.length
+  })
+
+  return newWorksheet;
 }
 
 /** Render file containing all data entry up to a given date */
 router.get('/export/:projectId/:periodicity', async ctx => {
-  
   const project = await Project.storeInstance.get(ctx.params.projectId);
 
   // iterate over all the logical frame layers and puts all indicators in the same list
-  // an indicator is being represented by it's name and computation
-  let logiFrameCompleteIndicators = [];
-  for (let lf of project.logicalFrames){
+  // an indicator is being represented by his name and computation
+  let logicalFrameCompleteIndicators = [];
+  for (let logicalFrame of project.logicalFrames){
     // this creates a row to act as a header for the section
     // this row has a different style and font size
-    logiFrameCompleteIndicators.push({name: 'Logical Framework: ' + lf.name, fill: sectionHeader.fill, font: sectionHeader.font });
-    for (let ind of lf.indicators){
-      logiFrameCompleteIndicators.push({computation: ind.computation, display: ind.display});
+    logicalFrameCompleteIndicators.push({name: 'Logical Framework: ' + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    // TODO: To be simplified with a recursive function
+    for (let indicator of logicalFrame.indicators){
+      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
     }
-    for (let purpose of lf.purposes){
-      for (let ind of purpose.indicators){
-        logiFrameCompleteIndicators.push({computation: ind.computation, display: ind.display});
+    for (let purpose of logicalFrame.purposes){
+      for (let indicator of purpose.indicators){
+        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
       }
       for (let output of purpose.outputs){
-        for (let ind of output.indicators){
-          logiFrameCompleteIndicators.push({computation: ind.computation, display: ind.display});
+        for (let indicator of output.indicators){
+          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
         }
         for (let activity of output.activities){
-          for (let ind of activity.indicators){
-            logiFrameCompleteIndicators.push({computation: ind.computation, display: ind.display});
+          for (let indicator of activity.indicators){
+            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
           }
         }
       }
@@ -165,15 +177,16 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   let crossCuttingCompleteIndicators = [];
   crossCuttingCompleteIndicators.push({name: 'Crosscutting indicators', fill: sectionHeader.fill, font: sectionHeader.font});
   for (const [indicatorID, value] of Object.entries(project.crossCutting)){
-    let ind = await Indicator.storeInstance.get(indicatorID);
-    crossCuttingCompleteIndicators.push({computation: value.computation, display: ind.name['en']});
+    let indicator = await Indicator.storeInstance.get(indicatorID);
+    //TODO: Here we have to get the current language
+    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name['en']});
   }
 
   // iterate over the extra indicators and adds them to the list in the same format
   let extraCompleteIndicators = [];
   extraCompleteIndicators.push({name: 'Extra indicators', fill: sectionHeader.fill, font: sectionHeader.font});
-  for (let ind of project.extraIndicators){
-    extraCompleteIndicators.push({computation: ind.computation, display: ind.display});
+  for (let indicator of project.extraIndicators){
+    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
@@ -200,7 +213,7 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   }
   
   // creates a list for the names of the columns based on the periodicity received as a parameter
-  timeColumns = Array.from(
+  dateColumn = Array.from(
     timeSlotRange(
       TimeSlot.fromDate(new Date(project.start + 'T00:00:00Z'), ctx.params.periodicity),
       TimeSlot.fromDate(new Date(project.end + 'T00:00:00Z'), ctx.params.periodicity)
@@ -209,29 +222,15 @@ router.get('/export/:projectId/:periodicity', async ctx => {
 
   // create the excel file
   let workbook = new Excel.Workbook();
-  // the Global tab will have the information of all sites combined
-  let worksheet = workbook.addWorksheet('Global');
-
-  // set the columns of the sheet with the right header and key
-  worksheet.columns = [{header: '', key: 'name'}].concat(timeColumns.map(name => {
-    return {
-      header: name,
-      key: name
-    }
-  }));
-
-  // force the columns to be at least as long as their header row.
-  // Have to take this approach because ExcelJS doesn't have an autofit property.
-  worksheet.columns.forEach(column => {
-      column.width = column.header.length < 12 ? 12 : column.header.length
-  })
+  
+  let worksheet = buildWorksheet(workbook, 'Global');
 
   
   // combine all the lists into one
-  let allCompleteIndicators = [].concat(logiFrameCompleteIndicators, crossCuttingCompleteIndicators, extraCompleteIndicators, dataSourcesCompleteIndicators);
+  let allCompleteIndicators = [].concat(logicalFrameCompleteIndicators, crossCuttingCompleteIndicators, extraCompleteIndicators, dataSourcesCompleteIndicators);
 
   // Adding the data
-  for (let e of allCompleteIndicators){
+  for (let indicator of allCompleteIndicators){
     // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
     // row 1 is the header.
     // const rowIndex = index + 2;
@@ -240,25 +239,29 @@ router.get('/export/:projectId/:periodicity', async ctx => {
     // We can add formulas pretty easily by providing the formula property.
     let row;
 
-    // if it has a computation (is an indicator) we get the values and put dump in the sheet
-    if (e.computation !== undefined){
+    // if it has a computation (meaning that is an indicator) we get the values and put dump in the sheet
+    if (indicator.computation !== undefined){
       // get values
       // when no filter is provided it means we want data from all sites
-      let res = await indicatorToRow(ctx, e.computation, e.display);
+      let res = await indicatorToRow(ctx, indicator.computation, indicator.display);
       // Dump all the data into Excel
       row = worksheet.addRow(res);
 
-      if (e.outlineLevel !== undefined){
-        row.outlineLevel = e.outlineLevel;
+      // Make it collapsed. 1 is one level. 2 is 2 level.....
+      if (indicator.outlineLevel !== undefined){
+        row.outlineLevel = indicator.outlineLevel;
       }
-      if (e.hidden !== undefined){
-        row.hidden = e.hidden;
+      // This hide the first level when we want to collapse.
+      if (indicator.hidden !== undefined){
+        row.hidden = indicator.hidden;
       }
-      if (e.font !== undefined){
-        row.font = e.font;
+      // All the font configuration
+      if (indicator.font !== undefined){
+        row.font = indicator.font;
       }
-      if (e.fill !== undefined){
-        row.fill = e.fill;
+      // Background color
+      if (indicator.fill !== undefined){
+        row.fill = indicator.fill;
       }
       if (res.fill !== undefined){
         row.fill = res.fill;
@@ -267,28 +270,21 @@ router.get('/export/:projectId/:periodicity', async ctx => {
     // if the row is a section header 
     else {
       // Dump all the data into Excel
-      row = worksheet.addRow(e);
+      row = worksheet.addRow(indicator);
       // apply the styles
-      row.fill = e.fill;
-      row.font = e.font;
+      row.fill = indicator.fill;
+      row.font = indicator.font;
     }
   };
 
   // iterates over the sites
   for (let site of project.entities){
     // creating a tab for each site
-    let newWorksheet = workbook.addWorksheet(site.name);
-    newWorksheet.columns = [{header: '', key: 'name'}].concat(timeColumns.map(name => {
-      return {
-        header: name,
-        key: name
-      }
-    }));
 
-    // force the columns to be at least as long as their header row.
-    newWorksheet.columns.forEach(column => {
-      column.width = column.header.length < 12 ? 12 : column.header.length
-    })
+    // Cleaning the name replacing all special characters by a space
+    site.name = site.name.replace(/[^a-zA-Z0-9]/g,' ');
+
+    let newWorksheet = buildWorksheet(workbook, site.name);
   
     // create a custom filter to get only the data relate to that specific site
     let customFilter = { entity: [site.id] };
