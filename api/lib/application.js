@@ -28,15 +28,14 @@ import configRouter from './routers/config';
 import pdfRouter from './routers/pdf';
 import reportingRouter from './routers/reporting';
 import resourcesRouter from './routers/resources';
+import downloadRouter from './routers/downloads';
 
 import forceAuthenticationMiddleware from './middlewares/force-authentication';
 import responseTimeMiddleware from 'koa-response-time';
 import errorHandlerMiddleware from './middlewares/error-handler';
 
  const app = new Koa();
-//var whitelist = ['localhost:4200', 'https://monitool-api.test.humanitarian.tech/', 'https://login.windows.net/', 'https://monitool-uat.medecinsdumonde.net/']
 
-//app.use(cors(whitelist, '*', '*', '*', '*','*', '*'));
 app.keys = [config.cookieSecret];
 
 app.use(responseTimeMiddleware());
@@ -63,5 +62,6 @@ app.use(forceAuthenticationMiddleware)	// From now on, all pages require auth
 app.use(pdfRouter.routes())				// PDF generation module
 app.use(resourcesRouter.routes())		// REST JSON API
 app.use(reportingRouter.routes())		// Reporting API
+app.use(downloadRouter.routes());
 
 export default app;

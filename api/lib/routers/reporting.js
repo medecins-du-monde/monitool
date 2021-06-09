@@ -91,7 +91,7 @@ function onTimeout(msgId) {
 /**
  * Ask the subprocess to compute some reporting.
  */
-async function queryReportingSubprocess(query) {
+export async function queryReportingSubprocess(query) {
 	// Create random message Id.
 	const msgId = Math.random().toString().substring(2);
 

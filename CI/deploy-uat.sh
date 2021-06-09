@@ -12,9 +12,9 @@ if [ -z `ssh-keygen -F $IP` ]; then
 fi
 
 CMD="cd $REMOTE_PATH; \
-    echo -e 'getting master version'; \
-    git checkout master; \
-    git pull origin master; \
+    echo -e 'getting uat version'; \
+    git checkout uat; \
+    git pull origin uat; \
     cd docker; \
     echo -e 'Updating the docker swarm'; \
     sudo docker stack deploy --resolve-image never -c compose-production.yml monitool-prod;\
