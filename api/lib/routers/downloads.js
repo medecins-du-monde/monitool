@@ -301,6 +301,9 @@ router.get('/export/:projectId/:periodicity', async ctx => {
         let res = await indicatorToRow(ctx, e.computation, e.display, customFilter);
         row = newWorksheet.addRow(res);
 
+        if (e.numFmt !== undefined){
+          row.numFmt = e.numFmt;
+        }
         if (e.outlineLevel !== undefined){
           row.outlineLevel = e.outlineLevel;
         }
@@ -322,7 +325,15 @@ router.get('/export/:projectId/:periodicity', async ctx => {
         row.font = e.font;
       }
     }
+
+    newWorksheet.views = [
+      {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
+    ];
   }
+
+  worksheet.views = [
+    {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
+  ];
   
   ctx.set('Content-disposition', `attachment; filename=Project.xlsx`);
   ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
