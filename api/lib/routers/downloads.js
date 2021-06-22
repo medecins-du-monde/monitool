@@ -23,7 +23,9 @@ let sectionHeader = {
     color: {argb:'ffffff'},
   }
 }
-
+let numberCellStyle = {
+  numFmt: '0.'
+}
 let partitionsCollapsed = {
   font: {
     name: 'Calibri',
@@ -93,7 +95,7 @@ async function indicatorToRow(ctx, computation, name, filter={}){
 // TODO: Optimize this method.
 function generateAllCombinations(partitionIndex, computation, name, formElement, list){
   if (partitionIndex === formElement.partitions.length){
-    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
+    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: numberCellStyle.numFmt});
   }
   else{
     for(let partitionOption of formElement.partitions[partitionIndex].elements){
@@ -153,19 +155,19 @@ router.get('/export/:projectId/:periodicity', async ctx => {
     logicalFrameCompleteIndicators.push({name: 'Logical Framework: ' + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
-      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
     }
     for (let purpose of logicalFrame.purposes){
       for (let indicator of purpose.indicators){
-        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
       }
       for (let output of purpose.outputs){
         for (let indicator of output.indicators){
-          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
         }
         for (let activity of output.activities){
           for (let indicator of activity.indicators){
-            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
           }
         }
       }
@@ -179,14 +181,14 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   for (const [indicatorID, value] of Object.entries(project.crossCutting)){
     let indicator = await Indicator.storeInstance.get(indicatorID);
     //TODO: Here we have to get the current language
-    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name['en']});
+    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name['en'], numFmt: numberCellStyle.numFmt});
   }
 
   // iterate over the extra indicators and adds them to the list in the same format
   let extraCompleteIndicators = [];
   extraCompleteIndicators.push({name: 'Extra indicators', fill: sectionHeader.fill, font: sectionHeader.font});
   for (let indicator of project.extraIndicators){
-    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
@@ -204,7 +206,7 @@ router.get('/export/:projectId/:periodicity', async ctx => {
           }
         }
       }
-      dataSourcesCompleteIndicators.push({computation: computation, display: element.name});
+      dataSourcesCompleteIndicators.push({computation: computation, display: element.name, numFmt: numberCellStyle.numFmt});
 
       if (element.partitions.length > 0){
         dataSourcesCompleteIndicators = dataSourcesCompleteIndicators.concat(buildAllPartitionsPossibilities(element))
@@ -247,6 +249,10 @@ router.get('/export/:projectId/:periodicity', async ctx => {
       // Dump all the data into Excel
       row = worksheet.addRow(res);
 
+      // Format the numbers with no decimal places
+      if (indicator.numFmt !== undefined){
+        row.numFmt = indicator.numFmt;
+      }
       // Make it collapsed. 1 is one level. 2 is 2 level.....
       if (indicator.outlineLevel !== undefined){
         row.outlineLevel = indicator.outlineLevel;
