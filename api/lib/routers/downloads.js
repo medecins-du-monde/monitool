@@ -143,16 +143,21 @@ function buildWorksheet(workbook, name) {
 }
 
 /** Render file containing all data entry up to a given date */
-router.get('/export/:projectId/:periodicity', async ctx => {
+router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by his name and computation
   let logicalFrameCompleteIndicators = [];
+  const LogicalFrameName = {
+    en: 'Logical Framework: ',
+    es: 'Marco Lógico: ',
+    fr: 'Cadre Logique: '
+  }
   for (let logicalFrame of project.logicalFrames){
     // this creates a row to act as a header for the section
     // this row has a different style and font size
-    logicalFrameCompleteIndicators.push({name: 'Logical Framework: ' + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    logicalFrameCompleteIndicators.push({name: LogicalFrameName[ctx.params.lang] + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
       logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
@@ -177,16 +182,26 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
   // and add them to the list too
   let crossCuttingCompleteIndicators = [];
-  crossCuttingCompleteIndicators.push({name: 'Crosscutting indicators', fill: sectionHeader.fill, font: sectionHeader.font});
+  const CrosscuttingName = {
+    en: 'Crosscutting indicators',
+    es: 'Indicadores transversales',
+    fr: 'Indicateurs transversaux'
+  }
+  crossCuttingCompleteIndicators.push({name: CrosscuttingName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
   for (const [indicatorID, value] of Object.entries(project.crossCutting)){
     let indicator = await Indicator.storeInstance.get(indicatorID);
     //TODO: Here we have to get the current language
-    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name['en'], numFmt: numberCellStyle.numFmt});
+    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name[ctx.params.lang], numFmt: numberCellStyle.numFmt});
   }
 
   // iterate over the extra indicators and adds them to the list in the same format
   let extraCompleteIndicators = [];
-  extraCompleteIndicators.push({name: 'Extra indicators', fill: sectionHeader.fill, font: sectionHeader.font});
+  const ExtraIndicatorsName = {
+    en: 'Extra indicators',
+    es: 'Indicadores adicionales',
+    fr: 'Indicateurs annexés'
+  }
+  extraCompleteIndicators.push({name: ExtraIndicatorsName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
   for (let indicator of project.extraIndicators){
     extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
   }
@@ -194,8 +209,13 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   // data sources don't have a computation field, but their computation use always the same formula,
   // so we can create a computation and represent them as an indicator
   let dataSourcesCompleteIndicators = [];
+  const DataSourceName = {
+    en: 'Data source: ',
+    es: 'Datos de base: ',
+    fr: 'Données de base: '
+  }
   for(let form of project.forms){
-    dataSourcesCompleteIndicators.push({ name: 'Data source: ' + form.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    dataSourcesCompleteIndicators.push({ name: DataSourceName[ctx.params.lang] + form.name, fill: sectionHeader.fill, font: sectionHeader.font });
     for (let element of form.elements){
       let computation = {
         formula: 'a',
