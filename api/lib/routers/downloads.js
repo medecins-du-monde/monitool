@@ -24,7 +24,7 @@ let sectionHeader = {
   }
 }
 let numberCellStyle = {
-  numFmt: '0.'
+  numFmt: '0'
 }
 let partitionsCollapsed = {
   font: {
@@ -100,7 +100,7 @@ function generateAllCombinations(partitionIndex, computation, name, formElement,
   else{
     for(let partitionOption of formElement.partitions[partitionIndex].elements){
       computation.parameters.a.filter[formElement.partitions[partitionIndex].id] = [partitionOption.id]
-      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== "") ? " / ":"") + partitionOption.name, formElement, list);
+      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== '    ') ? " / ":"") + partitionOption.name, formElement, list);
       delete computation.parameters.a.filter[formElement.partitions[partitionIndex].id];
     }
   }
@@ -117,7 +117,7 @@ function buildAllPartitionsPossibilities(formElement){
     }
   }
   let list = [];
-  generateAllCombinations(0, computation, '', formElement, list);
+  generateAllCombinations(0, computation, '    ', formElement, list);
   return list
 }
 
@@ -247,7 +247,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   
   let worksheet = buildWorksheet(workbook, 'Global');
 
-  
+  let maxLenght = 0;
   // combine all the lists into one
   let allCompleteIndicators = [].concat(logicalFrameCompleteIndicators, crossCuttingCompleteIndicators, extraCompleteIndicators, dataSourcesCompleteIndicators);
 
@@ -268,6 +268,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
       let res = await indicatorToRow(ctx, indicator.computation, indicator.display);
       // Dump all the data into Excel
       row = worksheet.addRow(res);
+      maxLenght = Math.max(maxLenght, res.name.length)
 
       // Format the numbers with no decimal places
       if (indicator.numFmt !== undefined){
@@ -297,6 +298,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     else {
       // Dump all the data into Excel
       row = worksheet.addRow(indicator);
+      maxLenght = Math.max(maxLenght, indicator.name.length)
       // apply the styles
       row.fill = indicator.fill;
       row.font = indicator.font;
@@ -315,11 +317,14 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     // create a custom filter to get only the data relate to that specific site
     let customFilter = { entity: [site.id] };
 
+    let siteMaxLenght = 0;
     for (let e of allCompleteIndicators){
       let row;
       if (e.computation !== undefined){
         let res = await indicatorToRow(ctx, e.computation, e.display, customFilter);
         row = newWorksheet.addRow(res);
+
+        siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
 
         if (e.numFmt !== undefined){
           row.numFmt = e.numFmt;
@@ -341,6 +346,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
         }
       } else {
         row = newWorksheet.addRow(e);
+        siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
         row.fill = e.fill;
         row.font = e.font;
       }
@@ -349,12 +355,14 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     newWorksheet.views = [
       {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
     ];
+    newWorksheet.columns[0].width = Math.max(siteMaxLenght + 10, 30);
   }
 
   worksheet.views = [
     {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
   ];
-  
+  worksheet.columns[0].width = Math.max(maxLenght + 10, 30);
+
   ctx.set('Content-disposition', `attachment; filename=Project.xlsx`);
   ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   
