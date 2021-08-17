@@ -24,7 +24,11 @@ let sectionHeader = {
   }
 }
 let numberCellStyle = {
-  numFmt: '0'
+  numFmt: '### ### ### ##0'
+}
+
+let percentageCellStyle = {
+  numFmt: '0%'
 }
 let partitionsCollapsed = {
   font: {
@@ -44,6 +48,15 @@ let errorRow = {
 }
 
 let dateColumn = [];
+
+async function convertToPercentage(result){
+  for (const [key, value] of Object.entries(result)) {
+    if(key !== 'name' && typeof value === "number"){
+      result[key] = value/100.0;
+    }
+  }
+}
+
 
 // Call the database and get the computed values
 // Add the name of the indicator to the result of the computation
@@ -74,6 +87,9 @@ async function indicatorToRow(ctx, computation, name, filter={}){
     // this function can throw an error in case the periodicity asked is not compatible with the data
     try{
       result = JSON.parse(await queryReportingSubprocess(query));
+      if (computation.formula === '100 * numerator / denominator'){
+        convertToPercentage(result);
+      }
     }
     // Here are the various reported on the excel export
     catch (err){
@@ -95,7 +111,7 @@ async function indicatorToRow(ctx, computation, name, filter={}){
 // TODO: Optimize this method.
 function generateAllCombinations(partitionIndex, computation, name, formElement, list){
   if (partitionIndex === formElement.partitions.length){
-    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: numberCellStyle.numFmt});
+    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(computation)});
   }
   else{
     for(let partitionOption of formElement.partitions[partitionIndex].elements){
@@ -142,6 +158,13 @@ function buildWorksheet(workbook, name) {
   return newWorksheet;
 }
 
+function getNumberFormat(computation){
+  if (computation !== null && computation.formula === '100 * numerator / denominator'){
+    return percentageCellStyle.numFmt;
+  }
+  return numberCellStyle.numFmt;
+}
+
 /** Render file containing all data entry up to a given date */
 router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
@@ -160,19 +183,19 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     logicalFrameCompleteIndicators.push({name: LogicalFrameName[ctx.params.lang] + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
-      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
+      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
     }
     for (let purpose of logicalFrame.purposes){
       for (let indicator of purpose.indicators){
-        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
+        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
       }
       for (let output of purpose.outputs){
         for (let indicator of output.indicators){
-          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
+          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
         }
         for (let activity of output.activities){
           for (let indicator of activity.indicators){
-            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
+            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
           }
         }
       }
@@ -191,7 +214,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   for (const [indicatorID, value] of Object.entries(project.crossCutting)){
     let indicator = await Indicator.storeInstance.get(indicatorID);
     //TODO: Here we have to get the current language
-    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name[ctx.params.lang], numFmt: numberCellStyle.numFmt});
+    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name[ctx.params.lang], numFmt: getNumberFormat(value.computation)});
   }
 
   // iterate over the extra indicators and adds them to the list in the same format
@@ -203,7 +226,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   }
   extraCompleteIndicators.push({name: ExtraIndicatorsName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
   for (let indicator of project.extraIndicators){
-    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: numberCellStyle.numFmt});
+    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
@@ -226,7 +249,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
           }
         }
       }
-      dataSourcesCompleteIndicators.push({computation: computation, display: element.name, numFmt: numberCellStyle.numFmt});
+      dataSourcesCompleteIndicators.push({computation: computation, display: element.name, numFmt: getNumberFormat(computation)});
 
       if (element.partitions.length > 0){
         dataSourcesCompleteIndicators = dataSourcesCompleteIndicators.concat(buildAllPartitionsPossibilities(element))
@@ -361,12 +384,17 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   worksheet.views = [
     {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
   ];
-  worksheet.columns[0].width = Math.max(maxLenght + 10, 30);
 
-  ctx.set('Content-disposition', `attachment; filename=Project.xlsx`);
+  // the minimun size of the colum should be 30 and the maximun 100
+
+  const minimunColWidth = 30;
+  const maximunColWidth = 100;
+  worksheet.columns[0].width = Math.min(Math.max(maxLenght + 10, minimunColWidth), maximunColWidth);
+
+  ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
   ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   
-  await workbook.xlsx.writeFile('Project.xlsx');
+  await workbook.xlsx.writeFile('monitool-' + project.country + '.xlsx');
 
   // Write to memory, buffer
   const buffer = await workbook.xlsx.writeBuffer()
