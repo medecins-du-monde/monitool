@@ -211,10 +211,23 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     fr: 'Indicateurs transversaux'
   }
   crossCuttingCompleteIndicators.push({name: CrosscuttingName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
-  for (const [indicatorID, value] of Object.entries(project.crossCutting)){
-    let indicator = await Indicator.storeInstance.get(indicatorID);
-    //TODO: Here we have to get the current language
-    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name[ctx.params.lang], numFmt: getNumberFormat(value.computation)});
+
+  let listIndicators = await Indicator.storeInstance.list();
+  console.log(JSON.stringify(listIndicators));
+
+  // build a set with all the themes in the project
+  const projectThemes = new Set(project.themes);
+
+  for (const indicator of listIndicators){
+    // checks if the indicator has at least one theme in common with the project
+    if (indicator.themes.some(themeId => projectThemes.has(themeId))){
+      // if so we add it to the report
+      let currentComputation = null;
+      if (project.crossCutting[indicator._id]){
+        currentComputation = project.crossCutting[indicator._id].computation;
+      }
+      crossCuttingCompleteIndicators.push({computation: currentComputation, display: indicator.name[ctx.params.lang], numFmt: getNumberFormat(currentComputation)});
+    }
   }
 
   // iterate over the extra indicators and adds them to the list in the same format
