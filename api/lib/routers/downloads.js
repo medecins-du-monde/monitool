@@ -141,7 +141,7 @@ function buildAllPartitionsPossibilities(formElement){
 function buildFormulas(indicator){
   const newLines = [];
   if (indicator.computation){
-    newLines.push({name: 'Formula: ' + indicator.computation.formula, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
+    newLines.push({name: '    Formula: ' + indicator.computation.formula, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
 
     for (const [parameter, value] of Object.entries(indicator.computation.parameters)){
       const simplerComputation = {
@@ -153,7 +153,7 @@ function buildFormulas(indicator){
         filter: value.filter
       }
 
-      newLines.push({computation: JSON.parse(JSON.stringify(simplerComputation)), display: parameter, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)})
+      newLines.push({computation: JSON.parse(JSON.stringify(simplerComputation)), display: "    "+parameter, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)})
     }
   }
   return newLines;
