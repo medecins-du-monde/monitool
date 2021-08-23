@@ -137,6 +137,28 @@ function buildAllPartitionsPossibilities(formElement){
   return list
 }
 
+
+function buildFormulas(indicator){
+  const newLines = [];
+  if (indicator.computation){
+    newLines.push({name: 'Formula: ' + indicator.computation.formula, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
+
+    for (const [parameter, value] of Object.entries(indicator.computation.parameters)){
+      const simplerComputation = {
+        formula: parameter,
+        parameters: {}
+      }
+      simplerComputation.parameters[parameter] = {
+        elementId: value.elementId,
+        filter: value.filter
+      }
+
+      newLines.push({computation: JSON.parse(JSON.stringify(simplerComputation)), display: parameter, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)})
+    }
+  }
+  return newLines;
+}
+
 function buildWorksheet(workbook, name) {
   // Cleaning the name replacing all special characters by a space
   name = name.replace(/[^a-zA-Z0-9]/g,' ');
@@ -213,7 +235,6 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   crossCuttingCompleteIndicators.push({name: CrosscuttingName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
 
   let listIndicators = await Indicator.storeInstance.list();
-  console.log(JSON.stringify(listIndicators));
 
   // build a set with all the themes in the project
   const projectThemes = new Set(project.themes);
@@ -227,6 +248,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
         currentComputation = project.crossCutting[indicator._id].computation;
       }
       crossCuttingCompleteIndicators.push({computation: currentComputation, display: indicator.name[ctx.params.lang], numFmt: getNumberFormat(currentComputation)});
+      crossCuttingCompleteIndicators = crossCuttingCompleteIndicators.concat(buildFormulas({computation: currentComputation}));
     }
   }
 
@@ -240,6 +262,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   extraCompleteIndicators.push({name: ExtraIndicatorsName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
   for (let indicator of project.extraIndicators){
     extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
+    extraCompleteIndicators = extraCompleteIndicators.concat(buildFormulas(indicator));    
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
@@ -285,7 +308,12 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
 
   let maxLenght = 0;
   // combine all the lists into one
-  let allCompleteIndicators = [].concat(logicalFrameCompleteIndicators, crossCuttingCompleteIndicators, extraCompleteIndicators, dataSourcesCompleteIndicators);
+  let allCompleteIndicators = [].concat(
+    logicalFrameCompleteIndicators,
+    crossCuttingCompleteIndicators,
+    extraCompleteIndicators,
+    dataSourcesCompleteIndicators
+  );
 
   // Adding the data
   for (let indicator of allCompleteIndicators){
@@ -334,6 +362,15 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     else {
       // Dump all the data into Excel
       row = worksheet.addRow(indicator);
+
+      // Make it collapsed. 1 is one level. 2 is 2 level.....
+      if (indicator.outlineLevel !== undefined){
+        row.outlineLevel = indicator.outlineLevel;
+      }
+      // This hide the first level when we want to collapse.
+      if (indicator.hidden !== undefined){
+        row.hidden = indicator.hidden;
+      }
       maxLenght = Math.max(maxLenght, indicator.name.length)
       // apply the styles
       row.fill = indicator.fill;
@@ -382,6 +419,16 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
         }
       } else {
         row = newWorksheet.addRow(e);
+
+        // Make it collapsed. 1 is one level. 2 is 2 level.....
+        if (e.outlineLevel !== undefined){
+          row.outlineLevel = e.outlineLevel;
+        }
+        // This hide the first level when we want to collapse.
+        if (e.hidden !== undefined){
+          row.hidden = e.hidden;
+        }
+
         siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
         row.fill = e.fill;
         row.font = e.font;
