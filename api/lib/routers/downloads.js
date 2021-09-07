@@ -7,6 +7,7 @@ import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 import Indicator from '../resource/model/indicator';
 
 const router = new Router();
+let lang = 'es';
 
 let sectionHeader = {
   // gray background
@@ -24,7 +25,7 @@ let sectionHeader = {
   }
 }
 let numberCellStyle = {
-  numFmt: '### ### ### ##0'
+  numFmt: '### ### ### ##0.##'
 }
 
 let percentageCellStyle = {
@@ -60,7 +61,7 @@ async function convertToPercentage(result){
 
 // Call the database and get the computed values
 // Add the name of the indicator to the result of the computation
-async function indicatorToRow(ctx, computation, name, filter={}){
+async function indicatorToRow(ctx, computation, name, baseline=null, target=null, filter={}){
   const query = {
 		projectId: ctx.params.projectId,
 		computation: computation,
@@ -89,6 +90,8 @@ async function indicatorToRow(ctx, computation, name, filter={}){
       result = JSON.parse(await queryReportingSubprocess(query));
       if (computation.formula === '100 * numerator / denominator'){
         convertToPercentage(result);
+        baseline /= 100;
+        target /= 100;
       }
     }
     // Here are the various reported on the excel export
@@ -105,6 +108,8 @@ async function indicatorToRow(ctx, computation, name, filter={}){
     }
   }
   result.name = name;
+  result.baseline = baseline;
+  result.target = target;
   return result;
 }
 
@@ -137,9 +142,31 @@ function buildAllPartitionsPossibilities(formElement){
   return list
 }
 
-
-function buildFormulas(indicator){
+function buildPartitionsForCalculations(simplerComputation, project, element){
   const newLines = [];
+  
+  for (const [parameter, value] of Object.entries(simplerComputation.parameters)){
+    for (const [partitionId, valuePartitions] of Object.entries(value.filter)){
+
+      const partition = element.partitions.find(p => p.id === partitionId);
+      for (const partitionElementId of valuePartitions){
+        const partitionElement = partition.elements.find(p => p.id === partitionElementId)
+        let newComputation = JSON.parse(JSON.stringify(simplerComputation))
+        newComputation.parameters[parameter].filter[partitionId] = [partitionElement.id]
+        const newLine = {
+          computation: newComputation, display: "    " + "    " + partitionElement.name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)
+        }
+
+        newLines.push(newLine);
+      }
+    }
+  }
+
+  return newLines;
+}
+
+function buildFormulas(indicator, project){
+  let newLines = [];
   if (indicator.computation){
     newLines.push({name: '    Formula: ' + indicator.computation.formula, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
 
@@ -153,7 +180,16 @@ function buildFormulas(indicator){
         filter: value.filter
       }
 
-      newLines.push({computation: JSON.parse(JSON.stringify(simplerComputation)), display: "    "+parameter, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)})
+      let element = null;
+      for (const f of project.forms){
+        let aux = f.elements.find(e => e.id === value.elementId);
+        if (aux){
+          element = aux;
+          break;
+        }
+      }
+      newLines.push({computation: JSON.parse(JSON.stringify(simplerComputation)), display: "    "+parameter+" ("+element.name+")", outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)});
+      newLines = newLines.concat(buildPartitionsForCalculations(simplerComputation, project, element))
     }
   }
   return newLines;
@@ -165,7 +201,20 @@ function buildWorksheet(workbook, name) {
 
   let newWorksheet = workbook.addWorksheet(name);
 
-  newWorksheet.columns = [{header: '', key: 'name'}].concat(dateColumn.map(name => {
+  // TODO: translate baseline
+
+  const baselineTranslation = {
+    'en': 'Baseline',
+    'es': 'Valor de base',
+    'fr': 'Valeur initiale'
+  }
+  const targetTranslation = {
+    'en': 'Target',
+    'es': 'Objectivo',
+    'fr': 'Valeur cible',
+  }
+
+  newWorksheet.columns = [{header: '', key: 'name'}, {header: baselineTranslation[lang], key: 'baseline'}, {header: targetTranslation[lang], key: 'target'}].concat(dateColumn.map(name => {
     return {
       header: name,
       key: name
@@ -190,6 +239,7 @@ function getNumberFormat(computation){
 /** Render file containing all data entry up to a given date */
 router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
+  lang = ctx.params.lang
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by his name and computation
@@ -205,19 +255,23 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     logicalFrameCompleteIndicators.push({name: LogicalFrameName[ctx.params.lang] + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
-      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
+      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+      logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
     }
     for (let purpose of logicalFrame.purposes){
       for (let indicator of purpose.indicators){
-        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
+        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+        logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
       }
       for (let output of purpose.outputs){
         for (let indicator of output.indicators){
-          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
+          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+          logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
         }
         for (let activity of output.activities){
           for (let indicator of activity.indicators){
-            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
+            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+            logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
           }
         }
       }
@@ -247,8 +301,8 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
       if (project.crossCutting[indicator._id]){
         currentComputation = project.crossCutting[indicator._id].computation;
       }
-      crossCuttingCompleteIndicators.push({computation: currentComputation, display: indicator.name[ctx.params.lang], numFmt: getNumberFormat(currentComputation)});
-      crossCuttingCompleteIndicators = crossCuttingCompleteIndicators.concat(buildFormulas({computation: currentComputation}));
+      crossCuttingCompleteIndicators.push({computation: currentComputation, display: indicator.name[ctx.params.lang], baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(currentComputation)});
+      crossCuttingCompleteIndicators = crossCuttingCompleteIndicators.concat(buildFormulas({computation: currentComputation}, project));
     }
   }
 
@@ -261,8 +315,8 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   }
   extraCompleteIndicators.push({name: ExtraIndicatorsName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
   for (let indicator of project.extraIndicators){
-    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, numFmt: getNumberFormat(indicator.computation)});
-    extraCompleteIndicators = extraCompleteIndicators.concat(buildFormulas(indicator));    
+    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+    extraCompleteIndicators = extraCompleteIndicators.concat(buildFormulas(indicator, project));    
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
@@ -329,7 +383,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     if (indicator.computation !== undefined){
       // get values
       // when no filter is provided it means we want data from all sites
-      let res = await indicatorToRow(ctx, indicator.computation, indicator.display);
+      let res = await indicatorToRow(ctx, indicator.computation, indicator.display, indicator.baseline, indicator.target);
       // Dump all the data into Excel
       row = worksheet.addRow(res);
       maxLenght = Math.max(maxLenght, res.name.length)
@@ -394,7 +448,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     for (let e of allCompleteIndicators){
       let row;
       if (e.computation !== undefined){
-        let res = await indicatorToRow(ctx, e.computation, e.display, customFilter);
+        let res = await indicatorToRow(ctx, e.computation, e.display, null, null, customFilter);
         row = newWorksheet.addRow(res);
 
         siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
@@ -436,7 +490,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     }
 
     newWorksheet.views = [
-      {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
+      {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: '1', activeCell: 'A1'}
     ];
     newWorksheet.columns[0].width = Math.max(siteMaxLenght + 10, 30);
   }
