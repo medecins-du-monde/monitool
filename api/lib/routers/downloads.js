@@ -7,6 +7,7 @@ import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 import Indicator from '../resource/model/indicator';
 
 const router = new Router();
+let lang = 'es';
 
 let sectionHeader = {
   // gray background
@@ -23,7 +24,13 @@ let sectionHeader = {
     color: {argb:'ffffff'},
   }
 }
+let numberCellStyle = {
+  numFmt: '### ### ### ##0.##'
+}
 
+let percentageCellStyle = {
+  numFmt: '0%'
+}
 let partitionsCollapsed = {
   font: {
     name: 'Calibri',
@@ -43,9 +50,18 @@ let errorRow = {
 
 let dateColumn = [];
 
+async function convertToPercentage(result){
+  for (const [key, value] of Object.entries(result)) {
+    if(key !== 'name' && typeof value === "number"){
+      result[key] = value/100.0;
+    }
+  }
+}
+
+
 // Call the database and get the computed values
 // Add the name of the indicator to the result of the computation
-async function indicatorToRow(ctx, computation, name, filter={}){
+async function indicatorToRow(ctx, computation, name, baseline=null, target=null, filter={}){
   const query = {
 		projectId: ctx.params.projectId,
 		computation: computation,
@@ -72,6 +88,11 @@ async function indicatorToRow(ctx, computation, name, filter={}){
     // this function can throw an error in case the periodicity asked is not compatible with the data
     try{
       result = JSON.parse(await queryReportingSubprocess(query));
+      if (computation.formula === '100 * numerator / denominator'){
+        convertToPercentage(result);
+        baseline /= 100;
+        target /= 100;
+      }
     }
     // Here are the various reported on the excel export
     catch (err){
@@ -87,18 +108,20 @@ async function indicatorToRow(ctx, computation, name, filter={}){
     }
   }
   result.name = name;
+  result.baseline = baseline;
+  result.target = target;
   return result;
 }
 
 // TODO: Optimize this method.
 function generateAllCombinations(partitionIndex, computation, name, formElement, list){
   if (partitionIndex === formElement.partitions.length){
-    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
+    list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(computation)});
   }
   else{
     for(let partitionOption of formElement.partitions[partitionIndex].elements){
       computation.parameters.a.filter[formElement.partitions[partitionIndex].id] = [partitionOption.id]
-      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== "") ? " / ":"") + partitionOption.name, formElement, list);
+      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== '    ') ? " / ":"") + partitionOption.name, formElement, list);
       delete computation.parameters.a.filter[formElement.partitions[partitionIndex].id];
     }
   }
@@ -115,8 +138,61 @@ function buildAllPartitionsPossibilities(formElement){
     }
   }
   let list = [];
-  generateAllCombinations(0, computation, '', formElement, list);
+  generateAllCombinations(0, computation, '    ', formElement, list);
   return list
+}
+
+function buildPartitionsForCalculations(simplerComputation, project, element){
+  const newLines = [];
+  
+  for (const [parameter, value] of Object.entries(simplerComputation.parameters)){
+    for (const [partitionId, valuePartitions] of Object.entries(value.filter)){
+
+      const partition = element.partitions.find(p => p.id === partitionId);
+      for (const partitionElementId of valuePartitions){
+        const partitionElement = partition.elements.find(p => p.id === partitionElementId)
+        let newComputation = JSON.parse(JSON.stringify(simplerComputation))
+        newComputation.parameters[parameter].filter[partitionId] = [partitionElement.id]
+        const newLine = {
+          computation: newComputation, display: "    " + "    " + partitionElement.name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)
+        }
+
+        newLines.push(newLine);
+      }
+    }
+  }
+
+  return newLines;
+}
+
+function buildFormulas(indicator, project){
+  let newLines = [];
+  if (indicator.computation){
+    newLines.push({name: '    Formula: ' + indicator.computation.formula, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font});
+
+    for (const [parameter, value] of Object.entries(indicator.computation.parameters)){
+      const simplerComputation = {
+        formula: parameter,
+        parameters: {}
+      }
+      simplerComputation.parameters[parameter] = {
+        elementId: value.elementId,
+        filter: value.filter
+      }
+
+      let element = null;
+      for (const f of project.forms){
+        let aux = f.elements.find(e => e.id === value.elementId);
+        if (aux){
+          element = aux;
+          break;
+        }
+      }
+      newLines.push({computation: JSON.parse(JSON.stringify(simplerComputation)), display: "    "+parameter+" ("+element.name+")", outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)});
+      newLines = newLines.concat(buildPartitionsForCalculations(simplerComputation, project, element))
+    }
+  }
+  return newLines;
 }
 
 function buildWorksheet(workbook, name) {
@@ -125,7 +201,20 @@ function buildWorksheet(workbook, name) {
 
   let newWorksheet = workbook.addWorksheet(name);
 
-  newWorksheet.columns = [{header: '', key: 'name'}].concat(dateColumn.map(name => {
+  // TODO: translate baseline
+
+  const baselineTranslation = {
+    'en': 'Baseline',
+    'es': 'Valor de base',
+    'fr': 'Valeur initiale'
+  }
+  const targetTranslation = {
+    'en': 'Target',
+    'es': 'Objectivo',
+    'fr': 'Valeur cible',
+  }
+
+  newWorksheet.columns = [{header: '', key: 'name'}, {header: baselineTranslation[lang], key: 'baseline'}, {header: targetTranslation[lang], key: 'target'}].concat(dateColumn.map(name => {
     return {
       header: name,
       key: name
@@ -140,32 +229,49 @@ function buildWorksheet(workbook, name) {
   return newWorksheet;
 }
 
+function getNumberFormat(computation){
+  if (computation !== null && computation.formula === '100 * numerator / denominator'){
+    return percentageCellStyle.numFmt;
+  }
+  return numberCellStyle.numFmt;
+}
+
 /** Render file containing all data entry up to a given date */
-router.get('/export/:projectId/:periodicity', async ctx => {
+router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
+  lang = ctx.params.lang
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by his name and computation
   let logicalFrameCompleteIndicators = [];
+  const LogicalFrameName = {
+    en: 'Logical Framework: ',
+    es: 'Marco Lógico: ',
+    fr: 'Cadre Logique: '
+  }
   for (let logicalFrame of project.logicalFrames){
     // this creates a row to act as a header for the section
     // this row has a different style and font size
-    logicalFrameCompleteIndicators.push({name: 'Logical Framework: ' + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    logicalFrameCompleteIndicators.push({name: LogicalFrameName[ctx.params.lang] + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
-      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+      logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
     }
     for (let purpose of logicalFrame.purposes){
       for (let indicator of purpose.indicators){
-        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+        logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
       }
       for (let output of purpose.outputs){
         for (let indicator of output.indicators){
-          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+          logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
         }
         for (let activity of output.activities){
           for (let indicator of activity.indicators){
-            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+            logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
           }
         }
       }
@@ -175,25 +281,54 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
   // and add them to the list too
   let crossCuttingCompleteIndicators = [];
-  crossCuttingCompleteIndicators.push({name: 'Crosscutting indicators', fill: sectionHeader.fill, font: sectionHeader.font});
-  for (const [indicatorID, value] of Object.entries(project.crossCutting)){
-    let indicator = await Indicator.storeInstance.get(indicatorID);
-    //TODO: Here we have to get the current language
-    crossCuttingCompleteIndicators.push({computation: value.computation, display: indicator.name['en']});
+  const CrosscuttingName = {
+    en: 'Crosscutting indicators',
+    es: 'Indicadores transversales',
+    fr: 'Indicateurs transversaux'
+  }
+  crossCuttingCompleteIndicators.push({name: CrosscuttingName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
+
+  let listIndicators = await Indicator.storeInstance.list();
+
+  // build a set with all the themes in the project
+  const projectThemes = new Set(project.themes);
+
+  for (const indicator of listIndicators){
+    // checks if the indicator has at least one theme in common with the project
+    if (indicator.themes.some(themeId => projectThemes.has(themeId))){
+      // if so we add it to the report
+      let currentComputation = null;
+      if (project.crossCutting[indicator._id]){
+        currentComputation = project.crossCutting[indicator._id].computation;
+      }
+      crossCuttingCompleteIndicators.push({computation: currentComputation, display: indicator.name[ctx.params.lang], baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(currentComputation)});
+      crossCuttingCompleteIndicators = crossCuttingCompleteIndicators.concat(buildFormulas({computation: currentComputation}, project));
+    }
   }
 
   // iterate over the extra indicators and adds them to the list in the same format
   let extraCompleteIndicators = [];
-  extraCompleteIndicators.push({name: 'Extra indicators', fill: sectionHeader.fill, font: sectionHeader.font});
+  const ExtraIndicatorsName = {
+    en: 'Extra indicators',
+    es: 'Indicadores adicionales',
+    fr: 'Indicateurs annexés'
+  }
+  extraCompleteIndicators.push({name: ExtraIndicatorsName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
   for (let indicator of project.extraIndicators){
-    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display});
+    extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+    extraCompleteIndicators = extraCompleteIndicators.concat(buildFormulas(indicator, project));    
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
   // so we can create a computation and represent them as an indicator
   let dataSourcesCompleteIndicators = [];
+  const DataSourceName = {
+    en: 'Data source: ',
+    es: 'Datos de base: ',
+    fr: 'Données de base: '
+  }
   for(let form of project.forms){
-    dataSourcesCompleteIndicators.push({ name: 'Data source: ' + form.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    dataSourcesCompleteIndicators.push({ name: DataSourceName[ctx.params.lang] + form.name, fill: sectionHeader.fill, font: sectionHeader.font });
     for (let element of form.elements){
       let computation = {
         formula: 'a',
@@ -204,7 +339,7 @@ router.get('/export/:projectId/:periodicity', async ctx => {
           }
         }
       }
-      dataSourcesCompleteIndicators.push({computation: computation, display: element.name});
+      dataSourcesCompleteIndicators.push({computation: computation, display: element.name, numFmt: getNumberFormat(computation)});
 
       if (element.partitions.length > 0){
         dataSourcesCompleteIndicators = dataSourcesCompleteIndicators.concat(buildAllPartitionsPossibilities(element))
@@ -225,9 +360,14 @@ router.get('/export/:projectId/:periodicity', async ctx => {
   
   let worksheet = buildWorksheet(workbook, 'Global');
 
-  
+  let maxLenght = 0;
   // combine all the lists into one
-  let allCompleteIndicators = [].concat(logicalFrameCompleteIndicators, crossCuttingCompleteIndicators, extraCompleteIndicators, dataSourcesCompleteIndicators);
+  let allCompleteIndicators = [].concat(
+    logicalFrameCompleteIndicators,
+    crossCuttingCompleteIndicators,
+    extraCompleteIndicators,
+    dataSourcesCompleteIndicators
+  );
 
   // Adding the data
   for (let indicator of allCompleteIndicators){
@@ -243,10 +383,15 @@ router.get('/export/:projectId/:periodicity', async ctx => {
     if (indicator.computation !== undefined){
       // get values
       // when no filter is provided it means we want data from all sites
-      let res = await indicatorToRow(ctx, indicator.computation, indicator.display);
+      let res = await indicatorToRow(ctx, indicator.computation, indicator.display, indicator.baseline, indicator.target);
       // Dump all the data into Excel
       row = worksheet.addRow(res);
+      maxLenght = Math.max(maxLenght, res.name.length)
 
+      // Format the numbers with no decimal places
+      if (indicator.numFmt !== undefined){
+        row.numFmt = indicator.numFmt;
+      }
       // Make it collapsed. 1 is one level. 2 is 2 level.....
       if (indicator.outlineLevel !== undefined){
         row.outlineLevel = indicator.outlineLevel;
@@ -271,6 +416,16 @@ router.get('/export/:projectId/:periodicity', async ctx => {
     else {
       // Dump all the data into Excel
       row = worksheet.addRow(indicator);
+
+      // Make it collapsed. 1 is one level. 2 is 2 level.....
+      if (indicator.outlineLevel !== undefined){
+        row.outlineLevel = indicator.outlineLevel;
+      }
+      // This hide the first level when we want to collapse.
+      if (indicator.hidden !== undefined){
+        row.hidden = indicator.hidden;
+      }
+      maxLenght = Math.max(maxLenght, indicator.name.length)
       // apply the styles
       row.fill = indicator.fill;
       row.font = indicator.font;
@@ -289,12 +444,18 @@ router.get('/export/:projectId/:periodicity', async ctx => {
     // create a custom filter to get only the data relate to that specific site
     let customFilter = { entity: [site.id] };
 
+    let siteMaxLenght = 0;
     for (let e of allCompleteIndicators){
       let row;
       if (e.computation !== undefined){
-        let res = await indicatorToRow(ctx, e.computation, e.display, customFilter);
+        let res = await indicatorToRow(ctx, e.computation, e.display, null, null, customFilter);
         row = newWorksheet.addRow(res);
 
+        siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
+
+        if (e.numFmt !== undefined){
+          row.numFmt = e.numFmt;
+        }
         if (e.outlineLevel !== undefined){
           row.outlineLevel = e.outlineLevel;
         }
@@ -312,16 +473,42 @@ router.get('/export/:projectId/:periodicity', async ctx => {
         }
       } else {
         row = newWorksheet.addRow(e);
+
+        // Make it collapsed. 1 is one level. 2 is 2 level.....
+        if (e.outlineLevel !== undefined){
+          row.outlineLevel = e.outlineLevel;
+        }
+        // This hide the first level when we want to collapse.
+        if (e.hidden !== undefined){
+          row.hidden = e.hidden;
+        }
+
+        siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
         row.fill = e.fill;
         row.font = e.font;
       }
     }
+
+    newWorksheet.views = [
+      {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: '1', activeCell: 'A1'}
+    ];
+    newWorksheet.columns[0].width = Math.max(siteMaxLenght + 10, 30);
   }
-  
-  ctx.set('Content-disposition', `attachment; filename=Project.xlsx`);
+
+  worksheet.views = [
+    {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
+  ];
+
+  // the minimun size of the colum should be 30 and the maximun 100
+
+  const minimunColWidth = 30;
+  const maximunColWidth = 100;
+  worksheet.columns[0].width = Math.min(Math.max(maxLenght + 10, minimunColWidth), maximunColWidth);
+
+  ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
   ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   
-  await workbook.xlsx.writeFile('Project.xlsx');
+  await workbook.xlsx.writeFile('monitool-' + project.country + '.xlsx');
 
   // Write to memory, buffer
   const buffer = await workbook.xlsx.writeBuffer()
