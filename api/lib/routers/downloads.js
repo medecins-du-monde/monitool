@@ -25,7 +25,7 @@ let sectionHeader = {
   }
 }
 let numberCellStyle = {
-  numFmt: '### ### ### ##0.##'
+  numFmt: '### ### ### ##0'
 }
 
 let percentageCellStyle = {
@@ -90,8 +90,6 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
       result = JSON.parse(await queryReportingSubprocess(query));
       if (computation.formula === '100 * numerator / denominator'){
         convertToPercentage(result);
-        baseline /= 100;
-        target /= 100;
       }
     }
     // Here are the various reported on the excel export
@@ -104,6 +102,11 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
       // if it's some other error, we send this error in the excel
         result[dateColumn[0]] = err.message;
         result.fill = errorRow.fill;
+      }
+    } finally{
+      if (computation.formula === '100 * numerator / denominator'){
+        baseline /= 100;
+        target /= 100;
       }
     }
   }
@@ -448,7 +451,7 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     for (let e of allCompleteIndicators){
       let row;
       if (e.computation !== undefined){
-        let res = await indicatorToRow(ctx, e.computation, e.display, null, null, customFilter);
+        let res = await indicatorToRow(ctx, e.computation, e.display, e.baseline, e.target, customFilter);
         row = newWorksheet.addRow(res);
 
         siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
