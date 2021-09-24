@@ -9,6 +9,30 @@ import Indicator from '../resource/model/indicator';
 const router = new Router();
 let lang = 'es';
 
+
+let blueFill = [
+  {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: {argb:'2E86C1'}
+  },
+  {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: {argb:'3498DB'}
+  },
+  {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: {argb:'5DADE2'}
+  },
+  {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: {argb:'85C1E9'}
+  },
+]
+
 let sectionHeader = {
   // gray background
   fill: {
@@ -124,7 +148,7 @@ function generateAllCombinations(partitionIndex, computation, name, formElement,
   else{
     for(let partitionOption of formElement.partitions[partitionIndex].elements){
       computation.parameters.a.filter[formElement.partitions[partitionIndex].id] = [partitionOption.id]
-      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== '    ') ? " / ":"") + partitionOption.name, formElement, list);
+      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== "    ") ? " / ":"") + partitionOption.name, formElement, list);
       delete computation.parameters.a.filter[formElement.partitions[partitionIndex].id];
     }
   }
@@ -141,7 +165,7 @@ function buildAllPartitionsPossibilities(formElement){
     }
   }
   let list = [];
-  generateAllCombinations(0, computation, '    ', formElement, list);
+  generateAllCombinations(0, computation, "    ", formElement, list);
   return list
 }
 
@@ -256,22 +280,33 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     // this creates a row to act as a header for the section
     // this row has a different style and font size
     logicalFrameCompleteIndicators.push({name: LogicalFrameName[ctx.params.lang] + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    
+    // TODO: add translations for the titles
+    // logicalFrameCompleteIndicators.push()
+    logicalFrameCompleteIndicators.push({name: 'General objective: ' + logicalFrame.goal, fill: blueFill[0] });
+    
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
       logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
       logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
     }
     for (let purpose of logicalFrame.purposes){
+      logicalFrameCompleteIndicators.push({name: 'Specific objective: ' + purpose.description, fill: blueFill[1] });
+
       for (let indicator of purpose.indicators){
         logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
         logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
       }
       for (let output of purpose.outputs){
+        console.log(output)
+        logicalFrameCompleteIndicators.push({name: 'Result: ' + output.description, fill: blueFill[2] });
         for (let indicator of output.indicators){
           logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
           logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
         }
         for (let activity of output.activities){
+
+          logicalFrameCompleteIndicators.push({name: 'Activity: ' + activity.description, fill: blueFill[3] });
           for (let indicator of activity.indicators){
             logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
             logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
