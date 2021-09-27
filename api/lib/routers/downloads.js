@@ -528,16 +528,16 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     }
 
     newWorksheet.views = [
-      {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: '1', activeCell: 'A1'}
+      {state: 'frozen', xSplit: 1, ySplit: 0, activeCell: 'A1'}
     ];
     newWorksheet.columns[0].width = Math.max(siteMaxLenght + 10, 30);
   }
 
   worksheet.views = [
-    {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
+    {state: 'frozen', xSplit: 1, ySplit: 0, activeCell: 'A1'}
   ];
 
-  // the minimun size of the colum should be 30 and the maximun 100
+  // the minimum size of the column should be 30 and the maximum 100
 
   const minimunColWidth = 30;
   const maximunColWidth = 100;
