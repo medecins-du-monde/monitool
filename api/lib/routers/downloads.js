@@ -407,6 +407,8 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     dataSourcesCompleteIndicators
   );
 
+  sectionHeader.fill.fgColor.argb = '999999';
+
   // Adding the data
   for (let indicator of allCompleteIndicators){
     // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
@@ -444,10 +446,10 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
       }
       // Background color
       if (indicator.fill !== undefined){
-        row.fill = indicator.fill;
+        row.fill = indicator.fill === undefined ? undefined : JSON.parse(JSON.stringify(indicator.fill));
       }
       if (res.fill !== undefined){
-        row.fill = res.fill;
+        row.fill = res.fill === undefined ? undefined : JSON.parse(JSON.stringify(res.fill));
       }
     }
     // if the row is a section header 
@@ -465,10 +467,24 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
       }
       maxLenght = Math.max(maxLenght, indicator.name.length)
       // apply the styles
-      row.fill = indicator.fill;
+      row.fill = indicator.fill === undefined ? undefined : JSON.parse(JSON.stringify(indicator.fill));
       row.font = indicator.font;
     }
   };
+
+  const COLORS = [
+    '1f77b4',
+    'ff7f0e',
+    '2ca02c',
+    'd62728',
+    '9467bd',
+    '8c564b',
+    'e377c2',
+    '7f7f7f',
+    'bcbd22',
+    '17becf',
+  ];
+  let colorIdx = 0;
 
   // iterates over the sites
   for (let site of project.entities){
@@ -481,6 +497,10 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   
     // create a custom filter to get only the data relate to that specific site
     let customFilter = { entity: [site.id] };
+
+
+    sectionHeader.fill.fgColor.argb = COLORS[colorIdx];
+    colorIdx = (colorIdx + 1) % 10
 
     let siteMaxLenght = 0;
     for (let e of allCompleteIndicators){
@@ -504,10 +524,10 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
           row.font = e.font;
         }
         if (e.fill !== undefined){
-          row.fill = e.fill;
+          row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
         }
         if (res.fill !== undefined){
-          row.fill = res.fill;
+          row.fill = res.fill === undefined ? undefined : JSON.parse(JSON.stringify(res.fill));
         }
       } else {
         row = newWorksheet.addRow(e);
@@ -522,7 +542,8 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
         }
 
         siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
-        row.fill = e.fill;
+        
+        row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
         row.font = e.font;
       }
     }
