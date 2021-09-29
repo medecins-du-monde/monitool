@@ -264,9 +264,10 @@ function getNumberFormat(computation){
 }
 
 /** Render file containing all data entry up to a given date */
-router.get('/export/:projectId/:periodicity/:lang', async ctx => {
+router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
   lang = ctx.params.lang
+  let minimized = ctx.params.minimized
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by his name and computation
@@ -486,72 +487,74 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
   ];
   let colorIdx = 0;
 
-  // iterates over the sites
-  for (let site of project.entities){
-    // creating a tab for each site
-
-    // Cleaning the name replacing all special characters by a space
-    site.name = site.name.replace(/[^a-zA-Z0-9]/g,' ');
-
-    let newWorksheet = buildWorksheet(workbook, site.name);
+  if (!minimized){
+    // iterates over the sites
+    for (let site of project.entities){
+      // creating a tab for each site
   
-    // create a custom filter to get only the data relate to that specific site
-    let customFilter = { entity: [site.id] };
-
-
-    sectionHeader.fill.fgColor.argb = COLORS[colorIdx];
-    colorIdx = (colorIdx + 1) % 10
-
-    let siteMaxLenght = 0;
-    for (let e of allCompleteIndicators){
-      let row;
-      if (e.computation !== undefined){
-        let res = await indicatorToRow(ctx, e.computation, e.display, e.baseline, e.target, customFilter);
-        row = newWorksheet.addRow(res);
-
-        siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
-
-        if (e.numFmt !== undefined){
-          row.numFmt = e.numFmt;
-        }
-        if (e.outlineLevel !== undefined){
-          row.outlineLevel = e.outlineLevel;
-        }
-        if (e.hidden !== undefined){
-          row.hidden = e.hidden;
-        }
-        if (e.font !== undefined){
+      // Cleaning the name replacing all special characters by a space
+      site.name = site.name.replace(/[^a-zA-Z0-9]/g,' ');
+  
+      let newWorksheet = buildWorksheet(workbook, site.name);
+  
+      // create a custom filter to get only the data relate to that specific site
+      let customFilter = { entity: [site.id] };
+  
+  
+      sectionHeader.fill.fgColor.argb = COLORS[colorIdx];
+      colorIdx = (colorIdx + 1) % 10
+  
+      let siteMaxLenght = 0;
+      for (let e of allCompleteIndicators){
+        let row;
+        if (e.computation !== undefined){
+          let res = await indicatorToRow(ctx, e.computation, e.display, e.baseline, e.target, customFilter);
+          row = newWorksheet.addRow(res);
+  
+          siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
+  
+          if (e.numFmt !== undefined){
+            row.numFmt = e.numFmt;
+          }
+          if (e.outlineLevel !== undefined){
+            row.outlineLevel = e.outlineLevel;
+          }
+          if (e.hidden !== undefined){
+            row.hidden = e.hidden;
+          }
+          if (e.font !== undefined){
+            row.font = e.font;
+          }
+          if (e.fill !== undefined){
+            row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
+          }
+          if (res.fill !== undefined){
+            row.fill = res.fill === undefined ? undefined : JSON.parse(JSON.stringify(res.fill));
+          }
+        } else {
+          row = newWorksheet.addRow(e);
+  
+          // Make it collapsed. 1 is one level. 2 is 2 level.....
+          if (e.outlineLevel !== undefined){
+            row.outlineLevel = e.outlineLevel;
+          }
+          // This hide the first level when we want to collapse.
+          if (e.hidden !== undefined){
+            row.hidden = e.hidden;
+          }
+  
+          siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
+          
+          row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
           row.font = e.font;
         }
-        if (e.fill !== undefined){
-          row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
-        }
-        if (res.fill !== undefined){
-          row.fill = res.fill === undefined ? undefined : JSON.parse(JSON.stringify(res.fill));
-        }
-      } else {
-        row = newWorksheet.addRow(e);
-
-        // Make it collapsed. 1 is one level. 2 is 2 level.....
-        if (e.outlineLevel !== undefined){
-          row.outlineLevel = e.outlineLevel;
-        }
-        // This hide the first level when we want to collapse.
-        if (e.hidden !== undefined){
-          row.hidden = e.hidden;
-        }
-
-        siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
-        
-        row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
-        row.font = e.font;
       }
+  
+      newWorksheet.views = [
+        {state: 'frozen', xSplit: 1, ySplit: 0, activeCell: 'A1'}
+      ];
+      newWorksheet.columns[0].width = Math.max(siteMaxLenght + 10, 30);
     }
-
-    newWorksheet.views = [
-      {state: 'frozen', xSplit: 1, ySplit: 0, activeCell: 'A1'}
-    ];
-    newWorksheet.columns[0].width = Math.max(siteMaxLenght + 10, 30);
   }
 
   worksheet.views = [
