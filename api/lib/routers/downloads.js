@@ -9,6 +9,30 @@ import Indicator from '../resource/model/indicator';
 const router = new Router();
 let lang = 'es';
 
+
+let blueFill = [
+  {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: {argb:'2E86C1'}
+  },
+  {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: {argb:'3498DB'}
+  },
+  {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: {argb:'5DADE2'}
+  },
+  {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: {argb:'85C1E9'}
+  },
+]
+
 let sectionHeader = {
   // gray background
   fill: {
@@ -25,7 +49,7 @@ let sectionHeader = {
   }
 }
 let numberCellStyle = {
-  numFmt: '### ### ### ##0.##'
+  numFmt: '### ### ### ##0'
 }
 
 let percentageCellStyle = {
@@ -90,8 +114,6 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
       result = JSON.parse(await queryReportingSubprocess(query));
       if (computation.formula === '100 * numerator / denominator'){
         convertToPercentage(result);
-        baseline /= 100;
-        target /= 100;
       }
     }
     // Here are the various reported on the excel export
@@ -104,6 +126,11 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
       // if it's some other error, we send this error in the excel
         result[dateColumn[0]] = err.message;
         result.fill = errorRow.fill;
+      }
+    } finally{
+      if (computation.formula === '100 * numerator / denominator'){
+        baseline /= 100;
+        target /= 100;
       }
     }
   }
@@ -121,7 +148,7 @@ function generateAllCombinations(partitionIndex, computation, name, formElement,
   else{
     for(let partitionOption of formElement.partitions[partitionIndex].elements){
       computation.parameters.a.filter[formElement.partitions[partitionIndex].id] = [partitionOption.id]
-      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== '    ') ? " / ":"") + partitionOption.name, formElement, list);
+      generateAllCombinations(partitionIndex + 1, computation, name + ((name !== "    ") ? " / ":"") + partitionOption.name, formElement, list);
       delete computation.parameters.a.filter[formElement.partitions[partitionIndex].id];
     }
   }
@@ -138,7 +165,7 @@ function buildAllPartitionsPossibilities(formElement){
     }
   }
   let list = [];
-  generateAllCombinations(0, computation, '    ', formElement, list);
+  generateAllCombinations(0, computation, "    ", formElement, list);
   return list
 }
 
@@ -237,9 +264,10 @@ function getNumberFormat(computation){
 }
 
 /** Render file containing all data entry up to a given date */
-router.get('/export/:projectId/:periodicity/:lang', async ctx => {
+router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
   lang = ctx.params.lang
+  let minimized = ctx.params.minimized
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by his name and computation
@@ -253,22 +281,33 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     // this creates a row to act as a header for the section
     // this row has a different style and font size
     logicalFrameCompleteIndicators.push({name: LogicalFrameName[ctx.params.lang] + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
+    
+    // TODO: add translations for the titles
+    // logicalFrameCompleteIndicators.push()
+    logicalFrameCompleteIndicators.push({name: 'General objective: ' + logicalFrame.goal, fill: blueFill[0] });
+    
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
       logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
       logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
     }
     for (let purpose of logicalFrame.purposes){
+      logicalFrameCompleteIndicators.push({name: 'Specific objective: ' + purpose.description, fill: blueFill[1] });
+
       for (let indicator of purpose.indicators){
         logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
         logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
       }
       for (let output of purpose.outputs){
+        console.log(output)
+        logicalFrameCompleteIndicators.push({name: 'Result: ' + output.description, fill: blueFill[2] });
         for (let indicator of output.indicators){
           logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
           logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
         }
         for (let activity of output.activities){
+
+          logicalFrameCompleteIndicators.push({name: 'Activity: ' + activity.description, fill: blueFill[3] });
           for (let indicator of activity.indicators){
             logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
             logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
@@ -369,6 +408,8 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
     dataSourcesCompleteIndicators
   );
 
+  sectionHeader.fill.fgColor.argb = '999999';
+
   // Adding the data
   for (let indicator of allCompleteIndicators){
     // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
@@ -406,10 +447,10 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
       }
       // Background color
       if (indicator.fill !== undefined){
-        row.fill = indicator.fill;
+        row.fill = indicator.fill === undefined ? undefined : JSON.parse(JSON.stringify(indicator.fill));
       }
       if (res.fill !== undefined){
-        row.fill = res.fill;
+        row.fill = res.fill === undefined ? undefined : JSON.parse(JSON.stringify(res.fill));
       }
     }
     // if the row is a section header 
@@ -427,79 +468,100 @@ router.get('/export/:projectId/:periodicity/:lang', async ctx => {
       }
       maxLenght = Math.max(maxLenght, indicator.name.length)
       // apply the styles
-      row.fill = indicator.fill;
+      row.fill = indicator.fill === undefined ? undefined : JSON.parse(JSON.stringify(indicator.fill));
       row.font = indicator.font;
     }
   };
 
-  // iterates over the sites
-  for (let site of project.entities){
-    // creating a tab for each site
+  const COLORS = [
+    '1f77b4',
+    'ff7f0e',
+    '2ca02c',
+    'd62728',
+    '9467bd',
+    '8c564b',
+    'e377c2',
+    '7f7f7f',
+    'bcbd22',
+    '17becf',
+  ];
+  let colorIdx = 0;
 
-    // Cleaning the name replacing all special characters by a space
-    site.name = site.name.replace(/[^a-zA-Z0-9]/g,' ');
-
-    let newWorksheet = buildWorksheet(workbook, site.name);
+  if (!minimized){
+    // iterates over the sites
+    for (let site of project.entities){
+      // creating a tab for each site
   
-    // create a custom filter to get only the data relate to that specific site
-    let customFilter = { entity: [site.id] };
-
-    let siteMaxLenght = 0;
-    for (let e of allCompleteIndicators){
-      let row;
-      if (e.computation !== undefined){
-        let res = await indicatorToRow(ctx, e.computation, e.display, null, null, customFilter);
-        row = newWorksheet.addRow(res);
-
-        siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
-
-        if (e.numFmt !== undefined){
-          row.numFmt = e.numFmt;
-        }
-        if (e.outlineLevel !== undefined){
-          row.outlineLevel = e.outlineLevel;
-        }
-        if (e.hidden !== undefined){
-          row.hidden = e.hidden;
-        }
-        if (e.font !== undefined){
+      // Cleaning the name replacing all special characters by a space
+      site.name = site.name.replace(/[^a-zA-Z0-9]/g,' ');
+  
+      let newWorksheet = buildWorksheet(workbook, site.name);
+  
+      // create a custom filter to get only the data relate to that specific site
+      let customFilter = { entity: [site.id] };
+  
+  
+      sectionHeader.fill.fgColor.argb = COLORS[colorIdx];
+      colorIdx = (colorIdx + 1) % 10
+  
+      let siteMaxLenght = 0;
+      for (let e of allCompleteIndicators){
+        let row;
+        if (e.computation !== undefined){
+          let res = await indicatorToRow(ctx, e.computation, e.display, e.baseline, e.target, customFilter);
+          row = newWorksheet.addRow(res);
+  
+          siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
+  
+          if (e.numFmt !== undefined){
+            row.numFmt = e.numFmt;
+          }
+          if (e.outlineLevel !== undefined){
+            row.outlineLevel = e.outlineLevel;
+          }
+          if (e.hidden !== undefined){
+            row.hidden = e.hidden;
+          }
+          if (e.font !== undefined){
+            row.font = e.font;
+          }
+          if (e.fill !== undefined){
+            row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
+          }
+          if (res.fill !== undefined){
+            row.fill = res.fill === undefined ? undefined : JSON.parse(JSON.stringify(res.fill));
+          }
+        } else {
+          row = newWorksheet.addRow(e);
+  
+          // Make it collapsed. 1 is one level. 2 is 2 level.....
+          if (e.outlineLevel !== undefined){
+            row.outlineLevel = e.outlineLevel;
+          }
+          // This hide the first level when we want to collapse.
+          if (e.hidden !== undefined){
+            row.hidden = e.hidden;
+          }
+  
+          siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
+          
+          row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
           row.font = e.font;
         }
-        if (e.fill !== undefined){
-          row.fill = e.fill;
-        }
-        if (res.fill !== undefined){
-          row.fill = res.fill;
-        }
-      } else {
-        row = newWorksheet.addRow(e);
-
-        // Make it collapsed. 1 is one level. 2 is 2 level.....
-        if (e.outlineLevel !== undefined){
-          row.outlineLevel = e.outlineLevel;
-        }
-        // This hide the first level when we want to collapse.
-        if (e.hidden !== undefined){
-          row.hidden = e.hidden;
-        }
-
-        siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
-        row.fill = e.fill;
-        row.font = e.font;
       }
+  
+      newWorksheet.views = [
+        {state: 'frozen', xSplit: 1, ySplit: 0, activeCell: 'A1'}
+      ];
+      newWorksheet.columns[0].width = Math.max(siteMaxLenght + 10, 30);
     }
-
-    newWorksheet.views = [
-      {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: '1', activeCell: 'A1'}
-    ];
-    newWorksheet.columns[0].width = Math.max(siteMaxLenght + 10, 30);
   }
 
   worksheet.views = [
-    {state: 'frozen', xSplit: 1, ySplit: 0, topLeftCell: 'B1', activeCell: 'A1'}
+    {state: 'frozen', xSplit: 1, ySplit: 0, activeCell: 'A1'}
   ];
 
-  // the minimun size of the colum should be 30 and the maximun 100
+  // the minimum size of the column should be 30 and the maximum 100
 
   const minimunColWidth = 30;
   const maximunColWidth = 100;
