@@ -269,8 +269,13 @@ export default class Cube {
 		}
 
 		// Copy into destination table.
-		for (let i = 0; i < length; ++i)
-			this.data[offset + i] = source[i];
+		for (let i = 0; i < length; ++i) {
+			if (source[i] !== null) {
+				this.data[offset + i] = source[i];
+			} else if (source[i] === null) {
+				this.data[offset + 1] = -123456
+			}
+		}
 	}
 
 	/**
