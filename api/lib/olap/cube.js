@@ -210,7 +210,7 @@ export default class Cube {
 	 * @param {Array.<Dimension>} dimensions The list of dimensions that this cube is using
 	 * @param {Array.<DimensionGroup>} dimensionGroups The list of dimension groups that this cube is using
 	 * @param {Array.<number>} data Data contained in the cube. The size of this array must be the product of the number of elements in the dimension.
-	 *
+	 * @param {Array.<any>} test
 	 * @example
 	 * var time = new Dimension('year', ['2013', '2014', '2015'], 'sum'),
 	 *     location = new Dimension('location', ['shopA', 'shopB'], 'sum');
@@ -228,6 +228,7 @@ export default class Cube {
 		this.dimensions = dimensions;
 		this.dimensionGroups = dimensionGroups;
 		this.data = data;
+		this.test = [];
 	}
 
 	fillFrom(element, input) {
@@ -373,6 +374,7 @@ export default class Cube {
 	query2(levels, levelIndex, filters) {
 		if (levelIndex == levels.length) {
 			try {
+				//console.log('fygiuhoi', this._query_rec(filters, 0, 0), typeof this._query_rec(filters, 0, 0))
 				return this._query_rec(filters, 0, 0);
 			}
 			catch (e) {
@@ -383,13 +385,9 @@ export default class Cube {
 		const level = levels[levelIndex];
 
 		const hash = {};
-		Object.keys(level.rows).forEach(key => {
+		Object.keys(level.rows).forEach((key, i) => {
 			filters[level.dimIndex] = level.rows[key];
 			const result = this.query2(levels, levelIndex + 1, filters);
-			console.log('---------------------KEY-----------------------')
-			console.log(key)
-			console.log('-------------------WWW-------------------------');
-			console.log(typeof result, result);
 			if (result !== undefined){
 				hash[key] = result;
 			}
@@ -398,6 +396,8 @@ export default class Cube {
 
 		console.log('-----------------------HASH---------------------------');
 		console.log(hash);
+		console.log(this.test);
+		//['3', 3, '4', 4]
 		return hash;
 	}
 
@@ -445,8 +445,6 @@ export default class Cube {
 				isNotComplete = false;
 				for (let i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
-					console.log('-------------------- TMP------------------------')
-					console.log(tmp);
 					if (tmp !== undefined) {
 						++contributions;
 						result += Number(tmp)
@@ -521,9 +519,9 @@ export default class Cube {
 			result = undefined;
 		} else if (isNotComplete) {
 			result = result.toString()
+			this.test.push(result);
 		}
-		
-		console.log('FYUOIPODJWHLGKHFYIGUOHIPOJÑ', typeof result, result);
+		//console.log('HELLO', result, typeof result);
 		return result;
 
 	}
@@ -590,8 +588,6 @@ export default class Cube {
 	}
 
 	serialize() {
-		console.log('---------------------- SERIALIZE---------------------')
-		console.log(this.data);
 		return {
 			id: this.id,
 			dimensions: this.dimensions,
