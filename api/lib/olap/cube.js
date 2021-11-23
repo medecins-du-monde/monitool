@@ -386,11 +386,18 @@ export default class Cube {
 		Object.keys(level.rows).forEach(key => {
 			filters[level.dimIndex] = level.rows[key];
 			const result = this.query2(levels, levelIndex + 1, filters);
-			if (result !== undefined)
+			console.log('---------------------KEY-----------------------')
+			console.log(key)
+			console.log('-------------------WWW-------------------------');
+			console.log(typeof result, result);
+			if (result !== undefined){
 				hash[key] = result;
+			}
 		});
 		filters[level.dimIndex] = null;
 
+		console.log('-----------------------HASH---------------------------');
+		console.log(hash);
 		return hash;
 	}
 
@@ -426,6 +433,7 @@ export default class Cube {
 		const numIndexes = localIndexes.length;
 
 		var result, tmp, contributions = 0;
+		var isNotComplete;
 
 		// Compute dataOffset at this level.
 		dataOffset *= dimension.items.length;
@@ -434,11 +442,16 @@ export default class Cube {
 		switch (dimension.aggregation) {
 			case 'sum':
 				result = 0;
+				isNotComplete = false;
 				for (let i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
+					console.log('-------------------- TMP------------------------')
+					console.log(tmp);
 					if (tmp !== undefined) {
 						++contributions;
-						result += tmp
+						result += Number(tmp)
+					} else {
+						isNotComplete = true
 					}
 				}
 				break;
@@ -504,10 +517,15 @@ export default class Cube {
 				throw new Error('INVALID_AGGREGATION_MODE');
 		}
 
-		if (contributions == 0)
+		if (contributions == 0){			
 			result = undefined;
-
+		} else if (isNotComplete) {
+			result = result.toString()
+		}
+		
+		console.log('FYUOIPODJWHLGKHFYIGUOHIPOJÑ', typeof result, result);
 		return result;
+
 	}
 
 	_cleanFilter(textFilters) {
@@ -572,6 +590,8 @@ export default class Cube {
 	}
 
 	serialize() {
+		console.log('---------------------- SERIALIZE---------------------')
+		console.log(this.data);
 		return {
 			id: this.id,
 			dimensions: this.dimensions,
