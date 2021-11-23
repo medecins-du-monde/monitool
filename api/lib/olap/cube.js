@@ -448,6 +448,8 @@ export default class Cube {
 					if (tmp !== undefined) {
 						++contributions;
 						result += Number(tmp)
+						if (typeof tmp === 'string')
+							result = result.toString();
 					} else {
 						isNotComplete = true
 					}

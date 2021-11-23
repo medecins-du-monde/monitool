@@ -153,6 +153,8 @@ function _mergeRec(depth, expr, parameters, trees) {
 			console.log(typeof result, result);
 			if ((typeof result === 'number' && Number.isFinite(result)) || isNaN(Number(result)))
 				return result;
+			else if (typeof result === 'string' && !isNaN(Number(result)))
+				return result;
 			else
 				return 'Not a finite number';
 		}
