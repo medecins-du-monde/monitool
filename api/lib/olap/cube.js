@@ -449,7 +449,7 @@ export default class Cube {
 						++contributions;
 						result += Number(tmp)
 						if (typeof tmp === 'string')
-							result = result.toString();
+							isNotComplete = true
 					} else {
 						isNotComplete = true
 					}
