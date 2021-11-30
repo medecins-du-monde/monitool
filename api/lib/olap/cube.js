@@ -462,7 +462,11 @@ export default class Cube {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
 					if (tmp !== undefined) {
 						++contributions;
-						result += tmp
+						result += Number(tmp)
+						if (typeof tmp === 'string')
+							isNotComplete = true
+					}else {
+						isNotComplete = true
 					}
 				}
 				result /= contributions;
@@ -472,9 +476,16 @@ export default class Cube {
 				result = -Number.MAX_VALUE;
 				for (let i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i]);
-					if (tmp !== undefined && tmp > result) {
-						++contributions;
-						result = tmp;
+					if (tmp !== undefined){
+						if (Number(tmp) > result) {
+							++contributions;
+							result = Number(tmp);
+
+							if (typeof tmp === 'string')
+								isNotComplete = true
+						}
+					} else {
+						isNotComplete = true
 					}
 				}
 				break;
@@ -483,9 +494,16 @@ export default class Cube {
 				result = Number.MAX_VALUE;
 				for (let i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
-					if (tmp !== undefined && tmp < result) {
-						++contributions;
-						result = tmp;
+					if (tmp !== undefined){
+						if (Number(tmp) < result) {
+							++contributions;
+							result = Number(tmp);
+
+							if (typeof tmp === 'string')
+								isNotComplete = true
+						}
+					} else {
+						isNotComplete = true
 					}
 				}
 				break;
