@@ -210,7 +210,6 @@ export default class Cube {
 	 * @param {Array.<Dimension>} dimensions The list of dimensions that this cube is using
 	 * @param {Array.<DimensionGroup>} dimensionGroups The list of dimension groups that this cube is using
 	 * @param {Array.<number>} data Data contained in the cube. The size of this array must be the product of the number of elements in the dimension.
-	 * @param {Array.<any>} test
 	 * @example
 	 * var time = new Dimension('year', ['2013', '2014', '2015'], 'sum'),
 	 *     location = new Dimension('location', ['shopA', 'shopB'], 'sum');
@@ -228,7 +227,6 @@ export default class Cube {
 		this.dimensions = dimensions;
 		this.dimensionGroups = dimensionGroups;
 		this.data = data;
-		this.test = [];
 	}
 
 	fillFrom(element, input) {
@@ -390,13 +388,14 @@ export default class Cube {
 			const result = this.query2(levels, levelIndex + 1, filters);
 			if (result !== undefined){
 				hash[key] = result;
+			} else {
+				hash[key] = 'missing-data';
 			}
 		});
 		filters[level.dimIndex] = null;
 
 		console.log('-----------------------HASH---------------------------');
 		console.log(hash);
-		console.log(this.test);
 		//['3', 3, '4', 4]
 		return hash;
 	}
@@ -539,7 +538,6 @@ export default class Cube {
 			result = undefined;
 		} else if (isNotComplete) {
 			result = result.toString()
-			this.test.push(result);
 		}
 		//console.log('HELLO', result, typeof result);
 		return result;
