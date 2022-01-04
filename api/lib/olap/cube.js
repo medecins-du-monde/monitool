@@ -272,7 +272,7 @@ export default class Cube {
 			if (source[i] !== null) {
 				this.data[offset + i] = source[i];
 			} else if (source[i] === null) {
-				this.data[offset + 1] = -123456
+				this.data[offset + i] = -123456
 			}
 		}
 	}
