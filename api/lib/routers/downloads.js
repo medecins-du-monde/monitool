@@ -1,5 +1,6 @@
 const Router = require('koa-router');
-const Excel = require('exceljs')
+const Excel = require('exceljs');
+const fs = require('fs');
 
 import Project from '../resource/model/project';
 import { queryReportingSubprocess } from './reporting';
@@ -262,6 +263,31 @@ function getNumberFormat(computation){
   }
   return numberCellStyle.numFmt;
 }
+
+router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx => {
+  const project = await Project.storeInstance.get(ctx.params.projectId);
+
+  // console.log('checagem efetuada')
+  // console.log('checagem efetuada')
+  // console.log('checagem efetuada')
+  // console.log('checagem efetuada')
+  // console.log('checagem efetuada')
+  
+  console.log('monitool-' + project.country + '.xlsx')
+  
+  const filename = 'monitool-' + project.country + '.xlsx';
+  
+  // check if the file already exists
+  if (fs.existsSync(filename)){
+    ctx.set('Content-disposition', 'attachment; filename=' + filename);
+    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    
+    ctx.body = fs.createReadStream(filename);
+  }
+  else{
+    ctx.body = '<html>Not ready yet</html>';
+  }
+})
 
 /** Render file containing all data entry up to a given date */
 router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
