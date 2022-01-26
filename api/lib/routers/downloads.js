@@ -302,7 +302,7 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
 
   const filename = 'monitool-' + project.country + '.xlsx';
   if (fs.existsSync(filename)){
-    fs.unlink(filename, err => console.log(err));
+    fs.unlinkSync(filename, err => console.log(err));
   }
 
   lang = ctx.params.lang
