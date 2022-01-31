@@ -85,11 +85,11 @@ async function convertToPercentage(result){
 
 // Call the database and get the computed values
 // Add the name of the indicator to the result of the computation
-async function indicatorToRow(ctx, computation, name, baseline=null, target=null, filter={}){
+async function indicatorToRow(ctx, computation, name, baseline=null, target=null, filter){
   const query = {
 		projectId: ctx.params.projectId,
 		computation: computation,
-		filter: filter,
+		filter: filter ? filter : {},
 		dimensionIds: [ctx.params.periodicity],
 		withTotals: false,
 		withGroups: false
@@ -174,17 +174,19 @@ function buildPartitionsForCalculations(simplerComputation, project, element){
   
   for (const [parameter, value] of Object.entries(simplerComputation.parameters)){
     for (const [partitionId, valuePartitions] of Object.entries(value.filter)){
-
       const partition = element.partitions.find(p => p.id === partitionId);
       for (const partitionElementId of valuePartitions){
-        const partitionElement = partition.elements.find(p => p.id === partitionElementId)
-        let newComputation = JSON.parse(JSON.stringify(simplerComputation))
-        newComputation.parameters[parameter].filter[partitionId] = [partitionElement.id]
-        const newLine = {
-          computation: newComputation, display: "    " + "    " + partitionElement.name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)
+        if (typeof partition !== "undefined") {
+          const partitionElement = partition.elements.find(p => p.id === partitionElementId)
+          if (typeof partitionElement !== "undefined") {
+            let newComputation = JSON.parse(JSON.stringify(simplerComputation))
+            newComputation.parameters[parameter].filter[partitionId] = [partitionElement.id]
+            const newLine = {
+              computation: newComputation, display: "    " + "    " + partitionElement.name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)
+            }
+            newLines.push(newLine);
+          }
         }
-
-        newLines.push(newLine);
       }
     }
   }
@@ -215,8 +217,11 @@ function buildFormulas(indicator, project){
           break;
         }
       }
-      newLines.push({computation: JSON.parse(JSON.stringify(simplerComputation)), display: "    "+parameter+" ("+element.name+")", outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)});
-      newLines = newLines.concat(buildPartitionsForCalculations(simplerComputation, project, element))
+
+      if (element) {
+        newLines.push({computation: JSON.parse(JSON.stringify(simplerComputation)), display: "    "+parameter+" ("+element.name+")", outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(simplerComputation)});
+        newLines = newLines.concat(buildPartitionsForCalculations(simplerComputation, project, element))
+      }
     }
   }
   return newLines;
@@ -288,28 +293,27 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
     
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
-      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+      logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, filter: {_start: logicalFrame.start, _end: logicalFrame.end, entity: logicalFrame.entities}, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
       logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
     }
     for (let purpose of logicalFrame.purposes){
       logicalFrameCompleteIndicators.push({name: 'Specific objective: ' + purpose.description, fill: blueFill[1] });
 
       for (let indicator of purpose.indicators){
-        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+        logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, filter: {_start: logicalFrame.start, _end: logicalFrame.end, entity: logicalFrame.entities}, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
         logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
       }
       for (let output of purpose.outputs){
-        console.log(output)
         logicalFrameCompleteIndicators.push({name: 'Result: ' + output.description, fill: blueFill[2] });
         for (let indicator of output.indicators){
-          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+          logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, filter: {_start: logicalFrame.start, _end: logicalFrame.end, entity: logicalFrame.entities}, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
           logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
         }
         for (let activity of output.activities){
 
           logicalFrameCompleteIndicators.push({name: 'Activity: ' + activity.description, fill: blueFill[3] });
           for (let indicator of activity.indicators){
-            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
+            logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display,filter: {_start: logicalFrame.start, _end: logicalFrame.end, entity: logicalFrame.entities}, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
             logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
           }
         }
@@ -424,7 +428,7 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
     if (indicator.computation !== undefined){
       // get values
       // when no filter is provided it means we want data from all sites
-      let res = await indicatorToRow(ctx, indicator.computation, indicator.display, indicator.baseline, indicator.target);
+      let res = await indicatorToRow(ctx, indicator.computation, indicator.display, indicator.baseline, indicator.target, indicator.filter);
       // Dump all the data into Excel
       row = worksheet.addRow(res);
       maxLenght = Math.max(maxLenght, res.name.length)
