@@ -210,7 +210,6 @@ export default class Cube {
 	 * @param {Array.<Dimension>} dimensions The list of dimensions that this cube is using
 	 * @param {Array.<DimensionGroup>} dimensionGroups The list of dimension groups that this cube is using
 	 * @param {Array.<number>} data Data contained in the cube. The size of this array must be the product of the number of elements in the dimension.
-	 *
 	 * @example
 	 * var time = new Dimension('year', ['2013', '2014', '2015'], 'sum'),
 	 *     location = new Dimension('location', ['shopA', 'shopB'], 'sum');
@@ -269,8 +268,13 @@ export default class Cube {
 		}
 
 		// Copy into destination table.
-		for (let i = 0; i < length; ++i)
-			this.data[offset + i] = source[i];
+		for (let i = 0; i < length; ++i) {
+			if (source[i] !== null) {
+				this.data[offset + i] = source[i];
+			} else if (source[i] === null) {
+				this.data[offset + i] = -123456
+			}
+		}
 	}
 
 	/**
@@ -378,14 +382,18 @@ export default class Cube {
 		const level = levels[levelIndex];
 
 		const hash = {};
-		Object.keys(level.rows).forEach(key => {
+		Object.keys(level.rows).forEach((key, i) => {
 			filters[level.dimIndex] = level.rows[key];
 			const result = this.query2(levels, levelIndex + 1, filters);
-			if (result !== undefined)
+			if (result !== undefined){
 				hash[key] = result;
+			} else {
+				hash[key] = 'missing-data';
+			}
 		});
 		filters[level.dimIndex] = null;
 
+		//['3', 3, '4', 4]
 		return hash;
 	}
 
@@ -421,6 +429,7 @@ export default class Cube {
 		const numIndexes = localIndexes.length;
 
 		var result, tmp, contributions = 0;
+		var isNotComplete;
 
 		// Compute dataOffset at this level.
 		dataOffset *= dimension.items.length;
@@ -429,11 +438,16 @@ export default class Cube {
 		switch (dimension.aggregation) {
 			case 'sum':
 				result = 0;
+				isNotComplete = false;
 				for (let i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
 					if (tmp !== undefined) {
 						++contributions;
-						result += tmp
+						result += Number(tmp)
+						if (typeof tmp === 'string')
+							isNotComplete = true
+					} else {
+						isNotComplete = true
 					}
 				}
 				break;
@@ -444,7 +458,11 @@ export default class Cube {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
 					if (tmp !== undefined) {
 						++contributions;
-						result += tmp
+						result += Number(tmp)
+						if (typeof tmp === 'string')
+							isNotComplete = true
+					}else {
+						isNotComplete = true
 					}
 				}
 				result /= contributions;
@@ -454,9 +472,16 @@ export default class Cube {
 				result = -Number.MAX_VALUE;
 				for (let i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i]);
-					if (tmp !== undefined && tmp > result) {
-						++contributions;
-						result = tmp;
+					if (tmp !== undefined){
+						if (Number(tmp) > result) {
+							++contributions;
+							result = Number(tmp);
+
+							if (typeof tmp === 'string')
+								isNotComplete = true
+						}
+					} else {
+						isNotComplete = true
 					}
 				}
 				break;
@@ -465,9 +490,16 @@ export default class Cube {
 				result = Number.MAX_VALUE;
 				for (let i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
-					if (tmp !== undefined && tmp < result) {
-						++contributions;
-						result = tmp;
+					if (tmp !== undefined){
+						if (Number(tmp) < result) {
+							++contributions;
+							result = Number(tmp);
+
+							if (typeof tmp === 'string')
+								isNotComplete = true
+						}
+					} else {
+						isNotComplete = true
 					}
 				}
 				break;
@@ -499,10 +531,13 @@ export default class Cube {
 				throw new Error('INVALID_AGGREGATION_MODE');
 		}
 
-		if (contributions == 0)
+		if (contributions == 0){			
 			result = undefined;
-
+		} else if (isNotComplete) {
+			result = result.toString()
+		}
 		return result;
+
 	}
 
 	_cleanFilter(textFilters) {

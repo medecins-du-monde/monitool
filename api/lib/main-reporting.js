@@ -149,7 +149,9 @@ function _mergeRec(depth, expr, parameters, trees) {
 
 		try {
 			const result = expr.evaluate(paramMap);
-			if (typeof result === 'number' && Number.isFinite(result))
+			if ((typeof result === 'number' && Number.isFinite(result)) || isNaN(Number(result)))
+				return result;
+			else if (typeof result === 'string' && !isNaN(Number(result)))
 				return result;
 			else
 				return 'Not a finite number';
