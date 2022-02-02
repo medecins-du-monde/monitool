@@ -372,7 +372,6 @@ export default class Cube {
 	query2(levels, levelIndex, filters) {
 		if (levelIndex == levels.length) {
 			try {
-				//console.log('fygiuhoi', this._query_rec(filters, 0, 0), typeof this._query_rec(filters, 0, 0))
 				return this._query_rec(filters, 0, 0);
 			}
 			catch (e) {
@@ -394,8 +393,6 @@ export default class Cube {
 		});
 		filters[level.dimIndex] = null;
 
-		console.log('-----------------------HASH---------------------------');
-		console.log(hash);
 		//['3', 3, '4', 4]
 		return hash;
 	}
@@ -539,7 +536,6 @@ export default class Cube {
 		} else if (isNotComplete) {
 			result = result.toString()
 		}
-		//console.log('HELLO', result, typeof result);
 		return result;
 
 	}
