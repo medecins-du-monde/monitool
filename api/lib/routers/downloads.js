@@ -1,5 +1,6 @@
 const Router = require('koa-router');
-const Excel = require('exceljs')
+const Excel = require('exceljs');
+const fs = require('fs');
 
 import Project from '../resource/model/project';
 import { queryReportingSubprocess } from './reporting';
@@ -263,9 +264,47 @@ function getNumberFormat(computation){
   return numberCellStyle.numFmt;
 }
 
+
+router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx => {
+  const project = await Project.storeInstance.get(ctx.params.projectId);
+  const filename = 'monitool-' + project.country + '.xlsx';
+  if (fs.existsSync(filename)){
+    ctx.status = 200;
+    ctx.body = '{ "message": "done" }'
+  } else {
+    ctx.status = 404;
+    ctx.body = '{ "message": "not done" }'
+  }
+
+})
+
+router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx => {
+  const project = await Project.storeInstance.get(ctx.params.projectId);
+  
+  const filename = 'monitool-' + project.country + '.xlsx';
+  
+  // check if the file already exists
+  if (fs.existsSync(filename)){
+    ctx.set('Content-disposition', 'attachment; filename=' + filename);
+    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    
+    ctx.body = fs.createReadStream(filename);
+  }
+  else{
+    ctx.status = 404;
+    ctx.message = 'File not found';
+  }
+})
+
 /** Render file containing all data entry up to a given date */
 router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
+
+  const filename = 'monitool-' + project.country + '.xlsx';
+  if (fs.existsSync(filename)){
+    fs.unlinkSync(filename, err => console.log(err));
+  }
+
   lang = ctx.params.lang
   let minimized = ctx.params.minimized
 
@@ -567,15 +606,16 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
   const maximunColWidth = 100;
   worksheet.columns[0].width = Math.min(Math.max(maxLenght + 10, minimunColWidth), maximunColWidth);
 
-  ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
-  ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  // ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
+  // ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   
-  await workbook.xlsx.writeFile('monitool-' + project.country + '.xlsx');
+  workbook.xlsx.writeFile('monitool-' + project.country + '.xlsx');
 
   // Write to memory, buffer
-  const buffer = await workbook.xlsx.writeBuffer()
+  // const buffer = await workbook.xlsx.writeBuffer()
+  // ctx.body = buffer;
 
-  ctx.body = buffer;
+  ctx.body = '{ "message": "done" }';
 });
 
 export default router;
