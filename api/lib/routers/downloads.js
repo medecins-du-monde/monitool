@@ -277,10 +277,9 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx 
     ctx.status = 200;
     ctx.body = '{ "message": "done" }'
   } else {
-    ctx.status = 404;
+    ctx.status = 200;
     ctx.body = '{ "message": "not done" }'
   }
-
 })
 
 router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx => {
