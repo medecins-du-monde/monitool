@@ -47,7 +47,7 @@
 			"patternProperties": {
 				"[a-f\\d]{8}-([a-f\\d]{4}-){3}[a-f\\d]{12}": {
 					"type": "array",
-					"items": { "type": "number" },
+					"items": { "type": ["null", "number"] },
 					"minItems": 1
 				}
 			}

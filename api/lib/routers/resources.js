@@ -129,8 +129,14 @@ router.put('/resources/project/:id', async ctx => {
 		project._id = ctx.params.id;
 		delete project._rev;
 		project.users = [{type: "internal", id: ctx.state.user._id, role: "owner"}];
-		project.name = 'CLONE - ' + project.name;
-		project.country = 'CLONE - ' + project.country;
+
+		if (ctx.request.query.with_data == 'true'){
+			project.name = 'CLONE - ' + project.name;
+			project.country = 'CLONE - ' + project.country;
+		} else{
+			project.name = 'CLONE STRUCTURE - ' + project.name;
+			project.country = 'CLONE STRUCTURE - ' + project.country;
+		}
 		await project.save();
 
 		// Recreate all inputs asynchronously. No need to have the user waiting.
