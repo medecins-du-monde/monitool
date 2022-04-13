@@ -43,6 +43,11 @@ export default class InputStore extends Store {
 			endkey: "input:" + projectId + ":" + dataSourceId + ":g"
 		});
 
+		console.log('dbResult');
+		console.log('dbResult');
+		console.log('dbResult');
+		console.log(dbResult);
+
 		if (update) {
 			const project = await Project.storeInstance.get(projectId);
 			const dataSource = project.getDataSourceById(dataSourceId);
