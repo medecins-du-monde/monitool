@@ -15,7 +15,7 @@
  * along with Monitool. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@bower_components/font-awesome/css/font-awesome.min.css';
+import 'font-awesome/css/font-awesome.min.css';
 
 import angular from 'angular';
 

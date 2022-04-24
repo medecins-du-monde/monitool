@@ -1,10 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ZopfliPlugin = require('zopfli-webpack-plugin');
-const BrotliPlugin = require('brotli-webpack-plugin');
 
 module.exports = {
 	// No need for minification etc.
@@ -59,12 +55,6 @@ module.exports = {
 		]
 	},
 
-	optimization: {
-		minimizer: [
-			new UglifyJsPlugin({extractComments: true})
-		]
-	},
-
 	plugins: [
 		new webpack.ContextReplacementPlugin(
 			/moment[\/\\]locale$/,
@@ -76,29 +66,18 @@ module.exports = {
 			template: 'src/index.html',
 			inject: 'head'
 		}),
+	],
 
-        // new BundleAnalyzerPlugin({
-        //     analyzerMode: 'static'
-        // })
-	]
+    devServer: {
+        port: 8081,
+        compress: false,
+        host: '0.0.0.0',
+        proxy: {
+            '/api': {
+                target: 'http://localhost:8000',
+                pathRewrite: { '^/api': '' },
+            },
+        }
+    },
+
 };
-
-
-if (process.argv.indexOf('-p') !== -1) {
-	module.exports.plugins.push(
-		new ZopfliPlugin({
-			asset: "[path].gz[query]",
-			algorithm: "zopfli",
-			test: /\.(css|html|js|svg|ttf)$/,
-			threshold: 0,
-			minRatio: 0.8
-		}),
-
-		new BrotliPlugin({
-			asset: '[path].br[query]',
-			test: /\.(css|html|js|svg|ttf)$/,
-			threshold: 0,
-			minRatio: 0.8
-		})
-	);
-}
