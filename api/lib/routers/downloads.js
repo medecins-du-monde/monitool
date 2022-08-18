@@ -92,7 +92,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
 		computation: computation,
 		filter: filter ? filter : {},
 		dimensionIds: [ctx.params.periodicity],
-		withTotals: false,
+		withTotals: true,
 		withGroups: false
 	};
 
@@ -172,7 +172,7 @@ function buildAllPartitionsPossibilities(formElement){
 
 function buildPartitionsForCalculations(simplerComputation, project, element){
   const newLines = [];
-  
+
   for (const [parameter, value] of Object.entries(simplerComputation.parameters)){
     for (const [partitionId, valuePartitions] of Object.entries(value.filter)){
       const partition = element.partitions.find(p => p.id === partitionId);
@@ -284,14 +284,14 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx 
 
 router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
-  
+
   const filename = 'monitool-' + project.country + '.xlsx';
-  
+
   // check if the file already exists
   if (fs.existsSync(filename)){
     ctx.set('Content-disposition', 'attachment; filename=' + filename);
     ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    
+
     ctx.body = fs.createReadStream(filename);
   }
   else{
@@ -324,15 +324,22 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
     // this creates a row to act as a header for the section
     // this row has a different style and font size
     logicalFrameCompleteIndicators.push({name: LogicalFrameName[ctx.params.lang] + logicalFrame.name, fill: sectionHeader.fill, font: sectionHeader.font });
-    
+
     // TODO: add translations for the titles
     // logicalFrameCompleteIndicators.push()
     logicalFrameCompleteIndicators.push({name: 'General objective: ' + logicalFrame.goal, fill: blueFill[0] });
-    
+
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
       logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, filter: {_start: logicalFrame.start, _end: logicalFrame.end, entity: logicalFrame.entities}, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
-      logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
+      let indicatorComputations = buildFormulas({computation: indicator.computation}, project)
+      const indicatorComputationFilter = !!logicalFrame.entities.length ? { entity: logicalFrame.entities } : { }
+      indicatorComputations = indicatorComputations.map(indicatorComputation => {
+        const updateIndicatorComputation = Object.assign({}, indicatorComputation)
+        updateIndicatorComputation.filter = indicatorComputationFilter
+        return updateIndicatorComputation;
+      })
+      logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(indicatorComputations)
     }
     for (let purpose of logicalFrame.purposes){
       logicalFrameCompleteIndicators.push({name: 'Specific objective: ' + purpose.description, fill: blueFill[1] });
@@ -397,7 +404,7 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
   extraCompleteIndicators.push({name: ExtraIndicatorsName[ctx.params.lang], fill: sectionHeader.fill, font: sectionHeader.font});
   for (let indicator of project.extraIndicators){
     extraCompleteIndicators.push({computation: indicator.computation, display: indicator.display, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
-    extraCompleteIndicators = extraCompleteIndicators.concat(buildFormulas(indicator, project));    
+    extraCompleteIndicators = extraCompleteIndicators.concat(buildFormulas(indicator, project));
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
@@ -424,10 +431,10 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
 
       if (element.partitions.length > 0){
         dataSourcesCompleteIndicators = dataSourcesCompleteIndicators.concat(buildAllPartitionsPossibilities(element))
-      } 
+      }
     }
   }
-  
+
   // creates a list for the names of the columns based on the periodicity received as a parameter
   dateColumn = Array.from(
     timeSlotRange(
@@ -438,7 +445,7 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
 
   // create the excel file
   let workbook = new Excel.Workbook();
-  
+
   let worksheet = buildWorksheet(workbook, 'Global');
 
   let maxLenght = 0;
@@ -495,7 +502,7 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
         row.fill = res.fill === undefined ? undefined : JSON.parse(JSON.stringify(res.fill));
       }
     }
-    // if the row is a section header 
+    // if the row is a section header
     else {
       // Dump all the data into Excel
       row = worksheet.addRow(indicator);
@@ -533,28 +540,28 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
     // iterates over the sites
     for (let site of project.entities){
       // creating a tab for each site
-  
+
       // Cleaning the name replacing all special characters by a space
       site.name = site.name.replace(/[^a-zA-Z0-9]/g,' ');
-  
+
       let newWorksheet = buildWorksheet(workbook, site.name);
-  
+
       // create a custom filter to get only the data relate to that specific site
       let customFilter = { entity: [site.id] };
-  
-  
+
+
       sectionHeader.fill.fgColor.argb = COLORS[colorIdx];
       colorIdx = (colorIdx + 1) % 10
-  
+
       let siteMaxLenght = 0;
       for (let e of allCompleteIndicators){
         let row;
         if (e.computation !== undefined){
           let res = await indicatorToRow(ctx, e.computation, e.display, e.baseline, e.target, customFilter);
           row = newWorksheet.addRow(res);
-  
+
           siteMaxLenght = Math.max(siteMaxLenght, res.name.length);
-  
+
           if (e.numFmt !== undefined){
             row.numFmt = e.numFmt;
           }
@@ -575,7 +582,7 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
           }
         } else {
           row = newWorksheet.addRow(e);
-  
+
           // Make it collapsed. 1 is one level. 2 is 2 level.....
           if (e.outlineLevel !== undefined){
             row.outlineLevel = e.outlineLevel;
@@ -584,14 +591,14 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
           if (e.hidden !== undefined){
             row.hidden = e.hidden;
           }
-  
+
           siteMaxLenght = Math.max(siteMaxLenght, e.name.length);
-          
+
           row.fill = e.fill === undefined ? undefined : JSON.parse(JSON.stringify(e.fill));
           row.font = e.font;
         }
       }
-  
+
       newWorksheet.views = [
         {state: 'frozen', xSplit: 1, ySplit: 0, activeCell: 'A1'}
       ];
@@ -611,7 +618,7 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
 
   // ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
   // ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  
+
   workbook.xlsx.writeFile('monitool-' + project.country + '.xlsx');
 
   // Write to memory, buffer
