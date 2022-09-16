@@ -92,7 +92,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
 		computation: computation,
 		filter: filter ? filter : {},
 		dimensionIds: [ctx.params.periodicity],
-		withTotals: false,
+		withTotals: true,
 		withGroups: false
 	};
 
@@ -332,7 +332,14 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?', async ctx => {
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators){
       logicalFrameCompleteIndicators.push({computation: indicator.computation, display: indicator.display, filter: {_start: logicalFrame.start, _end: logicalFrame.end, entity: logicalFrame.entities}, baseline: indicator.baseline, target: indicator.target, numFmt: getNumberFormat(indicator.computation)});
-      logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(buildFormulas({computation: indicator.computation}, project))
+      let indicatorComputations = buildFormulas({computation: indicator.computation}, project)
+      const indicatorComputationFilter = !!logicalFrame.entities.length ? { entity: logicalFrame.entities } : { }
+      indicatorComputations = indicatorComputations.map(indicatorComputation => {
+        const updateIndicatorComputation = Object.assign({}, indicatorComputation)
+        updateIndicatorComputation.filter = indicatorComputationFilter
+        return updateIndicatorComputation;
+      })
+      logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(indicatorComputations)
     }
     for (let purpose of logicalFrame.purposes){
       logicalFrameCompleteIndicators.push({name: 'Specific objective: ' + purpose.description, fill: blueFill[1] });
