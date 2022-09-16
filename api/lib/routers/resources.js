@@ -202,8 +202,13 @@ router.get('/resources/input', async ctx => {
 
 	if (q.mode && q.mode.startsWith('ids_by_')) {
 		let ids;
-		if (q.mode === 'ids_by_form')
+		if (q.mode === 'ids_by_form'){
 			ids = await Input.storeInstance.listIdsByDataSource(q.projectId, q.formId, true);
+			console.log('ids');
+			console.log('ids');
+			console.log('ids');
+			console.log(ids);
+		}
 		else
 			throw new Error('invalid_mode');
 
