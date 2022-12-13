@@ -330,7 +330,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     fr: "Cadre Logique: ",
   };
   for (let logicalFrame of project.logicalFrames) {
-    if (filters.logicalFrames && !filters.logicalFrames.includes(logicalFrame.id)) continue;
     // this creates a row to act as a header for the section
     // this row has a different style and font size
     logicalFrameCompleteIndicators.push({
@@ -338,6 +337,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       fill: sectionHeader.fill,
       font: sectionHeader.font,
     });
+    if (filters.logicalFrames && !filters.logicalFrames.includes(logicalFrame.id)) continue;
 
     // TODO: add translations for the titles
     // logicalFrameCompleteIndicators.push()
@@ -446,12 +446,12 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     es: "Indicadores transversales",
     fr: "Indicateurs transversaux",
   };
+  crossCuttingCompleteIndicators.push({
+    name: CrosscuttingName[ctx.params.lang],
+    fill: sectionHeader.fill,
+    font: sectionHeader.font,
+  });
   if (filters.crossCuttingIndicators) {
-    crossCuttingCompleteIndicators.push({
-      name: CrosscuttingName[ctx.params.lang],
-      fill: sectionHeader.fill,
-      font: sectionHeader.font,
-    });
 
     let listIndicators = await Indicator.storeInstance.list();
 
@@ -487,12 +487,12 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     es: "Indicadores adicionales",
     fr: "Indicateurs annexés",
   };
+  extraCompleteIndicators.push({
+    name: ExtraIndicatorsName[ctx.params.lang],
+    fill: sectionHeader.fill,
+    font: sectionHeader.font,
+  });
   if (filters.extraIndicators) {
-    extraCompleteIndicators.push({
-      name: ExtraIndicatorsName[ctx.params.lang],
-      fill: sectionHeader.fill,
-      font: sectionHeader.font,
-    });
     for (let indicator of project.extraIndicators) {
       extraCompleteIndicators.push({
         computation: Object.assign(indicator.computation, {
@@ -519,12 +519,12 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     fr: "Données de base: ",
   };
   for (let form of project.forms) {
-    if (filters.dataSources && !filters.dataSources.includes(form.id)) continue;
     dataSourcesCompleteIndicators.push({
       name: DataSourceName[ctx.params.lang] + form.name,
       fill: sectionHeader.fill,
       font: sectionHeader.font,
     });
+    if (filters.dataSources && !filters.dataSources.includes(form.id)) continue;
     for (let element of form.elements) {
       let computation = {
         formula: "a",
