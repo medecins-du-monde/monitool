@@ -102,7 +102,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
     result[dateColumn[0]] = "Calculation is missing";
     result.fill = errorRow.fill;
   }
-
+  
   else if (JSON.stringify(computation.parameters) === JSON.stringify({})) {
     for (let timeColumn of dateColumn){
       result[timeColumn] = +computation.formula;
@@ -172,7 +172,7 @@ function buildAllPartitionsPossibilities(formElement){
 
 function buildPartitionsForCalculations(simplerComputation, project, element){
   const newLines = [];
-  
+
   for (const [parameter, value] of Object.entries(simplerComputation.parameters)){
     for (const [partitionId, valuePartitions] of Object.entries(value.filter)){
       const partition = element.partitions.find(p => p.id === partitionId);
@@ -284,14 +284,14 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx 
 
 router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
-  
+
   const filename = 'monitool-' + project.country + '.xlsx';
-  
+
   // check if the file already exists
   if (fs.existsSync(filename)){
     ctx.set('Content-disposition', 'attachment; filename=' + filename);
     ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    
+
     ctx.body = fs.createReadStream(filename);
   }
   else{
@@ -321,8 +321,21 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   lang = ctx.params.lang;
   let minimized = ctx.params.minimized;
 
+  // const ComputationName = {
+  //   en: "Computation: ",
+  //   es: "Cálculo: ",
+  //   fr: "Calcul: ",
+  // };
+
+  // const CollectionSitesName = {
+  //   en: "Collection sites: ",
+  //   es: "Sitios de recolección: ",
+  //   fr: "Sites de collecte: ",
+  // };
+  
+
   // iterate over all the logical frame layers and puts all indicators in the same list
-  // an indicator is being represented by his name and computation
+  // an indicator is being represented by its name and computation
   let logicalFrameCompleteIndicators = [];
   const LogicalFrameName = {
     en: "Logical Framework: ",
@@ -340,7 +353,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     if (filters.logicalFrames && !filters.logicalFrames.includes(logicalFrame.id)) continue;
 
     // TODO: add translations for the titles
-    // logicalFrameCompleteIndicators.push()
     logicalFrameCompleteIndicators.push({
       name: "General objective: " + logicalFrame.goal,
       fill: blueFill[0],
@@ -361,6 +373,8 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
         numFmt: getNumberFormat(indicator.computation),
       });
       logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(
+        // logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.push(
+        // ComputationName[ctx.params.lang],
         buildFormulas({ computation: indicator.computation }, project)
       );
     }
@@ -385,7 +399,25 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
         });
         logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(
           buildFormulas({ computation: indicator.computation }, project)
+          // ComputationName[ctx.params.lang],
+        // buildFormulas({ computation: indicator.computation }, project)
         );
+        // logicalFrame.entities.forEach((entity) => {
+        //   const entityName = project.entities.find((e) => e.id === entity).name;
+        //   logicalFrameCompleteIndicators.push({
+        //     computation: indicator.computation,
+        //     display: entityName,
+        //     filter: {
+        //       _start: logicalFrame.start,
+        //       _end: logicalFrame.end,
+        //       entity: [entity],
+        //     },
+        //     baseline: indicator.baseline,
+        //     target: indicator.target,
+        //     numFmt: getNumberFormat(indicator.computation),
+        //   });
+
+        // });
       }
       for (let output of purpose.outputs) {
         logicalFrameCompleteIndicators.push({
@@ -409,6 +441,22 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
             logicalFrameCompleteIndicators.concat(
               buildFormulas({ computation: indicator.computation }, project)
             );
+          // logicalFrame.entities.forEach((entity) => {
+          //   const entityName = project.entities.find((e) => e.id === entity).name;
+          //   logicalFrameCompleteIndicators.push({
+          //     computation: indicator.computation,
+          //     display: entityName,
+          //     filter: {
+          //       _start: logicalFrame.start,
+          //       _end: logicalFrame.end,
+          //       entity: [entity],
+          //     },
+          //     baseline: indicator.baseline,
+          //     target: indicator.target,
+          //     numFmt: getNumberFormat(indicator.computation),
+          //   });
+
+          // });
         }
         for (let activity of output.activities) {
           logicalFrameCompleteIndicators.push({
