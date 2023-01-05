@@ -766,6 +766,9 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
 router.post('/export/currentView', async (ctx) => {
   // get body from request
   const body = ctx.request.body;
+
+  // paddings from the original table will be used to indent the rows
+  // and determine the fill/outline level
   const {data, paddings, headers} = body;
 
   const rowObjToRowArray = (rowObj, index) => headers.map(col => {
@@ -789,11 +792,13 @@ router.post('/export/currentView', async (ctx) => {
     row.font = padding === 0 ? sectionHeader.font : {};
     row.fill = padding === 0 ? sectionHeader.fill : {};
     maxLength = Math.max(maxLength, data[i].Name.length || 0);
-    // row.fill = sectionHeader.fill;
-    // row.outlineLevel = 1;
-    // row.hidden = true;
   }
-  
+
+  // sets row that only has one column (Name) in bold
+  for (let i = 0; i < data.length; i++) {
+    if (Object.keys(data[i]).length === 1)
+      worksheet.getRow(i + 2).font = { bold: true };
+  }
 
   // the minimum size of the column should be 30 and the maximum 100
   const minimumColWidth = 30;
