@@ -303,15 +303,6 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx =
 /** Render file containing all data entry up to a given date */
 router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
-  const encodedFilters = ctx.request.query.filters;
-  const filters = encodedFilters ? JSON.parse(decodeURI(encodedFilters)) : {
-    crossCuttingIndicators: true,
-    extraCompleteIndicators: true,
-    dateRange: {
-      start: project.start,
-      end: project.end,
-    }
-  };
 
   const filename = "monitool-" + project.country + ".xlsx";
   if (fs.existsSync(filename)) {
@@ -320,19 +311,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
 
   lang = ctx.params.lang;
   let minimized = ctx.params.minimized;
-
-  // const ComputationName = {
-  //   en: "Computation: ",
-  //   es: "Cálculo: ",
-  //   fr: "Calcul: ",
-  // };
-
-  // const CollectionSitesName = {
-  //   en: "Collection sites: ",
-  //   es: "Sitios de recolección: ",
-  //   fr: "Sites de collecte: ",
-  // };
-  
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by its name and computation
@@ -350,7 +328,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       fill: sectionHeader.fill,
       font: sectionHeader.font,
     });
-    if (filters.logicalFrames && !filters.logicalFrames.includes(logicalFrame.id)) continue;
 
     // TODO: add translations for the titles
     logicalFrameCompleteIndicators.push({
@@ -373,8 +350,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
         numFmt: getNumberFormat(indicator.computation),
       });
       logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(
-        // logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.push(
-        // ComputationName[ctx.params.lang],
         buildFormulas({ computation: indicator.computation }, project)
       );
     }
@@ -399,25 +374,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
         });
         logicalFrameCompleteIndicators = logicalFrameCompleteIndicators.concat(
           buildFormulas({ computation: indicator.computation }, project)
-          // ComputationName[ctx.params.lang],
-        // buildFormulas({ computation: indicator.computation }, project)
         );
-        // logicalFrame.entities.forEach((entity) => {
-        //   const entityName = project.entities.find((e) => e.id === entity).name;
-        //   logicalFrameCompleteIndicators.push({
-        //     computation: indicator.computation,
-        //     display: entityName,
-        //     filter: {
-        //       _start: logicalFrame.start,
-        //       _end: logicalFrame.end,
-        //       entity: [entity],
-        //     },
-        //     baseline: indicator.baseline,
-        //     target: indicator.target,
-        //     numFmt: getNumberFormat(indicator.computation),
-        //   });
-
-        // });
       }
       for (let output of purpose.outputs) {
         logicalFrameCompleteIndicators.push({
@@ -441,22 +398,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
             logicalFrameCompleteIndicators.concat(
               buildFormulas({ computation: indicator.computation }, project)
             );
-          // logicalFrame.entities.forEach((entity) => {
-          //   const entityName = project.entities.find((e) => e.id === entity).name;
-          //   logicalFrameCompleteIndicators.push({
-          //     computation: indicator.computation,
-          //     display: entityName,
-          //     filter: {
-          //       _start: logicalFrame.start,
-          //       _end: logicalFrame.end,
-          //       entity: [entity],
-          //     },
-          //     baseline: indicator.baseline,
-          //     target: indicator.target,
-          //     numFmt: getNumberFormat(indicator.computation),
-          //   });
-
-          // });
         }
         for (let activity of output.activities) {
           logicalFrameCompleteIndicators.push({
@@ -499,32 +440,30 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     fill: sectionHeader.fill,
     font: sectionHeader.font,
   });
-  if (filters.crossCuttingIndicators) {
 
-    let listIndicators = await Indicator.storeInstance.list();
+  let listIndicators = await Indicator.storeInstance.list();
 
-    // build a set with all the themes in the project
-    const projectThemes = new Set(project.themes);
+  // build a set with all the themes in the project
+  const projectThemes = new Set(project.themes);
 
-    for (const indicator of listIndicators) {
-      // checks if the indicator has at least one theme in common with the project
-      if (indicator.themes.some((themeId) => projectThemes.has(themeId))) {
-        // if so we add it to the report
-        let currentComputation = null;
-        if (project.crossCutting[indicator._id]) {
-          currentComputation = project.crossCutting[indicator._id].computation;
-        }
-        crossCuttingCompleteIndicators.push({
-          computation: currentComputation,
-          display: indicator.name[ctx.params.lang],
-          baseline: indicator.baseline,
-          target: indicator.target,
-          numFmt: getNumberFormat(currentComputation),
-        });
-        crossCuttingCompleteIndicators = crossCuttingCompleteIndicators.concat(
-          buildFormulas({ computation: currentComputation }, project)
-        );
+  for (const indicator of listIndicators) {
+    // checks if the indicator has at least one theme in common with the project
+    if (indicator.themes.some((themeId) => projectThemes.has(themeId))) {
+      // if so we add it to the report
+      let currentComputation = null;
+      if (project.crossCutting[indicator._id]) {
+        currentComputation = project.crossCutting[indicator._id].computation;
       }
+      crossCuttingCompleteIndicators.push({
+        computation: currentComputation,
+        display: indicator.name[ctx.params.lang],
+        baseline: indicator.baseline,
+        target: indicator.target,
+        numFmt: getNumberFormat(currentComputation),
+      });
+      crossCuttingCompleteIndicators = crossCuttingCompleteIndicators.concat(
+        buildFormulas({ computation: currentComputation }, project)
+      );
     }
   }
 
@@ -540,22 +479,17 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     fill: sectionHeader.fill,
     font: sectionHeader.font,
   });
-  if (filters.extraIndicators) {
-    for (let indicator of project.extraIndicators) {
-      extraCompleteIndicators.push({
-        computation: Object.assign(indicator.computation, {
-          parameters: { filter: filters.entities },
-        }),
-
-        display: indicator.display,
-        baseline: indicator.baseline,
-        target: indicator.target,
-        numFmt: getNumberFormat(indicator.computation),
-      });
-      extraCompleteIndicators = extraCompleteIndicators.concat(
-        buildFormulas(indicator, project)
-      );
-    }
+  for (let indicator of project.extraIndicators) {
+    extraCompleteIndicators.push({
+      computation: indicator.computation,
+      display: indicator.display,
+      baseline: indicator.baseline,
+      target: indicator.target,
+      numFmt: getNumberFormat(indicator.computation),
+    });
+    extraCompleteIndicators = extraCompleteIndicators.concat(
+      buildFormulas(indicator, project)
+    );
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
@@ -572,16 +506,13 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       fill: sectionHeader.fill,
       font: sectionHeader.font,
     });
-    if (filters.dataSources && !filters.dataSources.includes(form.id)) continue;
     for (let element of form.elements) {
       let computation = {
         formula: "a",
         parameters: {
           a: {
             elementId: element.id,
-            filter: {
-              entity: filters.entities,
-            },
+            filter: {},
           },
         },
       };
@@ -603,11 +534,11 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   dateColumn = Array.from(
     timeSlotRange(
       TimeSlot.fromDate(
-        new Date(filters.dateRange.start + "T00:00:00Z"),
+        new Date(project.start + "T00:00:00Z"),
         ctx.params.periodicity
       ),
       TimeSlot.fromDate(
-        new Date(filters.dateRange.end + "T00:00:00Z"),
+        new Date(project.end + "T00:00:00Z"),
         ctx.params.periodicity
       )
     )
