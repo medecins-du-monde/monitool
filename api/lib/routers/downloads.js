@@ -832,4 +832,65 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   ctx.body = '{ "message": "done" }';
 });
 
+router.post('/export/currentView', async (ctx) => {
+  // get body from request
+  const body = ctx.request.body;
+  const {data, paddings, headers} = body;
+
+  const rowObjToRowArray = (rowObj, index) => headers.map(col => {
+    const value = rowObj[col];
+    if (value === undefined) return '';
+    if (col === 'Name') return '    '.repeat(paddings[index]) + value;
+    return value;
+  });
+
+  // create the excel file
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Current view');
+
+  let maxLength = 0;
+
+  worksheet.addRow(headers);
+  for (let i = 0; i < data.length; i++) {
+    const row = worksheet.addRow(rowObjToRowArray(data[i], i));
+    const padding = paddings[i];
+    row.outlineLevel = padding > 2 ? (padding - 1) / 2 + 1: padding;
+    row.font = padding === 0 ? sectionHeader.font : {};
+    row.fill = padding === 0 ? sectionHeader.fill : {};
+    maxLength = Math.max(maxLength, data[i].Name.length || 0);
+    // row.fill = sectionHeader.fill;
+    // row.outlineLevel = 1;
+    // row.hidden = true;
+  }
+  
+
+  // the minimum size of the column should be 30 and the maximum 100
+  const minimumColWidth = 30;
+  const maximumColWidth = 100;
+  worksheet.columns[0].width = Math.min(
+    Math.max(maxLength + 10, minimumColWidth),
+    maximumColWidth
+  );
+
+  // remove the text in A1
+  worksheet.getCell('A1').value = '';
+
+  // set the width from the 4th column to the last column to 110
+  worksheet.columns.forEach((col, index) => {
+    if (index > 2) col.width = 15;
+  });
+
+  worksheet.views = [
+    { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
+  ];
+  
+  // final name will be monitool-<country>.xlsx, this will be done in the frontend
+  await workbook.xlsx.writeFile('currViewReport.xlsx');
+  ctx.set('Content-disposition', 'attachment; filename=currViewReport.xlsx');
+  ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  const stream = fs.createReadStream('currViewReport.xlsx');
+  ctx.status = 200;
+  ctx.body = stream;
+});
+
 export default router;
