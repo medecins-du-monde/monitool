@@ -547,6 +547,7 @@ export default class Cube {
 		// Convert all filters to sorted integer lists.
 		for (const key in textFilters) {
 			const textFilter = textFilters[key];
+			if (textFilter === null) continue;
 			const textFilterLength = textFilter.length;
 
 			const intFilter = new Array();
