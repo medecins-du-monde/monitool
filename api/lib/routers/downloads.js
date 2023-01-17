@@ -172,7 +172,7 @@ function buildAllPartitionsPossibilities(formElement){
 
 function buildPartitionsForCalculations(simplerComputation, project, element){
   const newLines = [];
-
+  
   for (const [parameter, value] of Object.entries(simplerComputation.parameters)){
     for (const [partitionId, valuePartitions] of Object.entries(value.filter)){
       const partition = element.partitions.find(p => p.id === partitionId);
@@ -284,14 +284,14 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx 
 
 router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
-
+  
   const filename = 'monitool-' + project.country + '.xlsx';
-
+  
   // check if the file already exists
   if (fs.existsSync(filename)){
     ctx.set('Content-disposition', 'attachment; filename=' + filename);
     ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
+    
     ctx.body = fs.createReadStream(filename);
   }
   else{
@@ -334,7 +334,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       name: "General objective: " + logicalFrame.goal,
       fill: blueFill[0],
     });
-
     // TODO: To be simplified with a recursive function
     for (let indicator of logicalFrame.indicators) {
       logicalFrameCompleteIndicators.push({
@@ -529,7 +528,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       }
     }
   }
-
+  
   // creates a list for the names of the columns based on the periodicity received as a parameter
   dateColumn = Array.from(
     timeSlotRange(
@@ -616,7 +615,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
             : JSON.parse(JSON.stringify(res.fill));
       }
     }
-    // if the row is a section header
+    // if the row is a section header 
     else {
       // Dump all the data into Excel
       row = worksheet.addRow(indicator);
@@ -657,12 +656,12 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     // iterates over the sites
     for (let site of project.entities) {
       // creating a tab for each site
-
+  
       // Cleaning the name replacing all special characters by a space
       site.name = site.name.replace(/[^a-zA-Z0-9]/g, " ");
 
       let newWorksheet = buildWorksheet(workbook, site.name);
-
+  
       // create a custom filter to get only the data relate to that specific site
       let customFilter = { entity: [site.id] };
 
@@ -685,7 +684,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
 
           siteMaxLength = Math.max(siteMaxLength, res.name.length);
 
-          if (e.numFmt !== undefined) {
+          if (e.numFmt !== undefined) 
             row.numFmt = e.numFmt;
           }
           if (e.outlineLevel !== undefined) {
@@ -711,7 +710,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
           }
         } else {
           row = newWorksheet.addRow(e);
-
+  
           // Make it collapsed. 1 is one level. 2 is 2 level.....
           if (e.outlineLevel !== undefined) {
             row.outlineLevel = e.outlineLevel;
@@ -730,7 +729,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
           row.font = e.font;
         }
       }
-
+  
       newWorksheet.views = [
         { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
       ];
