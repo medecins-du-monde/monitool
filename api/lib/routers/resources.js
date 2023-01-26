@@ -70,6 +70,16 @@ router.get('/resources/project', async ctx => {
 router.get('/resources/project/:id', async ctx => {
 	const project = await Project.storeInstance.get(ctx.params.id);
 
+	// add name of users
+	const projectUserIds = project.users.map(u => u.id).filter(u => !!u);
+	const users = await User.storeInstance.list();
+	users.forEach(u => {
+		if (projectUserIds.includes(u._id)) {
+			const projUser = project.users.find(pu => pu.id === u._id);
+			projUser.name = u.name;
+		}
+	})
+
 	if (!ctx.visibleProjectIds.has(ctx.params.id))
 		throw new Error('forbidden');
 
