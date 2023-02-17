@@ -21,8 +21,10 @@ export default async () => {
 
         emit(doc._id, progress / count);
       }
-    }.toString(),
+    }
+      .toString()
+      .replace(/\n/g, "")
+      .replace(/\s+/g, " "),
   };
-
   await database.insert(ddoc);
 };
