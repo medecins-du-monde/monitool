@@ -52,7 +52,7 @@ passport.deserializeUser(function(id, done) {
 				_id: 'user:' + config.auth.providers.training.account,
 				type: 'user',
 				name: "Training account",
-				role: 'common'
+				role: 'common',
 			}));
 		else
 			userPromise = User.storeInstance.get(id);
@@ -62,6 +62,8 @@ passport.deserializeUser(function(id, done) {
 				// Upgrade user to administrator if specified in the configuration file.
 				if ('user:' + config.auth.administrator === user._id)
 					user.role = 'admin';
+				// Update last login date
+				updateLastLogin(user);
 
 				done(null, user);
 			})
@@ -70,7 +72,10 @@ passport.deserializeUser(function(id, done) {
 	else if (type === 'partner') {
 		User.storeInstance
 			.getPartner(id.substring('partner:'.length))
-			.then(function(user) { done(null, user); })
+			.then(function(user) { 
+				updateLastLogin(user);
+				done(null, user);
+			})
 			.catch(function(error) { done(error); });
 	}
 	else
@@ -113,6 +118,8 @@ if (config.auth.providers.azureAD) {
 							user.name = profile.name;
 							user.save(); // don't wait for the callback
 						}
+						// Update last login date
+						updateLastLogin(user);
 
 						// Auth was OK
 						done(null, user);
@@ -120,7 +127,13 @@ if (config.auth.providers.azureAD) {
 					function(error) {
 						// This user never logged in!
 						if (error.message === 'missing' || error.message === 'deleted') {
-							var user = new User({_id: userId, type: 'user', name: profile.name, role: 'common'});
+							var user = new User({
+								_id: userId,
+								type: 'user',
+								name: profile.name,
+								role: 'common',
+								lastLogin: new Date().toISOString()
+							});
 							user.save().then(
 								function() {
 									done(null, user); // Auth is OK
@@ -138,7 +151,7 @@ if (config.auth.providers.azureAD) {
 				);
 			}
 			catch (e) {
-				done("An error has occured while loggin you in. Are you using a medecinsdumonde.net account?");
+				done("An error has occurred while logging you in. Are you using a medecinsdumonde.net account?");
 			}
 		}
 	);
@@ -203,7 +216,8 @@ if (config.auth.providers.training) {
 				_id: 'user:' + config.auth.providers.training.account,
 				type: 'user',
 				name: "Training account",
-				role: 'common'
+				role: 'common',
+				lastLogin: new Date().toISOString()
 			});
 
 			done(null, trainingUser);
@@ -213,3 +227,15 @@ if (config.auth.providers.training) {
 
 export default passport;
 
+const updateLastLogin = async (user) => {
+  try {
+    // if rev missing, check if user exists
+    if (!user._rev) {
+      const u = await User.storeInstance.get(user._id);
+      if (!u) return;
+      else user = u;
+    }
+    user.lastLogin = new Date().toISOString();
+    await user.save();
+  } catch (e) {}
+};
