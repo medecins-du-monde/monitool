@@ -836,6 +836,16 @@ router.post('/export/currentView', async (ctx) => {
 
 /** Export of users */
 router.get('/export/users', async (ctx) => {
+  // check that user is admin
+  const user = ctx.state.user;
+
+  if (user.role !== 'admin') {
+    ctx.status = 403;
+    ctx.body = { message: 'You are not authorized to access this resource' };
+    return;
+  }
+
+
   // get all users from the database
   const users = await User.storeInstance.list();
 
