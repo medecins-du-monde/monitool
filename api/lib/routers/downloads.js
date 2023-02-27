@@ -774,7 +774,8 @@ router.post('/export/currentView', async (ctx) => {
     const value = rowObj[col];
     if (value === undefined) return '';
     if (col === 'Name') return '    '.repeat(paddings[index]) + value;
-    return value;
+    // remove all dots from numbers
+    return value.replace(/\./g, '');
   });
 
   // create the excel file
@@ -788,15 +789,18 @@ router.post('/export/currentView', async (ctx) => {
     const row = worksheet.addRow(rowObjToRowArray(data[i], i));
     const padding = paddings[i];
     row.outlineLevel = padding > 2 ? (padding - 1) / 2 + 1: padding;
-    row.font = padding === 0 ? sectionHeader.font : {};
-    row.fill = padding === 0 ? sectionHeader.fill : {};
+    if (padding === 0) {
+      row.font = sectionHeader.font;
+      row.fill = sectionHeader.fill;
+    }
     maxLength = Math.max(maxLength, data[i].Name.length || 0);
   }
 
   // sets row that only has one column (Name) in bold
   for (let i = 0; i < data.length; i++) {
-    if (Object.keys(data[i]).length === 1)
+    if (Object.keys(data[i]).length === 1) {
       worksheet.getRow(i + 2).font = { bold: true };
+    }
   }
 
   // the minimum size of the column should be 30 and the maximum 100

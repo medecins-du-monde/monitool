@@ -38,29 +38,12 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string')
 			throw new Error('missing_parameter');
 
-
 		const options = {
 			startkey: "input:" + projectId + ":" + dataSourceId + ":0",
 			endkey: "input:" + projectId + ":" + dataSourceId + ":g"
 		};
 
-
-		console.log('startkey');
-		console.log(options.startkey);
-		console.log('endkey');
-		console.log(options.endkey);
-
-		const dbResult = await this._db.callView('inputs_with_progress', {
-			startkey: "input:" + projectId + ":" + dataSourceId + ":0",
-			endkey: "input:" + projectId + ":" + dataSourceId + ":g"
-		});
-
-
-
-		// console.log('dbResult');
-		// console.log('dbResult');
-		// console.log('dbResult');
-		// console.log(dbResult);
+		const dbResult = await this._db.callView('inputs_with_progress', options);
 
 		if (update) {
 			const project = await Project.storeInstance.get(projectId);

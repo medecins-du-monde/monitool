@@ -112,9 +112,14 @@ class Database {
 		for (let i = versionDoc.version; i < migrations.length; ++i) {
 			winston.log('info', '[Database] Updating from version ' + versionDoc.version);
 
-			await migrations[i]();
-			versionDoc.version += 1;
-			await this.insert(versionDoc);
+			try {
+				await migrations[i]();
+				versionDoc.version += 1;
+				await this.insert(versionDoc);
+			} catch (e) {
+				winston.log('error', '[Database] Migration failed: ' + e.message);
+        break;
+      }
 		}
 
 		winston.log('info', '[Database] No more migrations. Current version is ' + versionDoc.version);
@@ -135,7 +140,7 @@ class Database {
 				return lock;
 			}
 			catch (e) {
-				winston.log('info', '[Database] Failed to acquire migration lock :');
+				winston.log('info', '[Database] Failed to acquire migration lock :' + e.message);
 
 				await delay();
 				return getLockRec();

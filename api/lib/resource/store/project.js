@@ -217,6 +217,10 @@ function compareArray(before, after, changes, prefix) {
 	if (beforeIds.indexOf(undefined) !== -1 || afterIds.indexOf(undefined) !== -1)
 		return;
 
+	// if the arrays are the same, do nothing
+	if (beforeIds.toString() === afterIds.toString()) 
+		return;
+
 	// start by removing items
 	for (var beforeIndex = 0; beforeIndex < beforeIds.length; ++beforeIndex) {
 		var id = beforeIds[beforeIndex], afterIndex = afterIds.indexOf(id);
