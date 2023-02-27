@@ -92,7 +92,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
 		computation: computation,
 		filter: filter ? filter : {},
 		dimensionIds: [ctx.params.periodicity],
-		withTotals: false,
+		withTotals: true,
 		withGroups: false
 	};
 
@@ -172,7 +172,7 @@ function buildAllPartitionsPossibilities(formElement){
 
 function buildPartitionsForCalculations(simplerComputation, project, element){
   const newLines = [];
-  
+
   for (const [parameter, value] of Object.entries(simplerComputation.parameters)){
     for (const [partitionId, valuePartitions] of Object.entries(value.filter)){
       const partition = element.partitions.find(p => p.id === partitionId);
@@ -284,14 +284,14 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx 
 
 router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
-  
+
   const filename = 'monitool-' + project.country + '.xlsx';
-  
+
   // check if the file already exists
   if (fs.existsSync(filename)){
     ctx.set('Content-disposition', 'attachment; filename=' + filename);
     ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    
+
     ctx.body = fs.createReadStream(filename);
   }
   else{
@@ -303,15 +303,6 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx =
 /** Render file containing all data entry up to a given date */
 router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
-  const encodedFilters = ctx.request.query.filters;
-  const filters = encodedFilters ? JSON.parse(decodeURI(encodedFilters)) : {
-    crossCuttingIndicators: true,
-    extraCompleteIndicators: true,
-    dateRange: {
-      start: project.start,
-      end: project.end,
-    }
-  };
 
   const filename = "monitool-" + project.country + ".xlsx";
   if (fs.existsSync(filename)) {
@@ -322,7 +313,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   let minimized = ctx.params.minimized;
 
   // iterate over all the logical frame layers and puts all indicators in the same list
-  // an indicator is being represented by his name and computation
+  // an indicator is being represented by its name and computation
   let logicalFrameCompleteIndicators = [];
   const LogicalFrameName = {
     en: "Logical Framework: ",
@@ -337,10 +328,8 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       fill: sectionHeader.fill,
       font: sectionHeader.font,
     });
-    if (filters.logicalFrames && !filters.logicalFrames.includes(logicalFrame.id)) continue;
 
     // TODO: add translations for the titles
-    // logicalFrameCompleteIndicators.push()
     logicalFrameCompleteIndicators.push({
       name: "General objective: " + logicalFrame.goal,
       fill: blueFill[0],
@@ -451,32 +440,30 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     fill: sectionHeader.fill,
     font: sectionHeader.font,
   });
-  if (filters.crossCuttingIndicators) {
 
-    let listIndicators = await Indicator.storeInstance.list();
+  let listIndicators = await Indicator.storeInstance.list();
 
-    // build a set with all the themes in the project
-    const projectThemes = new Set(project.themes);
+  // build a set with all the themes in the project
+  const projectThemes = new Set(project.themes);
 
-    for (const indicator of listIndicators) {
-      // checks if the indicator has at least one theme in common with the project
-      if (indicator.themes.some((themeId) => projectThemes.has(themeId))) {
-        // if so we add it to the report
-        let currentComputation = null;
-        if (project.crossCutting[indicator._id]) {
-          currentComputation = project.crossCutting[indicator._id].computation;
-        }
-        crossCuttingCompleteIndicators.push({
-          computation: currentComputation,
-          display: indicator.name[ctx.params.lang],
-          baseline: indicator.baseline,
-          target: indicator.target,
-          numFmt: getNumberFormat(currentComputation),
-        });
-        crossCuttingCompleteIndicators = crossCuttingCompleteIndicators.concat(
-          buildFormulas({ computation: currentComputation }, project)
-        );
+  for (const indicator of listIndicators) {
+    // checks if the indicator has at least one theme in common with the project
+    if (indicator.themes.some((themeId) => projectThemes.has(themeId))) {
+      // if so we add it to the report
+      let currentComputation = null;
+      if (project.crossCutting[indicator._id]) {
+        currentComputation = project.crossCutting[indicator._id].computation;
       }
+      crossCuttingCompleteIndicators.push({
+        computation: currentComputation,
+        display: indicator.name[ctx.params.lang],
+        baseline: indicator.baseline,
+        target: indicator.target,
+        numFmt: getNumberFormat(currentComputation),
+      });
+      crossCuttingCompleteIndicators = crossCuttingCompleteIndicators.concat(
+        buildFormulas({ computation: currentComputation }, project)
+      );
     }
   }
 
@@ -492,22 +479,17 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     fill: sectionHeader.fill,
     font: sectionHeader.font,
   });
-  if (filters.extraIndicators) {
-    for (let indicator of project.extraIndicators) {
-      extraCompleteIndicators.push({
-        computation: Object.assign(indicator.computation, {
-          parameters: { filter: filters.entities },
-        }),
-
-        display: indicator.display,
-        baseline: indicator.baseline,
-        target: indicator.target,
-        numFmt: getNumberFormat(indicator.computation),
-      });
-      extraCompleteIndicators = extraCompleteIndicators.concat(
-        buildFormulas(indicator, project)
-      );
-    }
+  for (let indicator of project.extraIndicators) {
+    extraCompleteIndicators.push({
+      computation: indicator.computation,
+      display: indicator.display,
+      baseline: indicator.baseline,
+      target: indicator.target,
+      numFmt: getNumberFormat(indicator.computation),
+    });
+    extraCompleteIndicators = extraCompleteIndicators.concat(
+      buildFormulas(indicator, project)
+    );
   }
 
   // data sources don't have a computation field, but their computation use always the same formula,
@@ -524,16 +506,13 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       fill: sectionHeader.fill,
       font: sectionHeader.font,
     });
-    if (filters.dataSources && !filters.dataSources.includes(form.id)) continue;
     for (let element of form.elements) {
       let computation = {
         formula: "a",
         parameters: {
           a: {
             elementId: element.id,
-            filter: {
-              entity: filters.entities,
-            },
+            filter: {},
           },
         },
       };
@@ -555,11 +534,11 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   dateColumn = Array.from(
     timeSlotRange(
       TimeSlot.fromDate(
-        new Date(filters.dateRange.start + "T00:00:00Z"),
+        new Date(project.start + "T00:00:00Z"),
         ctx.params.periodicity
       ),
       TimeSlot.fromDate(
-        new Date(filters.dateRange.end + "T00:00:00Z"),
+        new Date(project.end + "T00:00:00Z"),
         ctx.params.periodicity
       )
     )
@@ -782,6 +761,76 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   // ctx.body = buffer;
 
   ctx.body = '{ "message": "done" }';
+});
+
+router.post('/export/currentView', async (ctx) => {
+  // get body from request
+  const body = ctx.request.body;
+
+  // paddings from the original table will be used to indent the rows
+  // and determine the fill/outline level
+  const {data, paddings, headers} = body;
+
+  const rowObjToRowArray = (rowObj, index) => headers.map(col => {
+    const value = rowObj[col];
+    if (value === undefined) return '';
+    if (col === 'Name') return '    '.repeat(paddings[index]) + value;
+    // remove all dots from numbers
+    return value.replace(/\./g, '');
+  });
+
+  // create the excel file
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Current view');
+
+  let maxLength = 0;
+
+  worksheet.addRow(headers);
+  for (let i = 0; i < data.length; i++) {
+    const row = worksheet.addRow(rowObjToRowArray(data[i], i));
+    const padding = paddings[i];
+    row.outlineLevel = padding > 2 ? (padding - 1) / 2 + 1: padding;
+    if (padding === 0) {
+      row.font = sectionHeader.font;
+      row.fill = sectionHeader.fill;
+    }
+    maxLength = Math.max(maxLength, data[i].Name.length || 0);
+  }
+
+  // sets row that only has one column (Name) in bold
+  for (let i = 0; i < data.length; i++) {
+    if (Object.keys(data[i]).length === 1) {
+      worksheet.getRow(i + 2).font = { bold: true };
+    }
+  }
+
+  // the minimum size of the column should be 30 and the maximum 100
+  const minimumColWidth = 30;
+  const maximumColWidth = 100;
+  worksheet.columns[0].width = Math.min(
+    Math.max(maxLength + 10, minimumColWidth),
+    maximumColWidth
+  );
+
+  // remove the text in A1
+  worksheet.getCell('A1').value = '';
+
+  // set the width from the 4th column to the last column to 110
+  worksheet.columns.forEach((col, index) => {
+    if (index > 2) col.width = 15;
+  });
+
+  worksheet.views = [
+    { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
+  ];
+  
+  // final name will be monitool-<country>.xlsx, this will be done in the frontend
+  await workbook.xlsx.writeFile('currViewReport.xlsx');
+  ctx.set('Content-disposition', 'attachment; filename=currViewReport.xlsx');
+  ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  const stream = fs.createReadStream('currViewReport.xlsx');
+  ctx.status = 200;
+  ctx.body = stream;
 });
 
 export default router;
