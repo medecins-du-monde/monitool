@@ -835,39 +835,45 @@ router.post('/export/currentView', async (ctx) => {
 });
 
 /** Export of users */
-router.get('/export/users', async (ctx) => {
+router.get("/export/users", async (ctx) => {
   // check that user is admin
   const user = ctx.state.user;
 
-  if (user.role !== 'admin') {
+  if (user.role !== "admin") {
     ctx.status = 403;
-    ctx.body = { message: 'You are not authorized to access this resource' };
+    ctx.body = { message: "You are not authorized to access this resource" };
     return;
   }
-
 
   // get all users from the database
   const users = await User.storeInstance.list();
 
   // get language from the request
   const lang = ctx.request.query.lang || lang;
-  
-  
+
   // Translations
   const headers = {
-    en: [	"User", "Type" ,"Name", "Role", "Last connection" ],
-    es: [	"Usuario", "Tipo" ,"Nombre", "Rol", "Última conexión" ],
-    fr: [	"Utilisateur", "Type" ,"Nom", "Rôle", "Dernière connexion" ],
+    en: ["User", "Email", "Type", "Name", "Role", "Last connection"],
+    es: [
+      "Usuario",
+      "Correo electrónico",
+      "Tipo",
+      "Nombre",
+      "Rol",
+      "Última conexión",
+    ],
+    fr: ["Utilisateur", "E-mail", "Type", "Nom", "Rôle", "Dernière connexion"],
   };
+
   // create the excel file
   const workbook = new Excel.Workbook();
   const worksheet = workbook.addWorksheet(headers[lang][0]);
 
   const missingData = {
-    en: 'Missing data',
-    es: 'Datos faltantes',
-    fr: 'Données manquantes',
-  }
+    en: "Missing data",
+    es: "Datos faltantes",
+    fr: "Données manquantes",
+  };
 
   // add the headers
   const headerRow = worksheet.addRow(headers[lang]);
@@ -879,6 +885,7 @@ router.get('/export/users', async (ctx) => {
   // set the width of the columns
   worksheet.columns = [
     { width: 30 },
+    { width: 45 },
     { width: 7 },
     { width: 30 },
     { width: 10 },
@@ -892,20 +899,25 @@ router.get('/export/users', async (ctx) => {
       ? new Date(users[i].lastLogin).toLocaleString(lang)
       : missingData[lang];
 
+    const user = users[i]._id.split(":")[1];
+
     worksheet.addRow([
-      users[i]._id.split(':')[1],
+      user,
+      `${user}@medecinsdumonde.net`,
       users[i].type,
       users[i].name,
       users[i].role,
       lastLogin,
     ]);
-
   }
   // write the file
-  await workbook.xlsx.writeFile('users.xlsx');
-  ctx.set('Content-disposition', 'attachment; filename=users.xlsx');
-  ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  const stream = fs.createReadStream('users.xlsx');
+  await workbook.xlsx.writeFile("users.xlsx");
+  ctx.set("Content-disposition", "attachment; filename=users.xlsx");
+  ctx.set(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  const stream = fs.createReadStream("users.xlsx");
   ctx.status = 200;
   ctx.body = stream;
 });
