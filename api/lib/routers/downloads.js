@@ -869,6 +869,21 @@ router.get('/export/users', async (ctx) => {
     fr: 'Données manquantes',
   }
 
+  const userType = {
+    en: {
+      user: 'MdM account',
+      partner: 'Partner account',
+    },
+    es: {
+      user: 'Cuenta de MdM',
+      partner: 'Cuenta de socio',
+    },
+    fr: {
+      user: 'Compte MdM',
+      partner: 'Compte partenaire',
+    }
+  }
+
   // add the headers
   const headerRow = worksheet.addRow(headers[lang]);
 
@@ -892,9 +907,13 @@ router.get('/export/users', async (ctx) => {
       ? new Date(users[i].lastLogin).toLocaleString(lang)
       : missingData[lang];
 
+    const type = users[i].type === 'user'
+      ? userType[lang].user
+      : userType[lang].partner;
+
     worksheet.addRow([
       users[i]._id.split(':')[1],
-      users[i].type,
+      type,
       users[i].name,
       users[i].role,
       lastLogin,
