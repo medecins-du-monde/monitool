@@ -33,6 +33,12 @@
 				"type": "string",
 				"pattern": "^theme:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
 			}
+		},
+		"comments": {
+			"type": "array"
+		},
+		"id": {
+			"type": "string"
 		}
 	},
 

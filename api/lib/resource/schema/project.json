@@ -174,7 +174,28 @@
 			}
 		},
 
-		"extraIndicators": {
+		"crossCuttingComments": {
+			"type":	"array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"filter": { "type": "object"},
+					"value": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"nameComment": { "type": "string" },
+							"multiThemeComment": { "type": "string" }
+						}
+					}
+				}
+			}
+		},
+		"extraIndicatorsComment": {
+			"type": "array"
+		},
+		"extraIndicators": {	
 			"type": "array",
 			"items": {"$ref": "#/definitions/indicator"}
 		}
@@ -239,7 +260,19 @@
 				"baseline": {"oneOf": [{"type": "null"}, {"type": "number"}]},
 				"target": {"oneOf": [{"type": "null"}, {"type": "number"}]},
 				"colorize": {"type": "boolean"},
-				"computation": { "$ref": "#/definitions/computation" }
+				"computation": { "$ref": "#/definitions/computation" },
+				"comments": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"value": { "type": "object"},
+							"filter": { "type": "object"}
+						}
+					}
+				},
+				"id": {"type": "string"}
 			}
 		},
 

@@ -26,6 +26,14 @@ import User from '../resource/model/user';
 
 const router = new Router();
 
+import uuidv4 from "uuid/v4";
+const isEqual = require("lodash.isequal");
+const isArray = require("lodash.isarray");
+
+const cloneDeep = (x) => {
+  return JSON.parse(JSON.stringify(x));
+};
+
 /**
  * Get current logged in account information
  * This is used by the client to check if current session is valid and learn user name for display purposes.
@@ -357,5 +365,469 @@ router.delete('/resources/:modelName(indicator|theme)/:id', async ctx => {
 	ctx.response.body = await model.destroy()
 });
 
+/**
+ * Saves a comment on the project structure.
+ */
+router.put("/resources/comment", async (ctx) => {
+  const { comment } = ctx.request.body;
+  if (!comment) throw new Error("missing_comment");
+  const project = await Project.storeInstance.get(comment.project);
+  if (!project) throw new Error("project_not_found");
+
+  const matchesFilter = (filter, c) => {
+    // check if both array have the same string, order doesn't matter
+    const haveSameEntities = (a, b) => {
+      if (!a || !b) return false;
+      if (a.length !== b.length) return false;
+
+      return a.every((e) => b.includes(e)) && b.every((e) => a.includes(e));
+    };
+
+    if (!c) return false;
+    const { computation, customFilters, dateRange, dimensionId, entities } = c;
+    if (computation && !isEqual(computation, filter.computation)) return false;
+    if (customFilters && !isEqual(customFilters, filter.customFilters))
+      return false;
+    if (dateRange && !isEqual(dateRange, filter.dateRange)) return false;
+    if (dimensionId && !isEqual(dimensionId, filter.dimensionId)) return false;
+    if (entities && !haveSameEntities(entities, filter.entities)) return false;
+
+    return true;
+  };
+
+  const findForFilter = (comments, filter) => {
+    if (!comments) return null;
+    return comments.find((c) => matchesFilter(c.filter, filter)) || null;
+  };
+
+  // logical frame comments / name and goal
+  if (comment.type === "logicalFrame") {
+    const logicalFrame = project.logicalFrames.find((x) => x.id === comment.id);
+    if (comment.nameComment) {
+      const allNameComments = logicalFrame.nameComment;
+      const commentForFilter = allNameComments
+        ? allNameComments.find((c) => matchesFilter(c.filter, comment.filter))
+        : null;
+
+      if (commentForFilter) commentForFilter.value = comment.nameComment;
+      else if (allNameComments)
+        allNameComments.push({
+          value: comment.nameComment,
+          filter: comment.filter,
+        });
+      else
+        logicalFrame.nameComment = [
+          {
+            value: comment.nameComment,
+            filter: comment.filter,
+          },
+        ];
+    }
+    if (comment.goalComment) {
+      const allGoalComments = logicalFrame.goalComment;
+      const commentForFilter = allGoalComments
+        ? allGoalComments.find((c) => matchesFilter(c.filter, comment.filter))
+        : null;
+
+      if (commentForFilter) commentForFilter.value = comment.goalComment;
+      else if (allGoalComments)
+        allGoalComments.push({
+          value: comment.goalComment,
+          filter: comment.filter,
+        });
+      else
+        logicalFrame.goalComment = [
+          {
+            value: comment.goalComment,
+            filter: comment.filter,
+          },
+        ];
+    }
+
+    // indicator comments, either from logicalFrame or purpose
+  } else if (comment.type === "indicator") {
+    const indicatorID = comment.id;
+    const logicalFrame = project.logicalFrames.find(
+      (x) => x.id === comment.logicalFrame
+    );
+
+    let purpose = null;
+    let output = null;
+    let activity = null;
+    const standaloneIndicator =
+      typeof indicatorID === "string" && indicatorID.startsWith("indicator:")
+        ? (await Indicator.storeInstance.get(indicatorID)) || null
+        : null;
+
+    const form = comment.form
+      ? project.forms.find((x) => x.id === comment.form)
+      : null;
+
+    const formElement = form
+      ? form.elements.find((x) => x.id === indicatorID)
+      : null;
+
+    const purposeID = comment.purpose;
+    if (purposeID) {
+      const purposes = logicalFrame.purposes.filter((p) => {
+        return typeof purposeID === "string"
+          ? p.id === purposeID
+          : isEqual({ description: p.description }, purposeID);
+      });
+
+      // if found more than one, throw an error
+      if (purposes.length > 1) throw new Error("multiple_purposes_found");
+
+      purpose = purposes[0];
+      if (!purpose) throw new Error("purpose_not_found");
+
+      // creates id if not present
+      if (!purpose.id) purpose.id = uuidv4();
+
+      const outputID = comment.output;
+      if (outputID) {
+        const outputs = purpose.outputs.filter((o) => {
+          return typeof outputID === "string"
+            ? o.id === outputID
+            : isEqual({ description: o.description }, outputID);
+        });
+
+        // if found more than one, throw an error
+        if (outputs.length > 1) throw new Error("multiple_outputs_found");
+
+        output = outputs[0];
+        if (!output) throw new Error("output_not_found");
+
+        // creates id if not present
+        if (!output.id) output.id = uuidv4();
+
+        const activityID = comment.activity;
+        if (activityID) {
+          const activities = output.activities.filter((a) => {
+            return typeof activityID === "string"
+              ? a.id === activityID
+              : isEqual({ description: a.description }, activityID);
+          });
+
+          // if found more than one, throw an error
+          if (activities.length > 1)
+            throw new Error("multiple_activities_found");
+
+          activity = activities[0];
+          if (!activity) throw new Error("activity_not_found");
+
+          // creates id if not present
+          if (!activity.id) activity.id = uuidv4();
+        }
+      }
+    }
+
+    const indicators = (
+      activity ||
+      output ||
+      purpose ||
+      logicalFrame || { indicators: project.extraIndicators || [] }
+    ).indicators.filter((ind) => {
+      return typeof indicatorID === "string"
+        ? ind.id === indicatorID
+        : isEqual({ display: ind.display }, indicatorID);
+    });
+
+    if (standaloneIndicator) {
+      const column = comment.column;
+      if (!column) throw new Error("missing_column");
+      const commentForFilter = findForFilter(
+        standaloneIndicator.comments,
+        comment.filter
+      );
+      const indComments = commentForFilter
+        ? cloneDeep(commentForFilter.value)
+        : {};
+
+      // each key is a project id, making if possible to have different comments
+      // on each of the tables that use the same shared indicator
+      indComments[project._id] = indComments[project._id] || {};
+      Object.assign(indComments[project._id], {
+        [column]: comment.comment,
+      });
+
+      if (commentForFilter) commentForFilter.value = indComments;
+      else if (!commentForFilter && isArray(standaloneIndicator.comments))
+        standaloneIndicator.comments.push({
+          filter: comment.filter,
+          value: indComments,
+        });
+      else
+        standaloneIndicator.comments = [
+          { filter: comment.filter, value: indComments },
+        ];
+      // save indicator
+      await standaloneIndicator.save();
+    } else if (formElement) {
+      const column = comment.column;
+      if (!column) throw new Error("missing_column");
+
+      const commentForFilter = findForFilter(
+        formElement.comments,
+        comment.filter
+      );
+
+      const elComments = commentForFilter
+        ? cloneDeep(commentForFilter.value)
+        : {};
+      Object.assign(elComments, {
+        [column]: comment.comment,
+      });
+
+      if (commentForFilter) commentForFilter.value = elComments;
+      else if (!commentForFilter && isArray(formElement.comments))
+        formElement.comments.push({
+          filter: comment.filter,
+          value: elComments,
+        });
+      else
+        formElement.comments = [{ filter: comment.filter, value: elComments }];
+    } else {
+      // if found more than one, throw an error
+      if (indicators.length > 1) throw new Error("multiple_indicators_found");
+      const indicator = indicators[0];
+      if (!indicator) throw new Error("indicator_not_found");
+
+      // creates id if not present
+      if (!indicator.id) indicator.id = uuidv4();
+
+      const column = comment.column;
+      if (!column) throw new Error("missing_column");
+
+      const commentForFilter = findForFilter(
+        indicator.comments,
+        comment.filter
+      );
+
+      const indicatorComments = commentForFilter
+        ? cloneDeep(commentForFilter.value)
+        : {};
+      Object.assign(indicatorComments, {
+        [column]: comment.comment,
+      });
+
+      if (commentForFilter) commentForFilter.value = indicatorComments;
+      else if (!commentForFilter && isArray(indicator.comments))
+        indicator.comments.push({
+          filter: comment.filter,
+          value: indicatorComments,
+        });
+      else
+        indicator.comments = [
+          { filter: comment.filter, value: indicatorComments },
+        ];
+    }
+    // purpose comments
+  } else if (comment.type === "purpose") {
+    const purposeID = comment.id;
+    const logicalFrame = project.logicalFrames.find(
+      (x) => x.id === comment.logicalFrame
+    );
+
+    const purposes = logicalFrame.purposes.filter((p) => {
+      return typeof purposeID === "string"
+        ? p.id === purposeID
+        : isEqual({ description: p.description }, purposeID);
+    });
+
+    // if found more than one, throw an error
+    if (purposes.length > 1) throw new Error("multiple_purposes_found");
+    const purpose = purposes[0];
+    if (!purpose) throw new Error("purpose_not_found");
+
+    // creates id if not present
+    if (!purpose.id) purpose.id = uuidv4();
+
+    const commentForFilter = findForFilter(purpose.comment, comment.filter);
+    if (commentForFilter) commentForFilter.value = comment.comment;
+    else if (!commentForFilter && isArray(purpose.comment))
+      purpose.comment.push({ filter: comment.filter, value: comment.comment });
+    else purpose.comment = [{ filter: comment.filter, value: comment.comment }];
+  } else if (comment.type === "output") {
+    const outputID = comment.id;
+    const logicalFrame = project.logicalFrames.find(
+      (x) => x.id === comment.logicalFrame
+    );
+
+    const purposeID = comment.purpose;
+    if (!purposeID) throw new Error("missing_purpose");
+
+    const purposes = logicalFrame.purposes.filter((p) => {
+      return typeof purposeID === "string"
+        ? p.id === purposeID
+        : isEqual({ description: p.description }, purposeID);
+    });
+
+    // if found more than one, throw an error
+    if (purposes.length > 1) throw new Error("multiple_purposes_found");
+    const purpose = purposes[0];
+    if (!purpose) throw new Error("purpose_not_found");
+
+    // creates id if not present
+    if (!purpose.id) purpose.id = uuidv4();
+
+    const outputs = purpose.outputs.filter((o) => {
+      return typeof outputID === "string"
+        ? o.id === outputID
+        : isEqual({ description: o.description }, outputID);
+    });
+
+    // if found more than one, throw an error
+    if (outputs.length > 1) throw new Error("multiple_outputs_found");
+    const output = outputs[0];
+    if (!output) throw new Error("output_not_found");
+
+    // creates id if not present
+    if (!output.id) output.id = uuidv4();
+
+    const commentForFilter = findForFilter(output.comment, comment.filter);
+    if (commentForFilter) commentForFilter.value = comment.comment;
+    else if (!commentForFilter && isArray(output.comment))
+      output.comment.push({ filter: comment.filter, value: comment.comment });
+    else output.comment = [{ filter: comment.filter, value: comment.comment }];
+  } else if (comment.type === "activity") {
+    const logicalFrame = project.logicalFrames.find(
+      (x) => x.id === comment.logicalFrame
+    );
+
+    const purposeID = comment.purpose;
+    const outputID = comment.output;
+    if (!purposeID) throw new Error("missing_purpose");
+
+    const purposes = logicalFrame.purposes.filter((p) => {
+      return typeof purposeID === "string"
+        ? p.id === purposeID
+        : isEqual({ description: p.description }, purposeID);
+    });
+
+    // if found more than one, throw an error
+    if (purposes.length > 1) throw new Error("multiple_purposes_found");
+    const purpose = purposes[0];
+    if (!purpose) throw new Error("purpose_not_found");
+
+    // creates id if not present
+    if (!purpose.id) purpose.id = uuidv4();
+
+    const outputs = purpose.outputs.filter((o) => {
+      return typeof outputID === "string"
+        ? o.id === outputID
+        : isEqual({ description: o.description }, outputID);
+    });
+
+    // if found more than one, throw an error
+    if (outputs.length > 1) throw new Error("multiple_outputs_found");
+    const output = outputs[0];
+    if (!output) throw new Error("output_not_found");
+
+    // creates id if not present
+    if (!output.id) output.id = uuidv4();
+
+    const activityID = comment.id;
+    if (!activityID) throw new Error("missing_activity");
+
+    const activities = output.activities.filter((a) => {
+      return typeof activityID === "string"
+        ? a.id === activityID
+        : isEqual({ description: a.description }, activityID);
+    });
+
+    // if found more than one, throw an error
+    if (activities.length > 1) throw new Error("multiple_activities_found");
+    const activity = activities[0];
+
+    if (!activity) throw new Error("activity_not_found");
+
+    // creates id if not present
+    if (!activity.id) activity.id = uuidv4();
+
+    const commentForFilter = findForFilter(activity.comment, comment.filter);
+    if (commentForFilter) commentForFilter.value = comment.comment;
+    else if (!commentForFilter && isArray(activity.comment))
+      activity.comment.push({ filter: comment.filter, value: comment.comment });
+    else
+      activity.comment = [{ filter: comment.filter, value: comment.comment }];
+  } else if (comment.type === "crossCutting") {
+    const commentsForFilter = findForFilter(
+      project.crossCuttingComments,
+      comment.filter
+    );
+    const crossCuttingComments = commentsForFilter
+      ? cloneDeep(commentsForFilter.value)
+      : {};
+    if (comment.nameComment)
+      crossCuttingComments.nameComment = comment.nameComment;
+    if (comment.multiThemeComment)
+      crossCuttingComments.multiThemeComment = comment.multiThemeComment;
+
+    if (commentsForFilter) commentsForFilter.value = crossCuttingComments;
+    else if (!commentsForFilter && project.crossCuttingComments)
+      project.crossCuttingComments.push({
+        filter: comment.filter,
+        value: crossCuttingComments,
+      });
+    else
+      project.crossCuttingComments = [
+        { filter: comment.filter, value: crossCuttingComments },
+      ];
+  } else if (comment.type === "theme") {
+    const theme = await Theme.storeInstance.get(comment.id);
+    if (!theme) throw new Error("theme_not_found");
+
+    const commentForFilter = findForFilter(theme.comments, comment.filter);
+    const themeComments = commentForFilter
+      ? cloneDeep(commentForFilter.value)
+      : {};
+    Object.assign(themeComments, {
+      [comment.project]: comment.comment,
+    });
+
+    if (commentForFilter) commentForFilter.value = themeComments;
+    else if (!commentForFilter && isArray(theme.comments))
+      theme.comments.push({
+        filter: comment.filter,
+        value: themeComments,
+      });
+    else theme.comments = [{ filter: comment.filter, value: themeComments }];
+    // save theme
+    await theme.save();
+  } else if (comment.type === "extraIndicators") {
+    const commentForFilter = findForFilter(
+      project.extraIndicatorsComment,
+      comment.filter
+    );
+
+    if (commentForFilter) commentForFilter.value = comment.comment;
+    else if (!commentForFilter && isArray(project.extraIndicatorsComment))
+      project.extraIndicatorsComment.push({
+        filter: comment.filter,
+        value: comment.comment,
+      });
+    else
+      project.extraIndicatorsComment = [
+        { filter: comment.filter, value: comment.comment },
+      ];
+  } else if (comment.type === "dataSource") {
+    const form = project.forms.find((f) => f.id === comment.id);
+    if (!form) throw new Error("form_not_found");
+
+    const commentForFilter = findForFilter(form.comment, comment.filter);
+
+    if (commentForFilter) commentForFilter.value = comment.comment;
+    else if (!commentForFilter && isArray(form.comment))
+      form.comment.push({ filter: comment.filter, value: comment.comment });
+    else form.comment = [{ filter: comment.filter, value: comment.comment }];
+  } else {
+    throw new Error("invalid_comment_type");
+  }
+
+  // save the project
+  await project.save();
+  ctx.response.body = {};
+});
 
 export default router;

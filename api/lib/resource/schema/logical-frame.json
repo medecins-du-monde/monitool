@@ -10,6 +10,8 @@
 			"$ref": "#/definitions/uuid"
 		},
 		"name": { "type": "string" },
+		"nameComment": {"type": "array"},
+		"goalComment": {"type": "array"},
 		"goal": { "type": "string" },
 
 		"entities": {
@@ -36,6 +38,18 @@
 				"additionalProperties": false,
 				"required": ["description", "assumptions", "indicators", "outputs"],
 				"properties": {
+					"id": {"type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"},
+					"comment": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"value": {"type": "string"},
+								"filter": {"type": "object"}
+							}
+						}
+					},
 					"description": { "type": "string" },
 					"assumptions": { "type": "string" },
 					"indicators": { "$ref": "#/definitions/indicators" },
@@ -46,6 +60,18 @@
 							"additionalProperties": false,
 							"required": ["description", "assumptions", "indicators", "activities"],
 							"properties": {
+								"id": {"type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"},
+								"comment": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"additionalProperties": false,
+										"properties": {
+											"value": {"type": "string"},
+											"filter": {"type": "object"}
+										}
+									}
+								},
 								"description": { "type": "string" },
 								"assumptions": { "type": "string" },
 								"indicators": { "$ref": "#/definitions/indicators" },
@@ -57,6 +83,18 @@
 										"required": ["description", "indicators"],
 										"properties": {
 											"description": { "type": "string" },
+											"id": {"type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"},
+											"comment": {
+												"type": "array",
+												"items": {
+													"type": "object",
+													"additionalProperties": false,
+													"properties": {
+														"value": {"type": "string"},
+														"filter": {"type": "object"}
+													}
+												}
+											},
 											"indicators": { "$ref": "#/definitions/indicators" }
 										}
 									}
@@ -128,8 +166,20 @@
 				"baseline": {"oneOf": [{"type": "null"}, {"type": "number"}]},
 				"target": {"oneOf": [{"type": "null"}, {"type": "number"}]},
 				"colorize": {"type": "boolean"},
-				"computation": { "$ref": "#/definitions/computation" }
-			}
+				"computation": { "$ref": "#/definitions/computation" },
+				"id": {"type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"},
+				"comments": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"value": { "type": "object"},
+							"filter": { "type": "object"}
+						}
+					}
+				}
+		}
 		},
 
 		"cc_indicator": {

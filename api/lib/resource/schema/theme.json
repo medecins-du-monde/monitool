@@ -60,6 +60,17 @@
 					"minLength": 1
 				}
 			}
+		},
+		"comments": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"value": { "type": "object"},
+					"filter": { "type": "object"}
+				}
+			}
 		}
 	}
 }

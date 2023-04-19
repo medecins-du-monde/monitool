@@ -9,6 +9,9 @@
 		"id": {
 			"$ref": "#/definitions/uuid"
 		},
+		"comment": {
+			"type": "array"
+			},
 		"name": {
 			"type": "string",
 			"minLength": 1

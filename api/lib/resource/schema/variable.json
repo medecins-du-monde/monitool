@@ -9,6 +9,16 @@
 		"name": { "type": "string", "minLength": 1 },
 		"timeAgg": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
 		"geoAgg": { "type": "string", "enum": ["none", "sum", "average", "highest", "lowest", "last"] },
+		"comments": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"value": { "type": "object" },
+					"filter": { "type": "object" }
+				}
+			}
+		},
 		"partitions": {
 			"type": "array",
 			"items": {
