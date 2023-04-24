@@ -6,6 +6,7 @@ import Project from '../resource/model/project';
 import { queryReportingSubprocess } from './reporting';
 import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 import Indicator from '../resource/model/indicator';
+import User from '../resource/model/user';
 
 const router = new Router();
 let lang = 'es';
@@ -828,6 +829,112 @@ router.post('/export/currentView', async (ctx) => {
   ctx.set('Content-disposition', 'attachment; filename=currViewReport.xlsx');
   ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   const stream = fs.createReadStream('currViewReport.xlsx');
+  ctx.status = 200;
+  ctx.body = stream;
+});
+
+/** Export of users */
+router.get("/export/users", async (ctx) => {
+  // check that user is admin
+  const user = ctx.state.user;
+
+  if (user.role !== "admin") {
+    ctx.status = 403;
+    ctx.body = { message: "You are not authorized to access this resource" };
+    return;
+  }
+
+  // get all users from the database
+  const users = await User.storeInstance.list();
+
+  // get language from the request
+  const lang = ctx.request.query.lang || lang;
+
+  // Translations
+  const headers = {
+    en: ["User", "Email", "Type", "Name", "Role", "Last connection"],
+    es: [
+      "Usuario",
+      "Correo electrónico",
+      "Tipo",
+      "Nombre",
+      "Rol",
+      "Última conexión",
+    ],
+    fr: ["Utilisateur", "E-mail", "Type", "Nom", "Rôle", "Dernière connexion"],
+  };
+
+  // create the excel file
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet(headers[lang][0]);
+
+  const missingData = {
+    en: "Missing data",
+    es: "Datos faltantes",
+    fr: "Données manquantes",
+  };
+
+  const userType = {
+    en: {
+      user: 'MdM account',
+      partner: 'Partner account',
+    },
+    es: {
+      user: 'Cuenta de MdM',
+      partner: 'Cuenta de socio',
+    },
+    fr: {
+      user: 'Compte MdM',
+      partner: 'Compte partenaire',
+    }
+  }
+
+  // add the headers
+  const headerRow = worksheet.addRow(headers[lang]);
+
+  // set the styles for the header
+  headerRow.font = sectionHeader.font;
+  headerRow.fill = sectionHeader.fill;
+
+  // set the width of the columns
+  worksheet.columns = [
+    { width: 30 },
+    { width: 45 },
+    { width: 7 },
+    { width: 30 },
+    { width: 10 },
+    { width: 25 },
+  ];
+
+  // add the data
+  for (let i = 0; i < users.length; i++) {
+    // if the user has no last login, add the missing data text
+    const lastLogin = users[i].lastLogin
+      ? new Date(users[i].lastLogin).toLocaleString(lang)
+      : missingData[lang];
+
+    const user = users[i]._id.split(":")[1];
+    const type = users[i].type === 'user'
+      ? userType[lang].user
+      : userType[lang].partner;
+
+    worksheet.addRow([
+      user,
+      `${user}@medecinsdumonde.net`,
+      type,
+      users[i].name,
+      users[i].role,
+      lastLogin,
+    ]);
+  }
+  // write the file
+  await workbook.xlsx.writeFile("users.xlsx");
+  ctx.set("Content-disposition", "attachment; filename=users.xlsx");
+  ctx.set(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  const stream = fs.createReadStream("users.xlsx");
   ctx.status = 200;
   ctx.body = stream;
 });
