@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json-schema.org/schema#",
-	"title": "Monitool project schema",
+	"title": "Monitool logical frame schema",
 
 	"type": "object",
 	"additionalProperties": false,
@@ -34,8 +34,9 @@
 			"items": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["description", "assumptions", "indicators", "outputs"],
+				"required": ["description", "assumptions", "indicators", "outputs", "id"],
 				"properties": {
+					"id": {"$ref": "#/definitions/uuid"},
 					"description": { "type": "string" },
 					"assumptions": { "type": "string" },
 					"indicators": { "$ref": "#/definitions/indicators" },
@@ -44,8 +45,9 @@
 						"items": {
 							"type": "object",
 							"additionalProperties": false,
-							"required": ["description", "assumptions", "indicators", "activities"],
+							"required": ["description", "assumptions", "indicators", "activities", "id"],
 							"properties": {
+								"id": {"$ref": "#/definitions/uuid"},
 								"description": { "type": "string" },
 								"assumptions": { "type": "string" },
 								"indicators": { "$ref": "#/definitions/indicators" },
@@ -54,8 +56,9 @@
 									"items": {
 										"type": "object",
 										"additionalProperties": false,
-										"required": ["description", "indicators"],
+										"required": ["description", "indicators", "id"],
 										"properties": {
+											"id": {"$ref": "#/definitions/uuid"},
 											"description": { "type": "string" },
 											"indicators": { "$ref": "#/definitions/indicators" }
 										}
@@ -122,8 +125,9 @@
 		"indicator": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["baseline", "target", "colorize", "display", "computation"],
+			"required": ["baseline", "target", "colorize", "display", "computation", "id"],
 			"properties": {
+				"id": {"$ref": "#/definitions/uuid"},
 				"display": {"type": "string", "minLength": 1},
 				"baseline": {"oneOf": [{"type": "null"}, {"type": "number"}]},
 				"target": {"oneOf": [{"type": "null"}, {"type": "number"}]},

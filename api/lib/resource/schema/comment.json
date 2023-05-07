@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Monitool comment schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_id", "path", "content"],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^comment:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+    },
+    "_rev": {
+      "type": "string",
+      "pattern": "^[0-9]+\\-[0-9a-f]{32}$"
+    },
+    "path": {
+      "type": "string"
+    },
+    "content": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["filter"],
+        "properties": {
+          "filter": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "dateStart",
+              "dateEnd",
+              "dimension",
+              "disaggregatedBy",
+              "project"
+            ],
+            "properties": {
+              "dateStart": { "type": "string" },
+              "dateEnd": { "type": "string" },
+              "dimension": { "type": "string" },
+              "disaggregatedBy": { "type": "object" },
+              "project": {
+                "type": "string",
+                "pattern": "^project:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+              }
+            }
+          },
+          "comment": { "type": "string" },
+          "comments": { "type": "object" }
+        }
+      }
+    }
+  }
+}
