@@ -23,9 +23,6 @@ import Input from "../resource/model/input";
 import Project from "../resource/model/project";
 import Theme from "../resource/model/theme";
 import User from "../resource/model/user";
-import Comment from "../resource/model/comment";
-
-import uuidv4 from "uuid/v4";
 
 const router = new Router();
 
@@ -358,53 +355,6 @@ router.delete('/resources/:modelName(indicator|theme)/:id', async ctx => {
 	const model = await Model.storeInstance.get(ctx.params.id);
 
 	ctx.response.body = await model.destroy()
-});
-
-/** Saves a comment */
-router.put("/resources/comment", async (ctx) => {
-  	// Only admin accounts can touch comments.
-	if (ctx.state.user.role !== 'admin') throw new Error('forbidden');
-
-  const comment = ctx.request.body;
-
-  // Check if there's a comment with the same id
-  const oldComment = comment.id
-    ? await Comment.storeInstance.get(comment.id)
-    : null;
-
-  // If there's no comment with the same id, create a new one
-  if (!oldComment) {
-    // Adds id to the comment
-    Object.assign(comment, { _id: `comment:${uuidv4()}` });
-    
-    const newComment = new Comment(comment);
-    await newComment.save();
-    ctx.response.body = newComment.toAPI();
-    return;
-  }
-
-  // If there's a comment with the same id, just replace the content
-  oldComment.content = comment.content;
-  await oldComment.save();
-  ctx.response.body = oldComment.toAPI();
-  return;
-});
-
-/** Returns the comments by their paths or ids */
-router.post("/resources/comments", async (ctx) => {
-  const requestBody = ctx.request.body;
-  const paths = requestBody.paths || [];
-  const ids = requestBody.ids || [];
-
-  const comments = await Comment.storeInstance.list();
-  const filteredComments = comments.filter((c) => {
-    const path = c.path;
-    const id = c.id;
-
-    return paths.includes(path) || ids.includes(id);
-  });
-
-  ctx.response.body = filteredComments.map((c) => c.toAPI());
 });
 
 
