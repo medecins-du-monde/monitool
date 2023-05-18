@@ -16,13 +16,13 @@
  */
 
 
-import Router from 'koa-router';
+import Router from "koa-router";
 
-import Indicator from '../resource/model/indicator';
-import Input from '../resource/model/input';
-import Project from '../resource/model/project';
-import Theme from '../resource/model/theme';
-import User from '../resource/model/user';
+import Indicator from "../resource/model/indicator";
+import Input from "../resource/model/input";
+import Project from "../resource/model/project";
+import Theme from "../resource/model/theme";
+import User from "../resource/model/user";
 
 const router = new Router();
 
