@@ -18,44 +18,50 @@ export default async () => {
       const indicators = logicalFrame.indicators || [];
       indicators.forEach((indicator) => {
         // Adding ids to logical frames indicators
-         indicator.id = uuidv4();
+        indicator.id = indicator.id || uuidv4();
       });
 
       const purposes = logicalFrame.purposes || [];
       purposes.forEach((purpose) => {
         // Adding ids to logical frames purposes
-        purpose.id = uuidv4();
+        purpose.id = purpose.id || uuidv4();
 
         const indicators = purpose.indicators || [];
         indicators.forEach((indicator) => {
           // Adding ids to purposes indicators
-           indicator.id = uuidv4();
+          indicator.id = indicator.id || uuidv4();
         });
 
         const outputs = purpose.outputs || [];
         outputs.forEach((output) => {
           // Adding ids to purposes outputs
-           output.id = uuidv4();
+          output.id = output.id || uuidv4();
 
           const indicators = output.indicators || [];
           indicators.forEach((indicator) => {
             // Adding ids to outputs indicators
-             indicator.id = uuidv4();
+            indicator.id = indicator.id || uuidv4();
           });
 
           const activities = output.activities || [];
           activities.forEach((activity) => {
             // Adding ids to outputs activities
-             activity.id = uuidv4();
+            activity.id = activity.id || uuidv4();
 
             const indicators = activity.indicators || [];
             indicators.forEach((indicator) => {
               // Adding ids to activities indicators
-               indicator.id = uuidv4();
+              indicator.id = indicator.id || uuidv4();
             });
           });
         });
       });
+    });
+
+    const extraIndicators = project.extraIndicators || [];
+    extraIndicators.forEach((indicator) => {
+      // Adding ids to extra indicators
+      indicator.id = indicator.id || uuidv4();
     });
   });
 
