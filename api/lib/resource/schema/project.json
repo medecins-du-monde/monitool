@@ -298,8 +298,9 @@
     "indicator": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["baseline", "target", "colorize", "display", "computation"],
+      "required": ["id", "baseline", "target", "colorize", "display", "computation"],
       "properties": {
+        "id": { "$ref": "#/definitions/uuid" },
         "display": { "type": "string", "minLength": 1 },
         "baseline": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
         "target": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
