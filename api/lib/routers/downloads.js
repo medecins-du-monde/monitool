@@ -550,7 +550,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
 
   let worksheet = buildWorksheet(workbook, "Global");
 
-  let maxLength = 0;
   // combine all the lists into one
   let allCompleteIndicators = [].concat(
     logicalFrameCompleteIndicators,
@@ -585,7 +584,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       );
       // Dump all the data into Excel
       row = worksheet.addRow(res);
-      maxLength = Math.max(maxLength, res.name.length);
 
       // Format the numbers with no decimal places
       if (indicator.numFmt !== undefined) {
@@ -630,7 +628,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       if (indicator.hidden !== undefined) {
         row.hidden = indicator.hidden;
       }
-      maxLength = Math.max(maxLength, indicator.name.length);
       // apply the styles
       row.fill =
         indicator.fill === undefined
@@ -743,14 +740,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
   ];
 
-  // the minimum size of the column should be 30 and the maximum 100
-
-  const minimumColWidth = 30;
-  const maximumColWidth = 100;
-  worksheet.columns[0].width = Math.min(
-    Math.max(maxLength + 10, minimumColWidth),
-    maximumColWidth
-  );
+  worksheet.columns[0].width = 45;
 
   // ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
   // ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
