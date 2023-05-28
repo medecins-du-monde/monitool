@@ -149,8 +149,21 @@ function _mergeRec(depth, expr, parameters, trees) {
 
 		try {
 			const result = expr.evaluate(paramMap);
-			if ((typeof result === 'number' && Number.isFinite(result)) || isNaN(Number(result)))
+			if ((typeof result === 'number' && Number.isFinite(result)))
 				return result;
+			else if (isNaN(result)) {
+				const variables = expr.variables();
+				if (!['numerator', 'denominator'].every(v => variables.includes(v)))
+					return result;
+				
+				const num = paramMap['numerator'];
+				const den = paramMap['denominator'];
+
+				if (num === 'missing-data' || den === 'missing-data') return 'missing-data';
+				if (den === 0) return 'division-by-zero';
+				
+				return result;
+			}
 			else if (typeof result === 'string' && !isNaN(Number(result)))
 				return result;
 			else
