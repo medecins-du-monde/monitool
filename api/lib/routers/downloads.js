@@ -732,7 +732,8 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       newWorksheet.views = [
         { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
       ];
-      newWorksheet.columns[0].width = Math.max(siteMaxLength + 10, 30);
+      // newWorksheet.columns[0].width = Math.max(siteMaxLength + 10, 30);
+      newWorksheet.columns[0].width = 45;
     }
   }
 
