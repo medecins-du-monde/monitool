@@ -3,7 +3,7 @@
 	"title": "Monitool user schema",
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["_id", "type", "name", "role"],
+	"required": ["_id", "type", "name", "role", "active"],
 
 	"properties": {
 		"_id":  {
@@ -29,6 +29,9 @@
 		"lastLogin": {
 			"type": "string",
 			"pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$"
+		},
+		"active": {
+			"type": "boolean"
 		}
 	}
 }

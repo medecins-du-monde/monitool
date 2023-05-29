@@ -53,6 +53,7 @@ passport.deserializeUser(function(id, done) {
 				type: 'user',
 				name: "Training account",
 				role: 'common',
+				active: true,
 			}));
 		else
 			userPromise = User.storeInstance.get(id);
@@ -190,6 +191,8 @@ passport.use('partner_local', new LocalStrategy(
 	function(username, password, done) {
 		User.storeInstance.getPartner(username).then(
 			function(partner) {
+				if (!partner.active)
+					return done(null, false);
 				if (!passwordHash.verify(password, partner.password))
 					return done(null, false);
 
@@ -217,6 +220,7 @@ if (config.auth.providers.training) {
 				type: 'user',
 				name: "Training account",
 				role: 'common',
+				active: true,
 				lastLogin: new Date().toISOString()
 			});
 

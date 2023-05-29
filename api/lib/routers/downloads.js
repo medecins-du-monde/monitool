@@ -853,7 +853,7 @@ router.get("/export/users", async (ctx) => {
 
   // Translations
   const headers = {
-    en: ["User", "Email", "Type", "Name", "Role", "Last connection"],
+    en: ["User", "Email", "Type", "Name", "Role", "Last connection", 'Deleted'],
     es: [
       "Usuario",
       "Correo electrónico",
@@ -861,8 +861,9 @@ router.get("/export/users", async (ctx) => {
       "Nombre",
       "Rol",
       "Última conexión",
+      'Eliminado',
     ],
-    fr: ["Utilisateur", "E-mail", "Type", "Nom", "Rôle", "Dernière connexion"],
+    fr: ["Utilisateur", "E-mail", "Type", "Nom", "Rôle", "Dernière connexion", 'Supprimé'],
   };
 
   // create the excel file
@@ -873,6 +874,21 @@ router.get("/export/users", async (ctx) => {
     en: "Missing data",
     es: "Datos faltantes",
     fr: "Données manquantes",
+  };
+
+  const yesNo = {
+    en: {
+      true: "Yes",
+      false: "No",
+    },
+    es: {
+      true: "Sí",
+      false: "No",
+    },
+    fr: {
+      true: "Oui",
+      false: "Non",
+    },
   };
 
   const userType = {
@@ -901,10 +917,11 @@ router.get("/export/users", async (ctx) => {
   worksheet.columns = [
     { width: 30 },
     { width: 45 },
-    { width: 7 },
+    { width: 15 },
     { width: 30 },
     { width: 10 },
     { width: 25 },
+    { width: 10 },
   ];
 
   // add the data
@@ -926,6 +943,7 @@ router.get("/export/users", async (ctx) => {
       users[i].name,
       users[i].role,
       lastLogin,
+      !users[i].active ? yesNo[lang].true : yesNo[lang].false,
     ]);
   }
   // write the file
