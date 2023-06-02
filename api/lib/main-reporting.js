@@ -142,15 +142,95 @@ function _createFilter(dataSource, queryFilter, paramFilter) {
  */
 function _mergeRec(depth, expr, parameters, trees) {
 	if (depth === 0) {
+		const getInnermostParentheses = (expression) => {
+			const regex = /\(([^()]+)\)/g;
+			let matches = expression.match(regex);
+		
+			let innermostParentheses = '';
+		
+			if (matches && matches.length > 0) {
+				innermostParentheses = matches[matches.length - 1];
+			}
+		
+			return innermostParentheses;
+		}
+		
 		const paramMap = {};
-		parameters.forEach((key, index) => {
-			paramMap[key] = typeof trees[index] !== 'undefined' ? trees[index] : 'unknown';
-		});
+    parameters.forEach((key, index) => {
+			paramMap[key] =
+			typeof trees[index] !== "undefined" ? trees[index] : "unknown";
+    });
+		
+		const couldBeZero = {};
+		parameters.forEach((key) => {
+			const expressionContainsKey = (expression) => {
+				const regex = new RegExp(`\\b${key}\\b`);
+				return regex.test(expression);
+			}
+      if (!isNaN(Number(paramMap[key]))) return;
+
+      let auxExpr = expr.toString();
+
+      // Initialize couldBeZero
+      couldBeZero[key] = auxExpr.includes("(");
+
+      // This flags tells us if the parameter is in an expression
+      // with another parameter that isn't missing
+      let flag = false;
+
+      const ZERO_FRIENDLY_OPS = ["+", "-"];
+
+      while (auxExpr.includes("(")) {
+        // The toString() method of exprEval.Expression adds parentheses
+        // So we don't need to worry, there will always be a pair of parentheses
+        // per operation
+        const innermostParentheses = getInnermostParentheses(auxExpr);
+
+        // If the expression isn't zero-friendly, it couldn't be zero
+        if (
+          expressionContainsKey(innermostParentheses) &&
+          !ZERO_FRIENDLY_OPS.some((op) => innermostParentheses.includes(op))
+        ) {
+          couldBeZero[key] = false;
+          break;
+        }
+
+				// If the current parameter is in an expression with another parameter
+				// that isn't missing, set the flag to true
+        if (
+          parameters.some(
+            (p) =>
+              innermostParentheses.includes(p) && !isNaN(Number(paramMap[p]))
+          )
+        )
+          flag = true;
+
+        auxExpr = auxExpr.replace(innermostParentheses, "$");
+      }
+
+			if (!flag) couldBeZero[key] = false;
+    });
+
+		const zeroFriendlyParams = parameters.filter(p => couldBeZero[p]);
+		zeroFriendlyParams.forEach(p => paramMap[p] = 0);
 
 		try {
 			const result = expr.evaluate(paramMap);
-			if ((typeof result === 'number' && Number.isFinite(result)) || isNaN(Number(result)))
+			if ((typeof result === 'number' && Number.isFinite(result)))
+				return zeroFriendlyParams.length > 0 ? `${result}` : result;
+			else if (isNaN(result)) {
+				const variables = expr.variables();
+				if (!['numerator', 'denominator'].every(v => variables.includes(v)))
+					return result;
+				
+				const num = paramMap['numerator'];
+				const den = paramMap['denominator'];
+
+				if (num === 'missing-data' || den === 'missing-data') return 'missing-data';
+				if (den === 0) return 'division-by-zero';
+				
 				return result;
+			}
 			else if (typeof result === 'string' && !isNaN(Number(result)))
 				return result;
 			else

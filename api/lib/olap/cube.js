@@ -230,7 +230,7 @@ export default class Cube {
 	}
 
 	fillFrom(element, input) {
-		// Compute location where this subtable should go, and length of data to copy.
+		// Compute location where this sub-table should go, and length of data to copy.
 		const numPartitions = element.partitions.length;
 
 		let offset = this.dimensions[0].indexes[input.period],
@@ -437,13 +437,14 @@ export default class Cube {
 		// Aggregate
 		switch (dimension.aggregation) {
 			case 'sum':
-				result = 0;
+				// Assume all values are missing.
+				result = undefined;
 				isNotComplete = false;
 				for (let i = 0; i < numIndexes; ++i) {
 					tmp = this._query_rec(indexes, indexesOffset + 1, dataOffset + localIndexes[i])
 					if (tmp !== undefined) {
 						++contributions;
-						result += Number(tmp)
+						result = (result || 0) + Number(tmp)
 						if (typeof tmp === 'string')
 							isNotComplete = true
 					} else {
@@ -534,7 +535,7 @@ export default class Cube {
 		if (contributions == 0){			
 			result = undefined;
 		} else if (isNotComplete) {
-			result = result.toString()
+			result = result && result.toString()
 		}
 		return result;
 
