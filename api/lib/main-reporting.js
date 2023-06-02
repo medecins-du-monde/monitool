@@ -162,7 +162,11 @@ function _mergeRec(depth, expr, parameters, trees) {
     });
 		
 		const couldBeZero = {};
-		parameters.forEach((key, index) => {
+		parameters.forEach((key) => {
+			const expressionContainsKey = (expression) => {
+				const regex = new RegExp(`\\b${key}\\b`);
+				return regex.test(expression);
+			}
       if (!isNaN(Number(paramMap[key]))) return;
 
       let auxExpr = expr.toString();
@@ -184,7 +188,7 @@ function _mergeRec(depth, expr, parameters, trees) {
 
         // If the expression isn't zero-friendly, it couldn't be zero
         if (
-          innermostParentheses.includes(key) &&
+          expressionContainsKey(innermostParentheses) &&
           !ZERO_FRIENDLY_OPS.some((op) => innermostParentheses.includes(op))
         ) {
           couldBeZero[key] = false;
