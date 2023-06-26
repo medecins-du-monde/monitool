@@ -26,7 +26,7 @@
     "@koa/cors": "^3.1.0",
     "@koa/router": "^10.0.0",
     "cors": "^2.8.5",
-    "exceljs": "^4.2.0",
+    "exceljs": "^4.3.0",
     "expr-eval": "^1.2.1",
     "fast-json-patch": "^2.0.6",
     "is-my-json-valid": "x",
