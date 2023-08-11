@@ -79,7 +79,23 @@ let dateColumn = [];
 async function convertToPercentage(result){
   for (const [key, value] of Object.entries(result)) {
     if(key !== 'name' && typeof value === "number"){
-      result[key] = value/100.0;
+      result[key] = value.toFixed(1) + "%";
+    }
+  }
+}
+async function convertToPercentage(result, name){
+  for (const [key, value] of Object.entries(result)) {
+    try {
+      if (typeof value == 'string' && value !== null) {
+        let temp = Number(value);
+        if(key !== 'name'){
+          result[key] = temp.toFixed(1) + "%";        
+        }
+      }
+    } catch (e) {
+      if(key !== 'name' && typeof value === "number"){
+        result[key] = value.toFixed(1) + "%";
+      }
     }
   }
 }
