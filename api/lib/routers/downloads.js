@@ -76,14 +76,6 @@ let errorRow = {
 
 let dateColumn = [];
 
-// async function convertToPercentage(result){
-//   for (const [key, value] of Object.entries(result)) {
-//     if(key !== 'name' && typeof value === "number"){
-//       result[key] = value.toFixed(1) + "%";
-//     }
-//   }
-// }
-
 async function convertToPercentage(result){
   for (const [key, value] of Object.entries(result)) {
     if (key !== 'name') {
