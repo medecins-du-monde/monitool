@@ -78,8 +78,13 @@ let dateColumn = [];
 
 async function convertToPercentage(result){
   for (const [key, value] of Object.entries(result)) {
-    if(key !== 'name' && typeof value === "number"){
-      result[key] = value/100.0;
+    if (key !== 'name') {
+      if (typeof value === 'string' && value !== "missing-data") {
+        let temp = Number(value);
+        result[key] = temp.toFixed(1) + "%";
+      } else if (typeof value === "number") {
+        result[key] = value.toFixed(1) + "%";
+      }
     }
   }
 }
@@ -114,7 +119,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
     // this function can throw an error in case the periodicity asked is not compatible with the data
     try{
       result = JSON.parse(await queryReportingSubprocess(query));
-      if (computation.formula === '100 * numerator / denominator'){
+      if (computation.formula === '100 * numerator / denominator' || /100/.test(computation.formula)){
         convertToPercentage(result);
       }
     }
@@ -130,7 +135,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
         result.fill = errorRow.fill;
       }
     } finally{
-      if (computation.formula === '100 * numerator / denominator'){
+      if (computation.formula === '100 * numerator / denominator' || /100/.test(computation.formula)){
         baseline /= 100;
         target /= 100;
       }
@@ -264,7 +269,7 @@ function buildWorksheet(workbook, name) {
 }
 
 function getNumberFormat(computation){
-  if (computation !== null && computation.formula === '100 * numerator / denominator'){
+  if (computation !== null && (computation.formula === '100 * numerator / denominator' || /100/.test(computation.formula))){
     return percentageCellStyle.numFmt;
   }
   return numberCellStyle.numFmt;
@@ -786,7 +791,7 @@ router.post('/export/currentView', async (ctx) => {
       row.font = sectionHeader.font;
       row.fill = sectionHeader.fill;
     }
-    maxLength = Math.max(maxLength, data[i].Name.length || 0);
+    maxLength = Math.max(maxLength, (data[i] && data[i].Name) ? data[i].Name.length : 0);
   }
 
   // sets row that only has one column (Name) in bold
