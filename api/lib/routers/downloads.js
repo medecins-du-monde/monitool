@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const Excel = require('exceljs');
 const fs = require('fs');
+import { stream as stream1 } from '@zlooun/exceljs';
 
 import Project from '../resource/model/project';
 import { queryReportingSubprocess } from './reporting';
@@ -777,14 +778,22 @@ router.post('/export/currentView', async (ctx) => {
   });
 
   // create the excel file
-  const workbook = new Excel.Workbook();
+  // new workbook
+  console.log('step 1')
+  const output_file_name = "/currViewReport.xlsx";
+  console.log('step 2')
+  const writeStream = fs.createWriteStream(output_file_name, { flags: 'w' });
+  console.log('step 3')
+  const workbook = new stream1.xlsx.WorkbookWriter({ stream: writeStream });
+  console.log('step 4')
   const worksheet = workbook.addWorksheet('Current view');
 
   let maxLength = 0;
 
   worksheet.addRow(headers);
   for (let i = 0; i < data.length; i++) {
-    const row = worksheet.addRow(rowObjToRowArray(data[i], i));
+    console.log('step 5')
+    const row = worksheet.addRow(rowObjToRowArray(data[i], i)).commit();
     const padding = paddings[i];
     row.outlineLevel = padding > 2 ? (padding - 1) / 2 + 1: padding;
     if (padding === 0) {
@@ -793,14 +802,14 @@ router.post('/export/currentView', async (ctx) => {
     }
     maxLength = Math.max(maxLength, (data[i] && data[i].Name) ? data[i].Name.length : 0);
   }
-
+  console.log('step 6')
   // sets row that only has one column (Name) in bold
   for (let i = 0; i < data.length; i++) {
     if (Object.keys(data[i]).length === 1) {
       worksheet.getRow(i + 2).font = { bold: true };
     }
   }
-
+  console.log('step 7')
   // the minimum size of the column should be 30 and the maximum 100
   const minimumColWidth = 30;
   const maximumColWidth = 100;
@@ -808,21 +817,25 @@ router.post('/export/currentView', async (ctx) => {
     Math.max(maxLength + 10, minimumColWidth),
     maximumColWidth
   );
-
+  console.log('step 8')
   // remove the text in A1
   worksheet.getCell('A1').value = '';
-
+  
+  console.log('step 9')
   // set the width from the 4th column to the last column to 110
   worksheet.columns.forEach((col, index) => {
     if (index > 2) col.width = 15;
   });
 
+  console.log('step 10')
   worksheet.views = [
     { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
   ];
-  
+  // end of new code
+  console.log('step 11')
+  workbook.commit()
   // final name will be monitool-<country>.xlsx, this will be done in the frontend
-  await workbook.xlsx.writeFile('currViewReport.xlsx');
+  // await workbook.xlsx.writeFile('currViewReport.xlsx');
   ctx.set('Content-disposition', 'attachment; filename=currViewReport.xlsx');
   ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   const stream = fs.createReadStream('currViewReport.xlsx');
