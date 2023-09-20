@@ -319,6 +319,14 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   lang = ctx.params.lang;
   let minimized = ctx.params.minimized;
 
+  async function sleep(timeMs) {
+    return new Promise((ok) =>
+      setTimeout(() => {
+        ok();
+      }, timeMs)
+    );
+  }
+
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by its name and computation
   let logicalFrameCompleteIndicators = [];
@@ -573,7 +581,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   sectionHeader.fill.fgColor.argb = "999999";
 
   // Adding the data
-  for (let indicator of allCompleteIndicators) {
+  for (let [index, indicator] of allCompleteIndicators.entries()) {
     // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
     // row 1 is the header.
     // const rowIndex = index + 2;
@@ -648,6 +656,10 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       row.font = indicator.font;
     }
     row.commit();
+    if (index % 10 === 0) {
+      console.log('\n TIMEOUT \n')
+      await sleep(100);
+    }
   }
 
   const COLORS = [
@@ -681,7 +693,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       colorIdx = (colorIdx + 1) % 10;
 
       let siteMaxLength = 0;
-      for (let e of allCompleteIndicators) {
+      for (let [index, e] of allCompleteIndicators.entries()) {
         let row;
         if (e.computation !== undefined) {
           let res = await indicatorToRow(
@@ -741,6 +753,10 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
           row.font = e.font;
         }
         row.commit();
+        if (index % 10 === 0) {
+          console.log('\n TIMEOUT \n')
+          await sleep(100);
+        }
       }
 
       // newWorksheet.views = [
