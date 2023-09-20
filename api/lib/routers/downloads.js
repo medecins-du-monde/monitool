@@ -552,11 +552,10 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   ).map((ts) => ts.value);
 
   // create the excel file
-  // const writeStream = fs.createWriteStream("monitool-" + project.country + ".xlsx", { flags: 'w' });
+  const writeStream = fs.createWriteStream("./monitool-" + project.country + ".xlsx", { flags: 'w' });
   const options = {
-    filename: "./monitool-" + project.country + ".xlsx",
-    useStyles: true,
-    useSharedStrings: true
+    stream: writeStream,
+    useStyles: true
   };
 
   let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
@@ -648,7 +647,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
           : JSON.parse(JSON.stringify(indicator.fill));
       row.font = indicator.font;
     }
-    await row.commit();
+    row.commit();
   }
 
   const COLORS = [
@@ -741,7 +740,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
               : JSON.parse(JSON.stringify(e.fill));
           row.font = e.font;
         }
-        await row.commit();
+        row.commit();
       }
 
       // newWorksheet.views = [
@@ -749,7 +748,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       // ];
       // newWorksheet.columns[0].width = Math.max(siteMaxLength + 10, 30);
       newWorksheet.columns[0].width = 45;
-      await newWorksheet.commit();
+      newWorksheet.commit();
     }
   }
 
@@ -758,7 +757,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   // ];
 
   worksheet.columns[0].width = 45;
-  await worksheet.commit();
+  worksheet.commit();
 
   await workbook.commit();
 
