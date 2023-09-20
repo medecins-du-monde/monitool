@@ -552,7 +552,14 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   ).map((ts) => ts.value);
 
   // create the excel file
-  let workbook = new Excel.Workbook();
+  // const writeStream = fs.createWriteStream("monitool-" + project.country + ".xlsx", { flags: 'w' });
+  const options = {
+    filename: "./monitool-" + project.country + ".xlsx",
+    useStyles: true,
+    useSharedStrings: true
+  };
+
+  let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
 
   let worksheet = buildWorksheet(workbook, "Global");
 
@@ -641,6 +648,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
           : JSON.parse(JSON.stringify(indicator.fill));
       row.font = indicator.font;
     }
+    row.commit();
   }
 
   const COLORS = [
@@ -733,26 +741,31 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
               : JSON.parse(JSON.stringify(e.fill));
           row.font = e.font;
         }
+        row.commit();
       }
 
-      newWorksheet.views = [
-        { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
-      ];
+      // newWorksheet.views = [
+      //   { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
+      // ];
       // newWorksheet.columns[0].width = Math.max(siteMaxLength + 10, 30);
       newWorksheet.columns[0].width = 45;
+
+      newWorksheet.commit();
     }
   }
 
-  worksheet.views = [
-    { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
-  ];
+  // worksheet.views = [
+  //   { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
+  // ];
 
   worksheet.columns[0].width = 45;
+
+  workbook.commit();
 
   // ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
   // ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
-  workbook.xlsx.writeFile("monitool-" + project.country + ".xlsx");
+  // workbook.xlsx.writeFile("monitool-" + project.country + ".xlsx");
 
   // Write to memory, buffer
   // const buffer = await workbook.xlsx.writeBuffer()
