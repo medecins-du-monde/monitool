@@ -119,23 +119,23 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
     // this function can throw an error in case the periodicity asked is not compatible with the data
     try{
       result = JSON.parse(await queryReportingSubprocess(query));
-      if (computation.formula === '100 * numerator / denominator' || /100/.test(computation.formula)){
+      if (/100/.test(computation.formula)) {
         convertToPercentage(result);
       }
     }
     // Here are the various reported on the excel export
     catch (err){
       // if this is the case, instead of the results we add an a custom error message
-      if (err.message == "invalid dimensionId"){
+      if (err.message == "invalid dimensionId") {
         result[dateColumn[0]] = "This data is not available by " + ctx.params.periodicity;
         result.fill = errorRow.fill;
-      }else{
+      } else {
       // if it's some other error, we send this error in the excel
         result[dateColumn[0]] = err.message;
         result.fill = errorRow.fill;
       }
     } finally{
-      if (computation.formula === '100 * numerator / denominator' || /100/.test(computation.formula)){
+      if (/100/.test(computation.formula)){
         baseline /= 100;
         target /= 100;
       }
@@ -269,7 +269,7 @@ function buildWorksheet(workbook, name) {
 }
 
 function getNumberFormat(computation){
-  if (computation !== null && (computation.formula === '100 * numerator / denominator' || /100/.test(computation.formula))){
+  if (computation !== null && /100/.test(computation.formula)){
     return percentageCellStyle.numFmt;
   }
   return numberCellStyle.numFmt;
@@ -791,7 +791,7 @@ router.post('/export/currentView', async (ctx) => {
       row.font = sectionHeader.font;
       row.fill = sectionHeader.fill;
     }
-    maxLength = Math.max(maxLength, (data[i] && data[i].Name) ? data[i].Name.length : 0);
+    maxLength = Math.max(maxLength, data[i].Name.length || 0);
   }
 
   // sets row that only has one column (Name) in bold
