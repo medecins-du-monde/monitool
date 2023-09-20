@@ -320,14 +320,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   lang = ctx.params.lang;
   let minimized = ctx.params.minimized;
 
-  async function sleep(timeMs) {
-    return new Promise((ok) =>
-      setTimeout(() => {
-        ok();
-      }, timeMs)
-    );
-  }
-
+  console.log('\n GET LIST OF INDICATORS \n')
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by its name and computation
   let logicalFrameCompleteIndicators = [];
@@ -443,6 +436,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     }
   }
 
+  console.log('\n CROSS CUTTING INDICATORS \n')
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
   // and add them to the list too
   let crossCuttingCompleteIndicators = [];
@@ -483,6 +477,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     }
   }
 
+  console.log('\n EXTRA INDICATORS \n')
   // iterate over the extra indicators and adds them to the list in the same format
   let extraCompleteIndicators = [];
   const ExtraIndicatorsName = {
@@ -508,6 +503,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     );
   }
 
+  console.log('\n GET LIST OF DATA SOURCES \n')
   // data sources don't have a computation field, but their computation use always the same formula,
   // so we can create a computation and represent them as an indicator
   let dataSourcesCompleteIndicators = [];
@@ -546,6 +542,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     }
   }
 
+  console.log('\n PERIODICITY \n')
   // creates a list for the names of the columns based on the periodicity received as a parameter
   dateColumn = Array.from(
     timeSlotRange(
@@ -584,7 +581,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   sectionHeader.fill.fgColor.argb = "999999";
 
   // Adding the data
-  for (let [index, indicator] of allCompleteIndicators.entries()) {
+  for (let indicator of allCompleteIndicators) {
     // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
     // row 1 is the header.
     // const rowIndex = index + 2;
@@ -659,10 +656,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       row.font = indicator.font;
     }
     row.commit();
-    if (index % 10 === 0) {
-      console.log('\n TIMEOUT \n')
-      await sleep(100);
-    }
   }
 
   const COLORS = [
@@ -696,7 +689,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       colorIdx = (colorIdx + 1) % 10;
 
       let siteMaxLength = 0;
-      for (let [index, e] of allCompleteIndicators.entries()) {
+      for (let e of allCompleteIndicators) {
         let row;
         if (e.computation !== undefined) {
           let res = await indicatorToRow(
@@ -756,10 +749,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
           row.font = e.font;
         }
         row.commit();
-        if (index % 10 === 0) {
-          console.log('\n TIMEOUT \n')
-          await sleep(100);
-        }
       }
 
       // newWorksheet.views = [
