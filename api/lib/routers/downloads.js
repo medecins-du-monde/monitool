@@ -648,7 +648,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
           : JSON.parse(JSON.stringify(indicator.fill));
       row.font = indicator.font;
     }
-    row.commit();
+    await row.commit();
   }
 
   const COLORS = [
@@ -741,7 +741,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
               : JSON.parse(JSON.stringify(e.fill));
           row.font = e.font;
         }
-        row.commit();
+        await row.commit();
       }
 
       // newWorksheet.views = [
@@ -749,8 +749,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       // ];
       // newWorksheet.columns[0].width = Math.max(siteMaxLength + 10, 30);
       newWorksheet.columns[0].width = 45;
-
-      newWorksheet.commit();
+      await newWorksheet.commit();
     }
   }
 
@@ -759,8 +758,9 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   // ];
 
   worksheet.columns[0].width = 45;
+  await worksheet.commit();
 
-  workbook.commit();
+  await workbook.commit();
 
   // ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
   // ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
