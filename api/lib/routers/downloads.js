@@ -150,6 +150,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
 
 // TODO: Optimize this method.
 function generateAllCombinations(partitionIndex, computation, name, formElement, list){
+  console.log(name);
   if (partitionIndex === formElement.partitions.length){
     list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(computation)});
   }
