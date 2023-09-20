@@ -115,11 +115,12 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
     }
   }
 
-  else{
+  else {
+    const isPercentage = computation.formula.indexOf('100') !== -1;
     // this function can throw an error in case the periodicity asked is not compatible with the data
     try{
       result = JSON.parse(await queryReportingSubprocess(query));
-      if (/100/.test(computation.formula)) {
+      if (isPercentage) {
         convertToPercentage(result);
       }
     }
@@ -135,7 +136,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
         result.fill = errorRow.fill;
       }
     } finally{
-      if (/100/.test(computation.formula)){
+      if (isPercentage){
         baseline /= 100;
         target /= 100;
       }
@@ -269,7 +270,7 @@ function buildWorksheet(workbook, name) {
 }
 
 function getNumberFormat(computation){
-  if (computation !== null && /100/.test(computation.formula)){
+  if (computation !== null && computation.formula.indexOf('100') !== -1){
     return percentageCellStyle.numFmt;
   }
   return numberCellStyle.numFmt;
