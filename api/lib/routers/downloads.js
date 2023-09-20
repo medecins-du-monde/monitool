@@ -309,6 +309,7 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx =
 
 /** Render file containing all data entry up to a given date */
 router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
+  console.log('\n START EXPORT PROCESS \n')
   const project = await Project.storeInstance.get(ctx.params.projectId);
 
   const filename = "monitool-" + project.country + ".xlsx";
@@ -558,6 +559,8 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       )
     )
   ).map((ts) => ts.value);
+
+  console.log('\n CREATE EXCEL FILE \n')
 
   // create the excel file
   const writeStream = fs.createWriteStream("./monitool-" + project.country + ".xlsx", { flags: 'w' });
