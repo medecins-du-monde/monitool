@@ -150,7 +150,6 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
 
 // TODO: Optimize this method.
 function generateAllCombinations(partitionIndex, computation, name, formElement, list){
-  console.log(name);
   if (partitionIndex === formElement.partitions.length){
     list.push({computation: JSON.parse(JSON.stringify(computation)), display: name, outlineLevel: 1, hidden: true, font: partitionsCollapsed.font, numFmt: getNumberFormat(computation)});
   }
@@ -310,7 +309,6 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx =
 
 /** Render file containing all data entry up to a given date */
 router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
-  console.log('\n START EXPORT PROCESS \n')
   const project = await Project.storeInstance.get(ctx.params.projectId);
 
   const filename = "monitool-" + project.country + ".xlsx";
@@ -321,7 +319,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   lang = ctx.params.lang;
   let minimized = ctx.params.minimized;
 
-  console.log('\n GET LIST OF INDICATORS \n')
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by its name and computation
   let logicalFrameCompleteIndicators = [];
@@ -437,7 +434,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     }
   }
 
-  console.log('\n CROSS CUTTING INDICATORS \n')
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
   // and add them to the list too
   let crossCuttingCompleteIndicators = [];
@@ -478,7 +474,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     }
   }
 
-  console.log('\n EXTRA INDICATORS \n')
   // iterate over the extra indicators and adds them to the list in the same format
   let extraCompleteIndicators = [];
   const ExtraIndicatorsName = {
@@ -504,7 +499,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     );
   }
 
-  console.log('\n GET LIST OF DATA SOURCES \n')
   // data sources don't have a computation field, but their computation use always the same formula,
   // so we can create a computation and represent them as an indicator
   let dataSourcesCompleteIndicators = [];
@@ -543,7 +537,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     }
   }
 
-  console.log('\n PERIODICITY \n')
   // creates a list for the names of the columns based on the periodicity received as a parameter
   dateColumn = Array.from(
     timeSlotRange(
@@ -557,8 +550,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       )
     )
   ).map((ts) => ts.value);
-
-  console.log('\n CREATE EXCEL FILE \n')
 
   // create the excel file
   const writeStream = fs.createWriteStream("./monitool-" + project.country + ".xlsx", { flags: 'w' });
