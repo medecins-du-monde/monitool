@@ -299,6 +299,7 @@ class InputBuilder extends Transform {
 	_inputIsValid(input) {
 		const timeSlot = new TimeSlot(input.period);
 		const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
+		const entity = this.project.entities.find(entity => entity.id === input.entity);
 
 		return this.project.start <= endDate
 			&& this.project.end >= startDate
@@ -306,6 +307,8 @@ class InputBuilder extends Transform {
 			&& (!this.dataSource.end || this.dataSource.end >= startDate)
 			&& this.dataSource.entities.includes(input.entity)
 			&& this.dataSource.isValidSlot(input.period)
+			&& (!entity.start || entity.start <= endDate)
+			&& (!entity.end || entity.end >= startDate)
 	}
 }
 
