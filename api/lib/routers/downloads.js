@@ -265,7 +265,6 @@ function buildWorksheet(workbook, name) {
   newWorksheet.columns.forEach(column => {
     column.width = column.header.length < 12 ? 12 : column.header.length
   })
-
   return newWorksheet;
 }
 
@@ -279,7 +278,9 @@ function getNumberFormat(computation){
 
 router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
-  const filename = 'monitool-' + project.country + '.xlsx';
+  
+  let minimized = ctx.params.minimized;
+  const filename = `monitool-${project.country}${minimized ? '-global' : '-detailed'}.xlsx`;
   if (fs.existsSync(filename)){
     ctx.status = 200;
     ctx.body = '{ "message": "done" }'
@@ -292,7 +293,8 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx 
 router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
 
-  const filename = 'monitool-' + project.country + '.xlsx';
+  let minimized = ctx.params.minimized;
+  const filename = `monitool-${project.country}${minimized ? '-global' : '-detailed'}.xlsx`;
 
   // check if the file already exists
   if (fs.existsSync(filename)){
@@ -311,13 +313,17 @@ router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx =
 router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   const project = await Project.storeInstance.get(ctx.params.projectId);
 
-  const filename = "monitool-" + project.country + ".xlsx";
+  lang = ctx.params.lang;
+  let minimized = ctx.params.minimized;
+
+  const filename = `monitool-${project.country}${minimized ? '-global' : '-detailed'}.xlsx`;
   if (fs.existsSync(filename)) {
     fs.unlinkSync(filename, (err) => console.log(err));
   }
-
-  lang = ctx.params.lang;
-  let minimized = ctx.params.minimized;
+  if (fs.existsSync(filename + '.temp')) {
+    ctx.body = '{ "message": "not done" }';
+    return;
+  }
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by its name and computation
@@ -552,10 +558,11 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   ).map((ts) => ts.value);
 
   // create the excel file
-  const writeStream = fs.createWriteStream("./monitool-" + project.country + ".xlsx", { flags: 'w' });
+  const writeStream = fs.createWriteStream(`${filename}.temp`, { flags: 'w' });
   const options = {
     stream: writeStream,
-    useStyles: true
+    useStyles: true,
+    useSharedStrings: true
   };
 
   let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
@@ -650,6 +657,9 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
     row.commit();
   }
 
+  worksheet.columns[0].width = 45;
+  worksheet.commit();
+
   const COLORS = [
     "1f77b4",
     "ff7f0e",
@@ -742,24 +752,18 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
         }
         row.commit();
       }
-
-      // newWorksheet.views = [
-      //   { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
-      // ];
-      // newWorksheet.columns[0].width = Math.max(siteMaxLength + 10, 30);
       newWorksheet.columns[0].width = 45;
       newWorksheet.commit();
     }
   }
 
-  // worksheet.views = [
-  //   { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
-  // ];
-
-  worksheet.columns[0].width = 45;
-  worksheet.commit();
-
   await workbook.commit();
+
+  fs.rename(`${filename}.temp`, `${filename}`, function(err) {
+    if ( err ) console.log('ERROR: ' + err);
+  });
+
+  ctx.body = '{ "message": "done" }';
 
   // ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
   // ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -769,8 +773,6 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   // Write to memory, buffer
   // const buffer = await workbook.xlsx.writeBuffer()
   // ctx.body = buffer;
-
-  ctx.body = '{ "message": "done" }';
 });
 
 router.post('/export/currentView', async (ctx) => {
