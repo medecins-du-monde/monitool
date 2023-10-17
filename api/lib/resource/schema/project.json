@@ -229,6 +229,8 @@
 										"disaggregatedBy"
 									],
 									"properties": {
+                    "dateStart": { "type": "string" },
+                    "dateEnd": { "type": "string" },
 										"dimension": { "type": "string" },
 										"disaggregatedBy": { "type": "object" }
 									}
