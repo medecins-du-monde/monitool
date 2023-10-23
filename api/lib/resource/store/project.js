@@ -122,7 +122,7 @@ export default class ProjectStore extends Store {
 	 *
 	 * Used in the client to display list of projects.
 	 */
-	async listShort(userId) {
+	async listShort(userId, params) {
 		if (typeof userId !== 'string')
 			throw new Error('missing_parameter');
 
@@ -131,7 +131,7 @@ export default class ProjectStore extends Store {
 			this._db.callView('inputs_updated_at', { group: true })
 		]);
 
-		const projects = mainResult.rows.map(row => row.value);
+		var projects = mainResult.rows.map(row => row.value);
 
 		projects.forEach(p => {
 			const updatedAt = updatedAtResult.rows.find(row => row.key === p._id);
@@ -140,9 +140,35 @@ export default class ProjectStore extends Store {
 			p.users = p.users.filter(u => u.id === userId);
 		});
 
-		return projects;
-	}
+		var results = [];
+		if (params.status) {
+			if (params.status.split(',').includes('Ongoing')) {
+				results = results.concat(projects.filter(p => (p.active === true) && (new Date(p.end) > new Date())));
+			} else if (params.status.split(',').includes('Finished')) {
+				results = results.concat(projects.filter(p => (p.active === true) && (new Date(p.end) < new Date())));
+			} else if(params.status.split(',').includes('Deleted')) {
+				results = results.concat(projects.filter(p => (p.active === false)));
+			} else {
+				return {
+					result: results,
+					total_item: 0,
+					total_page: 0
+				}
+			}
+		} else {
+			return {
+				result: results,
+				total_item: 0,
+				total_page: 0
+			}
+		}
 
+		return {
+			result: results.slice((params.page_number - 1) * params.item_per_page, params.page_number * params.item_per_page),
+			total_item: results.length,
+			total_page: Math.ceil(results.length / params.item_per_page)
+		}
+	}
 	/**
 	 * Retrieve all projects that collect a given indicator.
 	 * The projects are stripped down before sending (the subset is selected to ensure that client,
