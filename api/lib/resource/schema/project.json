@@ -229,13 +229,19 @@
 										"disaggregatedBy"
 									],
 									"properties": {
-                    "dateStart": { "type": "string" },
-                    "dateEnd": { "type": "string" },
 										"dimension": { "type": "string" },
 										"disaggregatedBy": { "type": "object" }
 									}
 								},
-								"comment": { "type": "string" },
+								"comment": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["value"],
+                  "properties": {
+                    "value": { "type": "string" },
+                    "cellValue": { "type": "tring" }
+                  }
+                },
 								"comments": { "type": "object" }
 							}
 						}
