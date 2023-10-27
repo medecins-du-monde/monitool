@@ -239,7 +239,7 @@
                   "required": ["value"],
                   "properties": {
                     "value": { "type": "string" },
-                    "cellValue": { "type": "tring" }
+                    "cellValue": { "type": "string" }
                   }
                 },
 								"comments": { "type": "object" }
