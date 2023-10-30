@@ -81,7 +81,7 @@ async function _subQuery(project, query, param) {
 
 	return cube.query(
 		query.dimensionIds,
-		_createFilter(dataSource, query.filter, param.filter),
+		_createFilter(dataSource, query.filter, param.filter, query.dimensionIds[0]),
 		query.withTotals,
 		query.withGroups
 	);
@@ -105,7 +105,7 @@ async function _createCube(project, dataSource, variable) {
 	return cube;
 }
 
-function _createFilter(dataSource, queryFilter, paramFilter) {
+function _createFilter(dataSource, queryFilter, paramFilter, dimension) {
 	// Merge queryFilter and paramFilter
 	const filter = JSON.parse(JSON.stringify(queryFilter));
 	for (let key in paramFilter)
@@ -123,6 +123,17 @@ function _createFilter(dataSource, queryFilter, paramFilter) {
 				TimeSlot.fromDate(new Date(filter._end + 'T00:00:00Z'), timeDimension)
 			)
 		).map(ts => ts.value);
+
+		// Removes last timeslot if its range gets outside the filter end (ignore dimension weekly periodicities)
+		if (!dimension.includes('week')) {
+			const lastTimeSlotEnd = new TimeSlot(timeValues[timeValues.length - 1]).lastDate.toISOString().slice(0, 10);
+			if (
+				Number(lastTimeSlotEnd.slice(5, 7)) > Number(filter._end.slice(5, 7)) ||
+				Number(lastTimeSlotEnd.slice(0, 4)) > Number(filter._end.slice(0, 4))
+			) {
+				timeValues.pop();
+			}
+		}
 
 		delete filter._start;
 		delete filter._end;
