@@ -235,7 +235,15 @@
 										"disaggregatedBy": { "type": "object" }
 									}
 								},
-								"comment": { "type": "string" },
+								"comment": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["value"],
+                  "properties": {
+                    "value": { "type": "string" },
+                    "cellValue": { "type": "string" }
+                  }
+                },
 								"comments": { "type": "object" }
 							}
 						}
