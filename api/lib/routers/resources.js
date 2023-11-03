@@ -54,7 +54,8 @@ router.get('/resources/project', async ctx => {
 		ctx.response.body = {
 			result: projects.result.filter(p => ctx.visibleProjectIds.has(p._id)),
 			total_item: projects.total_item,
-			total_page: projects.total_page
+			total_page: projects.total_page,
+			categories: projects.categories
 		}
 	} else {
 		if (ctx.request.query.mode === 'crossCutting')

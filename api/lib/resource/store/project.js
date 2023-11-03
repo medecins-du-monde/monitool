@@ -141,32 +141,63 @@ export default class ProjectStore extends Store {
 		});
 
 		var results = [];
+		var total_ongoing = 0;
+		var total_finished = 0;
+		var total_deleted = 0;
+
 		if (params.status) {
 			if (params.status.split(',').includes('Ongoing')) {
-				results = results.concat(projects.filter(p => (p.active === true) && (new Date(p.end) > new Date())));
-			} else if (params.status.split(',').includes('Finished')) {
-				results = results.concat(projects.filter(p => (p.active === true) && (new Date(p.end) < new Date())));
-			} else if(params.status.split(',').includes('Deleted')) {
-				results = results.concat(projects.filter(p => (p.active === false)));
-			} else {
-				return {
-					result: results,
-					total_item: 0,
-					total_page: 0
+				var queryset_ongoing = projects.filter(p => (p.active === true) && (new Date(p.end) > new Date()));
+				if (params.search) {
+					queryset_ongoing = queryset_ongoing.filter(
+						p => p.name.toLowerCase().includes(params.search) || p.country.toLowerCase().includes(params.search)
+					)
 				}
+				total_ongoing = queryset_ongoing.length;
+				results = results.concat(queryset_ongoing);
+			}
+			if (params.status.split(',').includes('Finished')) {
+				var queryset_finished = projects.filter(p => (p.active === true) && (new Date(p.end) < new Date()));
+				if (params.search) {
+					queryset_finished = queryset_finished.filter(
+						p => p.name.toLowerCase().includes(params.search) || p.country.toLowerCase().includes(params.search)
+					)
+				}
+				total_finished = queryset_finished.length;
+				results = results.concat(queryset_finished);
+			}
+			if(params.status.split(',').includes('Deleted')) {
+				var queryset_deleted = projects.filter(p => (p.active === false));
+				if (params.search) {
+					queryset_deleted = queryset_deleted.filter(
+						p => p.name.toLowerCase().includes(params.search) || p.country.toLowerCase().includes(params.search)
+					)
+				}
+				total_deleted = queryset_deleted.length;
+				results = results.concat(queryset_deleted);
 			}
 		} else {
 			return {
 				result: results,
 				total_item: 0,
-				total_page: 0
+				total_page: 0,
+				categories: {
+					ongoing: total_ongoing,
+					finished: total_finished,
+					deleted: total_deleted
+				}
 			}
 		}
 
 		return {
 			result: results.slice((params.page_number - 1) * params.item_per_page, params.page_number * params.item_per_page),
 			total_item: results.length,
-			total_page: Math.ceil(results.length / params.item_per_page)
+			total_page: Math.ceil(results.length / params.item_per_page),
+			categories: {
+				ongoing: total_ongoing,
+				finished: total_finished,
+				deleted: total_deleted
+			}
 		}
 	}
 	/**
