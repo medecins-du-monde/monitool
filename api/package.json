@@ -40,7 +40,7 @@
     "koa-session": "^5.8.1",
     "nano": "^7.0.0",
     "passport-local": "^1.0.0",
-    "passport-oauth2": "^1.4.0",
+    "passport-oauth2": "^1.7.0",
     "password-hash": "x",
     "pdfmake": "^0.1.27",
     "roboto-fontface": "^0.7.0",

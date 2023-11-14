@@ -174,6 +174,7 @@ if (config.auth.providers.azureAD) {
 				tokenBinary = new Buffer(tokenBase64, 'base64'),
 				tokenAscii  = JSON.parse(tokenBinary.toString());
 
+			console.log('\n\n', 'Azure token:', tokenAscii, '\n\n');
 			done(null, tokenAscii);
 		}
 		catch (ex) {
