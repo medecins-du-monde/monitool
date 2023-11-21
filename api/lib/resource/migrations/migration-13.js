@@ -16,23 +16,24 @@ export default async () => {
     const comments = project.comments || [];
     comments.forEach((comment) => {
       comment.content.map((el) => {
-        el.content.filter = {
-          dimension: el.content.filter.dimension,
-          disaggregatedBy: el.content.filter.disaggregatedBy
+        const content = el.content || el;
+        content.filter = {
+          dimension: content.filter.dimension,
+          disaggregatedBy: content.filter.disaggregatedBy
+        }
+        if (content.comment) {
+          content.comment = {
+            value: content.comment
+          }
+        }
+        if (content.comments) {
+          Object.keys(content.comments).forEach(function(key) {
+            content.comments[key] = {
+              value: content.comments[key]
+            };
+          });
         }
       })
-      if (el.content.comment) {
-        el.content.comment = {
-          value: el.content.comment
-        }
-      }
-      if (el.content.comments) {
-        Object.keys(el.content.comments).forEach(function(key) {
-          el.content.comments[key] = {
-            value: el.content.comments[key]
-          };
-        });
-      }
     });
   });
 
