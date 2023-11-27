@@ -122,6 +122,12 @@ if (config.auth.providers.azureAD) {
 						// Update last login date
 						updateLastLogin(user);
 
+						// User is not active
+						if (!user.active) {
+							console.log('\n\nUSER:\n', user, '\n\n')
+							return done(null, false);
+						}
+
 						// Auth was OK
 						done(null, user);
 					},
