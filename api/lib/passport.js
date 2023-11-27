@@ -122,6 +122,7 @@ if (config.auth.providers.azureAD) {
 						// Update last login date
 						updateLastLogin(user);
 
+						console.log('\n\nUSER:\n', user, '\n\n')
 						// User is not active
 						if (!user.active) {
 							console.log('\n\nUSER:\n', user, '\n\n')
