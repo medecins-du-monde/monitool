@@ -124,7 +124,6 @@ if (config.auth.providers.azureAD) {
 
 						// User is not active
 						if (!user.active) {
-							console.log('\n\nUSER:\n', user, '\n\n')
 							return done(null, false);
 						}
 
