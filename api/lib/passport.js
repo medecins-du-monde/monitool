@@ -119,13 +119,14 @@ if (config.auth.providers.azureAD) {
 							user.name = profile.name;
 							user.save(); // don't wait for the callback
 						}
-						// Update last login date
-						updateLastLogin(user);
 
 						// User is not active
-						if (!user.active) {
+						if (typeof(user.active) !== "undefined" && user.active) {
 							return done(null, false);
 						}
+						
+						// Update last login date
+						updateLastLogin(user);
 
 						// Auth was OK
 						done(null, user);
