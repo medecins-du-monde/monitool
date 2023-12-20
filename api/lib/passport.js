@@ -121,7 +121,7 @@ if (config.auth.providers.azureAD) {
 						}
 
 						// User is not active
-						if (typeof(user.active) !== "undefined" && user.active) {
+						if (typeof(user.active) !== "undefined" && !user.active) {
 							return done(null, false);
 						}
 						
