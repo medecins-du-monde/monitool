@@ -122,7 +122,7 @@ export default class ProjectStore extends Store {
 	 *
 	 * Used in the client to display list of projects.
 	 */
-	async listShort(userId, params) {
+	async listShort(userId) {
 		if (typeof userId !== 'string')
 			throw new Error('missing_parameter');
 
@@ -131,7 +131,8 @@ export default class ProjectStore extends Store {
 			this._db.callView('inputs_updated_at', { group: true })
 		]);
 
-		var projects = mainResult.rows.map(row => row.value);
+		const projects = mainResult.rows.map(row => row.value);
+		console.log(projects);
 
 		projects.forEach(p => {
 			const updatedAt = updatedAtResult.rows.find(row => row.key === p._id);
@@ -140,66 +141,9 @@ export default class ProjectStore extends Store {
 			p.users = p.users.filter(u => u.id === userId);
 		});
 
-		var results = [];
-		var total_ongoing = 0;
-		var total_finished = 0;
-		var total_deleted = 0;
-
-		if (params.status) {
-			if (params.status.split(',').includes('Ongoing')) {
-				var queryset_ongoing = projects.filter(p => (p.active === true) && (new Date(p.end) > new Date()));
-				if (params.search) {
-					queryset_ongoing = queryset_ongoing.filter(
-						p => p.name.toLowerCase().includes(params.search) || p.country.toLowerCase().includes(params.search)
-					)
-				}
-				total_ongoing = queryset_ongoing.length;
-				results = results.concat(queryset_ongoing);
-			}
-			if (params.status.split(',').includes('Finished')) {
-				var queryset_finished = projects.filter(p => (p.active === true) && (new Date(p.end) < new Date()));
-				if (params.search) {
-					queryset_finished = queryset_finished.filter(
-						p => p.name.toLowerCase().includes(params.search) || p.country.toLowerCase().includes(params.search)
-					)
-				}
-				total_finished = queryset_finished.length;
-				results = results.concat(queryset_finished);
-			}
-			if(params.status.split(',').includes('Deleted')) {
-				var queryset_deleted = projects.filter(p => (p.active === false));
-				if (params.search) {
-					queryset_deleted = queryset_deleted.filter(
-						p => p.name.toLowerCase().includes(params.search) || p.country.toLowerCase().includes(params.search)
-					)
-				}
-				total_deleted = queryset_deleted.length;
-				results = results.concat(queryset_deleted);
-			}
-		} else {
-			return {
-				result: results,
-				total_item: 0,
-				total_page: 0,
-				categories: {
-					ongoing: total_ongoing,
-					finished: total_finished,
-					deleted: total_deleted
-				}
-			}
-		}
-
-		return {
-			result: results.slice((params.page_number - 1) * params.item_per_page, params.page_number * params.item_per_page),
-			total_item: results.length,
-			total_page: Math.ceil(results.length / params.item_per_page),
-			categories: {
-				ongoing: total_ongoing,
-				finished: total_finished,
-				deleted: total_deleted
-			}
-		}
+		return projects;
 	}
+	
 	/**
 	 * Retrieve all projects that collect a given indicator.
 	 * The projects are stripped down before sending (the subset is selected to ensure that client,
