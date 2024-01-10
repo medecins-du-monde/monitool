@@ -198,7 +198,7 @@ passport.use('partner_local', new LocalStrategy(
 	function(username, password, done) {
 		User.storeInstance.getPartner(username).then(
 			function(partner) {
-				if (!partner.active)
+				if (typeof(partner.active) !== "undefined" && !partner.active)
 					return done(null, false);
 				if (!passwordHash.verify(password, partner.password))
 					return done(null, false);
