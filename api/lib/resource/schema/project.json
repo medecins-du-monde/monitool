@@ -86,7 +86,8 @@
                 "type": "string",
                 "pattern": "^user:[a-z0-9\\.\\-\\_]+$"
               },
-              "role": { "type": "string", "enum": ["owner", "read"] }
+              "role": { "type": "string", "enum": ["owner", "read"] },
+              "name": { "type": "string", "minLength": 1 }
             }
           },
           {
