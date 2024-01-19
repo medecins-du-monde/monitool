@@ -102,6 +102,7 @@ if (config.auth.providers.azureAD) {
 		// Its the hook to cache the access/refresh tokens, post-process the Azure profile, etc.
 		function (accessToken, refreshToken, profile, done) {
 			try {
+				console.log('strategy.main:', 'Set user');
 				var userId = 'user:' + profile.unique_name.substring(0, profile.unique_name.indexOf('@')),
 					domain = profile.unique_name.substring(profile.unique_name.lastIndexOf('@') + 1);
 
@@ -114,6 +115,7 @@ if (config.auth.providers.azureAD) {
 
 				User.storeInstance.get(userId).then(
 					function(user) {
+						console.log('strategy.main:', 'User exists');
 						// If Oauth provider updated the name, we update as well in DB
 						if (user.name !== profile.name) {
 							user.name = profile.name;
@@ -132,6 +134,7 @@ if (config.auth.providers.azureAD) {
 						done(null, user);
 					},
 					function(error) {
+						console.log('strategy.main:', 'New user');
 						// This user never logged in!
 						if (error.message === 'missing' || error.message === 'deleted') {
 							var user = new User({
@@ -166,12 +169,14 @@ if (config.auth.providers.azureAD) {
 	// Azure AD requires an additional 'resource' parameter for the token request
 	//  this corresponds to the Azure resource you're requesting access to
 	//  in our case we're just trying to authenticate, so we just request generic access to the Azure AD graph API
-	strategy.tokenParams = strategy.authorizationParams = function(options) {	
-	return { resource: "https://graph.windows.net" };
+	strategy.tokenParams = strategy.authorizationParams = function(options) {
+		console.log('strategy.tokenParams:', 'Getting resource');
+		return { resource: "https://graph.windows.net" };
 	};
 	// this is our custom logic for digging into the token returned to us by Azure
 	//  in raw form its base64 text and we want the corresponding JSON
 	strategy.userProfile = function(accessToken, done) {
+		console.log('strategy.userProfile:', 'Process token');
 		// thx: https://github.com/QuePort/passport-azure-oauth/blob/master/lib/passport-azure-oauth/strategy.js
 		var profile = {};
 
@@ -180,7 +185,7 @@ if (config.auth.providers.azureAD) {
 				tokenBinary = new Buffer(tokenBase64, 'base64'),
 				tokenAscii  = JSON.parse(tokenBinary.toString());
 
-			console.log('\n\n', 'Azure token:', tokenAscii, '\n\n');
+			console.log('strategy.userProfile:', 'Azure AD token:', tokenAscii);
 			done(null, tokenAscii);
 		}
 		catch (ex) {
