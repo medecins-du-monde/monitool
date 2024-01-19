@@ -142,7 +142,8 @@ if (config.auth.providers.azureAD) {
 								type: 'user',
 								name: profile.name,
 								role: 'common',
-								lastLogin: new Date().toISOString()
+								lastLogin: new Date().toISOString(),
+								active: true
 							});
 							user.save().then(
 								function() {
