@@ -115,7 +115,7 @@ if (config.auth.providers.azureAD) {
 
 				User.storeInstance.get(userId).then(
 					function(user) {
-						console.log('strategy.main:', 'User exists');
+						console.log('strategy.main:', 'User exists:', user);
 						// If Oauth provider updated the name, we update as well in DB
 						if (user.name !== profile.name) {
 							user.name = profile.name;
