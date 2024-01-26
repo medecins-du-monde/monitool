@@ -132,7 +132,6 @@ export default class ProjectStore extends Store {
 		]);
 
 		const projects = mainResult.rows.map(row => row.value);
-		console.log(projects);
 
 		projects.forEach(p => {
 			const updatedAt = updatedAtResult.rows.find(row => row.key === p._id);
