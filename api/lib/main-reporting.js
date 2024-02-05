@@ -20,7 +20,7 @@ setInterval(() => {
 	const now = +new Date();
 
 	for (const key in _cubeCache) {
-		if (now - _cubeCache[key].time > 5 * 60 * 1000)
+		if (_cubeCache[key] && now - _cubeCache[key].time > 5 * 60 * 1000)
 			delete _cubeCache[key];
 	}
 }, 5000);
@@ -38,11 +38,18 @@ export async function computeReport(query) {
 	const project = await Project.storeInstance.get(query.projectId);
 
 	// Get result trees for each parameter
-	const variableResults = await Promise.all(
+	const variableResults = [];
+	const cachedItems = [];
+	const subQueries = await Promise.all(
 		Object
 			.values(query.computation.parameters)
-			.map(param => _subQuery(project, query, param))
+			.map(param =>  _subQuery(project, query, param))
 	);
+
+	subQueries.forEach(subQuery => {
+		variableResults.push(subQuery.cube),
+		cachedItems.push(subQuery.cachedItem)
+	})
 
 	// Create expression to compute final result.
 	const parser = new exprEval.Parser();
@@ -61,7 +68,7 @@ export async function computeReport(query) {
 
 	// Return a JSON string, which will be easier to cache and to send
 	// to the parent process than a deep object tree.
-	return JSON.stringify(result);
+	return JSON.stringify({cachedItems, items: result});
 }
 
 async function _subQuery(project, query, param) {
@@ -70,21 +77,35 @@ async function _subQuery(project, query, param) {
 
 	// Retrieve cube
 	const cacheKey = [project._id, dataSource.id, variable.id].join(":");
+	
+	if (query.refreshCache) {
+		if (_cubeCache[cacheKey]) {
+			delete _cubeCache[cacheKey];
+		}
+	}
 
-	if (!_cubeCache[cacheKey])
+	if (!_cubeCache[cacheKey]) {
+		console.log('newCache');
 		_cubeCache[cacheKey] = {
 			time: +new Date(),
 			cube: _createCube(project, dataSource, variable)
 		}
+	}
 
 	const cube = await _cubeCache[cacheKey].cube;
 
-	return cube.query(
-		query.dimensionIds,
-		_createFilter(dataSource, query.filter, param.filter, query.dimensionIds[0]),
-		query.withTotals,
-		query.withGroups
-	);
+	return {
+		cachedItem: {
+			time: _cubeCache[cacheKey].time,
+			key: cacheKey
+		},
+		cube: cube.query(
+			query.dimensionIds,
+			_createFilter(dataSource, query.filter, param.filter, query.dimensionIds[0]),
+			query.withTotals,
+			query.withGroups
+		)
+	}
 }
 
 async function _createCube(project, dataSource, variable) {

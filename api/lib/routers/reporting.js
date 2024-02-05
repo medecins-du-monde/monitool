@@ -130,7 +130,8 @@ router.post('/reporting/project/:prjId', async ctx => {
 		filter: ctx.request.body.filter,
 		dimensionIds: ctx.request.body.dimensionIds,
 		withTotals: ctx.request.body.withTotals,
-		withGroups: ctx.request.body.withGroups
+		withGroups: ctx.request.body.withGroups,
+		refreshCache: ctx.request.body.refreshCache
 	};
 
 	ctx.response.body = await queryReportingSubprocess(query);
