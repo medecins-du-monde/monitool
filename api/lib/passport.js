@@ -137,6 +137,7 @@ if (config.auth.providers.azureAD) {
 						console.log('strategy.main:', 'New user');
 						// This user never logged in!
 						if (error.message === 'missing' || error.message === 'deleted') {
+							console.log({_id: userId, name: profile.name});
 							var user = new User({
 								_id: userId,
 								type: 'user',
