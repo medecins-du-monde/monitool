@@ -8,7 +8,7 @@
 	"properties": {
 		"_id":  {
 			"type": "string",
-			"pattern": "^user:[a-z0-9\\._-]+$"
+			"pattern": "^user:[a-z0-9A-Z\\._-]+$"
 		},
 		"_rev": {
 			"type": "string",
