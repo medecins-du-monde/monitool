@@ -321,6 +321,10 @@
       "additionalProperties": false,
       "required": ["baseline", "target", "colorize", "computation"],
       "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^indicator:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+        },
         "baseline": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
         "target": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
         "colorize": { "type": "boolean" },
