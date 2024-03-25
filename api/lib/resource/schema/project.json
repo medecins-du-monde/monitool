@@ -241,7 +241,7 @@
                   "additionalProperties": false,
                   "required": ["value"],
                   "properties": {
-                    "value": { "type": "string" },
+                    "value": { "type": "any" },
                     "cellValue": { "type": "string" }
                   }
                 },
