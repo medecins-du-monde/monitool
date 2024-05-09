@@ -70,6 +70,22 @@ export default class InputStore extends Store {
 		return result;
 	}
 
+
+	/**
+	 * Retrieve all inputs of a given project and datasource
+	 * Used to clone a datasource.
+	 */
+	async listByDatasource(projectId, dataSourceId) {
+		const result = await this._db.callList({
+			include_docs: true,
+			startkey: "input:" + projectId + ":" + dataSourceId + ":0",
+			endkey: "input:" + projectId + ":" + dataSourceId + ":g"
+		});
+
+		let inputs = result.rows.map(row => new Input(row.doc));
+		return inputs;
+	}
+
 	/**
 	 * Retrieve all inputs of a given project
 	 * Used to generate cubes (for project reporting), or fetch partner inputs.

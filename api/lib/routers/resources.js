@@ -237,6 +237,47 @@ router.get('/resources/input', async ctx => {
 
 
 /**
+ * Clone inputs for a datasource
+ */
+router.put('/resources/input', async ctx => {
+	const body = ctx.request.body;
+	if (!body || !body.projectId)
+		throw new Error('forbidden');
+
+	// Check ACLs
+	const project = await Project.storeInstance.get(body.projectId);
+	const projectUser = project.getProjectUser(ctx.state.user);
+	const projectRole = project.getRole(ctx.state.user);
+
+	const allowed =
+		(projectRole === 'owner') ||
+		(projectRole === 'input' && projectUser.entities.includes(input.entity) && projectUser.dataSources.includes(input.form));
+
+	if (!allowed)
+		throw new Error('forbidden');
+
+	if (body.mode && body.mode === 'clone_datasource_input' && body.formId && body.newFormId) {
+		Input.storeInstance.listByDatasource(body.projectId, body.formId).then(inputs => {
+			inputs.forEach(input => {
+				input._id = 'input:' + body.projectId + ':' + body.newFormId + ':' + input.entity + ':' + input.period;
+				delete input._rev;
+				input.project = body.projectId;
+			});
+
+			Input.storeInstance.bulkSave(inputs);
+			ctx.response.body = inputs.toAPI();
+		});
+	}
+	else {
+		throw new Error('invalid_mode');
+	}
+
+	if (!ctx.response.body)
+		ctx.response.body = project.toAPI();
+})
+
+
+/**
  * Retrieve one input by id
  */
 router.get('/resources/input/:id', async ctx => {
