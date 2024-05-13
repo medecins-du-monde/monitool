@@ -141,8 +141,8 @@ router.put('/resources/project/:id', async ctx => {
 		project.users = [{type: "internal", id: ctx.state.user._id, role: "owner"}];
 
 		if (ctx.request.query.with_data == 'true'){
-			project.name = 'CLONE - ' + project.name;
-			project.country = 'CLONE - ' + project.country;
+			project.name = 'CLONE STRUCTURE & DATA - ' + project.name;
+			project.country = 'CLONE STRUCTURE & DATA - ' + project.country;
 		} else{
 			project.name = 'CLONE STRUCTURE - ' + project.name;
 			project.country = 'CLONE STRUCTURE - ' + project.country;
