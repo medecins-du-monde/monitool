@@ -262,10 +262,18 @@ router.put('/resources/input', async ctx => {
 				input._id = 'input:' + body.projectId + ':' + body.newFormId + ':' + input.entity + ':' + input.period;
 				delete input._rev;
 				input.project = body.projectId;
+				input.form = body.newFormId;
+				Object.keys(input.values).forEach(function(key, index) {
+					input.values[body.newElementsId[index]] = input.values[key];
+					delete input.values[key];
+				});
+				Object.keys(input.structure).forEach(function(key, index) {
+					input.structure[body.newElementsId[index]] = input.structure[key];
+					delete input.structure[key];
+				});
 			});
 
 			Input.storeInstance.bulkSave(inputs);
-			ctx.response.body = inputs.toAPI();
 		});
 	}
 	else {
