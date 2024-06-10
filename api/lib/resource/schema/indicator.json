@@ -33,7 +33,8 @@
 				"type": "string",
 				"pattern": "^theme:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
 			}
-		}
+		},
+        "computation": { "$ref": "#/definitions/computation" }
 	},
 
 	"definitions": {
@@ -55,6 +56,27 @@
 				"fr": { "type": "string" },
 				"es": { "type": "string" }
 			}
-		}
+		},
+		
+		"computation": {
+			"oneOf": [
+			  {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["formula"],
+				"properties": {
+				  "formula": {
+					"type": "string",
+					"minLength": 1
+				  },
+				  "type": {
+					"type": "string",
+					"minLength": 1
+				  }
+				}
+			  },
+			  { "type": "null" }
+			]
+		  }
 	}
 }

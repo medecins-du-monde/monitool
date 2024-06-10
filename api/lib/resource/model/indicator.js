@@ -54,6 +54,26 @@ export default class Indicator extends DbModel {
 		});
 	}
 
+	async save(skipChecks) {
+		await super.save(skipChecks);
+
+		const projects = await Project.storeInstance.listByIndicator(this._id, false);
+		console.log('\n\projects\n\n');
+
+		// Delete cross cutting indicator from projects if the formula has changed.
+		projects.forEach(project => {
+			if (
+				project.crossCutting[this._id] &&
+				project.crossCutting[this._id].computation.formula !== this.computation.formula
+			) {
+				delete project.crossCutting[this._id];
+				console.log('\n\nDELETED\n\n');
+			}
+		});
+		// Save everything in on request
+		await this._db.callBulk({docs: [...projects]});
+	}
+
 	/**
 	 * Delete indicator and updates all projects that are using it.
 	 */
