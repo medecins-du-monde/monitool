@@ -32,21 +32,31 @@ const delay = async () => {
 
 class Database {
 
-	get url() {
-		let url = 'http://';
-
-		if (!this.config)
-			url += 'localhost:5984';
-
-		else {
-			if (this.config.username && this.config.password)
-				url += this.config.username + ':' + this.config.password + '@';
-
-			url += this.config.host || 'localhost';
-			url += ':' + (this.config.port || 5984);
+	get nanoOpts() {
+		let nanoOpts = {
+			url: 'http://',
+			requestDefaults: { 
+				headers: {}
+			}
 		}
 
-		return url;
+		if (!this.config)
+			nanoOpts.url += 'localhost:5984';
+
+		else {
+			nanoOpts.url += this.config.host || 'localhost';
+			nanoOpts.url += ':' + (this.config.port || 5984);
+
+			if (this.config.username && this.config.password) {
+				nanoOpts.requestDefaults.headers = {
+					// Works, but insecure: https://github.com/apache/couchdb-nano/issues/174#issuecomment-1021215664
+					// TODO: Update Nano and use an improved solution
+					Authorization:"Basic " + new Buffer(this.config.username + ":" + this.config.password).toString('base64')
+				};
+			}
+		}
+
+		return nanoOpts;
 	}
 
 	get bucketName() {
@@ -58,7 +68,7 @@ class Database {
 
 	constructor(config) {
 		this.config = config;
-		this.nano = nano(this.url);
+		this.nano = nano(this.nanoOpts);
 		this.database = this.nano.use(this.bucketName)
 	}
 
