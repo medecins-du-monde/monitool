@@ -57,6 +57,9 @@
 		},
 		"updatedAt": {
 			"type": "string"
+		},
+		"blocked": {
+			"type": "boolean"
 		}
 	}
 }

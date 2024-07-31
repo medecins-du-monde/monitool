@@ -310,10 +310,22 @@ router.get('/resources/input/:id', async ctx => {
  */
 router.put('/resources/input/:id', async ctx => {
 	// Validate that the _id in the payload is the same as the id in the URL.
-	if (ctx.request.body._id !== ctx.params.id)
+	if (ctx.request.body.value._id !== ctx.params.id)
 		throw new Error('id_mismatch');
-
-	const input = new Input(ctx.request.body);
+	let prevInput;
+	await Input.storeInstance.get(ctx.params.id).then(function(input) {
+		prevInput = input;
+	}).catch(function(error) {});
+	let input;
+	// Depends on the action we update the full input, or just the blocked state.
+	if (ctx.request.body.action === 'saveInput') {
+		input = new Input(ctx.request.body.value);
+	} else if (ctx.request.body.action === 'toggleBlock') {
+		if (!prevInput) {
+			throw new Error('forbidden');
+		}
+		input =  new Input(Object.assign(prevInput, {blocked: ctx.request.body.value.blocked}))
+	}
 	const project = await Project.storeInstance.get(input.project);
 
 	// Check ACLs
@@ -322,7 +334,7 @@ router.put('/resources/input/:id', async ctx => {
 
 	const allowed =
 		(projectRole === 'owner') ||
-		(projectRole === 'input' && projectUser.entities.includes(input.entity) && projectUser.dataSources.includes(input.form));
+		(projectRole === 'input' && projectUser.entities.includes(input.entity) && projectUser.dataSources.includes(input.form) && (prevInput ? !prevInput.blocked : true));
 
 	if (!allowed)
 		throw new Error('forbidden');
@@ -344,7 +356,7 @@ router.delete('/resources/input/:id', async ctx => {
 
 	const allowed =
 		(projectRole === 'owner') ||
-		(projectRole === 'input' && projectUser.entities.includes(input.entity) && projectUser.dataSources.includes(input.form));
+		(projectRole === 'input' && projectUser.entities.includes(input.entity) && projectUser.dataSources.includes(input.form) && !input.blocked);
 
 	if (!allowed)
 		throw new Error('forbidden');
