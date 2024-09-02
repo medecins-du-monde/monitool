@@ -34,7 +34,7 @@ export default class InputStore extends Store {
 	 * Retrieve all input ids that are linked to a particular data source.
 	 * Used to populate datasource planning (/projects/xxx/input).
 	 */
-	async listIdsByDataSource(projectId, dataSourceId, update = false) {
+	async listIdsByDataSource(projectId, dataSourceId) {
 		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string')
 			throw new Error('missing_parameter');
 
@@ -44,29 +44,35 @@ export default class InputStore extends Store {
 		};
 
 		const dbResult = await this._db.callView('inputs_with_progress', options);
+		const project = await Project.storeInstance.get(projectId);
+		const dataSource = project.getDataSourceById(dataSourceId);
+		let count = 0;
+		for (let variableId in dataSource.structure) {
+			count += dataSource.structure[variableId].reduce((m, p) => m * p.items.length, 1);
+		};
 
-		if (update) {
-			const project = await Project.storeInstance.get(projectId);
-			const dataSource = project.getDataSourceById(dataSourceId);
+		// Remove inputs that are no longer relevant
+		dbResult.rows = dbResult.rows.filter(row => {
+			const [siteId, period] = row.id.split(':').slice(4);
+			const timeSlot = new TimeSlot(period);
+			const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
 
-			// Remove inputs that are no longer relevant
-			dbResult.rows = dbResult.rows.filter(row => {
-				const [siteId, period] = row.id.split(':').slice(4);
-				const timeSlot = new TimeSlot(period);
-				const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
-
-				return dataSource
-					&& project.start <= endDate
-					&& project.end >= startDate
-					&& (!dataSource.start || dataSource.start <= endDate)
-					&& (!dataSource.end || dataSource.end >= startDate)
-					&& dataSource.entities.includes(siteId)
-					&& dataSource.isValidSlot(period);
-			});
-		}
+			return dataSource
+				&& project.start <= endDate
+				&& project.end >= startDate
+				&& (!dataSource.start || dataSource.start <= endDate)
+				&& (!dataSource.end || dataSource.end >= startDate)
+				&& dataSource.entities.includes(siteId)
+				&& dataSource.isValidSlot(period);
+		});
 
 		const result = {};
-		dbResult.rows.forEach(item => result[item.id] = item.value);
+		dbResult.rows.forEach(item => {
+			// Compute percentage
+			item.value.progress /= count;
+			// Set result
+			result[item.id] = item.value
+		});
 		return result;
 	}
 

@@ -213,7 +213,7 @@ router.get('/resources/input', async ctx => {
 	if (q.mode && q.mode.startsWith('ids_by_')) {
 		let ids;
 		if (q.mode === 'ids_by_form'){
-			ids = await Input.storeInstance.listIdsByDataSource(q.projectId, q.formId, true);
+			ids = await Input.storeInstance.listIdsByDataSource(q.projectId, q.formId);
 		}
 		else
 			throw new Error('invalid_mode');
@@ -327,6 +327,11 @@ router.put('/resources/input/:id', async ctx => {
 		input =  new Input(Object.assign(prevInput, {blocked: ctx.request.body.value.blocked}))
 	}
 	const project = await Project.storeInstance.get(input.project);
+
+	// Update input structure for toggleBlock.
+	if (ctx.request.body.action === 'toggleBlock') {
+		input.update(project.getDataSourceById(input.form).structure);
+	}
 
 	// Check ACLs
 	const projectUser = project.getProjectUser(ctx.state.user);

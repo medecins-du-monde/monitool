@@ -63,17 +63,15 @@ const migrateDesignDoc = async () => {
 		map: function (doc) {
 		  if (doc.type === "input") { 
 			var progress = 0;
-			var count = 0;
 			for (var key in doc.values) {
 			  for (var i = 0; i < doc.values[key].length; ++i) {
-				count++;
 				if (doc.values[key][i] !== null) {
 				  progress++;
 				}
 			  }
 			}
 	
-			emit(doc._id, {progress: progress / count, blocked: doc.blocked ? true : false});
+			emit(doc._id, {progress: progress, blocked: doc.blocked ? true : false});
 		  }
 		}
 		.toString()
