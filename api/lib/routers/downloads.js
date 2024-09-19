@@ -119,7 +119,7 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
     const isPercentage = computation.formula.indexOf('100') !== -1;
     // this function can throw an error in case the periodicity asked is not compatible with the data
     try{
-      result = JSON.parse(await queryReportingSubprocess(query));
+      result = JSON.parse(await queryReportingSubprocess(query)).items;
       if (isPercentage) {
         convertToPercentage(result);
       }
@@ -316,14 +316,18 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   lang = ctx.params.lang;
   let minimized = ctx.params.minimized;
 
+  console.log("\nStart download...\n");
+
   const filename = `monitool-${project.country}${minimized ? '-global' : '-detailed'}.xlsx`;
   if (fs.existsSync(filename)) {
     fs.unlinkSync(filename, (err) => console.log(err));
   }
-  if (fs.existsSync(filename + '.temp')) {
-    ctx.body = '{ "message": "not done" }';
-    return;
-  }
+  // if (fs.existsSync(filename + '.temp')) {
+  //   ctx.body = '{ "message": "not done" }';
+  //   return;
+  // }
+
+  console.log("\nInitialize stream...\n")
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by its name and computation
@@ -579,6 +583,8 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
 
   sectionHeader.fill.fgColor.argb = "999999";
 
+  let bool = 0;
+
   // Adding the data
   for (let indicator of allCompleteIndicators) {
     // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
@@ -601,6 +607,12 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
         indicator.target,
         indicator.filter
       );
+      if (bool < 8) {
+        if (bool > 3)
+        console.log('\nDebugging\n', res)
+        // console.log('\n', res.keys(), "\n");
+        bool++;
+      }
       // Dump all the data into Excel
       row = worksheet.addRow(res);
 
