@@ -322,10 +322,10 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   if (fs.existsSync(filename)) {
     fs.unlinkSync(filename, (err) => console.log(err));
   }
-  // if (fs.existsSync(filename + '.temp')) {
-  //   ctx.body = '{ "message": "not done" }';
-  //   return;
-  // }
+  if (fs.existsSync(filename + '.temp')) {
+    ctx.body = '{ "message": "not done" }';
+    return;
+  }
 
   console.log("\nInitialize stream...\n")
 
