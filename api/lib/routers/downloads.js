@@ -1105,9 +1105,8 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
     fs.unlinkSync(filename, (err) => console.log(err));
   }
   if (fs.existsSync(filename + '.temp')) {
-    fs.unlinkSync(filename + '.temp', (err) => console.log(err));
-    // ctx.body = '{ "message": "not done" }';
-    // return;
+    ctx.body = '{ "message": "not done" }';
+    return;
   }
 
   console.log(`\nGenerating file ${filename}...\n`);
