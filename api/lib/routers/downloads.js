@@ -51,11 +51,11 @@ let sectionHeader = {
   }
 }
 let numberCellStyle = {
-  numFmt: '### ### ### ##0'
+  numFmt: '### ### ### ##0.#'
 }
 
 let percentageCellStyle = {
-  numFmt: '0%'
+  numFmt: '0.#%'
 }
 let partitionsCollapsed = {
   font: {
@@ -76,25 +76,11 @@ let errorRow = {
 
 let dateColumn = [];
 
-async function convertToPercentage(result){
-  for (const [key, value] of Object.entries(result)) {
-    if (key !== 'name') {
-      if (typeof value === 'string' && value !== "missing-data") {
-        let temp = Number(value);
-        result[key] = temp.toFixed(1) + "%";
-      } else if (typeof value === "number") {
-        result[key] = value.toFixed(1) + "%";
-      }
-    }
-  }
-}
-
-
 // Call the database and get the computed values
 // Add the name of the indicator to the result of the computation
-async function indicatorToRow(ctx, computation, name, baseline=null, target=null, filter){
+async function indicatorToRow(ctx, projectId, computation, name, baseline=null, target=null, filter){
   const query = {
-		projectId: ctx.params.projectId,
+		projectId: projectId,
 		computation: computation,
 		filter: filter ? filter : {},
 		dimensionIds: [ctx.params.periodicity],
@@ -120,9 +106,6 @@ async function indicatorToRow(ctx, computation, name, baseline=null, target=null
     // this function can throw an error in case the periodicity asked is not compatible with the data
     try{
       result = JSON.parse(await queryReportingSubprocess(query)).items;
-      if (isPercentage) {
-        convertToPercentage(result);
-      }
     }
     // Here are the various reported on the excel export
     catch (err){
@@ -250,7 +233,7 @@ function buildWorksheet(workbook, name) {
   }
   const targetTranslation = {
     'en': 'Target',
-    'es': 'Objectivo',
+    'es': 'Objetivo',
     'fr': 'Valeur cible',
   }
 
@@ -259,7 +242,7 @@ function buildWorksheet(workbook, name) {
       header: name,
       key: name
     }
-  }));
+  })).concat([{header: 'Total', key: '_total'}]);
 
   // force the columns to be at least as long as their header row.
   newWorksheet.columns.forEach(column => {
@@ -275,59 +258,17 @@ function getNumberFormat(computation){
   return numberCellStyle.numFmt;
 }
 
+/**
+ * Gets the item type from the id.
+ * 
+ * @param {String} id Id of a Project or an Indicator.
+ * @returns {String} String indicating id type.
+ */
+function getIdType(id) {
+  return id.split(':')[0];
+}
 
-router.get('/export/:projectId/:periodicity/:lang/:minimized?/check', async ctx => {
-  const project = await Project.storeInstance.get(ctx.params.projectId);
-  
-  let minimized = ctx.params.minimized;
-  const filename = `monitool-${project.country}${minimized ? '-global' : '-detailed'}.xlsx`;
-  if (fs.existsSync(filename)){
-    ctx.status = 200;
-    ctx.body = '{ "message": "done" }'
-  } else {
-    ctx.status = 200;
-    ctx.body = '{ "message": "not done" }'
-  }
-})
-
-router.get('/export/:projectId/:periodicity/:lang/:minimized?/file', async ctx => {
-  const project = await Project.storeInstance.get(ctx.params.projectId);
-
-  let minimized = ctx.params.minimized;
-  const filename = `monitool-${project.country}${minimized ? '-global' : '-detailed'}.xlsx`;
-
-  // check if the file already exists
-  if (fs.existsSync(filename)){
-    ctx.set('Content-disposition', 'attachment; filename=' + filename);
-    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-    ctx.body = fs.createReadStream(filename);
-  }
-  else{
-    ctx.status = 404;
-    ctx.message = 'File not found';
-  }
-})
-
-/** Render file containing all data entry up to a given date */
-router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
-  const project = await Project.storeInstance.get(ctx.params.projectId);
-
-  lang = ctx.params.lang;
-  let minimized = ctx.params.minimized;
-
-  console.log("\nStart download...\n");
-
-  const filename = `monitool-${project.country}${minimized ? '-global' : '-detailed'}.xlsx`;
-  if (fs.existsSync(filename)) {
-    fs.unlinkSync(filename, (err) => console.log(err));
-  }
-  if (fs.existsSync(filename + '.temp')) {
-    ctx.body = '{ "message": "not done" }';
-    return;
-  }
-
-  console.log("\nInitialize stream...\n")
+async function generateProjectDownload(filename, project, ctx) {
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by its name and computation
@@ -601,18 +542,13 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
       // when no filter is provided it means we want data from all sites
       let res = await indicatorToRow(
         ctx,
+        ctx.params.id,
         indicator.computation,
         indicator.display,
         indicator.baseline,
         indicator.target,
         indicator.filter
       );
-      if (bool < 8) {
-        if (bool > 3)
-        console.log('\nDebugging\n', res)
-        // console.log('\n', res.keys(), "\n");
-        bool++;
-      }
       // Dump all the data into Excel
       row = worksheet.addRow(res);
 
@@ -686,7 +622,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   ];
   let colorIdx = 0;
 
-  if (!minimized) {
+  if (!ctx.params.minimized) {
     // iterates over the sites
     for (let site of project.entities) {
       // creating a tab for each site
@@ -708,6 +644,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
         if (e.computation !== undefined) {
           let res = await indicatorToRow(
             ctx,
+            ctx.params.id,
             e.computation,
             e.display,
             e.baseline,
@@ -774,17 +711,420 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
   fs.rename(`${filename}.temp`, `${filename}`, function(err) {
     if ( err ) console.log('ERROR: ' + err);
   });
+}
 
+async function generateIndicatorDownload(filename, indicator, ctx) {
+  const relatedProjects = await Project.storeInstance.listByIndicator(indicator._id, true);
+
+  // match the cross cutting id saved inside the project with the id of the global indicators in the database
+  // and add them to the list too
+  let completeProjects = [];
+  let earliestStart;
+  let latestEnd;
+  const currentDate = new Date();
+
+  for (const project of relatedProjects) {
+      // if so we add it to the report
+      let currentComputation = null;
+      let currentBaseline = null;
+      let currentTarget = null;
+      if (project.crossCutting[indicator._id]) {
+        currentComputation = project.crossCutting[indicator._id].computation;
+        currentBaseline = project.crossCutting[indicator._id].baseline;
+        currentTarget = project.crossCutting[indicator._id].target;
+        // Only set dates if the crossCutting indicator is in the project
+        const start = new Date(project.start + "T00:00:00Z");
+        const end = new Date(project.end + "T00:00:00Z");
+        if (!earliestStart || earliestStart > start) {
+          earliestStart = start;
+        }
+        if (!latestEnd || latestEnd < end) {
+          latestEnd = end;
+        }
+      }
+      completeProjects.push({
+        computation: currentComputation,
+        display: `${project.country} - ${project.name}`,
+        baseline: currentBaseline,
+        target: currentTarget,
+        numFmt: getNumberFormat(currentComputation),
+        id: project._id
+      });
+      let indicatorFormulas = buildFormulas({ computation: currentComputation }, project);
+      indicatorFormulas.map(formula => {formula.id = project._id});
+      completeProjects = completeProjects.concat(indicatorFormulas);
+  }
+  
+  // creates a list for the names of the columns based on the periodicity received as a parameter
+  dateColumn = Array.from(
+    timeSlotRange(
+      TimeSlot.fromDate(
+        earliestStart,
+        ctx.params.periodicity
+      ),
+      TimeSlot.fromDate(
+        currentDate > latestEnd ? latestEnd : currentDate,
+        ctx.params.periodicity
+      )
+    )
+  ).map((ts) => ts.value);
+
+  // create the excel file
+  const writeStream = fs.createWriteStream(`${filename}.temp`, { flags: 'w' });
+  const options = {
+    stream: writeStream,
+    useStyles: true,
+    useSharedStrings: true
+  };
+
+  let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
+
+  let worksheet = buildWorksheet(workbook, "Global");
+
+  sectionHeader.fill.fgColor.argb = "999999";
+
+  // Adding the data
+  for (let project of completeProjects) {
+    // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
+    // row 1 is the header.
+    // const rowIndex = index + 2;
+
+    // By using destructuring we can easily dump all of the data into the row without doing much
+    // We can add formulas pretty easily by providing the formula property.
+    let row;
+
+    // if it has a computation (meaning that is an indicator) we get the values and put dump in the sheet
+    if (project.computation !== undefined) {
+      // get values
+      // when no filter is provided it means we want data from all sites
+      let res = await indicatorToRow(
+        ctx,
+        project.id,
+        project.computation,
+        project.display,
+        project.baseline,
+        project.target,
+        project.filter
+      );
+      // Dump all the data into Excel
+      row = worksheet.addRow(res);
+      // Format the numbers with no decimal places
+      if (project.numFmt !== undefined) {
+        row.numFmt = project.numFmt;
+      }
+      // Make it collapsed. 1 is one level. 2 is 2 level.....
+      if (project.outlineLevel !== undefined) {
+        row.outlineLevel = project.outlineLevel;
+      }
+      // This hide the first level when we want to collapse.
+      if (project.hidden !== undefined) {
+        row.hidden = project.hidden;
+      }
+      // All the font configuration
+      if (project.font !== undefined) {
+        row.font = project.font;
+      }
+      // Background color
+      if (project.fill !== undefined) {
+        row.fill =
+          project.fill === undefined
+            ? undefined
+            : JSON.parse(JSON.stringify(project.fill));
+      }
+      if (res.fill !== undefined) {
+        row.fill =
+          res.fill === undefined
+            ? undefined
+            : JSON.parse(JSON.stringify(res.fill));
+      }
+      row.commit();
+    }
+    // if the row is a section header
+    else {
+      // Dump all the data into Excel
+      row = worksheet.addRow(project);
+
+      // Make it collapsed. 1 is one level. 2 is 2 level.....
+      if (project.outlineLevel !== undefined) {
+        row.outlineLevel = project.outlineLevel;
+      }
+      // This hide the first level when we want to collapse.
+      if (project.hidden !== undefined) {
+        row.hidden = project.hidden;
+      }
+      // apply the styles
+      row.fill =
+      project.fill === undefined
+          ? undefined
+          : JSON.parse(JSON.stringify(project.fill));
+      row.font = project.font;
+    }
+    row.commit();
+  }
+
+  worksheet.columns[0].width = 45;
+  worksheet.commit();
+
+  const COLORS = [
+    "1f77b4",
+    "ff7f0e",
+    "2ca02c",
+    "d62728",
+    "9467bd",
+    "8c564b",
+    "e377c2",
+    "7f7f7f",
+    "bcbd22",
+    "17becf",
+  ];
+  let colorIdx = 0;
+
+  if (!ctx.params.minimized) {
+    // iterates over the sites
+    for (let project of relatedProjects) {
+      // creating a tab for each site
+
+      // Cleaning the name replacing all special characters by a space
+      project.country = project.country.replace(/[^a-zA-Z0-9]/g, " ");
+
+      let newWorksheet = buildWorksheet(workbook, project.country);
+      
+      let projectComputation = null;
+      let projectBaseline = null;
+      let projectTarget = null;
+
+      let projectIndicators = [];
+
+      let projectStart = new Date(project.start + "T00:00:00Z");;
+      let projectEnd = new Date(project.end + "T00:00:00Z");;
+
+      if (project.crossCutting[indicator._id]) {
+        projectComputation = project.crossCutting[indicator._id].computation;
+        projectBaseline = project.crossCutting[indicator._id].baseline;
+        projectTarget = project.crossCutting[indicator._id].target;
+      }
+
+      // creates a list for the names of the columns based on the periodicity received as a parameter
+      dateColumn = Array.from(
+        timeSlotRange(
+          TimeSlot.fromDate(
+            projectStart,
+            ctx.params.periodicity
+          ),
+          TimeSlot.fromDate(
+            currentDate > projectEnd ? projectEnd : currentDate,
+            ctx.params.periodicity
+          )
+        )
+      ).map((ts) => ts.value);
+
+      for (let entity of project.entities) {
+        projectIndicators.push({
+          computation: projectComputation,
+          display: entity.name,
+          baseline: projectBaseline,
+          target: projectTarget,
+          numFmt: getNumberFormat(projectComputation),
+          id: project._id,
+          filter: { entity: [entity.id] }
+        });
+        let indicatorFormulas = buildFormulas({ computation: projectComputation }, project);
+        indicatorFormulas.map(formula => {
+          formula.id = project._id;
+          formula.filter = { entity: [entity.id] };
+        });
+        projectIndicators = projectIndicators.concat(indicatorFormulas);
+      }
+
+      sectionHeader.fill.fgColor.argb = COLORS[colorIdx];
+      colorIdx = (colorIdx + 1) % 10;
+
+      let siteMaxLength = 0;
+      for (let e of projectIndicators) {
+        let row;
+        if (e.computation !== undefined) {
+          let res = await indicatorToRow(
+            ctx,
+            e.id,
+            e.computation,
+            e.display,
+            e.baseline,
+            e.target,
+            e.filter
+          );
+          row = newWorksheet.addRow(res);
+
+          siteMaxLength = Math.max(siteMaxLength, res.name.length);
+
+          if (e.numFmt !== undefined) {
+            row.numFmt = e.numFmt;
+          }
+          if (e.outlineLevel !== undefined) {
+            row.outlineLevel = e.outlineLevel;
+          }
+          if (e.hidden !== undefined) {
+            row.hidden = e.hidden;
+          }
+          if (e.font !== undefined) {
+            row.font = e.font;
+          }
+          if (e.fill !== undefined) {
+            row.fill =
+              e.fill === undefined
+                ? undefined
+                : JSON.parse(JSON.stringify(e.fill));
+          }
+          if (res.fill !== undefined) {
+            row.fill =
+              res.fill === undefined
+                ? undefined
+                : JSON.parse(JSON.stringify(res.fill));
+          }
+        } else {
+          row = newWorksheet.addRow(e);
+
+          // Make it collapsed. 1 is one level. 2 is 2 level.....
+          if (e.outlineLevel !== undefined) {
+            row.outlineLevel = e.outlineLevel;
+          }
+          // This hide the first level when we want to collapse.
+          if (e.hidden !== undefined) {
+            row.hidden = e.hidden;
+          }
+
+          siteMaxLength = Math.max(siteMaxLength, e.name.length);
+
+          row.fill =
+            e.fill === undefined
+              ? undefined
+              : JSON.parse(JSON.stringify(e.fill));
+          row.font = e.font;
+        }
+        row.commit();
+      }
+      newWorksheet.columns[0].width = 45;
+      newWorksheet.commit();
+    }
+  }
+
+  await workbook.commit();
+
+  fs.rename(`${filename}.temp`, `${filename}`, function(err) {
+    if ( err ) console.log('ERROR: ' + err);
+  });
+
+}
+
+/**
+ * Checks if a file stream with the passed params for the excel export already exists.
+ * Returns a the request with a message indicating the state of the file stream. 
+ */
+router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
+  let filename = 'monitool-';
+
+  switch (getIdType(ctx.params.id)) {
+    case 'indicator':
+      const indicator = await Indicator.storeInstance.get(ctx.params.id);
+      filename += `${indicator.name.en.replace(/ /g,"-")}`;
+      break;
+    case 'project':
+      const project = await Project.storeInstance.get(ctx.params.id);
+      filename += `${project.country.replace(/ /g,"-")}`;
+      break;
+    default:
+      break;
+  }
+  filename += `${ctx.params.minimized ? '-global' : '-detailed'}.xlsx`;
+
+  if (fs.existsSync(filename)){
+    ctx.status = 200;
+    ctx.body = '{ "message": "done" }'
+  } else {
+    ctx.status = 200;
+    ctx.body = '{ "message": "not done" }'
+  }
+})
+
+router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
+  let filename = 'monitool-';
+
+  switch (getIdType(ctx.params.id)) {
+    case 'indicator':
+      const indicator = await Indicator.storeInstance.get(ctx.params.id);
+      filename += `${indicator.name.en.replace(/ /g,"-")}`;
+      break;
+    case 'project':
+      const project = await Project.storeInstance.get(ctx.params.id);
+      filename += `${project.country.replace(/ /g,"-")}`;
+      break;
+    default:
+      break;
+  }
+  filename += `${ctx.params.minimized ? '-global' : '-detailed'}.xlsx`;
+
+  // check if the file already exists
+  if (fs.existsSync(filename)){
+    ctx.set('Content-disposition', 'attachment; filename=' + filename);
+    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+    ctx.body = fs.createReadStream(filename);
+  }
+  else{
+    ctx.status = 404;
+    ctx.message = 'File not found';
+  }
+})
+
+/** Render file containing all data entry up to a given date */
+router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
+  // const project = await Project.storeInstance.get(ctx.params.projectId);
+
+  const type = getIdType(ctx.params.id);
+  let indicator = undefined;
+  let project = undefined;
+
+  console.log(`\nStart download for ${ctx.params.id}...\n`);
+
+  let filename = 'monitool-';
+
+  switch (type) {
+    case 'indicator':
+      indicator = await Indicator.storeInstance.get(ctx.params.id);
+      filename += `${indicator.name.en.replace(/ /g,"-")}`;
+      break;
+    case 'project':
+      project = await Project.storeInstance.get(ctx.params.id);
+      filename += `${project.country.replace(/ /g,"-")}`;
+      break;
+    default:
+      break;
+  }
+  filename += `${ctx.params.minimized ? '-global' : '-detailed'}.xlsx`;
+
+  if (fs.existsSync(filename)) {
+    fs.unlinkSync(filename, (err) => console.log(err));
+  }
+  if (fs.existsSync(filename + '.temp')) {
+    ctx.body = '{ "message": "not done" }';
+    return;
+  }
+
+  console.log(`\nGenerating file ${filename}...\n`);
+
+  switch (type) {
+    case 'indicator':
+      await generateIndicatorDownload(filename, indicator, ctx);
+      break;
+    case 'project':
+      await generateProjectDownload(filename, project, ctx);
+      break;
+    default:
+      break;
+    
+  }
+
+  console.log(`\nFile ${filename} is ready to download\n`);
   ctx.body = '{ "message": "done" }';
-
-  // ctx.set('Content-disposition', `attachment; filename=`+`monitool-`+project.country+`.xlsx`);
-  // ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-  // workbook.xlsx.writeFile("monitool-" + project.country + ".xlsx");
-
-  // Write to memory, buffer
-  // const buffer = await workbook.xlsx.writeBuffer()
-  // ctx.body = buffer;
 });
 
 router.post('/export/currentView', async (ctx) => {
