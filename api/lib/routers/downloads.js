@@ -1012,7 +1012,10 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
   fs.rename(`${filename}.temp`, `${filename}`, function(err) {
     if ( err ) console.log('ERROR: ' + err);
   });
+}
 
+function getFilename(name, minimized = true) {
+  return encodeURI(`monitool-(${name.replace(/[`;,.\\\/]/gi, '')})-${minimized ? 'global' : 'detailed'}.xlsx`);
 }
 
 /**
@@ -1020,21 +1023,20 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
  * Returns a the request with a message indicating the state of the file stream. 
  */
 router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
-  let filename = 'monitool-';
+  let filename;
 
   switch (getIdType(ctx.params.id)) {
     case 'indicator':
       const indicator = await Indicator.storeInstance.get(ctx.params.id);
-      filename += `${indicator.name.en.replace(/ /g,"-")}`;
+      filename = getFilename(indicator.name.en, ctx.params.minimized);
       break;
     case 'project':
       const project = await Project.storeInstance.get(ctx.params.id);
-      filename += `${project.country.replace(/ /g,"-")}`;
+      filename = getFilename(project.country, ctx.params.minimized);
       break;
     default:
       break;
   }
-  filename += `${ctx.params.minimized ? '-global' : '-detailed'}.xlsx`;
 
   if (fs.existsSync(filename)){
     ctx.status = 200;
@@ -1046,21 +1048,20 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
 })
 
 router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
-  let filename = 'monitool-';
+  let filename;
 
   switch (getIdType(ctx.params.id)) {
     case 'indicator':
       const indicator = await Indicator.storeInstance.get(ctx.params.id);
-      filename += `${indicator.name.en.replace(/ /g,"-")}`;
+      filename = getFilename(indicator.name.en, ctx.params.minimized);
       break;
     case 'project':
       const project = await Project.storeInstance.get(ctx.params.id);
-      filename += `${project.country.replace(/ /g,"-")}`;
+      filename = getFilename(project.country, ctx.params.minimized);
       break;
     default:
       break;
   }
-  filename += `${ctx.params.minimized ? '-global' : '-detailed'}.xlsx`;
 
   // check if the file already exists
   if (fs.existsSync(filename)){
@@ -1077,51 +1078,41 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
 
 /** Render file containing all data entry up to a given date */
 router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
-  // const project = await Project.storeInstance.get(ctx.params.projectId);
-
+  // Get export type;
   const type = getIdType(ctx.params.id);
-  let indicator = undefined;
-  let project = undefined;
 
   console.log(`\nStart download for ${ctx.params.id}...\n`);
 
-  let filename = 'monitool-';
+  // Get data depending on the id type;
+  const data = await(
+    type === 'indicator' ?
+    Indicator.storeInstance.get(ctx.params.id) :
+    Project.storeInstance.get(ctx.params.id)
+  );
 
-  switch (type) {
-    case 'indicator':
-      indicator = await Indicator.storeInstance.get(ctx.params.id);
-      filename += `${indicator.name.en.replace(/ /g,"-")}`;
-      break;
-    case 'project':
-      project = await Project.storeInstance.get(ctx.params.id);
-      filename += `${project.country.replace(/ /g,"-")}`;
-      break;
-    default:
-      break;
-  }
-  filename += `${ctx.params.minimized ? '-global' : '-detailed'}.xlsx`;
+  // Set filename;
+  const filename = getFilename(
+    (type === 'indicator' ? data.name.en : data.country),
+    ctx.params.minimized
+  );
 
   if (fs.existsSync(filename)) {
     fs.unlinkSync(filename, (err) => console.log(err));
   }
   if (fs.existsSync(filename + '.temp')) {
+    // fs.unlinkSync(filename + '.temp', (err) => console.log(err));
     ctx.body = '{ "message": "not done" }';
     return;
   }
 
   console.log(`\nGenerating file ${filename}...\n`);
 
-  switch (type) {
-    case 'indicator':
-      await generateIndicatorDownload(filename, indicator, ctx);
-      break;
-    case 'project':
-      await generateProjectDownload(filename, project, ctx);
-      break;
-    default:
-      break;
-    
-  }
+  // Generate file data;
+  await (
+    type === 'indicator' ?
+    generateIndicatorDownload(filename, data, ctx) :
+    generateProjectDownload(filename, data, ctx)
+  );
 
   console.log(`\nFile ${filename} is ready to download\n`);
   ctx.body = '{ "message": "done" }';
