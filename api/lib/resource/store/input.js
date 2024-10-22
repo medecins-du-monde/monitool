@@ -70,6 +70,9 @@ export default class InputStore extends Store {
 		dbResult.rows.forEach(item => {
 			// Compute percentage
 			item.value.progress /= count;
+			if (item.value.progress > 1) {
+				item.value.progress = 1;
+			}
 			// Set result
 			result[item.id] = item.value
 		});
