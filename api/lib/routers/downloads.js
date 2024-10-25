@@ -1015,7 +1015,7 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
 }
 
 function getFilename(name, minimized = true) {
-  return encodeURI(`monitool-(${name.replace(/[`;,.\\\/]/gi, '')})-${minimized ? 'global' : 'detailed'}.xlsx`);
+  return encodeURI(`(${name.replace(/[`;,.\\\/]/gi, '')})-${minimized ? 'global-excel-export' : 'detailed-excel-export'}.xlsx`);
 }
 
 /**
