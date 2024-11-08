@@ -1014,7 +1014,7 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
   });
 }
 
-function getFilename(name, minimized = true) {
+function getFilename(name, minimized = false) {
   return encodeURI(`(${name.replace(/[`;,.\\\/]/gi, '')})-${minimized ? 'global-excel-export' : 'detailed-excel-export'}.xlsx`);
 }
 
@@ -1048,6 +1048,7 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
 })
 
 router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
+  
   let filename;
 
   switch (getIdType(ctx.params.id)) {
@@ -1067,7 +1068,6 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
   if (fs.existsSync(filename)){
     ctx.set('Content-disposition', 'attachment; filename=' + filename);
     ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
     ctx.body = fs.createReadStream(filename);
   }
   else{
