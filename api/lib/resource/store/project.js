@@ -194,6 +194,19 @@ export default class ProjectStore extends Store {
 		return result.rows.map(row => new Project(row.doc));
 	}
 
+	async hasInputs(projectId, dataSourceId) {
+		let id = `input:${projectId}`;
+		if (dataSourceId) {
+			id += `:${dataSourceId}`;
+		}
+		const result = await this._db.callList({
+			startkey: `${id}!`,
+			endkey: `${id}~`,
+			limit: 1
+		});
+		return result.rows.length > 0 ? true : false;
+	}
+
 }
 
 

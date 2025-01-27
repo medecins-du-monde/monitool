@@ -64,6 +64,16 @@ router.get('/resources/project', async ctx => {
 	ctx.response.body = projects.filter(p => ctx.visibleProjectIds.has(p._id));
 })
 
+router.get('/resources/project/:id/hasInputs', async ctx => {
+	const response = await Project.storeInstance.hasInputs(ctx.params.id);
+	ctx.response.body = response;
+})
+
+router.get('/resources/project/:id/hasInputs/:formId', async ctx => {
+	const response = await Project.storeInstance.hasInputs(ctx.params.id, ctx.params.formId);
+	ctx.response.body = response;
+})
+
 /**
  * Retrieve one project
  */
