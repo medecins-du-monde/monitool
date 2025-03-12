@@ -131,6 +131,109 @@ async function indicatorToRow(ctx, projectId, computation, name, baseline=null, 
   return result;
 }
 
+async function indicatorToCCRows(project, CCid, timeslot){
+  const query = {
+		projectId: project.id,
+		computation: project.computation,
+		filter: project.filter ? project.filter : {},
+		dimensionIds: ['semester'],
+		withTotals: false,
+		withGroups: false
+	};
+
+  let resultRows = [];
+  let queryResult = {};
+
+  // creates a list for the names of the columns based on the periodicity received as a parameter
+  const projectDates = Array.from(
+    timeSlotRange(
+      TimeSlot.fromDate(
+        new Date(project.start + "T00:00:00Z"),
+        'semester'
+      ),
+      TimeSlot.fromDate(
+        new Date(project.end + "T00:00:00Z"),
+        'semester'
+      )
+    )
+  ).map((ts) => ts.value).filter(ts => timeslot.includes(ts));
+
+  if(project.computation === null){
+    resultRows.push({
+      name: project.display,
+      date: "",
+      [CCid]: "Calculation is missing",
+      fill: errorRow.fill
+    })
+  }
+
+  else if (JSON.stringify(project.computation.parameters) === JSON.stringify({})) {
+    for (let date of projectDates) {
+      resultRows.push({
+        name: project.display,
+        date: date,
+        [CCid]: +project.computation.formula
+      })
+    }
+  }
+
+  else {
+    const isPercentage = project.computation.formula.indexOf('100') !== -1;
+    // this function can throw an error in case the periodicity asked is not compatible with the data
+    try{
+      queryResult = JSON.parse(await queryReportingSubprocess(query)).items;
+    }
+    // Here are the various reported on the excel export
+    catch (err){
+      // if this is the case, instead of the results we add an a custom error message
+      if (err.message == "invalid dimensionId") {
+        resultRows.push({
+          name: name,
+          date: "",
+          [CCid]: "This data is not available by semester",
+          fill: errorRow.fill
+        })
+      } else {
+      // if it's some other error, we send this error in the excel
+        resultRows.push({
+          name: project.display,
+          date: "",
+          [CCid]: err.message,
+          fill: errorRow.fill
+        })
+      }
+    } finally{
+      if (!Object.keys(queryResult).some(date => timeslot.includes(date))) {
+        resultRows.push({
+          name: project.display,
+          date: "",
+          [CCid]: "Selected dates are outside project range"
+        })
+      }
+      for(let date of Object.keys(queryResult)) {
+        if (timeslot.includes(date)) {
+          let value;
+          if (queryResult[date] === 'missing-data') {
+            value = '?'
+          } else {
+            value = Number(queryResult[date]);
+            if (isPercentage) {
+              value = value / 100;
+            }
+          }
+          // let value = queryResult[date] === 'missing-data' ? '?' : (isPercentage ? queryResult[date] / 100 : queryResult[date])
+          resultRows.push({
+            name: project.display,
+            date: date,
+            [CCid]: value
+          })
+        }
+      }
+    }
+  }
+  return resultRows;
+}
+
 // TODO: Optimize this method.
 function generateAllCombinations(partitionIndex, computation, name, formElement, list){
   if (partitionIndex === formElement.partitions.length){
@@ -243,6 +346,42 @@ function buildWorksheet(workbook, name) {
       key: name
     }
   })).concat([{header: 'Total', key: '_total'}]);
+
+  // force the columns to be at least as long as their header row.
+  newWorksheet.columns.forEach(column => {
+    column.width = column.header.length < 12 ? 12 : column.header.length
+  })
+  return newWorksheet;
+}
+
+function buildCCWorksheet(workbook, name, lang, indicators) {
+  // Cleaning the name replacing all special characters by a space
+  name = name.replace(/[^a-zA-Z0-9]/g,' ');
+
+  let newWorksheet = workbook.addWorksheet(name);
+
+  // TODO: translate baseline
+
+  const nameTranslation = {
+    'en': 'Name of the project',
+    'es': 'Nombre del proyecto',
+    'fr': 'Nom du projet'
+  }
+  const dateTranslation = {
+    'en': 'Year-semester',
+    'es': 'Año-semestre',
+    'fr': 'Annee-semestre'
+  }
+
+  newWorksheet.columns = [
+    {header: nameTranslation[lang], key: 'name'},
+    {header: dateTranslation[lang], key: 'date'}
+  ].concat(indicators.map(indicator => {
+    return {
+      header: [indicator.name[lang]],
+      key: indicator._id
+    }
+  }));
 
   // force the columns to be at least as long as their header row.
   newWorksheet.columns.forEach(column => {
@@ -1014,8 +1153,172 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
   });
 }
 
+async function generateCCIndicatorDownload(filename, indicator, lang, countries, continents, start, end) {
+  const relatedProjects = await Project.storeInstance.listByIndicator(indicator._id, true);
+
+  // match the cross cutting id saved inside the project with the id of the global indicators in the database
+  // and add them to the list too
+  let completeProjects = [];
+
+  for (const project of relatedProjects) {
+      // filtering
+      if (countries.length > 0) {
+        if (!countries.includes(project.country)) {
+          continue;
+        }
+      } else if (continents.length > 0) {
+        console.log(project.continent)
+        if (!project.continent || !continents.includes(project.continent)) {
+          continue;
+        }
+      }
+      // if so we add it to the report
+      let currentComputation = null;
+      let currentBaseline = null;
+      let currentTarget = null;
+      if (project.crossCutting[indicator._id]) {
+        currentComputation = project.crossCutting[indicator._id].computation;
+        currentBaseline = project.crossCutting[indicator._id].baseline;
+        currentTarget = project.crossCutting[indicator._id].target;
+      }
+      completeProjects.push({
+        computation: currentComputation,
+        display: `${project.country} - ${project.name}`,
+        baseline: currentBaseline,
+        target: currentTarget,
+        start: project.start,
+        end: project.end,
+        numFmt: getNumberFormat(currentComputation),
+        id: project._id
+      });
+  }
+
+  // creates a list for the names of the columns based on the periodicity received as a parameter
+  const timeSlot = Array.from(
+    timeSlotRange(
+      TimeSlot.fromDate(
+        new Date(start),
+        'semester'
+      ),
+      TimeSlot.fromDate(
+        new Date(end),
+        'semester'
+      )
+    )
+  ).map((ts) => ts.value);
+
+  // create the excel file
+  const writeStream = fs.createWriteStream(`${filename}.temp`, { flags: 'w' });
+  const options = {
+    stream: writeStream,
+    useStyles: true,
+    useSharedStrings: true
+  };
+
+  let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
+
+  let worksheet = buildCCWorksheet(workbook, "Global", lang, [indicator]);
+
+  sectionHeader.fill.fgColor.argb = "999999";
+
+  // Adding the data
+  for (let project of completeProjects) {
+    // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
+    // row 1 is the header.
+    // const rowIndex = index + 2;
+
+    // By using destructuring we can easily dump all of the data into the row without doing much
+    // We can add formulas pretty easily by providing the formula property.
+    let row;
+
+    // if it has a computation (meaning that is an indicator) we get the values and put dump in the sheet
+    if (project.computation !== undefined) {
+
+      // get values
+      // when no filter is provided it means we want data from all sites
+      let rows = await indicatorToCCRows(
+        project,
+        indicator._id,
+        timeSlot
+      );
+
+      for (let res of rows) {
+        // Dump all the data into Excel
+        row = worksheet.addRow(res);
+        // Format the numbers with no decimal places
+        if (project.numFmt !== undefined) {
+          row.numFmt = project.numFmt;
+        }
+        // All the font configuration
+        if (project.font !== undefined) {
+          row.font = project.font;
+        }
+        // Background color
+        if (project.fill !== undefined) {
+          row.fill =
+            project.fill === undefined
+              ? undefined
+              : JSON.parse(JSON.stringify(project.fill));
+        }
+        if (res.fill !== undefined) {
+          row.fill =
+            res.fill === undefined
+              ? undefined
+              : JSON.parse(JSON.stringify(res.fill));
+        }
+        row.commit();
+      }
+    }
+  }
+  
+  worksheet.commit();
+
+  const COLORS = [
+    "1f77b4",
+    "ff7f0e",
+    "2ca02c",
+    "d62728",
+    "9467bd",
+    "8c564b",
+    "e377c2",
+    "7f7f7f",
+    "bcbd22",
+    "17becf",
+  ];
+  let colorIdx = 0;
+
+  await workbook.commit();
+
+  fs.rename(`${filename}.temp`, `${filename}`, function(err) {
+    if ( err ) console.log('ERROR: ' + err);
+  });
+}
+
 function getFilename(name, minimized = false) {
   return encodeURI(`(${name.replace(/[`;,.\\\/]/gi, '')})-${minimized ? 'global-excel-export' : 'detailed-excel-export'}.xlsx`);
+}
+function getCCFilename(ctx) {
+
+  let filename = `new_cc_export_${ctx.params.ids}_${ctx.params.lang}`;
+  if (ctx.params.countries && ctx.params.countries != '_') { filename += `_${ctx.params.countries}` };
+  if (ctx.params.continents && ctx.params.continents != '_') { filename += `_${ctx.params.continents}` };
+  
+  // creates a list for the names of the columns based on the periodicity received as a parameter
+  const timeSlot = Array.from(
+    timeSlotRange(
+      TimeSlot.fromDate(
+        new Date(ctx.params.start),
+        'semester'
+      ),
+      TimeSlot.fromDate(
+        new Date(ctx.params.end),
+        'semester'
+      )
+    )
+  ).map((ts) => ts.value);
+  filename += `_${timeSlot[0]}_${timeSlot[timeSlot.length - 1]}`;
+
+  return `${filename}.xlsx`
 }
 
 /**
@@ -1037,6 +1340,23 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
     default:
       break;
   }
+
+  if (fs.existsSync(filename)){
+    ctx.status = 200;
+    ctx.body = '{ "message": "done" }'
+  } else {
+    ctx.status = 200;
+    ctx.body = '{ "message": "not done" }'
+  }
+})
+
+/**
+ * Checks if a file stream with the passed params for the excel export already exists.
+ * Returns a the request with a message indicating the state of the file stream. 
+ */
+router.get('/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?/check', async ctx => {
+
+  let filename = getCCFilename(ctx);
 
   if (fs.existsSync(filename)){
     ctx.status = 200;
@@ -1076,6 +1396,22 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
   }
 })
 
+router.get('/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?/file', async ctx => {
+  
+  let filename = getCCFilename(ctx);
+
+  // check if the file already exists
+  if (fs.existsSync(filename)){
+    ctx.set('Content-disposition', 'attachment; filename=' + filename);
+    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    ctx.body = fs.createReadStream(filename);
+  }
+  else{
+    ctx.status = 404;
+    ctx.message = 'File not found';
+  }
+})
+
 /** Render file containing all data entry up to a given date */
 router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
   // Get export type;
@@ -1100,7 +1436,6 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
     fs.unlinkSync(filename, (err) => console.log(err));
   }
   if (fs.existsSync(filename + '.temp')) {
-    // fs.unlinkSync(filename + '.temp', (err) => console.log(err));
     ctx.body = '{ "message": "not done" }';
     return;
   }
@@ -1113,6 +1448,41 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
     generateIndicatorDownload(filename, data, ctx) :
     generateProjectDownload(filename, data, ctx)
   );
+
+  console.log(`\nFile ${filename} is ready to download\n`);
+  ctx.body = '{ "message": "done" }';
+});
+
+/** Render file containing all data entry up to a given date */
+router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", async (ctx) => {
+
+  console.log(`\nStart download for newCrossCutting...\n`);
+
+  // Set filename;
+  let filename = getCCFilename(ctx);
+
+  if (fs.existsSync(filename)) {
+    fs.unlinkSync(filename, (err) => console.log(err));
+  }
+  if (fs.existsSync(filename + '.temp')) {
+    fs.unlinkSync(filename + '.temp', (err) => console.log(err));
+    // ctx.body = '{ "message": "not done" }';
+    // return;
+  }
+  
+  console.log(`\nGenerating file ${filename}...\n`);
+  console.log(ctx);
+
+  const indicatorIds = ctx.params.ids.split('+');
+  const countries = !ctx.params.countries || ctx.params.countries == '_' ? [] : ctx.params.countries.split('+');
+  const continents = !ctx.params.continents || ctx.params.continents == '_' ? []: ctx.params.continents.split('+');
+  let data = [];
+  for (let id of indicatorIds) {
+    const indicator = await Indicator.storeInstance.get(id);
+    data.push(indicator);
+  }
+  // Generate file data;
+  await (generateCCIndicatorDownload(filename, data[0], ctx.params.lang, countries, continents, ctx.params.start, ctx.params.end));
 
   console.log(`\nFile ${filename} is ready to download\n`);
   ctx.body = '{ "message": "done" }';
