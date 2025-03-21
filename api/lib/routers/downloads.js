@@ -239,9 +239,6 @@ async function indicatorToCCRows(project, indicators, timeslot) {
               indicatorResults[date][indicator._id] = queryResult[date];
             } else {
               indicatorResults[date][indicator._id] = Number(queryResult[date]);
-              // if (isPercentage) {
-              //   value = value / 100;
-              // }
             }
           }
         }
@@ -259,7 +256,11 @@ async function indicatorToCCRows(project, indicators, timeslot) {
         date: date,
       }
       for (const indicator of indicators) {
-        result[indicator._id] = indicatorResults.error[indicator._id] || indicatorResults[date][indicator._id];
+        result[indicator._id] =
+          indicatorResults.error[indicator._id] ||
+          indicatorResults[date][indicator._id] !== undefined ?
+            indicatorResults[date][indicator._id] :
+            'outside-range';
       }
       resultRows.push(result);
     } 
@@ -1523,9 +1524,9 @@ router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", as
     fs.unlinkSync(filename, (err) => console.log(err));
   }
   if (fs.existsSync(filename + '.temp')) {
-    fs.unlinkSync(filename + '.temp', (err) => console.log(err));
-    // ctx.body = '{ "message": "not done" }';
-    // return;
+    // fs.unlinkSync(filename + '.temp', (err) => console.log(err));
+    ctx.body = '{ "message": "not done" }';
+    return;
   }
   
   console.log(`\nGenerating file ${filename}...\n`);
