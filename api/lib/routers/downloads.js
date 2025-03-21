@@ -73,6 +73,39 @@ let errorRow = {
     fgColor:{argb:'bbbbbb'}
   }
 }
+  
+const errorTranslations = {
+  'missing-calc': {
+    'en': "No calculation for this indicator",
+    'es': "No hay cálculo para este indicador",
+    'fr': "Aucun calcul pour cet indicateur"
+  },
+  'no-indicator': {
+    'en': "This indicator isn't part of the Project",
+    'es': "Este indicador no es parte del proyecto",
+    'fr': "Cet indicateur ne fait pas partie du projet"
+  },
+  'outside-range': {
+    'en': "Date range is outside project dates",
+    'es': "El rango de fechas esta fuera de las fechas del proyecto",
+    'fr': "La plage de dates est en dehors des dates du projet"
+  },
+  "missing-data": {
+    'en': "No data for this indicator",
+    'es': "No hay datos para este indicador",
+    'fr': "Aucune donnée pour cet indicateur"
+  },
+  "not-available-by-semester": {
+    'en': "Data is not available by semester",
+    'es': "Los datos no estan disponibles por semestre",
+    'fr': "Les données ne sont pas disponibles par semestre"
+  },
+  "division-by-zero": {
+    'en': "Division by Zero",
+    'es': "División por cero",
+    'fr': "Division par Zero"
+  }
+}
 
 let dateColumn = [];
 
@@ -131,20 +164,12 @@ async function indicatorToRow(ctx, projectId, computation, name, baseline=null, 
   return result;
 }
 
-async function indicatorToCCRows(project, CCid, timeslot){
-  const query = {
-		projectId: project.id,
-		computation: project.computation,
-		filter: project.filter ? project.filter : {},
-		dimensionIds: ['semester'],
-		withTotals: false,
-		withGroups: false
-	};
+async function indicatorToCCRows(project, indicators, timeslot) {
 
-  let resultRows = [];
-  let queryResult = {};
-
-  // creates a list for the names of the columns based on the periodicity received as a parameter
+  let indicatorResults = {
+    error: {}
+  };
+  // Creates a list of all possible dates for a project
   const projectDates = Array.from(
     timeSlotRange(
       TimeSlot.fromDate(
@@ -158,78 +183,95 @@ async function indicatorToCCRows(project, CCid, timeslot){
     )
   ).map((ts) => ts.value).filter(ts => timeslot.includes(ts));
 
-  if(project.computation === null){
-    resultRows.push({
-      name: project.display,
-      date: "",
-      [CCid]: "Calculation is missing",
-      fill: errorRow.fill
-    })
+  for (let date of projectDates) {
+    indicatorResults[date] = {};
   }
 
-  else if (JSON.stringify(project.computation.parameters) === JSON.stringify({})) {
-    for (let date of projectDates) {
-      resultRows.push({
-        name: project.display,
-        date: date,
-        [CCid]: +project.computation.formula
-      })
+  for (const indicator of indicators) {
+    // Sets error and skips to next loop if indicator not in the project or no computation
+    if (!project.crossCutting[indicator._id] || !project.crossCutting[indicator._id].computation) {
+      indicatorResults.error[indicator._id] =
+        indicator.themes.some(theme => project.themes.find(t => t === theme)) ? 'missing-calc' : 'no-indicator';
+      continue;
     }
-  }
-
-  else {
-    const isPercentage = project.computation.formula.indexOf('100') !== -1;
-    // this function can throw an error in case the periodicity asked is not compatible with the data
-    try{
-      queryResult = JSON.parse(await queryReportingSubprocess(query)).items;
-    }
-    // Here are the various reported on the excel export
-    catch (err){
-      // if this is the case, instead of the results we add an a custom error message
-      if (err.message == "invalid dimensionId") {
-        resultRows.push({
-          name: name,
-          date: "",
-          [CCid]: "This data is not available by semester",
-          fill: errorRow.fill
-        })
-      } else {
-      // if it's some other error, we send this error in the excel
-        resultRows.push({
-          name: project.display,
-          date: "",
-          [CCid]: err.message,
-          fill: errorRow.fill
-        })
+  
+    // Takes care of static value formulas
+    if (JSON.stringify(project.crossCutting[indicator._id].computation.parameters) === JSON.stringify({})) {
+      if (!projectDates.some(date => timeslot.includes(date))) {
+        indicatorResults.error[indicator._id] = 'outside-range';
       }
-    } finally{
-      if (!Object.keys(queryResult).some(date => timeslot.includes(date))) {
-        resultRows.push({
-          name: project.display,
-          date: "",
-          [CCid]: "Selected dates are outside project range"
-        })
-      }
-      for(let date of Object.keys(queryResult)) {
+      for (let date of projectDates) {
         if (timeslot.includes(date)) {
-          let value;
-          if (queryResult[date] === 'missing-data') {
-            value = '?'
-          } else {
-            value = Number(queryResult[date]);
-            if (isPercentage) {
-              value = value / 100;
+          indicatorResults[date][indicator._id] = +project.crossCutting[indicator._id].computation.formula;
+        }
+      }
+    // Does a query to get all values
+    } else {
+      const query = {
+        projectId: project.id,
+        computation: project.crossCutting[indicator._id].computation,
+        filter: project.filter ? project.filter : {},
+        dimensionIds: ['semester'],
+        withTotals: false,
+        withGroups: false
+      };
+      let queryResult = {};
+      // this function can throw an error in case the periodicity asked is not compatible with the data
+      try{
+        queryResult = JSON.parse(await queryReportingSubprocess(query)).items;
+      }
+      // Here are the various reported on the excel export
+      catch (err){
+        // if this is the case, instead of the results we add an a custom error message
+        if (err.message == "invalid dimensionId") {
+          indicatorResults.error[indicator._id] = 'not-available-by-semester';
+        } else {
+        // if it's some other error, we send this error in the excel
+          indicatorResults.error[indicator._id] = err.message;
+        }
+      } finally{
+        if (!Object.keys(queryResult).some(date => timeslot.includes(date) && projectDates.includes(date))) {
+          indicatorResults.error[indicator._id] = 'outside-range';
+        }
+        for(let date of Object.keys(queryResult)) {
+          if (timeslot.includes(date) && projectDates.includes(date)) {
+            if (isNaN(queryResult[date])) {
+              indicatorResults[date][indicator._id] = queryResult[date];
+            } else {
+              indicatorResults[date][indicator._id] = Number(queryResult[date]);
+              // if (isPercentage) {
+              //   value = value / 100;
+              // }
             }
           }
-          // let value = queryResult[date] === 'missing-data' ? '?' : (isPercentage ? queryResult[date] / 100 : queryResult[date])
-          resultRows.push({
-            name: project.display,
-            date: date,
-            [CCid]: value
-          })
         }
       }
     }
+  }
+  const resultRows = [];
+  if (projectDates.some(date => JSON.stringify(indicatorResults[date]) !== JSON.stringify({}))) {
+    for (const date of projectDates) {
+      if (JSON.stringify(indicatorResults[date]) === JSON.stringify({})) {
+        continue;
+      }
+      let result = {
+        name: project.display,
+        date: date,
+      }
+      for (const indicator of indicators) {
+        result[indicator._id] = indicatorResults.error[indicator._id] || indicatorResults[date][indicator._id];
+      }
+      resultRows.push(result);
+    } 
+  } else {
+    let result = {
+      name: project.display,
+      date: '',
+    }
+    for (const indicator of indicators) {
+      result[indicator._id] = indicatorResults.error[indicator._id];
+    }
+    resultRows.push(result);
   }
   return resultRows;
 }
@@ -374,18 +416,34 @@ function buildCCWorksheet(workbook, name, lang, indicators) {
   }
 
   newWorksheet.columns = [
-    {header: nameTranslation[lang], key: 'name'},
-    {header: dateTranslation[lang], key: 'date'}
+    {header: nameTranslation[lang], key: 'name', width: 60},
+    {header: dateTranslation[lang], key: 'date', width: 20}
   ].concat(indicators.map(indicator => {
     return {
       header: [indicator.name[lang]],
-      key: indicator._id
+      key: indicator._id,
+      width: 40
     }
   }));
 
+  newWorksheet.getColumn(1).alignment = {wrapText: true};
   // force the columns to be at least as long as their header row.
   newWorksheet.columns.forEach(column => {
-    column.width = column.header.length < 12 ? 12 : column.header.length
+    // column.width = column.header.length < 12 ? 12 : column.header.length;
+    column.eachCell(function(cell, rowNumber) {
+      cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+      cell.font = {
+        name: 'Calibri',
+        size: 12,
+        bold: true,
+        color: { argb: 'ffffff' }
+      };
+      cell.fill = {
+        type: 'pattern',
+        pattern:'solid',
+        fgColor:{argb:'005ec5'}
+      };
+    })
   })
   return newWorksheet;
 }
@@ -1153,12 +1211,14 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
   });
 }
 
-async function generateCCIndicatorDownload(filename, indicator, lang, countries, continents, start, end) {
-  const relatedProjects = await Project.storeInstance.listByIndicator(indicator._id, true);
-
+async function generateCCIndicatorDownload(filename, indicators, lang, countries, continents, timeSlotStart, timeSlotEnd) {
+  const relatedProjects = await Project.storeInstance.listByIndicators(indicators);
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
   // and add them to the list too
   let completeProjects = [];
+  let earliestStart;
+  let latestEnd;
+  const currentDate = new Date();
 
   for (const project of relatedProjects) {
       // filtering
@@ -1167,43 +1227,37 @@ async function generateCCIndicatorDownload(filename, indicator, lang, countries,
           continue;
         }
       } else if (continents.length > 0) {
-        console.log(project.continent)
         if (!project.continent || !continents.includes(project.continent)) {
           continue;
         }
       }
-      // if so we add it to the report
-      let currentComputation = null;
-      let currentBaseline = null;
-      let currentTarget = null;
-      if (project.crossCutting[indicator._id]) {
-        currentComputation = project.crossCutting[indicator._id].computation;
-        currentBaseline = project.crossCutting[indicator._id].baseline;
-        currentTarget = project.crossCutting[indicator._id].target;
+      
+      const projectStart = new Date(project.start + "T00:00:00Z");
+      const projectEnd = new Date(project.end + "T00:00:00Z");
+      if (!earliestStart || earliestStart > projectStart) {
+        earliestStart = projectStart;
       }
+      if (!latestEnd || latestEnd < projectEnd) {
+        latestEnd = projectEnd;
+      }
+      
       completeProjects.push({
-        computation: currentComputation,
+        // computation: currentComputation,
         display: `${project.country} - ${project.name}`,
-        baseline: currentBaseline,
-        target: currentTarget,
         start: project.start,
         end: project.end,
-        numFmt: getNumberFormat(currentComputation),
-        id: project._id
+        crossCutting: project.crossCutting,
+        // numFmt: getNumberFormat(currentComputation),
+        id: project._id,
+        themes: project.themes
       });
   }
-
+  
   // creates a list for the names of the columns based on the periodicity received as a parameter
-  const timeSlot = Array.from(
+  const dateRange = Array.from(
     timeSlotRange(
-      TimeSlot.fromDate(
-        new Date(start),
-        'semester'
-      ),
-      TimeSlot.fromDate(
-        new Date(end),
-        'semester'
-      )
+      timeSlotStart || TimeSlot.fromDate(earliestStart, 'semester'),
+      timeSlotEnd || TimeSlot.fromDate((currentDate > latestEnd ? latestEnd : currentDate), 'semester')
     )
   ).map((ts) => ts.value);
 
@@ -1217,9 +1271,7 @@ async function generateCCIndicatorDownload(filename, indicator, lang, countries,
 
   let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
 
-  let worksheet = buildCCWorksheet(workbook, "Global", lang, [indicator]);
-
-  sectionHeader.fill.fgColor.argb = "999999";
+  let worksheet = buildCCWorksheet(workbook, "Global", lang, indicators);
 
   // Adding the data
   for (let project of completeProjects) {
@@ -1232,16 +1284,14 @@ async function generateCCIndicatorDownload(filename, indicator, lang, countries,
     let row;
 
     // if it has a computation (meaning that is an indicator) we get the values and put dump in the sheet
-    if (project.computation !== undefined) {
 
       // get values
       // when no filter is provided it means we want data from all sites
       let rows = await indicatorToCCRows(
         project,
-        indicator._id,
-        timeSlot
+        indicators,
+        dateRange
       );
-
       for (let res of rows) {
         // Dump all the data into Excel
         row = worksheet.addRow(res);
@@ -1260,15 +1310,27 @@ async function generateCCIndicatorDownload(filename, indicator, lang, countries,
               ? undefined
               : JSON.parse(JSON.stringify(project.fill));
         }
-        if (res.fill !== undefined) {
-          row.fill =
-            res.fill === undefined
-              ? undefined
-              : JSON.parse(JSON.stringify(res.fill));
+        for (let indicator of indicators) {
+          let cell = row.getCell(indicator._id)
+          if (isNaN(cell.value) || !project.crossCutting[indicator._id]) {
+            cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+            cell.fill = {
+              type: 'pattern',
+              pattern:'solid',
+              fgColor:{argb:'d3d3d3'}
+            };
+            cell.value = errorTranslations[cell.value] ? errorTranslations[cell.value][lang] : cell.value;
+          } else {
+            if (project.crossCutting[indicator._id].isPercentage) {
+              cell.numFmt = percentageCellStyle.numFmt;
+              cell.value /= 100;
+            } else {
+              cell.numFmt = numberCellStyle.numFmt;
+            }
+          }
         }
         row.commit();
       }
-    }
   }
   
   worksheet.commit();
@@ -1299,24 +1361,20 @@ function getFilename(name, minimized = false) {
 }
 function getCCFilename(ctx) {
 
-  let filename = `new_cc_export_${ctx.params.ids}_${ctx.params.lang}`;
+  const ids = ctx.params.ids.split('+').map(id => id.split(':')[1].split('-')[0]).join('+');
+  let filename = `new_cc_export_${ids}_${ctx.params.lang}`;
   if (ctx.params.countries && ctx.params.countries != '_') { filename += `_${ctx.params.countries}` };
   if (ctx.params.continents && ctx.params.continents != '_') { filename += `_${ctx.params.continents}` };
   
-  // creates a list for the names of the columns based on the periodicity received as a parameter
-  const timeSlot = Array.from(
-    timeSlotRange(
-      TimeSlot.fromDate(
-        new Date(ctx.params.start),
-        'semester'
-      ),
-      TimeSlot.fromDate(
-        new Date(ctx.params.end),
-        'semester'
-      )
-    )
-  ).map((ts) => ts.value);
-  filename += `_${timeSlot[0]}_${timeSlot[timeSlot.length - 1]}`;
+  const timeSlotStart = (ctx.params.start && ctx.params.start != '_')? TimeSlot.fromDate(
+    new Date(ctx.params.start),
+    'semester'
+  ) : '';
+  const timeSlotEnd = (ctx.params.end && ctx.params.end != '_')? TimeSlot.fromDate(
+    new Date(ctx.params.end),
+    'semester'
+  ) : '';
+  filename += `_${timeSlotStart}_${timeSlotEnd}`;
 
   return `${filename}.xlsx`
 }
@@ -1471,18 +1529,25 @@ router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", as
   }
   
   console.log(`\nGenerating file ${filename}...\n`);
-  console.log(ctx);
 
   const indicatorIds = ctx.params.ids.split('+');
   const countries = !ctx.params.countries || ctx.params.countries == '_' ? [] : ctx.params.countries.split('+');
   const continents = !ctx.params.continents || ctx.params.continents == '_' ? []: ctx.params.continents.split('+');
+  const timeSlotStart = (ctx.params.start && ctx.params.start != '_')? TimeSlot.fromDate(
+    new Date(ctx.params.start),
+    'semester'
+  ) : null;
+  const timeSlotEnd = (ctx.params.end && ctx.params.end != '_')? TimeSlot.fromDate(
+    new Date(ctx.params.end),
+    'semester'
+  ) : null;
   let data = [];
   for (let id of indicatorIds) {
     const indicator = await Indicator.storeInstance.get(id);
     data.push(indicator);
   }
   // Generate file data;
-  await (generateCCIndicatorDownload(filename, data[0], ctx.params.lang, countries, continents, ctx.params.start, ctx.params.end));
+  await (generateCCIndicatorDownload(filename, data, ctx.params.lang, countries, continents, timeSlotStart, timeSlotEnd));
 
   console.log(`\nFile ${filename} is ready to download\n`);
   ctx.body = '{ "message": "done" }';
