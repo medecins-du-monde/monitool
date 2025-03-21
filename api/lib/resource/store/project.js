@@ -181,6 +181,44 @@ export default class ProjectStore extends Store {
 
 		return projects;
 	}
+	
+	/**
+	 * Retrieve all projects that collect a given indicator.
+	 * The projects are stripped down before sending (the subset is selected to ensure that client,
+	 * has enought info to compute the cross-cutting indicator).
+	 *
+	 * Used in the client to display cross-cutting reporting.
+	 */
+	async listByIndicators(indicators) {
+
+		function getIsPercentage(computation){
+		  return computation !== null && computation.formula.indexOf('100') !== -1
+		}
+
+		let projects = await this.list();
+		
+		projects = projects.filter(p =>
+			p.active &&
+			p.themes.some(themeId => indicators.some(indicator => indicator.themes.includes(themeId)))
+		);
+
+		projects.forEach(project => {
+			const crossCutting = {};
+			for (let indicator of indicators) {
+				if (project.crossCutting[indicator._id]) {
+					crossCutting[indicator._id] = project.crossCutting[indicator._id];
+					crossCutting[indicator._id].isPercentage = getIsPercentage(crossCutting[indicator._id].computation);
+				}
+			}
+			project.crossCutting = crossCutting;
+			// indicatorIds.filter(id => project.crossCutting[id]).map(id => project.crossCutting[id]);
+			project.logicalFrames = [];
+			project.forms = [];
+			project.extraIndicators = [];
+		});
+
+		return projects;
+	}
 
 	/**
 	 * Retrieve all projects that are associated with a given theme
