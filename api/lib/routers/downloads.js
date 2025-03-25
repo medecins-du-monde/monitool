@@ -261,7 +261,6 @@ async function indicatorToCCRows(project, indicators, timeslot) {
           result[indicator._id] = 'outside-range';
         }
       }
-      console.log(indicatorResults);
       resultRows.push(result);
     } 
   } else {
