@@ -256,12 +256,12 @@ async function indicatorToCCRows(project, indicators, timeslot) {
         date: date,
       }
       for (const indicator of indicators) {
-        result[indicator._id] =
-          indicatorResults.error[indicator._id] ||
-          indicatorResults[date][indicator._id] !== undefined ?
-            indicatorResults[date][indicator._id] :
-            'outside-range';
+        result[indicator._id] = indicatorResults.error[indicator._id] || indicatorResults[date][indicator._id]
+        if (result[indicator._id] === undefined) {
+          result[indicator._id] = 'outside-range';
+        }
       }
+      console.log(indicatorResults);
       resultRows.push(result);
     } 
   } else {
