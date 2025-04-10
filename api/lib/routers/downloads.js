@@ -51,11 +51,13 @@ let sectionHeader = {
   }
 }
 let numberCellStyle = {
-  numFmt: '### ### ### ##0.#'
+  numFmt: '### ### ### ##0.#',
+  numFmtWhole: '### ### ### ##0'
 }
 
 let percentageCellStyle = {
-  numFmt: '0.#%'
+  numFmt: '0.#"%"',
+  numFmtWhole: '0"%"'
 }
 let partitionsCollapsed = {
   font: {
@@ -65,6 +67,7 @@ let partitionsCollapsed = {
     color: {argb:'666666'},
   }
 }
+let numFmt = (value, numFmtObj) => (Math.round(value * 10) / 10 % 1) > 0 ? numFmtObj.numFmt : numFmtObj.numFmtWhole;
 
 let errorRow = {
   fill: {
@@ -139,6 +142,11 @@ async function indicatorToRow(ctx, projectId, computation, name, baseline=null, 
     // this function can throw an error in case the periodicity asked is not compatible with the data
     try{
       result = JSON.parse(await queryReportingSubprocess(query)).items;
+      Object.keys(result).forEach((key) => {
+        if (!isNaN(result[key])) {
+          result[key] = Number(result[key]);
+        }
+      })
     }
     // Here are the various reported on the excel export
     catch (err){
@@ -150,11 +158,6 @@ async function indicatorToRow(ctx, projectId, computation, name, baseline=null, 
       // if it's some other error, we send this error in the excel
         result[dateColumn[0]] = err.message;
         result.fill = errorRow.fill;
-      }
-    } finally{
-      if (isPercentage){
-        baseline /= 100;
-        target /= 100;
       }
     }
   }
@@ -450,9 +453,9 @@ function buildCCWorksheet(workbook, name, lang, indicators) {
 
 function getNumberFormat(computation){
   if (computation !== null && computation.formula.indexOf('100') !== -1){
-    return percentageCellStyle.numFmt;
+    return percentageCellStyle;
   }
-  return numberCellStyle.numFmt;
+  return numberCellStyle;
 }
 
 /**
@@ -751,7 +754,9 @@ async function generateProjectDownload(filename, project, ctx) {
 
       // Format the numbers with no decimal places
       if (indicator.numFmt !== undefined) {
-        row.numFmt = indicator.numFmt;
+        row.eachCell(function(cell) {
+          cell.numFmt = numFmt(cell.value, indicator.numFmt);
+        })
       }
       // Make it collapsed. 1 is one level. 2 is 2 level.....
       if (indicator.outlineLevel !== undefined) {
@@ -853,7 +858,9 @@ async function generateProjectDownload(filename, project, ctx) {
           siteMaxLength = Math.max(siteMaxLength, res.name.length);
 
           if (e.numFmt !== undefined) {
-            row.numFmt = e.numFmt;
+            row.eachCell(function(cell) {
+              cell.numFmt = numFmt(cell.value, e.numFmt);
+            })
           }
           if (e.outlineLevel !== undefined) {
             row.outlineLevel = e.outlineLevel;
@@ -1007,7 +1014,9 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
       row = worksheet.addRow(res);
       // Format the numbers with no decimal places
       if (project.numFmt !== undefined) {
-        row.numFmt = project.numFmt;
+        row.eachCell(function(cell) {
+          cell.numFmt = numFmt(cell.value, project.numFmt);
+        })
       }
       // Make it collapsed. 1 is one level. 2 is 2 level.....
       if (project.outlineLevel !== undefined) {
@@ -1154,7 +1163,9 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
           siteMaxLength = Math.max(siteMaxLength, res.name.length);
 
           if (e.numFmt !== undefined) {
-            row.numFmt = e.numFmt;
+            row.eachCell(function(cell) {
+              cell.numFmt = numFmt(cell.value, e.numFmt);
+            })
           }
           if (e.outlineLevel !== undefined) {
             row.outlineLevel = e.outlineLevel;
@@ -1297,7 +1308,9 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
         row = worksheet.addRow(res);
         // Format the numbers with no decimal places
         if (project.numFmt !== undefined) {
-          row.numFmt = project.numFmt;
+          row.eachCell(function(cell) {
+            cell.numFmt = numFmt(cell.value, project.numFmt);
+          })
         }
         // All the font configuration
         if (project.font !== undefined) {
@@ -1321,12 +1334,7 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
             };
             cell.value = errorTranslations[cell.value] ? errorTranslations[cell.value][lang] : cell.value;
           } else {
-            if (project.crossCutting[indicator._id].isPercentage) {
-              cell.numFmt = percentageCellStyle.numFmt;
-              cell.value /= 100;
-            } else {
-              cell.numFmt = numberCellStyle.numFmt;
-            }
+            cell.numFmt = numFmt(cell.value, project.crossCutting[indicator._id].isPercentage ? percentageCellStyle : numberCellStyle);
           }
         }
         row.commit();
@@ -1494,8 +1502,9 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
     fs.unlinkSync(filename, (err) => console.log(err));
   }
   if (fs.existsSync(filename + '.temp')) {
-    ctx.body = '{ "message": "not done" }';
-    return;
+    fs.unlinkSync(filename + '.temp', (err) => console.log(err));
+    // ctx.body = '{ "message": "not done" }';
+    // return;
   }
 
   console.log(`\nGenerating file ${filename}...\n`);
