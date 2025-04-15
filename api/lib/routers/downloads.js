@@ -7,6 +7,8 @@ import { queryReportingSubprocess } from './reporting';
 import TimeSlot, {timeSlotRange} from 'timeslot-dag';
 import Indicator from '../resource/model/indicator';
 import User from '../resource/model/user';
+import { continentList, countryList } from '../utils/iso-countries';
+import Theme from '../resource/model/theme';
 
 const router = new Router();
 let lang = 'es';
@@ -255,6 +257,9 @@ async function indicatorToCCRows(project, indicators, timeslot) {
         continue;
       }
       let result = {
+        continent: project.continent,
+        country: project.country,
+        politicalCombat: project.themeNames.join(', '),
         name: project.display,
         date: date,
       }
@@ -268,6 +273,9 @@ async function indicatorToCCRows(project, indicators, timeslot) {
     } 
   } else {
     let result = {
+      continent: project.continent,
+      country: project.country,
+      politicalCombat: project.themeNames.join(', '),
       name: project.display,
       date: '',
     }
@@ -417,10 +425,28 @@ function buildCCWorksheet(workbook, name, lang, indicators) {
     'es': 'Año-semestre',
     'fr': 'Annee-semestre'
   }
+  const continent = {
+    'en': 'Continent',
+    'es': 'Continente',
+    'fr': 'Continent'
+  }
+  const country = {
+    'en': 'Country',
+    'es': 'País',
+    'fr': 'Pays'
+  }
+  const politicalCombat = {
+    'en': 'Political combat',
+    'es': 'Combate político',
+    'fr': 'Combat Politique'
+  }
 
   newWorksheet.columns = [
+    {header: continent[lang], key: 'continent', width: 20},
+    {header: country[lang], key: 'country', width: 20},
+    {header: politicalCombat[lang], key: 'politicalCombat', width: 40},
     {header: nameTranslation[lang], key: 'name', width: 60},
-    {header: dateTranslation[lang], key: 'date', width: 20}
+    {header: dateTranslation[lang], key: 'date', width: 20},
   ].concat(indicators.map(indicator => {
     return {
       header: [indicator.name[lang]],
@@ -429,10 +455,10 @@ function buildCCWorksheet(workbook, name, lang, indicators) {
     }
   }));
 
-  newWorksheet.getColumn(1).alignment = {wrapText: true};
-  // force the columns to be at least as long as their header row.
+  for (let i of [1, 2, 3, 4]) {
+    newWorksheet.getColumn(i).alignment = {wrapText: true};
+  }
   newWorksheet.columns.forEach(column => {
-    // column.width = column.header.length < 12 ? 12 : column.header.length;
     column.eachCell(function(cell, rowNumber) {
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       cell.font = {
@@ -1227,6 +1253,7 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
   // and add them to the list too
   let completeProjects = [];
+  let dataThemes = {};
   let earliestStart;
   let latestEnd;
   const currentDate = new Date();
@@ -1242,6 +1269,15 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
           continue;
         }
       }
+
+      const projectThemeNames = [];
+      for (let themeId of project.themes) {
+        if (!dataThemes[themeId]) {
+          const theme = await Theme.storeInstance.get(themeId);
+          dataThemes[theme._id] = theme;
+        }
+        projectThemeNames.push(dataThemes[themeId].shortName[lang]);
+      }
       
       const projectStart = new Date(project.start + "T00:00:00Z");
       const projectEnd = new Date(project.end + "T00:00:00Z");
@@ -1254,13 +1290,16 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
       
       completeProjects.push({
         // computation: currentComputation,
-        display: `${project.country} - ${project.name}`,
+        display: project.name,
         start: project.start,
         end: project.end,
+        continent: continentList[project.continent] ? continentList[project.continent][lang] : project.continent,
+        country: countryList[project.country] ? (typeof countryList[project.country][lang] !== 'string' ? countryList[project.country][lang][0] : countryList[project.country][lang]) : project.country,
         crossCutting: project.crossCutting,
         // numFmt: getNumberFormat(currentComputation),
         id: project._id,
-        themes: project.themes
+        themes: project.themes,
+        themeNames: projectThemeNames,
       });
   }
   
@@ -1532,9 +1571,9 @@ router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", as
     fs.unlinkSync(filename, (err) => console.log(err));
   }
   if (fs.existsSync(filename + '.temp')) {
-    // fs.unlinkSync(filename + '.temp', (err) => console.log(err));
-    ctx.body = '{ "message": "not done" }';
-    return;
+    fs.unlinkSync(filename + '.temp', (err) => console.log(err));
+    // ctx.body = '{ "message": "not done" }';
+    // return;
   }
   
   console.log(`\nGenerating file ${filename}...\n`);
@@ -1552,7 +1591,7 @@ router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", as
   ) : null;
   let data = [];
   for (let id of indicatorIds) {
-    const indicator = await Indicator.storeInstance.get(id);
+    let indicator = await Indicator.storeInstance.get(id);
     data.push(indicator);
   }
   // Generate file data;
