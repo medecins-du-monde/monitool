@@ -1571,9 +1571,9 @@ router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", as
     fs.unlinkSync(filename, (err) => console.log(err));
   }
   if (fs.existsSync(filename + '.temp')) {
-    fs.unlinkSync(filename + '.temp', (err) => console.log(err));
-    // ctx.body = '{ "message": "not done" }';
-    // return;
+    // fs.unlinkSync(filename + '.temp', (err) => console.log(err));
+    ctx.body = '{ "message": "not done" }';
+    return;
   }
   
   console.log(`\nGenerating file ${filename}...\n`);
