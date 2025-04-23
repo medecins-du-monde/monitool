@@ -266,7 +266,7 @@ async function indicatorToCCRows(project, indicators, timeslot) {
       for (const indicator of indicators) {
         result[indicator._id] = indicatorResults.error[indicator._id] || indicatorResults[date][indicator._id]
         if (result[indicator._id] === undefined) {
-          result[indicator._id] = 'outside-range';
+          result[indicator._id] = 'no-indicator'; // Not the real error but expected cell style -> Real error outside-range (of indicator)
         }
       }
       resultRows.push(result);
@@ -456,7 +456,7 @@ function buildCCWorksheet(workbook, name, lang, indicators) {
   }));
 
   for (let i of [1, 2, 3, 4]) {
-    newWorksheet.getColumn(i).alignment = {wrapText: true};
+    newWorksheet.getColumn(i).alignment = {wrapText: true, vertical: 'middle'};
   }
   newWorksheet.columns.forEach(column => {
     column.eachCell(function(cell, rowNumber) {
@@ -1323,6 +1323,9 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
 
   let worksheet = buildCCWorksheet(workbook, "Global", lang, indicators);
 
+  let firstProjectRow = 2;
+  let lastProjectRow;
+
   // Adding the data
   for (let project of completeProjects) {
     // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
@@ -1342,6 +1345,9 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
         indicators,
         dateRange
       );
+
+      lastProjectRow = firstProjectRow + rows.length - 1;
+
       for (let res of rows) {
         // Dump all the data into Excel
         row = worksheet.addRow(res);
@@ -1365,36 +1371,111 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
         for (let indicator of indicators) {
           let cell = row.getCell(indicator._id)
           if (isNaN(cell.value) || !project.crossCutting[indicator._id]) {
+            switch (cell.value) {
+              case 'no-indicator':
+                cell.fill = {
+                  type: 'pattern',
+                  pattern:'solid',
+                  fgColor:{ argb:'eeeeee' }
+                }
+                cell.font = {
+                  name: 'Calibri',
+                  color: { argb: 'eeeeee' }
+                };
+                break;
+
+              case 'missing-data':
+                cell.fill = {
+                  type: 'pattern',
+                  pattern:'solid',
+                  fgColor:{ argb:'fff5ce' }
+                }
+                cell.font = {
+                  name: 'Calibri',
+                  color: { argb: 'b47804' }
+                };
+                break;
+
+              case 'missing-calc':
+                cell.fill = {
+                  type: 'pattern',
+                  pattern:'solid',
+                  fgColor:{ argb:'dee6ef' }
+                }
+                cell.font = {
+                  name: 'Calibri',
+                  color: { argb: '2a6099' }
+                };
+                break;
+            
+              default:
+                cell.fill = {
+                  type: 'pattern',
+                  pattern:'solid',
+                  fgColor:{ argb:'ffd8ce' }
+                }
+                cell.font = {
+                  name: 'Calibri',
+                  color: { argb: '8d281e' }
+                };
+                break;
+            }
             cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-            cell.fill = {
-              type: 'pattern',
-              pattern:'solid',
-              fgColor:{argb:'d3d3d3'}
-            };
-            cell.value = errorTranslations[cell.value] ? errorTranslations[cell.value][lang] : cell.value;
+            if (cell.value === 'no-indicator') {
+              cell.value = '';
+            } else {
+              cell.value = errorTranslations[cell.value] ? errorTranslations[cell.value][lang] : cell.value;
+            }
           } else {
             cell.numFmt = numFmt(cell.value, project.crossCutting[indicator._id].isPercentage ? percentageCellStyle : numberCellStyle);
           }
         }
+        // row.commit(); // This conflicts with merging the cells
+      }
+      worksheet.columns.forEach((col, index) => {
+        if (index < 4) {
+          // Merges all shared value cells for a project
+          worksheet.mergeCells(firstProjectRow, index + 1, lastProjectRow, index + 1);
+        } else if (index > 4) {
+          // Goes through each project column cells to check if error messages are shared, if it's the case it merges them.
+          let cellValue = '';
+          let firstCellPos = firstProjectRow;
+          for (let i = firstProjectRow; i <= lastProjectRow; i++) {
+            const cell = worksheet.getCell(i, index + 1);
+            if (cell.value !== cellValue || i == lastProjectRow) {
+              if (i == lastProjectRow) i++;
+              if (isNaN(cellValue) && (firstCellPos < i - 1)) {
+                worksheet.mergeCells(firstCellPos, index + 1, i - 1, index + 1);
+              }
+              firstCellPos = i;
+              cellValue = cell.value;
+            }
+          }
+        }
+      });
+
+      for (let i = firstProjectRow; i <= lastProjectRow; i++) {
+        const row = worksheet.getRow(i);
+        // Adds a separator between projects
+        if (i == firstProjectRow) {
+          // Fix cell for missing continent
+          row.getCell(1).border = {
+            top: {style: 'thick', color: {argb: 'd3d3d3'}}
+          }
+          row.eachCell(function(cell) {
+            cell.border = {
+              top: {style: 'thick', color: {argb: 'd3d3d3'}}
+            };
+          })
+        }
+        // Commits each project row, after all merging has been done
         row.commit();
       }
+      
+      firstProjectRow = lastProjectRow + 1;
   }
   
   worksheet.commit();
-
-  const COLORS = [
-    "1f77b4",
-    "ff7f0e",
-    "2ca02c",
-    "d62728",
-    "9467bd",
-    "8c564b",
-    "e377c2",
-    "7f7f7f",
-    "bcbd22",
-    "17becf",
-  ];
-  let colorIdx = 0;
 
   await workbook.commit();
 
