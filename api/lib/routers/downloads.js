@@ -436,7 +436,7 @@ function buildCCWorksheet(workbook, name, lang, indicators) {
     'fr': 'Pays'
   }
   const politicalCombat = {
-    'en': 'Political combat',
+    'en': 'Political battle',
     'es': 'Combate político',
     'fr': 'Combat Politique'
   }
