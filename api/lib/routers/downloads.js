@@ -1622,7 +1622,6 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
     fs.unlinkSync(filename, (err) => console.log(err));
   }
   if (fs.existsSync(filename + '.temp')) {
-    // fs.unlinkSync(filename + '.temp', (err) => console.log(err));
     ctx.body = '{ "message": "not done" }';
     return;
   }
@@ -1630,11 +1629,20 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
   console.log(`\nGenerating file ${filename}...\n`);
 
   // Generate file data;
-  await (
-    type === 'indicator' ?
-    generateIndicatorDownload(filename, data, ctx) :
-    generateProjectDownload(filename, data, ctx)
-  );
+  try {
+    await (
+      type === 'indicator' ?
+      generateIndicatorDownload(filename, data, ctx) :
+      generateProjectDownload(filename, data, ctx)
+    );
+  } catch (error) {
+    if (fs.existsSync(filename + '.temp')) {
+      fs.unlinkSync(filename + '.temp', (err) => console.log(err));
+    }
+    ctx.status = 500
+    ctx.body = '{ "message": "' + error + '" }';
+    return;
+  }
 
   console.log(`\nFile ${filename} is ready to download\n`);
   ctx.body = '{ "message": "done" }';
