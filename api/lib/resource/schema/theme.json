@@ -20,7 +20,7 @@
 		},
 		"type": {
 			"type": "string",
-			"pattern": "^theme$"
+			"pattern": "^(theme)|(requiredTheme)$"
 		},
 		"shortName": {
 			"type": "object",
