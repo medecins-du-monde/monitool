@@ -19,6 +19,7 @@ import Store from './store';
 import Project from '../model/project';
 import Indicator from '../model/indicator';
 import jsonpatch from 'fast-json-patch';
+import Theme from '../model/theme';
 
 export default class ProjectStore extends Store {
 
@@ -155,9 +156,15 @@ export default class ProjectStore extends Store {
 			throw new Error("missing_parameter");
 
 		const indicator = await Indicator.storeInstance.get(indicatorId);
+		let isRequired = false;
+
+		for (let themeId of indicator.themes) {
+			const theme = await Theme.storeInstance.get(themeId)
+			if (theme.type === 'requiredTheme') isRequired = true;
+		}
 
 		let projects = await this.list();
-		projects = projects.filter(p => p.active && p.themes.some(themeId => indicator.themes.includes(themeId)));
+		projects = projects.filter(p => p.active && (isRequired || p.themes.some(themeId => (indicator.themes.includes(themeId)))));
 
 		// strip down project
 		if (strippedDown) {
@@ -195,11 +202,23 @@ export default class ProjectStore extends Store {
 		  return computation !== null && computation.formula.indexOf('100') !== -1
 		}
 
+		let isRequired = false;
+		for (let indicator of indicators) {
+			for (let themeId of indicator.themes) {
+				const theme = await Theme.storeInstance.get(themeId)
+				if (theme.type === 'requiredTheme') {
+					isRequired = true;
+					break;
+				}
+			}
+			if (isRequired) break;
+		}
+
 		let projects = await this.list();
 		
 		projects = projects.filter(p =>
-			p.active &&
-			p.themes.some(themeId => indicators.some(indicator => indicator.themes.includes(themeId)))
+			p.active && (isRequired ||
+			p.themes.some(themeId => indicators.some(indicator => indicator.themes.includes(themeId))))
 		);
 
 		projects.forEach(project => {
