@@ -13,6 +13,9 @@
 			"type": "string",
 			"minLength": 1
 		},
+		"disabled": {
+			"type": "boolean"
+		},
 		"entities": {
 			"type": "array",
 			"items": { "$ref": "#/definitions/uuid" }

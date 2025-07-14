@@ -10,6 +10,9 @@
 			"$ref": "#/definitions/uuid"
 		},
 		"name": { "type": "string" },
+		"disabled": {
+			"type": "boolean"
+		},
 		"goal": { "type": "string" },
 
 		"entities": {
