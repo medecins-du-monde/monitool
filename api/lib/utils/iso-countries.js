@@ -24,6 +24,16 @@ export const continentList = {
     es: ["Norteamérica", "Ámerica del Norte"],
     fr: "Amérique du Nord"
   },
+  "CA": {
+    en: "Central America",
+    es: ["Centroámerica", "Ámerica Central"],
+    fr: "Amérique Centrale"
+  },
+  "ME": {
+    en: "Middle East",
+    es: ["Oriente Medio", "Medio Oriente"],
+    fr: "Moyen Orient"
+  },
   "OC": {
     en: "Oceania",
     es: "Oceanía",
@@ -82,7 +92,7 @@ export const countryList = {
         "es": "Albania"
     },
     "AM": {
-        "continent": "AS",
+        "continent": "EU",
         "en": "Armenia",
         "fr": "Arménie",
         "es": "Armenia"
@@ -537,7 +547,7 @@ export const countryList = {
         "es": "Granada"
     },
     "GE": {
-        "continent": "AS",
+        "continent": "EU",
         "en": "Georgia",
         "fr": "Géorgie",
         "es": "Georgia"
@@ -839,7 +849,7 @@ export const countryList = {
         "es": "República Democrática Popular de Lao"
     },
     "LB": {
-        "continent": "AS",
+        "continent": "ME",
         "en": "Lebanon",
         "fr": "Liban",
         "es": "Líbano"
@@ -1022,7 +1032,7 @@ export const countryList = {
         "es": "Malaui"
     },
     "MX": {
-        "continent": "NA",
+        "continent": "CA",
         "en": "Mexico",
         "fr": "Mexique",
         "es": "México"
@@ -1185,7 +1195,7 @@ export const countryList = {
         "es": "Puerto Rico"
     },
     "PS": {
-        "continent": "AS",
+        "continent": "ME",
         "en": [
             "Palestine",
             "State of Palestine",
@@ -1236,7 +1246,7 @@ export const countryList = {
         "es": "Serbia"
     },
     "RU": {
-        "continent": "AS",
+        "continent": "EU",
         "en": [
             "Russia",
             "Russian Federation",
@@ -1365,7 +1375,7 @@ export const countryList = {
         "es": "Sint Maarten (neerlandesa)"
     },
     "SY": {
-        "continent": "AS",
+        "continent": "ME",
         "en": "Syrian Arab Republic",
         "fr": "Syrie",
         "es": "República Árabe Siria"
@@ -1585,7 +1595,7 @@ export const countryList = {
         "es": "Kosovo"
     },
     "YE": {
-        "continent": "AS",
+        "continent": "AF",
         "en": "Yemen",
         "fr": "Yémen",
         "es": "Yemen"
