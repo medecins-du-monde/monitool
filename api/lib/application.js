@@ -29,6 +29,7 @@ import pdfRouter from './routers/pdf';
 import reportingRouter from './routers/reporting';
 import resourcesRouter from './routers/resources';
 import downloadRouter from './routers/downloads';
+import templateRouter from './routers/template';
 
 import forceAuthenticationMiddleware from './middlewares/force-authentication';
 import responseTimeMiddleware from 'koa-response-time';
@@ -63,5 +64,6 @@ app.use(pdfRouter.routes())				// PDF generation module
 app.use(resourcesRouter.routes())		// REST JSON API
 app.use(reportingRouter.routes())		// Reporting API
 app.use(downloadRouter.routes());
+app.use(templateRouter.routes());
 
 export default app;
