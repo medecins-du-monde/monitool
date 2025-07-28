@@ -44,10 +44,21 @@ export const continentList = {
     es: ["Ámerica del Sur", "Suramérica", "Sudamérica"],
     fr: "Amérique du Sud"
   },
+  // Custom continents
   "FICTIVE": {
     en: "Fictive",
     es: "Ficticio",
     fr: "Fictif"
+  },
+  "SIEG": {
+    en: "MdM France headquarters",
+    es: "Sede de MdM Francia",
+    fr: "Siège MdM France"
+  },
+  "MDMI": {
+    en: "MdM International",
+    es: "MdM International",
+    fr: "MdM Internacional"
   },
 }
 
@@ -1624,10 +1635,102 @@ export const countryList = {
         "fr": "Zimbabwe",
         "es": "Zimbabue"
     },
+    // France Regions
+    "D-ALS": {
+        "continent": "EU",
+        "en": "Alsace delegation",
+        "fr": "Délégation Alsace",
+        "es": "Delegación de Alsacia"
+    },
+    "D-AQ": {
+        "continent": "EU",
+        "en": "Aquitaine delegation",
+        "fr": "Délégation Aquitaine ",
+        "es": "Delegación de Aquitania"
+    },
+    "D-ARA": {
+        "continent": "EU",
+        "en": "Auvergne Rhone Alpes delegation",
+        "fr": "Délégation Auvergne Rhone Alpes",
+        "es": "Delegación de Auvernia Ródano Alpes"
+    },
+    "D-COR": {
+        "continent": "EU",
+        "en": "Corse delegation",
+        "fr": "Délégation Corse",
+        "es": "Delegación Córcega"
+    },
+    "D-HDF": {
+        "continent": "EU",
+        "en": "Hauts-de-france delegation",
+        "fr": "Délégation Hauts-De-France",
+        "es": "Delegación Alta Francia"
+    },
+    "D-IDF": {
+        "continent": "EU",
+        "en": "Ile-De-France delegation",
+        "fr": "Délégation Ile-De-France",
+        "es": "Delegación de Isla de Francia"
+    },
+    "D-LR": {
+        "continent": "EU",
+        "en": "Languedoc Roussillon delegation",
+        "fr": "Délégation Languedoc Roussillon ",
+        "es": "Delegación del Languedoc-Rosellón"
+    },
+    "D-MP": {
+        "continent": "EU",
+        "en": "Midi-pyrénées delegation",
+        "fr": "Délégation Midi-Pyrénées",
+        "es": "Delegación Mediodía-Pirineos"
+    },
+    "D-NOR": {
+        "continent": "EU",
+        "en": "Normandy delegation",
+        "fr": "Délégation Normandie",
+        "es": "Delegación Normandía"
+    },
+    "D-OI": {
+        "continent": "EU",
+        "en": "Indian Ocean delegation",
+        "fr": "Délégation Océan Indien",
+        "es": "Delegación del Océano Índico"
+    },
+    "D-PACA": {
+        "continent": "EU",
+        "en": "PACA delegation",
+        "fr": "Délégation PACA",
+        "es": "Delegación PACA"
+    },
+    "D-PDL": {
+        "continent": "EU",
+        "en": "Pays De La Loire delegation",
+        "fr": "Délégation Pays De La Loire",
+        "es": "Delegación Pays De La Loire"
+    },
+    "D-PC": {
+        "continent": "EU",
+        "en": "Poitou Charentes delegation",
+        "fr": "Délégation Poitou Charentes",
+        "es": "Delegación Poitou-Charentes"
+    },
+    // Custom continents
     "FICTIVE": {
         continent: 'FICTIVE',
         en: "Fictive",
-        es: "Ficticio",
-        fr: "Fictif"
-    }
+        fr: "Fictif",
+        es: "Ficticio"
+    },
+    "SIEG": {
+        continent: "SIEG",
+        en: "MdM France headquarters",
+        fr: "Siège MdM France",
+        es: "Sede de MdM Francia"
+    },
+    "MDMI": {
+        continent: "MDMI",
+        en: "MdM International",
+        fr: "MdM International",
+        es: "MdM Internacional"
+    },
 }
