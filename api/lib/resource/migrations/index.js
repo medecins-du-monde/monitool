@@ -15,6 +15,7 @@ import migration12 from './migration-12';
 import migration13 from './migration-13';
 import migration14 from './migration-14';
 import migration15 from './migration-15';
+import migration16 from './migration-16';
 
 export default [
 	migration0,
@@ -32,5 +33,6 @@ export default [
 	migration12,
 	migration13,
 	migration14,
-	migration15
+	migration15,
+	migration16
 ];
