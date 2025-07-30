@@ -33,16 +33,24 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
     const project = await Project.storeInstance.get(ctx.params.id);
     const dataSource = project.getDataSourceById(ctx.params.dataSourceId);
 
+    let input = undefined;
+    let site = undefined;
+    if (ctx.params.siteId && ctx.params.period) {
+      input = await Input.storeInstance.get(ctx.params.id, ctx.params.dataSourceId, ctx.params.siteId, ctx.params.period, true);
+      site = project.entities.find(ent => ent.id === ctx.params.siteId);
+    }
+
     // Set filename;
-    let filename = (dataSource.name || 'data-source') + '.xlsx';
+    let filename = project.name + ' - ' + (dataSource.name || 'data-source');
+
+    if (input) {
+      filename += ' - ' + site.name + ' - ' + input.period + '.xlsx';
+    } else {
+      filename += ' template.xlsx';
+    }
 
     if (fs.existsSync(filename)) {
         fs.unlinkSync(filename, (err) => console.log(err));
-    }
-
-    let input = undefined;
-    if (ctx.params.siteId && ctx.params.period) {
-      input = await Input.storeInstance.get(ctx.params.id, ctx.params.dataSourceId, ctx.params.siteId, ctx.params.period, true);
     }
 
     // create the excel file
@@ -146,6 +154,7 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
             if (index <= cols.length) return;
             const value = cell.value;
             cell.fill = header.fill;
+            cell.alignment = {wrapText: true, vertical: 'top', horizontal: 'left'};
             if (value !== '' && value !== lastCell.val) {
                 if (lastCell.index < index - 1) {
                     worksheet.mergeCells(lastCell.index, i, index - 1, i);
@@ -171,6 +180,16 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
             }
         })
         row.fill = header.fill;
+        row.alignment = {wrapText: true, vertical: 'top', horizontal: 'left'};
+      }
+
+      if (numberCols > 2) {
+        const col = worksheet.getColumn(numberCols);
+        col.font = header.font;
+      }
+      if (numberRows > 2) {
+        const row = worksheet.getRow(numberRows);
+        row.font = header.font;
       }
 
       worksheet.commit();
