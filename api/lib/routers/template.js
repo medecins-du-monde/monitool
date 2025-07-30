@@ -36,15 +36,16 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
     let input = undefined;
     let site = undefined;
     if (ctx.params.siteId && ctx.params.period) {
-      input = await Input.storeInstance.get(ctx.params.id, ctx.params.dataSourceId, ctx.params.siteId, ctx.params.period, true);
+      const inputId = 'input:' + ctx.params.id + ":" + ctx.params.dataSourceId + ":" + ctx.params.siteId + ":" + ctx.params.period;
+      input = await Input.storeInstance.get(inputId);
       site = project.entities.find(ent => ent.id === ctx.params.siteId);
     }
 
     // Set filename;
-    let filename = project.name + ' - ' + (dataSource.name || 'data-source');
+    let filename = truncateString(project.name, 25) + ' - ' + truncateString(dataSource.name || 'data-source', 25);
 
     if (input) {
-      filename += ' - ' + site.name + ' - ' + input.period + '.xlsx';
+      filename += ' - ' + truncateString(site.name, 25) + ' - ' + input.period + '.xlsx';
     } else {
       filename += ' template.xlsx';
     }
@@ -291,6 +292,14 @@ const getColFromNumber = (col) => {
     col = Math.floor(col / 26) - 1;
   }
   return result;
+}
+
+const truncateString = (str, num) => {
+  if (str.length > num) {
+    return str.slice(0, num) + "...";
+  } else {
+    return str;
+  }
 }
 
 export default router;

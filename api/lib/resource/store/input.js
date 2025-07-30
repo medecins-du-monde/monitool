@@ -182,38 +182,6 @@ export default class InputStore extends Store {
 		return inputs;
 	}
 
-	/**
-	 * Retrieve a given input, and the previous one for the same data source and site,
-	 * This is used to populate the input page in client.
-	 */
-	async get(projectId, dataSourceId, siteId, period, update = false) {
-		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string' || typeof siteId !== 'string' || typeof period !== 'string')
-			throw new Error('missing_parameter');
-
-		const id = 'input:' + projectId + ":" + dataSourceId + ":" + siteId + ":" + period;
-		const result = await this._db.callList({
-			startkey: id,
-			endkey: 'input:' + projectId + ":" + dataSourceId + ":" + siteId,
-			descending: true,
-			limit: 1,
-			include_docs: true
-		});
-
-		if (result.rows.length === 0)
-			throw new Error('no_input');
-
-		const input = new Input(result.rows[0].doc);
-
-		if (update) {
-			const project = await Project.storeInstance.get(projectId);
-			const dataSource = project.getDataSourceById(dataSourceId);
-
-			input.update(dataSource.structure);
-		}
-
-		return input;
-	}
-
 	async bulkSave(inputs) {
 		inputs = inputs.slice();
 
