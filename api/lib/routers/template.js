@@ -302,4 +302,94 @@ const truncateString = (str, num) => {
   }
 }
 
+const logError = (prop, expected, received, name) => {
+  console.log(
+    `\n`,
+    `INVALID ${prop.toUpperCase()} -> "${name}"`,
+    `\n`,
+    `Expected ${prop}: ${expected}`,
+    `\n`,
+    `Received ${prop}: ${received}`,
+    `\n`
+  );
+}
+
+/**
+ * Checks if the passed data has the correct structure to be imported
+ */
+router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/check', async ctx => {
+    if (!ctx.visibleProjectIds.has(ctx.params.id))
+        throw new Error('forbidden');
+
+    const body = ctx.request.body;
+    if (!body || body.length <= 0)
+      throw new Error('forbidden');
+
+    const project = await Project.storeInstance.get(ctx.params.id);
+    const dataSource = project.getDataSourceById(ctx.params.dataSourceId);
+
+    if (dataSource.elements.length !== body.length) {
+      // throw new Error('invalid');
+      logError('number of sheets', dataSource.elements.length, body.length, '');
+    }
+
+    // For every variable of the form
+    for (let pos = 0; dataSource.elements[pos]; pos++) {
+      const element = dataSource.elements[pos];
+
+      const cols = [];
+      const rows = [];
+
+      let numberCols = 0;
+      let numberRows = 0;
+
+      // calculates the total number of rows and cols of the table based on the number of partitions
+      let i = 0;
+
+      // element.distribution is the number of partitions that are going to form rows in the table
+      // the first partitions are rows, the last partitions are cols
+      // the number represented by element.distribution says how many of the first partitions are rows
+
+      // we loop through the partitions that are going to be rows
+      for (i = 0; i < element.distribution; i += 1) {
+        rows.push(element.partitions[i]);
+        if (numberRows === 0) { numberRows = 1; }
+        numberRows *= element.partitions[i].elements.length;
+      }
+      // we loop through the remaining partition, they are going to form cols
+      for (i = element.distribution; i < element.partitions.length; i += 1) {
+        cols.push(element.partitions[i]);
+        if (numberCols === 0) { numberCols = 1; }
+        numberCols *= element.partitions[i].elements.length;
+      }
+
+      numberRows = numberRows + cols.length + 1;
+      numberCols = numberCols + rows.length + 1;
+
+      const importRows = body[pos].data.length;
+      const importCols = body[pos].data[0].length;
+
+      if (numberRows !== importRows) {
+        // throw new Error('invalid');
+        logError('rows', numberRows, importRows, body[pos].name);
+      }
+      if (numberCols !== importCols) {
+        // throw new Error('invalid');
+        logError('cols', numberCols, importCols, body[pos].name);
+      }
+
+      const numberValueRows = numberRows - cols.length - (rows.length > 0 ? 1 : 0); // Number of value rows (without headers and total)
+      const numberValueColumns = numberCols - rows.length - (cols.length > 0 ? 1 : 0); // Number of column rows (without headers and total)
+
+      for (let row = 0; row < numberValueRows; row++) {
+        for (let col = 0; col < numberValueColumns; col++) {
+          if (isNaN(body[pos].data[row + cols.length][col + rows.length])) {
+            logError('value', 'A number', body[pos].data[row + cols.length][col + rows.length], body[pos].name);
+          }
+        }
+      }
+    }
+    // console.log(body);
+});
+
 export default router;
