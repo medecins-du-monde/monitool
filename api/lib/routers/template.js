@@ -315,7 +315,7 @@ const logError = (prop, expected, received, name) => {
 }
 
 /**
- * Checks if the passed data has the correct structure to be imported
+ * Checks if the passed data has the correct structure to be imported and parse it.
  */
 router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/check', async ctx => {
     if (!ctx.visibleProjectIds.has(ctx.params.id))
@@ -328,10 +328,20 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
     const project = await Project.storeInstance.get(ctx.params.id);
     const dataSource = project.getDataSourceById(ctx.params.dataSourceId);
 
+    // If the file has the bad number of sheets we return an error and stop the process.
     if (dataSource.elements.length !== body.length) {
-      // throw new Error('invalid');
       logError('number of sheets', dataSource.elements.length, body.length, '');
+      ctx.status = 404;
+      
+      ctx.body = [{
+        error: 'Bad number of sheets',
+        key: 'import.error.bad-number-of-sheets',
+      }];
+      return;
     }
+
+    const result = {};
+    let errors = [];
 
     // For every variable of the form
     for (let pos = 0; dataSource.elements[pos]; pos++) {
@@ -342,6 +352,8 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
 
       let numberCols = 0;
       let numberRows = 0;
+    
+      const sheetErrors = [];
 
       // calculates the total number of rows and cols of the table based on the number of partitions
       let i = 0;
@@ -372,24 +384,62 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
       if (numberRows !== importRows) {
         // throw new Error('invalid');
         logError('rows', numberRows, importRows, body[pos].name);
+        sheetErrors.push({
+          error: 'Bad number of rows on sheet ' + body[pos].name,
+          key: 'import.error.bad-number-of-rows',
+          extra: { sheet: body[pos].name },
+        });
       }
       if (numberCols !== importCols) {
         // throw new Error('invalid');
         logError('cols', numberCols, importCols, body[pos].name);
+        sheetErrors.push({
+          error: 'Bad number of columns on sheet ' + body[pos].name,
+          key: 'import.error.bad-number-of-cols',
+          extra: { sheet: body[pos].name },
+        });
+      }
+      if (sheetErrors.length > 0) {
+        errors = errors.concat(sheetErrors);
+        continue;
       }
 
       const numberValueRows = numberRows - cols.length - (rows.length > 0 ? 1 : 0); // Number of value rows (without headers and total)
       const numberValueColumns = numberCols - rows.length - (cols.length > 0 ? 1 : 0); // Number of column rows (without headers and total)
 
+      result[element.id] = [];
+
       for (let row = 0; row < numberValueRows; row++) {
         for (let col = 0; col < numberValueColumns; col++) {
-          if (isNaN(body[pos].data[row + cols.length][col + rows.length])) {
-            logError('value', 'A number', body[pos].data[row + cols.length][col + rows.length], body[pos].name);
+          const cellValue = body[pos].data[row + cols.length][col + rows.length];
+          if (isNaN(cellValue)) {
+            logError('value', 'A number', cellValue, body[pos].name);
+            sheetErrors.push({
+              error: 'Bad value on sheet ' + body[pos].name,
+              key: 'import.error.bad-value',
+              extra: { sheet: body[pos].name, row: row + cols.length + 1, col: col + rows.length + 1, value: cellValue },
+            });
+          } else {
+            result[element.id].push(cellValue)
           }
         }
       }
+
+      if (sheetErrors.length > 0) {
+        errors = errors.concat(sheetErrors);
+      }
     }
-    // console.log(body);
+    
+    console.log(errors);
+    if (errors.length > 0) {
+      ctx.status = 404;
+      
+      ctx.body = errors;
+      return;
+    }
+
+    ctx.response.body = result;
+    return;
 });
 
 export default router;
