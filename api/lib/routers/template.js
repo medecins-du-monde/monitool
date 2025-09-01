@@ -118,13 +118,9 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
           else if (currentRow === numberValueRows || currentColumn === numberValueColumns) {
             let sum = '';
             if (currentRow === numberValueRows) {
-              sum += getCellFromTable(j, cols.length, j, numberRows - 2);
-            }
-            if (currentColumn === numberValueColumns) {
-              if (sum !== '') {
-                sum += ', ';
-              }
-              sum += getCellFromTable(rows.length, i, numberCols - 2, i);
+              sum = getCellFromTable(j, cols.length, j, numberRows - 2);
+            } else {
+              sum = getCellFromTable(rows.length, i, numberCols - 2, i);
             }
             table[i].push({formula: `SUM(${sum})`});
           }
@@ -314,6 +310,27 @@ const logError = (prop, expected, received, name) => {
   );
 }
 
+const realParseFloat = (s) => {
+    if (!s) return s;
+    s = s.toString().replace(/[^\d,.-]/g, ''); // strip everything except numbers, dots, commas and negative sign
+    if (/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(s)) // Matches #,###.######
+    {
+        s = s.replace(/,/g, ''); // strip out commas
+        return parseFloat(s); // convert to number
+    }
+    else if (/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(s)) // Not match #,###.###### and now matches #.###,########
+    {
+        s = s.replace(/\./g, ''); // strip out dots
+        s = s.replace(/,/g, '.'); // replace comma with dot
+        return parseFloat(s);
+    }
+    else // try #,###.###### anyway
+    {
+        s = s.replace(/,/g, ''); // strip out commas
+        return parseFloat(s); // convert to number
+    }
+}
+
 /**
  * Checks if the passed data has the correct structure to be imported and parse it.
  */
@@ -379,10 +396,8 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
       numberCols = numberCols + rows.length + 1;
 
       const importRows = body[pos].data.length;
-      const importCols = body[pos].data[0].length;
 
       if (numberRows !== importRows) {
-        // throw new Error('invalid');
         logError('rows', numberRows, importRows, body[pos].name);
         sheetErrors.push({
           error: 'Bad number of rows on sheet ' + body[pos].name,
@@ -390,15 +405,18 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
           extra: { sheet: body[pos].name },
         });
       }
-      if (numberCols !== importCols) {
-        // throw new Error('invalid');
-        logError('cols', numberCols, importCols, body[pos].name);
-        sheetErrors.push({
-          error: 'Bad number of columns on sheet ' + body[pos].name,
-          key: 'import.error.bad-number-of-cols',
-          extra: { sheet: body[pos].name },
-        });
-      }
+      for (let el of body[pos].data) {
+        const importCols = el.length;
+        if (numberCols !== importCols) {
+          logError('cols', numberCols, importCols, body[pos].name);
+          sheetErrors.push({
+            error: 'Bad number of columns on sheet ' + body[pos].name,
+            key: 'import.error.bad-number-of-cols',
+            extra: { sheet: body[pos].name },
+          });
+          break;
+        }
+      };
       if (sheetErrors.length > 0) {
         errors = errors.concat(sheetErrors);
         continue;
@@ -420,7 +438,7 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
               extra: { sheet: body[pos].name, row: row + cols.length + 1, col: col + rows.length + 1, value: cellValue },
             });
           } else {
-            result[element.id].push(cellValue)
+            result[element.id].push(realParseFloat(cellValue));
           }
         }
       }
