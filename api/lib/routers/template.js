@@ -118,9 +118,9 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
           else if (currentRow === numberValueRows || currentColumn === numberValueColumns) {
             let sum = '';
             if (currentRow === numberValueRows) {
-              sum = getCellFromTable(j, cols.length, j, numberRows - 2);
+              sum += getCellFromTable(j, cols.length, j, numberRows - 2);
             } else {
-              sum = getCellFromTable(rows.length, i, numberCols - 2, i);
+              sum += getCellFromTable(rows.length, i, numberCols - 2, i);
             }
             table[i].push({formula: `SUM(${sum})`});
           }
@@ -395,6 +395,10 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
       numberRows = numberRows + cols.length + 1;
       numberCols = numberCols + rows.length + 1;
 
+      if (numberRows === 1 && numberCols === 1 && body[pos].data.length < 1) {
+        body[pos].data = [[null]];
+      }
+
       const importRows = body[pos].data.length;
 
       if (numberRows !== importRows) {
@@ -405,18 +409,18 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
           extra: { sheet: body[pos].name },
         });
       }
-      for (let el of body[pos].data) {
-        const importCols = el.length;
-        if (numberCols !== importCols) {
-          logError('cols', numberCols, importCols, body[pos].name);
-          sheetErrors.push({
-            error: 'Bad number of columns on sheet ' + body[pos].name,
-            key: 'import.error.bad-number-of-cols',
-            extra: { sheet: body[pos].name },
-          });
-          break;
-        }
-      };
+
+      const importCols = body[pos].data[0].length;
+
+      if (numberCols !== importCols) {
+        logError('rows', numberRows, importCols, body[pos].name);
+        sheetErrors.push({
+          error: 'Bad number of cols on sheet ' + body[pos].name,
+          key: 'import.error.bad-number-of-cols',
+          extra: { sheet: body[pos].name },
+        });
+      }
+      
       if (sheetErrors.length > 0) {
         errors = errors.concat(sheetErrors);
         continue;
@@ -429,7 +433,7 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
 
       for (let row = 0; row < numberValueRows; row++) {
         for (let col = 0; col < numberValueColumns; col++) {
-          const cellValue = body[pos].data[row + cols.length][col + rows.length];
+          const cellValue = body[pos].data[row + cols.length][col + rows.length] || null;
           if (isNaN(cellValue)) {
             logError('value', 'A number', cellValue, body[pos].name);
             sheetErrors.push({
