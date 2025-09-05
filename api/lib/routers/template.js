@@ -433,7 +433,7 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
 
       for (let row = 0; row < numberValueRows; row++) {
         for (let col = 0; col < numberValueColumns; col++) {
-          const cellValue = body[pos].data[row + cols.length][col + rows.length] || null;
+          const cellValue = typeof body[pos].data[row + cols.length][col + rows.length] === 'undefined' ? null : body[pos].data[row + cols.length][col + rows.length];
           if (isNaN(cellValue)) {
             logError('value', 'A number', cellValue, body[pos].name);
             sheetErrors.push({
