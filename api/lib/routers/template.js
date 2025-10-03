@@ -130,7 +130,7 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
           }
           // Fill everything else with empty cells
           else {
-            table[i].push(null);
+            table[i].push('');
           }
         }
       }
@@ -320,7 +320,7 @@ const logError = (prop, expected, received, name) => {
 }
 
 const realParseFloat = (s) => {
-    if (!s) return s;
+    if (!s || s === '') return null;
     s = s.toString().replace(/[^\d,.-]/g, ''); // strip everything except numbers, dots, commas and negative sign
     if (/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(s)) // Matches #,###.######
     {
@@ -420,7 +420,7 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
       let tableStart;
       let tableEnd;
 
-      for (let i = tableIndex + 1; i <= body[0].data.length; i++) {
+      for (let i = tableIndex + 1; i < body[0].data.length; i++) {
         if (!tableStart && body[0].data[i].length > 0) {
           tableStart = i;
         }
