@@ -62,7 +62,10 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
         useSharedStrings: true
     };
 
-    let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
+    let workbook = new Excel.stream.xlsx.WorkbookWriter(options);workbook.creator = 'Me';
+    workbook.lastModifiedBy = 'Monitool';
+    workbook.created = new Date();
+    let worksheet = workbook.addWorksheet('Sheet 1', {views: [{showGridLines: false}], properties: {defaultColWidth: 20}});
 
     // For every variable of the form
     for (const element of dataSource.elements) {
@@ -74,20 +77,20 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
       let numberRows = 0;
 
       // calculates the total number of rows and cols of the table based on the number of partitions
-      let i = 0;
+      // let i = 0;
 
       // element.distribution is the number of partitions that are going to form rows in the table
       // the first partitions are rows, the last partitions are cols
       // the number represented by element.distribution says how many of the first partitions are rows
 
       // we loop through the partitions that are going to be rows
-      for (i = 0; i < element.distribution; i += 1) {
+      for (let i = 0; i < element.distribution; i += 1) {
         rows.push(element.partitions[i]);
         if (numberRows === 0) { numberRows = 1; }
         numberRows *= element.partitions[i].elements.length;
       }
       // we loop through the remaining partition, they are going to form cols
-      for (i = element.distribution; i < element.partitions.length; i += 1) {
+      for (let i = element.distribution; i < element.partitions.length; i += 1) {
         cols.push(element.partitions[i]);
         if (numberCols === 0) { numberCols = 1; }
         numberCols *= element.partitions[i].elements.length;
@@ -100,7 +103,7 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
       const numberValueRows = numberRows - cols.length - (rows.length > 0 ? 1 : 0); // Number of value rows (without headers and total)
       const numberValueColumns = numberCols - rows.length - (cols.length > 0 ? 1 : 0); // Number of column rows (without headers and total)
 
-      for (i = 0; i < numberRows; i += 1) {
+      for (let i = 0; i < numberRows; i += 1) {
         table.push([]);
         const currentRow = i - cols.length; // Current row (Starts from 1)
         
@@ -116,13 +119,14 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
           }
           // Set the total formulas
           else if (currentRow === numberValueRows || currentColumn === numberValueColumns) {
-            let sum = '';
+            // let sum = '';
+            // Last row, means the total will be from all the table rows for that column
             if (currentRow === numberValueRows) {
-              sum += getCellFromTable(j, cols.length, j, numberRows - 2);
+              table[i].push('totalCol');
+            // Last column, means the total will be from all the table columns for that row
             } else {
-              sum += getCellFromTable(rows.length, i, numberCols - 2, i);
+              table[i].push('totalRow');
             }
-            table[i].push({formula: `SUM(${sum})`});
           }
           // Fill everything else with empty cells
           else {
@@ -131,65 +135,52 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
         }
       }
 
-      let worksheet = workbook.addWorksheet(element.name, {views:[{state: 'frozen', xSplit: rows.length, ySplit: cols.length}]});
-      worksheet.columns = Array(numberCols).fill().map((e, i) => ({key: i * 1, width: 20}));
+      // let worksheet = workbook.addWorksheet(element.name, {views:[{state: 'frozen', xSplit: rows.length, ySplit: cols.length}]});
+      // worksheet.columns = Array(numberCols).fill().map((e, i) => ({key: i * 1, width: 20}));
 
-      fillCollumnLabels(rows, cols, table);
+      let tableNameRow = worksheet.addRow([element.name]);
+      tableNameRow.fill = header.fill;
+      tableNameRow.font = { bold: true };
+      tableNameRow.border = {
+        bottom: {style:'double'},
+      }
+      worksheet.addRow([]);
+
+      fillColumnLabels(rows, cols, table);
       fillRowLabels(rows, cols, table);
       fillTotalLabels(rows, cols, table, numberCols, numberRows);
 
-      for (let value of table) {
+      let rowlength = worksheet.getColumn(1)['_worksheet']['_rows'].length;
+      for (let [i, value] of table.entries()) {
+        value = value.map((cellVal, j) => {
+          if (cellVal === 'totalRow') {
+            cellVal = {formula: getTotalFormula(getCellRangeFromTable(rows.length, rowlength + i, j - 1, rowlength + i), 'sum')};
+          }
+          if (cellVal === 'totalCol') {
+            cellVal = {formula: getTotalFormula(getCellRangeFromTable(j, rowlength + cols.length, j, rowlength + i - 1), 'sum')};
+          }
+          return cellVal;
+        })
         let row = worksheet.addRow(value);
-      }
-
-      // Merge headers rows
-      for (let i = 0; i < rows.length;) {
-        i++;
-        const col = worksheet.getColumn(i);
-        let lastCell = { index: cols.length, val: ''};
-        col.eachCell((cell, index) => {
-            if (index <= cols.length) return;
-            const value = cell.value;
+        row.eachCell({ includeEmpty: true }, (cell, colNum) => {
+          cell.border = {
+            top: {style:'thin', color: {argb: 'cccccc'}},
+            left: {style:'thin', color: {argb: 'cccccc'}},
+            bottom: {style:'thin', color: {argb: 'cccccc'}},
+            right: {style:'thin', color: {argb: 'cccccc'}}
+          };
+          if (colNum <= rows.length || i < cols.length) {
             cell.fill = header.fill;
             cell.alignment = {wrapText: true, vertical: 'top', horizontal: 'left'};
-            if (value !== '' && value !== lastCell.val) {
-                if (lastCell.index < index - 1) {
-                    worksheet.mergeCells(lastCell.index, i, index - 1, i);
-                }
-                lastCell = { index: index, val: value };
-            }
-        })
-      }
-      
-      // Merge header columns
-      for (let i = 0; i < cols.length;) {
-        i++;
-        const row = worksheet.getRow(i);
-        let lastCell = { index: rows.length, val: ''};
-        row.eachCell((cell, index) => {
-            if (index <= rows.length) return;
-            const value = cell.value;
-            if (value !== '' && value !== lastCell.val) {
-                if (lastCell.index < index - 1) {
-                    worksheet.mergeCells(i, lastCell.index, i, index - 1);
-                }
-                lastCell = { index: index, val: value };
-            }
-        })
-        row.fill = header.fill;
-        row.alignment = {wrapText: true, vertical: 'top', horizontal: 'left'};
+          }
+          if ((cols.length > 0 && colNum === value.length) || (rows.length > 0 && i === table.length - 1)) {
+            cell.font = header.font;
+          }
+        });
       }
 
-      if (numberCols > 2) {
-        const col = worksheet.getColumn(numberCols);
-        col.font = header.font;
-      }
-      if (numberRows > 2) {
-        const row = worksheet.getRow(numberRows);
-        row.font = header.font;
-      }
-
-      worksheet.commit();
+      worksheet.addRow([]);
+      worksheet.addRow([]);
     }
 
     await workbook.commit();
@@ -247,7 +238,7 @@ const fillRowLabels = (rows, cols, table) => {
     fillCurrentRowLabel(rows, cols, 0);
 }
 
-const fillCollumnLabels = (rows, cols, table) => {
+const fillColumnLabels = (rows, cols, table) => {
     let x = 0;
     let y = rows.length;
 
@@ -272,7 +263,25 @@ const fillCollumnLabels = (rows, cols, table) => {
     fillCurrentColLabel(cols, 0);
 }
 
-const getCellFromTable = (colStart, rowStart, colEnd, rowEnd) => {
+const getTotalFormula = (range, type) => {
+  // Types = "sum", "average", "highest", "lowest", "last"
+  switch (type) {
+    case "sum":
+      return `SUM(${range})`;
+    case "average":
+      return `AVERAGE(${range})`
+    case "highest":
+      return `MAX(${range})`
+    case "lowest":
+      return `MIN(${range})`
+    case "last":
+      return `${range.split(":")[1]}`
+    default:
+      return undefined
+  }
+}
+
+const getCellRangeFromTable = (colStart, rowStart, colEnd, rowEnd) => {
   colStart = getColFromNumber(colStart);
   colEnd = getColFromNumber(colEnd);
   rowStart += 1;
@@ -292,9 +301,9 @@ const getColFromNumber = (col) => {
 
 const truncateString = (str, num) => {
   if (str.length > num) {
-    return str.slice(0, num) + "...";
+    return str.replace(/\//g, "-").slice(0, num) + "...";
   } else {
-    return str;
+    return str.replace(/\//g, "-");
   }
 }
 
@@ -346,7 +355,7 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
     const dataSource = project.getDataSourceById(ctx.params.dataSourceId);
 
     // If the file has the bad number of sheets we return an error and stop the process.
-    if (dataSource.elements.length !== body.length) {
+    if (body.length !== 1) {
       logError('number of sheets', dataSource.elements.length, body.length, '');
       ctx.status = 404;
       
@@ -370,7 +379,7 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
       let numberCols = 0;
       let numberRows = 0;
     
-      const sheetErrors = [];
+      const elementErrors = [];
 
       // calculates the total number of rows and cols of the table based on the number of partitions
       let i = 0;
@@ -395,34 +404,69 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
       numberRows = numberRows + cols.length + 1;
       numberCols = numberCols + rows.length + 1;
 
-      if (numberRows === 1 && numberCols === 1 && body[pos].data.length < 1) {
-        body[pos].data = [[null]];
+      // Find table and limit
+      const tableIndex = body[0].data.findIndex(data => data[0] === element.name);
+      if (tableIndex < 0) {
+        logError('Table', element.name);
+        
+        errors.push({
+          error: 'No table for ' + element.name,
+          key: 'import.error.no-table',
+          extra: { element: element.name },
+        });
+        continue;
+      }
+      
+      let tableStart;
+      let tableEnd;
+
+      for (let i = tableIndex + 1; i <= body[0].data.length; i++) {
+        if (!tableStart && body[0].data[i].length > 0) {
+          tableStart = i;
+        }
+        if (tableStart && (!body[0].data[i + 1] || body[0].data[i + 1].length <= 0)) {
+          tableEnd = i + 1;
+          break;
+        }
       }
 
-      const importRows = body[pos].data.length;
+      if (!tableStart || !tableEnd) {
+        logError('Table', element.name);
+        
+        errors.push({
+          error: 'Bad table for ' + element.name,
+          key: 'import.error.bad-table',
+          extra: { element: element.name },
+        });
+        continue;
+      }
+
+      const elementTable = body[0].data.slice(tableStart, tableEnd);
+
+      const importRows = elementTable.length;
 
       if (numberRows !== importRows) {
-        logError('rows', numberRows, importRows, body[pos].name);
-        sheetErrors.push({
-          error: 'Bad number of rows on sheet ' + body[pos].name,
+        logError('rows', numberRows, importRows, element.name);
+        elementErrors.push({
+          error: 'Bad number of rows on table ' + element.name,
           key: 'import.error.bad-number-of-rows',
-          extra: { sheet: body[pos].name },
-        });
-      }
-
-      const importCols = body[pos].data[0].length;
-
-      if (numberCols !== importCols) {
-        logError('rows', numberRows, importCols, body[pos].name);
-        sheetErrors.push({
-          error: 'Bad number of cols on sheet ' + body[pos].name,
-          key: 'import.error.bad-number-of-cols',
-          extra: { sheet: body[pos].name },
+          extra: { element: element.name },
         });
       }
       
-      if (sheetErrors.length > 0) {
-        errors = errors.concat(sheetErrors);
+      const importCols = elementTable[0].length;
+
+      if (numberCols !== importCols) {
+        logError('rows', numberRows, importCols, element.name);
+        elementErrors.push({
+          error: 'Bad number of cols on table ' + element.name,
+          key: 'import.error.bad-number-of-cols',
+          extra: { element: element.name },
+        });
+      }
+      
+      if (elementErrors.length > 0) {
+        errors = errors.concat(elementErrors);
         continue;
       }
 
@@ -433,13 +477,13 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
 
       for (let row = 0; row < numberValueRows; row++) {
         for (let col = 0; col < numberValueColumns; col++) {
-          const cellValue = typeof body[pos].data[row + cols.length][col + rows.length] === 'undefined' ? null : body[pos].data[row + cols.length][col + rows.length];
+          const cellValue = typeof elementTable[row + cols.length][col + rows.length] === 'undefined' ? null : elementTable[row + cols.length][col + rows.length];
           if (isNaN(cellValue)) {
-            logError('value', 'A number', cellValue, body[pos].name);
-            sheetErrors.push({
-              error: 'Bad value on sheet ' + body[pos].name,
+            logError('value', 'A number', cellValue, element.name);
+            elementErrors.push({
+              error: 'Bad value on table ' + element.name,
               key: 'import.error.bad-value',
-              extra: { sheet: body[pos].name, row: row + cols.length + 1, col: col + rows.length + 1, value: cellValue },
+              extra: { element: element.name, row: row + cols.length + 1, col: col + rows.length + 1, value: cellValue },
             });
           } else {
             result[element.id].push(realParseFloat(cellValue));
@@ -447,8 +491,8 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
         }
       }
 
-      if (sheetErrors.length > 0) {
-        errors = errors.concat(sheetErrors);
+      if (elementErrors.length > 0) {
+        errors = errors.concat(elementErrors);
       }
     }
     
