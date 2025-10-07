@@ -320,7 +320,7 @@ const logError = (prop, expected, received, name) => {
 }
 
 const realParseFloat = (s) => {
-    if (!s || s === '') return null;
+    if (s == null || s === '') return null;
     s = s.toString().replace(/[^\d,.-]/g, ''); // strip everything except numbers, dots, commas and negative sign
     if (/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(s)) // Matches #,###.######
     {
