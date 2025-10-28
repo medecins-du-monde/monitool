@@ -22,6 +22,17 @@ import Project from '../resource/model/project';
  */
 export default async (ctx, next) => {
 	if (ctx.isAuthenticated()) {
+		// Check if user is deactivated
+		if (ctx.state.user.isDeactivated) {
+			ctx.logout();
+			ctx.response.body = {
+				error: "account_deactivated",
+				message: "Your account has been deactivated due to inactivity. Please contact support to reactivate your account."
+			};
+			ctx.response.status = 403;
+			return;
+		}
+
 		ctx.visibleProjectIds = new Set(await Project.storeInstance.listVisibleIds(ctx.state.user));
 		await next();
 	}

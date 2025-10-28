@@ -685,7 +685,7 @@ router.get("/export/:projectId/:periodicity/:lang/:minimized?", async (ctx) => {
 
           siteMaxLength = Math.max(siteMaxLength, res.name.length);
 
-          if (e.numFmt !== undefined) 
+          if (e.numFmt !== undefined) {
             row.numFmt = e.numFmt;
           }
           if (e.outlineLevel !== undefined) {

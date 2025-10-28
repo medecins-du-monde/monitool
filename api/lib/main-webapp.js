@@ -20,6 +20,7 @@ import winston from 'winston';
 import application from './application';
 import config from './config/config';
 import database from './resource/database';
+import { initializeDeactivationJob } from './services/user-deactivation';
 
 // Catch the uncaught errors that weren't wrapped in a domain or try catch statement
 process.on('uncaughtException', function(err) {
@@ -40,6 +41,9 @@ async function tryStartApplication() {
 
 	// Create bucket / Migrate if needed
 	await database.prepare();
+
+	// Initialize user deactivation cron job
+	initializeDeactivationJob();
 
 	// Crash if we fail to listen.
 	application.listen(config.port);

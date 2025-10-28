@@ -113,12 +113,17 @@ if (config.auth.providers.azureAD) {
 
 				User.storeInstance.get(userId).then(
 					function(user) {
+						// Check if user is deactivated
+						if (user.isDeactivated) {
+							return done("Your account has been deactivated due to inactivity. Please contact support to reactivate your account.");
+						}
+
 						// If Oauth provider updated the name, we update as well in DB
 						if (user.name !== profile.name) {
 							user.name = profile.name;
 							user.save(); // don't wait for the callback
 						}
-						// Update last login date
+						// Update last login date and reset warning
 						updateLastLogin(user);
 
 						// Auth was OK
@@ -193,6 +198,14 @@ passport.use('partner_local', new LocalStrategy(
 				if (!passwordHash.verify(password, partner.password))
 					return done(null, false);
 
+				// Check if partner account is deactivated
+				if (partner.isDeactivated) {
+					return done("Your account has been deactivated due to inactivity. Please contact support to reactivate your account.");
+				}
+
+				// Update last login date and reset warning
+				updateLastLogin(partner);
+
 				done(null, partner)
 			},
 			function(error) {
@@ -235,7 +248,13 @@ const updateLastLogin = async (user) => {
       if (!u) return;
       else user = u;
     }
-    user.lastLogin = new Date().toISOString();
-    await user.save();
+
+	// Once deactivated, accounts can only be reactivated manually by support staff
+	if (!user.isDeactivated){
+		user.lastLogin = new Date().toISOString();
+		user.warningSentDate = null;
+	}
+	
+	await user.save();
   } catch (e) {}
 };
