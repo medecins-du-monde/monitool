@@ -60,6 +60,7 @@
 					"minLength": 1
 				}
 			}
-		}
+		},
+		"disabled": { "type": "boolean" }
 	}
 }
