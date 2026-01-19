@@ -253,7 +253,45 @@
 					}
 				}
 			}
-		}
+		},
+    "dashboard": {
+      "type": "array",
+      "required": ["id", "type", "properties", "datasets"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "$ref": "#/definitions/uuid" },
+          "type": { "type": "string" },
+          "title": { "type": "string" },
+          "meta": {
+            "type": "object",
+            "required": ["dimension", "filter"],
+            "properties": {
+              "dimension": { "type": "string" },
+              "filter": { "type": "object" }
+            }
+          }
+        },
+        "datasets": {
+            "backgroundColor": { "type": "string" },
+            "borderColor": { "type": "string" },
+            "required": ["computation", "filter", "label"],
+            "properties": {
+              "meta": {
+                "computation": {
+                    "formula": { "type": "string" },
+                    "parameters": { "type": "object" }
+                },
+                "filter": { "type": "object" }
+              },
+              "label": { "type": "string" },
+              "baseline": { "type": "number" },
+              "target": { "type": "number" },
+              "unit": { "type": "string" }
+            }
+        }
+      }
+    }
   },
 
   "definitions": {
