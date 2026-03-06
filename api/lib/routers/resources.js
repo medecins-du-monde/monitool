@@ -152,10 +152,8 @@ router.put('/resources/project/:id', async ctx => {
 
 		if (ctx.request.query.with_data == 'true'){
 			project.name = 'CLONE STRUCTURE & DATA - ' + project.name;
-			project.country = 'CLONE STRUCTURE & DATA - ' + project.country;
 		} else{
 			project.name = 'CLONE STRUCTURE - ' + project.name;
-			project.country = 'CLONE STRUCTURE - ' + project.country;
 		}
 		await project.save();
 
