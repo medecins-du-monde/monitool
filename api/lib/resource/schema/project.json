@@ -120,7 +120,7 @@
                 "pattern": "^user:[a-z0-9A-Z\\.\\-\\_]+$"
               },
               "role": { "type": "string", "enum": ["input"] },
-
+              "name": { "type": "string", "minLength": 1 },
               "entities": {
                 "type": "array",
                 "uniqueItems": true,
