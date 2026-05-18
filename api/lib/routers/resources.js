@@ -46,7 +46,20 @@ router.get('/resources/project', async ctx => {
 	let projects;
 	
 	if (ctx.state.user.type === 'user' && ctx.request.query.mode === 'short') {
-		projects = await Project.storeInstance.listShort(ctx.state.user._id);
+		const q = ctx.request.query;
+		const result = await Project.storeInstance.listShort(
+			ctx.state.user._id,
+			ctx.visibleProjectIds,
+			{
+				skip:       Number(q.skip)  || 0,
+				limit:      Number(q.limit) || 12,
+				continents: [].concat(q.continents || []),
+				countries:  [].concat(q.countries  || []),
+				statuses:   q.statuses ? [].concat(q.statuses) : ['Ongoing'],
+				search:     q.search || ''
+			}
+		);
+		ctx.response.body = result;
 	} else {
 		if (ctx.request.query.mode === 'crossCutting')
 			projects = await Project.storeInstance.listByIndicator(ctx.request.query.indicatorId, true);
@@ -57,11 +70,11 @@ router.get('/resources/project', async ctx => {
 
 		// listShort, listByIndicator and list require a post processing step
 		// to hide passwords (which is not the case for listShort)
-		projects = projects.map(p => p.toAPI())
+		projects = projects.map(p => p.toAPI());
+
+		// Filter projects depending on ACL.
+		ctx.response.body = projects.filter(p => ctx.visibleProjectIds.has(p._id));
 	}
-	
-	// Filter projects depending on ACL.
-	ctx.response.body = projects.filter(p => ctx.visibleProjectIds.has(p._id));
 })
 
 router.get('/resources/project/:id/hasInputs', async ctx => {
