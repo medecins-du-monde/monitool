@@ -21,6 +21,11 @@ import Indicator from '../model/indicator';
 import jsonpatch from 'fast-json-patch';
 import Theme from '../model/theme';
 
+function _getStatus(project) {
+	if (!project.active) return 'Deleted';
+	return new Date(project.end) < new Date() ? 'Finished' : 'Ongoing';
+}
+
 export default class ProjectStore extends Store {
 
 	get modelString() {
@@ -123,7 +128,12 @@ export default class ProjectStore extends Store {
 	 *
 	 * Used in the client to display list of projects.
 	 */
-	async listShort(userId) {
+	async listShort(userId, visibleIds, {
+		skip = 0, limit = 12,
+		continents = [], countries = [],
+		statuses = ['Ongoing'],
+		search = ''
+	} = {}) {
 		if (typeof userId !== 'string')
 			throw new Error('missing_parameter');
 
@@ -132,16 +142,57 @@ export default class ProjectStore extends Store {
 			this._db.callView('inputs_updated_at', { group: true })
 		]);
 
-		const projects = mainResult.rows.map(row => row.value);
+		let projects = mainResult.rows.map(row => row.value);
+
+		// Apply ACL visibility filter before counting/slicing
+		if (visibleIds)
+			projects = projects.filter(p => visibleIds.has(p._id));
 
 		projects.forEach(p => {
 			const updatedAt = updatedAtResult.rows.find(row => row.key === p._id);
-
 			p.inputDate = updatedAt ? updatedAt.value : null;
 			p.users = p.users.filter(u => u.id === userId);
 		});
 
-		return projects;
+		// Text filter: match name, region, or country keys
+		if (search) {
+			const q = search.toLowerCase();
+			projects = projects.filter(p =>
+				p.name.toLowerCase().includes(q) ||
+				(p.region && p.region.toLowerCase().includes(q)) ||
+				p.countries.some(c => c.toLowerCase().includes(q))
+			);
+		}
+
+		// Continent/country filter
+		if (continents.length > 0 || countries.length > 0) {
+			if (continents.length === 0) {
+				projects = projects.filter(p => p.countries.some(c => countries.includes(c)));
+			} else if (countries.length === 0) {
+				projects = projects.filter(p => p.continents.some(c => continents.includes(c)));
+			} else {
+				projects = projects.filter(p =>
+					p.countries.some(c => countries.includes(c)) &&
+					p.continents.some(c => continents.includes(c))
+				);
+			}
+		}
+
+		// Compute status counts before applying status filter (so UI can show all counts)
+		const statusCounts = { Ongoing: 0, Finished: 0, Deleted: 0 };
+		projects.forEach(p => { statusCounts[_getStatus(p)]++; });
+
+		// Status filter
+		if (statuses.length > 0)
+			projects = projects.filter(p => statuses.includes(_getStatus(p)));
+
+		const total = projects.length;
+
+		return {
+			items: projects.slice(skip, skip + limit),
+			total,
+			statusCounts
+		};
 	}
 	
 	/**
