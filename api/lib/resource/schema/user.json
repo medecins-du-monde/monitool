@@ -32,6 +32,10 @@
 		},
 		"active": {
 			"type": "boolean"
+		},
+		"favoriteProjects": {
+			"type": "array",
+			"items": { "type": "string" }
 		}
 	}
 }
