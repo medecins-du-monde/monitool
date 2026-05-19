@@ -20,11 +20,24 @@ import Project from '../model/project';
 import Indicator from '../model/indicator';
 import jsonpatch from 'fast-json-patch';
 import Theme from '../model/theme';
+import { continentList, countryList } from '../../utils/iso-countries';
+
+function _toNames(entry) {
+	return ['en', 'fr', 'es'].flatMap(lang => {
+		const v = entry[lang];
+		return Array.isArray(v) ? v : (v ? [v] : []);
+	}).map(n => n.toLowerCase());
+}
+const _countryNames = new Map(Object.entries(countryList).map(([code, e]) => [code, _toNames(e)]));
+const _continentNames = new Map(Object.entries(continentList).map(([code, e]) => [code, _toNames(e)]));
 
 function _getStatus(project) {
 	if (!project.active) return 'Deleted';
 	return new Date(project.end) < new Date() ? 'Finished' : 'Ongoing';
 }
+
+let _projectsShortCache = null;
+let _inputsUpdatedAtCache = null;
 
 export default class ProjectStore extends Store {
 
@@ -132,17 +145,19 @@ export default class ProjectStore extends Store {
 		skip = 0, limit = 12,
 		continents = [], countries = [],
 		statuses = ['Ongoing'],
-		search = ''
+		search = '',
+		favoriteProjectIds = new Set()
 	} = {}) {
 		if (typeof userId !== 'string')
 			throw new Error('missing_parameter');
 
-		const [mainResult, updatedAtResult] = await Promise.all([
-			this._db.callView('projects_short', {}),
-			this._db.callView('inputs_updated_at', { group: true })
-		]);
+		if (!_projectsShortCache)
+			_projectsShortCache = this._db.callView('projects_short', {});
+		if (!_inputsUpdatedAtCache)
+			_inputsUpdatedAtCache = this._db.callView('inputs_updated_at', { group: true });
 
-		let projects = mainResult.rows.map(row => row.value);
+		const [mainResult, updatedAtResult] = await Promise.all([_projectsShortCache, _inputsUpdatedAtCache]);
+		let projects = mainResult.rows.map(row => Object.assign({}, row.value));
 
 		// Apply ACL visibility filter before counting/slicing
 		if (visibleIds)
@@ -154,26 +169,27 @@ export default class ProjectStore extends Store {
 			p.users = p.users.filter(u => u.id === userId);
 		});
 
-		// Text filter: match name, region, or country keys
+		// Text filter: match name, region, or country/continent codes and full names (all languages)
 		if (search) {
 			const q = search.toLowerCase();
 			projects = projects.filter(p =>
 				p.name.toLowerCase().includes(q) ||
 				(p.region && p.region.toLowerCase().includes(q)) ||
-				p.countries.some(c => c.toLowerCase().includes(q))
+				(p.countries || []).some(c => c.toLowerCase().includes(q) || (_countryNames.get(c) || []).some(n => n.includes(q))) ||
+				(p.continents || []).some(c => c.toLowerCase().includes(q) || (_continentNames.get(c) || []).some(n => n.includes(q)))
 			);
 		}
 
 		// Continent/country filter
 		if (continents.length > 0 || countries.length > 0) {
 			if (continents.length === 0) {
-				projects = projects.filter(p => p.countries.some(c => countries.includes(c)));
+				projects = projects.filter(p => (p.countries || []).some(c => countries.includes(c)));
 			} else if (countries.length === 0) {
-				projects = projects.filter(p => p.continents.some(c => continents.includes(c)));
+				projects = projects.filter(p => (p.continents || []).some(c => continents.includes(c)));
 			} else {
 				projects = projects.filter(p =>
-					p.countries.some(c => countries.includes(c)) &&
-					p.continents.some(c => continents.includes(c))
+					(p.countries || []).some(c => countries.includes(c)) &&
+					(p.continents || []).some(c => continents.includes(c))
 				);
 			}
 		}
@@ -185,6 +201,12 @@ export default class ProjectStore extends Store {
 		// Status filter
 		if (statuses.length > 0)
 			projects = projects.filter(p => statuses.includes(_getStatus(p)));
+
+		projects.sort((a, b) => {
+			const tierA = favoriteProjectIds.has(a._id) ? 0 : a.users.some(u => u.role === 'owner') ? 1 : 2;
+			const tierB = favoriteProjectIds.has(b._id) ? 0 : b.users.some(u => u.role === 'owner') ? 1 : 2;
+			return tierA - tierB || a.name.localeCompare(b.name);
+		});
 
 		const total = projects.length;
 
@@ -300,6 +322,14 @@ export default class ProjectStore extends Store {
 
 		const result = await this._db.callView('project_by_theme', { key: themeId, include_docs: true });
 		return result.rows.map(row => new Project(row.doc));
+	}
+
+	invalidateProjectsCache() {
+		_projectsShortCache = null;
+	}
+
+	invalidateInputsCache() {
+		_inputsUpdatedAtCache = null;
 	}
 
 	async hasInputs(projectId, dataSourceId) {

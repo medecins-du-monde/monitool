@@ -34,6 +34,18 @@ router.get('/resources/myself', async ctx => {
 	ctx.response.body = ctx.state.user;
 });
 
+router.put('/resources/myself', async ctx => {
+	if (ctx.state.user.type !== 'user' || !ctx.state.user._rev)
+		throw new Error('forbidden');
+
+	const user = await User.storeInstance.get(ctx.state.user._id);
+	user.favoriteProjects = Array.isArray(ctx.request.body.favoriteProjects)
+		? ctx.request.body.favoriteProjects
+		: [];
+	await user.save();
+	ctx.response.body = user.toAPI();
+});
+
 /**
  * Retrieve multiple projects.
  *
@@ -51,12 +63,13 @@ router.get('/resources/project', async ctx => {
 			ctx.state.user._id,
 			ctx.visibleProjectIds,
 			{
-				skip:       Number(q.skip)  || 0,
-				limit:      Number(q.limit) || 12,
-				continents: [].concat(q.continents || []),
-				countries:  [].concat(q.countries  || []),
-				statuses:   q.statuses ? [].concat(q.statuses) : ['Ongoing'],
-				search:     q.search || ''
+				skip:               Number(q.skip)  || 0,
+				limit:              Number(q.limit) || 12,
+				continents:         [].concat(q.continents || []),
+				countries:          [].concat(q.countries  || []),
+				statuses:           q.statuses ? [].concat(q.statuses) : ['Ongoing'],
+				search:             q.search || '',
+				favoriteProjectIds: new Set(ctx.state.user.favoriteProjects || [])
 			}
 		);
 		ctx.response.body = result;
@@ -169,9 +182,11 @@ router.put('/resources/project/:id', async ctx => {
 			project.name = 'CLONE STRUCTURE - ' + project.name;
 		}
 		await project.save();
+		Project.storeInstance.invalidateProjectsCache();
 
 		// Recreate all inputs asynchronously. No need to have the user waiting.
-		if (ctx.request.query.with_data == 'true')
+		if (ctx.request.query.with_data == 'true') {
+			Project.storeInstance.invalidateInputsCache();
 			Input.storeInstance.listByProject(ctx.request.query.from).then(inputs => {
 				inputs.forEach(input => {
 					input._id = 'input:' + project._id + ':' + input.form + ':' + input.entity + ':' + input.period;
@@ -181,6 +196,7 @@ router.put('/resources/project/:id', async ctx => {
 
 				Input.storeInstance.bulkSave(inputs);
 			});
+		}
 
 		ctx.response.body = project.toAPI();
 	}
@@ -216,6 +232,7 @@ router.put('/resources/project/:id', async ctx => {
 
 		const newProject = new Project(ctx.request.body);
 		await newProject.save(false, ctx.state.user);
+		Project.storeInstance.invalidateProjectsCache();
 
 		ctx.response.body = newProject.toAPI();
 	}
@@ -298,6 +315,7 @@ router.put('/resources/input', async ctx => {
 
 			Input.storeInstance.bulkSave(inputs);
 		});
+		Project.storeInstance.invalidateInputsCache();
 	}
 	else {
 		throw new Error('invalid_mode');
@@ -366,6 +384,7 @@ router.put('/resources/input/:id', async ctx => {
 		throw new Error('forbidden');
 
 	await input.save();
+	Project.storeInstance.invalidateInputsCache();
 	ctx.response.body = input.toAPI();
 })
 
@@ -388,6 +407,7 @@ router.delete('/resources/input/:id', async ctx => {
 		throw new Error('forbidden');
 
 	ctx.response.body = await input.destroy();
+	Project.storeInstance.invalidateInputsCache();
 })
 
 /**
