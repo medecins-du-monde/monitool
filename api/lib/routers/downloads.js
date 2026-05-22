@@ -257,8 +257,8 @@ async function indicatorToCCRows(project, indicators, timeslot) {
         continue;
       }
       let result = {
-        continent: project.continent,
-        country: project.country,
+        continent: (project.continents || []).join(', '),
+        country: (project.countries || []).join(', '),
         politicalCombat: project.themeNames.join(', '),
         name: project.display,
         date: date,
@@ -273,8 +273,8 @@ async function indicatorToCCRows(project, indicators, timeslot) {
     } 
   } else {
     let result = {
-      continent: project.continent,
-      country: project.country,
+      continent: (project.continents || []).join(', '),
+      country: (project.countries || []).join(', '),
       politicalCombat: project.themeNames.join(', '),
       name: project.display,
       date: '',
@@ -376,7 +376,7 @@ function buildFormulas(indicator, project){
 
 function buildWorksheet(workbook, name) {
   // Cleaning the name replacing all special characters by a space
-  name = name.replace(/[^a-zA-Z0-9]/g,' ');
+  name = name.replace(/[\/\\\?\*\[\]:]|(^')|('$)/g, ' ').slice(0, 31);
 
   let newWorksheet = workbook.addWorksheet(name);
 
@@ -409,7 +409,7 @@ function buildWorksheet(workbook, name) {
 
 function buildCCWorksheet(workbook, name, lang, indicators) {
   // Cleaning the name replacing all special characters by a space
-  name = name.replace(/[^a-zA-Z0-9]/g,' ');
+  name = name.replace(/[\/\\\?\*\[\]:]|(^')|('$)/g, ' ').slice(0, 31);
 
   let newWorksheet = workbook.addWorksheet(name);
 
@@ -449,7 +449,7 @@ function buildCCWorksheet(workbook, name, lang, indicators) {
     {header: dateTranslation[lang], key: 'date', width: 20},
   ].concat(indicators.map(indicator => {
     return {
-      header: [indicator.name[lang]],
+      header: indicator.name[lang],
       key: indicator._id,
       width: 40
     }
@@ -856,7 +856,7 @@ async function generateProjectDownload(filename, project, ctx) {
       // creating a tab for each site
 
       // Cleaning the name replacing all special characters by a space
-      site.name = site.name.replace(/[^a-zA-Z0-9]/g, " ");
+      site.name = site.name.replace(/[\/\\\?\*\[\]:]|(^')|('$)/g, ' ').slice(0, 31);
 
       let newWorksheet = buildWorksheet(workbook, site.name);
 
@@ -974,7 +974,7 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
       }
       completeProjects.push({
         computation: currentComputation,
-        display: `${project.country} - ${project.name}`,
+        display: `${(project.countries || []).join(', ')} - ${project.name}`.replace(/[\/\\\?\*\[\]:]|(^')|('$)/g, ' ').slice(0, 31),
         baseline: currentBaseline,
         target: currentTarget,
         numFmt: getNumberFormat(currentComputation),
@@ -1117,9 +1117,9 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
       // creating a tab for each site
 
       // Cleaning the name replacing all special characters by a space
-      project.country = project.country.replace(/[^a-zA-Z0-9]/g, " ");
+      let countryTab =  `${(project.countries || []).join(', ')} - ${project.name}`.replace(/[\/\\\?\*\[\]:]|(^')|('$)/g, ' ').slice(0, 30);
 
-      let newWorksheet = buildWorksheet(workbook, project.country);
+      let newWorksheet = buildWorksheet(workbook, countryTab);
       
       let projectComputation = null;
       let projectBaseline = null;
@@ -1261,11 +1261,11 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
   for (const project of relatedProjects) {
       // filtering
       if (countries.length > 0) {
-        if (!countries.includes(project.country)) {
+        if (!project.countries || !project.countries.some(c => countries.includes(c))) {
           continue;
         }
       } else if (continents.length > 0) {
-        if (!project.continent || !continents.includes(project.continent)) {
+        if (!project.continents || !project.continents.some(c => continents.includes(c))) {
           continue;
         }
       }
@@ -1293,8 +1293,8 @@ async function generateCCIndicatorDownload(filename, indicators, lang, countries
         display: project.name,
         start: project.start,
         end: project.end,
-        continent: continentList[project.continent] ? continentList[project.continent][lang] : project.continent,
-        country: countryList[project.country] ? (typeof countryList[project.country][lang] !== 'string' ? countryList[project.country][lang][0] : countryList[project.country][lang]) : project.country,
+        continents: project.continents || [],
+        countries: project.countries || [],
         crossCutting: project.crossCutting,
         // numFmt: getNumberFormat(currentComputation),
         id: project._id,
@@ -1521,7 +1521,7 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
       break;
     case 'project':
       const project = await Project.storeInstance.get(ctx.params.id);
-      filename = getFilename(project.country, ctx.params.minimized);
+      filename = getFilename(project.countries.join(', '), ctx.params.minimized);
       break;
     default:
       break;
@@ -1564,7 +1564,7 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
       break;
     case 'project':
       const project = await Project.storeInstance.get(ctx.params.id);
-      filename = getFilename(project.country, ctx.params.minimized);
+      filename = getFilename(project.countries.join(', '), ctx.params.minimized);
       break;
     default:
       break;
@@ -1614,7 +1614,7 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
 
   // Set filename;
   const filename = getFilename(
-    (type === 'indicator' ? data.name.en : data.country),
+    (type === 'indicator' ? data.name.en : data.countries.join(', ')),
     ctx.params.minimized
   );
 
