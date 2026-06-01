@@ -11,6 +11,7 @@ import { continentList, countryList } from '../utils/iso-countries';
 import Theme from '../resource/model/theme';
 
 const router = new Router();
+const progressMap = new Map();
 let lang = 'es';
 
 
@@ -748,6 +749,10 @@ async function generateProjectDownload(filename, project, ctx) {
     dataSourcesCompleteIndicators
   );
 
+  const _indicatorCount = allCompleteIndicators.filter(i => i.computation !== undefined).length;
+  const _entityCount = ctx.params.minimized ? 0 : project.entities.length;
+  progressMap.set(filename, { current: 0, total: _indicatorCount * (1 + _entityCount) });
+
   sectionHeader.fill.fgColor.argb = "999999";
 
   let bool = 0;
@@ -775,6 +780,7 @@ async function generateProjectDownload(filename, project, ctx) {
         indicator.target,
         indicator.filter
       );
+      const _p1 = progressMap.get(filename); if (_p1) _p1.current++;
       // Dump all the data into Excel
       row = worksheet.addRow(res);
 
@@ -879,6 +885,7 @@ async function generateProjectDownload(filename, project, ctx) {
             e.target,
             customFilter
           );
+          const _p2 = progressMap.get(filename); if (_p2) _p2.current++;
           row = newWorksheet.addRow(res);
 
           siteMaxLength = Math.max(siteMaxLength, res.name.length);
@@ -941,6 +948,7 @@ async function generateProjectDownload(filename, project, ctx) {
   fs.rename(`${filename}.temp`, `${filename}`, function(err) {
     if ( err ) console.log('ERROR: ' + err);
   });
+  setTimeout(() => progressMap.delete(filename), 5000);
 }
 
 async function generateIndicatorDownload(filename, indicator, ctx) {
@@ -1507,6 +1515,21 @@ function getCCFilename(ctx) {
   return `${filename}.xlsx`
 }
 
+async function getFilenameFromCtx(ctx) {
+  switch (getIdType(ctx.params.id)) {
+    case 'indicator': {
+      const indicator = await Indicator.storeInstance.get(ctx.params.id);
+      return getFilename(indicator.name.en, ctx.params.minimized);
+    }
+    case 'project': {
+      const project = await Project.storeInstance.get(ctx.params.id);
+      return getFilename(project.countries.join(', '), ctx.params.minimized);
+    }
+    default:
+      return null;
+  }
+}
+
 /**
  * Checks if a file stream with the passed params for the excel export already exists.
  * Returns a the request with a message indicating the state of the file stream. 
@@ -1598,6 +1621,29 @@ router.get('/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?/file
   }
 })
 
+router.get('/export/:id/:periodicity/:lang/:minimized?/progress', async ctx => {
+  const filename = await getFilenameFromCtx(ctx);
+  if (!filename) { ctx.status = 400; return; }
+
+  if (fs.existsSync(filename)) {
+    progressMap.delete(filename);
+    ctx.status = 200;
+    ctx.body = JSON.stringify({ current: 1, total: 1, percent: 100 });
+    return;
+  }
+  const p = progressMap.get(filename);
+  ctx.status = 200;
+  if (p) {
+    ctx.body = JSON.stringify({
+      current: p.current,
+      total: p.total,
+      percent: p.total > 0 ? Math.round((p.current / p.total) * 100) : 0
+    });
+  } else {
+    ctx.body = JSON.stringify({ current: 0, total: 0, percent: 0 });
+  }
+});
+
 /** Render file containing all data entry up to a given date */
 router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
   // Get export type;
@@ -1636,6 +1682,7 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
       generateProjectDownload(filename, data, ctx)
     );
   } catch (error) {
+    progressMap.delete(filename);
     if (fs.existsSync(filename + '.temp')) {
       fs.unlinkSync(filename + '.temp', (err) => console.log(err));
     }
