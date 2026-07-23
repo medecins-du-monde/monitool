@@ -78,18 +78,19 @@ async function _subQuery(project, query, param) {
 	// Retrieve cube
 	const cacheKey = [project._id, dataSource.id, variable.id].join(":");
 	
-	if (query.refreshCache) {
-		if (_cubeCache[cacheKey]) {
-			delete _cubeCache[cacheKey];
-		}
+	if (query.refreshCache && _cubeCache[cacheKey] && !_cubeCache[cacheKey].refreshing) {
+		delete _cubeCache[cacheKey];
 	}
 
 	if (!_cubeCache[cacheKey]) {
-		console.log('newCache');
-		_cubeCache[cacheKey] = {
+		console.log('newCache', cacheKey, query.refreshCache ? '(refresh)' : '(miss)');
+		const entry = {
 			time: +new Date(),
+			refreshing: true,
 			cube: _createCube(project, dataSource, variable)
-		}
+		};
+		entry.cube.finally(() => { entry.refreshing = false; });
+		_cubeCache[cacheKey] = entry;
 	}
 
 	const cube = await _cubeCache[cacheKey].cube;
