@@ -116,7 +116,8 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
           }
           // Get the values from the existing input
           else if (input && input.values[element.id] && currentRow < numberValueRows &&  currentColumn < numberValueColumns) {
-            table[i].push(input.values[element.id][currentRow * numberValueColumns + currentColumn]);
+            const rawValue = input.values[element.id][currentRow * numberValueColumns + currentColumn];
+            table[i].push(rawValue === null || rawValue === undefined ? '' : rawValue);
           }
           // Set the total formulas
           else if (currentRow === numberValueRows || currentColumn === numberValueColumns) {
@@ -455,10 +456,10 @@ router.put('/resources/project/:id/data-source/:dataSourceId/:siteId/:period/che
         });
       }
       
-      const importCols = elementTable[0].length;
+      const importCols = Math.max(...elementTable.map(row => row.length));
 
-      if (numberCols !== importCols) {
-        logError('rows', numberRows, importCols, element.name);
+      if (importCols > numberCols) {
+        logError('cols', numberCols, importCols, element.name);
         elementErrors.push({
           error: 'Bad number of cols on table ' + element.name,
           key: 'import.error.bad-number-of-cols',
@@ -613,7 +614,8 @@ router.get('/resources/project/:id/data-source-all-sites/:dataSourceId.xlsx/:per
             }
             // Get the values from the existing input
             else if (input && input.values[element.id] && currentRow < numberValueRows &&  currentColumn < numberValueColumns) {
-              table[i].push(input.values[element.id][currentRow * numberValueColumns + currentColumn]);
+              const rawValue = input.values[element.id][currentRow * numberValueColumns + currentColumn];
+              table[i].push(rawValue === null || rawValue === undefined ? '' : rawValue);
             }
             // Set the total formulas
             else if (currentRow === numberValueRows || currentColumn === numberValueColumns) {
