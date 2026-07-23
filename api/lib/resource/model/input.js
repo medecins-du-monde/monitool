@@ -80,7 +80,7 @@ export default class Input extends DbModel {
 	_createBlankRecord(newStructure) {
 		const newLength = newStructure.reduce((m, p) => m * p.items.length, 1);
 		const newValues = new Array(newLength);
-		newValues.fill(0);
+		newValues.fill(null);
 
 		return newValues;
 	}
@@ -132,8 +132,14 @@ export default class Input extends DbModel {
 
 		let fieldIndex = 0;
 		while (fieldIndex < newValues.length) {
-			// Try to retrieve the value from the cube.
-			newValues[fieldIndex] = cube.query([], textFilter) || 0;
+			// Try to retrieve the value from the cube. cube.query() returns:
+			//  - a number (including a legitimate stored 0) if the cell existed before,
+			//  - null if the cell existed before but was never answered,
+			//  - undefined if this exact item combination did not exist in the old structure
+			//    (e.g. a brand new disaggregation item). Both cases must stay/become null,
+			//    they must NOT be coalesced into 0.
+			const queried = cube.query([], textFilter);
+			newValues[fieldIndex] = queried === undefined ? null : queried;
 
 			// Increment intFilter, textFilter and fieldIndex.
 			for (let i = newStructureLength - 1; i >= 0; --i) {

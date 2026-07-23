@@ -31,6 +31,12 @@ const queue = {};
 let subprocess;
 
 /**
+ * Timestamps of recent restarts, used to back off if the subprocess
+ * keeps crashing in a tight loop instead of refork'ing instantly every time.
+ */
+const restartTimestamps = [];
+
+/**
  * start subprocess and listen to events.
  */
 function startChild() {
@@ -66,9 +72,6 @@ function onSubprocessMessage(message) {
  * that we won't answer.
  */
 function onSubprocessExit(code) {
-	// restart subprocess.
-	startChild();
-
 	// Fail all queued messages
 	for (let msgId in queue) {
 		const queueItem = queue[msgId];
@@ -76,6 +79,18 @@ function onSubprocessExit(code) {
 		clearTimeout(queueItem.timeout);
 		delete queue[msgId];
 	}
+
+	// Back off if the subprocess keeps crashing in a tight loop, so a crash
+	// under load does not immediately refork into the same overload.
+	const now = Date.now();
+	restartTimestamps.push(now);
+	while (restartTimestamps.length > 0 && now - restartTimestamps[0] > 60 * 1000)
+		restartTimestamps.shift();
+
+	const recentRestarts = restartTimestamps.length;
+	const delay = recentRestarts > 3 ? Math.min(30000, 1000 * 2 ** (recentRestarts - 3)) : 0;
+
+	setTimeout(startChild, delay);
 }
 
 /**

@@ -38,12 +38,12 @@ export default class InputStore extends Store {
 		if (typeof projectId !== 'string' || typeof dataSourceId !== 'string')
 			throw new Error('missing_parameter');
 
-		const options = {
+		const dbResult = await this._db.callList({
+			include_docs: true,
 			startkey: "input:" + projectId + ":" + dataSourceId + ":0",
 			endkey: "input:" + projectId + ":" + dataSourceId + ":g"
-		};
+		});
 
-		const dbResult = await this._db.callView('inputs_with_progress', options);
 		const project = await Project.storeInstance.get(projectId);
 		const dataSource = project.getDataSourceById(dataSourceId);
 		let count = 0;
@@ -51,10 +51,11 @@ export default class InputStore extends Store {
 			count += dataSource.structure[variableId].reduce((m, p) => m * p.items.length, 1);
 		};
 
+		let inputs = dbResult.rows.map(row => new Input(row.doc));
+
 		// Remove inputs that are no longer relevant
-		dbResult.rows = dbResult.rows.filter(row => {
-			const [siteId, period] = row.id.split(':').slice(4);
-			const timeSlot = new TimeSlot(period);
+		inputs = inputs.filter(input => {
+			const timeSlot = new TimeSlot(input.period);
 			const [startDate, endDate] = [timeSlot.firstDate.toISOString().slice(0, 10), timeSlot.lastDate.toISOString().slice(0, 10)];
 
 			return dataSource
@@ -62,19 +63,34 @@ export default class InputStore extends Store {
 				&& project.end >= startDate
 				&& (!dataSource.start || dataSource.start <= endDate)
 				&& (!dataSource.end || dataSource.end >= startDate)
-				&& dataSource.entities.includes(siteId)
-				&& dataSource.isValidSlot(period);
+				&& dataSource.entities.includes(input.entity)
+				&& dataSource.isValidSlot(input.period);
 		});
 
 		const result = {};
-		dbResult.rows.forEach(item => {
-			// Compute percentage
-			item.value.progress /= count;
-			if (item.value.progress > 1) {
-				item.value.progress = 1;
+		inputs.forEach(input => {
+			// Reshape in memory to match the CURRENT structure (does not persist),
+			// so progress is always counted against the same structure as `count`.
+			input.update(dataSource.structure);
+
+			let progress = 0;
+			for (let variableId in input.values) {
+				const values = input.values[variableId];
+				for (let i = 0; i < values.length; ++i) {
+					if (values[i] !== null) {
+						++progress;
+					}
+				}
 			}
+
+			// Compute percentage
+			progress = count ? progress / count : 0;
+			if (progress > 1) {
+				progress = 1;
+			}
+
 			// Set result
-			result[item.id] = item.value
+			result[input._id] = { progress: progress, blocked: input.blocked ? true : false };
 		});
 		return result;
 	}
