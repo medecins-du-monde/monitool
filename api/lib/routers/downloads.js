@@ -1821,12 +1821,29 @@ router.get("/export/users", async (ctx) => {
   // get all users from the database
   const users = await User.storeInstance.list();
 
+  // get all projects (lightweight view, no full doc load) to compute per-project roles
+  const { rows: projectRows } = await Project.storeInstance._db.callView('projects_short', {});
+  const projects = projectRows.map((row) => row.value);
+
+  // for each user, build the list of projects they belong to, with their role in each
+  const userProjectMemberships = new Map();
+  projects.forEach((project) => {
+    (project.users || []).forEach((u) => {
+      if (u.type !== 'internal') return;
+      if (!userProjectMemberships.has(u.id)) userProjectMemberships.set(u.id, []);
+      userProjectMemberships.get(u.id).push({ name: project.name, role: u.role });
+    });
+  });
+  userProjectMemberships.forEach((memberships) =>
+    memberships.sort((a, b) => a.name.localeCompare(b.name))
+  );
+
   // get language from the request
   const lang = ctx.request.query.lang || lang;
 
   // Translations
   const headers = {
-    en: ["User", "Email", "Type", "Name", "Role", "Last connection", 'Deleted'],
+    en: ["User", "Email", "Type", "Name", "Role", "Last connection", 'Deleted', 'Projects', 'Project roles'],
     es: [
       "Usuario",
       "Correo electrónico",
@@ -1835,8 +1852,16 @@ router.get("/export/users", async (ctx) => {
       "Rol",
       "Última conexión",
       'Eliminado',
+      'Proyectos',
+      'Roles en los proyectos',
     ],
-    fr: ["Utilisateur", "E-mail", "Type", "Nom", "Rôle", "Dernière connexion", 'Supprimé'],
+    fr: ["Utilisateur", "E-mail", "Type", "Nom", "Rôle", "Dernière connexion", 'Supprimé', 'Projets', 'Rôles dans les projets'],
+  };
+
+  const roleLabel = {
+    en: { owner: 'Owner', read: 'Read only', input: 'Data entry' },
+    es: { owner: 'Proprietario', read: 'Consulta unicamente', input: 'Entrada de datos' },
+    fr: { owner: 'Propriétaire', read: 'Consultation uniquement', input: 'Saisisseur' },
   };
 
   // create the excel file
@@ -1895,6 +1920,8 @@ router.get("/export/users", async (ctx) => {
     { width: 10 },
     { width: 25 },
     { width: 10 },
+    { width: 30 },
+    { width: 20 },
   ];
 
   // add the data
@@ -1918,7 +1945,20 @@ router.get("/export/users", async (ctx) => {
       lastLogin,
       !users[i].active ? yesNo[lang].true : yesNo[lang].false,
     ]);
+
+    // add one collapsed sub-row per project this user belongs to
+    const memberships = userProjectMemberships.get(users[i]._id) || [];
+    memberships.forEach((membership) => {
+      const row = worksheet.addRow([
+        undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+        membership.name,
+        roleLabel[lang][membership.role],
+      ]);
+      row.outlineLevel = 1;
+      row.hidden = true;
+    });
   }
+
   // write the file
   await workbook.xlsx.writeFile("users.xlsx");
   ctx.set("Content-disposition", "attachment; filename=users.xlsx");
