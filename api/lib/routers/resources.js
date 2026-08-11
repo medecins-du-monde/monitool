@@ -176,11 +176,11 @@ router.put('/resources/project/:id', async ctx => {
 		delete project._rev;
 		project.users = [{type: "internal", id: ctx.state.user._id, role: "owner"}];
 
-		if (ctx.request.query.with_data == 'true'){
-			project.name = 'CLONE STRUCTURE & DATA - ' + project.name;
-		} else{
-			project.name = 'CLONE STRUCTURE - ' + project.name;
-		}
+		project.clonedAt = new Date().toISOString();
+		project.clonedBy = ctx.state.user._id;
+		project.clonedByName = ctx.state.user.name;
+		project.clonedWithData = ctx.request.query.with_data === 'true';
+
 		await project.save();
 		Project.storeInstance.invalidateProjectsCache();
 
