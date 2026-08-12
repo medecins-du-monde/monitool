@@ -151,10 +151,20 @@ export default class ProjectStore extends Store {
 		if (typeof userId !== 'string')
 			throw new Error('missing_parameter');
 
+		// Cache the in-flight promise, not just its resolved value: a rejected query (eg. CouchDB
+		// timing out while rebuilding a view index) must not stay cached forever, or every request
+		// keeps re-awaiting the same dead promise until the process restarts. Clearing the cache on
+		// rejection lets the next call retry against CouchDB instead.
 		if (!_projectsShortCache)
-			_projectsShortCache = this._db.callView('projects_short', {});
+			_projectsShortCache = this._db.callView('projects_short', {}).catch(error => {
+				_projectsShortCache = null;
+				throw error;
+			});
 		if (!_inputsUpdatedAtCache)
-			_inputsUpdatedAtCache = this._db.callView('inputs_updated_at', { group: true });
+			_inputsUpdatedAtCache = this._db.callView('inputs_updated_at', { group: true }).catch(error => {
+				_inputsUpdatedAtCache = null;
+				throw error;
+			});
 
 		const [mainResult, updatedAtResult] = await Promise.all([_projectsShortCache, _inputsUpdatedAtCache]);
 		let projects = mainResult.rows.map(row => Object.assign({}, row.value));
