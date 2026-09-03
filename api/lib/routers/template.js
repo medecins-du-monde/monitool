@@ -5,6 +5,9 @@ import Project from '../resource/model/project';
 const router = new Router();
 const Excel = require('exceljs');
 const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const crypto = require('crypto');
 
 const header = {
   // gray background
@@ -41,7 +44,7 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
       site = project.entities.find(ent => ent.id === ctx.params.siteId);
     }
 
-    // Set filename;
+    // Human-readable filename, used only for the Content-disposition header.
     let filename = truncateString(project.name, 25) + ' - ' + truncateString(dataSource.name || 'data-source', 25);
 
     if (input) {
@@ -50,12 +53,12 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
       filename += ' template.xlsx';
     }
 
-    if (fs.existsSync(filename)) {
-        fs.unlinkSync(filename, (err) => console.log(err));
-    }
+    // Actual on-disk path: short, unique, and independent of user-controlled
+    // names, so it can never trigger a path-length error.
+    const tmpFilename = path.join(os.tmpdir(), `monitool-template-${crypto.randomBytes(16).toString('hex')}.xlsx`);
 
     // create the excel file
-    const writeStream = fs.createWriteStream(`${filename}`, { flags: 'w' });
+    const writeStream = fs.createWriteStream(tmpFilename, { flags: 'w' });
     const options = {
         stream: writeStream,
         useStyles: true,
@@ -186,12 +189,12 @@ router.get('/resources/project/:id/data-source/:dataSourceId.xlsx/:siteId?/:peri
     }
 
     await workbook.commit();
-    
+
     // check if the file already exists
-    if (fs.existsSync(filename)){
+    if (fs.existsSync(tmpFilename)){
         ctx.set('Content-disposition', 'attachment; filename=' + filename);
         ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        ctx.body = fs.createReadStream(filename);
+        ctx.body = fs.createReadStream(tmpFilename).on('close', () => fs.unlink(tmpFilename, () => {}));
     }
     else{
         ctx.status = 404;
@@ -537,7 +540,7 @@ router.get('/resources/project/:id/data-source-all-sites/:dataSourceId.xlsx/:per
       }
     }
 
-    // Set filename;
+    // Human-readable filename, used only for the Content-disposition header.
     let filename = truncateString(project.name, 25) + ' - ' + truncateString(dataSource.name || 'data-source', 25);
 
     if (ctx.params.period) {
@@ -546,12 +549,12 @@ router.get('/resources/project/:id/data-source-all-sites/:dataSourceId.xlsx/:per
       filename += 'All sites template.xlsx';
     }
 
-    if (fs.existsSync(filename)) {
-        fs.unlinkSync(filename, (err) => console.log(err));
-    }
+    // Actual on-disk path: short, unique, and independent of user-controlled
+    // names, so it can never trigger a path-length error.
+    const tmpFilename = path.join(os.tmpdir(), `monitool-template-${crypto.randomBytes(16).toString('hex')}.xlsx`);
 
     // create the excel file
-    const writeStream = fs.createWriteStream(`${filename}`, { flags: 'w' });
+    const writeStream = fs.createWriteStream(tmpFilename, { flags: 'w' });
     const options = {
         stream: writeStream,
         useStyles: true,
@@ -687,12 +690,12 @@ router.get('/resources/project/:id/data-source-all-sites/:dataSourceId.xlsx/:per
     }
 
     await workbook.commit();
-    
+
     // check if the file already exists
-    if (fs.existsSync(filename)){
+    if (fs.existsSync(tmpFilename)){
         ctx.set('Content-disposition', 'attachment; filename=' + filename);
         ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        ctx.body = fs.createReadStream(filename);
+        ctx.body = fs.createReadStream(tmpFilename).on('close', () => fs.unlink(tmpFilename, () => {}));
     }
     else{
         ctx.status = 404;
