@@ -173,10 +173,17 @@ export default class ProjectStore extends Store {
 		if (visibleIds)
 			projects = projects.filter(p => visibleIds.has(p._id));
 
+		// Resolve the current name of the project each clone was made from, for the "Cloned" badge.
+		// Built from the ACL-filtered list, so a parent the user cannot see resolves to null and the
+		// card omits the link rather than leaking a project name. Reads from the already-cached view,
+		// so this costs no extra query.
+		const namesById = new Map(projects.map(p => [p._id, p.name]));
+
 		projects.forEach(p => {
 			const updatedAt = updatedAtResult.rows.find(row => row.key === p._id);
 			p.inputDate = updatedAt ? updatedAt.value : null;
 			p.users = p.users.filter(u => u.id === userId);
+			p.clonedFromName = p.clonedFrom ? namesById.get(p.clonedFrom) || null : null;
 		});
 
 		// Text filter: match name, region, or country/continent codes and full names (all languages)
@@ -217,6 +224,37 @@ export default class ProjectStore extends Store {
 			const tierB = favoriteProjectIds.has(b._id) ? 0 : b.users.some(u => u.role === 'owner') ? 1 : 2;
 			return tierA - tierB || a.name.localeCompare(b.name);
 		});
+
+		// Keep a cloned project next to the project it was cloned from, without otherwise changing
+		// the favorite / owner / alphabetical ordering above. clonedFrom is preserved across saves
+		// (see the project save route), so the pairing lasts as long as the "Cloned" badge does.
+		const present = new Set(projects.map(p => p._id));
+		const childrenByParent = new Map();
+		for (const p of projects) {
+			if (p.clonedFrom && p.clonedFrom !== p._id && present.has(p.clonedFrom)) {
+				if (!childrenByParent.has(p.clonedFrom))
+					childrenByParent.set(p.clonedFrom, []);
+				childrenByParent.get(p.clonedFrom).push(p);
+			}
+		}
+		if (childrenByParent.size) {
+			const isChild = new Set();
+			for (const arr of childrenByParent.values())
+				for (const c of arr)
+					isChild.add(c._id);
+
+			const ordered = [];
+			const append = p => {
+				ordered.push(p);
+				for (const c of childrenByParent.get(p._id) || [])
+					append(c);
+			};
+			for (const p of projects)
+				if (!isChild.has(p._id))
+					append(p);
+
+			projects = ordered;
+		}
 
 		const total = projects.length;
 

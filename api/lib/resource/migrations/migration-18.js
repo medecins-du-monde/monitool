@@ -1,6 +1,9 @@
 import database from "../database";
 
-/** Add clone metadata to the projects_short view, so the "Cloned" badge can be shown in the project list */
+/**
+ * Add clone metadata to the projects_short view: clonedAt/clonedBy/clonedByName/clonedWithData
+ * drive the "Cloned" badge, and clonedFrom lets the project list show a clone next to its parent.
+ */
 export default async () => {
   const ddoc = await database.get('_design/monitool');
 
@@ -23,7 +26,8 @@ export default async () => {
                   clonedAt: doc.clonedAt,
                   clonedBy: doc.clonedBy,
                   clonedByName: doc.clonedByName,
-                  clonedWithData: doc.clonedWithData
+                  clonedWithData: doc.clonedWithData,
+                  clonedFrom: doc.clonedFrom
               });
           }
       }.toString()

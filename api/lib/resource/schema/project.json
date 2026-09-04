@@ -44,6 +44,7 @@
     "clonedBy": { "type": "string", "pattern": "^user:[a-z0-9A-Z\\.\\-\\_]+$" },
     "clonedByName": { "type": "string" },
     "clonedWithData": { "type": "boolean" },
+    "clonedFrom": { "type": "string", "pattern": "^project:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$" },
 
     "entities": {
       "type": "array",

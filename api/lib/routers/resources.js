@@ -180,6 +180,7 @@ router.put('/resources/project/:id', async ctx => {
 		project.clonedBy = ctx.state.user._id;
 		project.clonedByName = ctx.state.user.name;
 		project.clonedWithData = ctx.request.query.with_data === 'true';
+		project.clonedFrom = ctx.request.query.from;
 
 		await project.save();
 		Project.storeInstance.invalidateProjectsCache();
@@ -228,6 +229,19 @@ router.put('/resources/project/:id', async ctx => {
 			let isAllowed = u.type === 'user' && (u.role === 'admin' || u.role === 'project');
 			if (!isAllowed)
 				throw new Error('forbidden');
+		}
+
+		// Clone metadata is server-owned: the client never sends it back, so carry it over from the
+		// stored document. Editing a project must not clear the "Cloned" badge, nor the clone's
+		// pinned position under its parent in the project list. The delete branch also stops a
+		// client from inventing clone metadata on a project that never had any.
+		if (oldProject) {
+			for (const field of ['clonedAt', 'clonedBy', 'clonedByName', 'clonedWithData', 'clonedFrom']) {
+				if (oldProject[field] !== undefined)
+					ctx.request.body[field] = oldProject[field];
+				else
+					delete ctx.request.body[field];
+			}
 		}
 
 		const newProject = new Project(ctx.request.body);
