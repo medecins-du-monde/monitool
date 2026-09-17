@@ -166,9 +166,9 @@ router.put('/resources/project/:id', async ctx => {
 				throw error;
 		}
 
-		// Let fetch the origin project, and check that our user can access it legally
+		// Let fetch the origin project, and check that our user can access it legally (admins can access all projects)
 		const project = await Project.storeInstance.get(ctx.request.query.from);
-		if (project.visibility === 'private' && !project.users.find(u => u.id === ctx.state.user._id))
+		if (project.visibility === 'private' && u.role !== 'admin' && !project.users.find(pu => pu.id === u._id))
 			throw new Error('forbidden');
 
 		// Clone the project
