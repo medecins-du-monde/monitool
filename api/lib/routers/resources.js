@@ -460,7 +460,7 @@ router.put('/resources/:modelName(indicator|theme|user)/:id', async ctx => {
 	// Save the model.
 	const Model = {indicator: Indicator, theme: Theme, user: User}[ctx.params.modelName];
 	const model = new Model(ctx.request.body);
-	model.save();
+	await model.save();
 
 	ctx.response.body = model.toAPI();
 })

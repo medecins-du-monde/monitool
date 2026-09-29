@@ -17,6 +17,7 @@
 
 import Router from 'koa-router';
 import child_process from 'child_process';
+import {reportVersion} from '../export/changes';
 
 const router = new Router();
 
@@ -111,7 +112,7 @@ export async function queryReportingSubprocess(query) {
 	const msgId = Math.random().toString().substring(2);
 
 	// Send it to the reporting process.
-	const msgSent = subprocess.send({messageId: msgId, query: query});
+	const msgSent = subprocess.send({messageId: msgId, query: Object.assign({}, query, {sourceVersion: reportVersion(query.projectId)})});
 	if (!msgSent)
 		throw new Error('Reporting server not available');
 

@@ -126,3 +126,58 @@ load_shards_from_disk,1,[{file,"src/mem3_shards.erl"},{line,370}]},
 [{file,"src/couch_event_..."},...]},...]}},...}} 
 at couch_event_listener:do_event/3(line:150) in context child_terminated
 ```
+
+
+### General Report Excel cache
+
+Project-level detailed, global and current-view Excel exports share a backend file cache.
+The default is **10 completed workbooks per project**, expiring **24 hours after generation**.
+The least recently downloaded workbook is evicted first. Download requests update a persisted
+last-download timestamp; status checks and cache lookups do not. Files never downloaded (including
+legacy metadata without a download timestamp) use their generation time for eviction. Expiration
+remains measured from generation. The General Report FAQs describe this behavior without deployment settings.
+
+| Environment variable | Default | Purpose |
+| --- | --- | --- |
+| `MONITOOL_EXPORT_CACHE_DIR` | `/tmp/monitool-exports` | Dedicated writable cache directory |
+| `MONITOOL_EXPORT_CACHE_MAX_FILES` | `10` | Positive maximum completed workbooks per project |
+| `MONITOOL_EXPORT_CACHE_TTL_HOURS` | `24` | Positive expiration period, measured from generation |
+| `MONITOOL_EXPORT_CACHE_MAX_BYTES` | `0` | Optional global workbook byte limit; zero disables it |
+
+These settings belong to the Docker deployment, not the application’s administrator interface.
+The Compose templates mount a named `export_cache` volume at `/var/cache/monitool-exports`.
+Use a dedicated directory and **one API process per cache volume**: generation deduplication
+and file eviction are coordinated in that process. Multiple replicas would require a shared
+job lock and cache index before using the same volume. Temporary generation files need additional
+free space beyond the completed-file limits. Existing country-based files from the previous export
+implementation are not reused; they can be removed during deployment after active downloads finish.
+
+Cache keys include the full project ID, export mode, language, periodicity and normalized date/site
+filters. The frontend passes those same criteria to generation, progress, check and file requests.
+Current-view exports additionally hash their submitted rows, headings and indentation; they remain
+snapshots of the displayed report, so refresh the report to include changes made since it was displayed.
+Multi-project indicator/cross-cutting exports are outside this project-level cache policy.
+
+Successful project/input writes (including bulk imports, clones and deletions) invalidate all
+exports for the affected project. Shared indicator or theme changes conservatively invalidate all
+project exports. Calculation-cache versions change at the same time. Jobs whose source changes during
+generation cannot publish their output. Project access is checked on every cached request.
+
+A persisted CouchDB changes checkpoint is replayed at startup and before cache access, covering writes
+made while the API was stopped or through other database clients. A minute-based sweep expires files
+and replays changes even when there are no downloads. An absent checkpoint invalidates persisted files;
+if CouchDB is unavailable, downloads fail rather than serving files with unverified freshness.
+To reset the cache after replacing/restoring a database, stop the API, empty the dedicated cache directory,
+then restart. Do not point two environments/databases at the same cache volume.
+
+Global sizing: the per-project count does not bound total storage across projects. Estimate required
+space as `active projects × 10 × representative workbook size`, plus headroom for temporary files.
+Measure directory size (`du -sh /var/cache/monitool-exports`) and workbook sizes on the deployment volume
+before agreeing a global budget with MdM. No production sizing data is available in this repository,
+so the global limit is configurable but disabled by default. When enabled, it evicts completed files
+across projects by last download time; an individual export larger than the entire budget fails with HTTP 507.
+A database outage or filesystem failure is surfaced
+as an export error; regeneration failures are not cached.
+
+Verification: `cd api && npm run test:export` runs isolated cache, checkpoint and Excel route tests
+without a live CouchDB or reporting subprocess. `npm run build` verifies backend compilation.

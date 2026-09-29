@@ -18,6 +18,7 @@
 import nano from 'nano';
 import winston from 'winston';
 import config from '../config/config';
+import {changes} from '../export/changes';
 import migrations from './migrations/index';
 
 
@@ -191,7 +192,9 @@ class Database {
 	 * @return {Array}
 	 */
 	async callBulk(options) {
-		return this.database.bulk(options);
+		const results = await this.database.bulk(options);
+		results.filter(result => !result.error).forEach(result => changes.emit('changed', result.id));
+		return results;
 	}
 
 	/**
@@ -206,13 +209,16 @@ class Database {
 	async insert(doc) {
 		const result = await this.database.insert(doc);
 		doc._rev = result.rev;
+		changes.emit('changed', result.id || doc._id);
 	}
 
 	async destroy(id, rev) {
 		if (typeof id !== 'string' || typeof rev !== 'string')
 			throw new Error('invalid call to destroy.');
 
-		return this.database.destroy(id, rev);
+		const result = await this.database.destroy(id, rev);
+		changes.emit('changed', id);
+		return result;
 	}
 }
 

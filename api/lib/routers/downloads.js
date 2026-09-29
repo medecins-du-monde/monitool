@@ -9,10 +9,13 @@ import Indicator from '../resource/model/indicator';
 import User from '../resource/model/user';
 import { continentList, countryList } from '../utils/iso-countries';
 import Theme from '../resource/model/theme';
+import exportCache from '../export';
+import {digest} from '../export/cache';
+import {projectCriteria, normalizeFilters, intersectFilters} from '../export/criteria';
 
 const router = new Router();
 const progressMap = new Map();
-let lang = 'es';
+
 
 
 let blueFill = [
@@ -38,7 +41,7 @@ let blueFill = [
   },
 ]
 
-let sectionHeader = {
+const defaultSectionHeader = {
   // gray background
   fill: {
     type: 'pattern',
@@ -113,11 +116,16 @@ const errorTranslations = {
   }
 }
 
-let dateColumn = [];
+
 
 // Call the database and get the computed values
 // Add the name of the indicator to the result of the computation
 async function indicatorToRow(ctx, projectId, computation, name, baseline=null, target=null, filter){
+  const dateColumn = ctx.dateColumn;
+  filter = intersectFilters(filter, ctx.exportFilters);
+  if (filter._start && filter._end && filter._start > filter._end) {
+    return {name, baseline, target};
+  }
   const query = {
 		projectId: projectId,
 		computation: computation,
@@ -153,6 +161,7 @@ async function indicatorToRow(ctx, projectId, computation, name, baseline=null, 
     }
     // Here are the various reported on the excel export
     catch (err){
+      if (!err.message || /^Reporting server/.test(err.message)) throw err;
       // if this is the case, instead of the results we add an a custom error message
       if (err.message == "invalid dimensionId") {
         result[dateColumn[0]] = "This data is not available by " + ctx.params.periodicity;
@@ -375,7 +384,9 @@ function buildFormulas(indicator, project){
   return newLines;
 }
 
-function buildWorksheet(workbook, name) {
+function buildWorksheet(workbook, name, ctx) {
+  const dateColumn = ctx.dateColumn;
+  const lang = ctx.params.lang;
   // Cleaning the name replacing all special characters by a space
   name = name.replace(/[\/\\\?\*\[\]:]|(^')|('$)/g, ' ').slice(0, 31);
 
@@ -496,6 +507,7 @@ function getIdType(id) {
 }
 
 async function generateProjectDownload(filename, project, ctx) {
+  const sectionHeader = JSON.parse(JSON.stringify(defaultSectionHeader));
 
   // iterate over all the logical frame layers and puts all indicators in the same list
   // an indicator is being represented by its name and computation
@@ -716,21 +728,21 @@ async function generateProjectDownload(filename, project, ctx) {
   }
 
   // creates a list for the names of the columns based on the periodicity received as a parameter
-  dateColumn = Array.from(
+  ctx.dateColumn = Array.from(
     timeSlotRange(
       TimeSlot.fromDate(
-        new Date(project.start + "T00:00:00Z"),
+        new Date((ctx.exportFilters._start || project.start) + "T00:00:00Z"),
         ctx.params.periodicity
       ),
       TimeSlot.fromDate(
-        new Date(project.end + "T00:00:00Z"),
+        new Date((ctx.exportFilters._end || project.end) + "T00:00:00Z"),
         ctx.params.periodicity
       )
     )
   ).map((ts) => ts.value);
 
   // create the excel file
-  const writeStream = fs.createWriteStream(`${filename}.temp`, { flags: 'w' });
+  const writeStream = fs.createWriteStream(filename, { flags: 'w' });
   const options = {
     stream: writeStream,
     useStyles: true,
@@ -739,7 +751,7 @@ async function generateProjectDownload(filename, project, ctx) {
 
   let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
 
-  let worksheet = buildWorksheet(workbook, "Global");
+  let worksheet = buildWorksheet(workbook, "Global", ctx);
 
   // combine all the lists into one
   let allCompleteIndicators = [].concat(
@@ -750,8 +762,8 @@ async function generateProjectDownload(filename, project, ctx) {
   );
 
   const _indicatorCount = allCompleteIndicators.filter(i => i.computation !== undefined).length;
-  const _entityCount = ctx.params.minimized ? 0 : project.entities.length;
-  progressMap.set(filename, { current: 0, total: _indicatorCount * (1 + _entityCount) });
+  const _entityCount = ctx.params.minimized ? 0 : project.entities.filter(site => !ctx.exportFilters.entity || ctx.exportFilters.entity.includes(site.id)).length;
+  progressMap.set(ctx.exportKey, { current: 0, total: _indicatorCount * (1 + _entityCount) });
 
   sectionHeader.fill.fgColor.argb = "999999";
 
@@ -780,7 +792,7 @@ async function generateProjectDownload(filename, project, ctx) {
         indicator.target,
         indicator.filter
       );
-      const _p1 = progressMap.get(filename); if (_p1) _p1.current++;
+      const _p1 = progressMap.get(ctx.exportKey); if (_p1) _p1.current++;
       // Dump all the data into Excel
       row = worksheet.addRow(res);
 
@@ -858,13 +870,13 @@ async function generateProjectDownload(filename, project, ctx) {
 
   if (!ctx.params.minimized) {
     // iterates over the sites
-    for (let site of project.entities) {
+    for (let site of project.entities.filter(site => !ctx.exportFilters.entity || ctx.exportFilters.entity.includes(site.id))) {
       // creating a tab for each site
 
       // Cleaning the name replacing all special characters by a space
       site.name = site.name.replace(/[\/\\\?\*\[\]:]|(^')|('$)/g, ' ').slice(0, 31);
 
-      let newWorksheet = buildWorksheet(workbook, site.name);
+      let newWorksheet = buildWorksheet(workbook, site.name, ctx);
 
       // create a custom filter to get only the data relate to that specific site
       let customFilter = { entity: [site.id] };
@@ -883,9 +895,9 @@ async function generateProjectDownload(filename, project, ctx) {
             e.display,
             e.baseline,
             e.target,
-            customFilter
+            intersectFilters(e.filter, customFilter)
           );
-          const _p2 = progressMap.get(filename); if (_p2) _p2.current++;
+          const _p2 = progressMap.get(ctx.exportKey); if (_p2) _p2.current++;
           row = newWorksheet.addRow(res);
 
           siteMaxLength = Math.max(siteMaxLength, res.name.length);
@@ -945,13 +957,11 @@ async function generateProjectDownload(filename, project, ctx) {
 
   await workbook.commit();
 
-  fs.rename(`${filename}.temp`, `${filename}`, function(err) {
-    if ( err ) console.log('ERROR: ' + err);
-  });
-  setTimeout(() => progressMap.delete(filename), 5000);
+  progressMap.delete(ctx.exportKey);
 }
 
 async function generateIndicatorDownload(filename, indicator, ctx) {
+  const sectionHeader = JSON.parse(JSON.stringify(defaultSectionHeader));
   const relatedProjects = await Project.storeInstance.listByIndicator(indicator._id, true);
 
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
@@ -994,7 +1004,7 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
   }
   
   // creates a list for the names of the columns based on the periodicity received as a parameter
-  dateColumn = Array.from(
+  ctx.dateColumn = Array.from(
     timeSlotRange(
       TimeSlot.fromDate(
         earliestStart,
@@ -1017,7 +1027,7 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
 
   let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
 
-  let worksheet = buildWorksheet(workbook, "Global");
+  let worksheet = buildWorksheet(workbook, "Global", ctx);
 
   sectionHeader.fill.fgColor.argb = "999999";
 
@@ -1127,7 +1137,7 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
       // Cleaning the name replacing all special characters by a space
       let countryTab =  `${(project.countries || []).join(', ')} - ${project.name}`.replace(/[\/\\\?\*\[\]:]|(^')|('$)/g, ' ').slice(0, 30);
 
-      let newWorksheet = buildWorksheet(workbook, countryTab);
+      let newWorksheet = buildWorksheet(workbook, countryTab, ctx);
       
       let projectComputation = null;
       let projectBaseline = null;
@@ -1145,7 +1155,7 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
       }
 
       // creates a list for the names of the columns based on the periodicity received as a parameter
-      dateColumn = Array.from(
+      ctx.dateColumn = Array.from(
         timeSlotRange(
           TimeSlot.fromDate(
             projectStart,
@@ -1534,6 +1544,61 @@ async function getFilenameFromCtx(ctx) {
  * Checks if a file stream with the passed params for the excel export already exists.
  * Returns a the request with a message indicating the state of the file stream. 
  */
+function authorizeProject(ctx, projectId) {
+  if (!ctx.visibleProjectIds.has(projectId)) ctx.throw(403, 'forbidden');
+}
+
+function sendExport(ctx, entry, filename) {
+  ctx.set('Cache-Control', 'private, no-store');
+  ctx.set('Content-disposition', 'attachment; filename=' + filename);
+  ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  ctx.body = exportCache.stream(entry);
+}
+
+// Keep legacy indicator exports separate from project-level General Report caching.
+async function handleProjectExport(ctx, next) {
+  if (getIdType(ctx.params.id) !== 'project') return next();
+  const projectId = ctx.params.id;
+  authorizeProject(ctx, projectId);
+  const criteria = projectCriteria(ctx.params, ctx.query);
+  const key = exportCache.key(projectId, criteria);
+  ctx.set('Cache-Control', 'private, no-store');
+  if (ctx.params.action) {
+    const entry = await exportCache.lookup(projectId, criteria);
+    if (ctx.params.action === 'file') {
+      if (!entry) ctx.throw(404, 'File expired or was evicted');
+      const project = await Project.storeInstance.get(projectId);
+      // The project lookup yields: recheck freshness before opening the file.
+      const current = await exportCache.lookup(projectId, criteria);
+      if (!current) ctx.throw(404, 'File expired or was evicted');
+      sendExport(ctx, current, getFilename(project.countries.join(', '), criteria.type === 'global'));
+    } else if (ctx.params.action === 'check') {
+      ctx.body = {message: entry ? 'done' : 'not done'};
+    } else {
+      const progress = progressMap.get(key) || {current: 0, total: 0};
+      ctx.body = entry ? {current: 1, total: 1, percent: 100} : Object.assign({}, progress, {
+        percent: progress.total ? Math.round(progress.current / progress.total * 100) : 0
+      });
+    }
+    return;
+  }
+  const result = await exportCache.getOrGenerate(projectId, criteria, async temporary => {
+    const project = await Project.storeInstance.get(projectId);
+    const exportContext = {
+      params: Object.assign({}, ctx.params, {minimized: criteria.type === 'global'}),
+      exportFilters: criteria.filters,
+      exportKey: key
+    };
+    try { await generateProjectDownload(temporary, project, exportContext); }
+    finally { progressMap.delete(key); }
+  });
+  ctx.set('X-Export-Cache', result.cached ? 'HIT' : 'MISS');
+  ctx.body = {message: 'done', cached: result.cached};
+}
+
+router.get('/export/:id/:periodicity/:lang/:minimized?/:action(check|file|progress)', handleProjectExport);
+router.get('/export/:id/:periodicity/:lang/:minimized?', handleProjectExport);
+
 router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
   let filename;
 
@@ -1737,9 +1802,7 @@ router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", as
   ctx.body = '{ "message": "done" }';
 });
 
-router.post('/export/currentView', async (ctx) => {
-  // get body from request
-  const body = ctx.request.body;
+async function generateCurrentView(body) {
 
   // paddings from the original table will be used to indent the rows
   // and determine the fill/outline level
@@ -1750,7 +1813,7 @@ router.post('/export/currentView', async (ctx) => {
     if (value === undefined) return '';
     if (col === 'Name') return '    '.repeat(paddings[index]) + value;
     // remove all dots from numbers
-    return value.replace(/\./g, '');
+    return typeof value === 'string' ? value.replace(/\./g, '') : value;
   });
 
   // create the excel file
@@ -1765,8 +1828,8 @@ router.post('/export/currentView', async (ctx) => {
     const padding = paddings[i];
     row.outlineLevel = padding > 2 ? (padding - 1) / 2 + 1: padding;
     if (padding === 0) {
-      row.font = sectionHeader.font;
-      row.fill = sectionHeader.fill;
+      row.font = defaultSectionHeader.font;
+      row.fill = defaultSectionHeader.fill;
     }
     maxLength = Math.max(maxLength, data[i].Name.length || 0);
   }
@@ -1798,13 +1861,36 @@ router.post('/export/currentView', async (ctx) => {
     { state: "frozen", xSplit: 1, ySplit: 0, activeCell: "A1" },
   ];
   
-  // final name will be monitool-<country>.xlsx, this will be done in the frontend
-  await workbook.xlsx.writeFile('currViewReport.xlsx');
-  ctx.set('Content-disposition', 'attachment; filename=currViewReport.xlsx');
-  ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  const stream = fs.createReadStream('currViewReport.xlsx');
-  ctx.status = 200;
-  ctx.body = stream;
+  return workbook;
+}
+
+router.post('/export/currentView', async ctx => {
+  const body = ctx.request.body;
+  if (!Array.isArray(body.data) || !Array.isArray(body.headers) || !Array.isArray(body.paddings)) {
+    ctx.throw(400, 'Invalid current-view export');
+  }
+  if (typeof body.projectId === 'string' && body.projectId.startsWith('project:')) {
+    authorizeProject(ctx, body.projectId);
+    const criteria = {
+      type: 'current-view', language: body.language,
+      periodicity: body.periodicity, filters: normalizeFilters(body.filters),
+      // Never share a client-supplied snapshot with a different set of rows or headings.
+      content: digest({data: body.data, paddings: body.paddings, headers: body.headers})
+    };
+    await exportCache.getOrGenerate(body.projectId, criteria, async temporary => {
+      const workbook = await generateCurrentView(body);
+      await workbook.xlsx.writeFile(temporary);
+    });
+    const entry = await exportCache.lookup(body.projectId, criteria);
+    if (!entry) ctx.throw(409, 'Project changed during export; please retry');
+    sendExport(ctx, entry, 'currViewReport.xlsx');
+  } else {
+    // Multi-project indicator snapshots are outside the project cache policy.
+    if (!body.indicatorId || !body.indicatorId.startsWith('indicator:')) ctx.throw(400, 'Missing export project');
+    const workbook = await generateCurrentView(body);
+    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    ctx.body = await workbook.xlsx.writeBuffer();
+  }
 });
 
 /** Export of users */
@@ -1839,7 +1925,7 @@ router.get("/export/users", async (ctx) => {
   );
 
   // get language from the request
-  const lang = ctx.request.query.lang || lang;
+  const lang = ctx.request.query.lang || 'es';
 
   // Translations
   const headers = {
@@ -1908,8 +1994,8 @@ router.get("/export/users", async (ctx) => {
   const headerRow = worksheet.addRow(headers[lang]);
 
   // set the styles for the header
-  headerRow.font = sectionHeader.font;
-  headerRow.fill = sectionHeader.fill;
+  headerRow.font = defaultSectionHeader.font;
+  headerRow.fill = defaultSectionHeader.fill;
 
   // set the width of the columns
   worksheet.columns = [
