@@ -118,6 +118,33 @@
 					}
 				}
 			}
+		},
+		"exportCache": {
+			"type": "object",
+			"required": [
+				"directory",
+				"maxFiles",
+				"ttlMs",
+				"maxBytes"
+			],
+			"properties": {
+				"directory": {
+					"type": "string",
+					"minLength": 1
+				},
+				"maxFiles": {
+					"type": "integer",
+					"minimum": 1
+				},
+				"ttlMs": {
+					"type": "number",
+					"minimum": 1
+				},
+				"maxBytes": {
+					"type": "integer",
+					"minimum": 0
+				}
+			}
 		}
 	}
 }

@@ -78,7 +78,8 @@ async function _subQuery(project, query, param) {
 	// Retrieve cube
 	const cacheKey = [project._id, dataSource.id, variable.id].join(":");
 	
-	if (query.refreshCache && _cubeCache[cacheKey] && !_cubeCache[cacheKey].refreshing) {
+	if (_cubeCache[cacheKey] && (_cubeCache[cacheKey].sourceVersion !== query.sourceVersion ||
+		(query.refreshCache && !_cubeCache[cacheKey].refreshing))) {
 		delete _cubeCache[cacheKey];
 	}
 
@@ -86,6 +87,7 @@ async function _subQuery(project, query, param) {
 		console.log('newCache', cacheKey, query.refreshCache ? '(refresh)' : '(miss)');
 		const entry = {
 			time: +new Date(),
+			sourceVersion: query.sourceVersion,
 			refreshing: true,
 			cube: _createCube(project, dataSource, variable)
 		};
@@ -93,11 +95,12 @@ async function _subQuery(project, query, param) {
 		_cubeCache[cacheKey] = entry;
 	}
 
-	const cube = await _cubeCache[cacheKey].cube;
+	const entry = _cubeCache[cacheKey];
+	const cube = await entry.cube;
 
 	return {
 		cachedItem: {
-			time: _cubeCache[cacheKey].time,
+			time: entry.time,
 			key: cacheKey
 		},
 		cube: cube.query(

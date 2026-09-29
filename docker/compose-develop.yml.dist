@@ -22,7 +22,9 @@ services:
       - ../api/package.json:/app/package.json:ro
       - ../api/yarn.lock:/app/yarn.lock:ro
       - api_node_modules:/app/node_modules
+      - export_cache:/var/cache/monitool-exports
     environment:
+      MONITOOL_EXPORT_CACHE_DIR: "/var/cache/monitool-exports"
       MONITOOL_DEBUG: "TRUE"
       MONITOOL_PORT: "80"
       MONITOOL_COOKIE_SECRET: "123456789"
@@ -46,5 +48,6 @@ services:
       - couchdb_data:/opt/couchdb/data
 
 volumes:
+  export_cache:
   api_node_modules:
   couchdb_data:

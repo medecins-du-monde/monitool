@@ -34,6 +34,12 @@ const readFile = function (secret) {
 };
 
 const config = {
+	"exportCache": {
+		"directory": process.env.MONITOOL_EXPORT_CACHE_DIR || "/tmp/monitool-exports",
+		"maxFiles": Number(process.env.MONITOOL_EXPORT_CACHE_MAX_FILES || 10),
+		"ttlMs": Number(process.env.MONITOOL_EXPORT_CACHE_TTL_HOURS || 24) * 3600000,
+		"maxBytes": Number(process.env.MONITOOL_EXPORT_CACHE_MAX_BYTES || 0)
+	},
 	"debug": toBool(process.env.MONITOOL_DEBUG) || false,
 	"baseUrl": process.env.MONITOOL_BASE_URL || "http://localhost:8000",
 	"port": parseInt(process.env.MONITOOL_PORT) || 8000,

@@ -42,7 +42,7 @@ export default async (ctx, next) => {
 		await next();
 	}
 	catch (error) {
-		ctx.response.status = statusCodes[error.message] || 500;
+		ctx.response.status = statusCodes[error.message] || (error.status >= 400 && error.status <= 599 ? error.status : 500);
 
 		if (config.debug)
 			ctx.response.body = error;
