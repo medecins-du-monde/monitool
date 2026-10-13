@@ -17,7 +17,7 @@
 
 import validator from 'is-my-json-valid';
 import passwordHash from 'password-hash';
-import ProjectStore from '../store/project';
+import ProjectStore, {hidePartnerPasswords} from '../store/project';
 import DbModel from './db-model';
 import LogicalFrame from './logical-frame';
 import DataSource from './data-source';
@@ -189,7 +189,8 @@ export default class Project extends DbModel {
 					return;
 
 				var oldUser = oldProject.users.find(u => u.username === newUser.username);
-				newUser.password = oldUser.password;
+				if (oldUser)
+					newUser.password = oldUser.password;
 			});
 		}
 		catch (error) {
@@ -208,6 +209,7 @@ export default class Project extends DbModel {
 			delete oldProject._rev;
 			oldProject._id = 'rev:' + oldProject._id + ':' + time;
 			oldProject.type = 'rev:project';
+			hidePartnerPasswords(oldProject);
 
 			if (user)
 				oldProject.modifiedBy = user._id || ('partner:' + user.username);

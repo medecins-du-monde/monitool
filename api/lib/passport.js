@@ -21,6 +21,7 @@ import OAuth2Strategy from 'passport-oauth2';
 import passwordHash from 'password-hash';
 
 import User from './resource/model/user';
+import Project from './resource/model/project';
 import config from './config/config';
 
 const LocalStrategy = LocalStrategyModule.Strategy;
@@ -60,6 +61,11 @@ passport.deserializeUser(function(id, done) {
 
 		userPromise
 			.then(function(user) {
+				// Sessions live in the cookie: a deactivated account must be refused on every request,
+				// not only at login.
+				if (user.active === false)
+					return done(null, false);
+
 				// Upgrade user to administrator if specified in the configuration file.
 				if ('user:' + config.auth.administrator === user._id)
 					user.role = 'admin';
@@ -68,16 +74,19 @@ passport.deserializeUser(function(id, done) {
 
 				done(null, user);
 			})
-			.catch(function(error) { done(error); });
+			.catch(function(error) { endSessionIfMissing(error, done); });
 	}
 	else if (type === 'partner') {
 		User.storeInstance
 			.getPartner(id.substring('partner:'.length))
-			.then(function(user) { 
+			.then(async function(user) {
+				if (!await partnerProjectIsActive(user))
+					return done(null, false);
+
 				updateLastLogin(user);
 				done(null, user);
 			})
-			.catch(function(error) { done(error); });
+			.catch(function(error) { endSessionIfMissing(error, done); });
 	}
 	else
 		throw new Error('Invalid user.');
@@ -204,14 +213,17 @@ if (config.auth.providers.azureAD) {
 passport.use('partner_local', new LocalStrategy(
 	function(username, password, done) {
 		User.storeInstance.getPartner(username).then(
-			function(partner) {
+			async function(partner) {
 				if (typeof(partner.active) !== "undefined" && !partner.active)
 					return done(null, false);
 				if (!passwordHash.verify(password, partner.password))
 					return done(null, false);
+				if (!await partnerProjectIsActive(partner))
+					return done(null, false);
 
 				done(null, partner)
-			},
+			}
+		).catch(
 			function(error) {
 				if (error.message === 'missing')
 					return done(null, false);
@@ -244,6 +256,31 @@ if (config.auth.providers.training) {
 }
 
 export default passport;
+
+/**
+ * Partner accounts live inside their project: they stop working when the project is deleted.
+ */
+const partnerProjectIsActive = async (partner) => {
+	try {
+		const project = await Project.storeInstance.get(partner.projectId);
+		return project.active;
+	}
+	catch (error) {
+		if (error.message === 'missing' || error.message === 'deleted')
+			return false;
+		throw error;
+	}
+};
+
+/**
+ * Log out sessions whose account no longer exists, instead of failing every request.
+ */
+const endSessionIfMissing = (error, done) => {
+	if (error.message === 'missing' || error.message === 'deleted')
+		done(null, false);
+	else
+		done(error);
+};
 
 const updateLastLogin = async (user) => {
   try {

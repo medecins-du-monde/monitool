@@ -14,9 +14,9 @@ services:
     image: node:10
     working_dir: /app
     restart: always
+    # Do not publish 9229: "yarn run start" opens the Node debugger, which gives code execution
+    # on the server to anyone who reaches it.
     command: sh -c "yarn install --frozen-lockfile && yarn run start"
-    ports:
-      - "9229:9229"
     volumes:
       - ../api/lib:/app/lib:ro
       - ../api/package.json:/app/package.json:ro
@@ -44,8 +44,8 @@ services:
   couchdb:
     image: couchdb:2
     restart: always
-    ports:
-      - "5984:5984"
+    # CouchDB is only reached by the API over the stack network: never publish 5984.
+    # For manual edits, query it from the server console with "docker exec" instead.
     environment:
       COUCHDB_USER: ""
       COUCHDB_PASSWORD: ""

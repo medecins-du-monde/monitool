@@ -962,7 +962,8 @@ async function generateProjectDownload(filename, project, ctx) {
 
 async function generateIndicatorDownload(filename, indicator, ctx) {
   const sectionHeader = JSON.parse(JSON.stringify(defaultSectionHeader));
-  const relatedProjects = await Project.storeInstance.listByIndicator(indicator._id, true);
+  const relatedProjects = (await Project.storeInstance.listByIndicator(indicator._id, true))
+    .filter(project => ctx.visibleProjectIds.has(project._id));
 
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
   // and add them to the list too
@@ -1266,8 +1267,9 @@ async function generateIndicatorDownload(filename, indicator, ctx) {
   });
 }
 
-async function generateCCIndicatorDownload(filename, indicators, lang, countries, continents, timeSlotStart, timeSlotEnd) {
-  const relatedProjects = await Project.storeInstance.listByIndicators(indicators);
+async function generateCCIndicatorDownload(filename, indicators, lang, countries, continents, timeSlotStart, timeSlotEnd, visibleProjectIds) {
+  const relatedProjects = (await Project.storeInstance.listByIndicators(indicators))
+    .filter(project => visibleProjectIds.has(project._id));
   // match the cross cutting id saved inside the project with the id of the global indicators in the database
   // and add them to the list too
   let completeProjects = [];
@@ -1525,27 +1527,25 @@ function getCCFilename(ctx) {
   return `${filename}.xlsx`
 }
 
-async function getFilenameFromCtx(ctx) {
-  switch (getIdType(ctx.params.id)) {
-    case 'indicator': {
-      const indicator = await Indicator.storeInstance.get(ctx.params.id);
-      return getFilename(indicator.name.en, ctx.params.minimized);
-    }
-    case 'project': {
-      const project = await Project.storeInstance.get(ctx.params.id);
-      return getFilename(project.countries.join(', '), ctx.params.minimized);
-    }
-    default:
-      return null;
-  }
-}
-
 /**
  * Checks if a file stream with the passed params for the excel export already exists.
  * Returns a the request with a message indicating the state of the file stream. 
  */
 function authorizeProject(ctx, projectId) {
   if (!ctx.visibleProjectIds.has(projectId)) ctx.throw(403, 'forbidden');
+}
+
+/**
+ * Indicator and cross-cutting exports aggregate many projects. Partners never get them, and staff
+ * only get the projects they can see, so files on disk are keyed by that set: a file generated
+ * for an admin is never served to someone with a narrower view.
+ */
+function authorizeAggregateExport(ctx) {
+  if (ctx.state.user.type !== 'user') ctx.throw(403, 'forbidden');
+}
+
+function scopedPath(ctx, filename) {
+  return `${digest([...ctx.visibleProjectIds].sort()).slice(0, 16)}-${filename}`;
 }
 
 function sendExport(ctx, entry, filename) {
@@ -1599,21 +1599,18 @@ async function handleProjectExport(ctx, next) {
 router.get('/export/:id/:periodicity/:lang/:minimized?/:action(check|file|progress)', handleProjectExport);
 router.get('/export/:id/:periodicity/:lang/:minimized?', handleProjectExport);
 
-router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
-  let filename;
+/**
+ * Legacy indicator exports. Project ids never reach these routes: handleProjectExport answers them.
+ */
+async function getIndicatorFilename(ctx) {
+  authorizeAggregateExport(ctx);
+  if (getIdType(ctx.params.id) !== 'indicator') ctx.throw(400, 'invalid_mode');
+  const indicator = await Indicator.storeInstance.get(ctx.params.id);
+  return getFilename(indicator.name.en, ctx.params.minimized);
+}
 
-  switch (getIdType(ctx.params.id)) {
-    case 'indicator':
-      const indicator = await Indicator.storeInstance.get(ctx.params.id);
-      filename = getFilename(indicator.name.en, ctx.params.minimized);
-      break;
-    case 'project':
-      const project = await Project.storeInstance.get(ctx.params.id);
-      filename = getFilename(project.countries.join(', '), ctx.params.minimized);
-      break;
-    default:
-      break;
-  }
+router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
+  const filename = scopedPath(ctx, await getIndicatorFilename(ctx));
 
   if (fs.existsSync(filename)){
     ctx.status = 200;
@@ -1629,8 +1626,8 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/check', async ctx => {
  * Returns a the request with a message indicating the state of the file stream. 
  */
 router.get('/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?/check', async ctx => {
-
-  let filename = getCCFilename(ctx);
+  authorizeAggregateExport(ctx);
+  let filename = scopedPath(ctx, getCCFilename(ctx));
 
   if (fs.existsSync(filename)){
     ctx.status = 200;
@@ -1642,27 +1639,14 @@ router.get('/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?/chec
 })
 
 router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
-  
-  let filename;
-
-  switch (getIdType(ctx.params.id)) {
-    case 'indicator':
-      const indicator = await Indicator.storeInstance.get(ctx.params.id);
-      filename = getFilename(indicator.name.en, ctx.params.minimized);
-      break;
-    case 'project':
-      const project = await Project.storeInstance.get(ctx.params.id);
-      filename = getFilename(project.countries.join(', '), ctx.params.minimized);
-      break;
-    default:
-      break;
-  }
+  const filename = await getIndicatorFilename(ctx);
+  const path = scopedPath(ctx, filename);
 
   // check if the file already exists
-  if (fs.existsSync(filename)){
+  if (fs.existsSync(path)){
     ctx.set('Content-disposition', 'attachment; filename=' + filename);
     ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    ctx.body = fs.createReadStream(filename);
+    ctx.body = fs.createReadStream(path);
   }
   else{
     ctx.status = 404;
@@ -1671,14 +1655,15 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/file', async ctx => {
 })
 
 router.get('/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?/file', async ctx => {
-  
+  authorizeAggregateExport(ctx);
   let filename = getCCFilename(ctx);
+  const path = scopedPath(ctx, filename);
 
   // check if the file already exists
-  if (fs.existsSync(filename)){
+  if (fs.existsSync(path)){
     ctx.set('Content-disposition', 'attachment; filename=' + filename);
     ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    ctx.body = fs.createReadStream(filename);
+    ctx.body = fs.createReadStream(path);
   }
   else{
     ctx.status = 404;
@@ -1687,8 +1672,7 @@ router.get('/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?/file
 })
 
 router.get('/export/:id/:periodicity/:lang/:minimized?/progress', async ctx => {
-  const filename = await getFilenameFromCtx(ctx);
-  if (!filename) { ctx.status = 400; return; }
+  const filename = scopedPath(ctx, await getIndicatorFilename(ctx));
 
   if (fs.existsSync(filename)) {
     progressMap.delete(filename);
@@ -1711,23 +1695,15 @@ router.get('/export/:id/:periodicity/:lang/:minimized?/progress', async ctx => {
 
 /** Render file containing all data entry up to a given date */
 router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
-  // Get export type;
-  const type = getIdType(ctx.params.id);
+  authorizeAggregateExport(ctx);
+  if (getIdType(ctx.params.id) !== 'indicator') ctx.throw(400, 'invalid_mode');
 
   console.log(`\nStart download for ${ctx.params.id}...\n`);
 
-  // Get data depending on the id type;
-  const data = await(
-    type === 'indicator' ?
-    Indicator.storeInstance.get(ctx.params.id) :
-    Project.storeInstance.get(ctx.params.id)
-  );
+  const data = await Indicator.storeInstance.get(ctx.params.id);
 
   // Set filename;
-  const filename = getFilename(
-    (type === 'indicator' ? data.name.en : data.countries.join(', ')),
-    ctx.params.minimized
-  );
+  const filename = scopedPath(ctx, getFilename(data.name.en, ctx.params.minimized));
 
   if (fs.existsSync(filename)) {
     fs.unlinkSync(filename, (err) => console.log(err));
@@ -1741,11 +1717,7 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
 
   // Generate file data;
   try {
-    await (
-      type === 'indicator' ?
-      generateIndicatorDownload(filename, data, ctx) :
-      generateProjectDownload(filename, data, ctx)
-    );
+    await generateIndicatorDownload(filename, data, ctx);
   } catch (error) {
     progressMap.delete(filename);
     if (fs.existsSync(filename + '.temp')) {
@@ -1762,11 +1734,12 @@ router.get("/export/:id/:periodicity/:lang/:minimized?", async (ctx) => {
 
 /** Render file containing all data entry up to a given date */
 router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", async (ctx) => {
+  authorizeAggregateExport(ctx);
 
   console.log(`\nStart download for newCrossCutting...\n`);
 
   // Set filename;
-  let filename = getCCFilename(ctx);
+  let filename = scopedPath(ctx, getCCFilename(ctx));
 
   if (fs.existsSync(filename)) {
     fs.unlinkSync(filename, (err) => console.log(err));
@@ -1796,7 +1769,7 @@ router.get("/export-newCC/:ids/:lang/:countries?/:continents?/:start?/:end?", as
     data.push(indicator);
   }
   // Generate file data;
-  await (generateCCIndicatorDownload(filename, data, ctx.params.lang, countries, continents, timeSlotStart, timeSlotEnd));
+  await (generateCCIndicatorDownload(filename, data, ctx.params.lang, countries, continents, timeSlotStart, timeSlotEnd, ctx.visibleProjectIds));
 
   console.log(`\nFile ${filename} is ready to download\n`);
   ctx.body = '{ "message": "done" }';
