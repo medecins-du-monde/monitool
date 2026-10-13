@@ -96,6 +96,9 @@ export default class ProjectStore extends Store {
 			delete doc._rev;
 			delete doc.modifiedBy;
 
+			// Revisions saved before passwords were stripped from them still hold partner hashes.
+			hidePartnerPasswords(doc);
+
 			if (i > 0)
 				diffs.push({
 					time: time,
@@ -395,6 +398,15 @@ export default class ProjectStore extends Store {
 
 }
 
+
+/**
+ * Replace partner password hashes by null, as Project.toAPI() does.
+ * History is readable by anyone who can see the project, so it must never carry them.
+ */
+export function hidePartnerPasswords(doc) {
+	if (Array.isArray(doc.users))
+		doc.users = doc.users.map(user => user.type === 'partner' ? Object.assign({}, user, {password: null}) : user);
+}
 
 function hashFunction(obj) {
 	if (typeof obj === 'string')

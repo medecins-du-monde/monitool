@@ -52,11 +52,7 @@ export async function computeReport(query) {
 	})
 
 	// Create expression to compute final result.
-	const parser = new exprEval.Parser();
-	parser.consts = {};
-	parser.binaryOps['||'] = parser.binaryOps['or'] = (a, b) => typeof a !== 'number' ? b : a;
-
-	const expression = parser.parse(query.computation.formula);
+	const expression = parseFormula(query.computation.formula);
 
 	// Merge into final result
 	const result = _mergeRec(
@@ -69,6 +65,24 @@ export async function computeReport(query) {
 	// Return a JSON string, which will be easier to cache and to send
 	// to the parent process than a deep object tree.
 	return JSON.stringify({cachedItems, items: result});
+}
+
+/**
+ * Parse an indicator formula.
+ *
+ * Formulas come from the request body, so they are untrusted: they only ever combine numeric
+ * parameters, which means member access (a.b), string literals and arrays are never needed
+ * and are refused.
+ */
+export function parseFormula(formula) {
+	if (typeof formula !== 'string' || formula.length > 1000 || /["'`\[\]\\]/.test(formula))
+		throw new Error('invalid_formula');
+
+	const parser = new exprEval.Parser({allowMemberAccess: false});
+	parser.consts = {};
+	parser.binaryOps['||'] = parser.binaryOps['or'] = (a, b) => typeof a !== 'number' ? b : a;
+
+	return parser.parse(formula);
 }
 
 async function _subQuery(project, query, param) {

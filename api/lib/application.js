@@ -41,8 +41,18 @@ app.keys = [config.cookieSecret];
 
 app.use(responseTimeMiddleware());
 
-// We use sessions & body parser
-app.use(session({maxAge: 7 * 24 * 3600 * 1000}, app));
+// TLS terminates before nginx, so Koa only sees plain HTTP: trust the configured public URL
+// instead, otherwise the session cookie could not be flagged secure.
+if (config.secureCookies)
+	app.use(async (ctx, next) => {
+		ctx.cookies.secure = true;
+		await next();
+	});
+
+// We use sessions & body parser.
+// Sessions are stored in the signed cookie itself: keep them short-lived (renewed while in use),
+// as they cannot be revoked server-side before they expire.
+app.use(session({maxAge: 12 * 3600 * 1000, renew: true, httpOnly: true, sameSite: 'lax'}, app));
 app.use(bodyParser({jsonLimit: '1mb'}));
 
 // Handle errors
