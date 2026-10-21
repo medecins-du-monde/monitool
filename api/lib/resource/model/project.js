@@ -41,7 +41,8 @@ export default class Project extends DbModel {
 
 		// Check that entity ids exist in groups, ...
 		let entityIds = data.entities.map(e => e.id),
-			dataSourceIds = data.forms.map(ds => ds.id);
+			dataSourceIds = data.forms.map(ds => ds.id),
+			logicalFrameIds = data.logicalFrames.map(lf => lf.id);
 
 		data.groups.forEach(function(group) {
 			group.members.forEach(function(entityId) {
@@ -60,6 +61,12 @@ export default class Project extends DbModel {
 			if (user.dataSources)
 				user.dataSources.forEach(function(dataSourceId) {
 					if (dataSourceIds.indexOf(dataSourceId) === -1)
+						throw new Error('invalid_data');
+				});
+
+			if (user.logicalFrames)
+				user.logicalFrames.forEach(function(logicalFrameId) {
+					if (logicalFrameIds.indexOf(logicalFrameId) === -1)
 						throw new Error('invalid_data');
 				});
 		});

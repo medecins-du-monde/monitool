@@ -95,7 +95,17 @@
                 "pattern": "^user:[a-z0-9A-Z\\.\\-\\_]+$"
               },
               "role": { "type": "string", "enum": ["owner", "read"] },
-              "name": { "type": "string", "minLength": 1 }
+              "name": { "type": "string", "minLength": 1 },
+              "logicalFrames": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/uuid" }
+              },
+              "dataSources": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/uuid" }
+              }
             }
           },
           {
@@ -112,6 +122,16 @@
                   { "type": "string", "minLength": 6 },
                   { "type": "null" }
                 ]
+              },
+              "logicalFrames": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/uuid" }
+              },
+              "dataSources": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/uuid" }
               }
             }
           },
