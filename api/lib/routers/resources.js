@@ -23,8 +23,20 @@ import Input from "../resource/model/input";
 import Project from "../resource/model/project";
 import Theme from "../resource/model/theme";
 import User from "../resource/model/user";
+import { CLONE_TAG_CONFIRMATIONS } from "../utils/clone-review";
 
 const router = new Router();
+
+/**
+ * Add the current name of the project a clone was made from, for the clone banner and history.
+ * Computed per request (never stored), and left out when the user cannot see the original.
+ */
+async function withClonedFromName(ctx, project) {
+	if (project.clonedFrom && ctx.visibleProjectIds.has(project.clonedFrom))
+		project.clonedFromName = await Project.storeInstance.getName(project.clonedFrom);
+
+	return project;
+}
 
 /**
  * Get current logged in account information
@@ -119,7 +131,7 @@ router.get('/resources/project/:id', async ctx => {
 	if (!ctx.visibleProjectIds.has(ctx.params.id))
 		throw new Error('forbidden');
 
-	ctx.response.body = project.toAPI();
+	ctx.response.body = await withClonedFromName(ctx, project.toAPI());
 });
 
 
@@ -139,6 +151,47 @@ router.get('/resources/project/:id/revisions', async ctx => {
 	ctx.response.body = revisions;
 });
 
+
+/**
+ * Retrieve what the owner of a cloned project must review before removing the Clone tag.
+ */
+router.get('/resources/project/:id/clone-review', async ctx => {
+	if (!ctx.visibleProjectIds.has(ctx.params.id))
+		throw new Error('forbidden');
+
+	const project = await Project.storeInstance.get(ctx.params.id);
+	if (!project.clonedAt)
+		throw new Error('invalid_data');
+
+	ctx.response.body = await Project.storeInstance.getCloneReview(project, ctx.visibleProjectIds);
+});
+
+/**
+ * Remove the Clone tag once the owner has reviewed the configuration of a cloned project.
+ * The clone metadata is kept for traceability. No revision is stored: the removal cannot be reverted,
+ * so it is shown on the history page from cloneFinalization rather than as a history entry.
+ */
+router.post('/resources/project/:id/remove-clone-tag', async ctx => {
+	const project = await Project.storeInstance.get(ctx.params.id);
+	if (ctx.state.user.type !== 'user' || 'owner' !== project.getRole(ctx.state.user))
+		throw new Error('forbidden');
+
+	const confirmations = (ctx.request.body && ctx.request.body.confirmations) || {};
+	if (!project.clonedAt || project.cloneFinalization || !CLONE_TAG_CONFIRMATIONS.every(c => confirmations[c] === true))
+		throw new Error('invalid_data');
+
+	const finalizedProject = new Project(Object.assign({}, project, {
+		cloneFinalization: {
+			at: new Date().toISOString(),
+			by: ctx.state.user._id,
+			byName: ctx.state.user.name || ctx.state.user._id
+		}
+	}));
+	await finalizedProject.save(true);
+	Project.storeInstance.invalidateProjectsCache();
+
+	ctx.response.body = await withClonedFromName(ctx, finalizedProject.toAPI());
+});
 
 /**
  * Save a project
@@ -181,6 +234,7 @@ router.put('/resources/project/:id', async ctx => {
 		project.clonedByName = ctx.state.user.name;
 		project.clonedWithData = ctx.request.query.with_data === 'true';
 		project.clonedFrom = ctx.request.query.from;
+		delete project.cloneFinalization; // the origin may itself be a finalized clone
 
 		await project.save();
 		Project.storeInstance.invalidateProjectsCache();
@@ -199,7 +253,7 @@ router.put('/resources/project/:id', async ctx => {
 			});
 		}
 
-		ctx.response.body = project.toAPI();
+		ctx.response.body = await withClonedFromName(ctx, project.toAPI());
 	}
 	// User is saving a project
 	else {
@@ -231,12 +285,16 @@ router.put('/resources/project/:id', async ctx => {
 				throw new Error('forbidden');
 		}
 
+		// clonedFromName is computed per response (see withClonedFromName) and never stored. Clients that
+		// round-trip a fetched project (eg. delete / restore) send it back, so drop it before validation.
+		delete ctx.request.body.clonedFromName;
+
 		// Clone metadata is server-owned: the client never sends it back, so carry it over from the
 		// stored document. Editing a project must not clear the "Cloned" badge, nor the clone's
 		// pinned position under its parent in the project list. The delete branch also stops a
 		// client from inventing clone metadata on a project that never had any.
 		if (oldProject) {
-			for (const field of ['clonedAt', 'clonedBy', 'clonedByName', 'clonedWithData', 'clonedFrom']) {
+			for (const field of ['clonedAt', 'clonedBy', 'clonedByName', 'clonedWithData', 'clonedFrom', 'cloneFinalization']) {
 				if (oldProject[field] !== undefined)
 					ctx.request.body[field] = oldProject[field];
 				else
@@ -248,7 +306,7 @@ router.put('/resources/project/:id', async ctx => {
 		await newProject.save(false, ctx.state.user);
 		Project.storeInstance.invalidateProjectsCache();
 
-		ctx.response.body = newProject.toAPI();
+		ctx.response.body = await withClonedFromName(ctx, newProject.toAPI());
 	}
 })
 
