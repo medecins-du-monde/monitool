@@ -21,6 +21,7 @@ import Indicator from '../model/indicator';
 import jsonpatch from 'fast-json-patch';
 import Theme from '../model/theme';
 import { continentList, countryList } from '../../utils/iso-countries';
+import { findSimilarProjects, normalizeName } from '../../utils/clone-review';
 
 function _toNames(entry) {
 	return ['en', 'fr', 'es'].flatMap(lang => {
@@ -96,16 +97,25 @@ export default class ProjectStore extends Store {
 			delete doc._rev;
 			delete doc.modifiedBy;
 
+			// Removing the Clone tag cannot be reverted, so it is kept out of the history: the Clone
+			// origin card on the history page reports it instead.
+			delete doc.cloneFinalization;
+
 			// Revisions saved before passwords were stripped from them still hold partner hashes.
 			hidePartnerPasswords(doc);
 
-			if (i > 0)
-				diffs.push({
-					time: time,
-					user: user,
-					backwards: compare(revisions.rows[i - 1].doc, doc),
-					forwards: compare(doc, revisions.rows[i - 1].doc)
-				});
+			if (i > 0) {
+				const forwards = compare(doc, revisions.rows[i - 1].doc);
+
+				// Skip saves that changed nothing left to show (eg. the one that removed the Clone tag).
+				if (forwards.length)
+					diffs.push({
+						time: time,
+						user: user,
+						backwards: compare(revisions.rows[i - 1].doc, doc),
+						forwards: forwards
+					});
+			}
 		}
 
 		return diffs;
@@ -138,6 +148,65 @@ export default class ProjectStore extends Store {
 			throw new Error('invalid_user');
 	}
 
+	_getProjectsShort() {
+		// Cache the in-flight promise, not just its resolved value: a rejected query (eg. CouchDB
+		// timing out while rebuilding a view index) must not stay cached forever, or every request
+		// keeps re-awaiting the same dead promise until the process restarts. Clearing the cache on
+		// rejection lets the next call retry against CouchDB instead.
+		if (!_projectsShortCache)
+			_projectsShortCache = this._db.callView('projects_short', {}).catch(error => {
+				_projectsShortCache = null;
+				throw error;
+			});
+
+		return _projectsShortCache;
+	}
+
+	/**
+	 * Current name of a project, or null if it does not exist. Reads from the cached projects_short view.
+	 */
+	async getName(projectId) {
+		const shortResult = await this._getProjectsShort();
+		const row = shortResult.rows.find(row => row.value._id === projectId);
+		return row ? row.value.name : null;
+	}
+
+	/**
+	 * Gather what the owner of a cloned project must review before removing the Clone tag:
+	 * the original project, whether the clone still carries its name, whether the original was
+	 * modified since cloning, and the active projects that look like duplicates.
+	 */
+	async getCloneReview(project, visibleIds) {
+		const shortResult = await this._getProjectsShort();
+		const projects = shortResult.rows
+			.map(row => row.value)
+			.filter(p => visibleIds.has(p._id));
+
+		const original = project.clonedFrom ? projects.find(p => p._id === project.clonedFrom) : null;
+
+		return {
+			original: original ? { _id: original._id, name: original.name, active: original.active } : null,
+			sameNameAsOriginal: !!original && normalizeName(original.name) === normalizeName(project.name),
+			originalModifiedSince: original ? await this.getModifiedSince(original._id, project.clonedAt) : null,
+			similarProjects: findSimilarProjects(project, projects)
+		};
+	}
+
+	/**
+	 * Date of the first save of a project after the given date, or null if it was not modified since.
+	 * Each save stores the previous version as rev:<projectId>:<timestamp of the save>.
+	 */
+	async getModifiedSince(projectId, date) {
+		const time = (new Date(date).getTime() + 1).toString().padStart(16, '0');
+		const result = await this._db.callList({
+			startkey: 'rev:' + projectId + ':' + time,
+			endkey: 'rev:' + projectId + ':9999999999999999',
+			limit: 1
+		});
+
+		return result.rows.length ? new Date(parseInt(result.rows[0].id.substr(-16))).toISOString() : null;
+	}
+
 	/**
 	 * Retrieve list of all projects summaries
 	 * Most fields are missing from this query (hence, it returns POJOs instead of Project's instances).
@@ -154,22 +223,13 @@ export default class ProjectStore extends Store {
 		if (typeof userId !== 'string')
 			throw new Error('missing_parameter');
 
-		// Cache the in-flight promise, not just its resolved value: a rejected query (eg. CouchDB
-		// timing out while rebuilding a view index) must not stay cached forever, or every request
-		// keeps re-awaiting the same dead promise until the process restarts. Clearing the cache on
-		// rejection lets the next call retry against CouchDB instead.
-		if (!_projectsShortCache)
-			_projectsShortCache = this._db.callView('projects_short', {}).catch(error => {
-				_projectsShortCache = null;
-				throw error;
-			});
 		if (!_inputsUpdatedAtCache)
 			_inputsUpdatedAtCache = this._db.callView('inputs_updated_at', { group: true }).catch(error => {
 				_inputsUpdatedAtCache = null;
 				throw error;
 			});
 
-		const [mainResult, updatedAtResult] = await Promise.all([_projectsShortCache, _inputsUpdatedAtCache]);
+		const [mainResult, updatedAtResult] = await Promise.all([this._getProjectsShort(), _inputsUpdatedAtCache]);
 		let projects = mainResult.rows.map(row => Object.assign({}, row.value));
 
 		// Apply ACL visibility filter before counting/slicing
@@ -230,11 +290,12 @@ export default class ProjectStore extends Store {
 
 		// Keep a cloned project next to the project it was cloned from, without otherwise changing
 		// the favorite / owner / alphabetical ordering above. clonedFrom is preserved across saves
-		// (see the project save route), so the pairing lasts as long as the "Cloned" badge does.
+		// (see the project save route), so the pairing lasts as long as the "Cloned" badge does:
+		// once the owner removes the Clone tag (cloneFinalization), the project stands on its own.
 		const present = new Set(projects.map(p => p._id));
 		const childrenByParent = new Map();
 		for (const p of projects) {
-			if (p.clonedFrom && p.clonedFrom !== p._id && present.has(p.clonedFrom)) {
+			if (p.clonedFrom && !p.cloneFinalization && p.clonedFrom !== p._id && present.has(p.clonedFrom)) {
 				if (!childrenByParent.has(p.clonedFrom))
 					childrenByParent.set(p.clonedFrom, []);
 				childrenByParent.get(p.clonedFrom).push(p);
