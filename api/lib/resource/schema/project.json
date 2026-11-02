@@ -342,6 +342,19 @@
             }
         }
       }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "url"],
+        "properties": {
+          "id": { "$ref": "#/definitions/uuid" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "url": { "type": "string", "maxLength": 2048, "pattern": "^[hH][tT][tT][pP][sS]?://[^\\s/?#]+[^\\s]*$" }
+        }
+      }
     }
   },
 
