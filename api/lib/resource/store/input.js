@@ -198,6 +198,30 @@ export default class InputStore extends Store {
 		return inputs;
 	}
 
+	/**
+	 * Retrieve an input as stored in the database, or null if there is none.
+	 * Any other failure is thrown: it must not be mistaken for "this input does not exist".
+	 */
+	async getRaw(id) {
+		try {
+			return await this._db.get(id);
+		}
+		catch (error) {
+			if (error.statusCode === 404)
+				return null;
+
+			throw error;
+		}
+	}
+
+	/**
+	 * Write documents in one request, and return the result of each document.
+	 * This is not atomic: callers must check the results.
+	 */
+	async bulkWrite(docs) {
+		return this._db.callBulk({docs});
+	}
+
 	async bulkSave(inputs) {
 		inputs = inputs.slice();
 

@@ -148,6 +148,24 @@ export default class Project extends DbModel {
 	}
 
 	/**
+	 * Tell if an account may write the input of a given site and data source.
+	 * Same rule as saving an input from the edit page: owners may write anything, input
+	 * users only their own sites and data sources, and never a locked (blocked) input.
+	 */
+	canEditInput(user, entityId, dataSourceId, isBlocked) {
+		const role = this.getRole(user);
+		if (role === 'owner')
+			return true;
+
+		const projectUser = this.getProjectUser(user);
+		return role === 'input'
+			&& !!projectUser
+			&& projectUser.entities.includes(entityId)
+			&& projectUser.dataSources.includes(dataSourceId)
+			&& !isBlocked;
+	}
+
+	/**
 	 * Validate that project does not make references to indicators and themes that don't exist.
 	 */
 	async validateForeignKeys() {

@@ -30,6 +30,7 @@ import reportingRouter from './routers/reporting';
 import resourcesRouter from './routers/resources';
 import downloadRouter from './routers/downloads';
 import templateRouter from './routers/template';
+import importRouter from './routers/import';
 
 import forceAuthenticationMiddleware from './middlewares/force-authentication';
 import responseTimeMiddleware from 'koa-response-time';
@@ -43,7 +44,7 @@ app.use(responseTimeMiddleware());
 
 // We use sessions & body parser
 app.use(session({maxAge: 7 * 24 * 3600 * 1000}, app));
-app.use(bodyParser({jsonLimit: '1mb'}));
+app.use(bodyParser({jsonLimit: '5mb'}));
 
 // Handle errors
 app.use(errorHandlerMiddleware)
@@ -65,5 +66,6 @@ app.use(resourcesRouter.routes())		// REST JSON API
 app.use(reportingRouter.routes())		// Reporting API
 app.use(downloadRouter.routes());
 app.use(templateRouter.routes());
+app.use(importRouter.routes());
 
 export default app;
