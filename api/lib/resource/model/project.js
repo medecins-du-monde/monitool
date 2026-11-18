@@ -17,7 +17,7 @@
 
 import validator from 'is-my-json-valid';
 import passwordHash from 'password-hash';
-import ProjectStore from '../store/project';
+import ProjectStore, {hidePartnerPasswords} from '../store/project';
 import DbModel from './db-model';
 import LogicalFrame from './logical-frame';
 import DataSource from './data-source';
@@ -41,7 +41,8 @@ export default class Project extends DbModel {
 
 		// Check that entity ids exist in groups, ...
 		let entityIds = data.entities.map(e => e.id),
-			dataSourceIds = data.forms.map(ds => ds.id);
+			dataSourceIds = data.forms.map(ds => ds.id),
+			logicalFrameIds = data.logicalFrames.map(lf => lf.id);
 
 		data.groups.forEach(function(group) {
 			group.members.forEach(function(entityId) {
@@ -60,6 +61,12 @@ export default class Project extends DbModel {
 			if (user.dataSources)
 				user.dataSources.forEach(function(dataSourceId) {
 					if (dataSourceIds.indexOf(dataSourceId) === -1)
+						throw new Error('invalid_data');
+				});
+
+			if (user.logicalFrames)
+				user.logicalFrames.forEach(function(logicalFrameId) {
+					if (logicalFrameIds.indexOf(logicalFrameId) === -1)
 						throw new Error('invalid_data');
 				});
 		});
@@ -207,7 +214,8 @@ export default class Project extends DbModel {
 					return;
 
 				var oldUser = oldProject.users.find(u => u.username === newUser.username);
-				newUser.password = oldUser.password;
+				if (oldUser)
+					newUser.password = oldUser.password;
 			});
 		}
 		catch (error) {
@@ -226,6 +234,7 @@ export default class Project extends DbModel {
 			delete oldProject._rev;
 			oldProject._id = 'rev:' + oldProject._id + ':' + time;
 			oldProject.type = 'rev:project';
+			hidePartnerPasswords(oldProject);
 
 			if (user)
 				oldProject.modifiedBy = user._id || ('partner:' + user.username);

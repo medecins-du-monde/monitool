@@ -28,6 +28,9 @@
 			"type": "string",
 			"minimum": 6
 		},
+		"secureCookies": {
+			"type": "boolean"
+		},
 		"couchdb": {
 			"type": "object",
 			"required": [

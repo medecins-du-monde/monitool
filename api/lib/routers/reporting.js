@@ -139,7 +139,39 @@ export async function queryReportingSubprocess(query) {
 startChild();
 
 
+/**
+ * Check the shape of a reporting request before handing it to the subprocess.
+ */
+function isValidReportingBody(body) {
+	if (!body || typeof body !== 'object')
+		return false;
+
+	const computation = body.computation;
+	if (!computation || typeof computation.formula !== 'string' || computation.formula.length > 1000)
+		return false;
+
+	if (!computation.parameters || typeof computation.parameters !== 'object')
+		return false;
+
+	const parametersAreValid = Object.values(computation.parameters).every(param =>
+		param && typeof param.elementId === 'string' &&
+		(param.filter === undefined || (param.filter && typeof param.filter === 'object'))
+	);
+
+	return parametersAreValid
+		&& Array.isArray(body.dimensionIds)
+		&& body.dimensionIds.every(id => typeof id === 'string')
+		&& (body.filter === undefined || (body.filter && typeof body.filter === 'object'));
+}
+
 router.post('/reporting/project/:prjId', async ctx => {
+	// Reporting reads every input of the project: same rule as reading the project itself.
+	if (!ctx.visibleProjectIds.has(ctx.params.prjId))
+		throw new Error('forbidden');
+
+	if (!isValidReportingBody(ctx.request.body))
+		throw new Error('invalid_data');
+
 	const query = {
 		projectId: ctx.params.prjId,
 		computation: ctx.request.body.computation,

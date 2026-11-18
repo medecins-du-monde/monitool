@@ -46,6 +46,10 @@ const config = {
 	"cookieSecret":
 		process.env.MONITOOL_COOKIE_SECRET ||
 		readFile(process.env.MONITOOL_COOKIE_SECRET_FILE),
+	// Flag the session cookie "secure" when the public URL is https (override with MONITOOL_COOKIE_SECURE).
+	"secureCookies": process.env.MONITOOL_COOKIE_SECURE !== undefined
+		? Boolean(toBool(process.env.MONITOOL_COOKIE_SECURE))
+		: (process.env.MONITOOL_BASE_URL || '').startsWith('https://'),
 
 	"couchdb": {
 		"host": process.env.MONITOOL_COUCHDB_HOST || "localhost",

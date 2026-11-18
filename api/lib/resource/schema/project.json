@@ -45,6 +45,16 @@
     "clonedByName": { "type": "string" },
     "clonedWithData": { "type": "boolean" },
     "clonedFrom": { "type": "string", "pattern": "^project:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$" },
+    "cloneFinalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "by"],
+      "properties": {
+        "at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?$" },
+        "by": { "type": "string", "pattern": "^user:[a-z0-9A-Z\\.\\-\\_]+$" },
+        "byName": { "type": "string" }
+      }
+    },
 
     "entities": {
       "type": "array",
@@ -95,7 +105,17 @@
                 "pattern": "^user:[a-z0-9A-Z\\.\\-\\_]+$"
               },
               "role": { "type": "string", "enum": ["owner", "read"] },
-              "name": { "type": "string", "minLength": 1 }
+              "name": { "type": "string", "minLength": 1 },
+              "logicalFrames": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/uuid" }
+              },
+              "dataSources": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/uuid" }
+              }
             }
           },
           {
@@ -112,6 +132,16 @@
                   { "type": "string", "minLength": 6 },
                   { "type": "null" }
                 ]
+              },
+              "logicalFrames": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/uuid" }
+              },
+              "dataSources": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/uuid" }
               }
             }
           },
@@ -310,6 +340,19 @@
               "target": { "type": "number" },
               "unit": { "type": "string" }
             }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "url"],
+        "properties": {
+          "id": { "$ref": "#/definitions/uuid" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "url": { "type": "string", "maxLength": 2048, "pattern": "^[hH][tT][tT][pP][sS]?://[^\\s/?#]+[^\\s]*$" }
         }
       }
     }
