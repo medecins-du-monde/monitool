@@ -24,10 +24,7 @@ import { continentList, countryList } from '../../utils/iso-countries';
 import { findSimilarProjects, normalizeName } from '../../utils/clone-review';
 
 function _toNames(entry) {
-	return ['en', 'fr', 'es'].flatMap(lang => {
-		const v = entry[lang];
-		return Array.isArray(v) ? v : (v ? [v] : []);
-	}).map(n => n.toLowerCase());
+	return ['en', 'fr', 'es'].reduce((names, lang) => names.concat(entry[lang] || []), []).map(n => n.toLowerCase());
 }
 const _countryNames = new Map(Object.entries(countryList).map(([code, e]) => [code, _toNames(e)]));
 const _continentNames = new Map(Object.entries(continentList).map(([code, e]) => [code, _toNames(e)]));

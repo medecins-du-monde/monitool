@@ -53,6 +53,7 @@
     "build": "./node_modules/.bin/babel lib -d dist --copy-files",
     "serve": "node dist/main-webapp.js",
     "test": "./node_modules/mocha/bin/mocha --compilers js:babel-register --recursive test",
-    "test:export": "BABEL_DISABLE_CACHE=1 ./node_modules/mocha/bin/mocha --compilers js:babel-register 'test/export/*.js'"
+    "test:export": "BABEL_DISABLE_CACHE=1 ./node_modules/mocha/bin/mocha --compilers js:babel-register 'test/export/*.js'",
+    "test:import": "BABEL_DISABLE_CACHE=1 ./node_modules/mocha/bin/mocha --compilers js:babel-register 'test/import/*.js'"
   }
 }

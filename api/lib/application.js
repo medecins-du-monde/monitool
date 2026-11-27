@@ -30,6 +30,7 @@ import reportingRouter from './routers/reporting';
 import resourcesRouter from './routers/resources';
 import downloadRouter from './routers/downloads';
 import templateRouter from './routers/template';
+import importRouter from './routers/import';
 
 import forceAuthenticationMiddleware from './middlewares/force-authentication';
 import responseTimeMiddleware from 'koa-response-time';
@@ -53,7 +54,7 @@ if (config.secureCookies)
 // Sessions are stored in the signed cookie itself: keep them short-lived (renewed while in use),
 // as they cannot be revoked server-side before they expire.
 app.use(session({maxAge: 12 * 3600 * 1000, renew: true, httpOnly: true, sameSite: 'lax'}, app));
-app.use(bodyParser({jsonLimit: '1mb'}));
+app.use(bodyParser({jsonLimit: '5mb'}));
 
 // Handle errors
 app.use(errorHandlerMiddleware)
@@ -75,5 +76,6 @@ app.use(resourcesRouter.routes())		// REST JSON API
 app.use(reportingRouter.routes())		// Reporting API
 app.use(downloadRouter.routes());
 app.use(templateRouter.routes());
+app.use(importRouter.routes());
 
 export default app;
